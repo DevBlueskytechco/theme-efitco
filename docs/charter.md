@@ -1,4 +1,6 @@
-# Charter — theme-ember (tên tạm) · bản 0.1 · 22/10/2026 · Chủ: PO
+# Charter — theme-efitco · bản 0.1 · 22/10/2026 · Chủ: PO
+
+Quyết định CTO 22/10/2026: (1) kiến trúc = Skeleton block-first, không sections/JSON template, `{% partial %}` cho vùng động; (2) dev store của team đã chạy chế độ Canvas, ADR 0002 giữ nguyên.
 
 ## Mục tiêu đo được
 1. Theme mở, sửa và publish được trong Shopify Canvas trên store thật ở tuần 11; 10 yêu cầu Sidekick mẫu đều cho ra theme check 0 lỗi.
@@ -13,13 +15,31 @@ Trong: 8 trang (home, collection, product, cart, search, blog, article, page/con
 Ngoài: app/app block, multi-market tuỳ biến, blog nâng cao, Theme Store listing, metaobject tuỳ chỉnh.
 
 ## Mốc
-Tuần 0–2 chuẩn bị (G1 cuối tuần 0, G2 cuối tuần 1, G3 cuối tuần 2) · sprint 1 tuần 3–4 · sprint 2 tuần 5–6 · sprint 3 tuần 7–8 · sprint 4 tuần 9–10 · lên Canvas store thật tuần 11 · eval tuần 13–14. Cuối mỗi sprint: zip lên ember-canvas, checklist Canvas.
+Tuần 0–2 chuẩn bị (G1 cuối tuần 0, G2 cuối tuần 1, G3 cuối tuần 2) · sprint 1 tuần 3–4 · sprint 2 tuần 5–6 · sprint 3 tuần 7–8 · sprint 4 tuần 9–10 · lên Canvas store thật tuần 11 · eval tuần 13–14. Cuối mỗi sprint: zip lên efitco-canvas, checklist Canvas.
 
 ## Ngân sách giờ (người)
 PO 40 · BA 80 · Tech Lead 100 · Designer 80 · Dev FE 220 · Dev BE 160 · QA 160 · DevOps 80 · Writer 60 = 980 giờ / 12 tuần. Token agent 2.000 USD/tháng.
 
 ## Stakeholder
-CTO (ký G1, G5, quyết tranh chấp) · 9 role owner · 2 kỹ sư AI · 2 merchant quen (phỏng vấn, UAT).
+CTO: Tony Pham — ký G1/G5, quyết tranh chấp, review 30 phút thứ Sáu; kiêm mọi vai trò khi role owner vắng.
+Kỹ sư AI lead: Mr AI Lead · Kỹ sư AI: Mr AI (toàn thời gian từ 26/10).
+
+Ngày cố định = ngày role owner chấm đầu ra agent (1 ngày/tuần, cả ngày). Xếp theo nhịp: thứ Hai tạo ticket → agent chạy → thứ Ba–Năm chấm → thứ Năm kỹ sư AI gom sửa → thứ Sáu review với CTO.
+
+| Vai trò | Role owner | Ngày cố định/tuần | Kiêm (khi vắng) |
+| --- | --- | --- | --- |
+| PO | Mr PO | Thứ Hai (planning + chấm backlog/CR) | CTO |
+| BA | Mr BA | Thứ Ba | CTO |
+| Tech Lead | Mr Tech Lead | Thứ Năm (duyệt chia task, thẩm định PR) | CTO |
+| Designer | Mr Designer | Thứ Ba | CTO |
+| Dev FE | Mr Dev FE | Thứ Tư | CTO |
+| Dev BE | Mr Dev BE | Thứ Tư | CTO |
+| QA | Mr QA | Thứ Năm | CTO |
+| DevOps | Mr DevOps | Thứ Ba | CTO |
+| Tech Writer / Support | Mr Writer | Thứ Tư | CTO |
+
+Quy ước kiêm: QA không kiêm Dev FE/BE; CTO kiêm thì chấm đúng rubric của vai đó, không tự nới ngưỡng.
+Merchant phỏng vấn/UAT: Merchant 1, Merchant 2 (chốt tuần 0).
 
 ## Rủi ro
 1. Store không được bật Canvas early access → mục 1.2 chỉ làm được bước kiến trúc. Xử lý: xin bật trước tuần 0; không có thì kéo dài, không bỏ tiêu chí.
