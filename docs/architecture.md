@@ -27,4 +27,4 @@ Ngân sách: LCP ≤ 2.0s mobile benchmark; CSS critical inline ≤ 10 KB; JS t�
 Giữ 100% cấu trúc Skeleton để Sidekick đọc được; mỗi block có `{% doc %}` đủ để agent hiểu; settings phẳng; locale key đầy đủ. ADR 0004.
 
 ## Môi trường
-yum-dev (efitco-dev) (người), hoa-qua-nhap-khau (efitco-ai-dev) (agent, preview per branch), efitco-canvas (store thật bật Canvas, chỉ DevOps người upload zip). CI: theme check → preview → lhci → playwright.
+yum-dev (efitco-dev) (người), hoa-qua-nhap-khau (efitco-ai-dev) (agent, preview per branch), yum-dev (store người, đã có Canvas) (store thật bật Canvas, chỉ DevOps người upload zip). CI: theme check → preview → lhci → playwright.

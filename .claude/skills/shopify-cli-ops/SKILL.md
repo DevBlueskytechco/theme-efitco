@@ -7,4 +7,4 @@ description: Lệnh Shopify CLI dùng trong CI/preview cho store dev, có json o
 - Cập nhật cùng theme: `shopify theme push --theme <id> --json`.
 - Liệt kê để dọn: `shopify theme list --json`; theme `ai-*` quá 7 ngày → ghi danh sách vào ticket, người xoá.
 - Check: `shopify theme check --fail-level error`; dev local: `shopify theme dev --store hoa-qua-nhap-khau (efitco-ai-dev)`.
-- Không có lệnh nào tới `efitco-canvas` hay `--live`.
+- Không có lệnh nào tới `yum-dev (store người, đã có Canvas)` hay `--live`.

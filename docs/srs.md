@@ -145,7 +145,7 @@ Là CTO, tôi muốn theme đạt ngưỡng chất lượng đo được và ch�
 - AC1 Given home/product/collection với dữ liệu benchmark When chạy lhci Then performance ≥ 96 desktop, ≥ 90 mobile; accessibility ≥ 98; CI chặn merge khi dưới ngưỡng.
 - AC2 Given toàn bộ repo When theme check Then 0 lỗi, .theme-check.yml không override; không console error trên 8 trang; không Sass, không minified, không robots.txt.liquid.
 - AC3 Given checklist Theme Store nội bộ When chạy Then nhóm bắt buộc (R4, R6–R17) pass 100%; nhóm tham khảo ghi N/A.
-- AC4 Given zip upload lên efitco-canvas When checklist Canvas Then 5 bước pass; 10 yêu cầu Sidekick mẫu cho ra theme check 0 lỗi và cấu trúc không đổi.
+- AC4 Given zip upload lên yum-dev (store người, đã có Canvas) When checklist Canvas Then 5 bước pass; 10 yêu cầu Sidekick mẫu cho ra theme check 0 lỗi và cấu trúc không đổi.
 - AC5 Given tài liệu merchant When kiểm Then 12/12 block có docs/merchant, có hướng dẫn nâng cấp theme trong Canvas.
 
 Mã R: R6 Lighthouse; R8 nhất quán; R9 trình duyệt; R10 assets; R12 a11y; Canvas 5 bước

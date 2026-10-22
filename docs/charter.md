@@ -15,7 +15,7 @@ Trong: 8 trang (home, collection, product, cart, search, blog, article, page/con
 Ngoài: app/app block, multi-market tuỳ biến, blog nâng cao, Theme Store listing, metaobject tuỳ chỉnh.
 
 ## Mốc
-Tuần 0–2 chuẩn bị (G1 cuối tuần 0, G2 cuối tuần 1, G3 cuối tuần 2) · sprint 1 tuần 3–4 · sprint 2 tuần 5–6 · sprint 3 tuần 7–8 · sprint 4 tuần 9–10 · lên Canvas store thật tuần 11 · eval tuần 13–14. Cuối mỗi sprint: zip lên efitco-canvas, checklist Canvas.
+Tuần 0–2 chuẩn bị (G1 cuối tuần 0, G2 cuối tuần 1, G3 cuối tuần 2) · sprint 1 tuần 3–4 · sprint 2 tuần 5–6 · sprint 3 tuần 7–8 · sprint 4 tuần 9–10 · lên Canvas store thật tuần 11 · eval tuần 13–14. Cuối mỗi sprint: zip lên yum-dev (store người, đã có Canvas), checklist Canvas.
 
 ## Ngân sách giờ (người) và token
 PO 40 · BA 80 · Tech Lead 100 · Designer 80 · Dev FE 220 · Dev BE 160 · QA 160 · DevOps 80 · Writer 60 = 980 giờ / 12 tuần. Token agent 2.000 USD/tháng; cảnh báo 80%, dừng 100%; chỉ CTO được nới.
@@ -42,7 +42,7 @@ Quy ước kiêm: QA không kiêm Dev FE/BE; CTO kiêm thì chấm đúng rubric
 Merchant phỏng vấn/UAT: Merchant 1, Merchant 2 (chốt tuần 0).
 
 ## Rủi ro
-1. Store không được bật Canvas early access → mục 1.2 chỉ làm được bước kiến trúc. Xử lý: xin bật trước tuần 0; không có thì kéo dài, không bỏ tiêu chí.
+1. Quyết định CTO 22/10: pha 0–1 không dùng store thật; kiểm chứng Canvas trên dev store yum-dev (đã bật Canvas) bằng cách upload zip tay. Rủi ro: hành vi dev store có thể khác store trả phí khi lên merchant thật → ghi nhận, kiểm lại ở pha 2.
 2. Skeleton đổi kiến trúc giữa chừng (đang là block-first, `{% partial %}` phụ thuộc `agentic_editor_enabled`). Xử lý: ghim commit, theo dõi repo hàng tuần, CR khi đổi.
 3. Lighthouse 96 desktop khó với ảnh hero lớn. Xử lý: ngân sách hiệu năng ở ADR 0003, đo từ sprint 1.
 4. Role owner không giữ 1 ngày/tuần. Xử lý: lịch cố định, CTO nhắc; kéo dài pha, không giảm số mẫu chấm.

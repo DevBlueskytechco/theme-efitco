@@ -1,4 +1,4 @@
-# Checklist Canvas · chạy trên efitco-canvas sau khi DevOps người upload zip
+# Checklist Canvas · chạy trên dev store yum-dev (đã bật Canvas) sau khi DevOps người upload zip (Admin → Themes → Add theme → Upload zip)
 
 | Bước | Nội dung | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Tuần 11 |
 | --- | --- | --- | --- | --- | --- | --- |
