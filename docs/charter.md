@@ -17,8 +17,8 @@ Ngoài: app/app block, multi-market tuỳ biến, blog nâng cao, Theme Store li
 ## Mốc
 Tuần 0–2 chuẩn bị (G1 cuối tuần 0, G2 cuối tuần 1, G3 cuối tuần 2) · sprint 1 tuần 3–4 · sprint 2 tuần 5–6 · sprint 3 tuần 7–8 · sprint 4 tuần 9–10 · lên Canvas store thật tuần 11 · eval tuần 13–14. Cuối mỗi sprint: zip lên efitco-canvas, checklist Canvas.
 
-## Ngân sách giờ (người)
-PO 40 · BA 80 · Tech Lead 100 · Designer 80 · Dev FE 220 · Dev BE 160 · QA 160 · DevOps 80 · Writer 60 = 980 giờ / 12 tuần. Token agent 2.000 USD/tháng.
+## Ngân sách giờ (người) và token
+PO 40 · BA 80 · Tech Lead 100 · Designer 80 · Dev FE 220 · Dev BE 160 · QA 160 · DevOps 80 · Writer 60 = 980 giờ / 12 tuần. Token agent 2.000 USD/tháng; cảnh báo 80%, dừng 100%; chỉ CTO được nới.
 
 ## Stakeholder
 CTO: Tony Pham — ký G1/G5, quyết tranh chấp, review 30 phút thứ Sáu; kiêm mọi vai trò khi role owner vắng.
