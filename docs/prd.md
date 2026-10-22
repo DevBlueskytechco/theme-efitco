@@ -1,4 +1,4 @@
-# PRD — theme-ember · bản 0.1
+# PRD — theme-efitco · bản 0.1
 
 ## Vấn đề
 Merchant nhỏ muốn tự dựng và sửa cửa hàng bằng Sidekick trong Canvas; theme bán sẵn chưa vào được Canvas (chỉ theme Shopify và custom theme). Cần một theme xây đúng kiến trúc Skeleton để Sidekick sửa tốt, đẹp theo thiết kế Efitco T10, nhanh và accessible.

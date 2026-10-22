@@ -1,11 +1,11 @@
-# theme-ember (tên tạm)
+# Efitco
 
 Theme Shopify mới cho Canvas, dựng từ Skeleton Theme commit `a7a655e79b21e68316c228dc7e437b0b32550888` (clone 22/10/2026, `.git` gốc đã bỏ). Không kế thừa code từ bất kỳ theme nào khác.
 
 - Quy tắc kiến trúc: `AGENTS.md` (giữ nguyên từ Skeleton, nguồn sự thật số 1).
 - Hướng dẫn agent và team: `CLAUDE.md`, `.claude/`.
 - Tài liệu dự án: `docs/`.
-- Lệnh: `shopify theme dev --store ember-dev` (người) · `shopify theme check` · `npx playwright test` · `npx lhci autorun`.
+- Lệnh: `shopify theme dev --store efitco-dev` (người) · `shopify theme check` · `npx playwright test` · `npx lhci autorun`.
 
 ---
 

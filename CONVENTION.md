@@ -1,9 +1,9 @@
-# Convention team — theme-ember
+# Convention team — theme-efitco
 
 Bổ sung cho AGENTS.md (AGENTS.md thắng khi mâu thuẫn).
 
 ## Nhánh và commit
-`main` (store thật / Canvas), `develop` (ember-ai-dev tổng hợp), `feature/<ticket>-<slug>` (người), `feature/ai-<ticket>` (agent), `hotfix/<ticket>`. Conventional Commits: `feat(blocks)`, `fix(css)`, `chore(ci)`, `docs(merchant)`; mã ticket trong body. PR ≤ 400 dòng; 1 approve cùng phía + Tech Lead.
+`main` (store thật / Canvas), `develop` (efitco-ai-dev tổng hợp), `feature/<ticket>-<slug>` (người), `feature/ai-<ticket>` (agent), `hotfix/<ticket>`. Conventional Commits: `feat(blocks)`, `fix(css)`, `chore(ci)`, `docs(merchant)`; mã ticket trong body. PR ≤ 400 dòng; 1 approve cùng phía + Tech Lead.
 
 ## FE / BE
 Xem `.claude/rules/fe-be-boundary.md`. JS = BE.

@@ -1,4 +1,4 @@
-# theme-ember — hướng dẫn cho mọi agent
+# theme-efitco — hướng dẫn cho mọi agent
 
 Theme Shopify mới, dựng từ Skeleton Theme commit `a7a655e79b21e68316c228dc7e437b0b32550888`. Mục tiêu: chạy trong Shopify Canvas như custom theme (Sidekick sửa trực tiếp trên file). Không nộp Theme Store, nhưng lấy Theme Store requirements làm chuẩn chất lượng nội bộ.
 

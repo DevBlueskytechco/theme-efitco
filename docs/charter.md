@@ -1,4 +1,4 @@
-# Charter — theme-ember (tên tạm) · bản 0.1 · 22/10/2026 · Chủ: PO
+# Charter — theme-efitco · bản 0.1 · 22/10/2026 · Chủ: PO
 
 Quyết định CTO 22/10/2026: (1) kiến trúc = Skeleton block-first, không sections/JSON template, `{% partial %}` cho vùng động; (2) dev store của team đã chạy chế độ Canvas, ADR 0002 giữ nguyên.
 
@@ -15,7 +15,7 @@ Trong: 8 trang (home, collection, product, cart, search, blog, article, page/con
 Ngoài: app/app block, multi-market tuỳ biến, blog nâng cao, Theme Store listing, metaobject tuỳ chỉnh.
 
 ## Mốc
-Tuần 0–2 chuẩn bị (G1 cuối tuần 0, G2 cuối tuần 1, G3 cuối tuần 2) · sprint 1 tuần 3–4 · sprint 2 tuần 5–6 · sprint 3 tuần 7–8 · sprint 4 tuần 9–10 · lên Canvas store thật tuần 11 · eval tuần 13–14. Cuối mỗi sprint: zip lên ember-canvas, checklist Canvas.
+Tuần 0–2 chuẩn bị (G1 cuối tuần 0, G2 cuối tuần 1, G3 cuối tuần 2) · sprint 1 tuần 3–4 · sprint 2 tuần 5–6 · sprint 3 tuần 7–8 · sprint 4 tuần 9–10 · lên Canvas store thật tuần 11 · eval tuần 13–14. Cuối mỗi sprint: zip lên efitco-canvas, checklist Canvas.
 
 ## Ngân sách giờ (người)
 PO 40 · BA 80 · Tech Lead 100 · Designer 80 · Dev FE 220 · Dev BE 160 · QA 160 · DevOps 80 · Writer 60 = 980 giờ / 12 tuần. Token agent 2.000 USD/tháng.
