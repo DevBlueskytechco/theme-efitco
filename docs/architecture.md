@@ -1,4 +1,4 @@
-# Kiến trúc theme-ember · Tech Lead · bản 0.1
+# Kiến trúc theme-efitco · Tech Lead · bản 0.1
 
 ## Nền
 Skeleton Theme `a7a655e79b21e68316c228dc7e437b0b32550888`, block-first: `templates/*.liquid` là composition root → `{% block 'container' %}` → block/snippet/markup. Không `sections/`, không JSON template, không presets. Chi tiết và quy tắc: `AGENTS.md` (không bàn lại).
@@ -27,4 +27,4 @@ Ngân sách: LCP ≤ 2.0s mobile benchmark; CSS critical inline ≤ 10 KB; JS t�
 Giữ 100% cấu trúc Skeleton để Sidekick đọc được; mỗi block có `{% doc %}` đủ để agent hiểu; settings phẳng; locale key đầy đủ. ADR 0004.
 
 ## Môi trường
-ember-dev (người), ember-ai-dev (agent, preview per branch), ember-canvas (store thật bật Canvas, chỉ DevOps người upload zip). CI: theme check → preview → lhci → playwright.
+efitco-dev (người), efitco-ai-dev (agent, preview per branch), efitco-canvas (store thật bật Canvas, chỉ DevOps người upload zip). CI: theme check → preview → lhci → playwright.

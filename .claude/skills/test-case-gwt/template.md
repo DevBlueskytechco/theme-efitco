@@ -6,6 +6,6 @@ Nguồn: docs/srs.md#, ticket , Figma node
 
 ## Case biên (ngoài AC)
 
-## Dữ liệu test (ember-ai-dev)
+## Dữ liệu test (efitco-ai-dev)
 
 ## KHÔNG CHẮC

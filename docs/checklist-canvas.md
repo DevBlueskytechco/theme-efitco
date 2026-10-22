@@ -1,4 +1,4 @@
-# Checklist Canvas · chạy trên ember-canvas sau khi DevOps người upload zip
+# Checklist Canvas · chạy trên efitco-canvas sau khi DevOps người upload zip
 
 | Bước | Nội dung | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Tuần 11 |
 | --- | --- | --- | --- | --- | --- | --- |

@@ -21,6 +21,6 @@
 | R17 Responsive images | srcset, lazy | Bắt buộc | mọi FE |
 | R18 Naming | 1–2 từ, không trùng Shopify | Tham khảo (không Canvas/Sidekick trong tên) | — |
 | R19 Version/release notes | version + notes | Bắt buộc (writer) | mọi sprint |
-| R20 Demo store | client transfer store | Tham khảo; thay bằng ember-ai-dev dữ liệu demo | TE-9 |
+| R20 Demo store | client transfer store | Tham khảo; thay bằng efitco-ai-dev dữ liệu demo | TE-9 |
 | R21–R22 Docs/support | tài liệu, contact form, SLA | Tham khảo; thay bằng docs/merchant + hướng dẫn Canvas | writer |
 | Canvas C1–C5 | mở được; block hiện đúng; sửa trực tiếp; Sidekick 3/10 yêu cầu; theme check sau sửa | Bắt buộc | TE-10, cuối mỗi sprint |

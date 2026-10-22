@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse Bash. Chặn mọi lệnh đụng production hoặc store ngoài ember-ai-dev.
+# PreToolUse Bash. Chặn mọi lệnh đụng production hoặc store ngoài efitco-ai-dev.
 set -euo pipefail
 INPUT=$(cat)
 CMD=$(echo "$INPUT" | jq -r '.tool_input.command // empty')
@@ -9,6 +9,6 @@ echo "$CMD" | grep -Eq 'theme (publish|delete)|theme push[^|]*--live|--allow-liv
 echo "$CMD" | grep -Eq 'git push[^|]*(origin )?(main|develop)\b' && deny "nhánh bảo vệ"
 echo "$CMD" | grep -Eq 'git push[^|]*(--force|-f\b)' && deny "force push"
 if echo "$CMD" | grep -Eq -- '--store[= ]'; then
-  echo "$CMD" | grep -Eq -- "--store[= ]*${SHOPIFY_FLAG_STORE:-ember-ai-dev}" || deny "store không phải ember-ai-dev"
+  echo "$CMD" | grep -Eq -- "--store[= ]*${SHOPIFY_FLAG_STORE:-efitco-ai-dev}" || deny "store không phải efitco-ai-dev"
 fi
 exit 0
