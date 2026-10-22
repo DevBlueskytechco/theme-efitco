@@ -1,5 +1,7 @@
 # Charter — theme-ember (tên tạm) · bản 0.1 · 22/10/2026 · Chủ: PO
 
+Quyết định CTO 22/10/2026: (1) kiến trúc = Skeleton block-first, không sections/JSON template, `{% partial %}` cho vùng động; (2) dev store của team đã chạy chế độ Canvas, ADR 0002 giữ nguyên.
+
 ## Mục tiêu đo được
 1. Theme mở, sửa và publish được trong Shopify Canvas trên store thật ở tuần 11; 10 yêu cầu Sidekick mẫu đều cho ra theme check 0 lỗi.
 2. Lighthouse trên home/product/collection: performance ≥ 96 desktop, ≥ 90 mobile; accessibility ≥ 98; bug P1/P2 = 0 khi lên Canvas.

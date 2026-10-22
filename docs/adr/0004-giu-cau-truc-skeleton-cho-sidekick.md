@@ -1,5 +1,5 @@
 # 0004. Giữ nguyên cấu trúc Skeleton để Sidekick sửa được
-Ngày: 2026-10-22 | Trạng thái: Đề xuất (G3 chấp nhận)
+Ngày: 2026-10-22 | Trạng thái: Chấp nhận (CTO 22/10/2026: xây theo Skeleton block-first; Shopify đang cập nhật docs Theme Store cho kiến trúc này)
 
 ## Bối cảnh
 Canvas/Sidekick làm việc trực tiếp trên file theme và được huấn luyện trên kiến trúc Skeleton (README: 'edited by coding agents'). Lệch cấu trúc = Sidekick sửa sai.
