@@ -1,6 +1,6 @@
 # Kiểm kê Figma Efitco T10 — trang chủ · Designer điền tuần 0 (T3)
 
-File: https://www.figma.com/design/XKbUtekvrV7t0IhhG6ox6g/Efitco-T10?node-id=1-359
+File: https://www.figma.com/design/ky78ISZjTmrnNxmYsF76Dm/Efitco-T10--Copy-?node-id=0-1 (bản copy do CTO tạo 22/10; frame Homepage nằm trong Page 1 — Designer điền node id của frame Homepage vào bảng dưới)
 
 Điền 12 dòng theo thứ tự từ trên xuống. Tên block theo thuật ngữ Shopify; map vào story.
 
