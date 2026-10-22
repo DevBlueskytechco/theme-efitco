@@ -1,0 +1,62 @@
+{
+  "permissions": {
+    "deny": [
+      "Bash(shopify theme publish*)",
+      "Bash(shopify theme delete*)",
+      "Bash(shopify theme push --live*)",
+      "Bash(shopify theme push* --live*)",
+      "Bash(git push origin main*)",
+      "Bash(git push origin develop*)",
+      "Bash(git push --force*)",
+      "Bash(rm -rf*)"
+    ],
+    "allow": [
+      "Bash(shopify theme check*)",
+      "Bash(shopify theme push --unpublished*)",
+      "Bash(npx playwright test*)",
+      "Bash(npx lhci*)",
+      "Bash(git checkout -b feature/ai-*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push origin feature/ai-*)",
+      "Bash(git diff*)",
+      "Bash(git log*)"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/scope-guard.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/no-live-push.sh"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/log-cost.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "env": {
+    "SHOPIFY_FLAG_STORE": "ember-ai-dev.myshopify.com",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+  }
+}

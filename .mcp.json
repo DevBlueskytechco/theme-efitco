@@ -1,0 +1,38 @@
+{
+  "mcpServers": {
+    "ticket": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "../ai-team/mcp/ticket_server.py"
+      ],
+      "env": {
+        "TICKET_BACKEND": "${TICKET_BACKEND:-file}",
+        "TICKET_API_TOKEN": "${TICKET_API_TOKEN:-}"
+      }
+    },
+    "store-dev": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "../ai-team/mcp/store_dev_server.py"
+      ],
+      "env": {
+        "SHOPIFY_FLAG_STORE": "ember-ai-dev.myshopify.com",
+        "SHOPIFY_CLI_THEME_TOKEN": "${SHOPIFY_CLI_THEME_TOKEN:-}"
+      }
+    },
+    "figma": {
+      "type": "stdio",
+      "command": "python3",
+      "args": [
+        "../ai-team/mcp/figma_server.py"
+      ],
+      "env": {
+        "FIGMA_TOKEN": "${FIGMA_TOKEN:-}",
+        "FIGMA_FILE_KEY": "XKbUtekvrV7t0IhhG6ox6g",
+        "FIGMA_DRAFT_PAGE": "AI drafts"
+      }
+    }
+  }
+}
