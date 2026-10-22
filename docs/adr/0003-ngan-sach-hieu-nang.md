@@ -9,7 +9,7 @@ Ngưỡng nội bộ cao hơn Theme Store nhiều; ảnh hero lớn và font là
 - B. Ngân sách cứng trong CI từ sprint 1: LCP ≤ 2.0s mobile, critical CSS ≤ 10 KB inline, JS ≤ 40 KB, ảnh hero ≤ 200 KB webp, 1 font preload, còn lại lazy. Chọn.
 
 ## Quyết định
-B, chặn merge khi dưới ngưỡng; lhci chạy desktop và mobile riêng với dữ liệu benchmark trên efitco-ai-dev.
+B, chặn merge khi dưới ngưỡng; lhci chạy desktop và mobile riêng với dữ liệu benchmark trên hoa-qua-nhap-khau (efitco-ai-dev).
 
 ## Hệ quả
 Tốt: không nợ hiệu năng. Xấu: PR FE phải kèm Lighthouse. Đo: lhci trong CI.

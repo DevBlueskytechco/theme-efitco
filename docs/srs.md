@@ -133,7 +133,7 @@ Là merchant, tôi muốn cài theme là có trang chủ hoàn chỉnh và các 
 - AC1 Given settings_data.json When cài mới Then trang chủ 12 block đúng thứ tự Figma, text mặc định có nghĩa (không Lorem Ipsum), không resource default trỏ tới thứ không tồn tại.
 - AC2 Given 404 When Then thông báo rõ + search + link home; password Then logo/shop.name, password_message, form; page.contact Then form name/email/message có validation và thông báo; gift_card Then QR ≥ 120px, mã, Apple Wallet, logo.
 - AC3 Given blog/article When Then title, image, excerpt_or_content, published_at, comments phân trang, form comment hoạt động.
-- AC4 Given store efitco-ai-dev When Then có dữ liệu demo: 24 sản phẩm (có sale, hết hàng, nhiều biến thể, gift card), 4 collection, 3 bài blog, ảnh tự do bản quyền.
+- AC4 Given store hoa-qua-nhap-khau (efitco-ai-dev) When Then có dữ liệu demo: 24 sản phẩm (có sale, hết hàng, nhiều biến thể, gift card), 4 collection, 3 bài blog, ảnh tự do bản quyền.
 
 Mã R: R7 404/password/page/blog/article/gift card; R14 default; R18 preset cùng tên theme
 
