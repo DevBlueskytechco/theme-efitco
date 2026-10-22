@@ -22,7 +22,7 @@ PO 40 · BA 80 · Tech Lead 100 · Designer 80 · Dev FE 220 · Dev BE 160 · QA
 
 ## Stakeholder
 CTO: Tony Pham — ký G1/G5, quyết tranh chấp, review 30 phút thứ Sáu; kiêm mọi vai trò khi role owner vắng.
-Kỹ sư AI lead: Mr AI Lead · Kỹ sư AI: Mr AI (toàn thời gian từ 26/10).
+Kỹ sư AI lead: Mr Trưởng Lead · Kỹ sư AI: Mr Khiêm (toàn thời gian từ 26/10).
 
 Ngày cố định = ngày role owner chấm đầu ra agent (1 ngày/tuần, cả ngày). Xếp theo nhịp: thứ Hai tạo ticket → agent chạy → thứ Ba–Năm chấm → thứ Năm kỹ sư AI gom sửa → thứ Sáu review với CTO.
 
