@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: npm i -g @shopify/cli@latest
+      - run: npm i -g @shopify/cli@4   # ghim major 4 (máy CTO + agent dùng 4.x; 3.x báo lỗi giả string[] — ES1-T10)
       - id: push
         run: |
           B=$(echo "${GITHUB_REF_NAME}" | tr '/' '-')
