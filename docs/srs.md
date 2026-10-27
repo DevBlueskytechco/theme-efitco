@@ -189,8 +189,8 @@ Là merchant, tôi muốn làm nổi bật 1 sản phẩm đang khuyến mãi c�
 
 Mã R: R8 không fake urgency; R6 Lighthouse; R12 a11y
 
-## 3. Câu hỏi mở (KHÔNG CHẮC)
-- SKU/variant: sản phẩm hết hàng ẩn khỏi featured collection hay hiện badge Sold out? Mặc định: hiện badge.
-- Cart mặc định drawer hay page? Mặc định: drawer, setting đổi.
-- Số cột collection mobile mặc định? Mặc định: 2.
-- Tên theme chính thức.
+## 3. Quyết định đã chốt (CTO 27/10/2026, trước là câu hỏi mở)
+- Hết hàng: sản phẩm vẫn hiện trong featured collection, bundle, shop the look, collection, kèm badge "Sold out"; nút thêm vào giỏ disabled. Áp cho TE-3, TE-4, TE-6, TE-12.
+- Cart: mặc định drawer (TE-5); setting `cart_type` cho đổi sang page.
+- Collection mobile: mặc định 2 cột (TE-6); setting cho chọn 1 hoặc 2.
+- Tên theme: Efitco (CTO 22/10).
