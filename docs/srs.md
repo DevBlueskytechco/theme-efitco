@@ -24,10 +24,10 @@ Là merchant, tôi muốn theme có header 2 cấp, footer, announcement bar và
 - AC2 Given menu main-menu có 2 cấp When mở header desktop Then cấp 2 hiện dropdown, mở bằng hover và keyboard (Enter/Space, Esc đóng); mobile Then drawer có accordion.
 - AC3 Given shop bật customer accounts When render header desktop và mobile Then có <shopify-account>, cart link có số lượng, search link.
 - AC4 Given setting announcement text rỗng (mặc định — Figma không có announcement bar) When render Then không có announcement bar; có text Then bar hiện trên header, có link tuỳ chọn.
-- AC5 Given token docs/tokens.json When render Then font heading Sofia Sans Condensed qua font_picker, body Inter; chữ phụ trên nền sáng dùng `--color-muted-light` #6B6B6B (≥ 4.5:1), #999999 chỉ trên nền tối.
 - AC5 Given shop bán ≥ 2 nước hoặc ngôn ngữ When render footer Then có country selector và language selector theo UX guideline Shopify; 1 nước/ngôn ngữ Then không hiện.
 - AC6 Given footer When render Then có newsletter form (customer form, thông báo thành công/lỗi), menu footer default footer, social icons từ settings, payment icons từ shop.enabled_payment_types đủ màu.
 - AC7 Given mọi trang When kiểm Then html lang = request.locale.iso_code, meta-tags snippet có title/description/canonical/og/twitter, page_image.
+- AC8 Given token docs/tokens.json When render Then font heading Sofia Sans Condensed qua font_picker, body Inter; chữ phụ trên nền sáng dùng `--color-muted-light` #6B6B6B (≥ 4.5:1), #999999 chỉ trên nền tối.
 
 Mã R: R4 menu đa cấp, newsletter, country/language, Follow on Shop, shopify-account; R7 layout; R11 SEO; R13 social; R14–R16 settings/font/màu
 

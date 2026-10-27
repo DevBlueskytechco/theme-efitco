@@ -10,7 +10,7 @@ Figma Efitco T10 có token màu/chữ/khoảng cách. Theme Store R15/R16 yêu c
 - C. Color scheme nhiều bộ như Dawn — linh hoạt nhưng nhiều setting, lệch Skeleton. Loại.
 
 ## Quyết định
-B. tokens.json là nguồn; 6 màu (background, foreground, accent, accent_foreground, muted, border), 2 font_picker (primary, heading), space scale 8 bậc từ 1 setting base, radius 3 setting.
+B. tokens.json là nguồn; màu theo docs/tokens.json (sửa 27/10 sau kiểm kê Figma): background, foreground, background_alt, background_cream, background_dark (+ foreground của mỗi nền), accent, accent_foreground, sale, sale_foreground, rating, muted, muted_light (#6B6B6B, AA), muted_on_dark (#999999 chỉ trên nền tối), border; 2 font_picker (primary, heading), space scale 8 bậc từ 1 setting base, radius 3 setting.
 
 ## Hệ quả
 Tốt: Sidekick đổi màu bằng setting. Xấu: thêm ~15 setting. Việc: Designer xuất tokens.json tuần 1; Dev FE TE-1 map. Đo: 0 màu hardcode trong CSS (grep #[0-9a-f]{3,6} ngoài css-variables).
