@@ -1,0 +1,63 @@
+KHÔNG CHẮC: (1) trust bar 4 icon (1:1107) và wordmark EFITCO 200px (1:1156) có trong Figma block 16 nhưng không có trong AC6 → để ngoài task, hỏi PO ở ticket question mới; (2) danh sách mạng social không có trong SRS/Figma inventory → tạm 6 mạng, cùng ticket hỏi PO; (3) ES1-T6 (BA) chưa trả lời — các điểm #3–#8 dưới đây là mặc định kỹ thuật, BA trả lời khác thì sửa trong task tương ứng; (4) ES1-T8 đã vào SRS thành TE-1 AC9 (commit 91b2936) → FE5/BE2 không còn chờ ES1-T8, nhưng phần trong suốt chỉ kiểm E2E được khi TE-2 hero có hook `data-header-overlay`.
+
+# ES1-T11 — Chia TE-1 Khung theme và design token thành task FE/BE
+
+Nguồn: docs/srs.md#TE-1 (AC1–AC9), docs/tokens.json, docs/figma-inventory.md block 1 (1:362) và 16 (1:1104), docs/token-compliance.md, ADR 0001–0004, drafts/qa/ES1-T5/test-cases.md (nhánh feature/ai-ES1-T5), ES1-T7, ES1-T8, ES1-T9.
+Ước lượng chốt TE-1: 20 point (FE 16, BE 4) — SRS sơ bộ 8 point là chưa tính header 2 cấp + drawer + footer đầy đủ + sticky/trong suốt. Báo PO để xếp sprint, không đổi phạm vi.
+
+## Quyết định kỹ thuật (áp cho mọi task TE-1)
+
+D1 Token → settings (trả lời ES1-T7 #1; ADR 0001 bổ sung 30/10):
+- Màu: 17 setting `color` id `color_<token>` theo docs/tokens.json `color` → biến `--color-<token>` (gạch dưới → gạch ngang): `--color-background`, `--color-foreground`, `--color-background-alt`, `--color-background-alt-foreground`, `--color-background-cream`, `--color-background-cream-foreground`, `--color-background-dark`, `--color-background-dark-foreground`, `--color-accent`, `--color-accent-foreground`, `--color-sale`, `--color-sale-foreground`, `--color-rating`, `--color-muted`, `--color-muted-light`, `--color-muted-on-dark`, `--color-border`. Bỏ `background_color`/`foreground_color` của Skeleton (settings_data đang `{}`, không mất dữ liệu).
+- Font: giữ `type_primary_font` (body, default `inter_n4`) → `--font-primary--family/--style/--weight`; thêm `type_heading_font` (default Sofia Sans Condensed 700, handle Dev FE xác nhận trong font library) → `--font-heading--family/--style/--weight`. Mỗi font 4 `font_face` swap qua `font_modify`. Preload đúng 1 file: body regular (ADR 0003).
+- Space: 1 setting `space_base` (range 2–8 px, default 4) → `--space-base`; `--space-1..8` = calc(base × 1, 2, 3, 4, 6, 8, 12, 30) = 4/8/12/16/24/32/48/120 khi base 4.
+- Radius: 4 setting theo tokens.json (không phải 3): `radius_input` 4, `radius_button` 4, `radius_card` 8, `radius_hero` 12 → `--radius-input/-button/-card/-hero`. Bỏ `input_corner_radius`, thay `--style-border-radius-inputs` trong critical.css.
+- Layout: `page_width` range px default 1416 → `--page-width`; `page_margin` giữ range default 20 → `--page-margin`.
+- Type scale: hằng số trong css-variables.liquid, không phải setting: `--text-xs` 13, `--text-sm` 14, `--text-base` 16, `--text-lg` 18, `--text-h3` 28, `--text-h2` 36, `--text-h1` 48, `--text-display` 100, `--text-wordmark` 200 (đơn vị rem; thu nhỏ mobile bằng clamp do Dev FE chọn).
+- 0 literal màu/font-family/border-radius trong `assets/*.css`, kể cả CSS demo hello-world/liquid-tips (ES1-T6 #8 — token hoá luôn, rẻ hơn chờ). Bóng đổ dùng `color-mix(in srgb, var(--color-foreground) N%, transparent)`, không `rgba()` literal.
+
+D2 Header (AC2, AC3):
+- Disclosure dùng `<details>`/`<summary>` để chạy không JS (NFR-4). Mục cấp 1 có con = `<summary>` (không phải link, ES1-T6 #3 mặc định); mục không con = `<a>`. Chỉ render 2 cấp, cấp 3 bỏ qua (AC2 "2 cấp").
+- Desktop nav ≥ 80rem; dưới 80rem dùng drawer `<details scroll-lock>` (critical.css đã có rule scroll-lock), accordion = `<details>` lồng, cho mở nhiều mục (ES1-T6 #4 mặc định).
+- JS (BE) chỉ tăng cường: hover mở/đóng, Esc đóng + trả focus, focusout đóng, đồng bộ `aria-expanded` trên summary, drawer focus trap + nút close. FE render sẵn `aria-controls` + id submenu; KHÔNG render `aria-expanded` tĩnh (sai khi không JS).
+- Tên shop/logo là `<a>`, không heading (TB-20). Logo: `image_picker` `logo` + `range` `logo_width`; chưa chọn → `shop.name`.
+- Cart link nằm trong `{% partial 'cart-count' %}` (TE-5 BE refresh), accessible name từ locale có pluralize số lượng; số 0 ẩn badge, tên vẫn đọc "0 items" (ES1-T6 #5 mặc định). Search = link `routes.search_url` (predictive là TE-8).
+- `<shopify-account>` giữ như Skeleton, testid `header-account` trên chính thẻ.
+
+D3 Announcement bar (AC4): block riêng `blocks/announcement-bar.liquid`, gọi trong `layout/theme.liquid` bằng container riêng `tag: 'div'` đặt trước container header (layout vẫn không bọc `content_for_layout`, giữ AGENTS.md). Text `strip` rỗng → block không xuất gì (ES1-T6 #6 mặc định). Có link → `<a>` bọc text.
+
+D4 Footer (AC5, AC6, AC9 phần localization):
+- 1 `link_list` `menu` default `footer`; link cấp 1 có con → cột (heading + list), không con → list phẳng — ra 2 cột Figma mà không thêm setting.
+- Newsletter `{% form 'customer' %}` + `contact[tags]=newsletter`, thành công `form.posted_successfully?`, lỗi `form.errors` + `aria-describedby`; không JS. Text heading/sub là setting `newsletter_heading` (text), `newsletter_text` (inline_richtext).
+- Localization: `{% form 'localization' %}` gộp 1 `<details>`, summary "<currency> / <LOCALE>" như Figma (AC9 thay cách tách ở AC5), mở ra 2 danh sách nút `type=submit name=country_code|language_code`. Mỗi danh sách chỉ render khi `available_*.size > 1`; cả 2 ≤ 1 → không render form. Không cần JS.
+- Social: global settings nhóm Social trong settings_schema, `url` id `social_<network>_link`; tạm 6 mạng facebook, instagram, youtube, tiktok, x, pinterest (chờ PO). Icon SVG inline trong `snippets/icon-social.liquid`, `aria-hidden`, tên mạng qua locale.
+- Payment `payment_type_svg_tag` giữ màu gốc; Follow on Shop `shop | login_button: action: 'follow'` (mã R4 của TE-1).
+
+D5 Sticky + trong suốt (AC9): setting header `sticky_header` checkbox default true. Sticky áp lên container của header bằng `.block-container:has(> .site-header)` (container Skeleton không có param class — không sửa container). Trong suốt KHÔNG thêm setting: CSS phát hiện hero đứng đầu bằng `body:has(main > :first-child [data-header-overlay])` — hook `data-header-overlay` do TE-2 đặt trên root hero; trang khác tự nhiên nền `--color-background`, chữ `--color-foreground`. Cuộn > 80px: JS gắn `data-scrolled` (IntersectionObserver trên sentinel cao 80px) → nền `--color-background`, bóng nhẹ `color-mix`, chữ `--color-foreground`. Không JS: header trong suốt vẫn hiện trên hero nhưng KHÔNG sticky (sticky của trường hợp trong suốt chỉ bật khi JS gắn `data-header-enhanced`) → không bao giờ chữ trắng trên nền trắng; trang không hero vẫn sticky nền đặc. Overlay 30% thuộc hero (TE-2 `overlay_opacity`).
+
+D6 JS file (trả lời ES1-T7 #3): `assets/header-menu.js` (custom element `header-menu`, `header-drawer`) — tên khớp route chặn trong spec TB-10; `assets/header-sticky.js` (custom element `sticky-header`). ES module, ≤ 8 KB mỗi file, nạp `type="module"` trong block header.
+
+D7 Spec E2E (trả lời ES1-T7 #2): QA merge `tests/e2e/ES1-T5.spec.ts` vào develop với `test.fixme` cho các test chưa có markup; mỗi task dưới bỏ `fixme` đúng nhóm TC của mình trong cùng PR. ES1-T3/ES1-T4 trùng phạm vi, ES1-T5 là bản duy nhất.
+
+D8 data-testid (gộp ES1-T9): dùng nguyên danh sách hợp đồng QA ES1-T5, chia theo block ở FE2/FE3/FE4. Đổi tên phải báo QA trong ticket.
+
+## Bảng task
+
+| Mã | Phía | Pt | Tên | Giải pháp | DoD | blocked_by |
+| --- | --- | --- | --- | --- | --- | --- |
+| TE-1-FE1 | FE | 3 | config/settings_schema.json + snippets/css-variables.liquid + layout/theme.liquid + assets/critical.css + assets/base.css + locales/en.default.schema.json: 17 màu, 2 font_picker, 1 space_base, 4 radius, 2 layout; type scale; 0 literal CSS | D1. css-variables xuất đủ biến D1; theme.liquid preload 1 font body; CSS hiện có chuyển hết sang var; meta-tags/lang giữ nguyên (AC7 đã đạt theo tiền kiểm QA) | `shopify theme check` 0; `grep -nE '#[0-9a-fA-F]{3,8}\b\|rgba?\(\|hsla?\(' assets/*.css` 0 dòng (trừ trong `var(`/`color-mix(` với var); `npx playwright test tests/e2e/ES1-T5.spec.ts -g "TC-0[124] \|TC-2[456] \|TC-38"` pass; `npx lhci autorun` ≥ 96/90/98 | — |
+| TE-1-FE2 | FE | 1 | blocks/announcement-bar.liquid + layout/theme.liquid + assets/critical.css + locales: 2 settings (text, link), mặc định rỗng | D3. Schema `text` default rỗng + `url`; nền `--color-background-dark`, chữ `--color-background-dark-foreground`; testid `announcement-bar`, `announcement-bar-link` | theme check 0; `npx playwright test tests/e2e/ES1-T5.spec.ts -g "TC-21"` pass với EXPECT_ANNOUNCEMENT=off/text/link; TB-04, TB-09 tay; ảnh 360/768/1280 | FE1 |
+| TE-1-FE3 | FE | 5 | blocks/header.liquid + assets/critical.css + locales/en.default.json + en.default.schema.json: 4 settings (logo, logo_width, menu default main-menu, customer_account_menu), nav 2 cấp details/summary, drawer accordion, account/search/cart-count partial, 15 data-testid (gộp ES1-T9) | D2, D8. Markup chạy đủ không JS; `{% partial 'cart-count' %}` bọc cart link; aria-controls + id; nút `header-drawer-close` render sẵn cho BE gắn; script `header-menu.js` khai báo `type=module` (file do BE1 tạo — FE chỉ thêm thẻ khi BE1 merge, hoặc BE1 thêm) | theme check 0; `npx playwright test tests/e2e/ES1-T5.spec.ts -g "TC-05\|TC-10\|TC-15\|TC-1[6-9]\|TB-05\|TB-11\|TB-13\|TB-15\|TB-20"` pass; axe TB-19 trạng thái mặc định 0 serious; lhci ≥ 96/90/98; ảnh 360/768/1280; ui-diff 1:362 | FE1 |
+| TE-1-FE4 | FE | 5 | blocks/footer.liquid + snippets/icon-social.liquid + config/settings_schema.json (nhóm Social 6 url) + assets/base.css + locales: newsletter customer form, menu default footer 2 cột, social, payment, localization gộp, Follow on Shop, 13 data-testid | D4, D8. Toàn bộ không JS; mục ngoài AC (trust bar, wordmark) không làm tới khi PO trả lời | theme check 0; `npx playwright test tests/e2e/ES1-T5.spec.ts -g "TC-2[89]\|TC-3[0-7]\|TC-31"` pass (TC-32..34 chạy tay nếu hCaptcha chặn); lhci ≥ 96/90/98; ảnh 360/768/1280; ui-diff 1:1104 trừ trust bar/wordmark | FE1 |
+| TE-1-FE5 | FE | 2 | blocks/header.liquid + assets/critical.css + locales schema: 1 setting sticky_header, sticky container :has, trong suốt khi hero đứng đầu (:has data-header-overlay), style scrolled theo data-attribute | D5. Chỉ CSS + Liquid; hook `data-header-enhanced`, `data-scrolled`, sentinel `data-testid="header-sticky-sentinel"` cho BE2; ghi hook `data-header-overlay` vào doc header để TE-2 đặt | theme check 0; /collections/all, /cart, /search: nền `--color-background`, axe color-contrast 0, TB-22 pass; tắt JS trên trang có hero: header không sticky; `sticky_header` tắt → không sticky; lhci ≥ 96/90/98, CLS không tăng; phần trong suốt E2E chạy lại khi TE-2 hero merge | FE3 |
+| TE-1-BE1 | BE | 3 | assets/header-menu.js: 2 custom element header-menu + header-drawer, hover/Esc/focusout/aria-expanded, drawer focus trap/close/Esc, ≤ 8 KB | D2, D6. Bám testid FE3; không đụng markup ngoài thêm `<script type="module">` trong header; đóng drawer khi resize ≥ 80rem; không lỗi khi menu rỗng | `npx playwright test tests/e2e/ES1-T5.spec.ts -g "TC-0[6-9]\|TC-1[1-4]\|TB-10\|TB-1[67]\|TB-19\|TB-28"` pass; file ≤ 8 KB (`wc -c assets/header-menu.js`); 0 console error; lhci ≥ 96/90/98 | FE3 |
+| TE-1-BE2 | BE | 1 | assets/header-sticky.js: 1 custom element sticky-header, IntersectionObserver sentinel 80px → data-scrolled, gắn data-header-enhanced, ≤ 8 KB | D5, D6. Không scroll listener; không chạy khi `sticky_header` tắt; transition tắt khi `prefers-reduced-motion` | Playwright: cuộn 100px → header có `data-scrolled`, nền = `--color-background`; cuộn về 0 → bỏ; TB-29 tay; JS bị chặn → không chữ trắng trên nền trắng; `wc -c` ≤ 8 KB; 0 console error; lhci ≥ 96/90/98 | FE5, BE1 |
+
+Ghi chú: trong bảng `\|` là `|` (escape markdown); lệnh nguyên văn xem body ticket con. Lệnh lhci = `npx lhci autorun` (desktop ≥ 96, mobile ≥ 90 qua lighthouserc.mobile.json, a11y ≥ 98).
+
+Ticket con: FE1 = ES1-T12 · FE2 = ES1-T13 · FE3 = ES1-T14 · FE4 = ES1-T15 · BE1 = ES1-T16 · FE5 = ES1-T17 · BE2 = ES1-T18. Câu hỏi PO: ES1-T19 (trust bar, wordmark, mạng social). ES1-T9 gộp vào FE2/FE3/FE4.
+
+Ánh xạ AC: AC1 FE1 · AC2 FE3 + BE1 · AC3 FE3 · AC4 FE2 · AC5 FE4 · AC6 FE4 · AC7 FE1 (giữ, kiểm) · AC8 FE1 · AC9 FE5 + BE2 (header), FE4 (localization), TE-2 (overlay_opacity, hook data-header-overlay). Thứ tự: FE1 → (FE2, FE3, FE4 song song) → BE1 → FE5 → BE2.
+
+## Mặc định thay cho câu hỏi còn mở (ES1-T6, BA)
+#3 mục cấp 1 có con = summary, không link; cấp 3 bỏ · #4 accordion mở nhiều, drawer có focus trap · #5 giỏ rỗng ẩn badge, accessible name có số 0; search = link · #6 text chỉ khoảng trắng = rỗng; link bọc text · #7 meta description giữ logic Skeleton, không fallback mới · #8 CSS demo token hoá trong FE1.
