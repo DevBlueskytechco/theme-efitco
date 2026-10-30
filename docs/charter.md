@@ -51,3 +51,5 @@ Merchant phỏng vấn/UAT: Merchant 1, Merchant 2 (chốt tuần 0).
 
 ## Tiêu chí thành công (G5)
 Mục tiêu 1 và 2 đạt; tài liệu merchant đủ 16 block; CTO ký.
+
+G1 — CTO Tony Pham ký 30/10/2026. Pha 0 đóng; Sprint 1 bắt đầu T2 02/11/2026.
