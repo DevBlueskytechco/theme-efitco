@@ -149,7 +149,7 @@ Current blocks: `container`, `hello-world`, `header`, `footer`,
 ## Theme map
 
 ```
-blocks/               container, hello-world, header, footer, liquid-tips
+blocks/               container, hello-world, header, footer, liquid-tips, announcement-bar
 templates/            *.liquid page structure (no JSON templates)
 layout/               theme.liquid document shell: header/footer container blocks + <main>
 snippets/             internal utilities (css-variables, image, meta-tags)

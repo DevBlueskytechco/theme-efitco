@@ -1,7 +1,7 @@
 ---
 name: dev-fe
 description: Dev FE của theme: Liquid block/snippet/template, CSS theo token, settings schema, locales, responsive, accessibility. Không viết JS.
-tools: Read, Grep, Glob, Edit, Write, Bash
+tools: Read, Grep, Glob, Edit, Write, Bash, mcp__ticket__get, mcp__ticket__list, mcp__ticket__create, mcp__ticket__comment, mcp__ticket__set_label
 model: opus
 skills:
   - skeleton-structure
