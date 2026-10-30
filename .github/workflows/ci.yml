@@ -29,10 +29,16 @@ jobs:
       - run: npm i -g @shopify/cli@4   # ghim major 4 (máy CTO + agent dùng 4.x; 3.x báo lỗi giả string[] — ES1-T10)
       - id: push
         run: |
-          B=$(echo "${GITHUB_REF_NAME}" | tr '/' '-')
-          OUT=$(shopify theme push --unpublished --json --theme "ai-$B" --path .)
-          echo "url=$(echo "$OUT" | jq -r .theme.preview_url)" >> $GITHUB_OUTPUT
-          echo "theme_id=$(echo "$OUT" | jq -r .theme.id)" >> $GITHUB_OUTPUT
+          # Nhánh PR dùng GITHUB_HEAD_REF (GITHUB_REF_NAME của PR là "15/merge")
+          B="ai-$(echo "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}" | tr '/' '-' | cut -c1-40)"
+          # Dùng lại theme preview cùng tên nếu đã có, tránh đầy giới hạn 20 theme của store
+          ID=$(shopify theme list --name "$B" --json | jq -r '.[0].id // empty')
+          if [ -n "$ID" ]; then ARGS=(--theme "$ID"); else ARGS=(--unpublished --theme "$B"); fi
+          if ! shopify theme push "${ARGS[@]}" --json --path . > push.json 2> push.err; then
+            echo "::error::theme push lỗi"; cat push.json push.err; exit 1
+          fi
+          echo "url=$(jq -r .theme.preview_url push.json)" >> "$GITHUB_OUTPUT"
+          echo "theme_id=$(jq -r .theme.id push.json)" >> "$GITHUB_OUTPUT"
   lighthouse:
     needs: preview
     runs-on: ubuntu-latest
