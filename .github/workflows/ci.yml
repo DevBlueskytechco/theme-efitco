@@ -32,13 +32,16 @@ jobs:
           # Nhánh PR dùng GITHUB_HEAD_REF (GITHUB_REF_NAME của PR là "15/merge")
           B="ai-$(echo "${GITHUB_HEAD_REF:-$GITHUB_REF_NAME}" | tr '/' '-' | cut -c1-40)"
           # Dùng lại theme preview cùng tên nếu đã có, tránh đầy giới hạn 20 theme của store
-          ID=$(shopify theme list --name "$B" --json | jq -r '.[0].id // empty')
+          shopify theme list --json > list.json || { cat list.json; exit 1; }
+          # CLI 4 có thể trả mảng hoặc object bọc mảng: chấp nhận cả hai
+          ID=$(jq -r --arg n "$B" '(if type=="array" then . else (.themes // .data // []) end) | map(select(.name==$n)) | .[0].id // empty' list.json)
           if [ -n "$ID" ]; then ARGS=(--theme "$ID"); else ARGS=(--unpublished --theme "$B"); fi
           if ! shopify theme push "${ARGS[@]}" --json --path . > push.json 2> push.err; then
             echo "::error::theme push lỗi"; cat push.json push.err; exit 1
           fi
-          echo "url=$(jq -r .theme.preview_url push.json)" >> "$GITHUB_OUTPUT"
-          echo "theme_id=$(jq -r .theme.id push.json)" >> "$GITHUB_OUTPUT"
+          cat push.json
+          echo "url=$(jq -r '(.theme // .) | .preview_url' push.json)" >> "$GITHUB_OUTPUT"
+          echo "theme_id=$(jq -r '(.theme // .) | .id' push.json)" >> "$GITHUB_OUTPUT"
   lighthouse:
     needs: preview
     runs-on: ubuntu-latest
