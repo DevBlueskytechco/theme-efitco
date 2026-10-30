@@ -1,15 +1,18 @@
 name: CI
 on:
   push:
-    branches: [develop, "feature/**"]
+    branches: [develop]   # nhánh feature chạy qua pull_request, tránh chạy 2 lần
   pull_request:
 jobs:
   theme-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: shopify/theme-check-action@v2
-        with: { token: "${{ github.token }}" }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      # Dùng CLI 4 giống máy CTO và agent; theme-check-action@v2 kéo bản cũ báo lỗi giả string[] (ES1-T10)
+      - run: npm i -g @shopify/cli@4
+      - run: shopify version && shopify theme check --fail-level error
   preview:
     needs: theme-check
     runs-on: ubuntu-latest
