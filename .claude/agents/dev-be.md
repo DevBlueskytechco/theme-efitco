@@ -1,7 +1,7 @@
 ---
 name: dev-be
 description: Dev BE của theme: toàn bộ JS trong assets/, partial rendering, logic cart/variant/search, snippet xuất JSON cho JS. Không đổi contract chưa Tech Lead duyệt.
-tools: Read, Grep, Glob, Edit, Write, Bash
+tools: Read, Grep, Glob, Edit, Write, Bash, mcp__ticket__get, mcp__ticket__list, mcp__ticket__create, mcp__ticket__comment, mcp__ticket__set_label
 model: opus
 skills:
   - skeleton-structure
