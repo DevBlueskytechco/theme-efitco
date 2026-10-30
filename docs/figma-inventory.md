@@ -58,7 +58,7 @@ Node lẻ không phải block (bỏ qua khi code): 1:360, 1:361 (rectangle nền
 
 Component instance dùng lặp: `Product name + price` (24), `Color Image`/`Color` swatch (95), `CTA Button` (9), `Menu` (14), `Lable` badge (18) → đây là 5 snippet dùng chung cần làm ở TE-1/TE-3.
 
-## Quyết định CTO (27/10/2026)
+## Quyết định CTO (27/10/2026; bổ sung 30/10: Figma giữ nguyên màu xám và 2 font lẻ — code theo tokens.json, xem docs/token-compliance.md)
 
 1. 4 block ngoài SRS (#6 quiz, #9 bundle builder, #10 countdown, #11 video demo): GIỮ như thiết kế → thêm story TE-11, TE-12, TE-13 trong docs/srs.md. Trang chủ = 16 block.
 2. Không có mobile trong Figma: Dev FE tự suy mobile; không chờ Designer.
