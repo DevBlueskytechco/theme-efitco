@@ -28,6 +28,7 @@ Là merchant, tôi muốn theme có header 2 cấp, footer, announcement bar và
 - AC6 Given footer When render Then có newsletter form (customer form, thông báo thành công/lỗi), menu footer default footer, social icons từ settings, payment icons từ shop.enabled_payment_types đủ màu.
 - AC7 Given mọi trang When kiểm Then html lang = request.locale.iso_code, meta-tags snippet có title/description/canonical/og/twitter, page_image.
 - AC8 Given token docs/tokens.json When render Then font heading Sofia Sans Condensed qua font_picker, body Inter; chữ phụ trên nền sáng dùng `--color-muted-light` #6B6B6B (≥ 4.5:1), #999999 chỉ trên nền tối.
+- AC9 (trả lời ES1-T8, Designer 30/10) Given trang chủ có hero ở đầu When render header Then header trong suốt đè lên hero, chữ/icon trắng; trang không có hero Then nền `--color-background`, chữ `--color-foreground`. Given hero có ảnh When render Then lớp phủ đen theo setting `overlay_opacity` (mặc định 30%) để chữ đạt AA. Given cuộn quá 80px When header sticky (setting `sticky_header`, mặc định bật) Then nền trắng, bóng nhẹ, chữ `--color-foreground`. Given footer When render localization Then 1 nút gộp "USD / EN" mở 2 danh sách country và language (thay cách tách 2 selector ở AC5).
 
 Mã R: R4 menu đa cấp, newsletter, country/language, Follow on Shop, shopify-account; R7 layout; R11 SEO; R13 social; R14–R16 settings/font/màu
 
