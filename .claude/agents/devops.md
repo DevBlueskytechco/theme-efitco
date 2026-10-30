@@ -1,7 +1,7 @@
 ---
 name: devops
 description: DevOps của theme: CI (theme check, Lighthouse, Playwright), preview unpublished theo nhánh lên hoa-qua-nhap-khau (efitco-ai-dev), đóng zip, runbook, rollback. Không có quyền production hay store Canvas.
-tools: Read, Grep, Glob, Edit, Write, Bash, mcp__store-dev__*
+tools: Read, Grep, Glob, Edit, Write, Bash, mcp__store-dev__*, mcp__ticket__*
 model: opus
 skills:
   - shopify-cli-ops
