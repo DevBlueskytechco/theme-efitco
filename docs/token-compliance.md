@@ -11,3 +11,9 @@ Nguồn: docs/figma-inventory.md, docs/tokens.json (22/10/2026).
 | 5 | Chữ trắng trên ảnh hero không có overlay cố định | overlay là ảnh | contrast AA | thêm setting overlay_opacity mặc định 30% | Dev FE |
 | 6 | Không có Styles/Variables trong Figma | — | Dev không bám được thay đổi | Designer tạo Color styles + Text styles theo tokens.json, đặt tên trùng token | Designer |
 | 7 | Không có mobile | chỉ 1920 | theme phải responsive | ĐÃ QUYẾT: Dev FE tự suy mobile theo skill responsive-a11y; không chờ Designer vẽ mobile. QA duyệt mobile theo convention | CTO 27/10 |
+
+## Quyết định CTO 30/10/2026 về file Figma
+- Figma giữ nguyên màu chữ #999999/#808080 và 2 font lẻ (node 1:888 Sofia Sans 800, node 1:1169 Sofia Sans Extra Condensed 800). Không sửa Figma thêm.
+- Nguồn sự thật cho code là docs/tokens.json, không phải màu đọc từ Figma: chữ phụ trên nền sáng dùng `--color-muted-light` #6B6B6B (AA), #999999 chỉ trên nền tối. Theme cho 2 setting font (heading, body); 2 layer font lẻ render bằng font heading.
+- ui-diff (Designer Agent) KHÔNG báo lệch cho 2 điểm này: màu chữ phụ #6B6B6B thay #999999/#808080, và font 2 layer trên.
+- Figma đã có 16 Color styles + 5 Text styles theo tokens.json (CTO tạo 27–30/10).
