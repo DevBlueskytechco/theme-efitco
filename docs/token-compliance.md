@@ -17,3 +17,4 @@ Nguồn: docs/figma-inventory.md, docs/tokens.json (22/10/2026).
 - Nguồn sự thật cho code là docs/tokens.json, không phải màu đọc từ Figma: chữ phụ trên nền sáng dùng `--color-muted-light` #6B6B6B (AA), #999999 chỉ trên nền tối. Theme cho 2 setting font (heading, body); 2 layer font lẻ render bằng font heading.
 - ui-diff (Designer Agent) KHÔNG báo lệch cho 2 điểm này: màu chữ phụ #6B6B6B thay #999999/#808080, và font 2 layer trên.
 - Figma đã có 16 Color styles + 5 Text styles theo tokens.json (CTO tạo 27–30/10).
+- Accent (CTO 30/10, từ ES1-T12): Figma #D94610 với chữ trắng chỉ 4.34:1 → theme dùng #C8400E (5.01:1 trên trắng, 4.55:1 trên #F4F4F4). Figma giữ nguyên; ui-diff không báo lệch màu accent.

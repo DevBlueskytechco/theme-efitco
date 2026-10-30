@@ -16,9 +16,16 @@
       },
       {
         "type": "font_picker",
+        "id": "type_heading_font",
+        "default": "sofia_sans_condensed_n7",
+        "label": "t:labels.heading_font",
+        "info": "t:info.heading_font"
+      },
+      {
+        "type": "font_picker",
         "id": "type_primary_font",
-        "default": "work_sans_n4",
-        "label": "t:general.primary"
+        "default": "inter_n4",
+        "label": "t:labels.body_font"
       }
     ]
   },
@@ -31,7 +38,7 @@
         "label": "t:labels.page_width",
         "options": [
           {
-            "value": "90rem",
+            "value": "91rem",
             "label": "t:options.page_width.narrow"
           },
           {
@@ -39,7 +46,7 @@
             "label": "t:options.page_width.wide"
           }
         ],
-        "default": "90rem"
+        "default": "91rem"
       },
       {
         "type": "range",
@@ -50,23 +57,21 @@
         "unit": "px",
         "label": "t:labels.page_margin",
         "default": 20
-      }
-    ]
-  },
-  {
-    "name": "t:general.colors",
-    "settings": [
-      {
-        "type": "color",
-        "id": "background_color",
-        "default": "#FFFFFF",
-        "label": "t:labels.background"
       },
       {
-        "type": "color",
-        "id": "foreground_color",
-        "default": "#333333",
-        "label": "t:labels.foreground"
+        "type": "range",
+        "id": "space_base",
+        "min": 2,
+        "max": 8,
+        "step": 1,
+        "unit": "px",
+        "label": "t:labels.space_base",
+        "info": "t:info.space_base",
+        "default": 4
+      },
+      {
+        "type": "header",
+        "content": "t:general.corner_radius"
       },
       {
         "type": "range",
@@ -77,6 +82,157 @@
         "unit": "px",
         "label": "t:labels.input_corner_radius",
         "default": 4
+      },
+      {
+        "type": "range",
+        "id": "button_corner_radius",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "t:labels.button_corner_radius",
+        "default": 4
+      },
+      {
+        "type": "range",
+        "id": "card_corner_radius",
+        "min": 0,
+        "max": 24,
+        "step": 1,
+        "unit": "px",
+        "label": "t:labels.card_corner_radius",
+        "default": 8
+      },
+      {
+        "type": "range",
+        "id": "hero_corner_radius",
+        "min": 0,
+        "max": 40,
+        "step": 1,
+        "unit": "px",
+        "label": "t:labels.hero_corner_radius",
+        "default": 12
+      }
+    ]
+  },
+  {
+    "name": "t:general.colors",
+    "settings": [
+      {
+        "type": "header",
+        "content": "t:general.color_base"
+      },
+      {
+        "type": "color",
+        "id": "background_color",
+        "default": "#FFFFFF",
+        "label": "t:labels.background"
+      },
+      {
+        "type": "color",
+        "id": "foreground_color",
+        "default": "#1A1A1A",
+        "label": "t:labels.foreground"
+      },
+      {
+        "type": "color",
+        "id": "muted_color",
+        "default": "#4D4D4D",
+        "label": "t:labels.muted"
+      },
+      {
+        "type": "color",
+        "id": "muted_light_color",
+        "default": "#6B6B6B",
+        "label": "t:labels.muted_light",
+        "info": "t:info.muted_light"
+      },
+      {
+        "type": "color",
+        "id": "border_color",
+        "default": "#E5E5E5",
+        "label": "t:labels.border"
+      },
+      {
+        "type": "header",
+        "content": "t:general.color_alternate"
+      },
+      {
+        "type": "color",
+        "id": "background_alt_color",
+        "default": "#F4F4F4",
+        "label": "t:labels.background_alt"
+      },
+      {
+        "type": "color",
+        "id": "background_alt_foreground_color",
+        "default": "#1A1A1A",
+        "label": "t:labels.background_alt_foreground"
+      },
+      {
+        "type": "color",
+        "id": "background_cream_color",
+        "default": "#F5F5F1",
+        "label": "t:labels.background_cream"
+      },
+      {
+        "type": "color",
+        "id": "background_cream_foreground_color",
+        "default": "#1A1A1A",
+        "label": "t:labels.background_cream_foreground"
+      },
+      {
+        "type": "color",
+        "id": "background_dark_color",
+        "default": "#1E1E1E",
+        "label": "t:labels.background_dark"
+      },
+      {
+        "type": "color",
+        "id": "background_dark_foreground_color",
+        "default": "#FFFFFF",
+        "label": "t:labels.background_dark_foreground"
+      },
+      {
+        "type": "color",
+        "id": "muted_on_dark_color",
+        "default": "#999999",
+        "label": "t:labels.muted_on_dark",
+        "info": "t:info.muted_on_dark"
+      },
+      {
+        "type": "header",
+        "content": "t:general.color_accent"
+      },
+      {
+        "type": "color",
+        "id": "accent_color",
+        "default": "#C8400E",
+        "label": "t:labels.accent"
+      },
+      {
+        "type": "color",
+        "id": "accent_foreground_color",
+        "default": "#FFFFFF",
+        "label": "t:labels.accent_foreground"
+      },
+      {
+        "type": "color",
+        "id": "sale_color",
+        "default": "#BD1616",
+        "label": "t:labels.sale"
+      },
+      {
+        "type": "color",
+        "id": "sale_foreground_color",
+        "default": "#FFFFFF",
+        "label": "t:labels.sale_foreground"
+      },
+      {
+        "type": "color",
+        "id": "rating_color",
+        "default": "#FFC107",
+        "label": "t:labels.rating"
       }
     ]
   }

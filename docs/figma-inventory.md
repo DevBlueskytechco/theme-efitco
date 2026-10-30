@@ -46,7 +46,7 @@ Node lẻ không phải block (bỏ qua khi code): 1:360, 1:361 (rectangle nền
 | Cỡ chữ | 13, 14, 16, 18, 28, 36, 48, 100, 200 | — | scale: 13/14/16/18 body, 28/36/48 heading, 100/200 display (wordmark footer) |
 | Màu chữ chính | #1A1A1A | 101 | `--color-foreground` |
 | Màu chữ phụ | #4D4D4D, #999999, #808080 | 103 | `--color-muted` #4D4D4D; `--color-muted-light` #6B6B6B (thay #999999/#808080 trên nền sáng, đạt AA); `--color-muted-on-dark` #999999 chỉ trên nền tối |
-| Màu nhấn CTA | #D94610 | 42 | `--color-accent` (cam) |
+| Màu nhấn CTA | #D94610 | 42 | `--color-accent` = #C8400E trong theme (CTO 30/10: #D94610 không đạt AA với chữ trắng) |
 | Màu sale/badge | #BD1616 | 54 | `--color-sale` |
 | Màu sao | #FFC107 | 24 | `--color-rating` |
 | Nền | #FFFFFF, #F4F4F4, #F4F4F5, #F5F5F1 | 263 | `--color-background`, `--color-background-alt` (gộp F4F4F4/F4F4F5 → 1; F5F5F1 kem riêng cho block 8) |
