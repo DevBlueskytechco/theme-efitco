@@ -1,34 +1,221 @@
 {% doc %}
-  Renders the theme's storefront header: shop title, main menu,
-  customer account entry, and cart link. Composed directly in
-  layout/theme.liquid so it wraps every page.
+  Renders the storefront header: logo or shop name, two-level main menu,
+  mobile drawer, search link, customer account entry and cart link.
+  Composed directly in layout/theme.liquid so it wraps every page. All
+  disclosures are <details>, so the menu and the drawer work without
+  JavaScript; JS only enhances them.
+
+  Hooks:
+  - data-header-overlay: set on the root of a hero that opens the page. The
+    header then sits transparent over the hero, with light text.
+  - data-sticky: on the root when the sticky_header setting is on.
+  - data-scrolled, data-header-enhanced: set on the root by JS. Without
+    data-header-enhanced a header over a hero does not stick.
+  - header-sticky-sentinel: 80px element in layout/theme.liquid. It sits
+    outside the sticky container so it scrolls away with the page.
+  - Partial region: cart-count.
+
+  Self-contained block: callers leave the body empty.
+
+  @example
+  {% block 'header' -%}{%- endblock %}
 {% enddoc %}
 
-<header {{ block.shopify_attributes }}>
-  <h2 class="header__title">
-    {{ shop.name | link_to: routes.root_url }}
-  </h2>
+{%- liquid
+  assign menu = block.settings.menu
+  assign logo = block.settings.logo
+  assign has_menu = false
+  if menu.links.size > 0
+    assign has_menu = true
+  endif
+-%}
 
-  <div class="header__menu">
-    {% for link in block.settings.menu.links %}
-      {{ link.title | link_to: link.url }}
-    {% endfor %}
-  </div>
+<header
+  class="site-header full-width"
+  data-testid="header"
+  {% if block.settings.sticky_header %}
+    data-sticky
+  {% endif %}
+  {{ block.shopify_attributes }}
+>
+  <div class="site-header__inner">
+    {% if has_menu %}
+      <details class="site-header__drawer" scroll-lock>
+        <summary class="site-header__icon" data-testid="header-drawer-toggle" aria-controls="HeaderDrawer">
+          <span class="visually-hidden">{{ 'blocks.header.open_menu' | t }}</span>
+          {% render 'header-icon', name: 'menu' %}
+        </summary>
 
-  <div class="header__icons">
-    {% if shop.customer_accounts_enabled %}
-      <shopify-account menu="{{ block.settings.customer_account_menu }}">
-        {{ 'icon-account.svg' | inline_asset_content }}
-      </shopify-account>
+        <div class="site-header__drawer-panel" id="HeaderDrawer" data-testid="header-drawer">
+          <button
+            type="button"
+            class="site-header__icon site-header__drawer-close"
+            data-testid="header-drawer-close"
+            aria-label="{{ 'blocks.header.close_menu' | t }}"
+          >
+            {% render 'header-icon', name: 'close' %}
+          </button>
+
+          <nav aria-label="{{ 'blocks.header.drawer_menu_label' | t }}">
+            <ul class="site-header__drawer-menu">
+              {% for link in menu.links %}
+                <li data-testid="header-menu-item">
+                  {% if link.links.size > 0 %}
+                    <details>
+                      <summary
+                        class="site-header__link site-header__drawer-link"
+                        data-testid="header-drawer-accordion-toggle"
+                        aria-controls="HeaderDrawerSubmenu-{{ forloop.index }}"
+                      >
+                        {{ link.title | escape }}
+                        {% render 'header-icon', name: 'chevron' %}
+                      </summary>
+                      <ul
+                        class="site-header__drawer-submenu"
+                        id="HeaderDrawerSubmenu-{{ forloop.index }}"
+                        data-testid="header-drawer-submenu"
+                      >
+                        {% for child in link.links %}
+                          <li>
+                            <a
+                              class="site-header__link"
+                              href="{{ child.url }}"
+                              {% if child.current %}
+                                aria-current="page"
+                              {% endif %}
+                            >
+                              {{- child.title | escape -}}
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </details>
+                  {% else %}
+                    <a
+                      class="site-header__link site-header__drawer-link"
+                      href="{{ link.url }}"
+                      {% if link.current %}
+                        aria-current="page"
+                      {% endif %}
+                    >
+                      {{- link.title | escape -}}
+                    </a>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          </nav>
+        </div>
+      </details>
     {% endif %}
 
-    <a href="{{ routes.cart_url }}" aria-label="{{ 'blocks.header.cart_count' | t: count: cart.item_count }}">
-      {% if cart.item_count > 0 %}
-        <sup aria-hidden="true">{{ cart.item_count }}</sup>
+    <a
+      class="site-header__logo"
+      href="{{ routes.root_url }}"
+      data-testid="header-logo"
+      {% if logo %}
+        aria-label="{{ shop.name | escape }}"
+        style="--logo-width: {{ block.settings.logo_width }}px;"
+      {% endif %}
+    >
+      {%- if logo -%}
+        {% assign logo_render_width = block.settings.logo_width | times: 2 %}
+        {% render 'image', image: logo, class: 'site-header__logo-image', width: logo_render_width %}
+      {%- else -%}
+        {{- shop.name | escape -}}
+      {%- endif -%}
+    </a>
+
+    {% if has_menu %}
+      <nav class="site-header__nav" aria-label="{{ 'blocks.header.menu_label' | t }}" data-testid="header-menu">
+        <ul class="site-header__menu">
+          {% for link in menu.links %}
+            <li class="site-header__item" data-testid="header-menu-item">
+              {% if link.links.size > 0 %}
+                <details>
+                  <summary
+                    class="site-header__link"
+                    data-testid="header-menu-toggle"
+                    aria-controls="HeaderSubmenu-{{ forloop.index }}"
+                  >
+                    {{ link.title | escape }}
+                    {% render 'header-icon', name: 'chevron' %}
+                  </summary>
+                  <ul
+                    class="site-header__submenu"
+                    id="HeaderSubmenu-{{ forloop.index }}"
+                    data-testid="header-submenu"
+                  >
+                    {% for child in link.links %}
+                      <li>
+                        <a
+                          class="site-header__link"
+                          href="{{ child.url }}"
+                          {% if child.current %}
+                            aria-current="page"
+                          {% endif %}
+                        >
+                          {{- child.title | escape -}}
+                        </a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </details>
+              {% else %}
+                <a
+                  class="site-header__link"
+                  href="{{ link.url }}"
+                  {% if link.current %}
+                    aria-current="page"
+                  {% endif %}
+                >
+                  {{- link.title | escape -}}
+                </a>
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      </nav>
+    {% elsif request.design_mode %}
+      <p class="site-header__placeholder">{{ 'blocks.header.menu_placeholder' | t }}</p>
+    {% endif %}
+
+    <div class="site-header__icons">
+      <a
+        class="site-header__icon"
+        href="{{ routes.search_url }}"
+        data-testid="header-search-link"
+        aria-label="{{ 'blocks.header.search' | t }}"
+      >
+        {% render 'header-icon', name: 'search' %}
+      </a>
+
+      {% if shop.customer_accounts_enabled %}
+        <shopify-account
+          class="site-header__icon"
+          menu="{{ block.settings.customer_account_menu }}"
+          data-testid="header-account"
+        >
+          {{ 'icon-account.svg' | inline_asset_content }}
+        </shopify-account>
       {% endif %}
 
-      <span aria-hidden="true">{{ 'icon-cart.svg' | inline_asset_content }}</span>
-    </a>
+      {% partial 'cart-count' %}
+        <a
+          class="site-header__icon"
+          href="{{ routes.cart_url }}"
+          data-testid="header-cart-link"
+          aria-label="{{ 'blocks.header.cart_count' | t: count: cart.item_count }}"
+        >
+          <span aria-hidden="true">{{ 'icon-cart.svg' | inline_asset_content }}</span>
+          {% if cart.item_count > 0 %}
+            <span class="site-header__cart-count" data-testid="header-cart-count" aria-hidden="true">
+              {{- cart.item_count -}}
+            </span>
+          {% endif %}
+        </a>
+      {% endpartial %}
+    </div>
   </div>
 </header>
 
@@ -37,15 +224,39 @@
   "name": "t:general.header",
   "settings": [
     {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "t:labels.logo",
+      "info": "t:info.logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "t:labels.logo_width",
+      "min": 60,
+      "max": 240,
+      "step": 4,
+      "unit": "px",
+      "default": 120
+    },
+    {
       "type": "link_list",
       "id": "menu",
-      "label": "t:labels.menu"
+      "label": "t:labels.menu",
+      "default": "main-menu"
     },
     {
       "type": "link_list",
       "id": "customer_account_menu",
       "label": "t:labels.customer_account_menu",
       "default": "customer-account-main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header",
+      "label": "t:labels.sticky_header",
+      "info": "t:info.sticky_header",
+      "default": true
     }
   ]
 }
