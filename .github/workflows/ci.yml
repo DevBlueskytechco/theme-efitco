@@ -52,21 +52,37 @@ jobs:
     needs: preview
     runs-on: ubuntu-latest
     env:
-      PREVIEW_URL: ${{ needs.preview.outputs.url }}
+      STORE_ORIGIN: https://hoa-qua-nhap-khau.myshopify.com
+      THEME_ID: ${{ needs.preview.outputs.theme_id }}
+      STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
       BENCH_PRODUCT: ${{ vars.BENCH_PRODUCT }}
       BENCH_COLLECTION: ${{ vars.BENCH_COLLECTION }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: npm i -g @lhci/cli
-      - run: lhci autorun --config=lighthouserc.json
-      - run: lhci autorun --config=lighthouserc.mobile.json
+      - run: npm ci
+      - name: Lighthouse desktop + mobile
+        run: |
+          Q="preview_theme_id=${THEME_ID}&pb=0"
+          URLS=(--collect.url="${STORE_ORIGIN}/?${Q}")
+          [ -n "$BENCH_PRODUCT" ] && URLS+=(--collect.url="${STORE_ORIGIN}/products/${BENCH_PRODUCT}?${Q}")
+          [ -n "$BENCH_COLLECTION" ] && URLS+=(--collect.url="${STORE_ORIGIN}/collections/${BENCH_COLLECTION}?${Q}")
+          npx lhci autorun --config=lighthouserc.json "${URLS[@]}"
+          npx lhci autorun --config=lighthouserc.mobile.json "${URLS[@]}"
+      - name: Bảng điểm
+        if: always()
+        run: |
+          for f in .lighthouseci/*/manifest.json; do echo "== $f"; jq -r '.[] | select(.isRepresentativeRun) | "\(.url | split("?")[0])  perf=\(.summary.performance)  a11y=\(.summary.accessibility)  bp=\(.summary["best-practices"])  seo=\(.summary.seo)"' "$f"; done
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: lighthouse, path: .lighthouseci, if-no-files-found: ignore }
   e2e:
     needs: preview
     runs-on: ubuntu-latest
     env:
-      PREVIEW_URL: ${{ needs.preview.outputs.url }}
+      STORE_ORIGIN: https://hoa-qua-nhap-khau.myshopify.com
+      PREVIEW_URL: https://hoa-qua-nhap-khau.myshopify.com/?preview_theme_id=${{ needs.preview.outputs.theme_id }}&pb=0
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
     steps:
       - uses: actions/checkout@v4
@@ -76,4 +92,4 @@ jobs:
       - run: npx playwright test
       - uses: actions/upload-artifact@v4
         if: always()
-        with: { name: playwright-report, path: playwright-report }
+        with: { name: playwright-report, path: playwright-report, if-no-files-found: ignore }
