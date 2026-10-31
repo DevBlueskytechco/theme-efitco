@@ -219,6 +219,13 @@
   </div>
 </header>
 
+{% if has_menu %}
+  <script src="{{ 'header-menu.js' | asset_url }}" type="module"></script>
+{% endif %}
+{% if block.settings.sticky_header %}
+  <script src="{{ 'header-sticky.js' | asset_url }}" type="module"></script>
+{% endif %}
+
 {% schema %}
 {
   "name": "t:general.header",
