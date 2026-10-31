@@ -46,8 +46,12 @@ jobs:
             sleep $((i * 20))
           done
           cat push.json
-          echo "url=$(jq -r '(.theme // .) | .preview_url' push.json)" >> "$GITHUB_OUTPUT"
-          echo "theme_id=$(jq -r '(.theme // .) | .id' push.json)" >> "$GITHUB_OUTPUT"
+          # id có thể là số hoặc gid://shopify/OnlineStoreTheme/123 → chỉ lấy số
+          TID=$(jq -r '(.theme // .) | .id' push.json | sed 's#.*/##')
+          [ -z "$TID" ] || [ "$TID" = "null" ] && TID=$(find_id | sed 's#.*/##')
+          echo "theme_id=$TID"; [[ "$TID" =~ ^[0-9]+$ ]] || { echo "::error::không lấy được theme id"; exit 1; }
+          echo "theme_id=$TID" >> "$GITHUB_OUTPUT"
+          echo "url=https://hoa-qua-nhap-khau.myshopify.com/?preview_theme_id=$TID" >> "$GITHUB_OUTPUT"
   lighthouse:
     needs: preview
     runs-on: ubuntu-latest
@@ -68,15 +72,23 @@ jobs:
           URLS=(--collect.url="${STORE_ORIGIN}/?${Q}")
           [ -n "$BENCH_PRODUCT" ] && URLS+=(--collect.url="${STORE_ORIGIN}/products/${BENCH_PRODUCT}?${Q}")
           [ -n "$BENCH_COLLECTION" ] && URLS+=(--collect.url="${STORE_ORIGIN}/collections/${BENCH_COLLECTION}?${Q}")
-          npx lhci autorun --config=lighthouserc.json "${URLS[@]}"
-          npx lhci autorun --config=lighthouserc.mobile.json "${URLS[@]}"
+          FAIL=0
+          npx lhci autorun --config=lighthouserc.json "${URLS[@]}" || FAIL=1
+          mkdir -p lh-out && cp .lighthouseci/lhr-*.json lh-out/ 2>/dev/null || true
+          npx lhci autorun --config=lighthouserc.mobile.json "${URLS[@]}" || FAIL=1
+          cp .lighthouseci/lhr-*.json lh-out/ 2>/dev/null || true
+          exit $FAIL
       - name: Bảng điểm
         if: always()
         run: |
-          for f in .lighthouseci/*/manifest.json; do echo "== $f"; jq -r '.[] | select(.isRepresentativeRun) | "\(.url | split("?")[0])  perf=\(.summary.performance)  a11y=\(.summary.accessibility)  bp=\(.summary["best-practices"])  seo=\(.summary.seo)"' "$f"; done
+          # Đọc thẳng lhr-*.json: có cả khi assert fail (manifest chỉ có sau upload)
+          shopt -s nullglob
+          for f in lh-out/lhr-*.json; do
+            jq -r '"\(.configSettings.formFactor)  \(.finalDisplayedUrl | split("?")[0])  status=\(.runtimeError.code // "ok")  perf=\(.categories.performance.score)  a11y=\(.categories.accessibility.score)  bp=\(.categories["best-practices"].score)  seo=\(.categories.seo.score)"' "$f"
+          done
       - uses: actions/upload-artifact@v4
         if: always()
-        with: { name: lighthouse, path: .lighthouseci, if-no-files-found: ignore }
+        with: { name: lighthouse, path: lh-out, if-no-files-found: ignore }
   e2e:
     needs: preview
     runs-on: ubuntu-latest
