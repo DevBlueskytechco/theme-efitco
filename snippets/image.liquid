@@ -13,6 +13,10 @@
   @param {number} [width] - The highest resolution width of the image to be rendered
   @param {number} [height] - The highest resolution height of the image to be rendered
   @param {string} [crop] - The crop position of the image
+  @param {string} [widths] - Comma-separated srcset widths. Default: '360, 720, 1080, 1440'
+  @param {string} [sizes] - The sizes attribute. Default: '100vw'
+  @param {string} [loading] - The loading attribute. Default: 'lazy'
+  @param {string} [fetchpriority] - The fetchpriority attribute, omitted when empty
 
   @example
   {% render 'image', image: product.featured_image %}
@@ -24,6 +28,14 @@
     width: 1200,
     height: 800,
     crop: 'center',
+  %}
+  {% render 'image',
+    image: product.featured_image,
+    width: 1800,
+    widths: '360, 720, 1080, 1800',
+    sizes: '100vw',
+    loading: 'eager',
+    fetchpriority: 'high',
   %}
 {% enddoc %}
 
@@ -37,6 +49,14 @@
   else
     assign wrapper = 'div'
   endif
+
+  assign responsive = false
+  if widths or sizes or loading or fetchpriority
+    assign responsive = true
+    assign tag_widths = widths | default: '360, 720, 1080, 1440'
+    assign tag_sizes = sizes | default: '100vw'
+    assign tag_loading = loading | default: 'lazy'
+  endif
 %}
 
 <{{ wrapper }}
@@ -45,5 +65,19 @@
     href="{{ url }}"
   {% endif %}
 >
-  {{ image | image_url: width: width, height: height, crop: crop | image_tag }}
+  {%- if fetchpriority -%}
+    {{
+      image
+      | image_url: width: width, height: height, crop: crop
+      | image_tag: widths: tag_widths, sizes: tag_sizes, loading: tag_loading, fetchpriority: fetchpriority
+    }}
+  {%- elsif responsive -%}
+    {{
+      image
+      | image_url: width: width, height: height, crop: crop
+      | image_tag: widths: tag_widths, sizes: tag_sizes, loading: tag_loading
+    }}
+  {%- else -%}
+    {{ image | image_url: width: width, height: height, crop: crop | image_tag }}
+  {%- endif -%}
 </{{ wrapper }}>

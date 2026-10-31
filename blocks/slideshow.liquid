@@ -1,0 +1,117 @@
+{% doc %}
+  Renders the home page carousel: a horizontal scroll-snap track that works
+  without JavaScript, plus controls that stay hidden until assets/slideshow.js
+  sets data-enhanced on the root. Must sit in the first container of the
+  template so the header overlays it (TE-1 AC9).
+
+  The parent cannot read its children: the body is a rendered string, so slide
+  count and dots are left to JavaScript.
+
+  Hooks set here: slideshow-carousel, data-header-overlay, data-autoplay,
+  data-autoplay-speed (seconds), data-label-slide ([index], [total]),
+  data-label-dot ([index]), data-label-pause, data-label-play, and a template
+  element inside slideshow-dots holding one dot button.
+  Hooks set by JavaScript: data-enhanced, data-multiple (2 slides or more),
+  data-playing on the root, inert on inactive slides.
+
+  Test hooks: data-testid="slideshow", "slideshow-track", "slideshow-controls",
+  "slideshow-prev", "slideshow-next", "slideshow-dots", "slideshow-pause",
+  "slideshow-live"; "slideshow-dot" on each cloned dot.
+
+  @param {string} content - One slideshow-slide block call per slide, 1 to 5
+
+  @example
+  {% block 'container' %}
+    {% block 'slideshow' %}
+      {% block 'slideshow-slide', priority: true %}{% endblock %}
+      {% block 'slideshow-slide' %}{% endblock %}
+    {% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+<slideshow-carousel
+  class="slideshow full-width"
+  role="region"
+  aria-roledescription="carousel"
+  aria-label="{{ 'blocks.slideshow.label' | t }}"
+  data-header-overlay
+  data-autoplay="{{ block.settings.autoplay }}"
+  data-autoplay-speed="{{ block.settings.autoplay_speed }}"
+  data-label-slide="{{ 'blocks.slideshow.slide_label' | t: index: '[index]', total: '[total]' }}"
+  data-label-dot="{{ 'blocks.slideshow.dot_label' | t: index: '[index]' }}"
+  data-label-pause="{{ 'blocks.slideshow.pause' | t }}"
+  data-label-play="{{ 'blocks.slideshow.play' | t }}"
+  data-testid="slideshow"
+  {{ block.shopify_attributes }}
+>
+  <div class="slideshow__frame">
+    <div
+      class="slideshow__track"
+      role="group"
+      tabindex="0"
+      aria-label="{{ 'blocks.slideshow.track_label' | t }}"
+      data-testid="slideshow-track"
+    >
+      {{ content }}
+    </div>
+
+    <div class="slideshow__controls" data-testid="slideshow-controls">
+      <button
+        type="button"
+        class="slideshow__arrow slideshow__arrow--prev"
+        aria-label="{{ 'blocks.slideshow.previous' | t }}"
+        data-testid="slideshow-prev"
+      >
+        {% render 'slideshow-icon', name: 'previous' %}
+      </button>
+      <button
+        type="button"
+        class="slideshow__arrow slideshow__arrow--next"
+        aria-label="{{ 'blocks.slideshow.next' | t }}"
+        data-testid="slideshow-next"
+      >
+        {% render 'slideshow-icon', name: 'next' %}
+      </button>
+      <div class="slideshow__dots" data-testid="slideshow-dots">
+        <template>
+          <button type="button" class="slideshow__dot" data-testid="slideshow-dot"></button>
+        </template>
+      </div>
+      <button
+        type="button"
+        class="slideshow__pause"
+        aria-label="{{ 'blocks.slideshow.pause' | t }}"
+        data-testid="slideshow-pause"
+      >
+        {% render 'slideshow-icon', name: 'pause' %}
+        {% render 'slideshow-icon', name: 'play' %}
+      </button>
+    </div>
+  </div>
+
+  <div class="visually-hidden" aria-live="polite" aria-atomic="true" data-testid="slideshow-live"></div>
+</slideshow-carousel>
+
+{% schema %}
+{
+  "name": "t:general.slideshow",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "autoplay",
+      "label": "t:labels.slideshow_autoplay",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "autoplay_speed",
+      "min": 3,
+      "max": 10,
+      "step": 1,
+      "unit": "t:labels.unit_seconds",
+      "label": "t:labels.slideshow_autoplay_speed",
+      "default": 5
+    }
+  ]
+}
+{% endschema %}
