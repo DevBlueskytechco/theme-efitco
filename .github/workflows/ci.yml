@@ -86,6 +86,11 @@ jobs:
           for f in lh-out/lhr-*.json; do
             jq -r '"\(.configSettings.formFactor)  \(.finalDisplayedUrl | split("?")[0])  status=\(.runtimeError.code // "ok")  perf=\(.categories.performance.score)  a11y=\(.categories.accessibility.score)  bp=\(.categories["best-practices"].score)  seo=\(.categories.seo.score)"' "$f"
           done
+          # Audit accessibility chưa đạt (lấy từ lần đo đầu) — để biết sửa gì cho a11y >= 0.98
+          F=$(ls lh-out/lhr-*.json 2>/dev/null | head -1)
+          [ -n "$F" ] && jq -r '.categories.accessibility.auditRefs[] | select(.weight > 0) | .id' "$F" | while read id; do
+            jq -r --arg id "$id" '.audits[$id] | select(.score != null and .score < 1) | "A11Y FAIL  \($id): \(.title)  — " + ([.details.items[]?.node.selector] | map(select(.)) | .[0:3] | join(" | "))' "$F"
+          done
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: lighthouse, path: lh-out, if-no-files-found: ignore }
