@@ -14,6 +14,7 @@
   - header-sticky-sentinel: 80px element in layout/theme.liquid. It sits
     outside the sticky container so it scrolls away with the page.
   - Partial region: cart-count.
+  - Custom element host: <header-menu>, <header-drawer>, <sticky-header> (ẩn) — JS ở assets/header-menu.js, assets/header-sticky.js.
 
   Self-contained block: callers leave the body empty.
 
@@ -217,7 +218,23 @@
       {% endpartial %}
     </div>
   </div>
+
+  {%- comment -%} Host cho JS (ES1-T22): có trong markup để theme editor/Canvas render lại header thì custom element tự kết nối lại {%- endcomment -%}
+  {%- if has_menu -%}
+    <header-menu hidden></header-menu>
+    <header-drawer hidden></header-drawer>
+  {%- endif -%}
+  {%- if block.settings.sticky_header -%}
+    <sticky-header hidden></sticky-header>
+  {%- endif -%}
 </header>
+
+{% if has_menu %}
+  <script src="{{ 'header-menu.js' | asset_url }}" type="module"></script>
+{% endif %}
+{% if block.settings.sticky_header %}
+  <script src="{{ 'header-sticky.js' | asset_url }}" type="module"></script>
+{% endif %}
 
 {% schema %}
 {
