@@ -5,10 +5,17 @@ export default async () => {
   const origin = new URL(preview).origin;
   const b = await chromium.launch(); const p = await b.newPage();
   await p.goto(`${origin}/password`);
-  if (await p.locator('form[action*="password"]').count()) {
-    await p.fill('input[type="password"]', process.env.STORE_PASSWORD || '');
-    await Promise.all([p.waitForLoadState('load'), p.locator('form[action*="password"]').evaluate((f: HTMLFormElement) => f.submit())]);
+  if (await p.locator('form[action*="password"] input[type="password"]').count()) {
+    await p.fill('form[action*="password"] input[type="password"]', process.env.STORE_PASSWORD || '');
+    // Chờ POST /password xong và Shopify chuyển hướng ra khỏi /password — nếu không cookie mở khoá chưa được ghi
+    await Promise.all([
+      p.waitForURL((u) => !u.pathname.startsWith('/password'), { timeout: 30_000 }),
+      p.locator('form[action*="password"]').evaluate((f: HTMLFormElement) => f.submit()),
+    ]);
   }
   await p.goto(preview);
+  if (new URL(p.url()).pathname.startsWith('/password')) {
+    throw new Error('Không mở khoá được store: kiểm STORE_PASSWORD (secret GitHub / .env)');
+  }
   await p.context().storageState({ path: 'tests/setup/state.json' }); await b.close();
 };
