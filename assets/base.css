@@ -457,6 +457,361 @@
   height: auto;
 }
 
+/** Buttons */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: var(--space-3) var(--space-6);
+  border: 1px solid transparent;
+  border-radius: var(--radius-button);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button--secondary {
+  border-color: currentcolor;
+  background-color: transparent;
+  color: inherit;
+}
+
+.button:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}
+
+/** Slideshow */
+slideshow-carousel {
+  display: block;
+}
+
+.slideshow {
+  --slideshow-inset: var(--page-margin);
+  --slideshow-arrow-size: 44px;
+  --slideshow-arrow-gap: var(--space-4);
+
+  padding-inline: var(--slideshow-inset);
+}
+
+.slideshow__frame {
+  position: relative;
+}
+
+.slideshow__track {
+  display: flex;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  border-radius: var(--radius-hero);
+}
+
+.slideshow__track::-webkit-scrollbar {
+  display: none;
+}
+
+.slideshow__track:focus-visible {
+  outline-offset: -4px;
+}
+
+/* Không JS không có nút: thanh cuộn là dấu hiệu duy nhất còn slide khác */
+@media (scripting: none) {
+  .slideshow__track {
+    scrollbar-width: thin;
+  }
+
+  .slideshow__track::-webkit-scrollbar {
+    display: block;
+  }
+}
+
+.slideshow__slide {
+  position: relative;
+  display: grid;
+  flex: 0 0 100%;
+  align-items: center;
+  aspect-ratio: 4 / 5;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+}
+
+.slideshow__media,
+.slideshow__overlay {
+  position: absolute;
+  inset: 0;
+}
+
+.slideshow__media .image {
+  height: 100%;
+}
+
+.slideshow__media .image > img,
+.slideshow__media video,
+.slideshow__placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slideshow__placeholder {
+  fill: var(--color-muted-on-dark);
+}
+
+.slideshow__overlay {
+  background-color: color-mix(in srgb, var(--color-background-dark) var(--overlay-opacity), transparent);
+}
+
+.slideshow__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-5);
+  width: 100%;
+  min-width: 0;
+  padding: calc(var(--header-height) + var(--space-5)) var(--space-4) calc(var(--slideshow-arrow-size) + var(--space-6));
+  text-align: center;
+}
+
+.slideshow__eyebrow {
+  font-family: var(--font-heading--family);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.slideshow__heading {
+  max-width: 100%;
+  font-size: var(--font-size-display);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.slideshow__subheading {
+  max-width: 45.375rem;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+}
+
+.slideshow__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+}
+
+.slideshow-icon {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+}
+
+/* Chờ JS: mặc định ẩn hết, slideshow.js gắn data-enhanced thì mới hiện */
+.slideshow__controls,
+.slideshow__arrow,
+.slideshow__dots,
+.slideshow__pause {
+  display: none;
+}
+
+slideshow-carousel[data-enhanced] .slideshow__controls {
+  position: absolute;
+  inset-inline: var(--space-3);
+  inset-block-end: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  pointer-events: none;
+}
+
+slideshow-carousel[data-enhanced][data-multiple] .slideshow__arrow,
+slideshow-carousel[data-enhanced][data-multiple][data-autoplay='true'] .slideshow__pause,
+slideshow-carousel[data-enhanced]:has(video) .slideshow__pause {
+  display: flex;
+}
+
+slideshow-carousel[data-enhanced][data-multiple] .slideshow__dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.slideshow__arrow,
+.slideshow__pause {
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--slideshow-arrow-size);
+  height: var(--slideshow-arrow-size);
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  padding: 0;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.slideshow__arrow--prev {
+  order: 1;
+}
+
+.slideshow__dots {
+  order: 2;
+  flex: 1 1 auto;
+  min-width: 0;
+  pointer-events: auto;
+}
+
+.slideshow__pause {
+  order: 3;
+}
+
+.slideshow__arrow--next {
+  order: 4;
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+.slideshow__arrow--prev:hover,
+.slideshow__arrow--next:hover,
+.slideshow__pause:hover {
+  border-color: var(--color-foreground);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+/* Vùng bấm 24px, chấm nhìn thấy 8px */
+.slideshow__dot {
+  position: relative;
+  flex: none;
+  width: var(--space-5);
+  height: var(--space-5);
+  border: 0;
+  padding: 0;
+  background: none;
+  color: var(--color-background-dark-foreground);
+  cursor: pointer;
+}
+
+.slideshow__dot::before {
+  position: absolute;
+  inset: var(--space-2);
+  border: 1px solid currentcolor;
+  border-radius: 50%;
+  content: '';
+}
+
+.slideshow__dot[aria-current='true']::before {
+  background-color: currentcolor;
+}
+
+.slideshow__pause .slideshow-icon--pause,
+slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .slideshow-icon--play {
+  display: none;
+}
+
+slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .slideshow-icon--pause {
+  display: block;
+}
+
+/* AC2: căn theo setting từ 48rem, dưới đó luôn căn giữa */
+@media (min-width: 48rem) {
+  .slideshow {
+    --slideshow-arrow-size: 52px;
+    --slideshow-arrow-gap: var(--space-5);
+  }
+
+  .slideshow__slide {
+    aspect-ratio: 4 / 3;
+  }
+
+  .slideshow__content {
+    width: min(
+      100% - (var(--slideshow-arrow-gap) + var(--slideshow-arrow-size) + var(--space-4)) * 2,
+      var(--page-width) - var(--page-margin) * 2
+    );
+    margin-inline: auto;
+    padding-inline: 0;
+  }
+
+  [data-alignment='left'] > .slideshow__content {
+    align-items: flex-start;
+    text-align: start;
+  }
+
+  [data-alignment='right'] > .slideshow__content {
+    align-items: flex-end;
+    text-align: end;
+  }
+
+  .slideshow__heading {
+    max-width: 45.375rem;
+  }
+
+  /* Hai nút vào giữa cạnh hero như Figma; chấm + tạm dừng ở đáy */
+  slideshow-carousel[data-enhanced] .slideshow__controls {
+    inset-block: 0;
+    inset-inline: var(--slideshow-arrow-gap);
+    align-items: flex-end;
+    justify-content: center;
+    padding-block-end: var(--space-4);
+  }
+
+  .slideshow__arrow {
+    position: absolute;
+    inset-block-start: calc(50% - var(--slideshow-arrow-size) / 2);
+  }
+
+  .slideshow__arrow--prev {
+    inset-inline-start: 0;
+  }
+
+  .slideshow__arrow--next {
+    inset-inline-end: 0;
+  }
+
+  .slideshow__dots {
+    flex: none;
+  }
+}
+
+@media (min-width: 80rem) {
+  .slideshow {
+    /* Figma: hero 1798 trên khung 1920 */
+    --slideshow-inset: max(var(--page-margin), 3.177vw);
+    --slideshow-arrow-gap: calc(var(--space-1) * 15);
+  }
+
+  .slideshow__slide {
+    aspect-ratio: 1798 / 827;
+  }
+
+  /* Figma: 60px dưới subheading = gap 24 + 36 */
+  .slideshow__buttons {
+    margin-block-start: calc(var(--space-1) * 9);
+  }
+
+  .button {
+    min-height: 52px;
+  }
+}
+
 /** Gift card template */
 .template-gift-card main {
   text-align: center;
