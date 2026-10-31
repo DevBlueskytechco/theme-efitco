@@ -1,0 +1,32 @@
+{% doc %}
+  Renders one inline, decorative header icon. Stroke follows currentColor
+  and --icon-stroke-width, so the icon inherits the header text color.
+
+  @param {string} name - Icon name: 'menu', 'close', 'search' or 'chevron'
+
+  @example
+  {% render 'header-icon', name: 'search' %}
+{% enddoc %}
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 20 20"
+  fill="none"
+  stroke="currentColor"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="var(--icon-stroke-width)"
+  aria-hidden="true"
+  focusable="false"
+>
+  {%- case name -%}
+    {%- when 'menu' -%}
+      <path d="M3 5.5h14M3 10h14M3 14.5h14" />
+    {%- when 'close' -%}
+      <path d="m5 5 10 10M15 5 5 15" />
+    {%- when 'search' -%}
+      <circle cx="9" cy="9" r="5.25" /><path d="m13 13 4 4" />
+    {%- when 'chevron' -%}
+      <path d="m5.5 8 4.5 4.5L14.5 8" />
+  {%- endcase -%}
+</svg>
