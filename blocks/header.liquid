@@ -22,12 +22,12 @@
       </shopify-account>
     {% endif %}
 
-    <a href="{{ routes.cart_url }}">
+    <a href="{{ routes.cart_url }}" aria-label="{{ 'blocks.header.cart_count' | t: count: cart.item_count }}">
       {% if cart.item_count > 0 %}
-        <sup>{{ cart.item_count }}</sup>
+        <sup aria-hidden="true">{{ cart.item_count }}</sup>
       {% endif %}
 
-      {{ 'icon-cart.svg' | inline_asset_content }}
+      <span aria-hidden="true">{{ 'icon-cart.svg' | inline_asset_content }}</span>
     </a>
   </div>
 </header>
