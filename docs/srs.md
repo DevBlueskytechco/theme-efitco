@@ -32,18 +32,22 @@ Là merchant, tôi muốn theme có header 2 cấp, footer, announcement bar và
 
 Mã R: R4 menu đa cấp, newsletter, country/language, Follow on Shop, shopify-account; R7 layout; R11 SEO; R13 social; R14–R16 settings/font/màu
 
-### TE-2 — Block hero và rich text
-Phía: FE · Ước lượng sơ bộ: 5 point (techlead chốt)
+### TE-2 — Block slideshow (hero) và rich text
+Phía: FE + BE (JS slideshow) · Ước lượng sơ bộ: 8 point (techlead chốt) · Figma 1:422, 1:437, 1:453 · CTO 31/10: làm slideshow như thiết kế
 
-Là merchant, tôi muốn block hero (ảnh hoặc video, 2 nút, 3 bố cục) và block rich text để mở đầu trang chủ theo Figma.
+Là merchant, tôi muốn block slideshow (mỗi slide: ảnh hoặc video, 2 nút, 3 bố cục) và block rich text để mở đầu trang chủ theo Figma.
 
 - AC1 Given hero có ảnh When render Then ảnh có focal point từ image_picker, srcset, eager load ở vị trí đầu trang; có video Then dùng video setting, autoplay muted loop, có poster.
 - AC2 Given bố cục chọn trái/giữa/phải When render Then nội dung căn đúng ở 1280 và 768; ở 360 luôn căn giữa theo Figma.
 - AC3 Given 0, 1 hoặc 2 nút có label When render Then chỉ nút có label hiện; nút có href từ url setting; nút thứ hai kiểu secondary.
 - AC4 Given chưa chọn ảnh/video When trong editor Then placeholder lifestyle image; ngoài editor Then nền màu từ setting.
 - AC5 Given rich text When render Then heading, body richtext, nút tuỳ chọn, độ rộng tối đa setting; heading level chọn h1/h2.
+- AC6 Given slideshow có 1–5 slide (block con `slide`, mỗi slide theo AC1–AC4) When render Then chỉ slide đầu là LCP: ảnh slide 1 eager + fetchpriority high, slide sau lazy; 1 slide Then ẩn nút trái/phải và chấm. Root slideshow mang `data-header-overlay` khi đứng đầu trang (TE-1 AC9).
+- AC7 Given ≥ 2 slide When người dùng bấm nút trái/phải, chấm, hoặc vuốt (cảm ứng) Then chuyển slide, chấm hiện slide đang xem (`aria-current`), slide ẩn có `inert`; không JS Then các slide cuộn ngang bằng scroll-snap, vẫn xem được hết.
+- AC8 Given setting autoplay bật (mặc định tắt) When chạy Then đổi slide theo khoảng thời gian setting (3–10 s), có nút tạm dừng, dừng khi hover/focus và khi `prefers-reduced-motion: reduce`; không reset vòng lặp giả.
+- AC9 Given trình đọc màn hình When vào slideshow Then root `role="region"` + `aria-roledescription="carousel"` + `aria-label`; mỗi slide `role="group"` + `aria-roledescription="slide"` + nhãn "n / tổng"; nút có tên truy cập.
 
-Mã R: R3 layout; R14 settings; R17 ảnh responsive
+Mã R: R3 layout; R12 a11y carousel; R14 settings; R17 ảnh responsive; R6 Lighthouse (LCP slide 1)
 
 ### TE-3 — Block featured collection và product card
 Phía: FE+BE · Ước lượng sơ bộ: 8 point (techlead chốt)
