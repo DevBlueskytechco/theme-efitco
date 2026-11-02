@@ -2,7 +2,7 @@ KHÔNG CHẮC: spec CHƯA chạy lần nào. Không có node_modules, PREVIEW_UR
 
 # ES1-T23 (2727475000000133014) — E2E TE-1 trên develop
 Nguồn: docs/srs.md#TE-1 (AC1..AC9), ticket ES1-T23, nhánh origin/feature/ai-ES1-T5 (spec + test case gốc), Figma 1:362 (Header), 1:1104 (Newsletter + Footer); token: docs/tokens.json
-Spec: tests/e2e/ES1-T23.spec.ts (đặt theo key ticket theo yêu cầu giao việc; body ticket ghi TE-1.spec.ts, xem KHÔNG CHẮC). Base đọc code: develop 2b1f0ff.
+Spec: tests/e2e/TE-1.spec.ts (CTO review: đổi tên theo body ticket). Base đọc code: develop 2b1f0ff.
 Tự động: E2E/static có trong spec. UI/a11y tay: chạy tay, không có trong spec. Cột Trạng thái: chạy = chạy mọi store; có điều kiện = skip khi thiếu dữ liệu; fixme = chờ; tay = thủ công.
 
 | ID | AC | Given | When | Then | Loại | Ưu tiên | Trạng thái |

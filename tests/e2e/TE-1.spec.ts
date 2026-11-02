@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy trên preview và chưa type-check (không có node_modules, PREVIEW_URL, STORE_PASSWORD trong phiên viết). Kết quả thật lấy từ CI e2e trên PR.
 // Ticket ES1-T23 (2727475000000133014) — E2E TE-1 trên develop, chuyển từ ES1-T5, AC theo docs/srs.md#TE-1 (AC1..AC9).
 // Không lặp ES1-T16.spec.ts (hành vi JS header/drawer/sticky) và smoke.spec.ts (status, console khi tải, axe trạng thái mặc định).
-// Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T23.spec.ts
+// Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-1.spec.ts
 // Biến tuỳ chọn: EXPECT_ANNOUNCEMENT=off|text|link (mặc định off), EXPECT_MENU_ITEMS=<n>
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -136,10 +136,10 @@ async function axeChrome(page: Page) {
   return (await b.analyze()).violations.filter(seriousOrCritical).map(v => `${v.id}: ${v.nodes.map(n => n.target.join(' ')).join(', ')}`);
 }
 
-// Nút gộp USD / EN chưa có data-testid (đã tạo ticket dev-fe): tạm tìm theo form localization, không theo class.
+// Nút gộp USD / EN: data-testid footer-localization-toggle (ES1-T26, PR #48); trước khi #48 merge thì fallback theo summary của form localization.
 function localization(page: Page) {
   const form = page.getByTestId(T.footer).locator('form[action*="localization"]');
-  return { form, summary: form.locator('summary') };
+  return { form, summary: form.getByTestId('footer-localization-toggle').or(form.locator('summary')).first() };
 }
 
 // Đổi sang lựa chọn chưa chọn, trả về value để đối chiếu sau khi tải lại.
