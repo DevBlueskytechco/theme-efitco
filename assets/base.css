@@ -19,7 +19,7 @@
 
 .welcome-description {
   max-width: 80ch;
-  margin-top: var(--space-5);
+  margin-block-start: var(--space-5);
 }
 
 .icon {
@@ -30,7 +30,7 @@
   display: grid;
   gap: var(--space-6);
   grid-template-columns: 1fr;
-  margin-top: var(--space-7);
+  margin-block-start: var(--space-7);
 }
 
 @media (min-width: 80rem) {
@@ -50,7 +50,7 @@
 }
 
 .highlight > * + * {
-  margin-top: var(--space-4);
+  margin-block-start: var(--space-4);
 }
 
 .highlight h3 {
@@ -161,7 +161,7 @@
 .site-footer {
   display: grid;
   grid-template-columns: var(--content-grid);
-  margin-top: var(--space-7);
+  margin-block-start: var(--space-7);
   background-color: var(--color-background-dark);
   color: var(--color-background-dark-foreground);
   font-size: var(--font-size-sm);
@@ -211,12 +211,12 @@
 }
 
 .site-footer__newsletter-text {
-  margin-top: var(--space-3);
+  margin-block-start: var(--space-3);
   color: var(--color-muted-on-dark);
 }
 
 .site-footer__form {
-  margin-top: var(--space-5);
+  margin-block-start: var(--space-5);
 }
 
 .site-footer__field {
@@ -253,7 +253,7 @@
 }
 
 .site-footer__message {
-  margin-top: var(--space-3);
+  margin-block-start: var(--space-3);
 }
 
 .site-footer__message--error {
@@ -329,8 +329,8 @@
 
 .site-footer__panel {
   position: absolute;
-  bottom: 100%;
-  left: 0;
+  inset-block-end: 100%;
+  inset-inline-start: 0;
   z-index: 1;
   display: grid;
   gap: var(--space-5);
@@ -422,8 +422,8 @@
   .site-footer__panel {
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
-    right: 0;
-    left: auto;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
   }
 }
 
@@ -509,10 +509,6 @@
   inline-size: calc(var(--space-1) * 5);
   block-size: var(--space-4);
   transition: translate 0.2s ease-out;
-}
-
-.button--link:dir(rtl) .slideshow-icon {
-  scale: -1 1;
 }
 
 .button--link:hover .button__label {
@@ -689,6 +685,13 @@ slideshow-carousel {
   flex: none;
   width: var(--space-4);
   height: var(--space-4);
+}
+
+/* RTL (TE-14 AC4): 3 icon chỉ hướng lật ngang; pause/play và chevron dọc của header không đổi */
+.slideshow-icon--previous:dir(rtl),
+.slideshow-icon--next:dir(rtl),
+.slideshow-icon--arrow:dir(rtl) {
+  scale: -1 1;
 }
 
 /* Chờ JS: mặc định ẩn hết, slideshow.js gắn data-enhanced thì mới hiện */
@@ -889,7 +892,7 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   container-type: inline-size;
   display: grid;
   gap: var(--space-5);
-  justify-self: var(--text-align, left);
+  justify-self: var(--text-align, start);
   width: 100%;
   max-width: var(--rich-text-max-width);
   padding-block: var(--space-7);
