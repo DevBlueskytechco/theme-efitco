@@ -31,11 +31,21 @@
     when 'alt', 'cream', 'sand', 'dark'
       assign background_class = ' block-container--' | append: background
   endcase
+
+  # Setting values stay left/right; CSS gets start/end so RTL flips without rewrites
+  case block.settings.alignment
+    when 'center'
+      assign text_align = 'center'
+    when 'right'
+      assign text_align = 'end'
+    else
+      assign text_align = 'start'
+  endcase
 -%}
 
 <{{ tag }}
   class="block-container{{ background_class }}"
-  style="--text-align: {{ block.settings.alignment }};"
+  style="--text-align: {{ text_align }};"
   {% if id != blank %}
     data-testid="container-{{ id }}"
   {% endif %}
