@@ -487,6 +487,78 @@
   outline-offset: 2px;
 }
 
+/* Link CTA (Figma 1:462): chữ heading 700 28/34 + mũi tên 20 × 16, không nền.
+   2 class để thắng .button { min-height: 52px } ở 80rem */
+.button.button--link {
+  justify-content: flex-start;
+  gap: var(--space-3);
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: currentcolor;
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(34 / 28);
+}
+
+.button--link .slideshow-icon {
+  inline-size: calc(var(--space-1) * 5);
+  block-size: var(--space-4);
+  transition: translate 0.2s ease-out;
+}
+
+.button--link:dir(rtl) .slideshow-icon {
+  scale: -1 1;
+}
+
+.button--link:hover .button__label {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.15em;
+}
+
+.button--link:hover .slideshow-icon {
+  translate: var(--space-1) 0;
+}
+
+.button--link:dir(rtl):hover .slideshow-icon {
+  translate: calc(var(--space-1) * -1) 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button--link .slideshow-icon,
+  .button--link:hover .slideshow-icon,
+  .button--link:dir(rtl):hover .slideshow-icon {
+    transition: none;
+    translate: none;
+  }
+}
+
+/** Container backgrounds: {% block 'container', background: 'sand' %} */
+.block-container--alt {
+  background-color: var(--color-background-alt);
+  color: var(--color-background-alt-foreground);
+}
+
+.block-container--cream {
+  background-color: var(--color-background-cream);
+  color: var(--color-background-cream-foreground);
+}
+
+.block-container--sand {
+  background-color: var(--color-background-sand);
+  color: var(--color-background-sand-foreground);
+}
+
+.block-container--dark {
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+}
+
 /** Slideshow */
 slideshow-carousel {
   display: block;
@@ -812,24 +884,80 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   }
 }
 
-/** Rich text */
+/** Rich text (Figma 1:454): 1 cột dưới 64rem, 2 cột heading | body + CTA từ 64rem */
 .rich-text {
+  container-type: inline-size;
+  display: grid;
+  gap: var(--space-5);
   justify-self: var(--text-align, left);
   width: 100%;
   max-width: var(--rich-text-max-width);
   padding-block: var(--space-7);
 }
 
-.rich-text > * + * {
-  margin-block-start: var(--space-5);
+/* 48 = type_scale; Figma chỉ có 1920, mobile theo ui-spec ES1-T34 */
+.rich-text__heading {
+  font-size: 3rem;
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-wrap: balance;
 }
 
-.rich-text__heading {
-  text-wrap: balance;
+/* Ảnh inline 1:455: 165 × 94 ở chữ 100px, co theo em. Khoảng cách 2 bên là dấu cách thật trong heading */
+.rich-text__heading .rich-text__inline-image {
+  display: inline-block;
+  inline-size: auto;
+  block-size: 0.94em;
+  aspect-ratio: 165 / 94;
+  border-radius: var(--radius-card);
+  vertical-align: top;
+}
+
+.rich-text__heading .rich-text__inline-image > img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.rich-text__body {
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: calc(26 / 16);
+}
+
+.rich-text__content > * + * {
+  margin-block-start: var(--space-5);
 }
 
 .rich-text__body > * + * {
   margin-block-start: var(--space-3);
+}
+
+@media (min-width: 64rem) {
+  /* Figma 1920: cột 732 / 526, khoảng 158 trên 1416 = 11.16% */
+  .rich-text {
+    grid-template-columns: minmax(0, 732fr) minmax(0, 526fr);
+    align-items: start;
+    column-gap: max(var(--space-7), 11.16%);
+    padding-block: var(--space-8);
+  }
+
+  .rich-text__heading:only-child,
+  .rich-text__content:only-child {
+    grid-column: 1 / -1;
+  }
+
+  /* Dòng dài nhất (NEED + ảnh + TO TRAIN.) ≈ 6.94em, hộp Figma 7.32em = cột trái.
+     Cỡ chữ = cột trái / 7.32 = (100cqi - gap) / 12.58 → đúng 100 ở 1416, không tràn cột ở 1024 (~69px) */
+  .rich-text__heading {
+    font-size: min(var(--font-size-display), (100cqi - max(var(--space-7), 11.16cqi)) / 12.58);
+  }
+
+  .rich-text__content > * + * {
+    margin-block-start: calc(var(--space-1) * 10);
+  }
 }
 
 .rich-text--placeholder {
