@@ -36,6 +36,14 @@ jobs:
             shopify theme list --json > list.json || return 1
             jq -r --arg n "$B" '(if type=="array" then . else (.themes // .data // []) end) | map(select(.name==$n)) | .[0].id // empty' list.json
           }
+          # Store dev giới hạn 20 theme: nếu chưa có theme của nhánh này và đã ≥ 16 theme thì xoá theme ai-* cũ nhất (trừ ai-develop)
+          if [ -z "$(find_id || true)" ]; then
+            jq -r '(if type=="array" then . else (.themes // .data // []) end) | map(select(.role != "live")) | length' list.json > count.txt || echo 0 > count.txt
+            if [ "$(cat count.txt)" -ge 16 ]; then
+              old=$(jq -r '(if type=="array" then . else (.themes // .data // []) end) | map(select((.name|startswith("ai-")) and .name != "ai-develop" and .role != "live")) | sort_by(.id|tostring|ltrimstr("gid://shopify/OnlineStoreTheme/")|tonumber) | .[0].id // empty' list.json)
+              [ -n "$old" ] && { echo "::warning::store đủ theme, xoá preview cũ nhất $old"; shopify theme delete --theme "${old##*/}" --force; }
+            fi
+          fi
           # Shopify đôi khi trả 502 khi tạo theme: thử 3 lần, mỗi lần kiểm lại theme đã được tạo chưa
           for i in 1 2 3; do
             ID=$(find_id || true)
