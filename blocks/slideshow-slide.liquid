@@ -10,10 +10,11 @@
   "slideshow-video", "slideshow-heading", "slideshow-button-primary",
   "slideshow-button-secondary".
 
+  @param {string} id - Unique slide id within the template, such as 'slide-1'
   @param {boolean} [priority] - True on the first slide only: renders the h1 and loads its image eagerly with high fetch priority. Move this parameter when reordering slides.
 
   @example
-  {% block 'slideshow-slide', priority: true %}{% endblock %}
+  {% block 'slideshow-slide', id: 'slide-1', priority: true %}{% endblock %}
 {% enddoc %}
 
 {%- liquid
@@ -45,6 +46,7 @@
   aria-roledescription="slide"
   data-alignment="{{ block.settings.content_alignment }}"
   style="--overlay-opacity: {{ block.settings.overlay_opacity }}%;"
+  data-slide-id="{{ id }}"
   data-testid="slideshow-slide"
   {{ block.shopify_attributes }}
 >
