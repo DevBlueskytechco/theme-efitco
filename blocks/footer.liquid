@@ -195,7 +195,7 @@
         {%- if show_countries or show_languages -%}
           {%- form 'localization', id: 'footer-localization', class: 'site-footer__localization' -%}
             <details class="site-footer__disclosure">
-              <summary class="site-footer__summary">
+              <summary class="site-footer__summary" data-testid="footer-localization-toggle">
                 <span class="site-footer__hidden-label">{{ 'blocks.footer.localization_label' | t }}</span>
                 {{ localization.country.currency.iso_code }} / {{ localization.language.iso_code | upcase }}
               </summary>
