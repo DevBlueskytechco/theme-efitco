@@ -3,7 +3,9 @@
   composes its page through a container block: the block owns the outer
   layout element and renders the composed body via {{ content }}.
 
+  @param {string} [id] - Static block id. Set it when a template has more than one container so each keeps its own settings, such as 'home-intro'.
   @param {string} [tag] - HTML element for the wrapper. Default: 'section'.
+  @param {string} [background] - Background color token: 'alt', 'cream', 'sand' or 'dark'. Empty: no background.
 
   @example Default section wrapper
   {% block 'container' %}
@@ -15,11 +17,30 @@
   {% block 'container', tag: 'div' %}
     ...
   {% endblock %}
+
+  @example Sand background, with an id so it keeps its own settings
+  {% block 'container', id: 'home-intro', background: 'sand' %}
+    ...
+  {% endblock %}
 {% enddoc %}
 
-{%- assign tag = tag | default: 'section' -%}
+{%- liquid
+  assign tag = tag | default: 'section'
+  assign background_class = ''
+  case background
+    when 'alt', 'cream', 'sand', 'dark'
+      assign background_class = ' block-container--' | append: background
+  endcase
+-%}
 
-<{{ tag }} class="block-container" style="--text-align: {{ block.settings.alignment }};" {{ block.shopify_attributes }}>
+<{{ tag }}
+  class="block-container{{ background_class }}"
+  style="--text-align: {{ block.settings.alignment }};"
+  {% if id != blank %}
+    data-testid="container-{{ id }}"
+  {% endif %}
+  {{ block.shopify_attributes }}
+>
   {{ content }}
 </{{ tag }}>
 

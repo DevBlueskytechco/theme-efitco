@@ -17,6 +17,9 @@
   @param {string} [sizes] - The sizes attribute. Default: '100vw'
   @param {string} [loading] - The loading attribute. Default: 'lazy'
   @param {string} [fetchpriority] - The fetchpriority attribute, omitted when empty
+  @param {boolean} [inline] - Uses a span wrapper so the image can sit inside a heading or paragraph. Ignored when url is set.
+  @param {boolean} [decorative] - Renders alt="" so screen readers skip the image. Default: the image alt text
+  @param {string} [testid] - data-testid on the wrapper, for E2E tests
 
   @example
   {% render 'image', image: product.featured_image %}
@@ -46,8 +49,15 @@
 
   if url
     assign wrapper = 'a'
+  elsif inline
+    assign wrapper = 'span'
   else
     assign wrapper = 'div'
+  endif
+
+  assign tag_alt = image.alt
+  if decorative
+    assign tag_alt = ''
   endif
 
   assign responsive = false
@@ -64,20 +74,23 @@
   {% if url %}
     href="{{ url }}"
   {% endif %}
+  {% if testid != blank %}
+    data-testid="{{ testid }}"
+  {% endif %}
 >
   {%- if fetchpriority -%}
     {{
       image
       | image_url: width: width, height: height, crop: crop
-      | image_tag: widths: tag_widths, sizes: tag_sizes, loading: tag_loading, fetchpriority: fetchpriority
+      | image_tag: widths: tag_widths, sizes: tag_sizes, loading: tag_loading, fetchpriority: fetchpriority, alt: tag_alt
     }}
   {%- elsif responsive -%}
     {{
       image
       | image_url: width: width, height: height, crop: crop
-      | image_tag: widths: tag_widths, sizes: tag_sizes, loading: tag_loading
+      | image_tag: widths: tag_widths, sizes: tag_sizes, loading: tag_loading, alt: tag_alt
     }}
   {%- else -%}
-    {{ image | image_url: width: width, height: height, crop: crop | image_tag }}
+    {{ image | image_url: width: width, height: height, crop: crop | image_tag: alt: tag_alt }}
   {%- endif -%}
 </{{ wrapper }}>
