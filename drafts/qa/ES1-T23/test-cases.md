@@ -74,7 +74,7 @@ Lưu ý AC2: nếu store chưa có menu, chỉ còn test static chạy thật; E
 - TC-25: bản cũ đòi heading ≥ 4 biến thể, tách thành TC-25b chờ ES1-T25.
 - TC-26: thêm quét phần tử thật cho vế "#999999 chỉ trên nền tối".
 - TC-31: mở summary trước khi click option (yêu cầu ticket); so `aria-current` thay cookie.
-- TC-32, TC-33: skip khi bị hCaptcha chuyển sang /challenge; thêm TC-32a chạy thật.
+- TC-32, TC-33: skip khi bị hCaptcha chuyển sang /challenge hoặc badge hCaptcha invisible giữ submit (CI #49: store dev bật hCaptcha, submit không chuyển trang); thêm TC-32a chạy thật.
 - TC-38: bỏ /pages/contact (không phải store nào cũng có, theo smoke.spec.ts); product chọn loại có ảnh và mô tả.
 - TB-15: đo focus xuyên shadow root; không kiểm vòng focus nếu shadow root của `shopify-account` đóng.
 - TB-28: lọc lỗi console ngoài theme như smoke.spec.ts.

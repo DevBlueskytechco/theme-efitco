@@ -156,8 +156,12 @@ async function chooseOther(page: Page, optId: string): Promise<string | null> {
 async function submitNewsletter(page: Page) {
   const before = page.url();
   await page.getByTestId(T.nlForm).getByTestId(T.nlSubmit).click();
-  await page.waitForURL(u => u.href !== before);
-  test.skip(/\/challenge/.test(page.url()), 'hCaptcha chặn submit tự động, chạy tay (xem test-cases.md)');
+  const moved = await page.waitForURL(u => u.href !== before, { timeout: 15_000 }).then(() => true, () => false);
+  // hCaptcha invisible (badge góc phải) giữ submit lại không chuyển trang, hoặc chuyển sang /challenge: skip, chạy tay.
+  // Không chuyển trang mà không có hCaptcha thì là lỗi thật của form → fail.
+  const captcha = (await page.locator('iframe[src*="hcaptcha"]').or(page.getByRole('img', { name: /hCaptcha/i })).count()) > 0;
+  test.skip(/\/challenge/.test(page.url()) || (!moved && captcha), 'hCaptcha chặn submit tự động, chạy tay (xem test-cases.md)');
+  expect(moved, 'submit newsletter không chuyển trang và không có hCaptcha').toBe(true);
 }
 
 test.describe('ES1-T23', () => {
