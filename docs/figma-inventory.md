@@ -18,7 +18,7 @@ Frame `Homepage` = node `1:359`, kích thước 1920 × 13300 (desktop duy nhấ
 | # | Tên block (Shopify) | Node id | y | Story | Breakpoint | Trạng thái thiếu | Ghi chú |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Header | 1:362 | 24 | TE-1 | desktop | hover menu, mega menu, mobile drawer, search mở | 7 menu: Shop, Collection, Sale, Our Story, Blog, Contact, Help; icon search/account/cart; logo 1:377 (vector). Nền trong suốt đè lên hero (1:363 BG) |
-| 2 | Slideshow / Hero | 1:422 (slide 1), 1:437 (slide 2) | 80 | TE-2 | desktop | dots/arrow hover, slide 3+, video | 1798 × 827, bo góc; eyebrow "Trusted by 10,000+ athletes", H1 2 dòng, sub, 1 CTA; nút Back/Next 1:435/1:436; dots 1:418 |
+| 2 | Slideshow / Hero (CTO 31/10: slideshow) | 1:422 (slide 1), 1:437 (slide 2) | 80 | TE-2 AC6–AC9 | desktop | dots/arrow hover, slide 3+, video | 1798 × 827, bo góc; eyebrow "Trusted by 10,000+ athletes", H1 2 dòng, sub, 1 CTA; nút Back/Next 1:435/1:436; dots 1:418 |
 | 3 | Collection list (carousel) | 1:395 | 1027 | TE-3 | desktop | rỗng (<5 collection), hover | "Browse Categories", 5 card 336 × 270: Free Weights, Functional Training, Benches & Racks, Recovery & Mobility, Accessories; nút next/back 1:398 |
 | 4 | Rich text + Collection list (shop by level) | 1:453 | 1515 | TE-2 + TE-3 | desktop | rỗng | Gộp 2 phần: 1:454 heading "Everything You Need to Train." + CTA "Become A Member"; 1:464 "Choose Your Training Level" 3 card 456 × 456 Beginner/Intermediate/Advanced có badge "24 Products" |
 | 5 | Featured collection (tabs) | 1:490 | 2663 | TE-3 | desktop | tab rỗng, hover card, quick add | "What People Are Buying?" 4 tab All/Weight/Portable Fitness/Accessories; 4 product card: badge -25%, rating 5.0, giá gạch, "+ 2 Colors" swatch |

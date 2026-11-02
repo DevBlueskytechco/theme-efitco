@@ -1,0 +1,160 @@
+{% doc %}
+  Renders a heading on the left and rich text plus an optional link on the
+  right, inside a box limited by the max_width setting. Stacks into one column
+  on small screens. The heading can hold a decorative inline image between the
+  heading and heading_after_image settings. Empty elements are skipped. When
+  heading, image, text and button are all empty, the editor shows a placeholder
+  and the storefront renders nothing. Text alignment and background come from
+  the parent container. Self-contained: callers must leave the body empty.
+
+  Test hooks: data-testid="rich-text", "rich-text-heading",
+  "rich-text-inline-image" (image wrapper), "rich-text-body", "rich-text-button".
+
+  @example
+  {% block 'container', id: 'home-intro', background: 'sand' %}
+    {% block 'rich-text' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign heading = block.settings.heading
+  assign heading_after_image = block.settings.heading_after_image
+  assign inline_image = block.settings.inline_image
+  assign body = block.settings.body
+  assign button_label = block.settings.button_label
+  assign button_url = block.settings.button_url | default: routes.all_products_collection_url
+  assign heading_tag = block.settings.heading_level
+
+  assign has_heading = false
+  if heading != blank or heading_after_image != blank or inline_image != blank
+    assign has_heading = true
+  endif
+-%}
+
+{%- if has_heading or body != blank or button_label != blank -%}
+  <div
+    class="rich-text"
+    style="--rich-text-max-width: {{ block.settings.max_width }}px;"
+    data-testid="rich-text"
+    {{ block.shopify_attributes }}
+  >
+    {%- if has_heading -%}
+      <{{ heading_tag }} class="rich-text__heading" data-testid="rich-text-heading">
+        {{- heading | escape -}}
+        {%- if inline_image != blank %}
+          {% render 'image',
+            image: inline_image,
+            class: 'rich-text__inline-image',
+            inline: true,
+            decorative: true,
+            width: 330,
+            widths: '165, 330',
+            sizes: '(min-width: 64rem) 165px, 80px',
+            loading: 'lazy',
+            testid: 'rich-text-inline-image'
+          %}
+          {{ heading_after_image | escape -}}
+        {%- elsif heading != blank and heading_after_image != blank %}
+          {{ heading_after_image | escape -}}
+        {%- else -%}
+          {{- heading_after_image | escape -}}
+        {%- endif -%}
+      </{{ heading_tag }}>
+    {%- endif -%}
+    {%- if body != blank or button_label != blank -%}
+      <div class="rich-text__content">
+        {%- if body != blank -%}
+          <div class="rich-text__body" data-testid="rich-text-body">{{ body }}</div>
+        {%- endif -%}
+        {%- if button_label != blank -%}
+          <a class="button button--link" href="{{ button_url }}" data-testid="rich-text-button">
+            <span class="button__label">{{ button_label | escape }}</span>
+            {%- render 'slideshow-icon', name: 'arrow' -%}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+{%- elsif request.design_mode -%}
+  <p
+    class="rich-text rich-text--placeholder"
+    style="--rich-text-max-width: {{ block.settings.max_width }}px;"
+    data-testid="rich-text"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.rich_text.placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.rich_text",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.rich_text_heading",
+      "default": "Everything You Need"
+    },
+    {
+      "type": "image_picker",
+      "id": "inline_image",
+      "label": "t:labels.rich_text_inline_image",
+      "info": "t:info.rich_text_inline_image"
+    },
+    {
+      "type": "text",
+      "id": "heading_after_image",
+      "label": "t:labels.rich_text_heading_after_image",
+      "info": "t:info.rich_text_heading_after_image",
+      "default": "to Train."
+    },
+    {
+      "type": "select",
+      "id": "heading_level",
+      "label": "t:labels.rich_text_heading_level",
+      "info": "t:info.rich_text_heading_level",
+      "options": [
+        {
+          "value": "h1",
+          "label": "t:options.heading_level.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.heading_level.h2"
+        }
+      ],
+      "default": "h2"
+    },
+    {
+      "type": "richtext",
+      "id": "body",
+      "label": "t:labels.rich_text_body",
+      "default": "<p>Versatile equipment for home training - strength, mobility, endurance, at every level.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "t:labels.rich_text_button_label",
+      "info": "t:info.slide_button_label",
+      "default": "Become A Member"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "t:labels.rich_text_button_url",
+      "info": "t:info.rich_text_button_url"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 480,
+      "max": 1416,
+      "step": 24,
+      "unit": "px",
+      "label": "t:labels.rich_text_max_width",
+      "default": 1416
+    }
+  ]
+}
+{% endschema %}

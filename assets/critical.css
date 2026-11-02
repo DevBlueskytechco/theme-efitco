@@ -254,6 +254,11 @@ a {
   object-position: left;
 }
 
+/* object-position không có từ khoá logical */
+.site-header__logo-image img:dir(rtl) {
+  object-position: right;
+}
+
 .site-header__link {
   display: flex;
   align-items: center;
@@ -400,7 +405,7 @@ details[open] > .site-header__link svg {
 
 .block-container:has(> .site-header[data-sticky]) {
   position: sticky;
-  top: 0;
+  inset-block-start: 0;
 }
 
 /* Hero đầu trang: đè lên hero; không JS thì không sticky */
@@ -453,7 +458,7 @@ body:has(main > :first-child [data-header-overlay]) .site-header:not([data-scrol
   position: relative;
   grid-template-columns: var(--content-grid);
   display: grid;
-  text-align: var(--text-align, left);
+  text-align: var(--text-align, start);
   width: 100%;
 }
 

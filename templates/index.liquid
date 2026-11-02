@@ -1,5 +1,10 @@
 {% block 'container' %}
-  {% block 'hello-world' %}
-    {% block 'liquid-tips', tips: ['hello_world.liquid_tips_1', 'hello_world.liquid_tips_2', 'hello_world.liquid_tips_3'] %}{% endblock %}
+  {% block 'slideshow' %}
+    {% block 'slideshow-slide', id: 'slide-1', priority: true %}{% endblock %}
+    {% block 'slideshow-slide', id: 'slide-2' %}{% endblock %}
   {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-intro', background: 'sand' %}
+  {% block 'rich-text' %}{% endblock %}
 {% endblock %}

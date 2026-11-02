@@ -1,0 +1,34 @@
+{% doc %}
+  Renders one inline, decorative slideshow icon that follows currentColor.
+
+  @param {string} name - Icon name: 'previous', 'next', 'pause', 'play' or 'arrow'
+
+  @example
+  {% render 'slideshow-icon', name: 'next' %}
+{% enddoc %}
+
+<svg
+  class="slideshow-icon slideshow-icon--{{ name }}"
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 20 20"
+  fill="none"
+  stroke="currentColor"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  stroke-width="2"
+  aria-hidden="true"
+  focusable="false"
+>
+  {%- case name -%}
+    {%- when 'previous' -%}
+      <path d="m12.5 3-7 7 7 7" />
+    {%- when 'next' -%}
+      <path d="m7.5 3 7 7-7 7" />
+    {%- when 'pause' -%}
+      <path d="M7 4v12M13 4v12" />
+    {%- when 'play' -%}
+      <path d="m6 4 10 6-10 6z" />
+    {%- when 'arrow' -%}
+      <path d="M2 10h16M12 4l6 6-6 6" />
+  {%- endcase -%}
+</svg>

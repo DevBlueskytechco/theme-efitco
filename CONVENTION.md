@@ -9,6 +9,8 @@ Bổ sung cho AGENTS.md (AGENTS.md thắng khi mâu thuẫn).
 Xem `.claude/rules/fe-be-boundary.md`. JS = BE.
 
 ## Liquid / CSS / JS
+- CSS dùng logical properties (inline/block, start/end), không left/right cứng — sẵn RTL (Editions Fall '26). Không dùng `{% stylesheet %}` nên CSS subsetting của Shopify không áp dụng; ngân sách CSS theo ADR 0003.
+- JS cart/product/search phải tương thích Standard storefront actions: override `Shopify.actions` khi theme có UI riêng (cart drawer), dispatch event `shopify:*` sau thay đổi.
 Xem skill `liquid-convention`, `block-settings-schema`, `js-partials`, `responsive-a11y`.
 
 ## Test
