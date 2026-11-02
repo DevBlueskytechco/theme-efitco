@@ -19,5 +19,9 @@ B. tokens.json là nguồn; màu theo docs/tokens.json (sửa 27/10 sau kiểm k
 - Đo bổ sung: 0 `rgb()/rgba()/hsl()` literal trong assets/*.css; bóng đổ dùng `color-mix()` với biến.
 - Chi tiết: drafts/techlead/ES1-T11/task-split.md mục D1.
 
+## Bổ sung 2026-11-02 (Tech Lead, ES1-T41)
+- +2 màu `background_sand` #EBE6E0, `background_sand_foreground` #1A1A1A → 19 màu. Chi tiết và quy tắc contrast trên sand: ADR 0005.
+- Tên setting thực tế trong code là `<token>_color` (vd `background_alt_color`), không phải `color_<token>`; biến CSS giữ `--color-<token>`.
+
 ## Hệ quả
 Tốt: Sidekick đổi màu bằng setting. Xấu: 26 setting toàn cục (17 màu, 2 font, 1 space, 4 radius, 2 layout). Việc: Designer xuất tokens.json tuần 1; Dev FE TE-1 map. Đo: 0 màu hardcode trong CSS (grep #[0-9a-f]{3,6} ngoài css-variables).
