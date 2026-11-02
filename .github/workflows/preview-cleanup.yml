@@ -1,0 +1,44 @@
+name: Preview cleanup
+# Xoá theme preview ai-<nhánh> trên store hoa-qua-nhap-khau:
+# - khi PR đóng/merge: xoá theme của nhánh đó
+# - hằng ngày + chạy tay: xoá mọi theme ai-* mà nhánh không còn trên GitHub (giữ ai-develop, không đụng theme live)
+on:
+  pull_request:
+    types: [closed]
+  schedule:
+    - cron: "0 20 * * *"   # 03:00 giờ VN
+  workflow_dispatch:
+concurrency: { group: preview-themes, cancel-in-progress: false }
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    env:
+      SHOPIFY_FLAG_STORE: hoa-qua-nhap-khau.myshopify.com
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm i -g @shopify/cli@4.9.5
+      - name: Xoá theme preview thừa
+        run: |
+          name_of() { echo "ai-$(echo "$1" | tr '/' '-' | cut -c1-40)"; }
+          shopify theme list --json > list.json
+          jq -r '(if type=="array" then . else (.themes // .data // []) end)[] | select(.role != "live" and .role != "main") | "\(.id)\t\(.name)"' list.json > themes.tsv
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            keep_mode=pr; target=$(name_of "${{ github.head_ref }}")
+          else
+            keep_mode=all
+            git ls-remote --heads origin | awk '{print $2}' | sed 's#refs/heads/##' | while read b; do name_of "$b"; done | sort -u > alive.txt
+            echo "ai-develop" >> alive.txt
+          fi
+          n=0
+          while IFS=$'\t' read -r id name; do
+            case "$name" in ai-*) ;; *) continue;; esac
+            if [ "$keep_mode" = pr ]; then [ "$name" = "$target" ] || continue
+            else grep -qxF "$name" alive.txt && continue; fi
+            id=${id##*/}
+            echo "xoá $name ($id)"; shopify theme delete --theme "$id" --force && n=$((n+1))
+          done < themes.tsv
+          echo "đã xoá $n theme"; shopify theme list
