@@ -62,6 +62,7 @@ Là merchant, tôi muốn đặt block hiện sản phẩm của một collectio
 - AC6 Given keyboard When tab qua card Then focus thấy được, ảnh có alt từ sản phẩm; touch target ≥ 24px.
 - AC7 Given bật nút Xem tất cả When render Then nút link tới collection.url, vị trí theo setting.
 
+- AC8 (Editions Fall '26 #20) Given collection đa nguồn có phần tử là variant When render card Then ảnh, giá, link ?variant= theo đúng variant đó, swatch chọn sẵn variant đó.
 Mã R: R7 collection (giá, unit price, ảnh); R7 product swatch; R12 a11y; R17
 
 ### TE-4 — Trang sản phẩm
@@ -78,6 +79,10 @@ Là khách, tôi muốn xem ảnh/video, chọn biến thể thấy giá và t�
 - AC7 Given cuối trang When render Then block related products và complementary products từ Product Recommendations API.
 - AC8 Given thêm giỏ thành công When Then cart drawer mở (TE-5) hoặc chuyển cart page theo setting.
 
+- AC9 (Editions #14) Given variant.requires_shipping = false (sản phẩm số, bán quyền truy cập) When render Then ẩn pickup availability và thông báo vận chuyển; sản phẩm 1 variant không hiện bộ chọn option.
+- AC10 (Editions #16) Given market có giá đã gồm thuế/phí (cart.taxes_included, cart.duties_included) When render giá Then hiện ghi chú tương ứng qua locale, theo từng market.
+- AC11 (Editions #28) Given trang sản phẩm When render Then có structured data Product (JSON-LD: name, image, offers theo variant, availability, price, priceCurrency, brand).
+- AC12 (Editions #5, BE) Given trang sản phẩm load hoặc đổi variant When Then dispatch event chuẩn `shopify:product:view` / variant theo tài liệu Standard storefront actions; override action show variant để UI đổi đúng variant.
 Mã R: R4 rich media, pickup, installments, recommendations, selling plans, variant images; R7 product page
 
 ### TE-5 — Cart drawer và cart page
@@ -92,6 +97,7 @@ Là khách, tôi muốn sửa giỏ không reload, thấy giảm giá, ghi chú 
 - AC5 Given cart page (templates/cart.liquid) When render Then đủ như drawer + cart note textarea + selling plan hiện + mã giảm giá tự động hiện; không JS vẫn update/checkout được bằng form.
 - AC6 Given setting cart type page When thêm giỏ Then chuyển cart page thay vì mở drawer.
 
+- AC7 (Editions #4, #5, #18, BE) Given agent hoặc app gọi `Shopify.actions` (add to cart, update cart lines, openCart) When Then theme override: openCart mở cart drawer (không sang trang cart), cart drawer + cart-count refresh từ dữ liệu cart thật qua partial (không cache client), dispatch `shopify:cart:lines-update` sau mỗi thay đổi do theme gây ra.
 Mã R: R4 discounts, selling plans, accelerated checkout; R7 cart page
 
 ### TE-6 — Trang collection: lọc, sắp xếp, phân trang
@@ -141,6 +147,8 @@ Là merchant, tôi muốn cài theme là có trang chủ hoàn chỉnh và các 
 - AC3 Given blog/article When Then title, image, excerpt_or_content, published_at, comments phân trang, form comment hoạt động.
 - AC4 Given store hoa-qua-nhap-khau (efitco-ai-dev) When Then có dữ liệu demo: 24 sản phẩm (có sale, hết hàng, nhiều biến thể, gift card), 4 collection, 3 bài blog, ảnh tự do bản quyền.
 
+- AC5 (Editions #25) Given shop.policies When render footer/trang phụ Then link chính sách lấy từ shop.policies, không nhập tay URL.
+- AC6 (Editions #27) Given chưa chọn logo/màu trong theme When render Then dùng shop.brand (logo, màu chính) làm mặc định nếu có.
 Mã R: R7 404/password/page/blog/article/gift card; R14 default; R18 preset cùng tên theme
 
 ### TE-10 — Chuẩn chất lượng và sẵn sàng Canvas
@@ -154,6 +162,7 @@ Là CTO, tôi muốn theme đạt ngưỡng chất lượng đo được và ch�
 - AC4 Given zip upload lên yum-dev (store người, đã có Canvas) When checklist Canvas Then 5 bước pass; 10 yêu cầu Sidekick mẫu cho ra theme check 0 lỗi và cấu trúc không đổi.
 - AC5 Given tài liệu merchant When kiểm Then 16/16 block có docs/merchant, có hướng dẫn nâng cấp theme trong Canvas.
 
+- AC6 (Editions #6, #17, #30, #40, QA) Given Chrome có WebMCP và inspector của `shopify theme dev` When gọi add_to_cart, update_cart_lines, show_variant Then UI theme (drawer, cart-count, variant) cập nhật đúng, 0 console error; nút dynamic checkout không vỡ layout với Apple Pay QR trên Chrome/Edge/Firefox; widget Shopify Inbox không che sticky add-to-cart, back-to-top, cart drawer ở 360 và 1280; header/account không dùng customer.has_account làm điều kiện hiển thị.
 Mã R: R6 Lighthouse; R8 nhất quán; R9 trình duyệt; R10 assets; R12 a11y; Canvas 5 bước
 
 ### TE-11 — Block product finder quiz
@@ -193,6 +202,18 @@ Là merchant, tôi muốn làm nổi bật 1 sản phẩm đang khuyến mãi c�
 - AC5 Given Lighthouse trang chủ When có 2 block này Then vẫn đạt ngưỡng TE-10 (≥ 96 desktop, ≥ 90 mobile).
 
 Mã R: R8 không fake urgency; R6 Lighthouse; R12 a11y
+
+### TE-14 — Sẵn sàng cho Sidekick, Canvas và agent (Editions Fall '26)
+Phía: FE (docs + Liquid) · Ước lượng sơ bộ: 5 point (techlead chốt) · Nguồn: Báo cáo Editions Fall '26 checklist mục 1, 2, 10
+
+Là CTO, tôi muốn theme có hướng dẫn máy đọc được và quy ước sẵn cho RTL để Sidekick trong Canvas và agent sửa theme không phá kiến trúc.
+
+- AC1 Given gốc theme When kiểm Then có `AGENTS.md` (viết lại theo outline Shopify cho base theme Canvas: non-negotiables, composition model, block/snippet contracts, styling và tokens, JavaScript, translations, decision guide; mỗi quy tắc có lý do) ≤ 50 KB, đúng tên viết hoa; liệt kê đủ block hiện có.
+- AC2 Given gốc theme When kiểm Then có `DESIGN.md` ghi ý đồ thiết kế Efitco: token (màu, font, khoảng cách, bo góc) lấy từ docs/tokens.json, nhịp trang, quy tắc ảnh, giọng chữ CTA, các quyết định CTO (accent #C8400E AA, xám #6B6B6B) ≤ 50 KB.
+- AC3 Given 10 yêu cầu Sidekick mẫu của checklist Canvas When chạy trên yum-dev Then Sidekick đọc 2 file và kết quả qua theme check 0 lỗi, giữ cấu trúc block-first.
+- AC4 Given mọi CSS trong assets/ When kiểm Then dùng logical properties (margin-inline, padding-inline-start, inset-inline-*, text-align: start/end) thay left/right, để bật RTL sau không phải viết lại; icon mũi tên/slider đảo bằng `:dir(rtl)`.
+
+Mã R: Canvas 5 bước; R8 nhất quán; Editions Fall '26 #1, #2, #10
 
 ## 3. Quyết định đã chốt (CTO 27/10/2026, trước là câu hỏi mở)
 - Hết hàng: sản phẩm vẫn hiện trong featured collection, bundle, shop the look, collection, kèm badge "Sold out"; nút thêm vào giỏ disabled. Áp cho TE-3, TE-4, TE-6, TE-12.
