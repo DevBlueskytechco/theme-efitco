@@ -1,6 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy trên preview và chưa type-check (không có node_modules, PREVIEW_URL, STORE_PASSWORD trong phiên viết). Kết quả thật lấy từ CI e2e trên PR.
 // Ticket ES1-T53 (2727475000000142027): TE-3-QA1, E2E featured collection + product card, docs/srs.md#TE-3 AC1–AC8 + quy tắc Hết hàng.
 // Gộp và thay tests/e2e/ES1-T50.spec.ts, ES1-T51.spec.ts, ES1-T52.spec.ts. Test case: drafts/qa/ES1-T53/test-cases.md (tên test bắt đầu bằng ID TC).
+// ES1-T74: mọi .js / products.json lấy bằng fetch trong trang (inPageJson), cùng market/tiền với card; market runner ghi vào annotation "market" + stdout. Xem drafts/qa/ES1-T74/test-cases.md.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-3.spec.ts
 // Dữ liệu (không hardcode handle): TE3_SALE_HANDLE, TE3_SMALL_PRICE_HANDLE, TE3_VARIES_HANDLE, TE3_UNIT_PRICE_HANDLE,
 //   TE3_SWATCH_HANDLE, TE3_SOLD_OUT_HANDLE, TE3_BADGE_SWATCH_HANDLE (ES1-T57), TE3_AC8_VARIANT_ID, TE3_AC8_PATH. Không đặt thì tự tìm card đầu tiên có testid, không có thì skip.
@@ -133,17 +134,57 @@ function blockSchema(): { presets?: unknown; settings: Array<Record<string, unkn
   return JSON.parse(m![1]);
 }
 
+// ES1-T74: JSON so tiền lấy bằng fetch TRONG trang (cùng cookie localization/cart, IP, header với HTML card) → cùng market, cùng tiền với card.
+// Không dùng page.request: CI PR #63 card hiện Tk (BDT) còn .js qua page.request trả giá market/tiền khác → TC-30 lệch 255900.
+// Không ghim market US (POST /localization): phụ thuộc danh sách market của store dev và bỏ qua đúng case runner gặp.
+type InPage<J> = { ok: boolean; status: number; body: J | null };
+async function inPageJson<J>(page: Page, path: string): Promise<InPage<J>> {
+  if (!/^https?:/.test(page.url())) await page.goto(ALL); // fetch tương đối cần origin store
+  return page.evaluate(async p => {
+    const r = await fetch(p, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+    return { ok: r.ok, status: r.status, body: r.ok ? await r.json().catch(() => null) : null };
+  }, path);
+}
+
+type MoneyCtx = { country: string | null; active: string | null; rate: string | null; cart: string | null };
+async function moneyContext(page: Page): Promise<MoneyCtx> {
+  if (!/^https?:/.test(page.url())) await page.goto(ALL);
+  return page.evaluate(async () => {
+    const s = (window as unknown as { Shopify?: { country?: string; currency?: { active?: string; rate?: string } } }).Shopify ?? {};
+    const cart = await fetch('/cart.js', { credentials: 'same-origin' }).then(r => (r.ok ? r.json() : null)).catch(() => null);
+    return { country: s.country ?? null, active: s.currency?.active ?? null, rate: s.currency?.rate ?? null, cart: cart?.currency ?? null };
+  });
+}
+const fmtCtx = (c: MoneyCtx) => `country=${c.country} Shopify.currency.active=${c.active} rate=${c.rate} cart.js currency=${c.cart}`;
+
+// Ghi market/tiền runner nhận vào annotation (HTML report) + stdout 1 lần mỗi project; tiền trang khác tiền cart.js thì skip có lý do, không fail sai.
+const checkedCtx = new WeakMap<Page, MoneyCtx>();
+const loggedProjects = new Set<string>();
+async function requireSameCurrency(page: Page): Promise<MoneyCtx> {
+  const hit = checkedCtx.get(page);
+  if (hit) return hit;
+  const ctx = await moneyContext(page);
+  const ti = test.info();
+  ti.annotations.push({ type: 'market', description: fmtCtx(ctx) });
+  if (!loggedProjects.has(ti.project.name)) {
+    loggedProjects.add(ti.project.name);
+    console.log(`[ES1-T74 market ${ti.project.name}] ${fmtCtx(ctx)}`);
+  }
+  test.skip(!!ctx.active && !!ctx.cart && ctx.active !== ctx.cart, `Tiền hiển thị (${ctx.active}) khác tiền cart.js (${ctx.cart}): .js không cùng đơn vị với card, không so được`);
+  checkedCtx.set(page, ctx);
+  return ctx;
+}
+
 async function storeProductCount(page: Page): Promise<number | null> {
-  const res = await page.request.get('/products.json?limit=250');
-  if (!res.ok()) return null;
-  const body = (await res.json().catch(() => null)) as { products?: unknown[] } | null;
-  return body?.products ? body.products.length : null;
+  const r = await inPageJson<{ products?: unknown[] }>(page, '/products.json?limit=250');
+  return r.body?.products ? r.body.products.length : null;
 }
 
 async function productJs(page: Page, handle: string): Promise<JsProduct> {
-  const res = await page.request.get(`/products/${handle}.js`);
-  expect(res.ok(), `/products/${handle}.js`).toBe(true);
-  return (await res.json()) as JsProduct;
+  await requireSameCurrency(page);
+  const r = await inPageJson<JsProduct>(page, `/products/${handle}.js`);
+  expect(r.ok && !!r.body, `/products/${handle}.js (fetch trong trang) trả ${r.status}`).toBe(true);
+  return r.body!;
 }
 
 async function handleOf(card: Locator): Promise<string> {
@@ -664,8 +705,9 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
   test('TC-22 AC3: sale giá nhỏ (compare_at dưới 1000 cents) tính % đúng', async ({ page }) => {
     let handle = ENV.small;
     if (!handle) {
-      const res = await page.request.get('/products.json?limit=250');
-      const data = res.ok() ? ((await res.json().catch(() => null)) as { products?: Array<{ handle: string; variants: Array<{ price: string; compare_at_price: string | null; available: boolean }> }> } | null) : null;
+      // Chỉ để chọn ứng viên; phép so % dùng .js trong trang (cùng tiền với card), ứng viên lệch tiền cũng không fail sai.
+      const r = await inPageJson<{ products?: Array<{ handle: string; variants: Array<{ price: string; compare_at_price: string | null; available: boolean }> }> }>(page, '/products.json?limit=250');
+      const data = r.body;
       const hit = (data?.products ?? []).find(p => {
         const v = p.variants.find(x => x.available) ?? p.variants[0];
         const c = Number(v?.compare_at_price ?? 0);
@@ -746,6 +788,31 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     expect(p.price_varies).toBe(true);
     expect(Math.abs(toCents(min) - p.price_min)).toBeLessThanOrEqual(1);
     expect(Math.abs(toCents(max) - p.price_max)).toBeLessThanOrEqual(1);
+  });
+
+  // ES1-T74: chốt nguồn so tiền. Card, Shopify.currency và cart.js cùng tiền; ghi lại page.request có lệch không (chỉ chẩn đoán, không assert).
+  test('TC-34 AC3 AC4: card và .js trong trang cùng market, cùng tiền', async ({ page }) => {
+    const cards = await cardsOn(page, ALL);
+    const ctx = await moneyContext(page);
+    test.info().annotations.push({ type: 'market', description: fmtCtx(ctx) });
+    expect(ctx.active, 'window.Shopify.currency.active có giá trị').toMatch(/^[A-Z]{3}$/);
+    expect(ctx.cart, 'cart.js currency = tiền đang hiển thị').toBe(ctx.active);
+    const card = cards.first();
+    const handle = await handleOf(card);
+    const inPage = await productJs(page, handle);
+    const vid = await variantIdOf(card);
+    const v = inPage.variants.find(x => x.id === vid) ?? inPage.variants.find(x => x.available) ?? inPage.variants[0];
+    const shown = (await card.getByTestId(T.range).count())
+      ? money(norm(await card.getByTestId(T.range).textContent()).split(' – ')[0])
+      : money(await card.getByTestId(T.regular).textContent());
+    const want = (await card.getByTestId(T.range).count()) ? inPage.price_min : v.price;
+    expect(Math.abs(toCents(shown) - want), `${handle}: giá card = .js trong trang (${ctx.active})`).toBeLessThanOrEqual(1);
+
+    const viaRequest = await page.request.get(`/products/${handle}.js`).then(r => (r.ok() ? r.json() : null)).catch(() => null) as JsProduct | null;
+    test.info().annotations.push({
+      type: 'page.request .js',
+      description: `${handle}: in-page price_min=${inPage.price_min}, page.request price_min=${viaRequest?.price_min ?? 'lỗi'}${viaRequest && viaRequest.price_min !== inPage.price_min ? ' (LỆCH: nguyên nhân TC-30 cũ)' : ''}`,
+    });
   });
 
   test('TC-31 AC4: unit price hiện "giá/đơn vị" và có nhãn ẩn', async ({ page }) => {
