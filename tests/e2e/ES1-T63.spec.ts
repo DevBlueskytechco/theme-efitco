@@ -45,10 +45,19 @@ type JsProduct = { id: number; title: string; vendor: string; description: strin
 type Offer = { '@type': string; price: number; priceCurrency: string; availability: string; url: string; sku?: string };
 type LdProduct = { '@type': string; name: string; url: string; image?: string[]; description?: string; brand?: { name: string }; offers: Offer[] };
 
+// ES1-T74: fetch trong trang → .js cùng market, cùng tiền với giá và JSON-LD trên trang. Tiền trang khác cart.js thì skip có lý do.
 async function productJs(page: Page, handle: string): Promise<JsProduct> {
-  const res = await page.request.get(`/products/${handle}.js`);
-  expect(res.ok(), `/products/${handle}.js trả ${res.status()}`).toBeTruthy();
-  return (await res.json()) as JsProduct;
+  if (!/^https?:/.test(page.url())) await page.goto(productPath(handle));
+  const r = await page.evaluate(async (p) => {
+    const s = (window as unknown as { Shopify?: { currency?: { active?: string } } }).Shopify ?? {};
+    const cart = await fetch('/cart.js', { credentials: 'same-origin' }).then((x) => (x.ok ? x.json() : null)).catch(() => null);
+    const res = await fetch(p, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+    return { ok: res.ok, status: res.status, body: res.ok ? await res.json().catch(() => null) : null, active: s.currency?.active ?? null, cart: cart?.currency ?? null };
+  }, `/products/${handle}.js`);
+  test.info().annotations.push({ type: 'market', description: `Shopify.currency.active=${r.active} cart.js currency=${r.cart}` });
+  test.skip(!!r.active && !!r.cart && r.active !== r.cart, `Tiền hiển thị (${r.active}) khác tiền cart.js (${r.cart})`);
+  expect(r.ok && !!r.body, `/products/${handle}.js (fetch trong trang) trả ${r.status}`).toBeTruthy();
+  return r.body as JsProduct;
 }
 
 async function noJsPage(browser: Browser) {
