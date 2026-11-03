@@ -15,7 +15,7 @@
   preselected swatch follow that variant. Product items have no `product`
   property and render with the product's default variant.
 
-  No script tag here: assets/product-swatch.js (BE, ES1-T52) adds it.
+  Loads assets/product-swatch.js (ES module, BE ES1-T52) when cards render.
   Self-contained: callers must leave the body empty.
 
   Test hooks: data-testid="featured-collection", "featured-collection-heading",
@@ -122,6 +122,7 @@
           </li>
         {%- endfor -%}
       </ul>
+      <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
     {%- else -%}
       <div class="featured-collection__placeholder" data-testid="featured-collection-placeholder">
         <p class="featured-collection__hint">{{ 'blocks.featured_collection.placeholder' | t }}</p>
