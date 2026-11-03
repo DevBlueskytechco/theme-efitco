@@ -28,23 +28,40 @@ class ProductSwatch extends HTMLElement {
     // no-op, so moving the card in the DOM never doubles it.
     this.addEventListener('change', this);
 
-    // Back/forward form restore can leave a non-default swatch checked: bring
-    // the image, links and price in line with it.
-    const checked = this.querySelector(`${SWATCH}:checked`);
-    if (checked instanceof HTMLInputElement && !checked.defaultChecked) {
-      this.select(checked);
-    }
+    // Back/forward and reload restore form state without a change event, and
+    // the browser may do it after this callback runs (ES1-T73). pageshow fires
+    // after that restore on a fresh load (after load) and on a bfcache
+    // restore (persisted), so sync again there.
+    window.addEventListener('pageshow', this);
+    this.sync();
   }
 
   disconnectedCallback() {
     this.removeEventListener('change', this);
+    window.removeEventListener('pageshow', this);
   }
 
   /** @param {Event} event */
   handleEvent(event) {
+    if (event.type === 'pageshow') {
+      this.sync();
+      return;
+    }
     const input = event.target;
     if (input instanceof HTMLInputElement && input.checked && input.matches(SWATCH)) {
       this.select(input);
+    }
+  }
+
+  /**
+   * A restored form can leave a non-default swatch checked: bring the image,
+   * links, price and badge in line with it. The default swatch already
+   * matches the Liquid output, so nothing to do then.
+   */
+  sync() {
+    const checked = this.querySelector(`${SWATCH}:checked`);
+    if (checked instanceof HTMLInputElement && !checked.defaultChecked) {
+      this.select(checked);
     }
   }
 
