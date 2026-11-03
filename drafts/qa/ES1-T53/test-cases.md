@@ -31,6 +31,7 @@ Cột Trạng thái: chạy = chạy trên mọi store; có điều kiện = ski
 | TC-30 | AC4 | Sản phẩm `price_varies` (`TE3_VARIES_HANDLE` hoặc card đầu có `price-range`) | Mở /collections/all | `price-range` dạng "min – max", max > min; min, max khớp price_min, price_max của `.js` (sai số 1 cent) | E2E | P1 | có điều kiện |
 | TC-31 | AC4 | Variant có unit price (`TE3_UNIT_PRICE_HANDLE` hoặc card đầu có `price-unit`) | Mở /collections/all | `price-unit` dạng "giá/đơn vị"; `.js` của variant có `unit_price`; có nhãn ẩn "Unit price" | E2E | P2 | có điều kiện |
 | TC-32 | AC4 | Card giá không đổi theo biến thể | Mở /collections/all | Không có `price-range`; có `price-regular` | E2E | P3 | có điều kiện |
+| TC-34 | AC3, AC4 | Runner nhận market bất kỳ (CI PR #63: BDT, tiền "Tk") | Mở /collections/all, đọc `Shopify.currency.active`, `/cart.js` currency, `.js` của card đầu bằng fetch trong trang (ES1-T74) | `Shopify.currency.active` là mã 3 chữ; cart.js currency = currency.active; giá card đầu (min nếu có khoảng) khớp `.js` trong trang (sai số 1 cent); annotation ghi market và giá `.js` qua page.request để chẩn đoán | E2E | P1 | chạy |
 | TC-33 | AC4 | Card `price_varies` có swatch | Click swatch khác | Khoảng giá được thay bằng giá của variant (nội dung template), không còn `price-range` | E2E | P2 | có điều kiện |
 | TC-40 | AC5 | Storefront (không phải editor) | Mở / | Không có `featured-collection-placeholder`; nếu có block thì grid có ≥ 1 card | E2E | P2 | chạy |
 | TC-41 | AC5 | blocks/featured-collection.liquid | Đọc Liquid | Block chỉ render khi `has_products or request.design_mode`; placeholder nằm ở nhánh không có sản phẩm; chuỗi hướng dẫn qua `| t` | static | P3 | chạy |
@@ -79,6 +80,9 @@ Cột Trạng thái: chạy = chạy trên mọi store; có điều kiện = ski
 - Xoá `tests/e2e/ES1-T51.spec.ts`: AC1 360/768/1280 → TC-01/02/05/06, AC7 → TC-60/61, axe → TC-55.
 - Xoá `tests/e2e/ES1-T52.spec.ts`: AC2 click/ArrowDown/axe sau đổi/nối lại DOM/console → TC-12/13/55/14/B-07.
 - Giữ: không. Các file đã xoá trong working tree, Orchestrator commit cùng spec mới.
+
+## Nguồn so tiền (ES1-T74)
+Mọi phép so tiền với `.js` (TC-17, TC-21, TC-22, TC-25, TC-30, TC-34, TC-53, TC-71) lấy `/products/<handle>.js` và `/products.json` bằng `fetch` trong trang (cùng cookie localization/cart, IP, header với HTML card), không qua `page.request`. Trước lần so đầu tiên của mỗi test: đọc `Shopify.currency.active` và `/cart.js` currency; khác nhau thì skip có lý do, không fail sai. TC-20 chỉ dùng giá trên trang, không đổi. Chi tiết: drafts/qa/ES1-T74/test-cases.md.
 
 ## Dữ liệu test (hoa-qua-nhap-khau (efitco-ai-dev))
 Không hardcode handle. Không đặt env thì spec tự tìm card đầu tiên có testid tương ứng trong 5 trang đầu của /collections/all. Không tìm thấy thì skip, lý do ghi trong report.
