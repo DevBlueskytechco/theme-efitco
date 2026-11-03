@@ -1555,6 +1555,367 @@ product-media-gallery {
   }
 }
 
+/** Product form (TE-4 AC2–AC4, AC6, AC9, ES1-T59 D4): picker pill radio, quantity, selling plan,
+   gift card, buy buttons, pickup. Mặc định kỹ thuật (Figma chưa có trang sản phẩm, ES1-T61);
+   payment_button của Shopify không bị đè màu (AC4) */
+product-form,
+product-variant-picker {
+  display: block;
+}
+
+.product-form,
+.product-form__form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.product-form {
+  margin-block: var(--space-5);
+}
+
+.product-form--placeholder {
+  padding: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.product-form[aria-busy='true'] .product-form__add {
+  cursor: progress;
+}
+
+.product-form__field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.product-form__label {
+  padding: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  line-height: var(--line-height-body);
+}
+
+.product-form__input {
+  inline-size: 100%;
+  min-block-size: 44px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.product-form__input:hover {
+  border-color: var(--color-foreground);
+}
+
+.product-form__quantity {
+  inline-size: calc(var(--space-1) * 28);
+}
+
+.product-form__textarea {
+  resize: vertical;
+}
+
+.product-form__hint {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Variant picker: không JS thì select trong noscript chọn variant, ẩn radio để không có 2 bộ chọn */
+.product-variant-picker {
+  display: grid;
+  gap: var(--space-4);
+}
+
+@media (scripting: none) {
+  product-variant-picker {
+    display: none;
+  }
+}
+
+.product-option {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.product-option .product-form__label {
+  margin-block-end: var(--space-2);
+}
+
+.product-option__values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+/* Pill 44px (WCAG 2.5.8 sàn 24px) */
+.product-option__value {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  padding-inline: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.product-option__value:hover {
+  border-color: var(--color-foreground);
+}
+
+.product-option__value:has(:checked) {
+  border-color: var(--color-foreground);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.product-option__value:has(:focus-visible) {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+/* Không còn variant bán được với lựa chọn hiện tại: vẫn chọn được để thấy Sold out / Unavailable */
+.product-option__value:has([data-available='false']) .product-option__text {
+  text-decoration: line-through;
+}
+
+.product-option__value:has([data-available='false']:not(:checked)) {
+  color: var(--color-muted);
+}
+
+.product-option__value--swatch {
+  padding: 0;
+  border-radius: 50%;
+}
+
+.product-option__value--swatch::before {
+  position: absolute;
+  inset: var(--space-1);
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent);
+  border-radius: 50%;
+  background-color: var(--swatch-color, var(--color-background-cream));
+  background-image: var(--swatch-image, none);
+  background-position: center;
+  background-size: cover;
+  content: '';
+}
+
+.product-option__value--swatch:has(:checked) {
+  background-color: var(--color-background);
+}
+
+/* Gạch chéo trên swatch không bán được (chữ đã ẩn nên line-through không thấy) */
+.product-option__value--swatch:has([data-available='false'])::after {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline: var(--space-1);
+  block-size: 1px;
+  background-color: var(--color-foreground);
+  content: '';
+  rotate: -45deg;
+}
+
+/* Selling plan (AC4) */
+.product-selling-plans {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.product-selling-plans .product-form__label {
+  margin-block-end: var(--space-2);
+}
+
+.product-selling-plans__list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.product-selling-plans__group {
+  margin-block-start: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.product-selling-plan {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+  min-block-size: 44px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.product-selling-plan:has(:checked) {
+  border-color: var(--color-foreground);
+}
+
+.product-selling-plan__input,
+.product-gift-card__checkbox {
+  flex: none;
+  inline-size: max(var(--space-5), var(--touch-target-min));
+  block-size: max(var(--space-5), var(--touch-target-min));
+  margin: 0;
+  accent-color: var(--color-foreground);
+}
+
+.product-selling-plan__name {
+  flex: 1 1 auto;
+  font-weight: 500;
+}
+
+.product-selling-plan__price .price__compare {
+  margin-inline-start: var(--space-1);
+}
+
+/* Gift card (AC6): field hiện khi tick, BE ES1-T67 bật/tắt disabled */
+.product-gift-card {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.product-gift-card__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: 44px;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.product-gift-card__fields {
+  display: none;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.product-gift-card:has(.product-gift-card__checkbox:checked) .product-gift-card__fields {
+  display: grid;
+}
+
+/* Buy buttons */
+.product-form__buy-buttons {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.product-form__inventory {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.product-form__inventory::before {
+  flex: none;
+  inline-size: var(--space-2);
+  block-size: var(--space-2);
+  border-radius: 50%;
+  background-color: var(--color-accent);
+  content: '';
+}
+
+.product-form__inventory:not([data-state='in_stock']) {
+  color: var(--color-muted);
+}
+
+.product-form__inventory:not([data-state='in_stock'])::before {
+  background-color: var(--color-muted);
+}
+
+.product-form__add {
+  inline-size: 100%;
+  min-block-size: 52px;
+}
+
+.product-form__add:disabled {
+  border-color: var(--color-border);
+  background-color: var(--color-background-alt);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+/* Chỉ khoảng cách, không đụng màu/kiểu nút của Shopify (AC4) */
+.product-form__payment-button:empty,
+.product-form__installments:empty {
+  display: none;
+}
+
+/* Pickup (AC4, AC9) */
+.product-pickup {
+  display: grid;
+  gap: var(--space-1);
+  padding-block-start: var(--space-4);
+  border-block-start: 1px solid var(--color-border);
+  font-size: var(--font-size-sm);
+}
+
+.product-pickup__status {
+  font-weight: 600;
+}
+
+.product-pickup__time,
+.product-pickup__address {
+  color: var(--color-muted);
+}
+
+.product-pickup__address p {
+  margin: 0;
+}
+
+.product-pickup__details {
+  margin-block-start: var(--space-2);
+}
+
+.product-pickup__summary {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: max(var(--space-5), var(--touch-target-min));
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.product-pickup__list {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-pickup__name {
+  font-weight: 600;
+}
+
+/* Live region lỗi: rỗng thì không chiếm chỗ, BE ES1-T67 điền text API */
+.product-form__error:not(:empty) {
+  padding: var(--space-3) var(--space-4);
+  border-inline-start: 2px solid var(--color-sale);
+  background-color: var(--color-background-alt);
+  color: var(--color-background-alt-foreground);
+  font-size: var(--font-size-sm);
+}
+
 /** Gift card template */
 .template-gift-card main {
   text-align: center;

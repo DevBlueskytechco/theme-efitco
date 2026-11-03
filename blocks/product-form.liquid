@@ -1,0 +1,502 @@
+{% doc %}
+  Product page buy form (TE-4 AC2 markup, AC3 option and quantity, AC4, AC6,
+  AC9). Reads the global `product`. Works without JavaScript (NFR-4).
+
+  current_variant = product.selected_or_first_available_variant, so the first
+  available variant loads by default and ?variant= deep links render that
+  variant's radios, hidden id, stock state and button.
+
+  Variant picker (custom element product-variant-picker) sits outside the
+  form so its radios (name option-{position}) are never submitted. One
+  fieldset + legend per option; each value is a label wrapping a radio,
+  shown as a pill, or as a swatch when value.swatch is set. Radios carry
+  data-available (value.available) and data-option-value-id. Not rendered
+  when product.has_only_default_variant (AC9). Hidden with
+  `scripting: none`: without JS the noscript select below picks the variant.
+
+  Inside the form (id product-form-{product.id}): hidden input name=id with
+  the current variant (assets/product-variant-picker.js, BE ES1-T66, keeps it
+  in sync), then a noscript select name=id listing every variant (sold out
+  options disabled) — without JS the last id parameter (the select) wins.
+
+  Partials (names must match the JS):
+  - product-installments: {{ form | payment_terms }}.
+  - product-selling-plans: radios name=selling_plan with prices from
+    current_variant.selling_plan_allocations; One-time purchase (empty value)
+    unless product.requires_selling_plan; product.selected_selling_plan is
+    preselected. Empty when the product has no selling plan groups.
+  - product-buy-buttons: stock state (In stock / Sold out) + submit button;
+    sold out → disabled with the Sold out label. Unavailable (combination
+    without a variant) is set by JS from data-label-unavailable.
+  - product-pickup: only when current_variant.requires_shipping and at least
+    one store availability has pick_up_enabled; first location + pick up time,
+    other locations in a details element.
+
+  {{ form | payment_button }} renders when the show_dynamic_checkout setting
+  is on, outside every partial (Shopify's script mounts the buttons, a
+  refresh would drop them) and without color overrides (AC4).
+
+  Gift card (product.gift_card?): checkbox
+  properties[__shopify_send_gift_card_to_customer] plus Recipient email,
+  Recipient name, Message (200 characters) and Send on (today to +90 days).
+  The fields show through CSS :has(:checked); assets/product-form.js (BE
+  ES1-T67) toggles disabled and adds properties[__shopify_offset].
+
+  Root custom element product-form (CSS display: block) with data hooks:
+  data-product-id, data-product-url, data-cart-add-url, data-cart-url,
+  data-cart-type (settings.cart_type from TE-5, default drawer),
+  data-label-add, data-label-sold-out, data-label-unavailable. Live regions:
+  product-form-status (role status) and product-form-error (role alert),
+  empty on load. JS sets aria-busy on the root while loading.
+
+  Test hooks: product-form, product-variant-picker, product-option (fieldset),
+  product-option-value (label wrapping the radio), product-form-variant-id,
+  product-variant-select, product-quantity, product-selling-plans,
+  product-selling-plan (label wrapping the radio), product-gift-card-toggle
+  (checkbox), product-gift-card-email, product-gift-card-name,
+  product-gift-card-message, product-gift-card-send-on, product-inventory,
+  product-form-add, product-payment-button, product-installments,
+  product-pickup, product-pickup-details, product-form-status,
+  product-form-error.
+
+  Empty state: no product (block used outside the product template) → a
+  hint in the theme editor, nothing on the storefront.
+
+  Self-contained: callers must leave the body empty.
+
+  @example
+  {% block 'container', id: 'product-main' %}
+    <div class="product__details">
+      {% block 'product-form' %}{% endblock %}
+    </div>
+  {% endblock %}
+{% enddoc %}
+
+{%- if product == blank -%}
+  {%- if request.design_mode -%}
+    <div class="product-form product-form--placeholder" {{ block.shopify_attributes }}>
+      {{ 'blocks.product_form.placeholder' | t }}
+    </div>
+  {%- endif -%}
+{%- else -%}
+  {%- liquid
+    assign current_variant = product.selected_or_first_available_variant
+    assign form_id = 'product-form-' | append: product.id
+    assign cart_type = settings.cart_type | default: 'drawer'
+
+    assign label_add = 'blocks.product_form.add_to_cart' | t
+    assign label_sold_out = 'blocks.product_form.sold_out' | t
+    assign label_unavailable = 'blocks.product_form.unavailable' | t
+
+    assign today = 'now' | date: '%Y-%m-%d'
+    assign send_on_max = 'now' | date: '%s' | plus: 7776000 | date: '%Y-%m-%d'
+  -%}
+
+  <product-form
+    class="product-form"
+    data-product-id="{{ product.id }}"
+    data-product-url="{{ product.url }}"
+    data-cart-add-url="{{ routes.cart_add_url }}"
+    data-cart-url="{{ routes.cart_url }}"
+    data-cart-type="{{ cart_type | escape }}"
+    data-label-add="{{ label_add | escape }}"
+    data-label-sold-out="{{ label_sold_out | escape }}"
+    data-label-unavailable="{{ label_unavailable | escape }}"
+    data-testid="product-form"
+    {{ block.shopify_attributes }}
+  >
+    {%- unless product.has_only_default_variant -%}
+      <product-variant-picker
+        class="product-variant-picker"
+        data-product-url="{{ product.url }}"
+        data-form-id="{{ form_id }}"
+        data-testid="product-variant-picker"
+      >
+        {%- for option in product.options_with_values -%}
+          {%- assign option_index = option.position | minus: 1 -%}
+          <fieldset
+            class="product-option"
+            data-option-position="{{ option.position }}"
+            data-testid="product-option"
+          >
+            <legend class="product-form__label">{{ option.name | escape }}</legend>
+            <div class="product-option__values">
+              {%- for value in option.values -%}
+                {%- liquid
+                  assign checked = false
+                  if current_variant.options[option_index] == value.name
+                    assign checked = true
+                  endif
+                  assign swatch_style = ''
+                  if value.swatch.image
+                    assign swatch_url = value.swatch.image | image_url: width: 88
+                    assign swatch_style = '--swatch-image: url(' | append: swatch_url | append: ');'
+                  elsif value.swatch.color
+                    assign swatch_style = '--swatch-color: ' | append: value.swatch.color | append: ';'
+                  endif
+                -%}
+                <label
+                  class="product-option__value{% if swatch_style != blank %} product-option__value--swatch{% endif %}"
+                  {% if swatch_style != blank %}
+                    style="{{ swatch_style }}"
+                  {% endif %}
+                  data-testid="product-option-value"
+                >
+                  <input
+                    class="product-option__input visually-hidden"
+                    type="radio"
+                    name="option-{{ option.position }}"
+                    value="{{ value.name | escape }}"
+                    data-option-value-id="{{ value.id }}"
+                    data-available="{{ value.available }}"
+                    {% if checked %}
+                      checked
+                    {% endif %}
+                  >
+                  <span class="product-option__text{% if swatch_style != blank %} visually-hidden{% endif %}">
+                    {{- value.name | escape -}}
+                  </span>
+                </label>
+              {%- endfor -%}
+            </div>
+          </fieldset>
+        {%- endfor -%}
+      </product-variant-picker>
+    {%- endunless -%}
+
+    {%- form 'product', product, id: form_id, class: 'product-form__form' -%}
+      <input
+        type="hidden"
+        name="id"
+        value="{{ current_variant.id }}"
+        data-testid="product-form-variant-id"
+      >
+
+      {%- unless product.has_only_default_variant -%}
+        <noscript>
+          <div class="product-form__field">
+            <label class="product-form__label" for="{{ form_id }}-variant">
+              {{- 'blocks.product_form.variant_label' | t -}}
+            </label>
+            <select
+              id="{{ form_id }}-variant"
+              class="product-form__input product-form__select"
+              name="id"
+              data-testid="product-variant-select"
+            >
+              {%- for variant in product.variants -%}
+                {%- liquid
+                  assign variant_title = variant.title | escape
+                  if variant.available
+                    assign variant_price = variant.price | money
+                    assign variant_text = 'blocks.product_form.variant_option' | t: title: variant_title, price: variant_price
+                  else
+                    assign variant_text = 'blocks.product_form.variant_option_sold_out' | t: title: variant_title
+                  endif
+                -%}
+                <option
+                  value="{{ variant.id }}"
+                  {% if variant.id == current_variant.id %}
+                    selected
+                  {% endif %}
+                  {% unless variant.available %}
+                    disabled
+                  {% endunless %}
+                >
+                  {{- variant_text -}}
+                </option>
+              {%- endfor -%}
+            </select>
+          </div>
+        </noscript>
+      {%- endunless -%}
+
+      {% partial 'product-installments' %}
+        <div class="product-form__installments" data-testid="product-installments">
+          {{- form | payment_terms -}}
+        </div>
+      {% endpartial %}
+
+      {% partial 'product-selling-plans' %}
+        {%- if product.selling_plan_groups.size > 0 -%}
+          {%- liquid
+            assign selected_plan = product.selected_selling_plan
+            assign plan_preselected = false
+            if selected_plan != blank
+              assign plan_preselected = true
+            endif
+          -%}
+          <fieldset class="product-selling-plans" data-testid="product-selling-plans">
+            <legend class="product-form__label">{{ 'blocks.product_form.purchase_options' | t }}</legend>
+            <div class="product-selling-plans__list">
+              {%- unless product.requires_selling_plan -%}
+                <label class="product-selling-plan" data-testid="product-selling-plan">
+                  <input
+                    class="product-selling-plan__input"
+                    type="radio"
+                    name="selling_plan"
+                    value=""
+                    {% unless plan_preselected %}
+                      checked
+                    {% endunless %}
+                  >
+                  <span class="product-selling-plan__name">{{ 'blocks.product_form.one_time_purchase' | t }}</span>
+                  <span class="product-selling-plan__price">{{ current_variant.price | money }}</span>
+                </label>
+                {%- assign plan_preselected = true -%}
+              {%- endunless -%}
+
+              {%- for group in product.selling_plan_groups -%}
+                {%- if product.selling_plan_groups.size > 1 -%}
+                  <p class="product-selling-plans__group">{{ group.name | escape }}</p>
+                {%- endif -%}
+                {%- for plan in group.selling_plans -%}
+                  {%- for allocation in current_variant.selling_plan_allocations -%}
+                    {%- if allocation.selling_plan.id == plan.id -%}
+                      {%- liquid
+                        assign plan_checked = false
+                        if selected_plan != blank and selected_plan.id == plan.id
+                          assign plan_checked = true
+                        elsif plan_preselected == false
+                          assign plan_checked = true
+                          assign plan_preselected = true
+                        endif
+                      -%}
+                      <label class="product-selling-plan" data-testid="product-selling-plan">
+                        <input
+                          class="product-selling-plan__input"
+                          type="radio"
+                          name="selling_plan"
+                          value="{{ plan.id }}"
+                          {% if plan_checked %}
+                            checked
+                          {% endif %}
+                        >
+                        <span class="product-selling-plan__name">{{ plan.name | escape }}</span>
+                        <span class="product-selling-plan__price">
+                          {%- if allocation.compare_at_price > allocation.price -%}
+                            <span class="visually-hidden">{{ 'products.price.sale_price' | t }}</span>
+                            {{ allocation.price | money }}
+                            <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
+                            <s class="price__compare">{{ allocation.compare_at_price | money }}</s>
+                          {%- else -%}
+                            {{ allocation.price | money }}
+                          {%- endif -%}
+                        </span>
+                      </label>
+                      {%- break -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endfor -%}
+              {%- endfor -%}
+            </div>
+          </fieldset>
+        {%- endif -%}
+      {% endpartial %}
+
+      <div class="product-form__field">
+        <label class="product-form__label" for="{{ form_id }}-quantity">
+          {{- 'blocks.product_form.quantity' | t -}}
+        </label>
+        <input
+          id="{{ form_id }}-quantity"
+          class="product-form__input product-form__quantity"
+          type="number"
+          name="quantity"
+          min="1"
+          value="1"
+          inputmode="numeric"
+          data-testid="product-quantity"
+        >
+      </div>
+
+      {%- if product.gift_card? -%}
+        <div class="product-gift-card">
+          <label class="product-gift-card__toggle" for="{{ form_id }}-gift-toggle">
+            <input
+              id="{{ form_id }}-gift-toggle"
+              class="product-gift-card__checkbox"
+              type="checkbox"
+              name="properties[__shopify_send_gift_card_to_customer]"
+              value="on"
+              data-testid="product-gift-card-toggle"
+            >
+            {{ 'blocks.product_form.gift_card.toggle' | t }}
+          </label>
+
+          <fieldset class="product-gift-card__fields">
+            <legend class="visually-hidden">{{ 'blocks.product_form.gift_card.legend' | t }}</legend>
+
+            <div class="product-form__field">
+              <label class="product-form__label" for="{{ form_id }}-gift-email">
+                {{- 'blocks.product_form.gift_card.email' | t -}}
+              </label>
+              <input
+                id="{{ form_id }}-gift-email"
+                class="product-form__input"
+                type="email"
+                name="properties[Recipient email]"
+                autocomplete="off"
+                data-testid="product-gift-card-email"
+              >
+            </div>
+
+            <div class="product-form__field">
+              <label class="product-form__label" for="{{ form_id }}-gift-name">
+                {{- 'blocks.product_form.gift_card.name' | t -}}
+              </label>
+              <input
+                id="{{ form_id }}-gift-name"
+                class="product-form__input"
+                type="text"
+                name="properties[Recipient name]"
+                autocomplete="off"
+                data-testid="product-gift-card-name"
+              >
+            </div>
+
+            <div class="product-form__field">
+              <label class="product-form__label" for="{{ form_id }}-gift-message">
+                {{- 'blocks.product_form.gift_card.message' | t -}}
+              </label>
+              <textarea
+                id="{{ form_id }}-gift-message"
+                class="product-form__input product-form__textarea"
+                name="properties[Message]"
+                rows="4"
+                maxlength="200"
+                aria-describedby="{{ form_id }}-gift-message-hint"
+                data-testid="product-gift-card-message"
+              ></textarea>
+              <p id="{{ form_id }}-gift-message-hint" class="product-form__hint">
+                {{- 'blocks.product_form.gift_card.message_hint' | t: count: 200 -}}
+              </p>
+            </div>
+
+            <div class="product-form__field">
+              <label class="product-form__label" for="{{ form_id }}-gift-send-on">
+                {{- 'blocks.product_form.gift_card.send_on' | t -}}
+              </label>
+              <input
+                id="{{ form_id }}-gift-send-on"
+                class="product-form__input"
+                type="date"
+                name="properties[Send on]"
+                min="{{ today }}"
+                max="{{ send_on_max }}"
+                pattern="\d{4}-\d{2}-\d{2}"
+                aria-describedby="{{ form_id }}-gift-send-on-hint"
+                data-testid="product-gift-card-send-on"
+              >
+              <p id="{{ form_id }}-gift-send-on-hint" class="product-form__hint">
+                {{- 'blocks.product_form.gift_card.send_on_hint' | t: days: 90 -}}
+              </p>
+            </div>
+          </fieldset>
+        </div>
+      {%- endif -%}
+
+      {% partial 'product-buy-buttons' %}
+        {%- liquid
+          if current_variant.available
+            assign stock_state = 'in_stock'
+            assign stock_label = 'blocks.product_form.in_stock' | t
+          else
+            assign stock_state = 'sold_out'
+            assign stock_label = label_sold_out
+          endif
+        -%}
+        <div class="product-form__buy-buttons">
+          <p class="product-form__inventory" data-state="{{ stock_state }}" data-testid="product-inventory">
+            {{- stock_label -}}
+          </p>
+          <button
+            class="button product-form__add"
+            type="submit"
+            name="add"
+            {% unless current_variant.available %}
+              disabled
+            {% endunless %}
+            data-testid="product-form-add"
+          >
+            <span class="product-form__add-label">
+              {%- if current_variant.available -%}
+                {{- label_add -}}
+              {%- else -%}
+                {{- label_sold_out -}}
+              {%- endif -%}
+            </span>
+          </button>
+        </div>
+      {% endpartial %}
+
+      {%- if block.settings.show_dynamic_checkout -%}
+        <div class="product-form__payment-button" data-testid="product-payment-button">
+          {{- form | payment_button -}}
+        </div>
+      {%- endif -%}
+    {%- endform -%}
+
+    {% partial 'product-pickup' %}
+      {%- liquid
+        assign pickup_locations = current_variant.store_availabilities | where: 'pick_up_enabled'
+      -%}
+      {%- if current_variant.requires_shipping and pickup_locations.size > 0 -%}
+        {%- assign first_location = pickup_locations.first -%}
+        {%- assign first_name = first_location.location.name | escape -%}
+        <div class="product-pickup" data-testid="product-pickup">
+          <p class="product-pickup__status" data-available="{{ first_location.available }}">
+            {%- if first_location.available -%}
+              {{- 'blocks.product_form.pickup.available_at' | t: location: first_name -}}
+            {%- else -%}
+              {{- 'blocks.product_form.pickup.unavailable_at' | t: location: first_name -}}
+            {%- endif -%}
+          </p>
+          {%- if first_location.available and first_location.pick_up_time != blank -%}
+            <p class="product-pickup__time">{{ first_location.pick_up_time | escape }}</p>
+          {%- endif -%}
+
+          {%- if pickup_locations.size > 1 -%}
+            <details class="product-pickup__details" data-testid="product-pickup-details">
+              <summary class="product-pickup__summary">{{ 'blocks.product_form.pickup.other_locations' | t }}</summary>
+              <ul class="product-pickup__list" role="list">
+                {%- for availability in pickup_locations offset: 1 -%}
+                  <li class="product-pickup__location">
+                    <p class="product-pickup__name">{{ availability.location.name | escape }}</p>
+                    <p class="product-pickup__time">
+                      {%- if availability.available -%}
+                        {{- 'blocks.product_form.pickup.available' | t -}}
+                        {%- if availability.pick_up_time != blank %}, {{ availability.pick_up_time | escape }}{% endif -%}
+                      {%- else -%}
+                        {{- 'blocks.product_form.pickup.unavailable' | t -}}
+                      {%- endif -%}
+                    </p>
+                    <div class="product-pickup__address">{{ availability.location.address | format_address }}</div>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </details>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    {% endpartial %}
+
+    <div class="product-form__status visually-hidden" role="status" aria-live="polite" data-testid="product-form-status"></div>
+    <div class="product-form__error" role="alert" data-testid="product-form-error"></div>
+  </product-form>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.product_form",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_dynamic_checkout",
+      "label": "t:labels.show_dynamic_checkout",
+      "info": "t:info.show_dynamic_checkout",
+      "default": true
+    }
+  ]
+}
+{% endschema %}
