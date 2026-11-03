@@ -1,7 +1,7 @@
 KHÔNG CHẮC: làm rõ cách đo ngân sách JS của ADR 0002/0003, chờ CTO chấp nhận ở ES1-T60 #4.
 
 # 0006. Ngân sách JS 40 KB đo theo trang, không theo tổng assets/*.js
-Ngày: 2026-11-03 | Trạng thái: Đề xuất (bổ sung ADR 0002, 0003; nguồn ES1-T59)
+Ngày: 2026-11-03 | Trạng thái: Chấp nhận — CTO 03/11/2026 (ES1-T60 #4) (bổ sung ADR 0002, 0003; nguồn ES1-T59)
 
 ## Bối cảnh
 - ADR 0002 ghi "tổng JS ≤ 40 KB", ADR 0003 ghi "JS ≤ 40 KB", không nói đo theo trang hay toàn theme. DoD TE-3 (ES1-T52) kiểm `assets/*.js` tổng tối đa 40 960 B.
