@@ -22,6 +22,7 @@ Cột Trạng thái: chạy = chạy trên mọi store; có điều kiện = ski
 | TC-14 | AC2 | Như TC-12 | Gỡ card khỏi DOM rồi gắn lại, sau đó click swatch | Vẫn đổi đúng như TC-12, 0 console error (listener không mất, không nhân đôi) | E2E | P3 | có điều kiện |
 | TC-15 | AC2 | Đã chọn swatch không mặc định | Bấm tiêu đề sang trang sản phẩm, rồi Back | Card khớp radio đang checked: href tiêu đề = `data-variant-url` của radio checked | E2E | P3 | có điều kiện |
 | TC-16 | AC2 | Option swatch có hơn 5 value | Mở /collections/all | Hiện đúng 5 radio + `product-card-swatch-more` chữ "+N", N = số value − 5 (theo `/products/<handle>.js`); link có `tabindex="-1"`, `aria-hidden="true"`, ban đầu trỏ `/products/<handle>` | E2E | P3 | có điều kiện |
+| TC-17 | AC2, AC3 | Card có 2 swatch khác trạng thái badge (sale / không sale / hết hàng) | Chọn swatch thứ 2 rồi chọn lại swatch đầu | Badge (`data-badge`, text, hidden, testid) khớp variant đang chọn theo `/products/<handle>.js`; chọn lại thì về như cũ; 0 console error | E2E | P2 | có điều kiện (dữ liệu) |
 | TC-20 | AC3 | Card sale (`TE3_SALE_HANDLE` hoặc card đầu có `product-card-badge-sale`) | Mở / và /collections/all | `price-compare` là thẻ S; giá gạch > giá bán; text badge = `-N%` với N = round((gạch − bán) × 100 / gạch) tính từ giá đọc trên trang; N = 0 thì chữ "Sale" | E2E | P1 | có điều kiện |
 | TC-21 | AC3 | Mọi card sale trên trang đầu /collections/all (tối đa 12) | Đối chiếu với `/products/<handle>.js` theo variant trong `?variant=` của tiêu đề | % trên badge = round-half-up số nguyên của (compare_at_price − price) × 100 / compare_at_price tính bằng cents; giá trên trang = price của variant | E2E | P1 | có điều kiện |
 | TC-22 | AC3 | Sản phẩm giá nhỏ: compare_at_price dưới 1000 cents (`TE3_SMALL_PRICE_HANDLE` hoặc tự tìm trong `/products.json`) | Mở card | Badge % đúng như TC-21, không ra 0 hoặc 100 do chia nguyên | E2E | P1 | có điều kiện |
@@ -94,7 +95,7 @@ Không hardcode handle. Không đặt env thì spec tự tìm card đầu tiên 
 - ES1-T53-01 = ticket ES1-T58 (P3, dev-fe): swatch dưới 24px khi `space_base` dưới 4. File drafts/qa/ES1-T53/bugs/ES1-T53-01.md.
 
 ## KHÔNG CHẮC
-- Badge sale/Sold out không đổi theo swatch, và link "+N" nhận `?variant=` sau khi đổi: chờ ES1-T55. TC-12 bỏ link "+N" khỏi phép so href, không kiểm badge sau khi đổi.
+- Đã chốt ES1-T55 (CTO 3/11): badge sale/Sold out đổi theo swatch (ES1-T56 markup, ES1-T57 JS), link "+N" giữ product.url. TC-12/13/14 kiểm cả badge sau khi đổi; TC-17 đổi qua lại 2 swatch khác badge.
 - Cỡ heading 48 hay 36 (ES1-T54 #2): spec không kiểm cỡ chữ.
 - TC-54: tiêu đề card là link inline, bounding box có thể thấp hơn 24px (khoảng 19px với chữ 16px). Spec áp ngoại lệ khoảng cách WCAG 2.5.8. Nếu PO muốn cứng ≥ 24px thì đổi assertion.
 - axe giới hạn trong vùng TE-3, không quét toàn trang. Toàn trang đã có ở smoke.spec.ts.

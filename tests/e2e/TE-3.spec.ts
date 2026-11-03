@@ -3,7 +3,7 @@
 // Gộp và thay tests/e2e/ES1-T50.spec.ts, ES1-T51.spec.ts, ES1-T52.spec.ts. Test case: drafts/qa/ES1-T53/test-cases.md (tên test bắt đầu bằng ID TC).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-3.spec.ts
 // Dữ liệu (không hardcode handle): TE3_SALE_HANDLE, TE3_SMALL_PRICE_HANDLE, TE3_VARIES_HANDLE, TE3_UNIT_PRICE_HANDLE,
-//   TE3_SWATCH_HANDLE, TE3_SOLD_OUT_HANDLE, TE3_AC8_VARIANT_ID, TE3_AC8_PATH. Không đặt thì tự tìm card đầu tiên có testid, không có thì skip.
+//   TE3_SWATCH_HANDLE, TE3_SOLD_OUT_HANDLE, TE3_BADGE_SWATCH_HANDLE (ES1-T57), TE3_AC8_VARIANT_ID, TE3_AC8_PATH. Không đặt thì tự tìm card đầu tiên có testid, không có thì skip.
 // Setting block khác mặc định: EXPECT_PRODUCTS_TO_SHOW, EXPECT_COLUMNS_DESKTOP, EXPECT_VIEW_ALL=header|bottom, EXPECT_VIEW_ALL_PATH.
 import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -285,8 +285,54 @@ async function expectSwapped(page: Page, card: Locator, target: Locator, ctx: { 
     expect(await priceText(card), 'không price_varies: giá giữ nguyên').toBe(ctx.priceBefore);
   }
 
+  await expectBadge(card, target);
+
   expect(page.url(), 'URL trang giữ nguyên').toBe(ctx.pageUrl);
   expect(ctx.docs.slice(ctx.docsBefore), 'không request document mới').toEqual([]);
+}
+
+const BADGE_TESTID: Record<string, string> = { sale: T.sale, sold_out: T.soldOut, none: 'product-card-badge' };
+
+// ES1-T57: [data-card-badge] theo data-badge / data-badge-label của radio đang chọn. Radio không có data-badge thì bỏ qua.
+async function expectBadge(card: Locator, target: Locator) {
+  const want = await target.getAttribute('data-badge');
+  if (!want) return;
+  const label = norm(await target.getAttribute('data-badge-label'));
+  const badge = card.locator('[data-card-badge]');
+  await expect(badge, 'luôn có đúng 1 [data-card-badge]').toHaveCount(1);
+  await expect(badge, 'data-badge theo radio').toHaveAttribute('data-badge', want);
+  await expect(badge, 'data-testid theo badge').toHaveAttribute('data-testid', BADGE_TESTID[want] ?? 'product-card-badge');
+  if (want === 'none') {
+    await expect(badge, 'none thì hidden').toBeHidden();
+    await expect(badge).toHaveText('');
+  } else {
+    await expect(badge, `${want} thì hiện`).toBeVisible();
+    await expect(badge).toHaveText(label);
+  }
+}
+
+// Card có 2 radio swatch khác data-badge (vd 1 màu sale, 1 màu không / hết hàng). Env TE3_BADGE_SWATCH_HANDLE ưu tiên.
+async function badgeSwatchCard(page: Page): Promise<Locator | null> {
+  const handle = process.env.TE3_BADGE_SWATCH_HANDLE;
+  for (let n = 1; n <= MAX_PAGES; n++) {
+    const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
+    if (!res || res.status() >= 400) return null;
+    const cards = page.getByTestId(T.collection).getByTestId(T.card);
+    const count = await cards.count();
+    if (!count) return null;
+    const scope = handle ? byHandle(page, cards, handle) : cards;
+    const idx = await scope.evaluateAll((els, sel) => els.findIndex(el => {
+      const kinds = new Set([...el.querySelectorAll(sel)].map(r => r.getAttribute('data-badge')).filter(Boolean));
+      return kinds.size > 1;
+    }), SWATCH);
+    if (idx >= 0) {
+      const card = scope.nth(idx);
+      await card.scrollIntoViewIfNeeded();
+      return card;
+    }
+    if ((handle && (await scope.count())) || count < PAGE_SIZE) return null;
+  }
+  return null;
 }
 
 async function axeBad(page: Page, include: string) {
@@ -511,6 +557,51 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     await expect(checked).toHaveCount(1);
     const want = await checked.getAttribute('data-variant-url');
     await expect(again.getByTestId(T.title), 'href tiêu đề = variant của radio đang checked').toHaveAttribute('href', want!);
+  });
+
+  // ES1-T57: badge sale / Sold out đổi theo swatch, không fetch; đối chiếu /products/<handle>.js.
+  test('TC-17 AC2 AC3: đổi swatch thì badge sale / Sold out theo variant, chọn lại thì về như cũ', async ({ page }, ti) => {
+    const errors = trackErrors(page);
+    const card = await badgeSwatchCard(page);
+    test.skip(!card, `Không có card có 2 swatch khác badge (sale / sold out / none) trong ${MAX_PAGES} trang đầu ${ALL}; đặt TE3_BADGE_SWATCH_HANDLE`);
+    await waitSwatchDefined(page);
+    const p = await productJs(page, await handleOf(card!));
+
+    const radios = card!.locator(SWATCH);
+    const from = Math.max(0, await checkedIndex(card!));
+    const kinds = await radios.evaluateAll(els => els.map(e => e.getAttribute('data-badge')));
+    const to = kinds.findIndex(k => k && k !== kinds[from]);
+    expect(to, 'có radio khác badge').toBeGreaterThanOrEqual(0);
+    const before = await card!.locator('[data-card-badge]').evaluate(el => ({ badge: el.getAttribute('data-badge'), text: el.textContent }));
+
+    await pick(card!, to, ti);
+    const target = radios.nth(to);
+    await expect(target).toBeChecked();
+    await expectBadge(card!, target);
+
+    // Quy tắc snippet: sold_out khi product hoặc variant hết hàng; sale khi compare_at > price, -N% (N = 0 thì Sale).
+    const vid = Number(await target.getAttribute('data-variant-id'));
+    const variant = p.variants.find(x => x.id === vid);
+    expect(variant, `variant ${vid} trong .js`).toBeTruthy();
+    const badge = card!.locator('[data-card-badge]');
+    if (!p.available || !variant!.available) {
+      await expect(badge).toHaveAttribute('data-testid', T.soldOut);
+      await expect(badge).toHaveText('Sold out');
+      await expect(card!.getByTestId(T.sale), 'hết hàng thì không badge sale').toHaveCount(0);
+    } else if ((variant!.compare_at_price ?? 0) > variant!.price) {
+      await expect(badge).toHaveAttribute('data-testid', T.sale);
+      await expect(badge).toHaveText(badgeText(salePercent(variant!.compare_at_price!, variant!.price)));
+      await expect(card!.getByTestId(T.soldOut)).toHaveCount(0);
+    } else {
+      await expect(badge).toBeHidden();
+      await expect(card!.getByTestId(T.sale)).toHaveCount(0);
+      await expect(card!.getByTestId(T.soldOut)).toHaveCount(0);
+    }
+
+    await pick(card!, from, ti);
+    await expect(badge).toHaveAttribute('data-badge', before.badge ?? 'none');
+    await expect(badge).toHaveText(norm(before.text));
+    expect(errors, errors.join('\n')).toEqual([]);
   });
 
   test('TC-16 AC2: hơn 5 màu thì 5 swatch + "+N" ra khỏi tab order', async ({ page }) => {

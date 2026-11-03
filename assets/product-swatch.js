@@ -2,7 +2,7 @@
  * <product-swatch>: root element of snippets/product-card.liquid (TE-3 AC2, AC8).
  *
  * Choosing a color swatch swaps the card image, every product link (?variant=)
- * and, when the price varies, the price markup. All data is rendered by Liquid
+ * the sale / sold out badge and, when the price varies, the price markup. All data is rendered by Liquid
  * on data-* hooks, so there is no fetch and no partial. The page never reloads
  * and the page URL never changes.
  *
@@ -11,6 +11,8 @@
  *   data-image-srcset, data-image-alt
  * - img[data-card-image], a[data-card-link], [data-card-price]
  * - template[data-price-for="<variant id>"]: price markup for that variant
+ * - swatch radio data-badge (sale | sold_out | none), data-badge-label;
+ *   [data-card-badge] gets data-badge, text, hidden and data-testid (ES1-T56)
  *
  * Keyboard is the native radio group (Tab in, arrows move, Space selects): no
  * roving tabindex, and nothing here moves focus. Without JS the radios still
@@ -18,6 +20,7 @@
  */
 
 const SWATCH = 'input[type="radio"][data-variant-id]';
+const BADGE_TESTID = { sale: 'product-card-badge-sale', sold_out: 'product-card-badge-sold-out' };
 
 class ProductSwatch extends HTMLElement {
   connectedCallback() {
@@ -58,6 +61,24 @@ class ProductSwatch extends HTMLElement {
     }
 
     this.swapPrice(variantId);
+    this.swapBadge(input.dataset.badge, input.dataset.badgeLabel);
+  }
+
+  /**
+   * Badge follows the chosen variant (ES1-T57). CSS styles from data-badge,
+   * so no class change. A radio without data-badge keeps the current badge.
+   * @param {string | undefined} badge sale | sold_out | none
+   * @param {string | undefined} label translated text, empty for none
+   */
+  swapBadge(badge, label) {
+    const el = this.querySelector('[data-card-badge]');
+    if (!(el instanceof HTMLElement) || !badge) return;
+
+    const none = badge !== 'sale' && badge !== 'sold_out';
+    el.dataset.badge = none ? 'none' : badge;
+    el.dataset.testid = none ? 'product-card-badge' : BADGE_TESTID[badge];
+    el.textContent = none ? '' : label || '';
+    el.hidden = none;
   }
 
   /**
