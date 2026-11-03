@@ -1,0 +1,94 @@
+{% doc %}
+  Mobile sticky add-to-cart bar (TE-4 AC5 markup). Reads the global `product`;
+  current_variant = product.selected_or_first_available_variant.
+
+  Root custom element product-sticky-bar with the hidden attribute: without
+  JS it never shows. assets/product-form.js (BE ES1-T67) removes hidden when
+  the main add button (product-form-add) leaves the viewport, puts it back
+  when the button returns, and sets data-sticky-bar-visible on html so the
+  body gets bottom padding. CSS keeps it below 48rem only, fixed to the
+  bottom of the viewport (no layout shift).
+
+  Content: small decorative image (variant featured media, else product
+  featured media), product title (one line), then partial product-sticky-bar
+  (name must match the JS): snippets/price.liquid for current_variant and a
+  submit button with form="product-form-{product.id}", so it submits the main
+  form in blocks/product-form.liquid. Sold out → disabled with the Sold out
+  label.
+
+  Test hooks: product-sticky-bar, product-sticky-bar-title,
+  product-sticky-bar-price, product-sticky-bar-add.
+
+  Empty state: no product → nothing (the bar is hidden in the editor anyway).
+
+  Self-contained: callers must leave the body empty.
+
+  @example
+  {% block 'container', id: 'product-main' %}
+    {% block 'product-sticky-bar' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- if product != blank -%}
+  {%- liquid
+    assign current_variant = product.selected_or_first_available_variant
+    assign form_id = 'product-form-' | append: product.id
+    assign bar_media = current_variant.featured_media | default: product.featured_media
+  -%}
+
+  <product-sticky-bar
+    class="product-sticky-bar"
+    hidden
+    data-form-id="{{ form_id }}"
+    data-testid="product-sticky-bar"
+    {{ block.shopify_attributes }}
+  >
+    <div class="product-sticky-bar__inner">
+      {%- if bar_media.preview_image != blank -%}
+        {{
+          bar_media.preview_image
+          | image_url: width: 96, height: 96, crop: 'center'
+          | image_tag:
+            class: 'product-sticky-bar__image',
+            width: 48,
+            height: 48,
+            alt: '',
+            loading: 'lazy'
+        }}
+      {%- endif -%}
+
+      <p class="product-sticky-bar__title" data-testid="product-sticky-bar-title">{{ product.title | escape }}</p>
+
+      {% partial 'product-sticky-bar' %}
+        <div class="product-sticky-bar__buy">
+          <div class="product-sticky-bar__price" data-testid="product-sticky-bar-price">
+            {% render 'price', product: product, variant: current_variant %}
+          </div>
+          <button
+            class="button product-sticky-bar__add"
+            type="submit"
+            name="add"
+            form="{{ form_id }}"
+            {% unless current_variant.available %}
+              disabled
+            {% endunless %}
+            data-testid="product-sticky-bar-add"
+          >
+            {%- if current_variant.available -%}
+              {{- 'blocks.product_form.add_to_cart' | t -}}
+            {%- else -%}
+              {{- 'blocks.product_form.sold_out' | t -}}
+            {%- endif -%}
+          </button>
+        </div>
+      {% endpartial %}
+    </div>
+  </product-sticky-bar>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.product_sticky_bar",
+  "settings": []
+}
+{% endschema %}

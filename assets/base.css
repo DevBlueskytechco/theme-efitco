@@ -1916,6 +1916,179 @@ product-variant-picker {
   font-size: var(--font-size-sm);
 }
 
+/** Product info (TE-4 AC3, AC9, AC10, ES1-T59 D3): mặc định kỹ thuật, ghi chú text-sm muted (ES1-T61 #6) */
+.product-info {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.product-info--placeholder {
+  padding: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.product-info__vendor {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.product-info__title {
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h2);
+  font-style: var(--font-heading--style);
+  font-weight: var(--font-heading--weight);
+  line-height: var(--line-height-heading);
+  overflow-wrap: anywhere;
+}
+
+.product-info__vendor + .product-info__title {
+  margin-block-start: calc(var(--space-2) - var(--space-4));
+}
+
+.product-info__price {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.product-info__price .price {
+  font-size: var(--font-size-lg);
+}
+
+.product-info__notes {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-body);
+}
+
+.product-info__note a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.product-info__note a:hover {
+  color: var(--color-foreground);
+}
+
+.product-info__description {
+  line-height: var(--line-height-body);
+  overflow-wrap: break-word;
+}
+
+.product-info__description > * + * {
+  margin-block-start: var(--space-3);
+}
+
+.product-info__description :is(ul, ol) {
+  padding-inline-start: var(--space-5);
+}
+
+.product-info__description a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.product-info__description img {
+  max-inline-size: 100%;
+  height: auto;
+}
+
+/** Product sticky bar (TE-4 AC5, ES1-T59 D5): hidden mặc định, assets/product-form.js (BE ES1-T67)
+   bỏ hidden + gắn data-sticky-bar-visible lên html. Chỉ dưới 48rem, fixed nên không gây CLS */
+product-sticky-bar {
+  display: block;
+}
+
+.product-sticky-bar {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: 5;
+  padding: var(--space-3) var(--page-margin);
+  padding-block-end: max(var(--space-3), env(safe-area-inset-bottom));
+  border-block-start: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.product-sticky-bar[hidden] {
+  display: none;
+}
+
+.product-sticky-bar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.product-sticky-bar__image {
+  flex: none;
+  inline-size: 48px;
+  block-size: 48px;
+  border-radius: var(--radius-input);
+  background-color: var(--color-background-cream);
+  object-fit: cover;
+}
+
+.product-sticky-bar__title {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  overflow: hidden;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.product-sticky-bar__buy {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Giữ đủ giá gạch / đơn giá (nhãn ẩn cho screen reader đi kèm), chữ nhỏ, đơn giá xuống dòng */
+.product-sticky-bar__price .price {
+  justify-content: flex-end;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-body);
+  text-align: end;
+  white-space: nowrap;
+}
+
+.product-sticky-bar__add {
+  padding-inline: var(--space-4);
+  white-space: nowrap;
+}
+
+.product-sticky-bar__add:disabled {
+  border-color: var(--color-border);
+  background-color: var(--color-background-alt);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+@media (max-width: 47.99rem) {
+  html[data-sticky-bar-visible] body {
+    padding-block-end: calc(44px + var(--space-3) * 2);
+  }
+}
+
+@media (min-width: 48rem) {
+  .product-sticky-bar {
+    display: none;
+  }
+}
+
 /** Gift card template */
 .template-gift-card main {
   text-align: center;
