@@ -4,21 +4,20 @@
   <div class="collection-products" data-testid="collection-products">
     {% paginate collection.products by 20 %}
       {% for product in collection.products %}
+        {% liquid
+          # First row loads eagerly: it holds the LCP image on every breakpoint
+          assign card_loading = 'lazy'
+          if forloop.index <= 4
+            assign card_loading = 'eager'
+          endif
+        %}
         <div class="collection-product" data-testid="collection-product">
-          {% if product.featured_image %}
-            {% render 'image',
-              class: 'collection-product__image',
-              image: product.featured_image,
-              url: product.url,
-              width: 400,
-              height: 400,
-              crop: 'center'
-            %}
-          {% endif %}
-          <div class="collection-product__content">
-            <p>{{ product.title | escape | link_to: product.url }}</p>
-            <p>{{ product.price | money }}</p>
-          </div>
+          {% render 'product-card',
+            product: product,
+            id_prefix: 'collection',
+            sizes: '(min-width: 80rem) 25vw, (min-width: 48rem) 50vw, 100vw',
+            loading: card_loading
+          %}
         </div>
       {% endfor %}
 

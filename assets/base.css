@@ -120,6 +120,180 @@
   --collection-card-size: 280px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(min(var(--collection-card-size), 100%), 1fr));
+  gap: var(--space-6) var(--space-5);
+}
+
+/** Product card (TE-3, Figma 1:502): ảnh 1:1, badge, tiêu đề, giá, swatch */
+product-swatch,
+.product-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+.product-card__media {
+  position: relative;
+}
+
+.product-card__media-link {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background-color: var(--color-background-cream);
+}
+
+/* darken: nền trắng của ảnh sản phẩm hoà vào nền cream như Figma */
+.product-card__image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  mix-blend-mode: darken;
+}
+
+.product-card__placeholder {
+  display: block;
+  block-size: 100%;
+  color: var(--color-muted-light);
+}
+
+.product-card__placeholder-svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: currentcolor;
+}
+
+.product-card__badge {
+  position: absolute;
+  inset-block-start: var(--space-4);
+  inset-inline-start: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  min-block-size: calc(var(--space-1) * 7);
+  padding-inline: var(--space-3);
+  border-radius: calc(var(--space-1) * 7);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  pointer-events: none;
+}
+
+.product-card__badge--sale {
+  background-color: var(--color-sale);
+  color: var(--color-sale-foreground);
+}
+
+.product-card__badge--sold-out {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.product-card__title {
+  margin: 0;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.625;
+  letter-spacing: -0.01em;
+}
+
+.product-card__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.product-card__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+/* Giá (snippets/price.liquid), dùng lại ở TE-4, TE-6 */
+.price {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--space-2);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.625;
+  letter-spacing: -0.01em;
+}
+
+.price__current--sale {
+  color: var(--color-sale);
+}
+
+.price__compare {
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--color-muted);
+}
+
+.price__unit {
+  flex-basis: 100%;
+  font-size: var(--font-size-xs);
+  font-weight: 400;
+  letter-spacing: 0;
+  color: var(--color-muted);
+}
+
+/* Swatch: pill 32 × 16 (Figma) trong vùng bấm 32 × 24 (AC6) */
+.product-card__swatches {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.product-card__swatch {
+  position: relative;
+  display: block;
+  inline-size: var(--space-6);
+  block-size: var(--space-5);
+  border-radius: var(--space-1);
+  cursor: pointer;
+}
+
+.product-card__swatch::before {
+  position: absolute;
+  inset-block: var(--space-1);
+  inset-inline: 0;
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent);
+  border-radius: var(--space-2);
+  background-color: var(--swatch-color, var(--color-background-cream));
+  background-image: var(--swatch-image, none);
+  background-position: center;
+  background-size: cover;
+  content: '';
+}
+
+.product-card__swatch-input:checked + .product-card__swatch::before {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-accent);
+}
+
+.product-card__swatch-input:focus-visible + .product-card__swatch {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}
+
+.product-card__swatch-more {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--space-5);
+  padding-inline-start: var(--space-1);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
 }
 
 /** Collections list page */

@@ -1,0 +1,69 @@
+{% doc %}
+  Renders a product price: price range, sale price with the compare-at price
+  struck through, or a single price, plus the unit price when the variant has
+  one. Used by the product card (TE-3) and reusable on the product page (TE-4)
+  and collection page (TE-6).
+
+  Range: shown when the product price varies, no variant is passed and
+  show_range is not false. Otherwise the price of `variant`, falling back to
+  product.selected_or_first_available_variant.
+
+  @param {product} product - The product to price
+  @param {variant} [variant] - Variant to price. When set, the range is never shown
+  @param {boolean} [show_range] - Show price_min – price_max when the price varies. Default: true
+
+  @example
+  {% render 'price', product: product %}
+  {% render 'price', product: product, variant: product.selected_or_first_available_variant %}
+{% enddoc %}
+
+{%- liquid
+  assign target = variant | default: product.selected_or_first_available_variant
+
+  assign use_range = false
+  if product.price_varies and variant == blank and show_range != false
+    assign use_range = true
+  endif
+
+  assign on_sale = false
+  if target.compare_at_price > target.price
+    assign on_sale = true
+  endif
+-%}
+
+<div class="price{% if on_sale and use_range == false %} price--on-sale{% endif %}" data-testid="price">
+  {%- if use_range -%}
+    {%- liquid
+      assign price_min = product.price_min | money
+      assign price_max = product.price_max | money
+    -%}
+    <span class="price__current" data-testid="price-range">
+      {{- 'products.price.range' | t: min: price_min, max: price_max -}}
+    </span>
+  {%- elsif on_sale -%}
+    <span class="visually-hidden">{{ 'products.price.sale_price' | t }}</span>
+    <span class="price__current price__current--sale" data-testid="price-regular">
+      {{- target.price | money -}}
+    </span>
+    <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
+    <s class="price__compare" data-testid="price-compare">{{ target.compare_at_price | money }}</s>
+  {%- else -%}
+    <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
+    <span class="price__current" data-testid="price-regular">{{ target.price | money }}</span>
+  {%- endif -%}
+
+  {%- if target.unit_price_measurement -%}
+    {%- liquid
+      assign measurement = target.unit_price_measurement
+      assign reference = measurement.reference_unit
+      if measurement.reference_value != 1
+        assign reference = measurement.reference_value | append: measurement.reference_unit
+      endif
+      assign unit_price = target.unit_price | money
+    -%}
+    <span class="visually-hidden">{{ 'products.price.unit_price' | t }}</span>
+    <span class="price__unit" data-testid="price-unit">
+      {{- 'products.price.unit_price_value' | t: price: unit_price, unit: reference -}}
+    </span>
+  {%- endif -%}
+</div>
