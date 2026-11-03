@@ -7,6 +7,7 @@
       {% # Interim until ES1-T63 (product-info) and ES1-T64 (product-form) replace these lines. %}
       <h1>{{ product.title }}</h1>
       {% render 'price', product: product, variant: product.selected_or_first_available_variant %}
+      {% block 'product-form' %}{% endblock %}
       <div>{{ product.description }}</div>
     </div>
   </div>
