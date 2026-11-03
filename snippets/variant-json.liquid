@@ -1,0 +1,31 @@
+{% doc %}
+  Variant data for assets/product-variant-picker.js (TE-4 AC2, AC12; BE
+  ES1-T66). JSON only, no visible markup: a script type application/json
+  with data-product-variants holding one object per variant:
+  id, options (option values in position order), available,
+  featured_media (media id or null), requires_shipping.
+
+  Rendered inside the product-variant-picker element of
+  blocks/product-form.liquid, which reads it with querySelector.
+  product.variants returns at most 250 variants.
+
+  @param {product} product - Product whose variants are exported
+
+  @example
+  {% render 'variant-json', product: product %}
+{% enddoc %}
+
+<script type="application/json" data-product-variants>
+  [
+    {%- for variant in product.variants -%}
+      {
+        "id": {{ variant.id | json }},
+        "options": {{ variant.options | json }},
+        "available": {{ variant.available | json }},
+        "featured_media": {{ variant.featured_media.id | json }},
+        "requires_shipping": {{ variant.requires_shipping | json }}
+      }
+      {%- unless forloop.last %},{% endunless -%}
+    {%- endfor -%}
+  ]
+</script>
