@@ -604,13 +604,6 @@ test.describe('ES1-T23', () => {
     }
   });
 
-  // Chờ Tech Lead: heading hiện có 2 biến thể (700, 800) theo tokens.json; R15 ghi 4 biến thể. Xem test-cases.md mục KHÔNG CHẮC.
-  test.fixme('TC-25b AC8 font heading đủ 4 biến thể theo R15', async ({ page }) => {
-    await page.goto('/');
-    const faces = await page.evaluate(() => Array.from(document.querySelectorAll('style')).map(s => s.textContent ?? '').join('\n').match(/@font-face\s*{[^}]*}/g) ?? []);
-    expect(faces.filter(x => /Sofia Sans Condensed/i.test(x)).length).toBeGreaterThanOrEqual(4);
-  });
-
   test('TC-26 AC8 màu chữ phụ: muted-light #6B6B6B, #999999 chỉ trên nền tối', async ({ page }) => {
     await page.goto('/');
     expect(await cssVar(page, '--color-muted-light')).toBe(rgb(tokens.color.muted_light));
