@@ -190,7 +190,7 @@ function byHandle(page: Page, cards: Locator, handle: string): Locator {
 
 // Tìm card trên /collections/all (tối đa MAX_PAGES trang). handle có giá trị → tìm theo handle (testid kiểm sau, thiếu là fail thật);
 // không có handle → card đầu tiên có testid. Trả null khi không có.
-async function findCard(page: Page, testid: string | null, handle?: string): Promise<Locator | null> {
+async function findCard(page: Page, testid: string | null, handle?: string, without?: string): Promise<Locator | null> {
   for (let n = 1; n <= MAX_PAGES; n++) {
     const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
     if (!res || res.status() >= 400) return null;
@@ -199,6 +199,7 @@ async function findCard(page: Page, testid: string | null, handle?: string): Pro
     if (!count) return null;
     let found = handle ? byHandle(page, cards, handle) : cards;
     if (!handle && testid) found = found.filter({ has: page.getByTestId(testid) });
+    if (!handle && without) found = found.filter({ hasNot: page.getByTestId(without) });
     if (await found.count()) {
       const card = found.first();
       await card.scrollIntoViewIfNeeded();
@@ -209,8 +210,8 @@ async function findCard(page: Page, testid: string | null, handle?: string): Pro
   return null;
 }
 
-async function requireCard(page: Page, testid: string | null, handle: string | undefined, what: string): Promise<Locator> {
-  const card = await findCard(page, testid, handle);
+async function requireCard(page: Page, testid: string | null, handle: string | undefined, what: string, without?: string): Promise<Locator> {
+  const card = await findCard(page, testid, handle, without);
   test.skip(!card, handle ? `Không thấy sản phẩm ${handle} (${what}) trong ${MAX_PAGES} trang đầu ${ALL}` : `Không có ${what} trên ${ALL} (dữ liệu TE-9 AC4)`);
   if (handle && testid) await expect(card!.getByTestId(testid), `${handle} phải có ${testid} (${what})`).toHaveCount(1);
   return card!;
@@ -533,10 +534,11 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     test(`TC-20 AC3: card sale có giá gạch thẻ S và badge % làm tròn từ giá trên trang (${path})`, async ({ page }) => {
       let card: Locator | null;
       if (path === ALL) {
-        card = await findCard(page, ENV.sale ? null : T.sale, ENV.sale);
+        // Card sale giá cố định; sale + khoảng giá (AC3 x AC4) kiểm ở TC-25 chờ ES1-T56.
+        card = await findCard(page, ENV.sale ? null : T.sale, ENV.sale, T.range);
       } else {
         const cards = await cardsOn(page, HOME);
-        const c = (ENV.sale ? byHandle(page, cards, ENV.sale) : cards.filter({ has: page.getByTestId(T.sale) })).first();
+        const c = (ENV.sale ? byHandle(page, cards, ENV.sale) : cards.filter({ has: page.getByTestId(T.sale) }).filter({ hasNot: page.getByTestId(T.range) })).first();
         card = (await c.count()) ? c : null;
       }
       test.skip(!card, `Không có sản phẩm sale trên ${path}`);
@@ -552,7 +554,7 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
 
   test('TC-21 AC3: mọi card sale trang đầu khớp % tính bằng cents từ /products/<handle>.js', async ({ page }) => {
     const cards = await cardsOn(page, ALL);
-    const sale = cards.filter({ has: page.getByTestId(T.sale) });
+    const sale = cards.filter({ has: page.getByTestId(T.sale) }).filter({ hasNot: page.getByTestId(T.range) });
     const n = Math.min(await sale.count(), 12);
     test.skip(n === 0, `Không có card sale trên trang đầu ${ALL}`);
     for (let i = 0; i < n; i++) {
@@ -602,12 +604,20 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
   });
 
   test('TC-24 AC3: giá sale có nhãn ẩn cho screen reader', async ({ page }) => {
-    const card = await requireCard(page, T.sale, ENV.sale, 'sản phẩm sale');
+    const card = await requireCard(page, T.sale, ENV.sale, 'sản phẩm sale giá cố định', T.range);
     const text = norm(await card.getByTestId(T.price).textContent());
     expect(text).toContain('Sale price');
     expect(text).toContain('Regular price');
     expect(norm(await card.getByTestId(T.regular).textContent())).not.toMatch(/price/i);
     expect(norm(await card.getByTestId(T.compare).textContent())).not.toMatch(/price/i);
+  });
+
+  // AC3 x AC4: giá thay đổi + variant card đang sale. CTO 3/11: hiện khoảng giá kèm nhãn ẩn 'Sale price' và giá gạch compare_at_price của variant card (ES1-T56).
+  test.fixme('TC-25 AC3 AC4: card sale có khoảng giá vẫn có giá gạch và nhãn Sale price', async ({ page }) => {
+    const card = await requireCard(page, T.range, undefined, 'sản phẩm sale có khoảng giá');
+    await expect(card.getByTestId(T.sale)).toHaveCount(1);
+    await expect(card.getByTestId(T.compare)).toHaveCount(1);
+    expect(norm(await card.getByTestId(T.price).textContent())).toContain('Sale price');
   });
 
   // Hết hàng (SRS mục 3)
