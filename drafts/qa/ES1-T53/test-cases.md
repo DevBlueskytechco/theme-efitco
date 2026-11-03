@@ -3,7 +3,7 @@ KHÔNG CHẮC: (1) spec CHƯA chạy: sandbox không có node_modules, PREVIEW_U
 # ES1-T53 — TE-3 Block featured collection và product card (QA1)
 Nguồn: docs/srs.md#TE-3 (AC1–AC8 + quy tắc Hết hàng, mục 3), ticket ES1-T53 (2727475000000142027), drafts/techlead/ES1-T47/task-split.md (nhánh feature/ai-ES1-T47; D2–D8), PR ES1-T50 / ES1-T51 / ES1-T52, Figma node 1:490 / 1:502.
 Code đọc tại commit 4737a1e (feature/ai-ES1-T53): snippets/product-card.liquid, snippets/price.liquid, blocks/featured-collection.liquid, templates/index.liquid, templates/collection.liquid, assets/product-swatch.js, assets/base.css.
-Spec: tests/e2e/ES1-T53.spec.ts. Chạy trên 2 project `desktop` (Desktop Chrome) và `mobile` (Pixel 7). Trang: `/` (container-home-featured-collection, nguồn mặc định collections['all']) và `/collections/all` (phân trang 20).
+Spec: tests/e2e/TE-3.spec.ts (CTO review: đổi tên theo ticket). Chạy trên 2 project `desktop` (Desktop Chrome) và `mobile` (Pixel 7). Trang: `/` (container-home-featured-collection, nguồn mặc định collections['all']) và `/collections/all` (phân trang 20).
 Tên test bắt đầu bằng ID TC, nên chạy riêng được bằng `-g "TC-11"`.
 Cột Trạng thái: chạy = chạy trên mọi store; có điều kiện = skip kèm lý do khi thiếu dữ liệu hoặc env; static = đọc file trong repo; tay = chạy tay, không có trong spec; N/A = chưa kiểm được.
 

@@ -46,7 +46,7 @@ Tự động: E2E/static có trong spec. UI/a11y tay: chạy tay, không có tro
 | TC-40 | AC7 | Product có ảnh, mô tả | Đọc head | og:type product, JSON-LD, og:image https + size, meta description | E2E | P2 | có điều kiện |
 | TC-24 | AC8 | Settings mặc định | Đọc computed font; đọc schema | Heading Sofia Sans Condensed, body Inter, ≥ 2 font_picker, không tự host | E2E | P2 | chạy |
 | TC-25 | AC8 | Settings mặc định | Đọc @font-face | Inter ≥ 4 biến thể; heading có; tất cả swap, từ Shopify CDN | E2E | P3 | chạy |
-| TC-25b | AC8 | Settings mặc định | Đọc @font-face | Heading ≥ 4 biến thể theo R15 | E2E | P3 | fixme, chờ ES1-T25 |
+| TC-25b | AC8 | Settings mặc định | Đọc @font-face | Heading ≥ 4 biến thể theo R15 | E2E | P3 | bỏ: CTO chốt ES1-T25 (3/11) — 4 biến thể chỉ áp cho body, heading 700/800 |
 | TC-26 | AC8 | Settings mặc định | Đọc biến; quét phần tử có chữ | `--color-muted-light` #6B6B6B, `--color-muted-on-dark` #999999; 0 chữ #999999 trên nền sáng | E2E | P1 | chạy |
 | TC-27 | AC8 | Editor, font_picker heading | Chọn font khác | Heading đổi, body giữ Inter | UI | P3 | tay |
 | TC-41 | AC9 | Trang không hero: collection, cart, search | Render header | Nền = background, chữ = foreground | E2E | P1 | chạy |
