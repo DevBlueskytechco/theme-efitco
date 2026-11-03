@@ -1,0 +1,215 @@
+{% doc %}
+  Renders products from one collection in a grid (Figma 1:490): eyebrow, h2
+  heading, optional View all link next to the heading or below the grid, and
+  up to products_to_show product cards. 2 columns below 48rem, 3 columns from
+  48rem, columns_desktop columns from 80rem. No carousel.
+
+  Source: the collection setting; when it is empty, collections[default_collection]
+  (the home page template passes 'all' so a fresh install and the CI preview
+  show products). When there is no source or it has no products, the editor
+  shows placeholder cards with a hint and the storefront renders nothing.
+
+  Variant items (multi-source collections, Editions Fall '26 #20, AC8): an item
+  that has a parent `product` is treated as a variant. The card then gets the
+  parent product plus `variant: item`, so image, price, ?variant= link and the
+  preselected swatch follow that variant. Product items have no `product`
+  property and render with the product's default variant.
+
+  No script tag here: assets/product-swatch.js (BE, ES1-T52) adds it.
+  Self-contained: callers must leave the body empty.
+
+  Test hooks: data-testid="featured-collection", "featured-collection-heading",
+  "featured-collection-grid", "featured-collection-view-all",
+  "featured-collection-placeholder".
+
+  @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading id. Default: block.id
+  @param {string} [default_collection] - Collection handle used when the collection setting is empty, such as 'all'. Empty: no fallback
+
+  @example
+  {% block 'container', id: 'home-featured-collection', tag: 'div' %}
+    {% block 'featured-collection', id: 'featured-collection', default_collection: 'all' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign source = block.settings.collection
+  if source == blank and default_collection != blank
+    assign source = collections[default_collection]
+  endif
+
+  assign has_products = false
+  if source != blank and source.products_count > 0
+    assign has_products = true
+  endif
+
+  assign limit = block.settings.products_to_show
+  assign columns = block.settings.columns_desktop
+  assign eyebrow = block.settings.eyebrow
+  assign heading = block.settings.heading
+  assign heading_id = id | default: block.id | append: '-heading'
+
+  assign show_view_all = false
+  if has_products and block.settings.show_view_all
+    assign show_view_all = true
+  endif
+  assign view_all_in_header = false
+  if show_view_all and block.settings.view_all_position == 'header'
+    assign view_all_in_header = true
+  endif
+
+  assign image_sizes = '(min-width: 1280px) calc(1416px / ' | append: columns | append: '), (min-width: 768px) 33vw, 50vw'
+-%}
+
+{%- if show_view_all -%}
+  {%- assign collection_title = source.title | escape -%}
+  {%- capture view_all_link -%}
+    <a class="button button--secondary featured-collection__view-all" href="{{ source.url }}" data-testid="featured-collection-view-all">
+      {{- 'blocks.featured_collection.view_all' | t -}}
+      <span class="visually-hidden"> {{ 'blocks.featured_collection.view_all_suffix' | t: collection: collection_title }}</span>
+    </a>
+  {%- endcapture -%}
+{%- endif -%}
+
+{%- if has_products or request.design_mode -%}
+  <section
+    class="featured-collection"
+    style="--columns: {{ columns }};"
+    {% if heading != blank %}
+      aria-labelledby="{{ heading_id }}"
+    {% endif %}
+    data-testid="featured-collection"
+    {{ block.shopify_attributes }}
+  >
+    {%- if eyebrow != blank or heading != blank or view_all_in_header -%}
+      <div class="featured-collection__header">
+        {%- if eyebrow != blank or heading != blank -%}
+          <div class="featured-collection__titles">
+            {%- if eyebrow != blank -%}
+              <p class="featured-collection__eyebrow">{{ eyebrow | escape }}</p>
+            {%- endif -%}
+            {%- if heading != blank -%}
+              <h2 class="featured-collection__heading" id="{{ heading_id }}" data-testid="featured-collection-heading">
+                {{- heading -}}
+              </h2>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+        {%- if view_all_in_header -%}
+          {{ view_all_link }}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if has_products -%}
+      <ul class="featured-collection__grid" role="list" data-testid="featured-collection-grid">
+        {%- for item in source.products limit: limit -%}
+          {%- liquid
+            assign card_product = item
+            assign card_variant = nil
+            if item.product != blank
+              assign card_product = item.product
+              assign card_variant = item
+            endif
+          -%}
+          <li class="featured-collection__item">
+            {% render 'product-card',
+              product: card_product,
+              variant: card_variant,
+              id_prefix: block.id,
+              sizes: image_sizes,
+              loading: 'lazy'
+            %}
+          </li>
+        {%- endfor -%}
+      </ul>
+    {%- else -%}
+      <div class="featured-collection__placeholder" data-testid="featured-collection-placeholder">
+        <p class="featured-collection__hint">{{ 'blocks.featured_collection.placeholder' | t }}</p>
+        <ul class="featured-collection__grid" role="list" data-testid="featured-collection-grid">
+          {%- for i in (1..limit) -%}
+            {%- assign placeholder_index = forloop.index0 | modulo: 6 | plus: 1 -%}
+            {%- assign placeholder_name = 'product-' | append: placeholder_index -%}
+            <li class="featured-collection__item">
+              <span class="featured-collection__placeholder-media">
+                {{- placeholder_name | placeholder_svg_tag: 'featured-collection__placeholder-svg' -}}
+              </span>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </div>
+    {%- endif -%}
+
+    {%- if show_view_all and view_all_in_header == false -%}
+      <div class="featured-collection__footer">
+        {{ view_all_link }}
+      </div>
+    {%- endif -%}
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.featured_collection",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection",
+      "info": "t:info.featured_collection_collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 4,
+      "max": 12,
+      "step": 1,
+      "label": "t:labels.products_to_show",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 3,
+      "max": 5,
+      "step": 1,
+      "label": "t:labels.columns_desktop",
+      "info": "t:info.columns_desktop",
+      "default": 4
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "default": "Bestsellers"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "What People Are Buying?"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "t:labels.show_view_all",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "view_all_position",
+      "label": "t:labels.view_all_position",
+      "options": [
+        {
+          "value": "header",
+          "label": "t:options.view_all_position.header"
+        },
+        {
+          "value": "bottom",
+          "label": "t:options.view_all_position.bottom"
+        }
+      ],
+      "default": "bottom"
+    }
+  ]
+}
+{% endschema %}

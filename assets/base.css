@@ -296,6 +296,115 @@ product-swatch,
   text-decoration: none;
 }
 
+/** Featured collection (TE-3, Figma 1:490): padding 120, heading → lưới 40, lưới 2 / 3 / --columns */
+.featured-collection {
+  display: grid;
+  gap: var(--space-5);
+  padding-block: var(--space-7);
+}
+
+.featured-collection__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-6);
+}
+
+.featured-collection__titles {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.featured-collection__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Figma 1:495: 48 / 58, letter-spacing -0.96 */
+.featured-collection__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.featured-collection__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featured-collection__item {
+  min-inline-size: 0;
+}
+
+.featured-collection__footer {
+  display: flex;
+  justify-content: center;
+}
+
+.featured-collection__placeholder {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.featured-collection__hint {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.featured-collection__placeholder-media {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background-color: var(--color-background-cream);
+  color: var(--color-muted-light);
+}
+
+.featured-collection__placeholder-svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: currentcolor;
+}
+
+@media (min-width: 48rem) {
+  .featured-collection__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .featured-collection {
+    gap: calc(var(--space-1) * 10);
+    padding-block: var(--space-8);
+  }
+}
+
+@media (min-width: 80rem) {
+  .featured-collection__grid {
+    grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+}
+
 /** Collections list page */
 .collections {
   display: grid;
