@@ -695,7 +695,8 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
         const p = await productJs(page, await handleOf(first));
         const vid = await variantIdOf(first);
         const v = p.variants.find(x => x.id === vid);
-        const want = v?.featured_image?.alt || p.title;
+        // Card: ảnh variant, không có thì ảnh đại diện sản phẩm; alt = alt của ảnh đó, trống mới dùng tên sản phẩm.
+        const want = v?.featured_image?.alt || (v?.featured_image ? '' : (p as any).media?.[0]?.alt) || p.title;
         await expect(first.getByTestId(T.image)).toHaveAttribute('alt', want);
       }
     });
