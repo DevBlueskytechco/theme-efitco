@@ -1261,6 +1261,300 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   padding-inline: var(--space-4);
 }
 
+/** Product page (TE-4, ES1-T59 D1): 1 cột dưới 64rem, media 7 / chi tiết 5 từ 64rem.
+   Figma chưa có trang sản phẩm: mặc định kỹ thuật, chờ Designer ES1-T61 */
+.product {
+  display: grid;
+  gap: var(--space-6);
+  padding-block: var(--space-5) var(--space-7);
+}
+
+.product > * {
+  min-inline-size: 0;
+}
+
+@media (min-width: 64rem) {
+  .product {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    align-items: start;
+    column-gap: var(--space-7);
+    padding-block: var(--space-6) var(--space-8);
+  }
+
+  /* Cộng chiều cao header vì header sticky mặc định bật (TE-1 AC9) */
+  .product__details {
+    position: sticky;
+    inset-block-start: calc(var(--header-height) + var(--space-6));
+  }
+}
+
+/** Product media gallery (TE-4 AC1, ES1-T59 D2): cuộn ngang scroll-snap dưới 64rem, xếp dọc từ 64rem */
+product-media-gallery {
+  display: block;
+}
+
+.product-media__list,
+.product-media__thumbnails {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-media__list {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.product-media__list::-webkit-scrollbar {
+  display: none;
+}
+
+/* Không JS: thanh cuộn là dấu hiệu còn media khác (giống slideshow) */
+@media (scripting: none) {
+  .product-media__list {
+    scrollbar-width: thin;
+  }
+
+  .product-media__list::-webkit-scrollbar {
+    display: block;
+  }
+}
+
+.product-media__item {
+  position: relative;
+  display: grid;
+  flex: 0 0 100%;
+  align-content: center;
+  overflow: hidden;
+  scroll-snap-align: start;
+  /* Bấm thumbnail (anchor) không để media nằm dưới header sticky */
+  scroll-margin-block-start: calc(var(--header-height) + var(--space-4));
+  border-radius: var(--radius-card);
+  background-color: var(--color-background-cream);
+}
+
+/* darken: nền trắng của ảnh sản phẩm hoà vào nền cream như product card */
+.product-media__image > img {
+  mix-blend-mode: darken;
+}
+
+.product-media__zoom {
+  display: block;
+  cursor: zoom-in;
+}
+
+.product-media__zoom:focus-visible,
+.product-media__external:focus-visible {
+  outline-offset: -4px;
+}
+
+.product-media__video-tag {
+  inline-size: 100%;
+  block-size: auto;
+  aspect-ratio: var(--media-ratio);
+  background-color: var(--color-background-dark);
+}
+
+.product-media__external {
+  position: relative;
+  display: block;
+  aspect-ratio: var(--media-ratio);
+  color: var(--color-foreground);
+}
+
+.product-media__external .product-media__image,
+.product-media__model .product-media__image {
+  block-size: 100%;
+}
+
+.product-media__external .product-media__image > img,
+.product-media__model .product-media__image > img {
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.product-media__play {
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  display: grid;
+  place-items: center;
+  inline-size: calc(var(--space-1) * 16);
+  block-size: calc(var(--space-1) * 16);
+  border-radius: 50%;
+  background-color: var(--color-background);
+  translate: -50% -50%;
+}
+
+.product-media__play .slideshow-icon {
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+  fill: currentcolor;
+}
+
+.product-media__external:hover .product-media__play {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+.product-media__model {
+  position: relative;
+  aspect-ratio: var(--media-ratio);
+}
+
+.product-media__model-viewer {
+  position: absolute;
+  inset: 0;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+}
+
+.product-media__placeholder {
+  aspect-ratio: 1;
+  color: var(--color-muted-light);
+}
+
+.product-media__placeholder-svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: currentcolor;
+}
+
+.product-media__thumbnails {
+  display: flex;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.product-media__thumbnail-item {
+  flex: none;
+}
+
+/* 64 × 64, vùng bấm vượt 24px (WCAG 2.5.8) */
+.product-media__thumbnail {
+  position: relative;
+  display: block;
+  inline-size: calc(var(--space-1) * 16);
+  block-size: calc(var(--space-1) * 16);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background-color: var(--color-background-cream);
+}
+
+.product-media__thumbnail:hover,
+.product-media__thumbnail[aria-current='true'] {
+  border-color: var(--color-foreground);
+}
+
+.product-media__thumbnail-image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  mix-blend-mode: darken;
+}
+
+.product-media__thumbnail-badge {
+  position: absolute;
+  inset-block-end: var(--space-1);
+  inset-inline-end: var(--space-1);
+  display: grid;
+  place-items: center;
+  padding: var(--space-1);
+  border-radius: 50%;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.product-media__thumbnail-badge .slideshow-icon {
+  inline-size: var(--space-3);
+  block-size: var(--space-3);
+  fill: currentcolor;
+}
+
+/* Dialog zoom: assets/product-media.js (BE ES1-T69) mở bằng showModal() và gắn ảnh */
+.product-media__dialog {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  block-size: 100%;
+  max-block-size: 100%;
+  padding: 0;
+  border: 0;
+}
+
+.product-media__dialog::backdrop {
+  background-color: color-mix(in srgb, var(--color-background-dark) 60%, transparent);
+}
+
+.product-media__dialog-image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.product-media__dialog-form {
+  position: absolute;
+  inset-block-start: var(--space-4);
+  inset-inline-end: var(--space-4);
+  z-index: 1;
+}
+
+.product-media__dialog-close {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+.product-media__dialog-close:hover {
+  border-color: var(--color-foreground);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.product-media__close-icon::before,
+.product-media__close-icon::after {
+  position: absolute;
+  inset-block-start: calc(50% - 1px);
+  inset-inline-start: calc(50% - var(--space-2));
+  inline-size: var(--space-4);
+  block-size: 2px;
+  background-color: currentcolor;
+  content: '';
+  rotate: 45deg;
+}
+
+.product-media__close-icon::after {
+  rotate: -45deg;
+}
+
+@media (min-width: 64rem) {
+  .product-media__list {
+    flex-direction: column;
+    gap: var(--space-3);
+    overflow: visible;
+    scroll-snap-type: none;
+  }
+
+  .product-media__item {
+    flex: none;
+  }
+}
+
 /** Gift card template */
 .template-gift-card main {
   text-align: center;
