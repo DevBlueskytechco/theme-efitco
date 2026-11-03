@@ -6,7 +6,9 @@
 
   Range: shown when the product price varies, no variant is passed and
   show_range is not false. Otherwise the price of `variant`, falling back to
-  product.selected_or_first_available_variant.
+  product.selected_or_first_available_variant. When that variant is on sale
+  the range keeps the hidden Sale price label and is followed by the
+  variant's compare-at price struck through (CTO 3/11, ES1-T56).
 
   @param {product} product - The product to price
   @param {variant} [variant] - Variant to price. When set, the range is never shown
@@ -31,15 +33,24 @@
   endif
 -%}
 
-<div class="price{% if on_sale and use_range == false %} price--on-sale{% endif %}" data-testid="price">
+<div class="price{% if on_sale %} price--on-sale{% endif %}" data-testid="price">
   {%- if use_range -%}
     {%- liquid
       assign price_min = product.price_min | money
       assign price_max = product.price_max | money
     -%}
-    <span class="price__current" data-testid="price-range">
-      {{- 'products.price.range' | t: min: price_min, max: price_max -}}
-    </span>
+    {%- if on_sale -%}
+      <span class="visually-hidden">{{ 'products.price.sale_price' | t }}</span>
+      <span class="price__current price__current--sale" data-testid="price-range">
+        {{- 'products.price.range' | t: min: price_min, max: price_max -}}
+      </span>
+      <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
+      <s class="price__compare" data-testid="price-compare">{{ target.compare_at_price | money }}</s>
+    {%- else -%}
+      <span class="price__current" data-testid="price-range">
+        {{- 'products.price.range' | t: min: price_min, max: price_max -}}
+      </span>
+    {%- endif -%}
   {%- elsif on_sale -%}
     <span class="visually-hidden">{{ 'products.price.sale_price' | t }}</span>
     <span class="price__current price__current--sale" data-testid="price-regular">
