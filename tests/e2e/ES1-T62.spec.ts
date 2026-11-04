@@ -2,9 +2,11 @@
 // Ticket ES1-T62 TE-4-FE1: gallery trang sản phẩm (docs/srs.md#TE-4 AC1, drafts/techlead/ES1-T59/task-split.md D1, D2, D10, D11).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_MEDIA_HANDLE=... TE4_VARIANTS_HANDLE=... npx playwright test tests/e2e/ES1-T62.spec.ts -g "AC1"
 // Dữ liệu: TE4_MEDIA_HANDLE (ảnh + video + external + 3D), TE4_VARIANTS_HANDLE (variant có featured_media khác media đầu),
-//   TE4_NO_MEDIA_HANDLE (tuỳ chọn, sản phẩm không media). Thiếu biến → skip có lý do.
+//   TE4_NO_MEDIA_HANDLE (tuỳ chọn, sản phẩm không media). Thiếu env → tests/e2e/store-data.json (ES1-T78); vẫn thiếu → skip có lý do.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { env } from './support/store-data';
+import { getJson } from './support/http';
 
 const T = {
   main: 'container-product-main',
@@ -28,9 +30,9 @@ const T = {
 } as const;
 
 const ENV = {
-  media: process.env.TE4_MEDIA_HANDLE,
-  variants: process.env.TE4_VARIANTS_HANDLE,
-  noMedia: process.env.TE4_NO_MEDIA_HANDLE,
+  media: env('TE4_MEDIA_HANDLE'),
+  variants: env('TE4_VARIANTS_HANDLE'),
+  noMedia: env('TE4_NO_MEDIA_HANDLE'),
 };
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
@@ -44,9 +46,9 @@ type JsProduct = {
 };
 
 async function productJs(page: Page, handle: string): Promise<JsProduct> {
-  const res = await page.request.get(`/products/${handle}.js`);
-  expect(res.ok(), `/products/${handle}.js trả ${res.status()}`).toBeTruthy();
-  return (await res.json()) as JsProduct;
+  const r = await getJson<JsProduct>(page.request, `/products/${handle}.js`);
+  expect(r.ok, `/products/${handle}.js trả ${r.status}`).toBeTruthy();
+  return r.body as JsProduct;
 }
 
 test.describe('ES1-T62 TE-4 gallery', () => {
@@ -124,7 +126,8 @@ test.describe('ES1-T62 TE-4 gallery', () => {
     await expect(dialog).toHaveCount(1);
     await expect(dialog).not.toHaveAttribute('open', /.*/);
     await expect(dialog.getByTestId(T.zoomImage)).toHaveCount(1);
-    await expect(dialog.getByTestId(T.close)).toHaveAccessibleName(/.+/);
+    // dialog đang đóng nên tên truy cập tính ra rỗng: kiểm nhãn thật trên nút (aria-label hoặc chữ ẩn).
+    expect(await dialog.getByTestId(T.close).evaluate(el => (el.getAttribute('aria-label') || el.textContent || '').trim())).not.toBe('');
   });
 
   test('AC1 thumbnail không JS: anchor tới ProductMedia-{id}, không aria-current tĩnh', async ({ browser }) => {

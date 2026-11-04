@@ -1642,6 +1642,11 @@ product-variant-picker {
   }
 }
 
+/* Không JS (kể cả khi trình duyệt chặn script mà không đổi media scripting): element chưa defined thì ẩn, dùng select trong noscript (ES1-T86) */
+product-variant-picker:not(:defined) {
+  display: none;
+}
+
 .product-option {
   min-inline-size: 0;
   margin: 0;
