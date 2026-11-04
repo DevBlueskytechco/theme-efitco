@@ -1,16 +1,8 @@
 /**
- * <product-variant-picker> TE-4 AC2 AC4 AC12, ES1-T66. No variant: Unavailable, no fetch.
- * Else id, ?variant=, 1 fetch for REGIONS, theme:variant:change (product-media.js).
- * ES1-T75: https://shopify.dev/docs/storefronts/themes/architecture/partials
- *   `partials.fetch('a', 'b', { url: url.toString() })`, `partials.apply(update)`;
- *   `signal` undocumented, AbortError caught.
- * https://shopify.dev/docs/api/storefront-events-and-actions/events/product-select
- *   `shopify:product:select`, `ProductSelectEvent`, `createPromise()` (ES1-T77);
- *   product, selectedOptions [{name, value}], promise → {variant | null}.
- *   product:view = <s-view-event> (ES1-T76); no show-variant action.
- * ES1-T81: no import map → bare '@shopify/standard-events' never resolved. Import the CDN
- *   URL (same as assets/standard-events.js → one instance). Not './standard-events.js':
- *   asset_url adds ?v=, a relative URL would load a second copy.
+ * <product-variant-picker> TE-4 AC2 AC4 AC12 (ES1-T66, ES1-T81). Unknown variant: Unavailable, no fetch.
+ * partials.fetch(...names, { url, signal }) + apply: shopify.dev/docs/storefronts/themes/architecture/partials
+ * shopify:product:select via ProductSelectEvent: shopify.dev/docs/api/storefront-events-and-actions
+ * Library loaded from the Shopify CDN URL (no import map); product:view is <s-view-event> (ES1-T76).
  */
 import { partials } from "@shopify/partial-rendering";
 
