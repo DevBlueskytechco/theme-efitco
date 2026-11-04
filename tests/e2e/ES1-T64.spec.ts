@@ -2,9 +2,10 @@
 // Ticket ES1-T64 TE-4-FE3: product form (docs/srs.md#TE-4 AC2 markup, AC3, AC4, AC6, AC9; drafts/techlead/ES1-T59/task-split.md D4, D10, D11).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_VARIANTS_HANDLE=... TE4_SINGLE_HANDLE=... TE4_SOLD_OUT_HANDLE=... TE4_DIGITAL_HANDLE=...
 //   TE4_GIFT_CARD_HANDLE=... TE4_SELLING_PLAN_HANDLE=... TE4_PICKUP_HANDLE=... npx playwright test tests/e2e/ES1-T64.spec.ts -g "AC2-markup|AC4|AC6|AC9|nojs"
-// Thiếu biến → skip có lý do. Partial chỉ render khi store bật agentic editor (AGENTS.md).
+// Thiếu env → tests/e2e/store-data.json (ES1-T78); vẫn thiếu → skip có lý do. Partial chỉ render khi store bật agentic editor (AGENTS.md).
 import { test, expect, type Page, type Browser } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { env } from './support/store-data';
 
 const T = {
   form: 'product-form',
@@ -32,13 +33,13 @@ const T = {
 } as const;
 
 const ENV = {
-  variants: process.env.TE4_VARIANTS_HANDLE,
-  single: process.env.TE4_SINGLE_HANDLE,
-  soldOut: process.env.TE4_SOLD_OUT_HANDLE,
-  digital: process.env.TE4_DIGITAL_HANDLE,
-  giftCard: process.env.TE4_GIFT_CARD_HANDLE,
-  sellingPlan: process.env.TE4_SELLING_PLAN_HANDLE,
-  pickup: process.env.TE4_PICKUP_HANDLE,
+  variants: env('TE4_VARIANTS_HANDLE'),
+  single: env('TE4_SINGLE_HANDLE'),
+  soldOut: env('TE4_SOLD_OUT_HANDLE'),
+  digital: env('TE4_DIGITAL_HANDLE'),
+  giftCard: env('TE4_GIFT_CARD_HANDLE'),
+  sellingPlan: env('TE4_SELLING_PLAN_HANDLE'),
+  pickup: env('TE4_PICKUP_HANDLE'),
 };
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
