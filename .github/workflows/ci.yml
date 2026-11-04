@@ -137,7 +137,10 @@ jobs:
       - run: npx playwright test --project=${{ matrix.project }}
       - uses: actions/upload-artifact@v4
         if: always()
-        with: { name: playwright-report-${{ matrix.project }}, path: playwright-report, if-no-files-found: ignore }
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: playwright-report
+          if-no-files-found: ignore
   # Check bắt buộc tên "e2e" (merge_pr.sh, dashboard): xanh khi cả desktop và mobile xanh
   e2e:
     needs: e2e-run
