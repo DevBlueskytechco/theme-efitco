@@ -6,6 +6,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { env } from './support/store-data';
+import { getJson } from './support/http';
 
 const T = {
   main: 'container-product-main',
@@ -45,9 +46,9 @@ type JsProduct = {
 };
 
 async function productJs(page: Page, handle: string): Promise<JsProduct> {
-  const res = await page.request.get(`/products/${handle}.js`);
-  expect(res.ok(), `/products/${handle}.js trả ${res.status()}`).toBeTruthy();
-  return (await res.json()) as JsProduct;
+  const r = await getJson<JsProduct>(page.request, `/products/${handle}.js`);
+  expect(r.ok, `/products/${handle}.js trả ${r.status}`).toBeTruthy();
+  return r.body as JsProduct;
 }
 
 test.describe('ES1-T62 TE-4 gallery', () => {
