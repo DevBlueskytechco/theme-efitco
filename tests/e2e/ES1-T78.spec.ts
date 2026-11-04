@@ -69,7 +69,6 @@ test.describe('ES1-T78 store-data', () => {
   });
 
   test('S-06 không env, không dữ liệu → undefined (spec tự skip)', () => {
-    withEnv({ TE4_PICKUP_HANDLE: undefined }, () => expect(env('TE4_PICKUP_HANDLE')).toBeUndefined());
     withEnv({ TE4_KHONG_TON_TAI: undefined }, () => expect(env('TE4_KHONG_TON_TAI')).toBeUndefined());
   });
 

@@ -95,13 +95,14 @@ class ProductVariantPicker extends HTMLElement {
   emitSelect(selected, v) {
     const { product: p = {}, options: names = [], currency } = this.data;
     const selectedOptions = names.map((name, i) => ({ name, value: selected[i] })).filter((o) => o.value != null);
-    const variant = v && {
+    // Không khớp variant: doc product-select quy định resolve { variant: null }
+    const variant = v ? {
       id: gid("ProductVariant", v.id),
       title: v.title,
       availableForSale: v.available,
       price: { amount: (v.price / 100).toFixed(2), currencyCode: currency },
       selectedOptions: names.map((name, i) => ({ name, value: v.options[i] })),
-    };
+    } : null;
     const product = { id: gid("Product", p.id), title: p.title, handle: p.handle };
     const target = this.root || this;
     events.then((m) => {

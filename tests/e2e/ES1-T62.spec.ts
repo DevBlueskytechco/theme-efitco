@@ -126,7 +126,8 @@ test.describe('ES1-T62 TE-4 gallery', () => {
     await expect(dialog).toHaveCount(1);
     await expect(dialog).not.toHaveAttribute('open', /.*/);
     await expect(dialog.getByTestId(T.zoomImage)).toHaveCount(1);
-    await expect(dialog.getByTestId(T.close)).toHaveAccessibleName(/.+/);
+    // dialog đang đóng nên tên truy cập tính ra rỗng: kiểm nhãn thật trên nút (aria-label hoặc chữ ẩn).
+    expect(await dialog.getByTestId(T.close).evaluate(el => (el.getAttribute('aria-label') || el.textContent || '').trim())).not.toBe('');
   });
 
   test('AC1 thumbnail không JS: anchor tới ProductMedia-{id}, không aria-current tĩnh', async ({ browser }) => {
