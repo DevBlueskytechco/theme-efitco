@@ -1,9 +1,5 @@
-/**
- * <product-variant-picker> TE-4 AC2 AC4 AC12 (ES1-T66, ES1-T81). Unknown variant: Unavailable, no fetch.
- * partials.fetch(...names, { url, signal }) + apply: shopify.dev/docs/storefronts/themes/architecture/partials
- * shopify:product:select via ProductSelectEvent: shopify.dev/docs/api/storefront-events-and-actions
- * Library loaded from the Shopify CDN URL (no import map); product:view is <s-view-event> (ES1-T76).
- */
+// <product-variant-picker> TE-4 AC2 AC4 AC12 (ES1-T66, ES1-T81, ES1-T87). Unknown variant: Unavailable, no fetch.
+// partials.fetch(...names, { url, signal }) + apply; ProductSelectEvent from CDN (no import map).
 import { partials } from "@shopify/partial-rendering";
 
 const REGIONS = ["product-price", "product-buy-buttons", "product-installments", "product-pickup", "product-selling-plans", "product-sticky-bar"];
@@ -26,6 +22,7 @@ class ProductVariantPicker extends HTMLElement {
     this.root = this.closest("product-form");
     this.form = document.getElementById(this.dataset.formId);
     this.idInput = this.form?.querySelector('input[type="hidden"][name="id"]');
+    this.save();
     this.listen("addEventListener");
   }
 
@@ -45,7 +42,7 @@ class ProductVariantPicker extends HTMLElement {
       const v = this.variants.find((x) => x.id === id);
       if (v && id !== Number(this.idInput?.value)) this.show(v);
     } else if (type === "pageshow") {
-      // bfcache may restore radios that differ from the hidden id.
+      // bfcache: radios may differ from id.
       const v = this.match(this.selection());
       if (v && v.id !== Number(this.idInput?.value)) this.update(v);
     } else if (target instanceof HTMLInputElement && target.checked) {
@@ -91,11 +88,10 @@ class ProductVariantPicker extends HTMLElement {
     });
   }
 
-  // AC12 shopify:product:select; lookup is sync so the promise resolves at once.
+  // AC12; lookup is sync so the promise resolves at once. No match → { variant: null }.
   emitSelect(selected, v) {
     const { product: p = {}, options: names = [], currency } = this.data;
     const selectedOptions = names.map((name, i) => ({ name, value: selected[i] })).filter((o) => o.value != null);
-    // Không khớp variant: doc product-select quy định resolve { variant: null }
     const variant = v ? {
       id: gid("ProductVariant", v.id),
       title: v.title,
@@ -114,7 +110,7 @@ class ProductVariantPicker extends HTMLElement {
         target.dispatchEvent(new E({ product, selectedOptions, promise: ok ? d.promise : Promise.resolve({ variant }) }));
         if (ok) d.resolve({ variant });
       } catch {
-        // Shape mismatch: keep the picker working.
+        // Shape mismatch: skip.
       }
     });
   }
@@ -124,18 +120,34 @@ class ProductVariantPicker extends HTMLElement {
     if (status) status.textContent = text;
   }
 
+  buttons() {
+    return [...document.querySelectorAll('button[name="add"]')].filter((b) => b.form === this.form);
+  }
+
+  // Last rendered add buttons + inventory (ES1-T87).
+  save() {
+    const i = (this.inv = this.root?.querySelector(INVENTORY));
+    this.saved = [...this.buttons(), i].filter(Boolean).map((el) => [el, el.disabled, el.dataset.state, el.innerHTML]);
+  }
+
+  restore() {
+    for (const [el, d, s, html] of this.saved) {
+      el.innerHTML = html;
+      if (s) el.dataset.state = s;
+      else el.disabled = d;
+    }
+  }
+
   unavailable() {
     this.controller?.abort();
     const label = this.root?.dataset.labelUnavailable || "";
-    for (const b of document.querySelectorAll('button[name="add"]')) {
-      if (b.form !== this.form) continue;
+    for (const b of this.buttons()) {
       b.disabled = true;
       (b.querySelector(".product-form__add-label") || b).textContent = label;
     }
-    const inventory = this.root?.querySelector(INVENTORY);
-    if (inventory) {
-      inventory.dataset.state = "unavailable";
-      inventory.textContent = label;
+    if (this.inv) {
+      this.inv.dataset.state = "unavailable";
+      this.inv.textContent = label;
     }
     this.announce(label);
   }
@@ -161,10 +173,11 @@ class ProductVariantPicker extends HTMLElement {
       if (controller.signal.aborted) return;
       await partials.apply(update);
       if (plan) for (const input of this.form.querySelectorAll(PLAN)) input.checked = input.value === plan;
-      const inventory = this.root?.querySelector(INVENTORY);
-      if (inventory) this.announce(inventory.textContent.trim());
+      this.save();
+      if (this.inv) this.announce(this.inv.textContent.trim());
     } catch {
-      // Abort/offline: keep state.
+      // Own abort: newer update owns the UI. Network/apply error: restore.
+      if (!controller.signal.aborted) this.restore();
     } finally {
       if (this.controller === controller) this.root?.removeAttribute("aria-busy");
     }
