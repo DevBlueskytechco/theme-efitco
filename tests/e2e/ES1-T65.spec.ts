@@ -4,6 +4,7 @@
 // Kiểm trong context tắt JS: sau khi BE4 (ES1-T68) merge, JS có thể bỏ hidden khi có kết quả; markup server luôn hidden.
 import { test, expect, type Page, type Browser } from '@playwright/test';
 import { env } from './support/store-data';
+import { getJson } from './support/http';
 
 const T = {
   root: 'product-recommendations',
@@ -36,9 +37,9 @@ async function noJsPage(browser: Browser) {
 }
 
 async function productId(page: Page, handle: string): Promise<number> {
-  const res = await page.request.get(`/products/${handle}.js`);
-  expect(res.ok(), `/products/${handle}.js trả ${res.status()}`).toBeTruthy();
-  return ((await res.json()) as { id: number }).id;
+  const r = await getJson<{ id: number }>(page.request, `/products/${handle}.js`);
+  expect(r.ok, `/products/${handle}.js trả ${r.status}`).toBeTruthy();
+  return r.body!.id;
 }
 
 test.describe('ES1-T65 TE-4 product recommendations', () => {
