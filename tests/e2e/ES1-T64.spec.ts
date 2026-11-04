@@ -2,9 +2,11 @@
 // Ticket ES1-T64 TE-4-FE3: product form (docs/srs.md#TE-4 AC2 markup, AC3, AC4, AC6, AC9; drafts/techlead/ES1-T59/task-split.md D4, D10, D11).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_VARIANTS_HANDLE=... TE4_SINGLE_HANDLE=... TE4_SOLD_OUT_HANDLE=... TE4_DIGITAL_HANDLE=...
 //   TE4_GIFT_CARD_HANDLE=... TE4_SELLING_PLAN_HANDLE=... TE4_PICKUP_HANDLE=... npx playwright test tests/e2e/ES1-T64.spec.ts -g "AC2-markup|AC4|AC6|AC9|nojs"
-// Thiếu biến → skip có lý do. Partial chỉ render khi store bật agentic editor (AGENTS.md).
+// Thiếu env → tests/e2e/store-data.json (ES1-T78); vẫn thiếu → skip có lý do. Partial chỉ render khi store bật agentic editor (AGENTS.md).
 import { test, expect, type Page, type Browser } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { env } from './support/store-data';
+import { getJson } from './support/http';
 
 const T = {
   form: 'product-form',
@@ -32,13 +34,13 @@ const T = {
 } as const;
 
 const ENV = {
-  variants: process.env.TE4_VARIANTS_HANDLE,
-  single: process.env.TE4_SINGLE_HANDLE,
-  soldOut: process.env.TE4_SOLD_OUT_HANDLE,
-  digital: process.env.TE4_DIGITAL_HANDLE,
-  giftCard: process.env.TE4_GIFT_CARD_HANDLE,
-  sellingPlan: process.env.TE4_SELLING_PLAN_HANDLE,
-  pickup: process.env.TE4_PICKUP_HANDLE,
+  variants: env('TE4_VARIANTS_HANDLE'),
+  single: env('TE4_SINGLE_HANDLE'),
+  soldOut: env('TE4_SOLD_OUT_HANDLE'),
+  digital: env('TE4_DIGITAL_HANDLE'),
+  giftCard: env('TE4_GIFT_CARD_HANDLE'),
+  sellingPlan: env('TE4_SELLING_PLAN_HANDLE'),
+  pickup: env('TE4_PICKUP_HANDLE'),
 };
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
@@ -49,9 +51,9 @@ type JsProduct = { id: number; options: Array<{ name: string; position: number }
 type CartJs = { items: Array<{ variant_id: number; quantity: number; properties: Record<string, string> | null }> };
 
 async function productJs(page: Page, handle: string): Promise<JsProduct> {
-  const res = await page.request.get(`/products/${handle}.js`);
-  expect(res.ok(), `/products/${handle}.js trả ${res.status()}`).toBeTruthy();
-  return (await res.json()) as JsProduct;
+  const r = await getJson<JsProduct>(page.request, `/products/${handle}.js`);
+  expect(r.ok, `/products/${handle}.js trả ${r.status}`).toBeTruthy();
+  return r.body as JsProduct;
 }
 
 async function clearCart(page: Page) {
@@ -59,8 +61,11 @@ async function clearCart(page: Page) {
 }
 
 async function cartJs(page: Page): Promise<CartJs> {
-  const res = await page.request.get('/cart.js');
-  return (await res.json()) as CartJs;
+  const r = await getJson<CartJs>(page.request, '/cart.js');
+  // Store dev giới hạn giỏ hàng (429 sau khi đã thử lại): môi trường, không phải lỗi theme → skip có lý do
+  test.skip(r.status === 429, 'Shopify trả 429 cho /cart.js sau khi thử lại (giới hạn store dev)');
+  expect(r.ok, `/cart.js trả ${r.status}`).toBeTruthy();
+  return r.body as CartJs;
 }
 
 async function noJsPage(browser: Browser) {
@@ -152,7 +157,8 @@ test.describe('ES1-T64 TE-4 product form', () => {
     await expect(qty).toHaveAttribute('min', '1');
     await expect(qty).toHaveValue('1');
     await expect(qty).toHaveAccessibleName('Quantity');
-    expect(await qty.evaluate(el => el.closest('form')?.id ?? '')).toMatch(/^product-form-\d+$/);
+    // form có <input name="id"> nên form.id trỏ vào input (DOM clobbering): đọc thuộc tính id.
+    expect(await qty.evaluate(el => el.closest('form')?.getAttribute('id') ?? '')).toMatch(/^product-form-\d+$/);
   });
 
   test('AC2-markup touch target option, nút từ 24px; axe 0 serious', async ({ page }) => {
@@ -179,7 +185,7 @@ test.describe('ES1-T64 TE-4 product form', () => {
     await page.goto(productPath(ENV.variants!));
     const pay = tid(page, T.paymentButton);
     await expect(pay).toHaveCount(1);
-    expect(await pay.evaluate(el => el.closest('form')?.id ?? '')).toMatch(/^product-form-\d+$/);
+    expect(await pay.evaluate(el => el.closest('form')?.getAttribute('id') ?? '')).toMatch(/^product-form-\d+$/);
     await expect(tid(page, T.installments)).toHaveCount(1);
     // Không CSS theme đè màu nút Shopify
     expect(await pay.evaluate(el => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0)');

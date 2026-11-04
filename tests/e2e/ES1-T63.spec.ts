@@ -2,9 +2,10 @@
 // Ticket ES1-T63 TE-4-FE2: product info + sticky bar + JSON-LD (docs/srs.md#TE-4 AC3, AC5 markup, AC9, AC10, AC11; drafts/techlead/ES1-T59/task-split.md D3, D5, D10, D11).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_VARIANTS_HANDLE=... TE4_DIGITAL_HANDLE=... TE4_SOLD_OUT_HANDLE=...
 //   [TE4_TAX_INCLUDED_COUNTRY=XX] npx playwright test tests/e2e/ES1-T63.spec.ts -g "AC3|AC9|AC10|AC11|AC5-markup"
-// Thiếu biến → skip có lý do. Partial chỉ render khi store bật agentic editor (AGENTS.md).
+// Thiếu env → tests/e2e/store-data.json (ES1-T78); vẫn thiếu → skip có lý do. Partial chỉ render khi store bật agentic editor (AGENTS.md).
 import { test, expect, type Page, type Browser } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { env } from './support/store-data';
 
 const T = {
   info: 'product-info',
@@ -23,10 +24,10 @@ const T = {
 } as const;
 
 const ENV = {
-  variants: process.env.TE4_VARIANTS_HANDLE,
-  digital: process.env.TE4_DIGITAL_HANDLE,
-  soldOut: process.env.TE4_SOLD_OUT_HANDLE,
-  taxCountry: process.env.TE4_TAX_INCLUDED_COUNTRY,
+  variants: env('TE4_VARIANTS_HANDLE'),
+  digital: env('TE4_DIGITAL_HANDLE'),
+  soldOut: env('TE4_SOLD_OUT_HANDLE'),
+  taxCountry: env('TE4_TAX_INCLUDED_COUNTRY'),
 };
 
 // locales/en.default.json blocks.product_info

@@ -1,12 +1,13 @@
 // KHÔNG CHẮC: spec chưa chạy (sandbox agent không mở được trình duyệt, không có node_modules) → chờ CI. Payload ProductSelectEvent có thể nằm trên event hoặc detail: spec đọc cả hai.
 // Ticket ES1-T66 TE-4-BE1: assets/product-variant-picker.js (docs/srs.md#TE-4 AC2, AC4, AC12; drafts/techlead/ES1-T59/task-split.md D6, D10, D11).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_VARIANTS_HANDLE=... [TE4_SELLING_PLAN_HANDLE=...] npx playwright test tests/e2e/ES1-T66.spec.ts -g "AC2|AC12"
-// Thiếu biến → skip có lý do. Partial chỉ render khi store bật agentic editor (AGENTS.md).
+// Thiếu env → tests/e2e/store-data.json (ES1-T78: TE4_OPTIONS_HANDLE); vẫn thiếu → skip có lý do. Partial chỉ render khi store bật agentic editor (AGENTS.md).
 // API theo ES1-T75: partials.fetch(...names, {url}) + apply; event shopify:product:select (ProductSelectEvent); product:view là <s-view-event> (ES1-T76), không thuộc spec này.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { env } from './support/store-data';
 
 const T = {
   form: 'product-form',
@@ -25,8 +26,9 @@ const T = {
 } as const;
 
 const ENV = {
-  variants: process.env.TE4_VARIANTS_HANDLE,
-  sellingPlan: process.env.TE4_SELLING_PLAN_HANDLE,
+  // ES1-T78: cần sản phẩm 2 option có tổ hợp thiếu. TE4_OPTIONS_HANDLE trước, giữ TE4_VARIANTS_HANDLE cho env cũ; mọi env thắng store-data.json.
+  variants: env('TE4_OPTIONS_HANDLE', 'TE4_VARIANTS_HANDLE'),
+  sellingPlan: env('TE4_SELLING_PLAN_HANDLE'),
 };
 
 const ROOT = process.cwd();
@@ -107,7 +109,7 @@ async function currentVariantId(page: Page) {
 }
 
 async function openVariants(page: Page) {
-  test.skip(!ENV.variants, 'Thiếu TE4_VARIANTS_HANDLE (sản phẩm từ 2 option, có variant hết hàng và tổ hợp không tồn tại)');
+  test.skip(!ENV.variants, 'Thiếu TE4_OPTIONS_HANDLE / TE4_VARIANTS_HANDLE (sản phẩm từ 2 option, có variant hết hàng và tổ hợp không tồn tại)');
   await page.goto(productPath(ENV.variants!));
   await expect(tid(page, T.picker)).toBeVisible();
   const product = await productJs(page, ENV.variants!);
@@ -227,7 +229,8 @@ test.describe('ES1-T66 TE-4 variant picker', () => {
     const before = { disabled: await add.isDisabled(), text: (await add.textContent())?.trim() };
     const path = productPath(ENV.variants!);
     await page.route(
-      (url) => url.pathname.endsWith(path) && url.searchParams.has('variant'),
+      // ES1-T78: handle có dấu → pathname percent-encode, so sau khi decode.
+      (url) => decodeURIComponent(url.pathname).endsWith(path) && url.searchParams.has('variant'),
       (route) => (['fetch', 'xhr'].includes(route.request().resourceType()) ? route.abort() : route.continue())
     );
     await selectOptions(page, target!.options);
