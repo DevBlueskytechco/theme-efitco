@@ -5,8 +5,10 @@
   product.media in admin order without duplicates.
 
   Media filters by type: image → snippets/image.liquid wrapped in a link to
-  the 2048px image (zoom works without JS); video → video_tag with controls,
-  preload none and the preview image as poster; external_video → poster plus
+  the 2048px image (zoom works without JS); video → <video> with controls,
+  preload none, media.sources and the preview image as poster, plus a
+  fallback img (alt = media.alt or product.title, same loading and
+  fetchpriority rule as the other media); external_video → poster plus
   a link to the YouTube/Vimeo page, the iframe sits in a <template> so nothing
   loads from YouTube/Vimeo until assets/product-media.js (BE) clones it
   (NFR-6); model → model_viewer_tag over its preview image. No media → one
@@ -107,8 +109,47 @@
             </a>
 
           {%- when 'video' -%}
+            {%- assign video_alt = media.alt | default: product.title -%}
             <div class="product-media__video" data-testid="product-media-video">
-              {{ media | video_tag: controls: true, preload: 'none', image_size: '1440x', class: 'product-media__video-tag' }}
+              <video
+                class="product-media__video-tag"
+                controls
+                playsinline
+                preload="none"
+                {% if preview != blank %}
+                  poster="{{ preview | image_url: width: 1440 }}"
+                {% endif %}
+              >
+                {%- for source in media.sources -%}
+                  <source src="{{ source.url }}" type="{{ source.mime_type }}">
+                {%- endfor -%}
+                {%- if preview != blank -%}
+                  {%- if item_priority -%}
+                    {{
+                      preview
+                      | image_url: width: 1440
+                      | image_tag:
+                        widths: '1440',
+                        sizes: media_sizes,
+                        alt: video_alt,
+                        loading: item_loading,
+                        fetchpriority: item_priority,
+                        class: 'product-media__video-fallback'
+                    }}
+                  {%- else -%}
+                    {{
+                      preview
+                      | image_url: width: 1440
+                      | image_tag:
+                        widths: '1440',
+                        sizes: media_sizes,
+                        alt: video_alt,
+                        loading: item_loading,
+                        class: 'product-media__video-fallback'
+                    }}
+                  {%- endif -%}
+                {%- endif -%}
+              </video>
             </div>
 
           {%- when 'external_video' -%}
@@ -224,9 +265,14 @@
       data-testid="product-media-zoom-dialog"
     >
       <form class="product-media__dialog-form" method="dialog">
-        <button class="product-media__dialog-close" type="submit" data-testid="product-media-zoom-close">
+        {% # aria-label, not hidden text: the dialog is closed (display: none) on load, so a name from hidden content is empty. %}
+        <button
+          class="product-media__dialog-close"
+          type="submit"
+          aria-label="{{ 'blocks.product_media.close' | t | escape }}"
+          data-testid="product-media-zoom-close"
+        >
           <span class="product-media__close-icon" aria-hidden="true"></span>
-          <span class="visually-hidden">{{ 'blocks.product_media.close' | t }}</span>
         </button>
       </form>
       {% # No src until JS sets src, alt, width and height from the clicked image, then removes hidden. %}
