@@ -93,7 +93,7 @@ class ProductForm extends HTMLElement {
   }
 }
 
-// Below 48rem only, while the main add button is above the viewport.
+// Below 48rem, add button above viewport (rootMargin: jumps fire).
 class ProductStickyBar extends HTMLElement {
   connectedCallback() {
     this.mq = matchMedia("(max-width: 47.99rem)");
@@ -112,7 +112,7 @@ class ProductStickyBar extends HTMLElement {
     if (!this.mq.matches || !this.form) return;
     this.io = new IntersectionObserver((entries) => {
       for (const e of entries) if (e.target === this.target) this.show(!e.isIntersecting && e.boundingClientRect.bottom <= 0);
-    });
+    }, { rootMargin: "0px 0px 99999px" });
     // Partial apply may swap the button.
     this.mo = new MutationObserver(() => this.watch());
     this.mo.observe(this.form, { childList: true, subtree: true });
