@@ -112,6 +112,7 @@
         data-form-id="{{ form_id }}"
         data-testid="product-variant-picker"
       >
+        {%- render 'variant-json', product: product -%}
         {%- for option in product.options_with_values -%}
           {%- assign option_index = option.position | minus: 1 -%}
           <fieldset
@@ -162,6 +163,7 @@
           </fieldset>
         {%- endfor -%}
       </product-variant-picker>
+      <script src="{{ 'product-variant-picker.js' | asset_url }}" type="module"></script>
     {%- endunless -%}
 
     {%- form 'product', product, id: form_id, class: 'product-form__form' -%}
