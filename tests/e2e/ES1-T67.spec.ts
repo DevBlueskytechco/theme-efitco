@@ -96,7 +96,8 @@ async function mockAdd(page: Page) {
 
 test.describe('ES1-T67 TE-4 product form + sticky bar', () => {
   test('AC5 AC6 AC8 contract: bundle, 1 thẻ script, custom element và selector khớp markup', () => {
-    expect(Buffer.byteLength(JS), 'bundle tối đa 5120 B').toBeLessThanOrEqual(5120);
+    // ES1-T85 thêm CartLinesUpdateEvent → vượt trần mềm 5120 B; trần cứng 8192 B/file (ADR 0006).
+    expect(Buffer.byteLength(JS), 'bundle tối đa 8192 B').toBeLessThanOrEqual(8192);
     const scripts = [...FORM_LIQUID.matchAll(/<script src="\{\{ 'product-form\.js' \| asset_url \}\}" type="module"><\/script>/g)];
     expect(scripts).toHaveLength(1);
     // sticky bar không có thẻ script riêng (doc comment được phép nhắc tên file)
