@@ -2141,6 +2141,110 @@ product-sticky-bar {
   }
 }
 
+/** Product recommendations (TE-4 AC7, ES1-T59 D7, ES1-T61 #7): hidden tới khi
+   assets/product-recommendations.js (BE ES1-T68) có kết quả. Heading như
+   featured-collection, lưới 2 cột / tối đa 3 từ 48rem / --columns từ 80rem,
+   card dùng lại .product-card (không swatch) */
+product-recommendations {
+  display: block;
+}
+
+.product-recommendations {
+  display: grid;
+  gap: var(--space-5);
+  padding-block: var(--space-7);
+}
+
+.product-recommendations[hidden] {
+  display: none;
+}
+
+.product-recommendations__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.product-recommendations__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-recommendations__list:empty {
+  display: none;
+}
+
+.product-recommendations__item {
+  min-inline-size: 0;
+}
+
+/* Nhãn screen reader theo snippets/price.liquid, đổi bằng class price--on-sale (JS gắn) */
+.product-recommendations .price:not(.price--on-sale) .price__label-sale,
+.product-recommendations .price:not(.price--on-sale) .price__compare-group,
+.product-recommendations .price--on-sale .price__label-regular {
+  display: none;
+}
+
+.product-recommendations .price--on-sale .price__current {
+  color: var(--color-sale);
+}
+
+.product-recommendations__placeholder {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.product-recommendations__hint {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.product-recommendations__placeholder-media {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background-color: var(--color-background-cream);
+  color: var(--color-muted-light);
+}
+
+.product-recommendations__placeholder-svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: currentcolor;
+}
+
+@media (min-width: 48rem) {
+  .product-recommendations__list {
+    grid-template-columns: repeat(var(--columns-tablet, 3), minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .product-recommendations {
+    gap: calc(var(--space-1) * 10);
+    padding-block: var(--space-8);
+  }
+}
+
+@media (min-width: 80rem) {
+  .product-recommendations__list {
+    grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+}
+
 /** Gift card template */
 .template-gift-card main {
   text-align: center;
