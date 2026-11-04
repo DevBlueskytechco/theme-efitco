@@ -117,7 +117,7 @@ test.describe('ES1-T68 TE-4 product recommendations JS', () => {
     await expect(first.getByTestId(T.cardTitle)).toHaveText(p.title);
     const href = await first.getByTestId(T.cardTitle).getAttribute('href');
     expect(href).toBeTruthy();
-    expect(new URL(href!, page.url()).pathname).toContain(`/products/${p.handle}`);
+    expect(decodeURIComponent(new URL(href!, page.url()).pathname)).toContain(`/products/${p.handle}`);
     const img = first.locator('img[data-card-image]');
     if (p.featured_image) {
       await expect(img).toHaveAttribute('src', /.+/);
