@@ -1359,6 +1359,13 @@ product-media-gallery {
   background-color: var(--color-background-dark);
 }
 
+/* Fallback img trong <video> (chỉ hiện khi trình duyệt không phát được video) */
+.product-media__video-fallback {
+  display: block;
+  inline-size: 100%;
+  block-size: auto;
+}
+
 .product-media__external {
   position: relative;
   display: block;
@@ -1854,10 +1861,50 @@ product-variant-picker {
   cursor: not-allowed;
 }
 
-/* Chỉ khoảng cách, không đụng màu/kiểu nút của Shopify (AC4) */
 .product-form__payment-button:empty,
 .product-form__installments:empty {
   display: none;
+}
+
+/* Dynamic checkout (ES1-T80, axe color-contrast): chỉ nút unbranded + link "More payment options"
+   lấy token foreground/background (tương phản như chữ thân, AA); nút ví có thương hiệu (Shop Pay,
+   PayPal…) giữ màu của Shopify (AC4). 2 class để thắng CSS Shopify kể cả :hover:not([disabled]). */
+.product-form__payment-button .shopify-payment-button__button--unbranded {
+  min-block-size: 52px;
+  padding: var(--space-3) var(--space-6);
+  border: 1px solid var(--color-foreground);
+  border-radius: var(--radius-button);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.product-form__payment-button .shopify-payment-button__button--unbranded:hover:not([disabled]) {
+  border-color: var(--color-foreground);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.product-form__payment-button .shopify-payment-button__button--unbranded:focus-visible {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.product-form__payment-button .shopify-payment-button__button--unbranded[disabled] {
+  border-color: var(--color-border);
+  background-color: var(--color-background-alt);
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+.product-form__payment-button .shopify-payment-button__more-options {
+  color: var(--color-foreground);
+  font-size: var(--font-size-sm);
+  text-decoration: underline;
 }
 
 /* Pickup (AC4, AC9) */

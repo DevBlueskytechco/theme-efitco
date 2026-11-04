@@ -10,8 +10,10 @@
   form so its radios (name option-{position}) are never submitted. One
   fieldset + legend per option; each value is a label wrapping a radio,
   shown as a pill, or as a swatch when value.swatch is set. Radios carry
-  data-available (value.available) and data-option-value-id. Not rendered
-  when product.has_only_default_variant (AC9). Hidden with
+  data-available (value.available) and data-option-value-id. Picker, its
+  variant JSON, its script and the noscript select are not rendered when
+  product.has_only_default_variant or product.variants.size == 1 (AC9: one
+  variant with its own option values is still no choice). Hidden with
   `scripting: none`: without JS the noscript select below picks the variant.
 
   Inside the form (id product-form-{product.id}): hidden input name=id with
@@ -34,7 +36,9 @@
 
   {{ form | payment_button }} renders when the show_dynamic_checkout setting
   is on, outside every partial (Shopify's script mounts the buttons, a
-  refresh would drop them) and without color overrides (AC4).
+  refresh would drop them). Only the unbranded button and the "more payment
+  options" link take theme tokens (contrast AA); branded wallet buttons keep
+  their own colors (AC4).
 
   Gift card (product.gift_card?): checkbox
   properties[__shopify_send_gift_card_to_customer] plus Recipient email,
@@ -88,6 +92,11 @@
     assign label_sold_out = 'blocks.product_form.sold_out' | t
     assign label_unavailable = 'blocks.product_form.unavailable' | t
 
+    assign has_variant_choice = true
+    if product.has_only_default_variant or product.variants.size == 1
+      assign has_variant_choice = false
+    endif
+
     assign today = 'now' | date: '%Y-%m-%d'
     assign send_on_max = 'now' | date: '%s' | plus: 7776000 | date: '%Y-%m-%d'
   -%}
@@ -105,7 +114,7 @@
     data-testid="product-form"
     {{ block.shopify_attributes }}
   >
-    {%- unless product.has_only_default_variant -%}
+    {%- if has_variant_choice -%}
       <product-variant-picker
         class="product-variant-picker"
         data-product-url="{{ product.url }}"
@@ -164,7 +173,7 @@
         {%- endfor -%}
       </product-variant-picker>
       <script src="{{ 'product-variant-picker.js' | asset_url }}" type="module"></script>
-    {%- endunless -%}
+    {%- endif -%}
 
     {%- form 'product', product, id: form_id, class: 'product-form__form' -%}
       <input
@@ -174,7 +183,7 @@
         data-testid="product-form-variant-id"
       >
 
-      {%- unless product.has_only_default_variant -%}
+      {%- if has_variant_choice -%}
         <noscript>
           <div class="product-form__field">
             <label class="product-form__label" for="{{ form_id }}-variant">
@@ -211,7 +220,7 @@
             </select>
           </div>
         </noscript>
-      {%- endunless -%}
+      {%- endif -%}
 
       {% partial 'product-installments' %}
         <div class="product-form__installments" data-testid="product-installments">

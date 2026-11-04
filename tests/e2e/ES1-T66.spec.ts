@@ -365,7 +365,9 @@ test.describe('ES1-T66 TE-4 variant picker', () => {
 
   test('AC12 không còn override show variant: JS không gán Shopify.actions', () => {
     expect(JS).not.toMatch(/Shopify\.actions|showVariant|shopify:product:view/);
-    expect(JS).toMatch(/import\(\s*"@shopify\/standard-events"\s*\)/);
+    // ES1-T81: không có import map → import thẳng URL CDN.
+    expect(JS).toMatch(/import\(\s*"https:\/\/cdn\.shopify\.com\/storefront\/standard-events\.js"\s*\)/);
+    expect(JS).not.toMatch(/["']@shopify\/standard-events["']/);
     expect(JS).toMatch(/partials\.fetch\(\.\.\.REGIONS,/);
   });
 });
