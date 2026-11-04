@@ -14,13 +14,15 @@ export async function getJson<T>(request: APIRequestContext, path: string, attem
   for (let i = 0; i < attempts; i++) {
     const res = await request.get(path, { headers: { Accept: 'application/json' } });
     status = res.status();
-    const type = res.headers()['content-type'] ?? '';
-    if (res.ok() && type.includes('json')) {
-      const body = (await res.json()) as T;
-      if (cacheable) CACHE.set(path, body);
-      return { ok: true, status, body };
-    }
-    if (!RETRY.has(status) && !(res.ok() && !type.includes('json'))) return { ok: false, status, body: null };
+    if (res.ok()) {
+      // /products/<handle>.js trả content-type JavaScript nhưng body là JSON: parse body, không dựa content-type.
+      const text = await res.text();
+      try {
+        const body = JSON.parse(text) as T;
+        if (cacheable) CACHE.set(path, body);
+        return { ok: true, status, body };
+      } catch { /* HTML (trang chặn/challenge) → thử lại */ }
+    } else if (!RETRY.has(status)) return { ok: false, status, body: null };
     const after = Number(res.headers()['retry-after']);
     await new Promise(r => setTimeout(r, Number.isFinite(after) && after > 0 ? Math.min(after, 8) * 1000 : 1500 * 2 ** i));
   }
