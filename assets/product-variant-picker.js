@@ -1,13 +1,8 @@
 /**
- * <product-variant-picker> TE-4 AC2 AC4 AC12, ES1-T66. No variant: Unavailable, no fetch.
- * Else id, ?variant=, 1 fetch for REGIONS, theme:variant:change (product-media.js).
- * ES1-T75: https://shopify.dev/docs/storefronts/themes/architecture/partials
- *   `partials.fetch('a', 'b', { url: url.toString() })`, `partials.apply(update)`;
- *   `signal` undocumented, AbortError caught.
- * https://shopify.dev/docs/api/storefront-events-and-actions/events/product-select
- *   `shopify:product:select`, `import { ProductSelectEvent } from '@shopify/standard-events'`;
- *   product, selectedOptions [{name, value}], promise → {variant | null}. Constructor shape
- *   assumed; lazy import. product:view = <s-view-event> (ES1-T76); no show-variant action.
+ * <product-variant-picker> TE-4 AC2 AC4 AC12 (ES1-T66, ES1-T81). Unknown variant: Unavailable, no fetch.
+ * partials.fetch(...names, { url, signal }) + apply: shopify.dev/docs/storefronts/themes/architecture/partials
+ * shopify:product:select via ProductSelectEvent: shopify.dev/docs/api/storefront-events-and-actions
+ * Library loaded from the Shopify CDN URL (no import map); product:view is <s-view-event> (ES1-T76).
  */
 import { partials } from "@shopify/partial-rendering";
 
@@ -16,7 +11,7 @@ const OPTION = 'input[type="radio"][name^="option-"]';
 const PLAN = 'input[type="radio"][name="selling_plan"]';
 const FIELDSET = "fieldset[data-option-position]";
 const INVENTORY = ".product-form__inventory";
-const events = import("@shopify/standard-events").catch(() => null);
+const events = import("https://cdn.shopify.com/storefront/standard-events.js").catch(() => null);
 
 const gid = (type, id) => `gid://shopify/${type}/${id}`;
 
@@ -110,9 +105,13 @@ class ProductVariantPicker extends HTMLElement {
     const product = { id: gid("Product", p.id), title: p.title, handle: p.handle };
     const target = this.root || this;
     events.then((m) => {
-      if (!m?.ProductSelectEvent || !selectedOptions.length) return;
+      const E = m?.ProductSelectEvent;
+      if (!E || !selectedOptions.length) return;
       try {
-        target.dispatchEvent(new m.ProductSelectEvent({ product, selectedOptions, promise: Promise.resolve({ variant }) }));
+        const d = E.createPromise?.();
+        const ok = typeof d?.resolve === "function";
+        target.dispatchEvent(new E({ product, selectedOptions, promise: ok ? d.promise : Promise.resolve({ variant }) }));
+        if (ok) d.resolve({ variant });
       } catch {
         // Shape mismatch: keep the picker working.
       }
