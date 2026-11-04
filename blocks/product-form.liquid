@@ -49,7 +49,8 @@
   Root custom element product-form (CSS display: block) with data hooks:
   data-product-id, data-product-url, data-cart-add-url, data-cart-url,
   data-cart-type (settings.cart_type from TE-5, default drawer),
-  data-label-add, data-label-sold-out, data-label-unavailable. Live regions:
+  data-label-add, data-label-added (status text after add, ES1-T84),
+  data-label-sold-out, data-label-unavailable. Live regions:
   product-form-status (role status) and product-form-error (role alert),
   empty on load. JS sets aria-busy on the root while loading.
 
@@ -89,6 +90,7 @@
     assign cart_type = settings.cart_type | default: 'drawer'
 
     assign label_add = 'blocks.product_form.add_to_cart' | t
+    assign label_added = 'blocks.product_form.added_to_cart' | t
     assign label_sold_out = 'blocks.product_form.sold_out' | t
     assign label_unavailable = 'blocks.product_form.unavailable' | t
 
@@ -109,6 +111,7 @@
     data-cart-url="{{ routes.cart_url }}"
     data-cart-type="{{ cart_type | escape }}"
     data-label-add="{{ label_add | escape }}"
+    data-label-added="{{ label_added | escape }}"
     data-label-sold-out="{{ label_sold_out | escape }}"
     data-label-unavailable="{{ label_unavailable | escape }}"
     data-testid="product-form"

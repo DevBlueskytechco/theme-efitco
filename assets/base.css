@@ -123,6 +123,12 @@
   gap: var(--space-6) var(--space-5);
 }
 
+/** <s-view-event> (ES1-T76): bọc card, cần hộp block để trigger intersect quan sát được */
+.product-card__view {
+  display: block;
+  min-inline-size: 0;
+}
+
 /** Product card (TE-3, Figma 1:502): ảnh 1:1, badge, tiêu đề, giá, swatch */
 product-swatch,
 .product-card {
@@ -1969,7 +1975,8 @@ product-variant-picker:not(:defined) {
 }
 
 /** Product info (TE-4 AC3, AC9, AC10, ES1-T59 D3): mặc định kỹ thuật, ghi chú text-sm muted (ES1-T61 #6) */
-.product-info {
+.product-info,
+.product-info__view {
   display: grid;
   gap: var(--space-4);
 }

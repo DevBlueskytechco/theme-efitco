@@ -16,10 +16,14 @@
     inside the partial and follows the variant.
   - product.description (rich text from the admin).
   - snippets/product-structured-data.liquid: JSON-LD Product, static.
+  - Storefront event shopify:product:view (ES1-T76, TE-4 AC12): the content
+    sits in <s-view-event> with product | standard_event_data, context page.
+    No JS here: assets/standard-events.js (BE ES1-T81, loaded in layout)
+    defines the element; it dispatches the event on document.
 
-  Test hooks: product-info, product-title, product-vendor, product-price (the
-  snippet keeps price, price-regular, price-compare, price-range,
-  price-unit), product-notes, product-note-tax, product-note-shipping,
+  Test hooks: product-info, product-view-event, product-title, product-vendor,
+  product-price (the snippet keeps price, price-regular, price-compare,
+  price-range, price-unit), product-notes, product-note-tax, product-note-shipping,
   product-description, product-structured-data.
 
   Empty state: no product (block used outside the product template) → a hint
@@ -59,38 +63,44 @@
   -%}
 
   <div class="product-info" data-testid="product-info" {{ block.shopify_attributes }}>
-    {%- if block.settings.show_vendor and product.vendor != blank -%}
-      <p class="product-info__vendor" data-testid="product-vendor">{{ product.vendor | escape }}</p>
-    {%- endif -%}
+    <s-view-event
+      class="product-info__view"
+      view-event-payload='{{ product | standard_event_data: "view", context: "page" | escape }}'
+      data-testid="product-view-event"
+    >
+      {%- if block.settings.show_vendor and product.vendor != blank -%}
+        <p class="product-info__vendor" data-testid="product-vendor">{{ product.vendor | escape }}</p>
+      {%- endif -%}
 
-    <h1 class="product-info__title" data-testid="product-title">{{ product.title | escape }}</h1>
+      <h1 class="product-info__title" data-testid="product-title">{{ product.title | escape }}</h1>
 
-    {% partial 'product-price' %}
-      <div class="product-info__price" data-testid="product-price">
-        {% render 'price', product: product, variant: current_variant %}
+      {% partial 'product-price' %}
+        <div class="product-info__price" data-testid="product-price">
+          {% render 'price', product: product, variant: current_variant %}
 
-        <div class="product-info__notes" data-testid="product-notes">
-          <p class="product-info__note" data-testid="product-note-tax">{{ tax_note_key | t }}</p>
-          {%- if current_variant.requires_shipping -%}
-            <p class="product-info__note" data-testid="product-note-shipping">
-              {%- if shipping_policy_url != blank -%}
-                {{- 'blocks.product_info.shipping_at_checkout_html' | t: link: shipping_policy_url -}}
-              {%- else -%}
-                {{- 'blocks.product_info.shipping_at_checkout' | t -}}
-              {%- endif -%}
-            </p>
-          {%- endif -%}
+          <div class="product-info__notes" data-testid="product-notes">
+            <p class="product-info__note" data-testid="product-note-tax">{{ tax_note_key | t }}</p>
+            {%- if current_variant.requires_shipping -%}
+              <p class="product-info__note" data-testid="product-note-shipping">
+                {%- if shipping_policy_url != blank -%}
+                  {{- 'blocks.product_info.shipping_at_checkout_html' | t: link: shipping_policy_url -}}
+                {%- else -%}
+                  {{- 'blocks.product_info.shipping_at_checkout' | t -}}
+                {%- endif -%}
+              </p>
+            {%- endif -%}
+          </div>
         </div>
-      </div>
-    {% endpartial %}
+      {% endpartial %}
 
-    {%- if product.description != blank -%}
-      <div class="product-info__description" data-testid="product-description">
-        {{- product.description -}}
-      </div>
-    {%- endif -%}
+      {%- if product.description != blank -%}
+        <div class="product-info__description" data-testid="product-description">
+          {{- product.description -}}
+        </div>
+      {%- endif -%}
 
-    {% render 'product-structured-data', product: product %}
+      {% render 'product-structured-data', product: product %}
+    </s-view-event>
   </div>
 {%- endif -%}
 
