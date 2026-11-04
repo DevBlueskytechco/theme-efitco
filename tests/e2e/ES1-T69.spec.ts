@@ -111,7 +111,7 @@ test.describe('ES1-T69 TE-4 product-media.js', () => {
   test('contract: bundle, thẻ script, testid JS dùng có trong block, ngân sách D9', () => {
     expect(Buffer.byteLength(JS), 'product-media.js tối đa 6144 B').toBeLessThanOrEqual(6144);
     expect(BLOCK).toMatch(/<script src="{{ 'product-media\.js' \| asset_url }}" type="module"><\/script>/);
-    expect((BLOCK.match(/product-media\.js/g) ?? []).length, '1 thẻ script').toBe(1);
+    expect((BLOCK.match(/<script[^>]*product-media\.js/g) ?? []).length, '1 thẻ script').toBe(1); // doc comment được phép nhắc tên file
     for (const id of [...JS.matchAll(/(?:testid="|testid === ")([a-z-]+)"/g)].map((m) => m[1])) {
       expect(BLOCK, `block thiếu data-testid ${id}`).toContain(`data-testid="${id}"`);
     }
@@ -247,7 +247,9 @@ test.describe('ES1-T69 TE-4 product-media.js', () => {
     const foreign: string[] = [];
     page.on('request', (r) => {
       const u = new URL(r.url());
-      if (/model-viewer/i.test(u.pathname) && !/(^|\.)(shopify|shopifycdn|shopifycloud)\.com$/.test(u.hostname)) foreign.push(r.url());
+      // Shopify CDN: *.shopify(cdn|cloud).com hoặc /cdn/shopifycloud/ cùng origin store
+      const cdn = /(^|\.)(shopify|shopifycdn|shopifycloud)\.com$/.test(u.hostname) || (u.origin === new URL(page.url()).origin && u.pathname.startsWith('/cdn/shopifycloud/'));
+      if (/model-viewer/i.test(u.pathname) && !cdn) foreign.push(r.url());
     });
     await openMedia(page);
     const model = tid(page, T.model).first();
