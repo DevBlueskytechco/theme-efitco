@@ -93,7 +93,11 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
     await expect(tid(page, 'cart-items-error')).toHaveAttribute('role', 'alert');
     await expect(tid(page, 'cart-form')).toHaveAttribute('id', 'cart-form-drawer');
 
-    await expect(tid(page, 'cart-drawer-close')).toHaveAccessibleName(/\S/);
+    // Dialog đóng = display none: Playwright trả tên truy cập rỗng cho phần tử ẩn → kiểm aria-label, rồi mở để kiểm tên thật.
+    const close = tid(page, 'cart-drawer-close');
+    await expect(close).toHaveAttribute('aria-label', /\S/);
+    await forceOpen(page);
+    await expect(close).toHaveAccessibleName(/\S/);
     const link = tid(page, 'header-cart-link');
     await expect(link).toHaveAttribute('data-cart-link', '');
     await expect(link).toHaveAttribute('aria-haspopup', 'dialog');
