@@ -241,6 +241,7 @@ async function productJs(page: Page, handle: string): Promise<JsProduct> {
 // Nhóm nojs: không chạy được fetch trong trang. Chỉ dùng id/available, không so tiền.
 async function productJsNoScript(page: Page, handle: string): Promise<JsProduct> {
   const r = await getJson<JsProduct>(page.request, `${productPath(handle)}.js`);
+  test.skip(r.status === 429, `Shopify trả 429 cho ${handle}.js sau khi thử lại (giới hạn store dev)`);
   expect(r.ok, `${handle}.js trả ${r.status}`).toBeTruthy();
   return r.body as JsProduct;
 }

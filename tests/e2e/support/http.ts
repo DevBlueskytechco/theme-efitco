@@ -30,7 +30,8 @@ export async function getJson<T>(request: APIRequestContext, path: string, attem
   }
   let status = 0;
   for (let i = 0; i < attempts; i++) {
-    const res = await request.get(path, { headers: { Accept: 'application/json' } });
+    // Handle có dấu: encode như trình duyệt (đường dẫn UTF-8 thô bị store dev trả 429 liên tục)
+    const res = await request.get(/%[0-9A-F]{2}/i.test(path) ? path : encodeURI(path), { headers: { Accept: 'application/json' } });
     status = res.status();
     if (res.ok()) {
       // /products/<handle>.js trả content-type JavaScript nhưng body là JSON: parse body, không dựa content-type.
