@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: spec CHƯA chạy trên store (sandbox không mở được Chromium, host store bị từ chối) → kết quả thật chờ CI. Mới qua playwright --list; chưa type-check (không có typescript).
 // Ticket ES1-T70 TE-4-QA1: E2E trang sản phẩm AC1-AC12, gộp hành vi của spec dev ES1-T62..T69, T85, T87 + shopify:product:view (ES1-T76).
 // Test case: drafts/qa/ES1-T70/test-cases.md. Tên test: "AC<n> TC-<id> ...". Nhóm không JS có chữ "nojs".
-// Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T70.spec.ts [-g "AC2 |nojs"]
+// Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-4.spec.ts [-g "AC2 |nojs"]
 // Dữ liệu: env TE4_* không rỗng, rồi tests/e2e/store-data.json (ES1-T78); thiếu → skip có lý do. Handle có dấu: so pathname sau decodeURIComponent.
 // So tiền: .js lấy bằng fetch trong trang để cùng market (ES1-T74). Nhóm nojs không chạy script trong trang: chỉ assertion locator, .js qua page.request và chỉ so id.
 import { test as base, expect, type Page, type Request, type Route } from '@playwright/test';

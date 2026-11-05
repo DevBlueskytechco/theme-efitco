@@ -1,8 +1,8 @@
-KHÔNG CHẮC: (1) Spec CHƯA chạy trên store: sandbox của phiên này không mở được Chromium (SIGTRAP) và host store bị từ chối, nên DoD "pass desktop + Pixel 7", axe, 0 console error chờ CI. Mới kiểm: `playwright test --list` parse được 90 test × 2 project; chưa type-check (không có typescript, npm registry bị từ chối). (2) Ticket ghi `tests/e2e/TE-4.spec.ts`, Orchestrator yêu cầu đặt theo key nên file là `tests/e2e/ES1-T70.spec.ts`; đổi tên không cần sửa nội dung. Đã hỏi ở ES1-T90. (3) Dữ liệu trên store dev chưa xem được, nên chưa biết bao nhiêu test có điều kiện sẽ skip.
+KHÔNG CHẮC: (1) Spec CHƯA chạy trên store: sandbox của phiên này không mở được Chromium (SIGTRAP) và host store bị từ chối, nên DoD "pass desktop + Pixel 7", axe, 0 console error chờ CI. Mới kiểm: `playwright test --list` parse được 90 test × 2 project; chưa type-check (không có typescript, npm registry bị từ chối). (2) Ticket ghi `tests/e2e/TE-4.spec.ts`, Orchestrator yêu cầu đặt theo key nên file là `tests/e2e/TE-4.spec.ts`; đổi tên không cần sửa nội dung. Đã hỏi ở ES1-T90. (3) Dữ liệu trên store dev chưa xem được, nên chưa biết bao nhiêu test có điều kiện sẽ skip.
 
 # ES1-T70 — TE-4 Trang sản phẩm (QA1)
 Nguồn: docs/srs.md#TE-4 (AC1–AC12, NFR-2, NFR-4), ticket ES1-T70, drafts/techlead/ES1-T59/task-split.md D1–D11, ES1-T75 (CTO: tên event, không có action show variant), ES1-T60, ES1-T79. Figma: không có frame trang sản phẩm (docs/figma-inventory.md).
-Spec: tests/e2e/ES1-T70.spec.ts, project `desktop` và `mobile` (Pixel 7). Tên test bắt đầu mã AC rồi tới ID: `-g "AC2 "`, `-g "TC-205"`, `-g nojs`.
+Spec: tests/e2e/TE-4.spec.ts, project `desktop` và `mobile` (Pixel 7). Tên test bắt đầu mã AC rồi tới ID: `-g "AC2 "`, `-g "TC-205"`, `-g nojs`.
 Áp cho mọi test E2E: fixture `consoleGuard` fail test nếu có console error hoặc pageerror (mục Quy ước). Không lặp lại ở từng dòng.
 Trạng thái: chạy = không phụ thuộc dữ liệu ngoài handle đã có trong store-data.json; có điều kiện = skip có lý do khi store thiếu dữ liệu đúng dạng; tay = không có trong spec.
 
