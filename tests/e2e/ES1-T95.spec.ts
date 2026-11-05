@@ -25,6 +25,7 @@ async function addToCart(request: APIRequestContext, handle: string) {
   const variant = (r.body as Product).variants.find((v) => v.available);
   test.skip(!variant, `${handle} không có variant bán được`);
   const res = await request.post('/cart/add.js', { data: { id: variant!.id, quantity: 1 } });
+  test.skip(res.status() === 429, 'Shopify trả 429 cho /cart/add.js (giới hạn store dev)');
   expect(res.ok(), `/cart/add.js trả ${res.status()}`).toBeTruthy();
 }
 
