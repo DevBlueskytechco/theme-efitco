@@ -1,8 +1,11 @@
 {% doc %}
   Wraps composed page content in a semantic HTML element. Every template
   composes its page through a container block: the block owns the outer
-  layout element and renders the composed body via {{ content }}.
+  layout element and renders the composed body via {{ content }}. When the body
+  is empty the storefront renders nothing, so an empty band takes no space; the
+  editor still renders the wrapper so the merchant can select the blocks inside.
 
+  @param {string} [content] - The composed page content for this band
   @param {string} [id] - Static block id. Set it when a template has more than one container so each keeps its own settings, such as 'home-intro'.
   @param {string} [tag] - HTML element for the wrapper. Default: 'section'.
   @param {string} [background] - Background color token: 'alt', 'cream', 'sand' or 'dark'. Empty: no background.
@@ -41,18 +44,22 @@
     else
       assign text_align = 'start'
   endcase
+
+  assign body = content | strip
 -%}
 
-<{{ tag }}
-  class="block-container{{ background_class }}"
-  style="--text-align: {{ text_align }};"
-  {% if id != blank %}
-    data-testid="container-{{ id }}"
-  {% endif %}
-  {{ block.shopify_attributes }}
->
-  {{ content }}
-</{{ tag }}>
+{%- if body != blank or request.design_mode -%}
+  <{{ tag }}
+    class="block-container{{ background_class }}"
+    style="--text-align: {{ text_align }};"
+    {% if id != blank %}
+      data-testid="container-{{ id }}"
+    {% endif %}
+    {{ block.shopify_attributes }}
+  >
+    {{ content }}
+  </{{ tag }}>
+{%- endif -%}
 
 {% schema %}
 {
