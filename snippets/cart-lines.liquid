@@ -1,0 +1,180 @@
+{% doc %}
+  Cart line items, or the empty state when the cart has no items (TE-5 AC1, AC4,
+  AC5). Shared by blocks/cart-page.liquid and blocks/cart-drawer.liquid; render
+  it inside their partial so a refresh keeps lines and totals in sync.
+
+  Does not use snippets/price.liquid: that snippet prices a variant and has no
+  final_price, original_price or line discounts. It reuses the price__* classes
+  and the products.price.* keys instead.
+
+  Controls point at the form with the form attribute, so they submit from any
+  position. Without JavaScript: updates[] plus the Update button save quantities,
+  the Remove link goes to item.url_to_remove.
+
+  JavaScript hooks: data-line-key (li), data-cart-remove (link),
+  data-cart-update (button, hidden by CSS once cart-items has data-enhanced).
+
+  Test hooks: cart-lines, cart-line, cart-line-image, cart-line-title,
+  cart-line-options, cart-line-properties, cart-line-selling-plan,
+  cart-line-price, cart-line-original-price, cart-line-unit-price,
+  cart-line-discount, cart-line-total, cart-line-quantity, cart-line-remove,
+  cart-update, cart-empty, cart-empty-cta.
+
+  @param {object} cart - The cart to list
+  @param {string} context - Where it renders, 'page' or 'drawer'. Part of the form id and of the input ids
+
+  @example
+  {% render 'cart-lines', cart: cart, context: 'page' %}
+{% enddoc %}
+
+{%- assign form_id = 'cart-form-' | append: context -%}
+
+{%- if cart.item_count == 0 -%}
+  <div class="cart-empty" data-testid="cart-empty">
+    <p class="cart-empty__text">{{ 'cart.empty' | t }}</p>
+    <a class="button" href="{{ routes.all_products_collection_url }}" data-testid="cart-empty-cta">
+      {{- 'cart.continue_shopping' | t -}}
+    </a>
+  </div>
+{%- else -%}
+  <ul class="cart-lines" role="list" data-testid="cart-lines">
+    {%- for item in cart.items -%}
+      {%- assign line_title = item.product.title | escape -%}
+      <li class="cart-line" data-line-key="{{ item.key }}" data-testid="cart-line">
+        {%- if item.image -%}
+          {%- render 'image',
+            image: item.image,
+            class: 'cart-line__image',
+            width: 240,
+            height: 240,
+            crop: 'center',
+            widths: '96, 120, 192, 240',
+            sizes: '(min-width: 48rem) 120px, 96px',
+            testid: 'cart-line-image'
+          -%}
+        {%- else -%}
+          <div class="cart-line__image cart-line__image--empty" data-testid="cart-line-image"></div>
+        {%- endif -%}
+
+        <div class="cart-line__details">
+          <a class="cart-line__title" href="{{ item.url }}" data-testid="cart-line-title">{{ line_title }}</a>
+
+          {%- unless item.product.has_only_default_variant -%}
+            <dl class="cart-line__meta" data-testid="cart-line-options">
+              {%- for option in item.options_with_values -%}
+                <div class="cart-line__meta-row">
+                  <dt>{{ option.name | escape }}</dt>
+                  <dd>{{ option.value | escape }}</dd>
+                </div>
+              {%- endfor -%}
+            </dl>
+          {%- endunless -%}
+
+          {%- capture line_properties -%}
+            {%- for property in item.properties -%}
+              {%- assign property_prefix = property.first | slice: 0 -%}
+              {%- if property_prefix != '_' and property.last != blank -%}
+                <div class="cart-line__meta-row">
+                  <dt>{{ property.first | escape }}</dt>
+                  <dd>{{ property.last | escape }}</dd>
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endcapture -%}
+          {%- if line_properties != blank -%}
+            <dl class="cart-line__meta" data-testid="cart-line-properties">{{ line_properties }}</dl>
+          {%- endif -%}
+
+          {%- if item.selling_plan_allocation -%}
+            <p class="cart-line__selling-plan" data-testid="cart-line-selling-plan">
+              {{- item.selling_plan_allocation.selling_plan.name | escape -}}
+            </p>
+          {%- endif -%}
+
+          <div class="price">
+            {%- if item.original_price != item.final_price -%}
+              <span class="visually-hidden">{{ 'products.price.sale_price' | t }}</span>
+              <span class="price__current price__current--sale" data-testid="cart-line-price">
+                {{- item.final_price | money -}}
+              </span>
+              <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
+              <s class="price__compare" data-testid="cart-line-original-price">{{ item.original_price | money }}</s>
+            {%- else -%}
+              <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
+              <span class="price__current" data-testid="cart-line-price">{{ item.final_price | money }}</span>
+            {%- endif -%}
+
+            {%- if item.unit_price_measurement -%}
+              {%- liquid
+                assign measurement = item.unit_price_measurement
+                assign reference = measurement.reference_unit
+                if measurement.reference_value != 1
+                  assign reference = measurement.reference_value | append: measurement.reference_unit
+                endif
+                assign unit_price = item.unit_price | money
+              -%}
+              <span class="visually-hidden">{{ 'products.price.unit_price' | t }}</span>
+              <span class="price__unit" data-testid="cart-line-unit-price">
+                {{- 'products.price.unit_price_value' | t: price: unit_price, unit: reference -}}
+              </span>
+            {%- endif -%}
+          </div>
+
+          {%- if item.line_level_discount_allocations.size > 0 -%}
+            <ul class="cart-line__discounts" role="list">
+              {%- for allocation in item.line_level_discount_allocations -%}
+                {%- assign discount_amount = allocation.amount | money -%}
+                <li class="cart-line__discount" data-testid="cart-line-discount">
+                  <span>{{ allocation.discount_application.title | escape }}</span>
+                  <span>{{ 'cart.discount_value' | t: amount: discount_amount }}</span>
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+
+        <div class="cart-line__controls">
+          <label class="visually-hidden" for="cart-quantity-{{ context }}-{{ forloop.index }}">
+            {{- 'cart.quantity_label' | t: title: line_title -}}
+          </label>
+          <input
+            id="cart-quantity-{{ context }}-{{ forloop.index }}"
+            class="cart-line__quantity"
+            type="number"
+            name="updates[]"
+            value="{{ item.quantity }}"
+            min="0"
+            inputmode="numeric"
+            form="{{ form_id }}"
+            data-testid="cart-line-quantity"
+          >
+          <a
+            class="cart-line__remove"
+            href="{{ item.url_to_remove }}"
+            aria-label="{{ 'cart.remove_label' | t: title: line_title }}"
+            data-cart-remove
+            data-testid="cart-line-remove"
+          >
+            {{- 'cart.remove' | t -}}
+          </a>
+        </div>
+
+        <p class="cart-line__total">
+          <span class="visually-hidden">{{ 'cart.line_total' | t }}</span>
+          <span data-testid="cart-line-total">{{ item.final_line_price | money }}</span>
+        </p>
+      </li>
+    {%- endfor -%}
+  </ul>
+
+  <button
+    class="button button--secondary cart-update"
+    type="submit"
+    name="update"
+    form="{{ form_id }}"
+    data-cart-update
+    data-testid="cart-update"
+  >
+    {{- 'cart.update' | t -}}
+  </button>
+{%- endif -%}
