@@ -1,6 +1,7 @@
 // Gọi JSON storefront có thử lại khi Shopify giới hạn tần suất (429) hoặc lỗi tạm 5xx/403 bot.
 // CI #67 (ES1-T78): nhiều spec gọi /products/<handle>.js cùng lúc → 429 làm test fail sai.
-// CI #80 (4 runner shard): 3 lần ~4,5 s chưa đủ → 5 lần, chờ 1,5/3/6/12 s, Retry-After tối đa 15 s.
+// CI #80: 4 lần, chờ 1/2/4 s, Retry-After tối đa 5 s → tổng ≤ ~11 s, còn chỗ trong timeout 30 s của test
+// (5 lần tới 12 s làm test timeout thay vì skip có lý do). Giảm request chủ yếu nhờ cache file bên dưới.
 import type { APIRequestContext } from '@playwright/test';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -20,7 +21,7 @@ function toDisk(path: string, body: unknown) {
   try { mkdirSync(DIR, { recursive: true }); writeFileSync(file(path), JSON.stringify(body)); } catch { /* cache là tối ưu, lỗi ghi bỏ qua */ }
 }
 
-export async function getJson<T>(request: APIRequestContext, path: string, attempts = 5): Promise<{ ok: boolean; status: number; body: T | null }> {
+export async function getJson<T>(request: APIRequestContext, path: string, attempts = 4): Promise<{ ok: boolean; status: number; body: T | null }> {
   const cacheable = /^\/products\/[^/]+\.js$/.test(path);
   if (cacheable && CACHE.has(path)) return { ok: true, status: 200, body: CACHE.get(path) as T };
   if (cacheable) {
@@ -41,7 +42,7 @@ export async function getJson<T>(request: APIRequestContext, path: string, attem
       } catch { /* HTML (trang chặn/challenge) → thử lại */ }
     } else if (!RETRY.has(status)) return { ok: false, status, body: null };
     const after = Number(res.headers()['retry-after']);
-    await new Promise(r => setTimeout(r, Number.isFinite(after) && after > 0 ? Math.min(after, 15) * 1000 : 1500 * 2 ** i));
+    await new Promise(r => setTimeout(r, Number.isFinite(after) && after > 0 ? Math.min(after, 5) * 1000 : 1000 * 2 ** i));
   }
   return { ok: false, status, body: null };
 }
