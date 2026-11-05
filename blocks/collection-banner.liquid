@@ -1,0 +1,65 @@
+{% doc %}
+  Collection page banner (TE-6 AC1, ES1-T103 D2): collection.image, h1 with
+  collection.title, collection.description. Reads the global `collection`. No
+  settings.
+
+  Uses collection.image only, never featured_image, so a product image does not
+  become the banner. The image is the LCP element: eager, high priority. It is
+  rendered without a crop and cut by CSS object-fit, because image_tag applies
+  the image focal point as object-position and a server crop would cancel it.
+  No image: text only. No description: the title only.
+
+  Test hooks: collection-banner, collection-banner-title,
+  collection-banner-description, collection-banner-image.
+
+  Empty state: no collection (block used outside the collection template) → a
+  hint in the theme editor, nothing on the storefront.
+
+  Self-contained: callers must leave the body empty.
+
+  @example
+  {% block 'container', id: 'collection-banner' %}
+    {% block 'collection-banner' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- if collection == blank -%}
+  {%- if request.design_mode -%}
+    <div class="collection-banner__hint" {{ block.shopify_attributes }}>
+      {{ 'blocks.collection_banner.placeholder' | t }}
+    </div>
+  {%- endif -%}
+{%- else -%}
+  {%- assign image_sizes = 'min(100vw, ' | append: settings.max_page_width | append: ')' -%}
+  <div class="collection-banner" data-testid="collection-banner" {{ block.shopify_attributes }}>
+    {%- if collection.image != blank -%}
+      {% render 'image',
+        class: 'collection-banner__image',
+        image: collection.image,
+        width: 1920,
+        widths: '360, 720, 1080, 1440, 1920',
+        sizes: image_sizes,
+        loading: 'eager',
+        fetchpriority: 'high',
+        testid: 'collection-banner-image'
+      %}
+    {%- endif -%}
+
+    <h1 class="collection-banner__title" data-testid="collection-banner-title">
+      {{- collection.title | escape -}}
+    </h1>
+
+    {%- if collection.description != blank -%}
+      <div class="collection-banner__description" data-testid="collection-banner-description">
+        {{- collection.description -}}
+      </div>
+    {%- endif -%}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.collection_banner",
+  "settings": []
+}
+{% endschema %}
