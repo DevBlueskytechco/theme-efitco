@@ -14,6 +14,9 @@
   - header-sticky-sentinel: 80px element in layout/theme.liquid. It sits
     outside the sticky container so it scrolls away with the page.
   - Partial region: cart-count.
+  - header-search-link: a real link to the search page, so search works without
+    JavaScript. The next element sibling must stay the search dialog of
+    snippets/predictive-search.liquid; JS opens it from this link.
   - Custom element host: <header-menu>, <header-drawer>, <sticky-header> (ẩn) — JS ở assets/header-menu.js, assets/header-sticky.js.
 
   Self-contained block: callers leave the body empty.
@@ -187,9 +190,11 @@
         href="{{ routes.search_url }}"
         data-testid="header-search-link"
         aria-label="{{ 'blocks.header.search' | t }}"
+        aria-haspopup="dialog"
       >
         {% render 'header-icon', name: 'search' %}
       </a>
+      {% render 'predictive-search' %}
 
       {% if shop.customer_accounts_enabled %}
         <shopify-account
