@@ -42,6 +42,8 @@ async function postLine(page: Page, handle: string, product: Product, quantity: 
   const data: Record<string, unknown> = { id: variant!.id, quantity };
   if (usePlan) data.selling_plan = variant!.selling_plan_allocations![0].selling_plan_id;
   const res = await page.request.post('/cart/add.js', { data });
+  // Store dev trả 429 cho POST ngoài trình duyệt khi tải cao; POST trong trang (fetch) kích hoạt Cloudflare challenge cả phiên (CI #82) → skip có lý do.
+  test.skip(res.status() === 429, 'Shopify trả 429 cho /cart/add.js (giới hạn store dev)');
   expect(res.ok(), `/cart/add.js trả ${res.status()}`).toBeTruthy();
   return variant!;
 }
