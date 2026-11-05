@@ -118,8 +118,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix: { project: [desktop, mobile] }
-    name: e2e-${{ matrix.project }}
+      # 2 shard mỗi project (CTO 05/11): mỗi runner ~1/2 số test → ít request mỗi IP, store dev bớt trả 403/429
+      matrix:
+        project: [desktop, mobile]
+        shard: [1, 2]
+    name: e2e-${{ matrix.project }}-${{ matrix.shard }}
     env:
       STORE_ORIGIN: https://hoa-qua-nhap-khau.myshopify.com
       PREVIEW_URL: https://hoa-qua-nhap-khau.myshopify.com/?preview_theme_id=${{ needs.preview.outputs.theme_id }}&pb=0
@@ -134,14 +137,14 @@ jobs:
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
       - run: npm ci && npx playwright install --with-deps chromium
-      - run: npx playwright test --project=${{ matrix.project }}
+      - run: npx playwright test --project=${{ matrix.project }} --shard=${{ matrix.shard }}/2
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report-${{ matrix.project }}
+          name: playwright-report-${{ matrix.project }}-${{ matrix.shard }}
           path: playwright-report
           if-no-files-found: ignore
-  # Check bắt buộc tên "e2e" (merge_pr.sh, dashboard): xanh khi cả desktop và mobile xanh
+  # Check bắt buộc tên "e2e" (merge_pr.sh, dashboard): xanh khi cả 4 runner desktop/mobile × shard xanh
   e2e:
     needs: e2e-run
     if: always()
