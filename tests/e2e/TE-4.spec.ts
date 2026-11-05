@@ -3,11 +3,11 @@
 // Test case: drafts/qa/ES1-T70/test-cases.md. Tên test: "AC<n> TC-<id> ...". Nhóm không JS có chữ "nojs".
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-4.spec.ts [-g "AC2 |nojs"]
 // Dữ liệu: env TE4_* không rỗng, rồi tests/e2e/store-data.json (ES1-T78); thiếu → skip có lý do. Handle có dấu: so pathname sau decodeURIComponent.
-// So tiền: .js lấy bằng fetch trong trang để cùng market (ES1-T74). Nhóm nojs không chạy script trong trang: chỉ assertion locator, .js qua page.request và chỉ so id.
+// So tiền: .js lấy bằng fetch trong trang để cùng market (ES1-T74). Nhóm nojs không chạy script trong trang: sản phẩm đọc JSON nhúng variant-json, giỏ đọc qua context phụ (ES1-T100, support/product-data.ts).
 import { test as base, expect, type Page, type Request, type Route } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { env } from './support/store-data';
-import { getJson } from './support/http';
+import { pageJson, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
 
 // DoD: 0 console error trên mọi test. Fixture tự chạy, kiểm sau mỗi test.
 // Bỏ qua: script Shopify/analytics, YouTube/Vimeo/model-viewer (nguồn ngoài theme) và 429 (giới hạn store dev).
@@ -221,37 +221,17 @@ async function ready(page: Page, ...elements: string[]) {
 
 // ES1-T74: fetch trong trang, cùng market với giá trên trang. Tiền trang khác cart.js → skip có lý do (giống ES1-T63).
 async function productJs(page: Page, handle: string): Promise<JsProduct> {
-  const r = await page.evaluate(async (path) => {
-    const cart = await fetch('/cart.js', { credentials: 'same-origin' }).then((x) => (x.ok ? x.json() : null)).catch(() => null);
-    const res = await fetch(path, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
-    return {
-      ok: res.ok,
-      status: res.status,
-      body: res.ok ? await res.json().catch(() => null) : null,
-      active: (window as Win).Shopify?.currency?.active ?? null,
-      cart: cart?.currency ?? null,
-    };
-  }, `${productPath(handle)}.js`);
-  test.info().annotations.push({ type: 'market', description: `Shopify.currency.active=${r.active} cart.js currency=${r.cart}` });
-  test.skip(!!r.active && !!r.cart && r.active !== r.cart, `Tiền hiển thị (${r.active}) khác tiền cart.js (${r.cart})`);
-  expect(r.ok && !!r.body, `${handle}.js trong trang trả ${r.status}`).toBeTruthy();
-  return r.body as JsProduct;
+  const active = await page.evaluate(() => (window as Win).Shopify?.currency?.active ?? null);
+  const cart = (await pageJson<{ currency?: string }>(page, '/cart.js')).body?.currency ?? null;
+  test.info().annotations.push({ type: 'market', description: `Shopify.currency.active=${active} cart.js currency=${cart}` });
+  test.skip(!!active && !!cart && active !== cart, `Tiền hiển thị (${active}) khác tiền cart.js (${cart})`);
+  return requireJson(await pageJson<JsProduct>(page, `${productPath(handle)}.js`), `${handle}.js`);
 }
 
-// Nhóm nojs: không chạy được fetch trong trang. Chỉ dùng id/available, không so tiền.
-async function productJsNoScript(page: Page, handle: string): Promise<JsProduct> {
-  const r = await getJson<JsProduct>(page.request, `${productPath(handle)}.js`);
-  test.skip(r.status === 429, `Shopify trả 429 cho ${handle}.js sau khi thử lại (giới hạn store dev)`);
-  expect(r.ok, `${handle}.js trả ${r.status}`).toBeTruthy();
-  return r.body as JsProduct;
-}
-
-async function cartItems(page: Page) {
-  const r = await getJson<{ items: Array<{ variant_id: number; quantity: number; properties: Record<string, string> | null }> }>(page.request, '/cart.js');
-  test.skip(r.status === 429, 'Shopify trả 429 cho /cart.js sau khi thử lại (giới hạn store dev)');
-  expect(r.ok, `/cart.js trả ${r.status}`).toBeTruthy();
-  return r.body!.items;
-}
+type CartJs = { items: Array<{ variant_id: number; quantity: number; properties: Record<string, string> | null }> };
+const cartItems = async (page: Page) => (await readCartJson<CartJs>(page)).items;
+// Nhóm nojs: không fetch trong trang được.
+const cartItemsNoScript = async (page: Page) => (await readCartNoScript<CartJs>(page)).items;
 
 const clearCart = (page: Page) => page.request.post('/cart/clear.js');
 
@@ -1685,7 +1665,7 @@ test.describe('ES1-T70 TE-4 AC12 event chuẩn', () => {
 });
 
 // ---------- nojs (NFR-4) ----------
-// Không dùng page.evaluate / locator.evaluate: JS tắt, chỉ assertion locator và page.request.
+// Không dùng page.evaluate / locator.evaluate trên trang tắt JS: chỉ assertion locator, page.request (POST giỏ) và helper *NoScript (ES1-T100).
 test.describe('ES1-T70 TE-4 nojs', () => {
   test.use({ javaScriptEnabled: false });
 
@@ -1707,7 +1687,7 @@ test.describe('ES1-T70 TE-4 nojs', () => {
   test('AC2 TC-251 nojs chọn variant thứ 2 trong select, submit: /cart.js đúng variant', async ({ page }) => {
     await clearCart(page);
     const handle = await open(page, DATA.variants, 'TE4_VARIANTS_HANDLE');
-    const js = await productJsNoScript(page, handle);
+    const js = await productDataNoScript(page, handle);
     const target = js.variants.filter((v) => v.available)[1];
     test.skip(!target, 'TE4_VARIANTS_HANDLE cần từ 2 variant còn hàng');
     await expect(tid(page, T.picker)).toBeHidden();
@@ -1718,13 +1698,13 @@ test.describe('ES1-T70 TE-4 nojs', () => {
     await select.selectOption(String(target.id));
     await tid(page, T.add).click();
     await page.waitForURL(isCart);
-    expect((await cartItems(page)).map((i) => i.variant_id)).toEqual([target.id]);
+    expect((await cartItemsNoScript(page)).map((i) => i.variant_id)).toEqual([target.id]);
     await clearCart(page);
   });
 
   test('AC2 TC-252 nojs ?variant= render đúng variant trong select và hidden id', async ({ page }) => {
     const handle = await open(page, DATA.options, 'TE4_OPTIONS_HANDLE');
-    const js = await productJsNoScript(page, handle);
+    const js = await productDataNoScript(page, handle);
     const target = js.variants.find((v) => v.available && v.id !== (js.variants.find((x) => x.available) ?? js.variants[0]).id);
     test.skip(!target, 'Cần từ 2 variant còn hàng');
     await page.goto(productPath(handle, `?variant=${target!.id}`));
@@ -1755,7 +1735,7 @@ test.describe('ES1-T70 TE-4 nojs', () => {
     await tid(page, T.giftSendOn).fill((await tid(page, T.giftSendOn).getAttribute('min'))!);
     await tid(page, T.add).click();
     await page.waitForURL(isCart);
-    const props = (await cartItems(page))[0]?.properties ?? {};
+    const props = (await cartItemsNoScript(page))[0]?.properties ?? {};
     expect(props['Recipient email']).toBe('recipient@example.com');
     expect(props['Recipient name']).toBe('Recipient Test');
     expect(props['Message']).toBe('Happy birthday');
@@ -1765,7 +1745,7 @@ test.describe('ES1-T70 TE-4 nojs', () => {
 
   test('AC7 TC-751 nojs 2 khối recommendations hidden, data hook đúng, list rỗng', async ({ page }) => {
     const handle = await open(page, DATA.variants, 'TE4_VARIANTS_HANDLE');
-    const js = await productJsNoScript(page, handle);
+    const js = await productDataNoScript(page, handle);
     await expect(tid(page, T.recs)).toHaveCount(2);
     for (const [container, intent] of [[T.related, 'related'], [T.complementary, 'complementary']] as const) {
       const root = recsIn(page, container);
@@ -1788,7 +1768,7 @@ test.describe('ES1-T70 TE-4 nojs', () => {
     const id = Number(await tid(page, T.variantSelect).inputValue());
     await tid(page, T.add).click();
     await page.waitForURL(isCart);
-    expect((await cartItems(page)).map((i) => i.variant_id)).toEqual([id]);
+    expect((await cartItemsNoScript(page)).map((i) => i.variant_id)).toEqual([id]);
     await clearCart(page);
   });
 
