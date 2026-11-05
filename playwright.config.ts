@@ -6,6 +6,8 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   // 1 worker trên CI: nhiều worker + nhiều PR cùng lúc làm Shopify chặn store dev (403).
   workers: process.env.CI ? 1 : undefined,
+  // CI chia --shard theo test (không theo file, TE-4.spec là 1 file lớn); workers 1 nên vẫn chạy tuần tự trong runner.
+  fullyParallel: true,
   globalSetup: './tests/setup/password.ts',
   use: { baseURL: process.env.STORE_ORIGIN || (process.env.PREVIEW_URL ? new URL(process.env.PREVIEW_URL).origin : undefined), storageState: 'tests/setup/state.json', trace: 'retain-on-failure', screenshot: 'only-on-failure' },
   projects: [

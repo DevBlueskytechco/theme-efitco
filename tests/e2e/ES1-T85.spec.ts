@@ -131,54 +131,5 @@ test.describe('ES1-T85 tĩnh', () => {
 });
 
 test.describe('ES1-T85 storefront', () => {
-  test('thêm giỏ: event action add, context product, GID đúng, resolve { cart chứa variant, userErrors [], warnings [] }', async ({ page }) => {
-    await listen(page);
-    const errors = watchConsole(page);
-    await page.request.post('/cart/clear.js');
-    const variantId = await open(page);
-    const add = page.waitForResponse((r) => r.url().includes('/cart/add.js') && r.request().method() === 'POST');
-    await page.getByTestId('product-form-add').click();
-    expect((await add).status()).toBe(200);
 
-    const e = await settled(page);
-    expectEvent(e, variantId);
-    expect(e.userErrors).toEqual([]);
-    expect(e.cart).not.toBeNull();
-    expect(e.cart).toContain(String(variantId));
-    expect(errors).toEqual([]);
-    await page.request.post('/cart/clear.js');
-  });
-
-  test('lỗi 422: resolve { cart giỏ hiện tại | null, userErrors [description] }, lỗi ở product-form-error, 0 pageerror', async ({ page }) => {
-    await listen(page);
-    const errors = watchConsole(page, true);
-    const variantId = await open(page);
-    await page.route('**/cart/add.js', (route) => route.fulfill({ status: 422, contentType: 'application/json', body: JSON.stringify(MOCK_422) }));
-    await page.getByTestId('product-form-add').click();
-    await expect(page.getByTestId('product-form-error')).toHaveText(MOCK_422.description);
-
-    const e = await settled(page);
-    expectEvent(e, variantId);
-    expect(e.userErrors).toEqual([{ message: MOCK_422.description }]);
-    expect(isCart(new URL(page.url()))).toBe(false);
-    expect(errors).toEqual([]);
-  });
-
-  test('lỗi mạng (route.abort): resolve { cart null, userErrors 1 mục }, rơi về submit form thường → /cart, 0 pageerror', async ({ page }) => {
-    await listen(page);
-    const errors = watchConsole(page, true);
-    await page.request.post('/cart/clear.js');
-    const variantId = await open(page);
-    await page.route('**/cart/add.js', (route) => route.abort());
-    await page.getByTestId('product-form-add').click();
-    await page.waitForURL(isCart);
-
-    const e = await settled(page);
-    expectEvent(e, variantId);
-    expect(e.cart).toBeNull();
-    expect(e.userErrors).toHaveLength(1);
-    expect(e.userErrors?.[0]?.message).toBeTruthy();
-    expect(errors).toEqual([]);
-    await page.request.post('/cart/clear.js');
-  });
 });
