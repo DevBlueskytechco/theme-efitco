@@ -36,7 +36,7 @@ const JS = readFileSync(join(ROOT, 'assets/product-variant-picker.js'), 'utf8');
 // https://shopify.dev/docs/api/storefront-events-and-actions/events/product-select (ES1-T75)
 const EVENT_SELECT = 'shopify:product:select';
 
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 // route.abort(): Chrome tự log "Failed to load resource: net::ERR_FAILED" (log mạng của trình duyệt, không phải lỗi JS theme).
 const NETWORK_LOG = /Failed to load resource/i;
 const seriousOrCritical = (v: { impact?: string | null }) => ['serious', 'critical'].includes(v.impact ?? '');

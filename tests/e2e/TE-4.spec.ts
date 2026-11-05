@@ -11,7 +11,7 @@ import { getJson } from './support/http';
 
 // DoD: 0 console error trên mọi test. Fixture tự chạy, kiểm sau mỗi test.
 // Bỏ qua: script Shopify/analytics, YouTube/Vimeo/model-viewer (nguồn ngoài theme) và 429 (giới hạn store dev).
-const IGNORE_CONSOLE = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)|youtube|vimeo|ytimg|model-viewer|status of 429/i;
+const IGNORE_CONSOLE = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)|youtube|vimeo|ytimg|model-viewer|status of 429/i;
 // route.abort()/fulfill lỗi: Chrome tự log "Failed to load resource" (log mạng, không phải lỗi JS theme). Chỉ test lỗi mạng mới bật cờ này.
 const NETWORK_LOG = /Failed to load resource/i;
 

@@ -58,7 +58,7 @@ const VIEW_ALL = process.env.EXPECT_VIEW_ALL ?? '';
 const VIEW_ALL_PATH = process.env.EXPECT_VIEW_ALL_PATH || ALL;
 
 // Giống smoke.spec.ts: lỗi console không thuộc theme.
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 const ROOT = process.cwd();
 const isMobile = (ti: TestInfo) => ti.project.name === 'mobile';

@@ -47,7 +47,7 @@ const PRODUCT_PAGE_JS: Array<[string, number]> = [
 ];
 
 const EXTERNAL_HOSTS = /youtube\.com|youtube-nocookie\.com|ytimg\.com|vimeo\.com|vimeocdn\.com/i;
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)|youtube|vimeo|ytimg|model-viewer/i];
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)|youtube|vimeo|ytimg|model-viewer/i];
 const seriousOrCritical = (v: { impact?: string | null }) => ['serious', 'critical'].includes(v.impact ?? '');
 
 type JsProduct = {

@@ -46,7 +46,7 @@ const FONT_HEADING = /^["']?Sofia Sans Condensed/i;
 const FONT_BODY = /^["']?Inter\b/i;
 
 // Giống smoke.spec.ts: lỗi console không thuộc theme.
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 const tokens = JSON.parse(readFileSync(join(ROOT, 'docs', 'tokens.json'), 'utf8')) as { color: Record<string, string> };
 

@@ -10,7 +10,7 @@ const ROOT = process.cwd();
 const read = (p: string) => readFileSync(join(ROOT, p), 'utf8');
 const CDN = 'https://cdn.shopify.com/storefront/standard-events.js';
 const HANDLE = process.env.TE4_VARIANTS_HANDLE;
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 function watchConsole(page: Page) {
   const errors: string[] = [];

@@ -11,7 +11,7 @@ const PAGES: { path: string; status: number }[] = [
 ];
 
 // Lỗi console không thuộc theme: script Shopify chèn (preview bar, pixel, analytics) và chính response 404 của trang 404.
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i,
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i,
   /Failed to load resource: the server responded with a status of 404/];
 
 for (const { path, status } of PAGES) {
