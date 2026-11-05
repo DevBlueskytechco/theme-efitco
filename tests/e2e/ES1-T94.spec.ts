@@ -7,6 +7,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
+import { getJson } from './support/http';
 
 type CartItem = {
   key: string;
@@ -33,15 +34,18 @@ const tid = (page: Page, id: string) => page.getByTestId(id);
 const digits = (text: string | null) => (text ?? '').replace(/\D/g, '');
 
 async function readProduct(request: APIRequestContext, handle: string): Promise<Product> {
-  const res = await request.get(`/products/${handle}.js`);
-  expect(res.ok(), `/products/${handle}.js trả ${res.status()}`).toBeTruthy();
-  return (await res.json()) as Product;
+  // getJson: cache file + thử lại + encode handle có dấu (store dev trả 429 khi gọi dồn, CI #80)
+  const r = await getJson<Product>(request, `/products/${handle}.js`);
+  test.skip(r.status === 429, `Shopify trả 429 cho ${handle}.js sau khi thử lại (giới hạn store dev)`);
+  expect(r.ok, `/products/${handle}.js trả ${r.status}`).toBeTruthy();
+  return r.body as Product;
 }
 
 async function readCart(request: APIRequestContext): Promise<Cart> {
-  const res = await request.get('/cart.js');
-  expect(res.ok()).toBeTruthy();
-  return (await res.json()) as Cart;
+  const r = await getJson<Cart>(request, '/cart.js');
+  test.skip(r.status === 429, 'Shopify trả 429 cho /cart.js sau khi thử lại (giới hạn store dev)');
+  expect(r.ok, `/cart.js trả ${r.status}`).toBeTruthy();
+  return r.body as Cart;
 }
 
 async function addToCart(request: APIRequestContext, handle: string, quantity = 1, usePlan = false) {
