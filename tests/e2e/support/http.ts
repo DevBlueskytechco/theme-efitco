@@ -2,15 +2,31 @@
 // CI #67 (ES1-T78): nhiều spec gọi /products/<handle>.js cùng lúc → 429 làm test fail sai.
 // CI #80 (4 runner shard): 3 lần ~4,5 s chưa đủ → 5 lần, chờ 1,5/3/6/12 s, Retry-After tối đa 15 s.
 import type { APIRequestContext } from '@playwright/test';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 
 const RETRY = new Set([403, 429, 500, 502, 503, 504]);
 
 // /products/<handle>.js không đổi trong 1 lượt chạy: cache theo worker để giảm request (Shopify trả 429 khi gọi dồn).
+// Thêm cache file dùng chung mọi worker trong runner (retry sinh worker mới, mất Map): mỗi handle 1 request/runner.
 const CACHE = new Map<string, unknown>();
+const DIR = join(tmpdir(), 'efitco-e2e-json');
+const file = (path: string) => join(DIR, encodeURIComponent(path) + '.json');
+function fromDisk(path: string): unknown {
+  try { return existsSync(file(path)) ? JSON.parse(readFileSync(file(path), 'utf8')) : undefined; } catch { return undefined; }
+}
+function toDisk(path: string, body: unknown) {
+  try { mkdirSync(DIR, { recursive: true }); writeFileSync(file(path), JSON.stringify(body)); } catch { /* cache là tối ưu, lỗi ghi bỏ qua */ }
+}
 
 export async function getJson<T>(request: APIRequestContext, path: string, attempts = 5): Promise<{ ok: boolean; status: number; body: T | null }> {
   const cacheable = /^\/products\/[^/]+\.js$/.test(path);
   if (cacheable && CACHE.has(path)) return { ok: true, status: 200, body: CACHE.get(path) as T };
+  if (cacheable) {
+    const disk = fromDisk(path);
+    if (disk !== undefined) { CACHE.set(path, disk); return { ok: true, status: 200, body: disk as T }; }
+  }
   let status = 0;
   for (let i = 0; i < attempts; i++) {
     const res = await request.get(path, { headers: { Accept: 'application/json' } });
@@ -20,7 +36,7 @@ export async function getJson<T>(request: APIRequestContext, path: string, attem
       const text = await res.text();
       try {
         const body = JSON.parse(text) as T;
-        if (cacheable) CACHE.set(path, body);
+        if (cacheable) { CACHE.set(path, body); toDisk(path, body); }
         return { ok: true, status, body };
       } catch { /* HTML (trang chặn/challenge) → thử lại */ }
     } else if (!RETRY.has(status)) return { ok: false, status, body: null };
