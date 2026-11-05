@@ -1,0 +1,267 @@
+{% doc %}
+  One step of the quiz block: a fieldset with the progress bar and question in
+  its legend, an optional decorative body map, and 2 to 4 options. Self-contained:
+  callers must leave the body empty.
+
+  An option is valid when it has both a label and a tag. With no question or
+  fewer than 2 valid options, the editor shows a placeholder and the storefront
+  renders nothing.
+
+  Options are checkboxes named filter.p.tag, so the GET form can send one tag
+  per step without JavaScript (drafts/techlead/ES1-T132/task-split.md D4). A
+  script may turn them into radios per step.
+
+  The body map is hidden below 48rem and takes no space when it is empty.
+
+  JavaScript hooks: data-quiz-step (step number), data-active (set by the
+  script), data-quiz-title (h3, tabindex -1), data-tag-handle (tag as a handle).
+  Test hooks: data-testid="quiz-step", "quiz-step-title", "quiz-step-progress",
+  "quiz-step-progress-bar", "quiz-body-map", "quiz-option", "quiz-option-input",
+  "quiz-placeholder".
+
+  @param {string} [id] - Static block id, so this block keeps its own settings. Also used for element ids. Default: block.id
+  @param {number} [step] - This step's number, from 1. Default: 1
+  @param {number} [total] - Number of steps in the quiz. Default: 1
+
+  @example
+  {% block 'quiz-step', id: 'quiz-step-1', step: 1, total: 3 %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign step_id = id | default: block.id
+  assign step_index = step | default: 1
+  assign step_total = total | default: 1 | at_least: 1
+  assign step_progress = step_index | times: 100.0 | divided_by: step_total | round: 2
+  assign question = block.settings.question
+  assign subheading = block.settings.subheading
+  assign body_map = block.settings.body_map
+  assign subheading_id = step_id | append: '-subheading'
+
+  assign option_count = 0
+  for n in (1..4)
+    assign label_key = 'option_' | append: n | append: '_label'
+    assign tag_key = 'option_' | append: n | append: '_tag'
+    assign option_label = block.settings[label_key] | strip
+    assign option_tag = block.settings[tag_key] | strip
+    if option_label != blank and option_tag != blank
+      assign option_count = option_count | plus: 1
+    endif
+  endfor
+-%}
+
+{%- if question != blank and option_count >= 2 -%}
+  <fieldset
+    class="quiz-step"
+    {% if subheading != blank %}
+      aria-describedby="{{ subheading_id }}"
+    {% endif %}
+    data-quiz-step="{{ step_index }}"
+    data-testid="quiz-step"
+    {{ block.shopify_attributes }}
+  >
+    <legend class="quiz-step__legend">
+      <span class="quiz-step__progress" data-testid="quiz-step-progress">
+        <span
+          class="quiz-step__bar"
+          style="--quiz-progress: {{ step_progress }}%;"
+          aria-hidden="true"
+          data-testid="quiz-step-progress-bar"
+        ></span>
+        <span class="quiz-step__count">{{ 'blocks.quiz_step.progress' | t: step: step_index, total: step_total }}</span>
+      </span>
+      <h3 class="quiz-step__title" tabindex="-1" data-quiz-title data-testid="quiz-step-title">{{ question | escape }}</h3>
+    </legend>
+    {%- if subheading != blank -%}
+      <p class="quiz-step__subheading" id="{{ subheading_id }}">{{ subheading | escape }}</p>
+    {%- endif -%}
+
+    <div class="quiz-step__body{% if body_map != blank %} quiz-step__body--map{% endif %}">
+      {%- if body_map != blank -%}
+        {% render 'image',
+          image: body_map,
+          class: 'quiz-step__map',
+          decorative: true,
+          width: 304,
+          widths: '152, 304',
+          sizes: '152px',
+          loading: 'lazy',
+          testid: 'quiz-body-map'
+        %}
+      {%- endif -%}
+      <div class="quiz-step__options">
+        {%- for n in (1..4) -%}
+          {%- liquid
+            assign label_key = 'option_' | append: n | append: '_label'
+            assign description_key = 'option_' | append: n | append: '_description'
+            assign tag_key = 'option_' | append: n | append: '_tag'
+            assign image_key = 'option_' | append: n | append: '_image'
+            assign option_label = block.settings[label_key] | strip
+            assign option_description = block.settings[description_key]
+            assign option_tag = block.settings[tag_key] | strip
+            assign option_image = block.settings[image_key]
+          -%}
+          {%- if option_label != blank and option_tag != blank -%}
+            <label class="quiz-option" data-testid="quiz-option">
+              <input
+                class="quiz-option__input"
+                type="checkbox"
+                name="filter.p.tag"
+                value="{{ option_tag | escape }}"
+                data-tag-handle="{{ option_tag | handleize }}"
+                data-testid="quiz-option-input"
+              >
+              {%- if option_image != blank -%}
+                {% render 'image',
+                  image: option_image,
+                  class: 'quiz-option__thumb',
+                  inline: true,
+                  decorative: true,
+                  width: 80,
+                  height: 80,
+                  crop: 'center',
+                  widths: '40, 80',
+                  sizes: '40px',
+                  loading: 'lazy'
+                %}
+              {%- endif -%}
+              <span class="quiz-option__text">
+                <span class="quiz-option__label">{{ option_label | escape }}</span>
+                {%- if option_description != blank -%}
+                  <span class="quiz-option__description">{{ option_description | escape }}</span>
+                {%- endif -%}
+              </span>
+              <span class="quiz-option__mark">
+                {%- render 'quiz-icon', name: 'check' -%}
+              </span>
+            </label>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+  </fieldset>
+{%- elsif request.design_mode -%}
+  <p class="quiz-placeholder" data-testid="quiz-placeholder" {{ block.shopify_attributes }}>
+    {{ 'blocks.quiz_step.placeholder' | t: step: step_index }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.quiz_step",
+  "settings": [
+    {
+      "type": "text",
+      "id": "question",
+      "label": "t:labels.quiz_question"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.quiz_subheading"
+    },
+    {
+      "type": "image_picker",
+      "id": "body_map",
+      "label": "t:labels.quiz_body_map",
+      "info": "t:info.quiz_body_map"
+    },
+    {
+      "type": "header",
+      "content": "t:general.quiz_option_1"
+    },
+    {
+      "type": "text",
+      "id": "option_1_label",
+      "label": "t:labels.quiz_option_label"
+    },
+    {
+      "type": "text",
+      "id": "option_1_description",
+      "label": "t:labels.quiz_option_description"
+    },
+    {
+      "type": "text",
+      "id": "option_1_tag",
+      "label": "t:labels.quiz_option_tag",
+      "info": "t:info.quiz_option"
+    },
+    {
+      "type": "image_picker",
+      "id": "option_1_image",
+      "label": "t:labels.quiz_option_image"
+    },
+    {
+      "type": "header",
+      "content": "t:general.quiz_option_2"
+    },
+    {
+      "type": "text",
+      "id": "option_2_label",
+      "label": "t:labels.quiz_option_label"
+    },
+    {
+      "type": "text",
+      "id": "option_2_description",
+      "label": "t:labels.quiz_option_description"
+    },
+    {
+      "type": "text",
+      "id": "option_2_tag",
+      "label": "t:labels.quiz_option_tag"
+    },
+    {
+      "type": "image_picker",
+      "id": "option_2_image",
+      "label": "t:labels.quiz_option_image"
+    },
+    {
+      "type": "header",
+      "content": "t:general.quiz_option_3"
+    },
+    {
+      "type": "text",
+      "id": "option_3_label",
+      "label": "t:labels.quiz_option_label"
+    },
+    {
+      "type": "text",
+      "id": "option_3_description",
+      "label": "t:labels.quiz_option_description"
+    },
+    {
+      "type": "text",
+      "id": "option_3_tag",
+      "label": "t:labels.quiz_option_tag"
+    },
+    {
+      "type": "image_picker",
+      "id": "option_3_image",
+      "label": "t:labels.quiz_option_image"
+    },
+    {
+      "type": "header",
+      "content": "t:general.quiz_option_4"
+    },
+    {
+      "type": "text",
+      "id": "option_4_label",
+      "label": "t:labels.quiz_option_label"
+    },
+    {
+      "type": "text",
+      "id": "option_4_description",
+      "label": "t:labels.quiz_option_description"
+    },
+    {
+      "type": "text",
+      "id": "option_4_tag",
+      "label": "t:labels.quiz_option_tag"
+    },
+    {
+      "type": "image_picker",
+      "id": "option_4_image",
+      "label": "t:labels.quiz_option_image"
+    }
+  ]
+}
+{% endschema %}

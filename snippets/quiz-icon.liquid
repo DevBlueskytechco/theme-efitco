@@ -1,0 +1,22 @@
+{% doc %}
+  Outputs one decorative quiz icon. The text next to it, or the checkbox state,
+  carries the meaning, so the SVG is hidden from assistive tech.
+
+  @param {string} name - One of: clock, badge, check.
+
+  @example
+  {% render 'quiz-icon', name: 'clock' %}
+{% enddoc %}
+
+<svg class="quiz-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {%- case name -%}
+    {%- when 'clock' -%}
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 7v5l3 2"/>
+    {%- when 'badge' -%}
+      <path d="m12 3 2.5 1.8 3-.2 1 2.9 2.4 1.8-1 2.7 1 2.7-2.4 1.8-1 2.9-3-.2L12 21l-2.5-1.8-3 .2-1-2.9-2.4-1.8 1-2.7-1-2.7 2.4-1.8 1-2.9 3 .2z"/>
+      <path d="m8.5 12 2.5 2.5 4.5-4.5"/>
+    {%- when 'check' -%}
+      <path d="m6 12 4 4 8-8"/>
+  {%- endcase -%}
+</svg>
