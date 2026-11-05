@@ -88,3 +88,42 @@ export async function readCartNoScript<T>(page: Page): Promise<T> {
     await sibling.close();
   }
 }
+
+// POST /cart/*.js (add, change, update, clear) từ trong trang: store dev trả 429 cho page.request.post (CI #82).
+// Trang chưa mở → mở /robots.txt cùng origin (nhẹ, có cookie). Trang tắt JS / evaluate lỗi → page.request.post có thử lại.
+// 429 sau khi thử lại → skip có lý do + log '[ES1-T100] ... trả 429'; lỗi khác → fail.
+export async function cartPost(page: Page, path: string, data: Record<string, unknown> = {}, attempts = 4): Promise<void> {
+  if (!isOpen(page)) await page.goto('/robots.txt', { waitUntil: 'domcontentloaded' });
+  let r: { ok: boolean; status: number };
+  try {
+    r = await page.evaluate(async ({ path, data, attempts }) => {
+      let status = 0;
+      for (let i = 0; i < attempts; i++) {
+        let after = NaN;
+        try {
+          const res = await fetch(path, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(data) });
+          status = res.status;
+          if (res.ok) return { ok: true, status };
+          if (![403, 429, 500, 502, 503, 504].includes(status)) return { ok: false, status };
+          after = Number(res.headers.get('retry-after'));
+        } catch { status = 0; }
+        if (i < attempts - 1) await new Promise((res) => setTimeout(res, after > 0 ? Math.min(after, 5) * 1000 : 1000 * 2 ** i));
+      }
+      return { ok: false, status };
+    }, { path, data, attempts });
+  } catch {
+    r = { ok: false, status: 0 };
+    for (let i = 0; i < attempts; i++) {
+      const res = await page.request.post(path, { data });
+      r = { ok: res.ok(), status: res.status() };
+      if (r.ok || ![403, 429, 500, 502, 503, 504].includes(r.status)) break;
+      if (i < attempts - 1) await new Promise((res) => setTimeout(res, 1000 * 2 ** i));
+    }
+  }
+  if (r.status === 429) {
+    const reason = `Shopify trả 429 cho ${path} sau khi thử lại (giới hạn store dev)`;
+    console.log(`[ES1-T100] ${reason}`);
+    test.skip(true, reason);
+  }
+  expect(r.ok, `${path} trả ${r.status}`).toBeTruthy();
+}
