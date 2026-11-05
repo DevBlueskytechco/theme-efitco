@@ -827,6 +827,10 @@ test.describe('ES1-T23', () => {
       if (!IGNORE_CONSOLE.some(r => r.test(text))) errors.push(text);
     });
     page.on('pageerror', e => errors.push(e.message));
+    // Accelerated checkout trong cart drawer (ES1-T95) nhúng iframe shop.app/pay ở mọi trang; shop.app trả 403 cho
+    // trình duyệt CI → lỗi console ghi vị trí chrome-error. Chỉ bỏ qua khi đúng iframe shop.app bị chặn.
+    let shopApp403 = 0;
+    page.on('response', r => { if (r.status() === 403 && /^https:\/\/shop\.app\//.test(r.url())) shopApp403++; });
     await page.goto('/');
     if (isDesktop(ti)) {
       const { item, submenu } = await parentItem(page);
@@ -837,7 +841,7 @@ test.describe('ES1-T23', () => {
       const acc = drawer.getByTestId(T.drawerAcc);
       if (await acc.count()) await acc.first().click();
     }
-    expect(errors).toEqual([]);
+    expect(errors.filter(e => !(shopApp403 && /status of 403 .*@ chrome-error:\/\//.test(e)))).toEqual([]);
   });
 });
 
