@@ -7,7 +7,7 @@
 import { test as base, expect, type Page, type Request, type Route } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { env } from './support/store-data';
-import { cartPost, pageJson, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
+import { pageJson, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
 
 // DoD: 0 console error trên mọi test. Fixture tự chạy, kiểm sau mỗi test.
 // Bỏ qua: script Shopify/analytics, YouTube/Vimeo/model-viewer (nguồn ngoài theme) và 429 (giới hạn store dev).
@@ -233,7 +233,7 @@ const cartItems = async (page: Page) => (await readCartJson<CartJs>(page)).items
 // Nhóm nojs: không fetch trong trang được.
 const cartItemsNoScript = async (page: Page) => (await readCartNoScript<CartJs>(page)).items;
 
-const clearCart = (page: Page) => cartPost(page, '/cart/clear.js');
+const clearCart = (page: Page) => page.request.post('/cart/clear.js');
 
 function optionValue(page: Page, index: number, value: string) {
   return tid(page, T.option).nth(index).getByTestId(T.optionValue).filter({

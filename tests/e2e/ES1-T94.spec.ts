@@ -7,7 +7,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
-import { cartPost, pageJson, productData, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
+import { pageJson, productData, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
 
 type CartItem = {
   key: string;
@@ -41,7 +41,8 @@ async function postLine(page: Page, handle: string, product: Product, quantity: 
   test.skip(!variant, `${handle} không có variant bán được`);
   const data: Record<string, unknown> = { id: variant!.id, quantity };
   if (usePlan) data.selling_plan = variant!.selling_plan_allocations![0].selling_plan_id;
-  await cartPost(page, '/cart/add.js', data);
+  const res = await page.request.post('/cart/add.js', { data });
+  expect(res.ok(), `/cart/add.js trả ${res.status()}`).toBeTruthy();
   return variant!;
 }
 
@@ -80,7 +81,7 @@ async function expectNoSeriousAxe(page: Page) {
 
 test.describe('ES1-T94 TE-5 cart page', () => {
   test.beforeEach(async ({ page }) => {
-    await cartPost(page, '/cart/clear.js');
+    await page.request.post('/cart/clear.js');
   });
 
   test('AC1 dòng hàng có đủ trường, số tiền khớp /cart.js', async ({ page }) => {
@@ -141,7 +142,7 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     const belowText = await tid(page, 'cart-free-shipping-text').textContent();
     expect(Number(await bar.getAttribute('value'))).toBeLessThan(max);
 
-    await cartPost(page, '/cart/update.js', { updates: { [variant.id]: Math.ceil(max / variant.price) } });
+    await page.request.post('/cart/update.js', { data: { updates: { [variant.id]: Math.ceil(max / variant.price) } } });
     await page.goto(cartUrl);
     await expect(bar).toHaveAttribute('value', String(max));
     expect(await tid(page, 'cart-free-shipping-text').textContent()).not.toBe(belowText);

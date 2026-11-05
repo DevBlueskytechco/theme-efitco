@@ -4,7 +4,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-1.spec.ts
 // Biến tuỳ chọn: EXPECT_ANNOUNCEMENT=off|text|link (mặc định off), EXPECT_MENU_ITEMS=<n>
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
-import { cartPost, pageJson } from './support/product-data';
+import { pageJson } from './support/product-data';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -368,8 +368,9 @@ test.describe('ES1-T23', () => {
     const product = await findProduct(page);
     test.skip(!product, 'store dev không có sản phẩm còn hàng');
     await page.goto('/');
-    await cartPost(page, '/cart/clear.js');
-    await cartPost(page, '/cart/add.js', { items: [{ id: product!.variantId, quantity: 2 }] });
+    await page.request.post('/cart/clear.js');
+    const add = await page.request.post('/cart/add.js', { data: { items: [{ id: product!.variantId, quantity: 2 }] } });
+    expect(add.ok()).toBeTruthy();
     await page.reload();
     const cart = page.getByTestId(T.header).getByTestId(T.cart);
     await expect(cart).toBeVisible();
@@ -707,7 +708,7 @@ test.describe('ES1-T23', () => {
   // ---------- Case biên ----------
   test('TB-05 giỏ rỗng: không badge, cart link vẫn có accessible name', async ({ page }) => {
     await page.goto('/');
-    await cartPost(page, '/cart/clear.js');
+    await page.request.post('/cart/clear.js');
     await page.reload();
     const cart = page.getByTestId(T.header).getByTestId(T.cart);
     await expect(cart).toHaveAccessibleName(/\S/);
