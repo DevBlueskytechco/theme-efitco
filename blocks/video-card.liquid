@@ -1,0 +1,227 @@
+{% doc %}
+  Renders one short video inside the video-carousel block as a list item: poster
+  link, play icon, optional badge and optional product row (TE-13 AC3, AC4, Figma
+  1:840). Self-contained: callers must leave the body empty.
+
+  Source: the video setting wins over video_url. video_id and video_host are not
+  schema settings: a branch preview has no block settings and a string parameter has
+  no .id or .type, so test templates pass them. Order: parameter, then
+  block.settings.video_url.id and .type. A video with no sources counts as no video.
+  With no source the editor shows a placeholder and the storefront renders nothing.
+
+  Nothing loads until the shopper asks: the video or iframe sits in a template tag
+  and the poster is a lazy img, not the poster attribute of a video tag. The poster
+  is a link, so it works without JavaScript: YouTube or Vimeo opens the video page;
+  a Shopify video opens the product, or its first mp4 source when there is no product.
+  Embeds use only youtube-nocookie.com and player.vimeo.com (NFR-6).
+
+  Poster order: poster setting, video preview image, product featured image. With no
+  image the frame keeps its ratio on the dark background.
+
+  JavaScript hooks: custom element video-card (assets/video-carousel.js, ES1-T158)
+  with data-video-kind (shopify or external), data-label-error, data-product-url and
+  data-video-error (set by the script; CSS then hides the play icon);
+  data-video-poster on the link, data-video-label on its hidden text,
+  data-video-template on the template tag.
+
+  Test hooks: data-testid="video-card", "video-card-frame", "video-card-poster",
+  "video-card-play", "video-card-template", "video-card-badge", "video-card-product",
+  "video-card-product-image", "video-card-product-title", "video-card-placeholder".
+
+  @param {string} id - Unique card id within the template, such as 'video-card-1'
+  @param {string} [video_id] - YouTube or Vimeo id, for test templates only
+  @param {string} [video_host] - 'youtube' or 'vimeo', for test templates only
+
+  @example
+  {% block 'video-card', id: 'video-card-1' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign card_video = block.settings.video
+  assign card_product = block.settings.product
+  assign source_count = card_video.sources.size | default: 0
+  assign card_kind = ''
+  assign poster_href = ''
+  assign embed_url = ''
+
+  if source_count > 0
+    assign card_kind = 'shopify'
+    if card_product != blank
+      assign poster_href = card_product.url
+    else
+      assign mp4_source = card_video.sources | where: 'format', 'mp4' | first
+      assign poster_href = mp4_source.url | default: card_video.sources.first.url
+    endif
+  else
+    assign external_id = video_id | default: block.settings.video_url.id | url_encode
+    assign external_host = video_host | default: block.settings.video_url.type | downcase
+    if external_id != blank
+      case external_host
+        when 'youtube'
+          assign card_kind = 'external'
+          assign poster_href = 'https://www.youtube.com/watch?v=' | append: external_id
+          assign embed_url = 'https://www.youtube-nocookie.com/embed/' | append: external_id | append: '?autoplay=1&playsinline=1&rel=0'
+        when 'vimeo'
+          assign card_kind = 'external'
+          assign poster_href = 'https://vimeo.com/' | append: external_id
+          assign embed_url = 'https://player.vimeo.com/video/' | append: external_id | append: '?autoplay=1'
+      endcase
+    endif
+  endif
+-%}
+
+{%- if card_kind != blank -%}
+  {%- liquid
+    assign poster_image = block.settings.poster | default: card_video.preview_image | default: card_product.featured_image
+    assign untitled = 'blocks.video_card.untitled' | t
+    assign card_title = card_video.alt | default: card_product.title | default: untitled
+    if card_product != blank
+      assign label_error = 'blocks.video_card.error_product' | t: title: card_title
+    else
+      assign label_error = 'blocks.video_card.error_no_product' | t: title: card_title
+    endif
+    assign media_label = 'blocks.video_card.media_label' | t: title: card_title
+  -%}
+  <li
+    class="video-card-item"
+    data-video-card-id="{{ id }}"
+    {{ block.shopify_attributes }}
+  >
+    <video-card
+      class="video-card"
+      data-video-kind="{{ card_kind }}"
+      data-label-error="{{ label_error | escape_once }}"
+      {% if card_product != blank %}
+        data-product-url="{{ card_product.url }}"
+      {% endif %}
+      data-testid="video-card"
+    >
+      <div class="video-card__frame" data-testid="video-card-frame">
+        <a
+          class="video-card__poster"
+          href="{{ poster_href | escape }}"
+          data-video-poster
+          data-testid="video-card-poster"
+        >
+          {%- if poster_image != blank -%}
+            {% render 'image',
+              image: poster_image,
+              class: 'video-card__poster-image',
+              width: 792,
+              widths: '264, 396, 528, 792',
+              sizes: '(min-width: 48rem) 264px, 70vw',
+              loading: 'lazy',
+              decorative: true
+            %}
+          {%- endif -%}
+          <span class="video-card__play" data-testid="video-card-play">
+            {%- render 'slideshow-icon', name: 'play' -%}
+          </span>
+          <span class="visually-hidden" data-video-label>{{ 'blocks.video_card.play' | t: title: card_title }}</span>
+        </a>
+
+        {%- if block.settings.badge != blank -%}
+          <span class="video-card__badge" data-testid="video-card-badge">{{ block.settings.badge | escape }}</span>
+        {%- endif -%}
+
+        <template data-video-template data-testid="video-card-template">
+          {%- if card_kind == 'shopify' -%}
+            <video
+              class="video-card__media"
+              controls
+              playsinline
+              preload="metadata"
+              aria-label="{{ media_label | escape_once }}"
+            >
+              {%- for source in card_video.sources -%}
+                <source src="{{ source.url }}" type="{{ source.mime_type }}">
+              {%- endfor -%}
+            </video>
+          {%- else -%}
+            <iframe
+              class="video-card__media"
+              src="{{ embed_url | escape }}"
+              title="{{ media_label | escape_once }}"
+              allow="autoplay; fullscreen; picture-in-picture"
+              allowfullscreen
+            ></iframe>
+          {%- endif -%}
+        </template>
+      </div>
+
+      {%- if card_product != blank -%}
+        {%- assign default_variant = card_product.selected_or_first_available_variant -%}
+        <div class="video-card__product" data-testid="video-card-product">
+          <div class="video-card__thumb">
+            {%- if card_product.featured_image != blank -%}
+              {% render 'image',
+                image: card_product.featured_image,
+                width: 120,
+                height: 120,
+                crop: 'center',
+                widths: '60, 120',
+                sizes: '60px',
+                loading: 'lazy',
+                decorative: true,
+                testid: 'video-card-product-image'
+              %}
+            {%- endif -%}
+          </div>
+          <div class="video-card__product-info">
+            <a class="video-card__product-title" href="{{ card_product.url }}" data-testid="video-card-product-title">
+              {{- card_product.title | escape -}}
+            </a>
+            {% render 'price', product: card_product, variant: default_variant %}
+          </div>
+        </div>
+      {%- endif -%}
+    </video-card>
+  </li>
+{%- elsif request.design_mode -%}
+  <li
+    class="video-card-item video-card-item--placeholder"
+    data-video-card-id="{{ id }}"
+    data-testid="video-card-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.video_carousel.card_placeholder' | t }}
+  </li>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.video_card",
+  "settings": [
+    {
+      "type": "video",
+      "id": "video",
+      "label": "t:labels.video_card_video",
+      "info": "t:info.video_card_video"
+    },
+    {
+      "type": "video_url",
+      "id": "video_url",
+      "accept": ["youtube", "vimeo"],
+      "label": "t:labels.video_card_video_url"
+    },
+    {
+      "type": "image_picker",
+      "id": "poster",
+      "label": "t:labels.video_card_poster",
+      "info": "t:info.video_card_poster"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:labels.video_card_product",
+      "info": "t:info.video_card_product"
+    },
+    {
+      "type": "text",
+      "id": "badge",
+      "label": "t:labels.video_card_badge",
+      "info": "t:info.video_card_badge"
+    }
+  ]
+}
+{% endschema %}

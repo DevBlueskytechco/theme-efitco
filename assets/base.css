@@ -6935,6 +6935,309 @@ featured-product[data-design-mode] .featured-product__countdown {
   }
 }
 
+/** Video carousel (TE-13, Figma 1:817): 1 hàng cuộn ngang tràn tới mép màn hình, mobile theo ES1-T154 #8.
+   Khối chiếm cả hàng của .block-container; padding bằng đúng lề để thẻ đầu thẳng hàng tiêu đề */
+.video-carousel {
+  --video-carousel-inset: calc((100% - var(--content-width)) / 2);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: calc(var(--space-1) * 10);
+  padding-block: var(--space-7);
+  text-align: start;
+}
+
+.video-carousel--placeholder {
+  margin-block: var(--space-7);
+  padding: var(--space-4);
+  outline: 1px dashed currentcolor;
+  outline-offset: -1px;
+  font-size: var(--font-size-sm);
+}
+
+.video-carousel__header {
+  display: grid;
+  gap: var(--space-5);
+  padding-inline: var(--video-carousel-inset);
+}
+
+.video-carousel__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.video-carousel__title {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.video-carousel__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Figma 1:825: 48 / 58, letter-spacing -0.96 */
+.video-carousel__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+/* Figma 1:826, đang ẩn: 18 / 28 */
+.video-carousel__link {
+  color: inherit;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: calc(28 / 18);
+  text-decoration: underline;
+}
+
+.video-carousel__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.video-carousel__stat {
+  display: grid;
+}
+
+/* Figma 1:830: 28 / 34 */
+.video-carousel__stat-value {
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(34 / 28);
+}
+
+/* Figma #808080 chỉ 3.6:1 trên nền alt, dùng muted để đạt AA (ES1-T154 #6) */
+.video-carousel__stat-label {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+.video-carousel__subheading {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+}
+
+/* Không có nút (ES1-T154 #8): giữ thanh cuộn để chuột vẫn cuộn được. padding-block chừa chỗ cho viền focus */
+.video-carousel__list {
+  display: flex;
+  gap: var(--space-5);
+  margin-block: calc(var(--space-1) * -1);
+  padding-block: var(--space-1);
+  padding-inline: var(--video-carousel-inset);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--video-carousel-inset);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  list-style: none;
+}
+
+.video-carousel__list:focus-visible {
+  outline-offset: -2px;
+}
+
+.video-card-item {
+  flex: 0 0 70vw;
+  min-inline-size: 0;
+  scroll-snap-align: start;
+}
+
+.video-card-item--placeholder {
+  padding: var(--space-4);
+  outline: 1px dashed currentcolor;
+  outline-offset: -1px;
+  font-size: var(--font-size-sm);
+}
+
+video-card {
+  display: block;
+}
+
+/* Tỉ lệ đặt ở khung nên poster, video, iframe hay lỗi đều không đổi layout; không ảnh thì còn nền tối */
+.video-card__frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 264 / 470;
+  border-start-start-radius: var(--radius-card);
+  border-start-end-radius: var(--radius-card);
+  background-color: var(--color-background-dark);
+}
+
+.video-card__frame:only-child {
+  border-radius: var(--radius-card);
+}
+
+.video-card__poster {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* display ở trên thắng thuộc tính hidden mà assets/video-carousel.js gắn khi video chạy */
+.video-card__poster[hidden] {
+  display: none;
+}
+
+/* Khung cắt overflow nên viền focus phải nằm trong */
+.video-card__poster:focus-visible {
+  outline-color: var(--color-accent);
+  outline-offset: -4px;
+}
+
+.image.video-card__poster-image {
+  position: absolute;
+  inset: 0;
+  block-size: 100%;
+}
+
+.image.video-card__poster-image > img {
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* Figma không có nút play, thêm vì bấm mới chạy (E6, ES1-T154 #7); cả poster là vùng bấm */
+.video-card__play {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: calc(var(--space-1) * 13);
+  block-size: calc(var(--space-1) * 13);
+  border-radius: 50%;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.video-card__play .slideshow-icon {
+  width: calc(var(--space-1) * 5);
+  height: calc(var(--space-1) * 5);
+}
+
+.video-card[data-video-error] .video-card__play {
+  display: none;
+}
+
+/* Figma 1:844: 13 / 20, cách góc 10 */
+.video-card__badge {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-end: 10px;
+  z-index: 2;
+  padding-block: 3px;
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: calc(20 / 13);
+  pointer-events: none;
+}
+
+.video-card__media {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  object-fit: cover;
+}
+
+/* Figma 1:845: fill ẩn, chỉ có viền sand. Viền nằm trong padding để hàng đúng 84 */
+.video-card__product {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: calc(var(--space-3) - 1px);
+  border: 1px solid var(--color-background-sand);
+  border-end-start-radius: var(--radius-card);
+  border-end-end-radius: var(--radius-card);
+}
+
+.video-card__thumb {
+  flex: none;
+  overflow: hidden;
+  inline-size: calc(var(--space-1) * 15);
+  block-size: calc(var(--space-1) * 15);
+  border: 1px solid var(--color-background-alt);
+  border-radius: 50%;
+  background-color: var(--color-background-alt);
+}
+
+.video-card__product-info {
+  display: grid;
+  gap: var(--space-1);
+  flex: 1;
+  min-inline-size: 0;
+}
+
+/* Tên 1 dòng để các thẻ cao bằng nhau. Vùng bấm phủ cả hàng sản phẩm */
+.video-card__product-title {
+  overflow: hidden;
+  color: inherit;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+  text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.video-card__product-title::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.video-card__product-title:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 48rem) {
+  .video-card-item {
+    flex-basis: 264px;
+  }
+}
+
+@media (min-width: 64rem) {
+  .video-carousel {
+    padding-block: var(--space-8);
+  }
+}
+
 /** Gift card template */
 .template-gift-card main {
   text-align: center;
