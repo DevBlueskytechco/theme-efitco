@@ -11,7 +11,7 @@ import { installPartials, MOCK_HEADER, MockCart, test as mockTest } from './supp
 import { isCloudflareLog } from './support/console-guard';
 import { summary429 } from './support/report-429';
 import { env } from './support/store-data';
-import { challengeReason, CLOUDFLARE_BLOCKED, expectStoreAllowed, gotoStore, watchStore, type StoreWatch } from './support/store-guard';
+import { challengeReason, CLOUDFLARE_BLOCKED, expectStoreAllowed, gotoStore, isStoreRefresh, watchStore, type StoreWatch } from './support/store-guard';
 
 const ROOT = process.cwd();
 const E2E = join(ROOT, 'tests/e2e');
@@ -382,10 +382,10 @@ test.describe.serial('ES1-T203 luồng mua thật', () => {
 
   // Refresh partial là request cùng pathname với trang. Không giả định định dạng của thư viện thật.
   function countRefreshes() {
-    const path = new URL(page.url()).pathname;
+    const pageUrl = page.url();
     const seen: string[] = [];
     const listener = (r: { resourceType(): string; url(): string }) => {
-      if (['fetch', 'xhr'].includes(r.resourceType()) && new URL(r.url()).pathname === path) seen.push(r.url());
+      if (['fetch', 'xhr'].includes(r.resourceType()) && isStoreRefresh(r.url(), pageUrl)) seen.push(r.url());
     };
     page.on('request', listener);
     return { seen, stop: () => page.off('request', listener) };
@@ -574,8 +574,8 @@ test.describe.serial('ES1-T203 luồng mua thật', () => {
     await gotoStore(page, '/');
     await actionsReady();
     watch.allowNetworkLog();
-    const path = new URL(page.url()).pathname;
-    const samePath = (url: URL) => url.pathname === path;
+    const pageUrl = page.url();
+    const samePath = (url: URL) => isStoreRefresh(url.href, pageUrl);
     await page.route(samePath, (route) => (route.request().resourceType() === 'document' ? route.fallback() : route.abort()));
     const result = await callAction<{ userErrors?: unknown[] }>('updateCart', { lines: [{ merchandiseId: variantId, quantity: 1, attributes: [{ key: '_t203', value: 'fail' }] }] });
     expect(result.userErrors ?? []).toEqual([]);

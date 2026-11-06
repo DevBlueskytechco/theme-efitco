@@ -3,14 +3,11 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T180.spec.ts
 // Merchant sửa trong editor (TC-H6) là bước tay; ở đây param trùng tên setting đóng vai giá trị đã lưu, trên /?view=te7.
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
-import { watchShopPay403 } from './support/console-guard';
+import { gotoStore } from './support/store-guard';
 
 const HOME = '/';
 const FIGMA = '/?view=figma';
 const TE7 = '/?view=te7';
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 const SLIDE = {
   eyebrow: 'Trusted by 10,000+ athletes',
@@ -36,26 +33,6 @@ const slide = (page: Page, id: string) => page.locator(`[data-slide-id="${id}"]`
 const norm = (text: string | null) => (text ?? '').replace(/\s+/g, ' ').trim();
 // textContent: giữ chữ gốc, không qua text-transform uppercase của CSS
 const content = async (locator: Locator) => norm(await locator.textContent());
-
-function watchConsole(page: Page) {
-  const errors: string[] = [];
-  const isShopPay403 = watchShopPay403(page);
-  page.on('console', (msg) => {
-    if (msg.type() !== 'error') return;
-    if (isShopPay403(msg)) return;
-    if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
-    errors.push(msg.text());
-  });
-  page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
-  return errors;
-}
-
-async function expectNoSeriousAxe(page: Page) {
-  await expectNotChallenged(page);
-  const { violations } = await new AxeBuilder({ page }).analyze();
-  const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
-}
 
 async function expectSlides(page: Page) {
   const slides = tid(page, 'slideshow-slide');
@@ -158,16 +135,17 @@ test.describe('ES1-T180 TE-17 hàng 2, 4a, 8, 13 mặc định', () => {
   test('Hàng 8 xuống dòng: 3 dòng từ 768, 360 để text-wrap chia, không tràn', async ({ page }) => {
     const breaks = (el: Element) => [...el.querySelectorAll('br')].map((br) => getComputedStyle(br).display);
     await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto(HOME);
+    // ES1-T224: gotoStore nêu rõ Cloudflare hoặc 429 thay vì timeout chờ heading. Đổi cỡ không tải lại: br chỉ phụ thuộc media query, ít hơn 1 lần tải trang; tràn ngang khi tải ở 360 đã có test `360: trang chủ không tràn ngang`.
+    await gotoStore(page, HOME);
     const heading = tid(band(page, 'home-inspiration'), 'image-with-text-heading');
+    await expect(heading, 'trang tải được nhưng thiếu heading hàng 8: lỗi block').toBeAttached({ timeout: 15_000 });
     expect(await heading.evaluate(breaks)).toEqual(['inline', 'inline']);
     // ES1-T217: font display swap, đếm dòng trước khi font về là đo trên font dự phòng.
     await page.evaluate(() => document.fonts.ready.then(() => undefined));
-    const lines =await heading.evaluate((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)));
+    const lines = await heading.evaluate((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)));
     expect(lines).toBe(3);
 
     await page.setViewportSize({ width: 360, height: 740 });
-    await page.goto(HOME);
     expect(await heading.evaluate(breaks)).toEqual(['none', 'none']);
     // Khoảng trắng sau br giữ các từ cách nhau khi br ẩn
     expect(await heading.innerText()).not.toMatch(/fitnessa|youreveryday/i);
@@ -248,12 +226,5 @@ test.describe('ES1-T180 TE-17 hàng 2, 4a, 8, 13 mặc định', () => {
     });
   }
 
-  test('axe 0 serious, 0 console error trên / và /?view=figma', async ({ page }) => {
-    const errors = watchConsole(page);
-    for (const url of [HOME, FIGMA]) {
-      await page.goto(url);
-      await expectNoSeriousAxe(page);
-    }
-    expect(errors).toEqual([]);
-  });
+  // Axe cả trang / và /?view=figma: gộp vào tests/e2e/ES1-T224.spec.ts, cùng DOM với T179, T182, bớt 4 lần tải trang.
 });

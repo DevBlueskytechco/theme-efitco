@@ -29,6 +29,13 @@ export async function challengeReason(page: Page): Promise<string | null> {
     .catch(() => null);
 }
 
+// Request refresh partial của store: cùng origin, cùng pathname với trang. Dịch vụ ngoài cũng có pathname `/` (error-analytics-sessions-production.shopifysvc.com, ES1-T224).
+export function isStoreRefresh(requestUrl: string, pageUrl: string) {
+  const request = new URL(requestUrl);
+  const current = new URL(pageUrl);
+  return request.origin === current.origin && request.pathname === current.pathname;
+}
+
 export const isChallengeResponse = (res: Pick<Response, 'headers'>) => res.headers()['cf-mitigated'] === 'challenge';
 
 // Trang đang mở là màn thử thách thì ném lỗi rõ ràng và tính vào tổng kết.
@@ -49,11 +56,12 @@ export function expectStoreAllowed(res: Pick<Response, 'headers' | 'status' | 'u
 }
 
 // Mở trang thật. 429 chờ 2, 4, 8 s rồi thử lại, hết lượt thì fail nói rõ 429; không skip.
-export async function gotoStore(page: Page, path: string): Promise<void> {
+// waitUntil domcontentloaded: cho trang không cần đợi ảnh, ví dụ tắt JS thì Chromium tải ngay cả ảnh loading=lazy (ES1-T224 R5).
+export async function gotoStore(page: Page, path: string, options: { waitUntil?: 'load' | 'domcontentloaded' } = {}): Promise<void> {
   const info = test.info();
   let waited = 0;
   for (let tries = 1; ; tries++) {
-    const res = await page.goto(path);
+    const res = await page.goto(path, options);
     if (res && isChallengeResponse(res)) {
       record429('challenge', specName());
       throw blockedError(`cf-mitigated, status ${res.status()}`, res.url());
