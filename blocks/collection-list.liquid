@@ -9,12 +9,13 @@
   and the storefront renders nothing, so the container leaves no empty band.
 
   The buttons stay hidden until a script sets data-enhanced on the root, and always
-  stay hidden below 48rem (ES1-T174). This block holds no script tag: TE-15-BE1
-  (ES1-T185) adds it together with data-lazy-module.
+  stay hidden below 48rem (ES1-T174). assets/lazy-module.js imports
+  assets/scroll-buttons.js when the block comes near the viewport (ES1-T185).
 
   JavaScript hooks: custom element scroll-buttons (root), data-enhanced (root),
-  data-scroll-track (list), data-scroll-prev, data-scroll-next (buttons). A script
-  hides one button with the hidden attribute.
+  data-lazy-module (root, URL of assets/scroll-buttons.js), data-scroll-track (list),
+  data-scroll-prev, data-scroll-next (buttons). A script hides one button with the
+  hidden attribute.
 
   Test hooks: data-testid="collection-list", "collection-list-heading",
   "collection-list-nav", "collection-list-prev", "collection-list-next",
@@ -40,6 +41,7 @@
     {% if id != blank %}
       data-collection-list-id="{{ id }}"
     {% endif %}
+    data-lazy-module="{{ 'scroll-buttons.js' | asset_url }}"
     data-testid="collection-list"
     {{ block.shopify_attributes }}
   >
@@ -84,6 +86,8 @@
     >
       {{ content }}
     </ul>
+
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
   </scroll-buttons>
 {%- elsif request.design_mode -%}
   <p

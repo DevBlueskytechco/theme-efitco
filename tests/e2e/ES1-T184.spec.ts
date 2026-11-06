@@ -20,6 +20,8 @@ const CATEGORIES = [
 ];
 
 const band = (page: Page, id: string) => page.getByTestId(`container-${id}`);
+// ES1-T185 nạp module ở /?view=te15: test CSS trạng thái trước nâng cấp phải chặn file, nếu không module đổi data-enhanced và hidden.
+const blockScrollButtons = (page: Page) => page.route(/\/scroll-buttons\.js/, (route) => route.abort());
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
@@ -40,12 +42,13 @@ async function noHorizontalOverflow(page: Page) {
 }
 
 test.describe('ES1-T184 tĩnh', () => {
-  test('block đứng ngay sau slideshow trong index và index.figma, không thẻ script', () => {
+  test('block đứng ngay sau slideshow trong index và index.figma, script chỉ có lazy-module (ES1-T185)', () => {
     for (const file of ['templates/index.liquid', 'templates/index.figma.liquid']) {
       const names = [...readFileSync(file, 'utf8').matchAll(/\{%-?\s*block\s+'([a-z-]+)'/g)].map((m) => m[1]).filter((name) => name !== 'container' && name !== 'slideshow-slide');
       expect(names.slice(0, 3), file).toEqual(['slideshow', 'collection-list', 'collection-card']);
     }
-    expect(readFileSync('blocks/collection-list.liquid', 'utf8')).not.toContain('<script');
+    const scripts = readFileSync('blocks/collection-list.liquid', 'utf8').match(/<script[^>]*>/g);
+    expect(scripts).toEqual([`<script src="{{ 'lazy-module.js' | asset_url }}" type="module">`]);
   });
 
   test('CSS block: 0 màu literal, 0 thuộc tính vật lý', () => {
@@ -86,6 +89,7 @@ test.describe('ES1-T184 /?view=te15', () => {
   });
 
   test('hook cho ES1-T185 có sẵn; nút ẩn khi chưa có data-enhanced', async ({ page }) => {
+    await blockScrollButtons(page);
     await page.goto(TE15);
     const root = band(page, 'te15-five').locator('scroll-buttons');
     await expect(root).toHaveCount(1);
@@ -151,6 +155,7 @@ test.describe('ES1-T184 cỡ card theo màn hình', () => {
 
   test('1920: có data-enhanced thì 2 nút 52 x 52, card đầu thẳng hàng tiêu đề, card 5 tràn mép phải', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
+    await blockScrollButtons(page);
     await page.goto(TE15);
     const five = band(page, 'te15-five');
     await five.locator('scroll-buttons').evaluate((el) => el.setAttribute('data-enhanced', ''));
@@ -169,6 +174,7 @@ test.describe('ES1-T184 cỡ card theo màn hình', () => {
 
   test('hidden thắng display của nút', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
+    await blockScrollButtons(page);
     await page.goto(TE15);
     const five = band(page, 'te15-five');
     await five.locator('scroll-buttons').evaluate((el) => el.setAttribute('data-enhanced', ''));
