@@ -9,6 +9,7 @@ import { join } from 'node:path';
 import { env } from './support/store-data';
 import { CART, CART_GLOB, cartApi } from './support/cart-api';
 import { productData, readCartJson } from './support/product-data';
+import { watchShopPay403 } from './support/console-guard';
 
 type CartItem = { key: string; quantity: number; final_line_price: number };
 type Cart = { item_count: number; total_price: number; items: CartItem[] };
@@ -28,8 +29,10 @@ const test = base.extend<{ guard: Guard }>({
     async ({ page }, use, info) => {
       const errors: string[] = [];
       let allowNetwork = false;
+      const isShopPay403 = watchShopPay403(page);
       page.on('console', (msg) => {
         if (msg.type() !== 'error') return;
+        if (isShopPay403(msg)) return;
         const text = msg.text();
         const source = msg.location().url;
         if (IGNORE_CONSOLE.test(text) || IGNORE_CONSOLE.test(source)) return;
