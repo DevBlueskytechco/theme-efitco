@@ -3,14 +3,10 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T179.spec.ts
 // Merchant sửa trong editor (TC-H6) là bước tay; ở đây param trùng tên setting đóng vai giá trị đã lưu, trên /?view=te7.
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
-import { watchShopPay403 } from './support/console-guard';
 
 const HOME = '/';
 const FIGMA = '/?view=figma';
 const TE7 = '/?view=te7';
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 const QUESTIONS = [
   'How long does shipping take?',
@@ -31,26 +27,6 @@ const tid = (scope: Page | Locator, id: string) => scope.getByTestId(id);
 const band = (page: Page, id: string) => page.getByTestId(`container-${id}`);
 const review = (page: Page, id: string) => page.locator(`[data-testimonial-id="${id}"]`);
 const question = (page: Page, id: string) => page.locator(`[data-faq-item-id="${id}"]`);
-
-function watchConsole(page: Page) {
-  const errors: string[] = [];
-  const isShopPay403 = watchShopPay403(page);
-  page.on('console', (msg) => {
-    if (msg.type() !== 'error') return;
-    if (isShopPay403(msg)) return;
-    if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
-    errors.push(msg.text());
-  });
-  page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
-  return errors;
-}
-
-async function expectNoSeriousAxe(page: Page) {
-  await expectNotChallenged(page);
-  const { violations } = await new AxeBuilder({ page }).analyze();
-  const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
-}
 
 async function expectFigmaFaq(scope: Locator) {
   await expect(scope.locator('.faq__eyebrow')).toHaveText('Questions and Answers');
@@ -211,8 +187,17 @@ test.describe('ES1-T179 TE-17 FAQ, testimonials mặc định', () => {
 
     await list.focus();
     await expect(list).toBeFocused();
-    await page.keyboard.press('End');
+    // ES1-T224: Chromium không cuộn ngang bằng End, kể cả trên overflow-x không có CSS theme (repro R1, R3); End cuộn trang. Bàn phím cuộn ngang bằng mũi tên, nên đo mũi tên thật tới hết card 4.
+    const pageY = await page.evaluate(() => window.scrollY);
+    await page.keyboard.press('ArrowRight');
     await expect.poll(() => list.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
+    const lastCard = tid(scope, 'testimonial-item').last();
+    await expect(async () => {
+      await page.keyboard.press('ArrowRight');
+      expect(await lastCard.evaluate((el) => el.getBoundingClientRect().right)).toBeLessThanOrEqual(page.viewportSize()!.width);
+    }).toPass({ timeout: 15_000 });
+    await expect(list).toBeFocused();
+    expect(await page.evaluate(() => window.scrollY), 'mũi tên không cuộn trang').toBe(pageY);
 
     // Kéo thanh cuộn bằng chuột cũng đặt scrollLeft: kiểm tra đích cuối, không phụ thuộc thanh cuộn của hệ điều hành
     await list.evaluate((el) => el.scrollTo({ left: el.scrollWidth, behavior: 'instant' }));
@@ -249,12 +234,5 @@ test.describe('ES1-T179 TE-17 FAQ, testimonials mặc định', () => {
     });
   }
 
-  test('axe 0 serious, 0 console error trên / và /?view=figma', async ({ page }) => {
-    const errors = watchConsole(page);
-    for (const url of [HOME, FIGMA]) {
-      await page.goto(url);
-      await expectNoSeriousAxe(page);
-    }
-    expect(errors).toEqual([]);
-  });
+  // Axe cả trang / và /?view=figma: gộp vào tests/e2e/ES1-T224.spec.ts.
 });

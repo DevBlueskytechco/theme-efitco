@@ -7,6 +7,7 @@ import { expect, test, type Page } from '@playwright/test';
 import { basename } from 'node:path';
 import { getJson } from './http';
 import { record429 } from './report-429';
+import { expectNotChallenged } from './store-guard';
 
 export type JsonResult<T> = { ok: boolean; status: number; body: T | null };
 export type ProductVariant = { id: number; available: boolean; price: number };
@@ -86,6 +87,7 @@ export async function readCartNoScript<T>(page: Page): Promise<T> {
   try {
     const helper = await sibling.newPage();
     await helper.goto(new URL('/cart', page.url()).toString(), { waitUntil: 'domcontentloaded' });
+    await expectNotChallenged(helper);
     return await readCartJson<T>(helper);
   } finally {
     await sibling.close();

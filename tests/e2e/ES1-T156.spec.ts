@@ -3,9 +3,9 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T156.spec.ts -g "AC1-markup|AC2|nojs"
 // JS của BE1 ở tests/e2e/ES1-T158.spec.ts; test trạng thái trước nâng cấp chặn file module (ES1-T158).
 import { readFileSync } from 'node:fs';
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page, type Response } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
+import { expectNotChallenged, expectStoreAllowed, gotoStore } from './support/store-guard';
 import { env } from './support/store-data';
 import { readCartNoScript } from './support/product-data';
 import { watchShopPay403 } from './support/console-guard';
@@ -248,7 +248,8 @@ test.describe('ES1-T156 TE-13 nojs', () => {
   });
 
   test('nojs select variant, form POST vào giỏ đúng variant', async ({ page }) => {
-    await page.goto(TE13);
+    // ES1-T224: tắt JS thì ảnh lazy tải ngay, nên không chờ load của trang nhiều band (repro R5). Mỗi bước có timeout riêng để CI nêu đúng bước treo; POST bị chặn báo Cloudflare, không thành timeout.
+    await gotoStore(page, TE13, { waitUntil: 'domcontentloaded' });
     const b = band(page, 'b');
     await expect(tid(b, 'product-variant-picker')).toBeHidden();
     const select = tid(b, 'product-variant-select');
@@ -256,8 +257,16 @@ test.describe('ES1-T156 TE-13 nojs', () => {
     const values = await select.locator('option:not([disabled])').evaluateAll((els) => els.map((el) => (el as HTMLOptionElement).value));
     test.skip(values.length < 2, 'TE4_VARIANTS_HANDLE cần từ 2 variant còn hàng');
     await select.selectOption(values[1]);
-    await tid(b, 'featured-product-add').click();
-    await page.waitForURL(/\/cart/);
+    const isCartAdd = (res: Response) => res.request().method() === 'POST' && new URL(res.url()).pathname.endsWith('/cart/add');
+    const [post] = await Promise.all([
+      page.waitForResponse(isCartAdd, { timeout: 15_000 }),
+      tid(b, 'featured-product-add').click({ timeout: 10_000 }),
+    ]);
+    expectStoreAllowed(post);
+    expect(post.status(), 'POST /cart/add').toBeLessThan(400);
+    // Regex /\/cart/ cũ khớp cả /cart/add, kể cả khi đang ở màn thử thách (repro R7).
+    await page.waitForURL((url) => url.pathname.endsWith('/cart'), { waitUntil: 'domcontentloaded', timeout: 15_000 });
+    await expectNotChallenged(page);
     const cart = await readCartNoScript<{ items: { variant_id: number }[] }>(page);
     expect(cart.items.map((i) => String(i.variant_id))).toEqual([values[1]]);
   });

@@ -3,37 +3,13 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T182.spec.ts
 // Body map bấm được và token panel: tests/e2e/ES1-T183.spec.ts.
 import { test, expect, type Page } from '@playwright/test';
-import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
-import { watchShopPay403 } from './support/console-guard';
 
 const HOME = '/';
 const FIGMA = '/?view=figma';
 const TE7 = '/?view=te7';
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
 const step = (page: Page, n: number) => page.locator(`[data-testid="quiz-step"][data-quiz-step="${n}"]`);
-
-function watchConsole(page: Page) {
-  const errors: string[] = [];
-  const isShopPay403 = watchShopPay403(page);
-  page.on('console', (msg) => {
-    if (msg.type() !== 'error') return;
-    if (isShopPay403(msg)) return;
-    if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
-    errors.push(msg.text());
-  });
-  page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
-  return errors;
-}
-
-async function expectNoSeriousAxe(page: Page) {
-  await expectNotChallenged(page);
-  const { violations } = await new AxeBuilder({ page }).analyze();
-  const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
-  expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
-}
 
 const STEPS = [
   {
@@ -173,12 +149,5 @@ test.describe('ES1-T182 TE-17-FE1c', () => {
     await expect(band.getByText('Sample question 3')).toHaveCount(0);
   });
 
-  test('axe 0 serious, 0 console error trên / và ?view=figma', async ({ page }) => {
-    const errors = watchConsole(page);
-    await page.goto(HOME);
-    await expectNoSeriousAxe(page);
-    await page.goto(FIGMA);
-    await expectNoSeriousAxe(page);
-    expect(errors).toEqual([]);
-  });
+  // Axe cả trang / và ?view=figma: gộp vào tests/e2e/ES1-T224.spec.ts.
 });

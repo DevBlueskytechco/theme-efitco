@@ -5,6 +5,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
+import { visibleImagesLoaded } from './support/page-ready';
 import { readFileSync } from 'node:fs';
 import { watchShopPay403 } from './support/console-guard';
 
@@ -129,7 +130,9 @@ test.describe('ES1-T188 trang /?view=figma', () => {
     });
     await openFigma(page);
     await blockOn(page).scrollIntoViewIfNeeded();
-    await page.waitForLoadState('networkidle');
+    // ES1-T224: networkidle không bao giờ tới vì video và Shop giữ kết nối. Chờ đúng 2 việc có thể làm tải ảnh tab ẩn: module nâng cấp, ảnh trong màn hình của tab đầu tải xong.
+    await expect(blockOn(page).getByTestId(T.tab).first()).toHaveAttribute('aria-selected', 'true', { timeout: 15_000 });
+    await expect.poll(() => visibleImagesLoaded(blockOn(page).getByTestId(T.panel).first()), { message: 'ảnh tab đầu chưa tải xong', timeout: 15_000 }).toBe(true);
     // Ảnh cũng có ngoài template (cùng sản phẩm ở tab đầu hoặc hàng khác) thì không tính.
     const hiddenOnly = await page.evaluate(() => {
       const path = (src: string) => new URL(src, location.href).pathname;
