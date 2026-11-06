@@ -34,11 +34,13 @@ async function expectNoSeriousAxe(page: Page) {
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
 }
 
+// y tính theo tài liệu: mỗi lần gọi có thể cuộn trang, so y theo viewport giữa 2 lần gọi sẽ sai (ES1-T172).
 async function box(locator: Locator) {
   await locator.scrollIntoViewIfNeeded();
-  const value = await locator.boundingBox();
-  expect(value, 'phần tử phải có bounding box').not.toBeNull();
-  return value!;
+  return locator.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    return { x: rect.x, y: rect.y + window.scrollY, width: rect.width, height: rect.height };
+  });
 }
 
 async function expectNoPageOverflow(page: Page) {
