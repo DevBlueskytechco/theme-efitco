@@ -4,7 +4,7 @@
 // Thiếu dữ liệu → skip có lý do. Automatic discount chưa có trên store dev (ES1-T91 #7) nên chỉ kiểm khi cart.js có discount.
 import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
+import { clickAndLoad, expectNotChallenged, expectStoreAllowed, gotoStore } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
@@ -44,12 +44,13 @@ async function postLine(page: Page, handle: string, product: Product, quantity: 
   const data: Record<string, unknown> = { id: variant!.id, quantity };
   if (usePlan) data.selling_plan = variant!.selling_plan_allocations![0].selling_plan_id;
   const res = await cartApi(page, CART.add, { data });
+  expectStoreAllowed(res);
   expect(res.ok(), `${CART.add} trả ${res.status()}`).toBeTruthy();
   return variant!;
 }
 
 async function addToCart(page: Page, handle: string, quantity = 1, usePlan = false) {
-  await page.goto(`/products/${handle}`);
+  await gotoStore(page, `/products/${handle}`);
   // selling plan không có trong JSON nhúng variant-json
   const product: Product = usePlan
     ? requireJson(await pageJson<Product>(page, `/products/${handle}.js`), `/products/${handle}.js`)
@@ -57,8 +58,11 @@ async function addToCart(page: Page, handle: string, quantity = 1, usePlan = fal
   return postLine(page, handle, product, quantity, usePlan);
 }
 
+// ES1-T229: tắt JS thì Chromium tải cả ảnh lazy, domcontentloaded để không hết giờ vì ảnh (ES1-T224).
+const gotoNoScript = (page: Page, path: string) => gotoStore(page, path, { waitUntil: 'domcontentloaded' });
+
 async function addToCartNoScript(page: Page, handle: string) {
-  await page.goto(`/products/${handle}`);
+  await gotoNoScript(page, `/products/${handle}`);
   return postLine(page, handle, await productDataNoScript(page, handle), 1, false);
 }
 
@@ -88,7 +92,7 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     await addToCart(page, ENV.product!, 2);
     const cart = await readCart(page);
     const item = cart.items[0];
-    await page.goto('/cart');
+    await gotoStore(page, '/cart');
 
     const line = tid(page, 'cart-line').first();
     await expect(line).toHaveAttribute('data-line-key', item.key);
@@ -114,7 +118,7 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     test.skip(!ENV.sellingPlan, 'Thiếu TE4_SELLING_PLAN_HANDLE');
     await addToCart(page, ENV.sellingPlan!, 1, true);
     const cart = await readCart(page);
-    await page.goto('/cart');
+    await gotoStore(page, '/cart');
     await expect(tid(page, 'cart-line-selling-plan').first()).toHaveText(cart.items[0].selling_plan_allocation!.selling_plan.name);
   });
 
@@ -123,7 +127,7 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     await addToCart(page, ENV.unitPrice!);
     const cart = await readCart(page);
     test.skip(!cart.items[0].unit_price_measurement, `${ENV.unitPrice} không có unit_price_measurement`);
-    await page.goto('/cart');
+    await gotoStore(page, '/cart');
     await expect(tid(page, 'cart-line-unit-price').first()).toBeVisible();
   });
 
@@ -132,7 +136,7 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
     const cartUrl = `/cart?country=${ENV.shopCountry}`;
     const variant = await addToCart(page, ENV.product!);
-    await page.goto(cartUrl);
+    await gotoStore(page, cartUrl);
 
     const bar = tid(page, 'cart-free-shipping-progress');
     test.skip((await bar.count()) === 0, 'Preview không có ngưỡng freeship (settings_data) hoặc tiền khác shop');
@@ -142,7 +146,7 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     expect(Number(await bar.getAttribute('value'))).toBeLessThan(max);
 
     await cartApi(page, CART.update, { data: { updates: { [variant.id]: Math.ceil(max / variant.price) } } });
-    await page.goto(cartUrl);
+    await gotoStore(page, cartUrl);
     await expect(bar).toHaveAttribute('value', String(max));
     expect(await tid(page, 'cart-free-shipping-text').textContent()).not.toBe(belowText);
   });
@@ -151,16 +155,16 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     test.skip(!ENV.shopCountry, 'Thiếu TE5_SHOP_COUNTRY (ES1-T91 #7)');
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
     await addToCart(page, ENV.product!);
-    await page.goto(`/cart?country=${ENV.shopCountry}`);
+    await gotoStore(page, `/cart?country=${ENV.shopCountry}`);
     const shopCurrency = (await readCart(page)).currency;
-    await page.goto('/cart?country=DE');
+    await gotoStore(page, '/cart?country=DE');
     const currency = (await readCart(page)).currency;
     test.skip(currency === shopCurrency, 'Store không có market khác tiền shop');
     await expect(tid(page, 'cart-free-shipping')).toHaveCount(0);
   });
 
   test('AC4 giỏ rỗng: thông báo + CTA, không tóm tắt, note, accelerated', async ({ page }) => {
-    await page.goto('/cart');
+    await gotoStore(page, '/cart');
     await expect(tid(page, 'cart-empty')).toBeVisible();
     await expect(tid(page, 'cart-empty-cta')).toHaveAttribute('href', /\/collections\/all/);
     await expect(tid(page, 'cart-lines')).toHaveCount(0);
@@ -174,7 +178,7 @@ test.describe('ES1-T94 TE-5 cart page', () => {
   test('AC5 hook cho BE: cart-items, live region, note gắn form ngoài partial', async ({ page }) => {
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
     await addToCart(page, ENV.product!);
-    await page.goto('/cart');
+    await gotoStore(page, '/cart');
     const items = tid(page, 'cart-items');
     await expect(items).toHaveAttribute('data-partials', 'cart-page cart-count');
     for (const attr of ['data-cart-change-url', 'data-cart-url', 'data-label-updated', 'data-label-removed', 'data-label-error', 'data-label-quantity-adjusted']) {
@@ -210,11 +214,10 @@ test.describe('ES1-T94 TE-5 cart page', () => {
       test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
       const { context, page } = await noJsPage(browser);
       await addToCartNoScript(page, ENV.product!);
-      await page.goto('/cart');
+      await gotoNoScript(page, '/cart');
       await tid(page, 'cart-line-quantity').first().fill('2');
       await tid(page, 'cart-page-note').fill('ES1-T94 note');
-      await tid(page, 'cart-update').click();
-      await page.waitForLoadState();
+      await clickAndLoad(page, () => tid(page, 'cart-update').click());
       const cart = await readCartNoScript<Cart>(page);
       expect(cart.items[0].quantity).toBe(2);
       expect(cart.note).toBe('ES1-T94 note');
@@ -226,8 +229,8 @@ test.describe('ES1-T94 TE-5 cart page', () => {
       test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
       const { context, page } = await noJsPage(browser);
       await addToCartNoScript(page, ENV.product!);
-      await page.goto('/cart');
-      await tid(page, 'cart-line-remove').first().click();
+      await gotoNoScript(page, '/cart');
+      await clickAndLoad(page, () => tid(page, 'cart-line-remove').first().click());
       await expect(tid(page, 'cart-empty')).toBeVisible();
       expect((await readCartNoScript<Cart>(page)).item_count).toBe(0);
       await context.close();
@@ -237,9 +240,10 @@ test.describe('ES1-T94 TE-5 cart page', () => {
       test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
       const { context, page } = await noJsPage(browser);
       await addToCartNoScript(page, ENV.product!);
-      await page.goto('/cart');
+      await gotoNoScript(page, '/cart');
       await tid(page, 'cart-page-note').fill('ES1-T94 checkout note');
-      await Promise.all([page.waitForURL(/checkout/), tid(page, 'cart-checkout').click()]);
+      await clickAndLoad(page, () => tid(page, 'cart-checkout').click());
+      await page.waitForURL(/checkout/);
       expect((await readCartNoScript<Cart>(page)).note).toBe('ES1-T94 checkout note');
       await context.close();
     });

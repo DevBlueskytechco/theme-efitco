@@ -5,6 +5,7 @@
 // Dữ liệu: card ≥ 2 swatch trên /collections/all (5 trang đầu) hoặc TE3_SWATCH_HANDLE; không có thì skip.
 import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 import { watchShopPay403 } from './support/console-guard';
+import { clickAndLoad, expectLoaded, gotoStore } from './support/store-guard';
 
 const ALL = '/collections/all';
 const PAGE_SIZE = 20;
@@ -30,8 +31,8 @@ function trackErrors(page: Page): string[] {
 async function swatchCard(page: Page): Promise<string | null> {
   const handle = process.env.TE3_SWATCH_HANDLE;
   for (let n = 1; n <= MAX_PAGES; n++) {
-    const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
-    if (!res || res.status() >= 400) return null;
+    // ES1-T229: bị chặn thì fail nêu Cloudflare. Trước đây status 403 thành "không có card" và test bị skip.
+    await gotoStore(page, n === 1 ? ALL : `${ALL}?page=${n}`);
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     const count = await cards.count();
     if (!count) return null;
@@ -91,9 +92,9 @@ test.describe('ES1-T73 product-swatch đồng bộ sau khi khôi phục form', (
     await expect(card.locator(SWATCH).nth(to)).toBeChecked();
     await expectInSync(card);
 
-    await card.getByTestId(T.title).click();
+    await clickAndLoad(page, () => card.getByTestId(T.title).click());
     await page.waitForURL(/\/products\//);
-    await page.goBack();
+    await expectLoaded(page, await page.goBack());
     await waitSwatchDefined(page);
     await page.waitForLoadState('load');
     const again = cardById(page, id!);
@@ -109,7 +110,7 @@ test.describe('ES1-T73 product-swatch đồng bộ sau khi khôi phục form', (
     await waitSwatchDefined(page);
     const card = cardById(page, id!);
     await pick(card, (await checkedIndex(card)) === 1 ? 0 : 1, ti);
-    await page.reload();
+    await expectLoaded(page, await page.reload());
     await waitSwatchDefined(page);
     await page.waitForLoadState('load');
     await expectInSync(cardById(page, id!));

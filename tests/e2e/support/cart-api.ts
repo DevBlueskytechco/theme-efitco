@@ -36,6 +36,21 @@ export function retryDelayMs(retryAfter: string | undefined, waitedMs: number, a
   return Math.max(0, Math.min(wanted, MAX_TOTAL_WAIT_MS - waitedMs));
 }
 
+// ES1-T229: số lượng trong kết quả Shopify.actions.getCart. Thật trả { cart: { totalQuantity } } (run 42235454285, ES1-T227).
+// Chưa có giỏ trên Storefront API (null, { cart: null }) tính là 0. Shape khác phải ném: nếu tính là 0 thì assert giỏ rỗng đạt với mọi giá trị.
+export function actionCartCount(result: unknown): number {
+  if (result === null) return 0;
+  const shape = (value: unknown) => `getCart không có totalQuantity, item_count. Nhận: ${Array.isArray(value) || typeof value !== 'object' ? String(value) : `key ${Object.keys(value as object).join(', ') || '(rỗng)'}`}`;
+  if (typeof result !== 'object' || Array.isArray(result)) throw new Error(shape(result));
+  const cart = 'cart' in result ? result.cart : result;
+  if (cart === null) return 0;
+  if (typeof cart !== 'object' || Array.isArray(cart)) throw new Error(shape(cart));
+  const { totalQuantity, item_count: itemCount } = cart as { totalQuantity?: unknown; item_count?: unknown };
+  const count = totalQuantity ?? itemCount;
+  if (!Number.isInteger(count) || (count as number) < 0) throw new Error(shape(cart));
+  return count as number;
+}
+
 // 429 sau khi đã thử lại: 1 dòng log + 1 dòng tổng kết + skip có lý do.
 export function skip429(reason: string): never {
   const spec = basename(test.info().file);

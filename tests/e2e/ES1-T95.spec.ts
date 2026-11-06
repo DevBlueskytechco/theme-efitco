@@ -4,7 +4,7 @@
 // Chưa có JS (ES1-T96): mở thử bằng thuộc tính open. EXPECT_CART_TYPE=page chỉ đặt khi preview có cart_type page (D12).
 import { test, expect, type APIRequestContext, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
+import { clickAndLoad, expectJsonAllowed, expectNotChallenged, expectStoreAllowed, gotoStore } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
@@ -22,11 +22,13 @@ const tid = (page: Page, id: string) => page.getByTestId(id);
 
 async function addToCart(request: APIRequestContext, handle: string) {
   const r = await getJson<Product>(request, `/products/${handle}.js`);
+  expectJsonAllowed(r, `/products/${handle}.js`);
   if (r.status === 429) skip429(`Shopify trả 429 cho ${handle}.js sau khi thử lại (giới hạn store dev)`);
   expect(r.ok, `/products/${handle}.js trả ${r.status}`).toBeTruthy();
   const variant = (r.body as Product).variants.find((v) => v.available);
   test.skip(!variant, `${handle} không có variant bán được`);
   const res = await cartApi(request, CART.add, { data: { id: variant!.id, quantity: 1 } });
+  expectStoreAllowed(res);
   expect(res.ok(), `${CART.add} trả ${res.status()}`).toBeTruthy();
 }
 
@@ -59,7 +61,7 @@ async function noJsPage(browser: Browser) {
 test.describe('ES1-T95 TE-5 cart drawer', () => {
   test('AC1-markup đúng 1 cart-drawer sau footer, ngoài container, mọi trang', async ({ page }) => {
     for (const path of ['/', '/collections/all', '/search?q=a', '/cart', ...(ENV.product ? [`/products/${ENV.product}`] : [])]) {
-      await page.goto(path);
+      await gotoStore(page, path);
       await expect(tid(page, 'cart-drawer'), path).toHaveCount(1);
       const parent = await tid(page, 'cart-drawer').evaluate((el) => el.parentElement?.tagName);
       expect(parent, `${path}: cart-drawer nằm trực tiếp trong body`).toBe('BODY');
@@ -70,7 +72,7 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
 
   test('AC1-markup dialog đóng, đủ hook, tên từ h2', async ({ page }) => {
     test.skip(ENV.pageMode, 'Preview đặt cart_type page: không có dialog');
-    await page.goto('/');
+    await gotoStore(page, '/');
     const dialog = tid(page, 'cart-drawer-dialog');
     await expect(tid(page, 'cart-drawer')).toHaveAttribute('data-mode', 'drawer');
     await expect(dialog).toHaveCount(1);
@@ -105,7 +107,7 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
     test.skip(ENV.pageMode, 'Preview đặt cart_type page: không có dialog');
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
     await addToCart(page.request, ENV.product!);
-    await page.goto('/');
+    await gotoStore(page, '/');
     const body = tid(page, 'cart-drawer-body');
     await expect(body).toHaveAttribute('data-item-count', '1');
     await expect(body.getByTestId('cart-line')).toHaveCount(1);
@@ -123,7 +125,7 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
 
   test('AC1-markup giỏ rỗng: thông báo + CTA, không tóm tắt, accelerated ẩn, axe khi ép open', async ({ page }) => {
     test.skip(ENV.pageMode, 'Preview đặt cart_type page: không có dialog');
-    await page.goto('/');
+    await gotoStore(page, '/');
     await forceOpen(page);
     await expect(tid(page, 'cart-empty')).toBeVisible();
     await expect(tid(page, 'cart-empty-cta')).toBeVisible();
@@ -139,7 +141,7 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
     await addToCart(page.request, ENV.product!);
     for (const width of [360, 768, 1280]) {
       await page.setViewportSize({ width, height: 800 });
-      await page.goto('/');
+      await gotoStore(page, '/');
       await forceOpen(page);
       const box = await tid(page, 'cart-drawer-dialog').boundingBox();
       expect(box, `${width}: dialog có kích thước`).not.toBeNull();
@@ -153,7 +155,7 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
   });
 
   test('AC1-markup /cart: không dialog, data-mode none, cart link không có hook drawer', async ({ page }) => {
-    await page.goto('/cart');
+    await gotoStore(page, '/cart');
     await expect(tid(page, 'cart-drawer')).toHaveAttribute('data-mode', 'none');
     await expect(page.locator('cart-drawer dialog')).toHaveCount(0);
     await expect(tid(page, 'cart-drawer-dialog')).toHaveCount(0);
@@ -165,7 +167,7 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
 
   test('AC6-markup cart_type page: mọi trang data-mode none, không dialog', async ({ page }) => {
     test.skip(!ENV.pageMode, 'Cần preview đặt cart_type page + EXPECT_CART_TYPE=page (D12)');
-    await page.goto('/');
+    await gotoStore(page, '/');
     await expect(tid(page, 'cart-drawer')).toHaveAttribute('data-mode', 'none');
     await expect(page.locator('cart-drawer dialog')).toHaveCount(0);
     await expect(tid(page, 'header-cart-link')).not.toHaveAttribute('data-cart-link', /.*/);
@@ -191,12 +193,13 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
   test.describe('nojs', () => {
     test('nojs dialog đóng, cart link tới /cart', async ({ browser }) => {
       const { context, page } = await noJsPage(browser);
-      await page.goto('/');
+      // ES1-T229: tắt JS thì Chromium tải cả ảnh lazy, domcontentloaded để không hết giờ vì ảnh (ES1-T224).
+      await gotoStore(page, '/', { waitUntil: 'domcontentloaded' });
       const dialog = tid(page, 'cart-drawer-dialog');
       if (await dialog.count()) await expect(dialog).toBeHidden();
       const link = tid(page, 'header-cart-link');
       await expect(link).toHaveAttribute('href', /\/cart$/);
-      await link.click();
+      await clickAndLoad(page, () => link.click());
       await expect(page).toHaveURL(/\/cart$/);
       await expect(tid(page, 'cart-page')).toBeVisible();
       await context.close();
