@@ -557,7 +557,7 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     test(`B-05 B-07 AC2: 0 console error khi tải, không id trùng (${path})`, async ({ page }) => {
       const errors = trackErrors(page);
       await cardsOn(page, path);
-      await page.waitForLoadState('networkidle');
+      await page.waitForLoadState('load');
       const dup = await page.evaluate(() => {
         const ids = [...document.querySelectorAll('[id]')].map(e => e.id);
         return [...new Set(ids.filter((id, i) => ids.indexOf(id) !== i))];
