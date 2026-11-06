@@ -7,6 +7,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
+import { watchShopPay403 } from './support/console-guard';
 
 const ALL = '/collections/all';
 const LIST = '/collections';
@@ -25,8 +26,10 @@ const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\
 
 function watchErrors(page: Page): string[] {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
+    if (isShopPay403(m)) return;
     const text = `${m.text()} @ ${m.location().url}`;
     if (!IGNORE_CONSOLE.some((r) => r.test(text))) errors.push(text);
   });

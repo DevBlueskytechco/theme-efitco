@@ -5,6 +5,9 @@
 // BE1 (ES1-T149) chạy lại spec này: phần chỉ đúng trước khi JS nâng cấp thì kiểm data-enhanced trước.
 import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { watchShopPay403 } from './support/console-guard';
+import { CART, cartApi } from './support/cart-api';
+import { readCartNoScript } from './support/product-data';
 
 const TE12 = '/?view=te12';
 const HOME = '/';
@@ -19,8 +22,10 @@ const soldOutItems = (page: Page) => bundle(page).locator('[data-testid="bundle-
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
@@ -247,7 +252,8 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
 
   test('nojs AC1 chọn 2 món, submit, /cart.js có đúng 2 món quantity 1', async ({ browser }) => {
     const { context, page } = await noJsPage(browser);
-    await page.request.post('/cart/clear.js');
+    const cleared = await cartApi(page, CART.clear);
+    expect(cleared.ok(), `${CART.clear} trả ${cleared.status()}`).toBeTruthy();
     await page.goto(TE12);
 
     const inputs = available(page);
@@ -256,12 +262,16 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
     await inputs.nth(0).check();
     await inputs.nth(1).check();
     await bundle(page).getByTestId('bundle-builder-submit').click();
-    await page.waitForLoadState('domcontentloaded');
+    // ES1-T171 D3: domcontentloaded trả về ngay khi trang cũ đã tải xong, nên phải chờ form POST chuyển tới /cart rồi mới đọc giỏ.
+    await page.waitForURL(/\/cart(\?|$)/);
 
-    const cart = await (await page.request.get('/cart.js')).json();
-    const lines = cart.items.map((i: { variant_id: number; quantity: number }) => [i.variant_id, i.quantity]);
+    type Cart = { item_count: number; items: { variant_id: number; quantity: number }[] };
+    let cart: Cart = { item_count: 0, items: [] };
+    await expect
+      .poll(async () => (cart = await readCartNoScript<Cart>(page)).item_count, { message: 'form name=id[] không thêm món nào vào giỏ', timeout: 15_000, intervals: [1000, 2000, 4000] })
+      .toBeGreaterThan(0);
+    const lines = cart.items.map((i) => [i.variant_id, i.quantity]);
     expect(lines.sort()).toEqual(ids.map((id) => [id, 1]).sort());
-    await page.request.post('/cart/clear.js');
     await context.close();
   });
 

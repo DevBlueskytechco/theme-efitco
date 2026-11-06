@@ -7,6 +7,7 @@ import { test, expect, type Page, type Route } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
+import { watchShopPay403 } from './support/console-guard';
 
 const T = {
   form: 'product-form',
@@ -33,8 +34,10 @@ const productPath = (handle: string) => `/products/${handle}`;
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     const text = msg.text();
     if (IGNORE_CONSOLE.some((r) => r.test(text) || r.test(msg.location().url)) || NETWORK_LOG.test(text)) return;
     errors.push(text);
