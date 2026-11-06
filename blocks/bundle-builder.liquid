@@ -11,7 +11,8 @@
   Discounts are display only (AC2, R8): the real price comes from an automatic
   discount the merchant creates. Liquid never computes a price; it only outputs
   data-tiers ("2:10,3:15") with the tiers whose percent is above 0. No tier
-  above 0: no data-tiers, discount row, progress bar or note.
+  above 0: no data-tiers, discount row, progress bar or note. With a tier above 0
+  the note always shows (AC-H18, R8): an empty setting takes the locale text.
 
   Sold out (product or variant unavailable, AC4): the input is disabled, the
   item has data-sold-out, there is no selection ring and the card keeps its
@@ -21,7 +22,8 @@
   the root and has no definition until then). Rename only with a ticket comment.
   - Root: data-tiers, data-cart-add-url, data-cart-url, data-cart-type,
     data-currency, data-locale, data-label-count-one, data-label-count-other,
-    data-label-progress (%n, %p), data-label-progress-done (%p),
+    data-label-progress-one (%n is 1, %p), data-label-progress (%n, %p),
+    data-label-progress-done (%p),
     data-label-discount (%p), data-label-status (%n, %t), data-label-error.
     JS sets data-enhanced on the root once the panel is rendered.
   - Item input: data-bundle-item, data-title, data-price (cents), value is the
@@ -44,21 +46,26 @@
   bundle-builder-note, bundle-builder-submit, bundle-builder-status,
   bundle-builder-error, bundle-builder-placeholder.
 
-  Empty state: no collection or no products → a hint in the theme editor,
-  nothing on the storefront.
+  Source: the collection setting; when it is empty, collections[default_collection]
+  (the home page template passes 'all', plan ES1-T169 D1). Empty state: no source
+  or no products → a hint in the theme editor, nothing on the storefront.
 
   Self-contained: callers must leave the body empty.
 
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading and input ids. Default: block.id
+  @param {string} [default_collection] - Collection handle used when the collection setting is empty, such as 'all'. Empty: no fallback
 
   @example
   {% block 'container', id: 'home-bundle-builder', tag: 'div', background: 'cream' %}
-    {% block 'bundle-builder', id: 'bundle-builder' %}{% endblock %}
+    {% block 'bundle-builder', id: 'bundle-builder', default_collection: 'all' %}{% endblock %}
   {% endblock %}
 {% enddoc %}
 
 {%- liquid
   assign source = block.settings.collection
+  if source == blank and default_collection != blank
+    assign source = collections[default_collection]
+  endif
 
   assign has_products = false
   if source != blank and source.products_count > 0
@@ -81,8 +88,9 @@
   assign eyebrow = block.settings.eyebrow
   assign heading = block.settings.heading
   assign link_label = block.settings.link_label
-  assign link_url = block.settings.link_url
-  assign discount_note = block.settings.discount_note
+  assign link_url = block.settings.link_url | default: routes.all_products_collection_url
+  assign discount_note = 'blocks.bundle_builder.discount_note' | t
+  assign discount_note = block.settings.discount_note | default: discount_note
   assign block_key = id | default: block.id
   assign heading_id = block_key | append: '-heading'
   assign cart_type = settings.cart_type | default: 'drawer'
@@ -90,6 +98,7 @@
 
   assign label_count_one = 'blocks.bundle_builder.count_one' | t
   assign label_count_other = 'blocks.bundle_builder.count_other' | t
+  assign label_progress_one = 'blocks.bundle_builder.progress_one' | t
   assign label_progress = 'blocks.bundle_builder.progress' | t
   assign label_progress_done = 'blocks.bundle_builder.progress_done' | t
   assign label_discount = 'blocks.bundle_builder.discount' | t
@@ -110,6 +119,7 @@
     data-locale="{{ request.locale.iso_code }}"
     data-label-count-one="{{ label_count_one | escape }}"
     data-label-count-other="{{ label_count_other | escape }}"
+    data-label-progress-one="{{ label_progress_one | escape }}"
     data-label-progress="{{ label_progress | escape }}"
     data-label-progress-done="{{ label_progress_done | escape }}"
     data-label-discount="{{ label_discount | escape }}"
@@ -118,7 +128,7 @@
     data-testid="bundle-builder"
     {{ block.shopify_attributes }}
   >
-    {%- if eyebrow != blank or heading != blank or link_label != blank and link_url != blank -%}
+    {%- if eyebrow != blank or heading != blank or link_label != blank -%}
       <div class="bundle-builder__header">
         {%- if eyebrow != blank or heading != blank -%}
           <div class="bundle-builder__titles">
@@ -132,7 +142,7 @@
             {%- endif -%}
           </div>
         {%- endif -%}
-        {%- if link_label != blank and link_url != blank -%}
+        {%- if link_label != blank -%}
           <a class="bundle-builder__link" href="{{ link_url }}" data-testid="bundle-builder-link">
             {{- link_label | escape -}}
           </a>
@@ -277,7 +287,7 @@
           </div>
         </div>
 
-        {%- if tiers != blank and discount_note != blank -%}
+        {%- if tiers != blank -%}
           <p class="bundle-builder__note" data-testid="bundle-builder-note">{{ discount_note | escape }}</p>
         {%- endif -%}
 
@@ -317,13 +327,14 @@
       "type": "inline_richtext",
       "id": "heading",
       "label": "t:labels.heading",
-      "default": "Pick Your Kit"
+      "default": "Pick Your Kit, Save As You Go"
     },
     {
       "type": "text",
       "id": "link_label",
       "label": "t:labels.link_label",
-      "info": "t:info.bundle_builder_link"
+      "info": "t:info.bundle_builder_link",
+      "default": "View Preset Bundles"
     },
     {
       "type": "url",
@@ -358,7 +369,7 @@
       "step": 1,
       "unit": "t:labels.unit_percent",
       "label": "t:labels.tier_1_percent",
-      "default": 0
+      "default": 10
     },
     {
       "type": "range",
@@ -377,7 +388,7 @@
       "step": 1,
       "unit": "t:labels.unit_percent",
       "label": "t:labels.tier_2_percent",
-      "default": 0
+      "default": 15
     },
     {
       "type": "range",
@@ -403,7 +414,7 @@
       "id": "discount_note",
       "label": "t:labels.discount_note",
       "info": "t:info.bundle_builder_discount_note",
-      "default": "Your discount is applied at checkout."
+      "default": "Discount applies when an automatic discount is active."
     }
   ]
 }

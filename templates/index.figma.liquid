@@ -9,9 +9,7 @@
   products; the image regions are masked when screenshots are compared here.
 
   Copy stays in the block defaults or, for repeated blocks, in locales passed as
-  default_* (plan ES1-T169 D1), same list as templates/index.liquid. The only
-  exception is the quiz steps, which render nothing without a question and 2
-  options: same values as templates/index.te11.liquid.
+  default_* (plan ES1-T169 D1), same list as templates/index.liquid.
 
   Remove this file before a real store release.
 {% endcomment %}
@@ -57,6 +55,31 @@
   assign why_heading = 'blocks.image_with_text.why_heading_html' | t
   assign why_body = 'blocks.image_with_text.why_text_html' | t
   assign why_button_label = 'blocks.image_with_text.why_button_label' | t
+
+  assign s1_question = 'blocks.quiz_step.s1_question' | t
+  assign s1_hint = 'blocks.quiz_step.s1_hint' | t
+  assign s1_option_1_label = 'blocks.quiz_step.s1_option_1_label' | t
+  assign s1_option_1_text = 'blocks.quiz_step.s1_option_1_text' | t
+  assign s1_option_2_label = 'blocks.quiz_step.s1_option_2_label' | t
+  assign s1_option_2_text = 'blocks.quiz_step.s1_option_2_text' | t
+  assign s1_option_3_label = 'blocks.quiz_step.s1_option_3_label' | t
+  assign s1_option_3_text = 'blocks.quiz_step.s1_option_3_text' | t
+  assign s2_question = 'blocks.quiz_step.s2_question' | t
+  assign s2_hint = 'blocks.quiz_step.s2_hint' | t
+  assign s2_option_1_label = 'blocks.quiz_step.s2_option_1_label' | t
+  assign s2_option_1_text = 'blocks.quiz_step.s2_option_1_text' | t
+  assign s2_option_2_label = 'blocks.quiz_step.s2_option_2_label' | t
+  assign s2_option_2_text = 'blocks.quiz_step.s2_option_2_text' | t
+  assign s2_option_3_label = 'blocks.quiz_step.s2_option_3_label' | t
+  assign s2_option_3_text = 'blocks.quiz_step.s2_option_3_text' | t
+  assign s3_question = 'blocks.quiz_step.s3_question' | t
+  assign s3_hint = 'blocks.quiz_step.s3_hint' | t
+  assign s3_option_1_label = 'blocks.quiz_step.s3_option_1_label' | t
+  assign s3_option_1_text = 'blocks.quiz_step.s3_option_1_text' | t
+  assign s3_option_2_label = 'blocks.quiz_step.s3_option_2_label' | t
+  assign s3_option_2_text = 'blocks.quiz_step.s3_option_2_text' | t
+  assign s3_option_3_label = 'blocks.quiz_step.s3_option_3_label' | t
+  assign s3_option_3_text = 'blocks.quiz_step.s3_option_3_text' | t
 
   assign testimonials_eyebrow = 'blocks.testimonials.default_eyebrow' | t
   assign testimonials_heading = 'blocks.testimonials.default_heading' | t
@@ -134,47 +157,53 @@
       id: 'figma-quiz-step-1',
       step: 1,
       total: 3,
-      question: 'Where do you want to focus?',
-      subheading: 'Pick from the list.',
       body_map: figma_image_1,
-      option_1_label: 'Upper body',
-      option_1_description: 'Shoulders, arms, chest',
-      option_1_tag: 'quiz-upper',
       option_1_image: figma_image_2,
-      option_2_label: 'Core',
-      option_2_description: 'Abs, stability, balance',
-      option_2_tag: 'quiz-core',
       option_2_image: figma_image_3,
-      option_3_label: 'Lower body',
-      option_3_description: 'Legs, glutes, calves',
-      option_3_tag: 'quiz-lower',
-      option_3_image: figma_image_4
+      option_3_image: figma_image_4,
+      default_question: s1_question,
+      default_subheading: s1_hint,
+      default_option_1_label: s1_option_1_label,
+      default_option_1_description: s1_option_1_text,
+      default_option_1_tag: 'quiz-upper',
+      default_option_2_label: s1_option_2_label,
+      default_option_2_description: s1_option_2_text,
+      default_option_2_tag: 'quiz-core',
+      default_option_3_label: s1_option_3_label,
+      default_option_3_description: s1_option_3_text,
+      default_option_3_tag: 'quiz-lower'
     %}{% endblock %}
     {% block 'quiz-step',
       id: 'figma-quiz-step-2',
       step: 2,
       total: 3,
-      question: 'What is your training level?',
-      option_1_label: 'Beginner',
-      option_1_description: 'New to regular training',
-      option_1_tag: 'quiz-beginner',
-      option_2_label: 'Advanced',
-      option_2_description: 'Training for years',
-      option_2_tag: 'quiz-advanced'
+      default_question: s2_question,
+      default_subheading: s2_hint,
+      default_option_1_label: s2_option_1_label,
+      default_option_1_description: s2_option_1_text,
+      default_option_1_tag: 'quiz-beginner',
+      default_option_2_label: s2_option_2_label,
+      default_option_2_description: s2_option_2_text,
+      default_option_2_tag: 'quiz-intermediate',
+      default_option_3_label: s2_option_3_label,
+      default_option_3_description: s2_option_3_text,
+      default_option_3_tag: 'quiz-advanced'
     %}{% endblock %}
     {% block 'quiz-step',
       id: 'figma-quiz-step-3',
       step: 3,
       total: 3,
-      question: 'Where do you train?',
-      option_1_label: 'At home',
-      option_1_tag: 'quiz-home',
-      option_2_label: 'At the gym',
-      option_2_tag: 'quiz-gym',
-      option_3_label: 'Outdoors',
-      option_3_tag: 'quiz-outdoor',
-      option_4_label: 'While traveling',
-      option_4_tag: 'quiz-travel'
+      default_question: s3_question,
+      default_subheading: s3_hint,
+      default_option_1_label: s3_option_1_label,
+      default_option_1_description: s3_option_1_text,
+      default_option_1_tag: 'quiz-home',
+      default_option_2_label: s3_option_2_label,
+      default_option_2_description: s3_option_2_text,
+      default_option_2_tag: 'quiz-gym',
+      default_option_3_label: s3_option_3_label,
+      default_option_3_description: s3_option_3_text,
+      default_option_3_tag: 'quiz-outdoor'
     %}{% endblock %}
   {% endblock %}
 {% endblock %}

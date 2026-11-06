@@ -5506,9 +5506,31 @@ featured-product {
 }
 
 .featured-product__gallery {
+  position: relative;
   display: grid;
   gap: var(--space-3);
   align-content: start;
+}
+
+/* Figma 1:761: 113 x 112, 24 from the image corner; 72 x 71, 12 below 48rem (ES1-T174) */
+.featured-product__seal {
+  position: absolute;
+  inset-block-start: var(--space-3);
+  inset-inline-start: var(--space-3);
+  inline-size: 4.5rem;
+  block-size: auto;
+  color: var(--color-muted-on-dark);
+  font-family: var(--font-primary--family);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+@media (min-width: 48rem) {
+  .featured-product__seal {
+    inset-block-start: var(--space-5);
+    inset-inline-start: var(--space-5);
+    inline-size: 7.0625rem;
+  }
 }
 
 /* Figma 1:760: 668 / 653 */
