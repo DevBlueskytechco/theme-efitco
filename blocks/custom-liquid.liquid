@@ -1,0 +1,51 @@
+{% doc %}
+  Outputs the Liquid or HTML the merchant enters in the custom_liquid setting. No
+  padding and no background of its own: the band comes from the parent container.
+  When the setting is empty, the editor shows a placeholder and the storefront
+  renders nothing, so the container renders no band either. Self-contained:
+  callers must leave the body empty.
+
+  Test hooks: data-testid="custom-liquid", "custom-liquid-placeholder".
+
+  @param {string} [id] - Static block id, needed when a template has more than one custom-liquid block
+
+  @example
+  {% block 'container', id: 'home-custom-liquid' %}
+    {% block 'custom-liquid' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- if block.settings.custom_liquid != blank -%}
+  <div
+    class="custom-liquid"
+    {% if id != blank %}
+      data-custom-liquid-id="{{ id }}"
+    {% endif %}
+    data-testid="custom-liquid"
+    {{ block.shopify_attributes }}
+  >
+    {{ block.settings.custom_liquid }}
+  </div>
+{%- elsif request.design_mode -%}
+  <p
+    class="custom-liquid custom-liquid--placeholder"
+    data-testid="custom-liquid-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.custom_liquid.placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.custom_liquid",
+  "settings": [
+    {
+      "type": "liquid",
+      "id": "custom_liquid",
+      "label": "t:labels.custom_liquid",
+      "info": "t:info.custom_liquid"
+    }
+  ]
+}
+{% endschema %}
