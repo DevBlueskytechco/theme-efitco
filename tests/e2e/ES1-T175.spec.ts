@@ -70,7 +70,10 @@ test.describe('ES1-T175 template cổng /?view=figma', () => {
     // ES1-T184: hàng 3 đứng ngay sau hero; store chưa có figma-cat-* (ES1-T178) thì band không render.
     const row3 = 'container-figma-collection-list';
     if (bands.includes(row3)) expect(bands.indexOf(row3)).toBe(1);
-    expect(bands.filter((id) => id !== row3)).toEqual(ROWS.map(([id]) => `container-${id}`));
+    // ES1-T191: hàng 14 đứng ngay trước FAQ; store chưa có blog figma-blog (ES1-T178) thì band không render.
+    const row14 = 'container-figma-blog-posts';
+    if (bands.includes(row14)) expect(bands.indexOf(row14)).toBe(bands.indexOf('container-figma-faq') - 1);
+    expect(bands.filter((id) => id !== row3 && id !== row14)).toEqual(ROWS.map(([id]) => `container-${id}`));
 
     for (const [id, root] of ROWS) {
       await expect(page.getByTestId(`container-${id}`).getByTestId(root), id).toHaveCount(1);
