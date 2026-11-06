@@ -1,0 +1,168 @@
+{% comment %}
+  Gate template for the home page, opened with /?view=figma (plan ES1-T169 D2, ES1-T175).
+  A branch preview has no block settings, so this file passes resources through
+  block parameters. Same block order as templates/index.liquid: a PR that adds a
+  block to the home page adds it to both files.
+
+  Each resource comes from a figma-* collection, or from collections.all when
+  that collection is missing or empty. Images are the featured images of those
+  products; the image regions are masked when screenshots are compared here.
+
+  Copy stays in the block defaults. The only exception is the quiz steps, which
+  render nothing without a question and 2 options: same values as
+  templates/index.te11.liquid.
+
+  Remove this file before a real store release.
+{% endcomment %}
+
+{%- liquid
+  assign figma_images = collections['figma-level-beginner']
+  unless figma_images.products_count > 0
+    assign figma_images = collections.all
+  endunless
+
+  assign figma_featured_collection = collections['figma-tab-all']
+  unless figma_featured_collection.products_count > 0
+    assign figma_featured_collection = collections.all
+  endunless
+
+  assign figma_bundle = collections['figma-bundle']
+  unless figma_bundle.products_count > 0
+    assign figma_bundle = collections.all
+  endunless
+
+  assign figma_featured_product = all_products['figma-ativafit-lava-featured']
+  unless figma_featured_product.id
+    assign figma_featured_product = collections.all.products[0]
+  endunless
+
+  assign figma_product_1 = figma_images.products[0]
+  assign figma_product_2 = figma_images.products[1]
+  assign figma_product_3 = figma_images.products[2]
+  assign figma_product_4 = figma_images.products[3]
+  assign figma_image_1 = figma_product_1.featured_image
+  assign figma_image_2 = figma_product_2.featured_image
+  assign figma_image_3 = figma_product_3.featured_image
+  assign figma_image_4 = figma_product_4.featured_image
+-%}
+
+<div
+  hidden
+  data-testid="figma-meta"
+  data-images="{{ figma_images.handle }}"
+  data-featured-collection="{{ figma_featured_collection.handle }}"
+  data-bundle="{{ figma_bundle.handle }}"
+  data-featured-product="{{ figma_featured_product.handle }}"
+></div>
+
+{% block 'container', id: 'figma-hero' %}
+  {% block 'slideshow' %}
+    {% block 'slideshow-slide', id: 'figma-slide-1', priority: true, image: figma_image_1 %}{% endblock %}
+    {% block 'slideshow-slide', id: 'figma-slide-2', image: figma_image_2 %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-intro', background: 'sand' %}
+  {% block 'rich-text', inline_image: figma_image_3 %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-featured-collection', tag: 'div' %}
+  {% block 'featured-collection', id: 'figma-featured-collection', collection: figma_featured_collection %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-quiz', tag: 'div' %}
+  {% block 'quiz', id: 'figma-quiz' %}
+    {% block 'quiz-step',
+      id: 'figma-quiz-step-1',
+      step: 1,
+      total: 3,
+      question: 'Where do you want to focus?',
+      subheading: 'Pick from the list.',
+      body_map: figma_image_1,
+      option_1_label: 'Upper body',
+      option_1_description: 'Shoulders, arms, chest',
+      option_1_tag: 'quiz-upper',
+      option_1_image: figma_image_2,
+      option_2_label: 'Core',
+      option_2_description: 'Abs, stability, balance',
+      option_2_tag: 'quiz-core',
+      option_2_image: figma_image_3,
+      option_3_label: 'Lower body',
+      option_3_description: 'Legs, glutes, calves',
+      option_3_tag: 'quiz-lower',
+      option_3_image: figma_image_4
+    %}{% endblock %}
+    {% block 'quiz-step',
+      id: 'figma-quiz-step-2',
+      step: 2,
+      total: 3,
+      question: 'What is your training level?',
+      option_1_label: 'Beginner',
+      option_1_description: 'New to regular training',
+      option_1_tag: 'quiz-beginner',
+      option_2_label: 'Advanced',
+      option_2_description: 'Training for years',
+      option_2_tag: 'quiz-advanced'
+    %}{% endblock %}
+    {% block 'quiz-step',
+      id: 'figma-quiz-step-3',
+      step: 3,
+      total: 3,
+      question: 'Where do you train?',
+      option_1_label: 'At home',
+      option_1_tag: 'quiz-home',
+      option_2_label: 'At the gym',
+      option_2_tag: 'quiz-gym',
+      option_3_label: 'Outdoors',
+      option_3_tag: 'quiz-outdoor',
+      option_4_label: 'While traveling',
+      option_4_tag: 'quiz-travel'
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-inspiration', background: 'sand' %}
+  {% block 'image-with-text',
+    id: 'figma-inspiration',
+    layout: 'banner',
+    accent_image_1: figma_image_1,
+    accent_image_2: figma_image_2,
+    accent_image_3: figma_image_3
+  %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-bundle-builder', tag: 'div', background: 'cream' %}
+  {% block 'bundle-builder', id: 'figma-bundle-builder', collection: figma_bundle %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-featured-product', tag: 'div' %}
+  {% block 'featured-product', id: 'figma-featured-product', product: figma_featured_product %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-testimonials', background: 'cream' %}
+  {% block 'testimonials' %}
+    {% block 'testimonial-item', id: 'figma-testimonial-1', image: figma_image_1, product: figma_product_1 %}{% endblock %}
+    {% block 'testimonial-item', id: 'figma-testimonial-2', image: figma_image_2, product: figma_product_2 %}{% endblock %}
+    {% block 'testimonial-item', id: 'figma-testimonial-3', image: figma_image_3, product: figma_product_3 %}{% endblock %}
+    {% block 'testimonial-item', id: 'figma-testimonial-4', image: figma_image_4, product: figma_product_4 %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-why-choose', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'figma-why-choose',
+    image: figma_image_1,
+    accent_image_1: figma_image_2,
+    accent_image_2: figma_image_3
+  %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-faq', background: 'cream' %}
+  {% block 'faq', image: figma_image_1 %}
+    {% block 'faq-item', id: 'figma-faq-1', open: true %}{% endblock %}
+    {% block 'faq-item', id: 'figma-faq-2' %}{% endblock %}
+    {% block 'faq-item', id: 'figma-faq-3' %}{% endblock %}
+    {% block 'faq-item', id: 'figma-faq-4' %}{% endblock %}
+    {% block 'faq-item', id: 'figma-faq-5' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
