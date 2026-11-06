@@ -1,0 +1,120 @@
+{% doc %}
+  Renders one card of the shop-by-level block as a list item: a link to the
+  collection with its image, label, title and real product count. Self-contained:
+  callers must leave the body empty.
+
+  The collection comes from the setting, then from the handle parameter, which lets
+  a template without saved settings pass a resource (templates/index.figma.liquid).
+  A handle that does not exist counts as no collection.
+
+  Sample content (plan ES1-T169 D1): the template passes default_label from locales.
+  It has another name than the setting, so a label the merchant saved always wins.
+  Text from the t filter may already be escaped, so it goes through escape_once.
+  The title comes from the setting, then from the collection: it has no sample text,
+  because a sample title would label the merchant's collection with the wrong name.
+  The product count has no sample value either: it is always products_count.
+  The image comes from the setting, then from the collection, and is decorative
+  because the title already names the link. Without any image the card keeps its
+  dark frame, so the white text stays readable.
+
+  When there is no collection, the editor shows a placeholder and the storefront
+  renders nothing.
+
+  Test hooks: data-testid="level-card", "level-card-link", "level-card-image",
+  "level-card-label", "level-card-title", "level-card-count",
+  "level-card-placeholder".
+
+  @param {string} id - Unique card id within the template, such as 'level-card-1'
+  @param {string} [handle] - Collection handle used when the collection setting is empty
+  @param {string} [default_label] - Sample text used when the label setting is empty
+
+  @example
+  {% assign level_label = 'blocks.level_card.default_label' | t %}
+  {% block 'level-card', id: 'level-card-1', handle: 'beginner', default_label: level_label %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign card_collection = block.settings.collection
+  if card_collection.handle == blank and handle != blank
+    assign card_collection = collections[handle]
+  endif
+  assign card_label = block.settings.label | default: default_label
+  assign card_title = block.settings.title | default: card_collection.title
+  assign card_image = block.settings.image | default: card_collection.featured_image
+-%}
+
+{%- if card_collection.handle != blank -%}
+  <li
+    class="level-card"
+    data-level-card-id="{{ id }}"
+    data-testid="level-card"
+    {{ block.shopify_attributes }}
+  >
+    <a class="level-card__link" href="{{ card_collection.url }}" data-testid="level-card-link">
+      {%- if card_image != blank -%}
+        {% render 'image',
+          image: card_image,
+          class: 'level-card__image',
+          width: 912,
+          widths: '320, 456, 640, 912',
+          sizes: '(min-width: 48rem) min(32vw, 456px), calc(100vw - 40px)',
+          loading: 'lazy',
+          decorative: true,
+          testid: 'level-card-image'
+        %}
+      {%- endif -%}
+      <div class="level-card__content">
+        {%- if card_label != blank -%}
+          <p class="level-card__label" data-testid="level-card-label">{{ card_label | escape_once }}</p>
+        {%- endif -%}
+        <h3 class="level-card__title" data-testid="level-card-title">{{ card_title | escape }}</h3>
+        <div class="level-card__products">
+          <span data-testid="level-card-count">
+            {{- 'blocks.level_card.products_count' | t: count: card_collection.products_count -}}
+          </span>
+          {%- render 'slideshow-icon', name: 'arrow' -%}
+        </div>
+      </div>
+    </a>
+  </li>
+{%- elsif request.design_mode -%}
+  <li
+    class="level-card level-card--placeholder"
+    data-level-card-id="{{ id }}"
+    data-testid="level-card-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.level_card.placeholder' | t }}
+  </li>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.level_card",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.level_card_image",
+      "info": "t:info.level_card_image"
+    },
+    {
+      "type": "text",
+      "id": "label",
+      "label": "t:labels.level_card_label",
+      "info": "t:info.level_card_label"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:labels.level_card_title",
+      "info": "t:info.level_card_title"
+    }
+  ]
+}
+{% endschema %}

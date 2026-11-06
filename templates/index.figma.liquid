@@ -7,8 +7,9 @@
   Each resource comes from a figma-* collection, or from collections.all when
   that collection is missing or empty. Images are the featured images of those
   products; the image regions are masked when screenshots are compared here.
-  Exception: collection cards have no fallback. Their name and link are the thing
-  being checked, so a missing figma-cat-* collection shows one card fewer.
+  Exception: collection cards and level cards have no fallback. Their name, link and
+  product count are the thing being checked, so a missing figma-cat-* or figma-level-*
+  collection shows one card fewer.
 
   Copy stays in the block defaults or, for repeated blocks, in locales passed as
   default_* (plan ES1-T169 D1), same list as templates/index.liquid.
@@ -50,6 +51,7 @@
   assign slide_heading = 'blocks.slideshow_slide.default_heading_html' | t
   assign slide_subheading = 'blocks.slideshow_slide.default_text' | t
   assign slide_button_label = 'blocks.slideshow_slide.default_button_label' | t
+  assign level_label = 'blocks.level_card.default_label' | t
   assign banner_heading = 'blocks.image_with_text.banner_heading_html' | t
   assign banner_body = 'blocks.image_with_text.banner_text_html' | t
   assign banner_button_label = 'blocks.image_with_text.banner_button_label' | t
@@ -157,6 +159,11 @@
 
 {% block 'container', id: 'figma-intro', background: 'sand' %}
   {% block 'rich-text', inline_image: figma_image_3 %}{% endblock %}
+  {% block 'shop-by-level' %}
+    {% block 'level-card', id: 'figma-level-card-1', handle: 'figma-level-beginner', default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'figma-level-card-2', handle: 'figma-level-intermediate', default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'figma-level-card-3', handle: 'figma-level-advanced', default_label: level_label %}{% endblock %}
+  {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'figma-featured-collection', tag: 'div' %}

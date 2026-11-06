@@ -32,3 +32,50 @@
     {% block 'collection-card', id: 'te15-five-5', handle: 'all' %}{% endblock %}
   {% endblock %}
 {% endblock %}
+
+{%- liquid
+  assign level_label = 'blocks.level_card.default_label' | t
+  assign te15_single_product = ''
+  for te15_collection in collections
+    if te15_collection.products_count == 1
+      assign te15_single_product = te15_collection.handle
+      break
+    endif
+  endfor
+-%}
+
+{% comment %} ES1-T186, 0 cards: a handle that does not exist renders no card, so no block and no band. {% endcomment %}
+{% block 'container', id: 'te15-level-empty', background: 'sand' %}
+  {% block 'shop-by-level', id: 'te15-level-list-empty' %}
+    {% block 'level-card', id: 'te15-level-empty-1', handle: 'te15-no-such-collection', default_label: level_label %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} Same band as a rich-text with no shop-by-level cards: the rich-text must stay. {% endcomment %}
+{% block 'container', id: 'te15-level-intro-only', background: 'sand' %}
+  {% block 'rich-text' %}{% endblock %}
+  {% block 'shop-by-level', id: 'te15-level-list-intro-only' %}
+    {% block 'level-card', id: 'te15-level-intro-only-1', handle: 'te15-no-such-collection', default_label: level_label %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te15-level-one', background: 'sand' %}
+  {% block 'shop-by-level', id: 'te15-level-list-one' %}
+    {% block 'level-card', id: 'te15-level-one-1', handle: 'all', default_label: level_label %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te15-level-three', background: 'sand' %}
+  {% block 'shop-by-level', id: 'te15-level-list-three' %}
+    {% block 'level-card', id: 'te15-level-three-1', handle: 'all', default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'te15-level-three-2', handle: 'all', default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'te15-level-three-3', handle: 'all', default_label: level_label %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} Singular badge: first store collection with exactly 1 product. None on the store: no band, the spec skips with a reason. {% endcomment %}
+{% block 'container', id: 'te15-level-singular', background: 'sand' %}
+  {% block 'shop-by-level', id: 'te15-level-list-singular' %}
+    {% block 'level-card', id: 'te15-level-singular-1', handle: te15_single_product, default_label: level_label %}{% endblock %}
+  {% endblock %}
+{% endblock %}

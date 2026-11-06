@@ -1,0 +1,87 @@
+{% doc %}
+  Renders the Shop by level row: eyebrow, heading and a list of level-card blocks.
+  Called once per template, so its sample text is the schema default. The template
+  places it after rich-text in the same container, so both share one background band.
+  No JavaScript: 1 column below 48rem, 3 columns from 48rem (ES1-T174).
+
+  The parent cannot read its children: the body is a rendered string, so a shorter
+  list just shows fewer cards at the same size. When no card renders, the editor
+  shows a placeholder and the storefront renders nothing, so eyebrow and heading
+  never stand alone.
+
+  Test hooks: data-testid="shop-by-level", "shop-by-level-eyebrow",
+  "shop-by-level-heading", "shop-by-level-list", "shop-by-level-placeholder".
+
+  @param {string} [id] - Static block id, needed when a template has more than one shop-by-level block
+  @param {string} content - One level-card block call per card
+
+  @example
+  {% block 'container', id: 'home-intro', background: 'sand' %}
+    {% block 'rich-text' %}{% endblock %}
+    {% block 'shop-by-level' %}
+      {% block 'level-card', id: 'level-card-1' %}{% endblock %}
+      {% block 'level-card', id: 'level-card-2' %}{% endblock %}
+      {% block 'level-card', id: 'level-card-3' %}{% endblock %}
+    {% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- assign items = content | strip -%}
+
+{%- if items != blank -%}
+  <div
+    class="shop-by-level"
+    {% if id != blank %}
+      data-shop-by-level-id="{{ id }}"
+    {% endif %}
+    data-testid="shop-by-level"
+    {{ block.shopify_attributes }}
+  >
+    {%- if block.settings.eyebrow != blank or block.settings.heading != blank -%}
+      <div class="shop-by-level__header">
+        {%- if block.settings.eyebrow != blank -%}
+          <p class="shop-by-level__eyebrow" data-testid="shop-by-level-eyebrow">
+            {{- block.settings.eyebrow | escape -}}
+          </p>
+        {%- endif -%}
+        {%- if block.settings.heading != blank -%}
+          <h2 class="shop-by-level__heading" data-testid="shop-by-level-heading">
+            {{- block.settings.heading | escape -}}
+          </h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    {%- comment -%} role="list": list-style none removes the list role in Safari. {%- endcomment -%}
+    <ul class="shop-by-level__list" role="list" data-testid="shop-by-level-list">
+      {{ content }}
+    </ul>
+  </div>
+{%- elsif request.design_mode -%}
+  <p
+    class="shop-by-level--placeholder"
+    data-testid="shop-by-level-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.shop_by_level.placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.shop_by_level",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.shop_by_level_eyebrow",
+      "default": "SHOP BY LEVEL"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.shop_by_level_heading",
+      "default": "Choose Your Training Level"
+    }
+  ]
+}
+{% endschema %}
