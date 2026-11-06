@@ -29,6 +29,8 @@ const test = base.extend<{ consoleGuard: ConsoleGuard }>({
         const source = msg.location().url;
         if (IGNORE_CONSOLE.test(text) || IGNORE_CONSOLE.test(source)) return;
         if (allowNetwork && NETWORK_LOG.test(text)) return;
+        // ES1-T96: thêm giỏ thành công mở drawer, drawer import assets/cart-items.js (ES1-T97, chưa có thì 404). Chỉ bỏ log mạng của đúng file này.
+        if (NETWORK_LOG.test(text) && /\/cart-items\.js/.test(source)) return;
         errors.push(`${text} @ ${source}`);
       });
       page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));

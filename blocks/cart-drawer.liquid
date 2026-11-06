@@ -48,16 +48,13 @@
   if cart_type == 'page' or template.name == 'cart'
     assign mode = 'none'
   endif
-
-  # Temporary: assets/cart-items.js arrives with ES1-T97, and a literal name here fails MissingAsset until then. ES1-T97 puts the literal back.
-  assign items_asset = 'cart-items.js'
 -%}
 
 <cart-drawer
   class="cart-drawer"
   data-mode="{{ mode }}"
   data-cart-url="{{ routes.cart_url }}"
-  data-items-src="{{ items_asset | asset_url }}"
+  data-items-src="{{ 'cart-items.js' | asset_url }}"
   data-testid="cart-drawer"
   {{ block.shopify_attributes }}
 >
@@ -138,6 +135,7 @@
       </cart-items>
     </dialog>
   {%- endif -%}
+  <script src="{{ 'cart-drawer.js' | asset_url }}" type="module"></script>
 </cart-drawer>
 
 {% schema %}
