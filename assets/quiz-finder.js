@@ -1,4 +1,4 @@
-// <quiz-finder> TE-11 (ES1-T139). No module or failed request: the GET form goes to search.
+// TE-11. No module or failed request: GET form to search.
 import { partials } from "@shopify/partial-rendering";
 
 const OPTION = "input[data-tag-handle]";
@@ -18,7 +18,7 @@ class QuizFinder extends HTMLElement {
     this.steps.forEach((s, i) => {
       for (const o of s.querySelectorAll(OPTION)) {
         o.dataset.name ??= o.name;
-        // Name first: same-name radios uncheck each other.
+        // Name first: same-name radios uncheck.
         o.name = `quiz-step-${i}`;
         o.type = "radio";
       }
@@ -28,7 +28,7 @@ class QuizFinder extends HTMLElement {
     const f = document.activeElement;
     this.show(i, this.form.contains(f) && !this.steps[i].contains(f));
     this.setAttribute("data-enhanced", "");
-    for (const type of ["click", "keydown"]) this.form.addEventListener(type, this);
+    for (const t of ["click", "keydown", "mousedown"]) this.form.addEventListener(t, this);
   }
 
   handleEvent(e) {
@@ -43,14 +43,16 @@ class QuizFinder extends HTMLElement {
         t.checked = true;
         this.next();
       }
+    } else if (e.type === "mousedown") {
+      if (e.detail > 1) e.preventDefault(); // Keep title focus.
     } else if (t.closest("[data-quiz-back]")) {
       this.ac?.abort();
       this.clear();
       this.show(this.index - 1);
     } else if (e.detail > 1 && t.closest("label")) {
-      e.preventDefault(); // Double click: 2nd hits the next step.
+      e.preventDefault(); // Hits the next step.
     } else if (isOption) {
-      // Label click detail varies by browser; only arrow keys stay (WCAG 3.2.2).
+      // Arrow keys stay (WCAG 3.2.2).
       if (!this.arrow) this.next();
       this.arrow = false;
     }
@@ -90,7 +92,7 @@ class QuizFinder extends HTMLElement {
     url.searchParams.set("view", resultsView);
 
     this.panel.setAttribute("aria-busy", "true");
-    // Blank (root() needs it) after apply: error, not 0.
+    // root() needs it. Blank after apply: error.
     this.root().dataset.quizCount = "";
     let n;
     try {
