@@ -45,6 +45,17 @@ fx check-5-warn.json  '{"issues":[{"path":"snippets/image.liquid","line":10,"col
 fx check-5-flat.json  '[{"path":"blocks/hero.liquid","line":2,"column":3,"severity":"error","check":"X","message":"m"}]'
 fx check-5-empty.json '{"issues":[]}'
 fx notjson.json       'Error: something broke'
+# ES1-T162: theme preview bị đưa lên live
+fx list-live-4.json   '[{"id":157463609441,"name":"ai-x","role":"live"},{"id":100,"name":"Skeleton","role":"unpublished"}]'
+fx list-live-5.json   '{"themes":[{"id":"gid://shopify/OnlineStoreTheme/157463609441","name":"ai-x","role":"LIVE"}]}'
+fx list-main.json     '[{"id":"157463609441","name":"ai-x","role":"main"}]'
+fx list-live-dup.json '[{"id":101,"name":"ai-x","role":"unpublished"},{"id":157463609441,"name":"ai-x","role":"live"}]'
+fx list-norole.json   '[{"id":303,"name":"ai-x"}]'
+fx list-live-noid.json '[{"name":"ai-x","role":"live"}]'
+fx list-dev.json      '[{"id":404,"name":"ai-x","role":"development"},{"id":100,"name":"Skeleton","role":"live"}]'
+fx list-demo.json     '[{"id":505,"name":"ai-x","role":"demo"},{"id":100,"name":"Skeleton","role":"live"}]'
+fx list-demo-unpub.json '[{"id":505,"name":"ai-x","role":"demo"},{"id":606,"name":"ai-x","role":"unpublished"}]'
+fx list-nolive.json   '[{"id":101,"name":"ai-x","role":"unpublished"}]'
 
 expect "pinned = 4.9.5"               0 "4.9.5"                   -- "$S" pinned
 expect "list 4.x id số"               0 "101"                     -- "$S" theme-id "$N" "$T/list-4.json"
@@ -53,6 +64,27 @@ expect "list 5.0 id chuỗi"            0 "303"                     -- "$S" them
 expect_empty "list không trùng tên → rỗng" -- "$S" theme-id "ai-khong-co" "$T/list-5.json"
 expect_empty "list lỗi CLI → rỗng"         -- "$S" theme-id "$N" "$T/error.json"
 expect "list không phải JSON → lỗi"   1 "không phải JSON"         -- "$S" theme-id "$N" "$T/notjson.json"
+expect "preview-id live 4.x dừng, in id"   4 "(id 157463609441) có role live" -- "$S" preview-id ai-x "$T/list-live-4.json"
+expect "preview-id LIVE hoa, gid→số"       4 "(id 157463609441) có role live" -- "$S" preview-id ai-x "$T/list-live-5.json"
+expect "preview-id role main dừng"         4 "có role main"            -- "$S" preview-id ai-x "$T/list-main.json"
+expect "preview-id trùng tên, 1 live dừng" 4 "(id 157463609441)"       -- "$S" preview-id ai-x "$T/list-live-dup.json"
+expect "preview-id thiếu role dừng"        4 "(id 303) có role không rõ" -- "$S" preview-id ai-x "$T/list-norole.json"
+expect "preview-id live thiếu id vẫn dừng" 4 "(id không rõ) có role live" -- "$S" preview-id ai-x "$T/list-live-noid.json"
+expect "preview-id unpublished"            0 "101"                     -- "$S" preview-id "$N" "$T/list-4.json"
+expect "preview-id development"            0 "404"                     -- "$S" preview-id ai-x "$T/list-dev.json"
+expect "preview-id 5.0 gid→số"             0 "202"                     -- "$S" preview-id "$N" "$T/list-5.json"
+expect "preview-id role khác có warning"   0 "::warning::bỏ qua theme 'ai-x' (id 505) role demo" -- "$S" preview-id ai-x "$T/list-demo.json"
+expect_empty "preview-id role khác → rỗng"     -- "$S" preview-id ai-x "$T/list-demo.json"
+expect "preview-id demo + unpublished"     0 "606"                     -- "$S" preview-id ai-x "$T/list-demo-unpub.json"
+expect_empty "preview-id không trùng tên → rỗng" -- "$S" preview-id ai-khong-co "$T/list-4.json"
+expect_empty "preview-id lỗi CLI → rỗng"       -- "$S" preview-id ai-x "$T/error.json"
+expect "preview-id không phải JSON → lỗi"  1 "không phải JSON"         -- "$S" preview-id ai-x "$T/notjson.json"
+expect "live-theme-warn live tên ai-*"     0 "::warning::live theme đang là preview ai-x (id 157463609441)" -- "$S" live-theme-warn "$T/list-live-4.json"
+expect "live-theme-warn LIVE hoa"          0 "::warning::live theme đang là preview ai-x" -- "$S" live-theme-warn "$T/list-live-5.json"
+expect "live-theme-warn role main"         0 "::warning::live theme đang là preview ai-x" -- "$S" live-theme-warn "$T/list-main.json"
+expect "live-theme-warn tên thường"        0 "live theme: Skeleton (id 100)" -- "$S" live-theme-warn "$T/list-4.json"
+expect "live-theme-warn không có live"     0 "::warning::danh sách theme không có theme live" -- "$S" live-theme-warn "$T/list-nolive.json"
+expect "live-theme-warn lỗi CLI"           0 "::warning::không đọc được danh sách theme" -- "$S" live-theme-warn "$T/error.json"
 expect "push 4.x OK"                  0 "101"                     -- "$S" push-result "$T/push-4.json"
 expect "push 5.0 ok gid→số"           0 "202"                     -- "$S" push-result "$T/push-5-ok.json"
 expect "push theme_id top-level"      0 "404"                     -- "$S" push-result "$T/push-5-themeid.json"
