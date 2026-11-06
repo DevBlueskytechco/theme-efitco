@@ -1,0 +1,51 @@
+{% doc %}
+  Variant select for visitors without JavaScript: a noscript select name=id
+  listing every variant, sold out options disabled. Render it inside the form,
+  after the hidden id input: the last id parameter (the select) wins.
+
+  Test hook: product-variant-select.
+
+  @param {product} product - The product to list variants of
+  @param {variant} current_variant - The variant selected on load
+  @param {string} form_id - Id of the product form, prefix of the select id
+
+  @example
+  {% render 'product-variant-select', product: product, current_variant: current_variant, form_id: form_id %}
+{% enddoc %}
+
+<noscript>
+  <div class="product-form__field">
+    <label class="product-form__label" for="{{ form_id }}-variant">
+      {{- 'blocks.product_form.variant_label' | t -}}
+    </label>
+    <select
+      id="{{ form_id }}-variant"
+      class="product-form__input product-form__select"
+      name="id"
+      data-testid="product-variant-select"
+    >
+      {%- for variant in product.variants -%}
+        {%- liquid
+          assign variant_title = variant.title | escape
+          if variant.available
+            assign variant_price = variant.price | money
+            assign variant_text = 'blocks.product_form.variant_option' | t: title: variant_title, price: variant_price
+          else
+            assign variant_text = 'blocks.product_form.variant_option_sold_out' | t: title: variant_title
+          endif
+        -%}
+        <option
+          value="{{ variant.id }}"
+          {% if variant.id == current_variant.id %}
+            selected
+          {% endif %}
+          {% unless variant.available %}
+            disabled
+          {% endunless %}
+        >
+          {{- variant_text -}}
+        </option>
+      {%- endfor -%}
+    </select>
+  </div>
+</noscript>
