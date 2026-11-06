@@ -413,7 +413,13 @@ test.describe.serial('ES1-T203 luồng mua thật', () => {
   }
 
   // Giỏ chưa có trên Storefront API có thể trả null: tính là 0.
-  const total = (cart: ActionCart) => cart?.totalQuantity ?? cart?.item_count ?? 0;
+  // ES1-T227: shape lạ không được tính là 0, nếu không thì assert giỏ rỗng trước updateCart đạt với mọi giá trị. Lưu ý callAction clone qua JSON.
+  const total = (cart: ActionCart) => {
+    if (cart === null) return 0;
+    const count = cart.totalQuantity ?? cart.item_count;
+    expect(typeof count, `getCart không có totalQuantity, item_count. Key sau clone JSON: ${Object.keys(cart).join(', ') || '(rỗng)'}`).toBe('number');
+    return count as number;
+  };
 
   test.beforeAll(async ({ browser }, info: TestInfo) => {
     test.skip(PAGE_MODE, 'Luồng mua thật đi qua drawer; preview cart_type page chạy test riêng bên dưới');
