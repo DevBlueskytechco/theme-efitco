@@ -355,6 +355,91 @@ product-swatch,
   min-inline-size: 0;
 }
 
+/* Tab (Figma 1:496): chỉ có khi từ 2 tab. Heading trên, tab dưới; từ 64rem heading trái, tab phải (ES1-T174).
+   collection-tabs giữ khoảng cách của .featured-collection, có box để lazy-module quan sát nên không dùng display: contents */
+collection-tabs {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: inherit;
+  min-inline-size: 0;
+}
+
+.featured-collection__header--tabs {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+
+/* Dưới 48rem cuộn ngang tới mép. padding-block chừa chỗ cho vùng bấm 44, khung cuộn không cắt */
+.featured-collection__tabs {
+  display: flex;
+  gap: var(--space-2);
+  min-inline-size: 0;
+  margin-block: calc(var(--space-1) / -2);
+  margin-inline: calc(var(--page-margin) * -1);
+  padding-block: calc(var(--space-1) / 2);
+  padding-inline: var(--page-margin);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--page-margin);
+  scrollbar-width: none;
+}
+
+.featured-collection__tabs::-webkit-scrollbar {
+  display: none;
+}
+
+/* Figma: 40 cao, padding ngang 28, bo 8, Inter 600 16/26, letter-spacing -0.16. Vùng bấm 44 bằng ::before */
+.featured-collection__tab {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  min-block-size: calc(var(--space-1) * 10);
+  padding-inline: calc(var(--space-1) * 7);
+  border-radius: calc(var(--radius-button) * 2);
+  background-color: var(--color-background-alt);
+  color: var(--color-background-alt-foreground);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: calc(26 / 16);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.featured-collection__tab::before {
+  position: absolute;
+  inset-block: calc(var(--space-1) / -2);
+  inset-inline: 0;
+  content: '';
+}
+
+.featured-collection__tab:hover {
+  background-color: color-mix(in srgb, var(--color-foreground) 8%, var(--color-background-alt));
+}
+
+/* JS bật aria-selected thì aria-current không còn tác dụng (không JS: tab đầu có aria-current) */
+.featured-collection__tab:is([aria-selected='true'], [aria-current='true']:not([aria-selected])) {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+/* Khung cuộn cắt viền ngoài: vẽ viền trong tab */
+.featured-collection__tab:focus-visible {
+  outline-offset: calc(var(--space-1) * -1);
+}
+
+.featured-collection__panel {
+  min-inline-size: 0;
+}
+
+.featured-collection__empty {
+  margin: 0;
+  color: var(--color-muted);
+}
+
 .featured-collection__footer {
   display: flex;
   justify-content: center;
@@ -393,12 +478,23 @@ product-swatch,
   .featured-collection__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  .featured-collection__tabs {
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
 }
 
 @media (min-width: 64rem) {
   .featured-collection {
     gap: calc(var(--space-1) * 10);
     padding-block: var(--space-8);
+  }
+
+  .featured-collection__header--tabs {
+    flex-direction: row;
+    align-items: center;
   }
 }
 
