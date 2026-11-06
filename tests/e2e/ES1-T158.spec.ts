@@ -708,9 +708,14 @@ test.describe('ES1-T158 AC4 lỗi video', () => {
   });
 
   test('AC4 không có product: giữ poster và href, play ẩn', async ({ page }) => {
-    await page.goto(TE13); // Đọc href gốc trước khi đổi thẻ.
-    const original = await card(page, 4).getByTestId('video-card-poster').getAttribute('href');
+    // ES1-T223: lưu href gốc trước module, không mở trang 2 lần: test có 2 lần goto hết giờ hoặc bị store chặn ở lần 2 (dòng 5).
+    await beforeModules(page, () => {
+      const href = document.querySelector('[data-video-card-id="te13-video-4"] [data-video-poster]')?.getAttribute('href');
+      document.documentElement.dataset.originalHref = href ?? '';
+    });
     const { scope } = await failing(page, 4);
+    const original = await page.locator('html').getAttribute('data-original-href');
+    expect(original).toMatch(/^https:\/\/www\.youtube\.com\/watch\?v=/);
     const poster = scope.getByTestId('video-card-poster');
     await expect(poster).toBeVisible();
     await expect(poster).toHaveAttribute('href', original ?? '');
