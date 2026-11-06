@@ -90,8 +90,8 @@ class QuizFinder extends HTMLElement {
     url.searchParams.set("view", resultsView);
 
     this.panel.setAttribute("aria-busy", "true");
-    // Still missing after apply: error, not 0.
-    this.root().removeAttribute("data-quiz-count");
+    // Blank (root() needs it) after apply: error, not 0.
+    this.root().dataset.quizCount = "";
     let n;
     try {
       const update = await partials.fetch("quiz-results", { url: url.href, signal: ac.signal });
