@@ -4,6 +4,7 @@
   assign slide_heading = 'blocks.slideshow_slide.default_heading_html' | t
   assign slide_subheading = 'blocks.slideshow_slide.default_text' | t
   assign slide_button_label = 'blocks.slideshow_slide.default_button_label' | t
+  assign level_label = 'blocks.level_card.default_label' | t
   assign banner_heading = 'blocks.image_with_text.banner_heading_html' | t
   assign banner_body = 'blocks.image_with_text.banner_text_html' | t
   assign banner_button_label = 'blocks.image_with_text.banner_button_label' | t
@@ -70,6 +71,11 @@
 
 {% block 'container', id: 'home-intro', background: 'sand' %}
   {% block 'rich-text' %}{% endblock %}
+  {% block 'shop-by-level' %}
+    {% block 'level-card', id: 'level-card-1', default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'level-card-2', default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'level-card-3', default_label: level_label %}{% endblock %}
+  {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-featured-collection', tag: 'div' %}
