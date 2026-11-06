@@ -1,0 +1,35 @@
+{% doc %}
+  Renders 5 stars for a rating from 0 to 5. The accessible name comes from the
+  wrapper ("Rated 4 out of 5"), so each SVG is hidden from assistive tech. A
+  rating of 0 still shows 5 empty stars. Values are rounded and clamped to 0-5.
+
+  @param {number} rating - Number of filled stars, 0 to 5
+  @param {string} [testid] - data-testid on the wrapper, for E2E tests
+
+  @example
+  {% render 'rating-stars', rating: 4 %}
+  {% render 'rating-stars', rating: block.settings.rating, testid: 'testimonial-rating' %}
+{% enddoc %}
+
+{%- assign stars = rating | plus: 0 | round | at_least: 0 | at_most: 5 -%}
+
+<span
+  class="rating-stars"
+  role="img"
+  aria-label="{{ 'blocks.testimonials.rating_label' | t: rating: stars }}"
+  {% if testid != blank %}
+    data-testid="{{ testid }}"
+  {% endif %}
+>
+  {%- for index in (1..5) -%}
+    <svg
+      class="rating-stars__star{% if index <= stars %} rating-stars__star--filled{% endif %}"
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+      focusable="false"
+    >
+      <path d="M12 2.5l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8-6.1-3.4-6.1 3.4 1.4-6.8-5.1-4.7 6.9-.8z"/>
+    </svg>
+  {%- endfor -%}
+</span>
