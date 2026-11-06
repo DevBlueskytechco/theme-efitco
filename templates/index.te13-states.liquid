@@ -1,0 +1,89 @@
+{% comment %}
+  TE-13 test template, opened with /?view=te13-states (plan ES1-T169 D4): countdown and
+  stock states of featured-product, several blocks on one page. Single block and video
+  carousel: templates/index.te13.liquid.
+  A branch preview has no block settings, so this file sets them through block
+  parameters and uses Figma copy. Handles come from tests/e2e/store-data.json.
+  Dates are computed here so they never expire. Each featured product uses its own
+  product, because the form id comes from the product id.
+  Remove this file before a real store release.
+{% endcomment %}
+
+{%- liquid
+  assign te13_sale = all_products['te13-featured']
+  if te13_sale == blank
+    assign te13_sale = all_products['sale-gia-nhỏ']
+  endif
+  assign te13_variants = all_products['variant-co-ảnh-rieng']
+  assign te13_sold_out = all_products['hết-hang-toan-bộ']
+  assign te13_single = all_products['sản-phẩm-chỉ-1-variant']
+  assign te13_swatch_sale = all_products['sản-phẩm-co-mau-sale-va-mau-khong-sale']
+
+  assign te13_now = 'now' | date: '%s' | plus: 0
+  assign te13_future_epoch = te13_now | plus: 172800
+  assign te13_future = te13_future_epoch | date: '%Y-%m-%d %H:%M'
+  assign te13_past = te13_now | minus: 172800 | date: '%Y-%m-%d %H:%M'
+
+  # data-end expected on band A: the future time with its seconds dropped
+  assign te13_seconds = te13_future_epoch | modulo: 60
+  assign te13_expected_end = te13_future_epoch | minus: te13_seconds
+-%}
+
+{% block 'container', id: 'te13-title' %}
+  <h1 class="visually-hidden">{{ shop.name }}</h1>
+  <div hidden data-testid="te13-meta" data-expected-end="{{ te13_expected_end }}"></div>
+{% endblock %}
+
+{% comment %} A: Figma 1:759, in date, on sale: countdown shows when this product has a compare-at price. {% endcomment %}
+{% block 'container', id: 'te13-a', tag: 'div' %}
+  {% block 'featured-product',
+    id: 'te13-featured-a',
+    product: te13_sale,
+    eyebrow: 'Featured Product · Free Weights',
+    countdown_end: te13_future,
+    spec_1_label: 'Weight range',
+    spec_2_label: 'Footprint',
+    spec_3_label: 'Materials',
+    spec_4_label: 'Assembly'
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} B: several variants, end date already passed: no countdown. {% endcomment %}
+{% block 'container', id: 'te13-b', tag: 'div' %}
+  {% block 'featured-product',
+    id: 'te13-featured-b',
+    product: te13_variants,
+    eyebrow: 'Expired end date',
+    countdown_end: te13_past,
+    spec_1_label: 'Weight range'
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} C: sold out, in date: no countdown (ES1-T155 #2), button disabled. {% endcomment %}
+{% block 'container', id: 'te13-c', tag: 'div' %}
+  {% block 'featured-product',
+    id: 'te13-featured-c',
+    product: te13_sold_out,
+    eyebrow: 'Sold out',
+    countdown_end: te13_future
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} D: one variant, malformed date: no countdown, no picker. {% endcomment %}
+{% block 'container', id: 'te13-d', tag: 'div' %}
+  {% block 'featured-product',
+    id: 'te13-featured-d',
+    product: te13_single,
+    eyebrow: 'Malformed end date',
+    countdown_end: '31/12/2030 23:59'
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} E: no date: no countdown even when the product is on sale. {% endcomment %}
+{% block 'container', id: 'te13-e', tag: 'div' %}
+  {% block 'featured-product',
+    id: 'te13-featured-e',
+    product: te13_swatch_sale,
+    eyebrow: 'No end date'
+  %}{% endblock %}
+{% endblock %}

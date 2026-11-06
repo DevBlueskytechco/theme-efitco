@@ -47,6 +47,46 @@
   assign figma_setup_3 = figma_setup.products[2]
   assign figma_setup_4 = figma_setup.products[3]
 
+  # Figma has no video files (ES1-T199 #3). A figma-* product uses its own video; until
+  # then the cards share the test product video, then a public YouTube id, so 6 cards
+  # always render. Cards 7 and 8 have no source and render nothing, as in Figma.
+  assign figma_video_media = all_products['media-dủ-loại'].media
+  assign figma_video_fallback = figma_video_media | where: 'media_type', 'video' | first
+  assign figma_video_external = figma_video_media | where: 'media_type', 'external_video' | first
+  assign figma_video_id = figma_video_external.external_id | default: 'aqz-KE-bpKQ'
+  assign figma_video_host = figma_video_external.host | default: 'youtube'
+
+  assign figma_video_product_1 = all_products['figma-ativafit-lava']
+  assign figma_video_product_2 = all_products['figma-compact-power-rack']
+  assign figma_video_product_3 = all_products['figma-olympic-plate-set']
+  assign figma_video_product_4 = all_products['figma-home-starter-kit']
+  assign figma_video_product_5 = all_products['figma-recovery-roller-pro']
+  assign figma_video_product_6 = all_products['figma-resistance-band-set-pro']
+  unless figma_video_product_1.id
+    assign figma_video_product_1 = collections.all.products[0]
+  endunless
+  unless figma_video_product_2.id
+    assign figma_video_product_2 = collections.all.products[1]
+  endunless
+  unless figma_video_product_3.id
+    assign figma_video_product_3 = collections.all.products[2]
+  endunless
+  unless figma_video_product_4.id
+    assign figma_video_product_4 = collections.all.products[3]
+  endunless
+  unless figma_video_product_5.id
+    assign figma_video_product_5 = collections.all.products[4]
+  endunless
+  unless figma_video_product_6.id
+    assign figma_video_product_6 = collections.all.products[5]
+  endunless
+  assign figma_video_1 = figma_video_product_1.media | where: 'media_type', 'video' | first | default: figma_video_fallback
+  assign figma_video_2 = figma_video_product_2.media | where: 'media_type', 'video' | first | default: figma_video_fallback
+  assign figma_video_3 = figma_video_product_3.media | where: 'media_type', 'video' | first | default: figma_video_fallback
+  assign figma_video_4 = figma_video_product_4.media | where: 'media_type', 'video' | first | default: figma_video_fallback
+  assign figma_video_5 = figma_video_product_5.media | where: 'media_type', 'video' | first | default: figma_video_fallback
+  assign figma_video_6 = figma_video_product_6.media | where: 'media_type', 'video' | first | default: figma_video_fallback
+
   assign figma_product_1 = figma_images.products[0]
   assign figma_product_2 = figma_images.products[1]
   assign figma_product_3 = figma_images.products[2]
@@ -271,6 +311,61 @@
 
 {% block 'container', id: 'figma-featured-product', tag: 'div' %}
   {% block 'featured-product', id: 'figma-featured-product', product: figma_featured_product %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-video-carousel', background: 'alt' %}
+  {% block 'video-carousel', id: 'figma-video-carousel' %}
+    {% block 'video-card',
+      id: 'figma-video-card-1',
+      video: figma_video_1,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: figma_video_product_1.featured_image,
+      product: figma_video_product_1
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'figma-video-card-2',
+      video: figma_video_2,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: figma_video_product_2.featured_image,
+      product: figma_video_product_2
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'figma-video-card-3',
+      video: figma_video_3,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: figma_video_product_3.featured_image,
+      product: figma_video_product_3
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'figma-video-card-4',
+      video: figma_video_4,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: figma_video_product_4.featured_image,
+      product: figma_video_product_4
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'figma-video-card-5',
+      video: figma_video_5,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: figma_video_product_5.featured_image,
+      product: figma_video_product_5
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'figma-video-card-6',
+      video: figma_video_6,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: figma_video_product_6.featured_image,
+      product: figma_video_product_6
+    %}{% endblock %}
+    {% block 'video-card', id: 'figma-video-card-7' %}{% endblock %}
+    {% block 'video-card', id: 'figma-video-card-8' %}{% endblock %}
+  {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'figma-testimonials', background: 'cream' %}

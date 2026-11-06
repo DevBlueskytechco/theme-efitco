@@ -9,7 +9,8 @@ import { env } from './support/store-data';
 import { readCartNoScript } from './support/product-data';
 import { watchShopPay403 } from './support/console-guard';
 
-const TE13 = '/?view=te13';
+// Plan ES1-T169 D4: band A-E chuyển sang index.te13-states (ES1-T157).
+const TE13 = '/?view=te13-states';
 const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 const band = (page: Page, id: string) => page.getByTestId(`container-te13-${id}`);

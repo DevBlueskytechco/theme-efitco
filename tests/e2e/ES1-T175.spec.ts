@@ -16,9 +16,11 @@ const ROWS = [
   ['figma-intro', 'rich-text'],
   ['figma-featured-collection', 'featured-collection'],
   ['figma-quiz', 'quiz'],
+  ['figma-shop-the-look', 'shop-the-look'],
   ['figma-inspiration', 'image-with-text'],
   ['figma-bundle-builder', 'bundle-builder'],
   ['figma-featured-product', 'featured-product'],
+  ['figma-video-carousel', 'video-carousel'],
   ['figma-testimonials', 'testimonials'],
   ['figma-why-choose', 'image-with-text'],
   ['figma-faq', 'faq'],
@@ -57,7 +59,7 @@ test.describe('ES1-T175 template cổng /?view=figma', () => {
     expect(figma).not.toContain('custom-liquid');
   });
 
-  test('10 band đúng thứ tự, mỗi band có block gốc, 0 console error', async ({ page }) => {
+  test('12 band đúng thứ tự, mỗi band có block gốc, 0 console error', async ({ page }) => {
     const errors = watchConsole(page);
     const response = await page.goto(FIGMA);
     expect(response?.ok()).toBeTruthy();

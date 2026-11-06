@@ -1,0 +1,35 @@
+--- a/tests/e2e/ES1-T156.spec.ts
++++ b/tests/e2e/ES1-T156.spec.ts
+@@ -9,7 +9,8 @@
+ import { readCartNoScript } from './support/product-data';
+ import { watchShopPay403 } from './support/console-guard';
+ 
+-const TE13 = '/?view=te13';
++// Plan ES1-T169 D4: band A-E chuyển sang index.te13-states (ES1-T157).
++const TE13 = '/?view=te13-states';
+ const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
+ 
+ const band = (page: Page, id: string) => page.getByTestId(`container-te13-${id}`);
+--- a/tests/e2e/ES1-T175.spec.ts
++++ b/tests/e2e/ES1-T175.spec.ts
+@@ -16,9 +16,11 @@
+   ['figma-intro', 'rich-text'],
+   ['figma-featured-collection', 'featured-collection'],
+   ['figma-quiz', 'quiz'],
++  ['figma-shop-the-look', 'shop-the-look'],
+   ['figma-inspiration', 'image-with-text'],
+   ['figma-bundle-builder', 'bundle-builder'],
+   ['figma-featured-product', 'featured-product'],
++  ['figma-video-carousel', 'video-carousel'],
+   ['figma-testimonials', 'testimonials'],
+   ['figma-why-choose', 'image-with-text'],
+   ['figma-faq', 'faq'],
+@@ -57,7 +59,7 @@
+     expect(figma).not.toContain('custom-liquid');
+   });
+ 
+-  test('10 band đúng thứ tự, mỗi band có block gốc, 0 console error', async ({ page }) => {
++  test('12 band đúng thứ tự, mỗi band có block gốc, 0 console error', async ({ page }) => {
+     const errors = watchConsole(page);
+     const response = await page.goto(FIGMA);
+     expect(response?.ok()).toBeTruthy();
