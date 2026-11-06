@@ -1,0 +1,117 @@
+{% doc %}
+  Renders the Training Tips row: eyebrow, heading and a list of article cards from
+  one blog (Figma 1:1022). Called once per template, so its sample text is the schema
+  default. No JavaScript: the list scrolls sideways with touch, mouse, scrollbar and
+  keyboard when it overflows, and a blog with fewer articles shows fewer cards at the
+  same size (assets/base.css).
+
+  The blog comes from the setting, then from the handle parameter, which lets a
+  template without saved settings pass a resource (templates/index.figma.liquid). A
+  template can preset the number of cards with articles_to_show, a schema setting.
+  When there is no blog or it has no articles, the editor shows a placeholder and the
+  storefront renders nothing, so the container leaves no empty band.
+
+  Self-contained: callers must leave the body empty.
+
+  Test hooks: data-testid="blog-posts", "blog-posts-eyebrow", "blog-posts-heading",
+  "blog-posts-list", "blog-posts-placeholder"; cards are in snippets/article-card.liquid.
+
+  @param {string} [id] - Static block id, needed when a template has more than one blog-posts block
+  @param {string} [handle] - Blog handle used when the blog setting is empty
+
+  @example
+  {% block 'container', id: 'home-blog-posts' %}
+    {% block 'blog-posts', id: 'blog-posts' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign source = block.settings.blog
+  if source.handle == blank and handle != blank
+    assign source = blogs[handle]
+  endif
+  assign article_count = source.articles_count | default: 0
+-%}
+
+{%- if article_count > 0 -%}
+  <div
+    class="blog-posts full-width"
+    {% if id != blank %}
+      data-blog-posts-id="{{ id }}"
+    {% endif %}
+    data-testid="blog-posts"
+    {{ block.shopify_attributes }}
+  >
+    {%- if block.settings.eyebrow != blank or block.settings.heading != blank -%}
+      <div class="blog-posts__header">
+        {%- if block.settings.eyebrow != blank -%}
+          <p class="blog-posts__eyebrow" data-testid="blog-posts-eyebrow">
+            {{- block.settings.eyebrow | escape -}}
+          </p>
+        {%- endif -%}
+        {%- if block.settings.heading != blank -%}
+          <h2 class="blog-posts__heading" data-testid="blog-posts-heading">
+            {{- block.settings.heading | escape -}}
+          </h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    {%- comment -%}
+      role="list": list-style none removes the list role in Safari, and tabindex lets
+      keyboard users scroll the list (same as blocks/testimonials.liquid).
+    {%- endcomment -%}
+    <ul
+      class="blog-posts__list"
+      role="list"
+      tabindex="0"
+      aria-label="{{ 'blocks.blog_posts.list_label' | t }}"
+      data-testid="blog-posts-list"
+    >
+      {%- for post in source.articles limit: block.settings.articles_to_show -%}
+        {% render 'article-card', article: post %}
+      {%- endfor -%}
+    </ul>
+  </div>
+{%- elsif request.design_mode -%}
+  <p
+    class="blog-posts--placeholder"
+    data-testid="blog-posts-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.blog_posts.placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.blog_posts",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.blog_posts_eyebrow",
+      "default": "From the Efitco blog"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.blog_posts_heading",
+      "default": "Training Tips & Inspiration"
+    },
+    {
+      "type": "blog",
+      "id": "blog",
+      "label": "t:labels.blog_posts_blog"
+    },
+    {
+      "type": "range",
+      "id": "articles_to_show",
+      "label": "t:labels.blog_posts_articles_to_show",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "default": 5
+    }
+  ]
+}
+{% endschema %}

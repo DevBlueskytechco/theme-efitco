@@ -5237,6 +5237,206 @@ cart-drawer {
   }
 }
 
+/** Blog posts (TE-16, Figma 1:1022): 1 hàng cuộn ngang tràn tới mép màn hình, mobile theo ES1-T174.
+   Khối chiếm cả hàng của .block-container; padding bằng đúng lề để card đầu thẳng hàng tiêu đề */
+.blog-posts {
+  --blog-posts-inset: calc((100% - var(--content-width)) / 2);
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  padding-block: var(--space-7);
+}
+
+.blog-posts--placeholder {
+  margin-block: var(--space-7);
+  padding: var(--space-4);
+  outline: 1px dashed currentcolor;
+  outline-offset: -1px;
+  font-size: var(--font-size-sm);
+}
+
+.blog-posts__header {
+  display: grid;
+  gap: var(--space-3);
+  padding-inline: var(--blog-posts-inset);
+}
+
+/* Figma 1:1024: 16 / 20, letter-spacing 0.64 */
+.blog-posts__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Figma 1:1025: 48 / 58, letter-spacing -0.96 */
+.blog-posts__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+/* Không có nút (Figma không có, 0 JS), nên giữ thanh cuộn: chuột không có bánh ngang vẫn tới được thẻ thứ 5.
+   padding-block chừa chỗ cho viền focus của link, khung cuộn cắt cả chiều dọc; margin âm giữ nguyên nhịp */
+.blog-posts__list {
+  display: flex;
+  gap: var(--space-4);
+  margin-block: calc(var(--space-1) * -1);
+  padding-block: var(--space-1);
+  padding-inline: var(--blog-posts-inset);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--blog-posts-inset);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  list-style: none;
+}
+
+.blog-posts__list:focus-visible {
+  outline-offset: -2px;
+}
+
+/* 252 x 336 ở 360, 307 x 410 ở 768, 336 x 448 từ 64rem (ES1-T174) */
+.article-card {
+  flex: 0 0 min(70vw, 336px);
+  min-inline-size: 0;
+  text-align: start;
+  scroll-snap-align: start;
+}
+
+/* Figma bo 16. overflow: hidden nên aspect-ratio giữ đúng tỉ lệ dù chữ dài. Nền tối giữ chữ trắng đọc được khi chưa có ảnh */
+.article-card__link {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: calc(var(--radius-card) + var(--space-1));
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+  text-decoration: none;
+}
+
+/* Viền mặc định currentcolor là chữ trắng, không thấy trên nền sáng */
+.article-card__link:focus-visible {
+  outline-color: var(--color-accent);
+}
+
+/* 2 class để thắng .image */
+.article-card__link > .article-card__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.article-card__link > .article-card__image > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Gradient 1:1027 từ 63.7% chiều cao tới đáy. Figma #000, dùng token nền tối: 0 màu literal */
+.article-card__link > .article-card__image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to bottom, transparent 63.72%, var(--color-background-dark));
+}
+
+/* Figma 1:1035: pill cao 28, cách mép 12, chữ 13 / 20. Nhãn dài thì cắt, không tràn khỏi card */
+.article-card__tag {
+  position: absolute;
+  inset-block-start: var(--space-3);
+  inset-inline-end: var(--space-3);
+  max-inline-size: calc(100% - var(--space-3) * 2);
+  min-block-size: calc(var(--space-1) * 7);
+  margin: 0;
+  padding-block: calc(var(--space-1) * 0.75);
+  padding-inline: var(--space-3);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: calc(20 / 13);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.article-card__content {
+  position: relative;
+  display: grid;
+  gap: var(--space-1);
+  padding-inline: var(--space-4);
+  padding-block-end: var(--space-4);
+}
+
+/* Figma 1:1037: Inter 18 / 28, letter-spacing -0.18. Tối đa 3 dòng để dòng thời gian đọc không bị đẩy khỏi card thấp */
+.article-card__title {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: calc(28 / 18);
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.article-card__link:hover .article-card__title {
+  text-decoration: underline;
+  text-underline-offset: 0.1em;
+}
+
+/* Figma 1:1038: 14 / 22, xám #999. Dùng chữ trắng của nền tối để đọc được trên ảnh sáng (ES1-T174 mục 4) */
+.article-card__read-time {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+@media (min-width: 48rem) {
+  .article-card {
+    flex-basis: min(40vw, 336px);
+  }
+
+  .article-card__content {
+    padding-inline: var(--space-5);
+    padding-block-end: var(--space-5);
+  }
+}
+
+@media (min-width: 64rem) {
+  .blog-posts {
+    gap: calc(var(--space-1) * 10);
+    padding-block: var(--space-8);
+  }
+
+  .blog-posts--placeholder {
+    margin-block: var(--space-8);
+  }
+
+  .blog-posts__list {
+    gap: var(--space-5);
+  }
+}
+
 /** Testimonials (TE-7, Figma 1:885): dưới 48rem cuộn ngang, 48rem 2 cột, 80rem 3 cột, đúng 4 mục 4 cột */
 .testimonials {
   display: grid;

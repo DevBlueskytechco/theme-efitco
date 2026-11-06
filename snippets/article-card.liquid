@@ -1,0 +1,57 @@
+{% doc %}
+  Renders one article as a list item: a link with the image, the first tag as a
+  label, the title and the reading time.
+
+  The image is decorative because the title already names the link, and always lazy.
+  Without an image the card keeps its dark frame, so the white text stays readable.
+  Without a tag there is no label.
+
+  Reading time (plan ES1-T169 D8): words in article.content at 200 words per minute,
+  rounded up. An article with no words has no reading time, so the line is hidden.
+  Each tag gets a space before it so that words on either side of a tag or a line
+  break stay separate; a tag inside a word counts that word twice.
+
+  Test hooks: data-testid="article-card", "article-card-link", "article-card-image",
+  "article-card-tag", "article-card-title", "article-card-read-time".
+
+  @param {article} article - The article to render
+
+  @example
+  {% for post in blog.articles limit: 5 %}
+    {% render 'article-card', article: post %}
+  {% endfor %}
+{% enddoc %}
+
+{%- liquid
+  assign word_count = article.content | newline_to_br | strip_newlines | replace: '&nbsp;', ' ' | replace: '<', ' <' | strip_html | split: ' ' | size
+  assign read_minutes = word_count | plus: 199 | divided_by: 200
+  assign article_tag = article.tags | first
+-%}
+
+<li class="article-card" data-testid="article-card">
+  <a class="article-card__link" href="{{ article.url }}" data-testid="article-card-link">
+    {%- if article.image != blank -%}
+      {% render 'image',
+        image: article.image,
+        class: 'article-card__image',
+        width: 672,
+        widths: '252, 336, 504, 672',
+        sizes: '(min-width: 64rem) 336px, (min-width: 48rem) 40vw, 70vw',
+        loading: 'lazy',
+        decorative: true,
+        testid: 'article-card-image'
+      %}
+    {%- endif -%}
+    {%- if article_tag != blank -%}
+      <p class="article-card__tag" data-testid="article-card-tag">{{ article_tag | escape }}</p>
+    {%- endif -%}
+    <div class="article-card__content">
+      <h3 class="article-card__title" data-testid="article-card-title">{{ article.title | escape }}</h3>
+      {%- if read_minutes > 0 -%}
+        <p class="article-card__read-time" data-testid="article-card-read-time">
+          {{- 'blocks.blog_posts.read_time' | t: count: read_minutes -}}
+        </p>
+      {%- endif -%}
+    </div>
+  </a>
+</li>

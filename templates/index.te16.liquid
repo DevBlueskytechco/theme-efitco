@@ -1,0 +1,24 @@
+{% comment %}
+  TE-16 test template, opened with /?view=te16 (ES1-T191). A branch preview has no
+  block settings, so the blog comes through the handle parameter. The figma-blog blog
+  comes from ES1-T178; without it the two lower bands render nothing and the spec skips.
+  Remove this file before a real store release.
+{% endcomment %}
+
+{% block 'container', id: 'te16-title' %}
+  <h1 class="visually-hidden">{{ shop.name }}</h1>
+{% endblock %}
+
+{% comment %} No blog: a handle that does not exist renders no block and no band. {% endcomment %}
+{% block 'container', id: 'te16-empty' %}
+  {% block 'blog-posts', id: 'te16-blog-empty', handle: 'te16-no-such-blog' %}{% endblock %}
+{% endblock %}
+
+{% comment %} Fewer cards than the 5 default, same size. {% endcomment %}
+{% block 'container', id: 'te16-two' %}
+  {% block 'blog-posts', id: 'te16-blog-two', handle: 'figma-blog', articles_to_show: 2 %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te16-default' %}
+  {% block 'blog-posts', id: 'te16-blog-default', handle: 'figma-blog' %}{% endblock %}
+{% endblock %}
