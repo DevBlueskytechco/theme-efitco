@@ -162,10 +162,11 @@ product-swatch,
   fill: currentcolor;
 }
 
+/* Cách mép 8 dưới 64rem, 16 từ 64rem: card 152 phải chứa đủ 2 badge (ES1-T174) */
 .product-card__badge {
   position: absolute;
-  inset-block-start: var(--space-4);
-  inset-inline-start: var(--space-4);
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
   display: inline-flex;
   align-items: center;
   min-block-size: calc(var(--space-1) * 7);
@@ -190,6 +191,63 @@ product-swatch,
 .product-card__badge[data-badge='sold_out'] {
   background-color: var(--color-foreground);
   color: var(--color-background);
+}
+
+.product-card__badge--new {
+  background-color: var(--color-badge-new);
+  color: var(--color-badge-new-foreground);
+}
+
+/* Sold out > -N% > New: JS chỉ đổi [data-card-badge], nên New tự theo swatch đang chọn */
+[data-card-badge]:not([hidden]) ~ .product-card__badge--new {
+  display: none;
+}
+
+/* Figma 1:502 Review: pill trắng 62 × 28, viền trong 1px, sao 14 × 13 + số.
+   Dưới 64rem padding 8: "Sold out" + rating vẫn vừa card 152 */
+.product-card__rating {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-end: var(--space-2);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: calc(var(--space-1) * 7);
+  padding-inline: calc(var(--space-2) - 1px);
+  border: 1px solid var(--color-background-alt);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: -0.02em;
+  pointer-events: none;
+}
+
+.product-card__rating-star {
+  flex: none;
+  inline-size: calc(var(--space-1) * 3.5);
+  block-size: calc(var(--space-1) * 3.25);
+  color: var(--color-rating);
+}
+
+/* Góc này là vòng chọn của bundle (Figma 1:636 không có rating) */
+.bundle-builder__item .product-card__rating {
+  display: none;
+}
+
+@media (min-width: 64rem) {
+  .product-card__badge {
+    inset-block-start: var(--space-4);
+    inset-inline-start: var(--space-4);
+  }
+
+  .product-card__rating {
+    inset-block-start: var(--space-4);
+    inset-inline-end: var(--space-4);
+    padding-inline: calc(var(--space-3) - 1px);
+  }
 }
 
 .product-card__title {
@@ -243,15 +301,19 @@ product-swatch,
   color: var(--color-muted);
 }
 
-/* Swatch: pill 32 × 16 (Figma) trong vùng bấm 32 × 24 (AC6).
-   Vùng bấm có sàn --touch-target-min để space_base < 4 vẫn ≥ 24px (ES1-T58);
-   pill giữ tỉ lệ space-6 × space-4 và căn giữa vùng bấm. */
+/* Swatch: pill 32 × 16 (Figma) trong label 32 × 24, ::after mở vùng bấm ra 44 × 44 (AC6, D7).
+   Label có sàn --touch-target-min để space_base < 4 vẫn ≥ 24px (ES1-T58);
+   pill giữ tỉ lệ space-6 × space-4 và căn giữa label.
+   Khoảng cách lấy đủ để 2 vùng bấm 44 chỉ chạm nhau, không chồng: bước 44 thay vì 36 của Figma. */
 .product-card__swatches {
+  --swatch-hit: 44px;
+  --swatch-inline: max(var(--space-6), var(--touch-target-min));
+  --swatch-block: max(var(--space-5), var(--touch-target-min));
   position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-1);
+  gap: max(0px, calc(var(--swatch-hit) - var(--swatch-block))) max(0px, calc(var(--swatch-hit) - var(--swatch-inline)));
   min-inline-size: 0;
   margin: 0;
   padding: 0;
@@ -261,10 +323,17 @@ product-swatch,
 .product-card__swatch {
   position: relative;
   display: block;
-  inline-size: max(var(--space-6), var(--touch-target-min));
-  block-size: max(var(--space-5), var(--touch-target-min));
+  inline-size: var(--swatch-inline);
+  block-size: var(--swatch-block);
   border-radius: var(--space-1);
   cursor: pointer;
+}
+
+.product-card__swatch::after {
+  position: absolute;
+  inset-block: min(0px, calc((100% - var(--swatch-hit)) / 2));
+  inset-inline: min(0px, calc((100% - var(--swatch-hit)) / 2));
+  content: '';
 }
 
 .product-card__swatch::before {
@@ -479,6 +548,11 @@ collection-tabs {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
+  /* Đúng 4 card (mặc định D7): 4 cột, không để 1 card lẻ (ES1-T174) */
+  .featured-collection__grid:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   .featured-collection__tabs {
     margin-inline: 0;
     padding-inline: 0;
@@ -499,7 +573,8 @@ collection-tabs {
 }
 
 @media (min-width: 80rem) {
-  .featured-collection__grid {
+  .featured-collection__grid,
+  .featured-collection__grid:has(> :nth-child(4):last-child) {
     grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
     gap: var(--space-5);
   }
