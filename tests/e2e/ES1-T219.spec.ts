@@ -14,11 +14,14 @@ async function open(page: Page) {
   await expect(tid(page, 'quiz')).toHaveAttribute('data-enhanced', '');
 }
 
-// mouse.click với clickCount 2 tạo đúng 1 lần bấm có detail 2: lần bấm thứ 2 của double click, rơi vào phần tử chọn trước.
+// ES1-T223: mouse.click với clickCount 2 bấm 2 lần (detail 1 rồi 2, playwright-core 1.64.1), lần detail 1 làm focus rời tiêu đề đúng theo trình duyệt.
+// down, up với clickCount 2 mới tạo đúng 1 lần bấm có detail 2: lần bấm thứ 2 của double click, rơi vào phần tử chọn trước.
 async function secondPress(page: Page, target: Locator) {
   const box = await target.boundingBox();
   expect(box).not.toBeNull();
-  await page.mouse.click(box!.x + box!.width / 2, box!.y + box!.height / 2, { clickCount: 2 });
+  await page.mouse.move(box!.x + box!.width / 2, box!.y + box!.height / 2);
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
 }
 
 test.describe('ES1-T219 double click giữ focus ở tiêu đề', () => {
@@ -52,8 +55,12 @@ test.describe('ES1-T219 double click giữ focus ở tiêu đề', () => {
 
   test('double click lựa chọn bước cuối: 1 lựa chọn, focus tiêu đề kết quả', async ({ page }) => {
     const sent: string[] = [];
+    const hops: string[] = [];
     page.on('request', (request) => {
-      if (isResults(new URL(request.url()))) sent.push(request.url());
+      if (!isResults(new URL(request.url()))) return;
+      hops.push(request.url());
+      // ES1-T223: tag chưa gắn sản phẩm nào thì Shopify redirect (ES1-T133 #1), Playwright báo thêm 1 request cho mỗi hop. Chỉ đếm request do JS gửi.
+      if (!request.redirectedFrom()) sent.push(request.url());
     });
     await open(page);
     await option(page, 'quiz-lower').check();
@@ -62,7 +69,7 @@ test.describe('ES1-T219 double click giữ focus ở tiêu đề', () => {
     await expect(option(page, 'quiz-gym')).toBeChecked();
     await expect(page.locator('[data-quiz-results-panel]')).toBeVisible();
     await expect(tid(page, 'quiz-results-heading')).toBeFocused();
-    expect(sent).toHaveLength(1);
+    expect(sent, `mọi hop: ${hops.join(' -> ')}`).toHaveLength(1);
   });
 
   test('bấm chuột thường vào Back chỉ lùi 1 bước: mousedown không chạy logic click', async ({ page }) => {
