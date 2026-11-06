@@ -8,6 +8,7 @@
 
   Gallery: image media only, 8 at most, scroll-snap, lazy. From 2 images the list
   takes keyboard focus and thumbnails are in-page links, no JavaScript needed.
+  The decorative seal (Figma 1:761) sits on the image corner.
 
   Countdown: countdown_end is YYYY-MM-DD HH:MM in store time, with the store
   offset added before it is read as epoch seconds. There is no element at all
@@ -45,7 +46,8 @@
   featured-product-countdown-days, featured-product-countdown-hours,
   featured-product-countdown-minutes, featured-product-countdown-seconds,
   featured-product-add, featured-product-view-detail, featured-product-status,
-  featured-product-error, featured-product-placeholder. Also product-variant-picker,
+  featured-product-error, featured-product-placeholder, featured-product-seal
+  (snippets/featured-product-seal). Also product-variant-picker,
   product-option, product-option-value, product-variant-select and price*.
 
   Empty state: no product selected → a hint in the theme editor, nothing on the
@@ -213,6 +215,9 @@
             </li>
           {%- endfor -%}
         </ul>
+
+        {%- assign seal_id = 'FeaturedSeal-' | append: featured.id -%}
+        {%- render 'featured-product-seal', id: seal_id -%}
 
         {%- if image_total > 1 -%}
           <ul class="featured-product__thumbnails" role="list" aria-label="{{ 'blocks.featured_product.thumbnails_label' | t }}">
@@ -448,7 +453,8 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "t:labels.eyebrow"
+      "label": "t:labels.eyebrow",
+      "default": "FEATURED PRODUCT · FREE WEIGHTS"
     },
     {
       "type": "text",
@@ -466,25 +472,29 @@
       "type": "text",
       "id": "spec_1_label",
       "label": "t:labels.spec_1_label",
-      "info": "t:info.spec_label"
+      "info": "t:info.spec_label",
+      "default": "Weight range"
     },
     {
       "type": "text",
       "id": "spec_2_label",
       "label": "t:labels.spec_2_label",
-      "info": "t:info.spec_label"
+      "info": "t:info.spec_label",
+      "default": "Footprint"
     },
     {
       "type": "text",
       "id": "spec_3_label",
       "label": "t:labels.spec_3_label",
-      "info": "t:info.spec_label"
+      "info": "t:info.spec_label",
+      "default": "Materials"
     },
     {
       "type": "text",
       "id": "spec_4_label",
       "label": "t:labels.spec_4_label",
-      "info": "t:info.spec_label"
+      "info": "t:info.spec_label",
+      "default": "Assembly"
     }
   ]
 }

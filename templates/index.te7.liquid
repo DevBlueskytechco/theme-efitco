@@ -542,6 +542,54 @@
   %}{% endblock %}
 {% endblock %}
 
+{% comment %}
+  D1 (plan ES1-T169, ES1-T182): each quiz-step field takes its setting first, then
+  default_*. Step 1 mixes both in one option. show_item off hides step 3.
+{% endcomment %}
+{% block 'container', id: 'te7-d1-quiz', tag: 'div' %}
+  {% block 'quiz', id: 'te7-d1-quiz-block' %}
+    {% block 'quiz-step',
+      id: 'te7-d1-step-set',
+      step: 1,
+      total: 3,
+      question: 'Setting question',
+      subheading: 'Setting hint',
+      option_1_label: 'Setting label',
+      default_question: 'Sample question 1',
+      default_subheading: 'Sample hint 1',
+      default_option_1_label: 'Sample label 1',
+      default_option_1_description: 'Sample text 1',
+      default_option_1_tag: 'sample-tag-1',
+      default_option_2_label: 'Sample label 2',
+      default_option_2_tag: 'sample-tag-2'
+    %}{% endblock %}
+    {% block 'quiz-step',
+      id: 'te7-d1-step-sample',
+      step: 2,
+      total: 3,
+      default_question: 'Sample question 2',
+      default_subheading: 'Sample hint 2',
+      default_option_1_label: 'Sample label 3',
+      default_option_1_tag: 'sample-tag-3',
+      default_option_2_label: 'Sample label 4',
+      default_option_2_tag: 'sample-tag-4',
+      default_option_3_label: 'Sample label 5',
+      default_option_3_tag: 'sample-tag-5'
+    %}{% endblock %}
+    {% block 'quiz-step',
+      id: 'te7-d1-step-hidden',
+      step: 3,
+      total: 3,
+      show_item: false,
+      default_question: 'Sample question 3',
+      default_option_1_label: 'Sample label 6',
+      default_option_1_tag: 'sample-tag-6',
+      default_option_2_label: 'Sample label 7',
+      default_option_2_tag: 'sample-tag-7'
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
 {% comment %} A merchant heading has no strong element, so the whole banner heading keeps the band color. {% endcomment %}
 {% block 'container', id: 'te7-d1-iwt-banner', background: 'sand' %}
   {% block 'image-with-text',
