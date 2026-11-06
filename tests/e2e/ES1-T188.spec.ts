@@ -74,6 +74,8 @@ test.describe('ES1-T188 tĩnh', () => {
 
 test.describe('ES1-T188 trang /?view=figma', () => {
   test('4 tab đúng nhãn, thứ tự, tab đầu đang chọn, đủ hook cho ES1-T189', async ({ page }) => {
+    // aria-current là trạng thái trước nâng cấp: ES1-T189 gỡ nó khi module chạy, nên chặn module.
+    await page.route(/\/collection-tabs\.js/, (route) => route.abort());
     await openFigma(page);
     const block = blockOn(page);
     await expect(block).toHaveAttribute('data-collection-tabs', '');

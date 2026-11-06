@@ -28,11 +28,12 @@
 
   JavaScript hooks (assets/collection-tabs.js, BE ES1-T189), only with 2 or more
   tabs: data-collection-tabs (root), custom element collection-tabs (wraps the
-  block content), data-tab-list (tab row), data-tab="N" (link, aria-current on
-  the first one), data-tab-panel="N" (panel, has an id for aria-controls, hidden
-  except the first), data-tab-panel-template="N" (template in that panel),
-  data-tab-empty (empty message). The active style follows aria-selected once set,
-  otherwise aria-current.
+  block content), data-lazy-module (on it, URL of assets/collection-tabs.js, read
+  by assets/lazy-module.js), data-tab-list (tab row), data-tab="N" (link,
+  aria-current on the first one), data-tab-panel="N" (panel, has an id for
+  aria-controls, hidden except the first), data-tab-panel-template="N" (template
+  in that panel), data-tab-empty (empty message). The active style follows
+  aria-selected once set, otherwise aria-current.
 
   Loads assets/product-swatch.js (ES module, BE ES1-T52) when cards render.
   Self-contained: callers must leave the body empty.
@@ -297,8 +298,9 @@
     {{ block.shopify_attributes }}
   >
     {%- if tab_count > 1 -%}
-      <collection-tabs>
+      <collection-tabs data-lazy-module="{{ 'collection-tabs.js' | asset_url }}">
         {{- block_body -}}
+        <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
       </collection-tabs>
     {%- else -%}
       {{- block_body -}}
