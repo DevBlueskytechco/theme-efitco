@@ -2,9 +2,21 @@
   Renders one review inside the testimonials block as a list item: optional
   image, author, optional Verified label, stars, title, quote and optional
   product. There is no default product, so a review is never attached to a
-  product the customer did not review. When quote and author are both empty, the
-  editor shows a placeholder and the storefront renders nothing. Self-contained:
-  callers must leave the body empty.
+  product the customer did not review. Self-contained: callers must leave the body
+  empty.
+
+  Sample content (plan ES1-T169 D1): the template passes default_* from locales.
+  They have other names than the settings, so they stay plain variables and a
+  value the merchant saved always wins. Clearing a setting brings the sample back,
+  so show_item is how a merchant hides the review. Text from the t filter may
+  already be escaped, so it goes through escape_once. The Verified label stays off
+  by default (exception E9).
+
+  Rating: a number setting, so it can be empty and take default_rating, then 5.
+  snippets/rating-stars.liquid rounds it and clamps it to 0-5.
+
+  When show_item is off or quote and author are both empty, the editor shows a
+  placeholder and the storefront renders nothing.
 
   Test hooks: data-testid="testimonial-item", "testimonial-image",
   "testimonial-author", "testimonial-verified", "testimonial-rating",
@@ -13,20 +25,34 @@
   "testimonial-placeholder".
 
   @param {string} id - Unique item id within the template, such as 'testimonial-1'
+  @param {string} [default_author] - Sample name used when the customer name setting is empty
+  @param {number} [default_rating] - Sample rating used when the rating setting is empty
+  @param {string} [default_title] - Sample text used when the title setting is empty
+  @param {string} [default_quote] - Sample text used when the quote setting is empty
 
   @example
-  {% block 'testimonial-item', id: 'testimonial-1' %}{% endblock %}
+  {% assign sample_author = 'blocks.testimonial_item.r1_name' | t %}
+  {% block 'testimonial-item', id: 'testimonial-1', default_author: sample_author, default_rating: 5 %}{% endblock %}
 {% enddoc %}
 
 {%- liquid
-  assign item_author = block.settings.author
-  assign item_title = block.settings.title
-  assign item_quote = block.settings.quote
+  assign item_author = block.settings.author | default: default_author
+  assign item_rating = block.settings.rating | default: default_rating | default: 5
+  assign item_title = block.settings.title | default: default_title
+  assign item_quote = block.settings.quote | default: default_quote
   assign item_image = block.settings.image
   assign item_product = block.settings.product
+
+  assign show_item = false
+  if item_author != blank or item_quote != blank
+    assign show_item = true
+  endif
+  if block.settings.show_item == false
+    assign show_item = false
+  endif
 -%}
 
-{%- if item_author != blank or item_quote != blank -%}
+{%- if show_item -%}
   <li
     class="testimonial-item"
     data-testimonial-id="{{ id }}"
@@ -39,7 +65,7 @@
         class: 'testimonial-item__image',
         width: 912,
         widths: '320, 456, 640, 912',
-        sizes: '(min-width: 80rem) 30vw, (min-width: 48rem) 50vw, 85vw',
+        sizes: '(min-width: 120rem) 456px, (min-width: 80rem) 30vw, (min-width: 48rem) 50vw, 85vw',
         loading: 'lazy',
         testid: 'testimonial-image'
       %}
@@ -50,7 +76,7 @@
         <div class="testimonial-item__meta">
           <div class="testimonial-item__reviewer">
             {%- if item_author != blank -%}
-              <p class="testimonial-item__author" data-testid="testimonial-author">{{ item_author | escape }}</p>
+              <p class="testimonial-item__author" data-testid="testimonial-author">{{ item_author | escape_once }}</p>
             {%- endif -%}
             {%- if block.settings.verified -%}
               <p class="testimonial-item__verified" data-testid="testimonial-verified">
@@ -59,14 +85,14 @@
               </p>
             {%- endif -%}
           </div>
-          {% render 'rating-stars', rating: block.settings.rating, testid: 'testimonial-rating' %}
+          {% render 'rating-stars', rating: item_rating, testid: 'testimonial-rating' %}
         </div>
 
         {%- if item_title != blank -%}
-          <h3 class="testimonial-item__title" data-testid="testimonial-title">{{ item_title | escape }}</h3>
+          <h3 class="testimonial-item__title" data-testid="testimonial-title">{{ item_title | escape_once }}</h3>
         {%- endif -%}
         {%- if item_quote != blank -%}
-          <blockquote class="testimonial-item__quote" data-testid="testimonial-quote">{{ item_quote | escape }}</blockquote>
+          <blockquote class="testimonial-item__quote" data-testid="testimonial-quote">{{ item_quote | escape_once }}</blockquote>
         {%- endif -%}
       </div>
 
@@ -114,10 +140,16 @@
   "name": "t:general.testimonial_item",
   "settings": [
     {
+      "type": "checkbox",
+      "id": "show_item",
+      "label": "t:labels.testimonial_show_item",
+      "info": "t:info.testimonial_show_item",
+      "default": true
+    },
+    {
       "type": "text",
       "id": "author",
-      "label": "t:labels.testimonial_author",
-      "default": "Customer name"
+      "label": "t:labels.testimonial_author"
     },
     {
       "type": "checkbox",
@@ -127,26 +159,20 @@
       "default": false
     },
     {
-      "type": "range",
+      "type": "number",
       "id": "rating",
-      "min": 0,
-      "max": 5,
-      "step": 1,
       "label": "t:labels.testimonial_rating",
-      "default": 5
+      "info": "t:info.testimonial_rating"
     },
     {
       "type": "text",
       "id": "title",
-      "label": "t:labels.testimonial_title",
-      "default": "Add a short review title"
+      "label": "t:labels.testimonial_title"
     },
     {
       "type": "textarea",
       "id": "quote",
-      "label": "t:labels.testimonial_quote",
-      "info": "t:info.testimonial_quote",
-      "default": "Add a real customer quote here, in the customer's own words."
+      "label": "t:labels.testimonial_quote"
     },
     {
       "type": "image_picker",

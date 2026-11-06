@@ -414,3 +414,73 @@
     {% block 'faq-item', id: 'te7-faq-none-1', question: '' %}{% endblock %}
   {% endblock %}
 {% endblock %}
+
+{% comment %}
+  D1 (plan ES1-T169, ES1-T179): a value in a setting wins over default_*, an empty
+  setting takes default_*, show_item and show_stat_2 off hide the item and the stat.
+{% endcomment %}
+{% block 'container', id: 'te7-d1-faq', background: 'cream' %}
+  {% block 'faq',
+    id: 'te7-d1-faq-block',
+    eyebrow: 'Setting eyebrow',
+    default_eyebrow: 'Sample eyebrow',
+    default_heading: 'Sample heading',
+    stat_1_value: 'Setting value',
+    default_stat_1_label: 'Sample label',
+    default_stat_1_value: 'Sample value',
+    show_stat_2: false,
+    default_stat_2_value: 'Sample value 2'
+  %}
+    {% block 'faq-item',
+      id: 'te7-d1-faq-set',
+      question: 'Setting question',
+      answer: '<p>Setting answer</p>',
+      default_question: 'Sample question 1',
+      default_answer: '<p>Sample answer 1</p>'
+    %}{% endblock %}
+    {% block 'faq-item',
+      id: 'te7-d1-faq-sample',
+      default_question: 'Sample question 2',
+      default_answer: '<p>Sample answer 2</p>'
+    %}{% endblock %}
+    {% block 'faq-item',
+      id: 'te7-d1-faq-hidden',
+      show_item: false,
+      default_question: 'Sample question 3',
+      default_answer: '<p>Sample answer 3</p>'
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} Rating 2 in the setting beats default_rating 4; 7 and -1 are clamped; no rating anywhere is 5. {% endcomment %}
+{% block 'container', id: 'te7-d1-testimonials', background: 'cream' %}
+  {% block 'testimonials',
+    id: 'te7-d1-testimonials-block',
+    heading: 'Setting heading',
+    default_eyebrow: 'Sample eyebrow',
+    default_heading: 'Sample heading'
+  %}
+    {% block 'testimonial-item',
+      id: 'te7-d1-set',
+      author: 'Setting author',
+      rating: 2,
+      title: 'Setting title',
+      quote: 'Setting quote',
+      default_author: 'Sample author 1',
+      default_rating: 4,
+      default_title: 'Sample title 1',
+      default_quote: 'Sample quote 1'
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'te7-d1-sample',
+      default_author: 'Sample author 2',
+      default_rating: 4,
+      default_title: 'Sample title 2',
+      default_quote: 'Sample quote 2'
+    %}{% endblock %}
+    {% block 'testimonial-item', id: 'te7-d1-hidden', show_item: false, default_author: 'Sample author 3', default_rating: 4 %}{% endblock %}
+    {% block 'testimonial-item', id: 'te7-d1-high', author: 'Rating seven', rating: 7 %}{% endblock %}
+    {% block 'testimonial-item', id: 'te7-d1-low', author: 'Rating minus one', rating: -1 %}{% endblock %}
+    {% block 'testimonial-item', id: 'te7-d1-none', author: 'No rating' %}{% endblock %}
+  {% endblock %}
+{% endblock %}

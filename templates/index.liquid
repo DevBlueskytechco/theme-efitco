@@ -33,12 +33,54 @@
   {% block 'featured-product', id: 'featured-product' %}{% endblock %}
 {% endblock %}
 
+{%- comment -%} Sample content for a new install (plan ES1-T169 D1): a setting the merchant saved wins. Same list in templates/index.figma.liquid. {%- endcomment -%}
+{%- liquid
+  assign testimonials_eyebrow = 'blocks.testimonials.default_eyebrow' | t
+  assign testimonials_heading = 'blocks.testimonials.default_heading' | t
+  assign r1_name = 'blocks.testimonial_item.r1_name' | t
+  assign r1_title = 'blocks.testimonial_item.r1_title' | t
+  assign r1_quote = 'blocks.testimonial_item.r1_quote' | t
+  assign r2_name = 'blocks.testimonial_item.r2_name' | t
+  assign r2_title = 'blocks.testimonial_item.r2_title' | t
+  assign r2_quote = 'blocks.testimonial_item.r2_quote' | t
+  assign r3_name = 'blocks.testimonial_item.r3_name' | t
+  assign r3_title = 'blocks.testimonial_item.r3_title' | t
+  assign r3_quote = 'blocks.testimonial_item.r3_quote' | t
+  assign r4_name = 'blocks.testimonial_item.r4_name' | t
+  assign r4_title = 'blocks.testimonial_item.r4_title' | t
+  assign r4_quote = 'blocks.testimonial_item.r4_quote' | t
+-%}
+
 {% block 'container', id: 'home-testimonials', background: 'cream' %}
-  {% block 'testimonials' %}
-    {% block 'testimonial-item', id: 'testimonial-1' %}{% endblock %}
-    {% block 'testimonial-item', id: 'testimonial-2' %}{% endblock %}
-    {% block 'testimonial-item', id: 'testimonial-3' %}{% endblock %}
-    {% block 'testimonial-item', id: 'testimonial-4' %}{% endblock %}
+  {% block 'testimonials', default_eyebrow: testimonials_eyebrow, default_heading: testimonials_heading %}
+    {% block 'testimonial-item',
+      id: 'testimonial-1',
+      default_author: r1_name,
+      default_rating: 5,
+      default_title: r1_title,
+      default_quote: r1_quote
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'testimonial-2',
+      default_author: r2_name,
+      default_rating: 4,
+      default_title: r2_title,
+      default_quote: r2_quote
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'testimonial-3',
+      default_author: r3_name,
+      default_rating: 5,
+      default_title: r3_title,
+      default_quote: r3_quote
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'testimonial-4',
+      default_author: r4_name,
+      default_rating: 5,
+      default_title: r4_title,
+      default_quote: r4_quote
+    %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
@@ -46,12 +88,39 @@
   {% block 'image-with-text', id: 'why-choose' %}{% endblock %}
 {% endblock %}
 
+{%- comment -%} Sample content for a new install (plan ES1-T169 D1). Figma has one answer, used for all 5 questions. Same list in templates/index.figma.liquid. {%- endcomment -%}
+{%- liquid
+  assign faq_eyebrow = 'blocks.faq.default_eyebrow' | t
+  assign faq_heading = 'blocks.faq.default_heading' | t
+  assign faq_stat_1_label = 'blocks.faq.default_stat_1_label' | t
+  assign faq_stat_1_value = 'blocks.faq.default_stat_1_value' | t
+  assign faq_stat_1_text = 'blocks.faq.default_stat_1_text' | t
+  assign faq_stat_2_label = 'blocks.faq.default_stat_2_label' | t
+  assign faq_stat_2_value = 'blocks.faq.default_stat_2_value' | t
+  assign faq_stat_2_text = 'blocks.faq.default_stat_2_text' | t
+  assign faq_answer = 'blocks.faq_item.default_answer_html' | t
+  assign faq_q1 = 'blocks.faq_item.q1_question' | t
+  assign faq_q2 = 'blocks.faq_item.q2_question' | t
+  assign faq_q3 = 'blocks.faq_item.q3_question' | t
+  assign faq_q4 = 'blocks.faq_item.q4_question' | t
+  assign faq_q5 = 'blocks.faq_item.q5_question' | t
+-%}
+
 {% block 'container', id: 'home-faq', background: 'cream' %}
-  {% block 'faq' %}
-    {% block 'faq-item', id: 'faq-1', open: true %}{% endblock %}
-    {% block 'faq-item', id: 'faq-2' %}{% endblock %}
-    {% block 'faq-item', id: 'faq-3' %}{% endblock %}
-    {% block 'faq-item', id: 'faq-4' %}{% endblock %}
-    {% block 'faq-item', id: 'faq-5' %}{% endblock %}
+  {% block 'faq',
+    default_eyebrow: faq_eyebrow,
+    default_heading: faq_heading,
+    default_stat_1_label: faq_stat_1_label,
+    default_stat_1_value: faq_stat_1_value,
+    default_stat_1_text: faq_stat_1_text,
+    default_stat_2_label: faq_stat_2_label,
+    default_stat_2_value: faq_stat_2_value,
+    default_stat_2_text: faq_stat_2_text
+  %}
+    {% block 'faq-item', id: 'faq-1', open: true, default_question: faq_q1, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'faq-2', default_question: faq_q2, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'faq-3', default_question: faq_q3, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'faq-4', default_question: faq_q4, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'faq-5', default_question: faq_q5, default_answer: faq_answer %}{% endblock %}
   {% endblock %}
 {% endblock %}
