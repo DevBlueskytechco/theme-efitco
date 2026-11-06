@@ -15,6 +15,7 @@ Xem skill `liquid-convention`, `block-settings-schema`, `js-partials`, `responsi
 
 ## Test
 `data-testid` trên mọi phần tử tương tác và vùng partial, đặt tên `<block>-<element>`. Playwright trong `tests/e2e/<ticket>.spec.ts`.
+Spec đọc JSON storefront (`/products/*.js`, `/cart.js`, `/products.json`) dùng `tests/e2e/support/product-data.ts`, không `request.get` thẳng: store dev trả 429 cho request ngoài trình duyệt (ES1-T100).
 
 ## Ticket
 Trạng thái: Backlog → Ready → In Progress → In Review → Testing → Done. Nhãn agent: ai-draft → ai-review → ai-dat / ai-sua / ai-loai. Trường: `agent`, `side`, `points`, `r_codes`.
