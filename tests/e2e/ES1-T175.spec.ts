@@ -65,7 +65,10 @@ test.describe('ES1-T175 template cổng /?view=figma', () => {
     const bands = await page
       .locator('[data-testid^="container-figma-"]')
       .evaluateAll((els) => els.map((el) => el.getAttribute('data-testid')));
-    expect(bands).toEqual(ROWS.map(([id]) => `container-${id}`));
+    // ES1-T184: hàng 3 đứng ngay sau hero; store chưa có figma-cat-* (ES1-T178) thì band không render.
+    const row3 = 'container-figma-collection-list';
+    if (bands.includes(row3)) expect(bands.indexOf(row3)).toBe(1);
+    expect(bands.filter((id) => id !== row3)).toEqual(ROWS.map(([id]) => `container-${id}`));
 
     for (const [id, root] of ROWS) {
       await expect(page.getByTestId(`container-${id}`).getByTestId(root), id).toHaveCount(1);

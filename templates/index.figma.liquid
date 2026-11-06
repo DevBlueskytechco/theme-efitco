@@ -7,6 +7,8 @@
   Each resource comes from a figma-* collection, or from collections.all when
   that collection is missing or empty. Images are the featured images of those
   products; the image regions are masked when screenshots are compared here.
+  Exception: collection cards have no fallback. Their name and link are the thing
+  being checked, so a missing figma-cat-* collection shows one card fewer.
 
   Copy stays in the block defaults or, for repeated blocks, in locales passed as
   default_* (plan ES1-T169 D1), same list as templates/index.liquid.
@@ -140,6 +142,16 @@
       default_subheading: slide_subheading,
       default_button_label: slide_button_label
     %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-collection-list', background: 'dark' %}
+  {% block 'collection-list' %}
+    {% block 'collection-card', id: 'figma-collection-card-1', handle: 'figma-cat-free-weights' %}{% endblock %}
+    {% block 'collection-card', id: 'figma-collection-card-2', handle: 'figma-cat-functional-training' %}{% endblock %}
+    {% block 'collection-card', id: 'figma-collection-card-3', handle: 'figma-cat-benches-racks' %}{% endblock %}
+    {% block 'collection-card', id: 'figma-collection-card-4', handle: 'figma-cat-recovery-mobility' %}{% endblock %}
+    {% block 'collection-card', id: 'figma-collection-card-5', handle: 'figma-cat-accessories' %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
