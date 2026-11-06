@@ -12,6 +12,7 @@ import { pageJson, requireJson } from './support/product-data';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { watchShopPay403 } from './support/console-guard';
 
 const T = {
   container: 'container-home-featured-collection',
@@ -113,8 +114,10 @@ const fileName = (url: string) => new URL(url, 'https://x.invalid').pathname.spl
 function trackErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
-  page.on('console', m => {
+  const isShopPay403 = watchShopPay403(page);
+  page.on('console', (m) => {
     if (m.type() !== 'error') return;
+    if (isShopPay403(m)) return;
     const text = `${m.text()} @ ${m.location().url}`;
     if (!IGNORE_CONSOLE.some(r => r.test(text))) errors.push(text);
   });

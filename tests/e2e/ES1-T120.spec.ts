@@ -4,6 +4,7 @@
 // Biến thể chạy trên /?view=te7 (templates/index.te7.liquid), mặc định schema chạy trên /.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { watchShopPay403 } from './support/console-guard';
 
 const TE7 = '/?view=te7';
 const HOME = '/';
@@ -14,8 +15,10 @@ const band = (page: Page, id: string) => page.getByTestId(`container-${id}`);
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
@@ -31,11 +34,13 @@ async function expectNoSeriousAxe(page: Page) {
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
 }
 
+// y tính theo tài liệu: mỗi lần gọi có thể cuộn trang, so y theo viewport giữa 2 lần gọi sẽ sai (ES1-T172).
 async function box(locator: Locator) {
   await locator.scrollIntoViewIfNeeded();
-  const value = await locator.boundingBox();
-  expect(value, 'phần tử phải có bounding box').not.toBeNull();
-  return value!;
+  return locator.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    return { x: rect.x, y: rect.y + window.scrollY, width: rect.width, height: rect.height };
+  });
 }
 
 async function expectNoPageOverflow(page: Page) {
