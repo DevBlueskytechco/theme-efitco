@@ -1,0 +1,164 @@
+{% doc %}
+  Renders one review inside the testimonials block as a list item: optional
+  image, author, optional Verified label, stars, title, quote and optional
+  product. There is no default product, so a review is never attached to a
+  product the customer did not review. When quote and author are both empty, the
+  editor shows a placeholder and the storefront renders nothing. Self-contained:
+  callers must leave the body empty.
+
+  Test hooks: data-testid="testimonial-item", "testimonial-image",
+  "testimonial-author", "testimonial-verified", "testimonial-rating",
+  "testimonial-title", "testimonial-quote", "testimonial-product",
+  "testimonial-product-link", "testimonial-product-price",
+  "testimonial-placeholder".
+
+  @param {string} id - Unique item id within the template, such as 'testimonial-1'
+
+  @example
+  {% block 'testimonial-item', id: 'testimonial-1' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign item_author = block.settings.author
+  assign item_title = block.settings.title
+  assign item_quote = block.settings.quote
+  assign item_image = block.settings.image
+  assign item_product = block.settings.product
+-%}
+
+{%- if item_author != blank or item_quote != blank -%}
+  <li
+    class="testimonial-item"
+    data-testimonial-id="{{ id }}"
+    data-testid="testimonial-item"
+    {{ block.shopify_attributes }}
+  >
+    {%- if item_image != blank -%}
+      {% render 'image',
+        image: item_image,
+        class: 'testimonial-item__image',
+        width: 912,
+        widths: '320, 456, 640, 912',
+        sizes: '(min-width: 80rem) 30vw, (min-width: 48rem) 50vw, 85vw',
+        loading: 'lazy',
+        testid: 'testimonial-image'
+      %}
+    {%- endif -%}
+
+    <div class="testimonial-item__content">
+      <div class="testimonial-item__text">
+        <div class="testimonial-item__meta">
+          <div class="testimonial-item__reviewer">
+            {%- if item_author != blank -%}
+              <p class="testimonial-item__author" data-testid="testimonial-author">{{ item_author | escape }}</p>
+            {%- endif -%}
+            {%- if block.settings.verified -%}
+              <p class="testimonial-item__verified" data-testid="testimonial-verified">
+                {%- render 'icon-trust', icon: 'check' -%}
+                {{- 'blocks.testimonials.verified' | t -}}
+              </p>
+            {%- endif -%}
+          </div>
+          {% render 'rating-stars', rating: block.settings.rating, testid: 'testimonial-rating' %}
+        </div>
+
+        {%- if item_title != blank -%}
+          <h3 class="testimonial-item__title" data-testid="testimonial-title">{{ item_title | escape }}</h3>
+        {%- endif -%}
+        {%- if item_quote != blank -%}
+          <blockquote class="testimonial-item__quote" data-testid="testimonial-quote">{{ item_quote | escape }}</blockquote>
+        {%- endif -%}
+      </div>
+
+      {%- if item_product != blank -%}
+        <div class="testimonial-item__product" data-testid="testimonial-product">
+          <div class="testimonial-item__thumb">
+            {%- if item_product.featured_image != blank -%}
+              {% render 'image',
+                image: item_product.featured_image,
+                width: 128,
+                height: 128,
+                crop: 'center',
+                widths: '64, 128',
+                sizes: '64px',
+                loading: 'lazy',
+                decorative: true
+              %}
+            {%- endif -%}
+          </div>
+          <div class="testimonial-item__product-info">
+            <a class="testimonial-item__product-link" href="{{ item_product.url }}" data-testid="testimonial-product-link">
+              {{- item_product.title | escape -}}
+            </a>
+            <div data-testid="testimonial-product-price">
+              {% render 'price', product: item_product %}
+            </div>
+          </div>
+        </div>
+      {%- endif -%}
+    </div>
+  </li>
+{%- elsif request.design_mode -%}
+  <li
+    class="testimonial-item testimonial-item--placeholder"
+    data-testimonial-id="{{ id }}"
+    data-testid="testimonial-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.testimonials.item_placeholder' | t }}
+  </li>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.testimonial_item",
+  "settings": [
+    {
+      "type": "text",
+      "id": "author",
+      "label": "t:labels.testimonial_author",
+      "default": "Customer name"
+    },
+    {
+      "type": "checkbox",
+      "id": "verified",
+      "label": "t:labels.testimonial_verified",
+      "info": "t:info.testimonial_verified",
+      "default": false
+    },
+    {
+      "type": "range",
+      "id": "rating",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "label": "t:labels.testimonial_rating",
+      "default": 5
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:labels.testimonial_title",
+      "default": "Add a short review title"
+    },
+    {
+      "type": "textarea",
+      "id": "quote",
+      "label": "t:labels.testimonial_quote",
+      "info": "t:info.testimonial_quote",
+      "default": "Add a real customer quote here, in the customer's own words."
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.testimonial_image"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:labels.testimonial_product",
+      "info": "t:info.testimonial_product"
+    }
+  ]
+}
+{% endschema %}

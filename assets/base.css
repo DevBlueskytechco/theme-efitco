@@ -2811,6 +2811,258 @@ cart-items[aria-busy='true'] {
   }
 }
 
+/** Testimonials (TE-7, Figma 1:885): dưới 48rem cuộn ngang, 48rem 2 cột, 80rem 3 cột, đúng 4 mục 4 cột */
+.testimonials {
+  display: grid;
+  gap: var(--space-5);
+  min-inline-size: 0;
+  padding-block: var(--space-7);
+}
+
+.testimonials--placeholder {
+  margin: 0;
+  padding-inline: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+.testimonials__header {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.testimonials__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Figma 1:893: 48 / 58, letter-spacing -0.96 */
+.testimonials__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+/* Tràn tới mép màn hình để lộ card kế; margin âm bằng đúng lề nên trang không cuộn ngang */
+.testimonials__list {
+  display: flex;
+  gap: var(--space-4);
+  margin-block: 0;
+  margin-inline: calc(var(--page-margin) * -1);
+  padding-block: 0;
+  padding-inline: var(--page-margin);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--page-margin);
+  scroll-snap-type: x mandatory;
+  list-style: none;
+}
+
+.testimonials__list:focus-visible {
+  outline-offset: -2px;
+}
+
+.testimonial-item {
+  display: flex;
+  flex: 0 0 85%;
+  flex-direction: column;
+  min-inline-size: 0;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  text-align: start;
+  scroll-snap-align: start;
+}
+
+.testimonial-item:only-child {
+  flex-basis: 100%;
+}
+
+.testimonial-item--placeholder {
+  padding: var(--space-5);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+/* Figma 1:896: 456 / 270 */
+.testimonial-item__image img {
+  aspect-ratio: 456 / 270;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+.testimonial-item__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5);
+}
+
+/* flex 1 đẩy hàng product xuống đáy để các card cùng hàng thẳng đường kẻ */
+.testimonial-item__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.testimonial-item__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-3);
+}
+
+.testimonial-item__reviewer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  min-inline-size: 0;
+}
+
+.testimonial-item__author {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.625;
+}
+
+.testimonial-item__verified {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-1) / 2);
+  margin: 0;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+  letter-spacing: -0.01em;
+  line-height: 1.57;
+}
+
+.testimonial-item__verified .icon-trust {
+  inline-size: 22px;
+  block-size: 22px;
+}
+
+.rating-stars {
+  display: inline-flex;
+  flex: none;
+  gap: calc(var(--space-1) / 2);
+  color: var(--color-border);
+}
+
+.rating-stars__star {
+  inline-size: 13px;
+  block-size: 13px;
+}
+
+.rating-stars__star--filled {
+  color: var(--color-rating);
+}
+
+.testimonial-item__title {
+  margin: 0;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: calc(28 / 18);
+}
+
+.testimonial-item__quote {
+  margin: 0;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+}
+
+/* Đường kẻ nằm trên hàng product: không có product thì mất cả hai */
+.testimonial-item__product {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block-start: var(--space-5);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.testimonial-item__thumb {
+  flex: none;
+  inline-size: 64px;
+  block-size: 64px;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: var(--color-background-alt);
+}
+
+.testimonial-item__thumb img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.testimonial-item__product-info {
+  min-inline-size: 0;
+}
+
+.testimonial-item__product-link {
+  color: inherit;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+  text-decoration: none;
+}
+
+.testimonial-item__product-link:hover {
+  text-decoration: underline;
+}
+
+@media (min-width: 48rem) {
+  .testimonials__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-5);
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow-x: visible;
+    scroll-snap-type: none;
+  }
+}
+
+@media (min-width: 64rem) {
+  .testimonials {
+    gap: calc(var(--space-1) * 10);
+    padding-block: var(--space-8);
+  }
+}
+
+@media (min-width: 80rem) {
+  .testimonials__list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .testimonials__list:has(> :nth-child(4):last-child) {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
 /** Gift card template */
 .template-gift-card main {
   text-align: center;
