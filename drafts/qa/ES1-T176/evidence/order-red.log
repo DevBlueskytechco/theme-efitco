@@ -1,0 +1,28 @@
+Lệnh: npx playwright test --config=drafts/qa/ES1-T176/offline/order-mutated.config.ts --grep "cùng cây block"
+Đầu vào: bản sao 2 template ở drafts/qa/ES1-T176/offline/mutated/, index.figma.liquid thêm 1 container chứa block multicolumn ở cuối. Không sửa templates/.
+Chạy ngày 06/11/2026, máy local, Playwright 1.64.1. Không gọi store.
+
+Running 1 test using 1 worker
+
+  ✘  1 [desktop] › tests/e2e/ES1-T176.spec.ts:191:9 › ES1-T176 so Figma › Thứ tự block giữa 2 template (AC-H1, D2) › index.figma và index cùng cây block, cùng background, tag của container (5ms)
+
+  1) [desktop] › tests/e2e/ES1-T176.spec.ts:191:9 › ES1-T176 so Figma › Thứ tự block giữa 2 template (AC-H1, D2) › index.figma và index cùng cây block, cùng background, tag của container
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  - 0
+    + Received  + 2
+
+    @@ -60,6 +60,8 @@
+        "    faq-item",
+        "    faq-item",
+        "    faq-item",
+        "    faq-item",
+        "    faq-item",
+    +   "container background=- tag=-",
+    +   "  multicolumn",
+      ]
+
+  1 failed
+
+Đối chứng: cùng test trên templates/ thật pass (config identity, 10 passed, 19 skipped).
