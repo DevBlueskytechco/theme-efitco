@@ -124,11 +124,11 @@ test.describe('ES1-T137 TE-11 quiz', () => {
     await expect(page.getByText('Hidden quiz')).toHaveCount(0);
   });
 
-  test('AC1 trang chủ chưa cấu hình: không có quiz', async ({ page }) => {
+  test('AC1 trang chủ chưa cấu hình: quiz đủ 3 bước theo D1 ES1-T169', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
-    await expect(tid(page, 'quiz')).toHaveCount(0);
-    await expect(tid(page, 'quiz-step')).toHaveCount(0);
+    await expect(tid(page, 'quiz')).toHaveCount(1);
+    await expect(tid(page, 'quiz-step')).toHaveCount(3);
     await expect(tid(page, 'quiz-placeholder')).toHaveCount(0);
     await expectNoSeriousAxe(page);
     expect(errors).toEqual([]);

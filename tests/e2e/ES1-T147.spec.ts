@@ -180,10 +180,11 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
     await expect(input).not.toBeChecked();
   });
 
-  test('AC1-markup trang chủ chưa cấu hình: không có bundle builder', async ({ page }) => {
+  test('AC1-markup trang chủ chưa cấu hình: bundle builder lấy collection all, có bậc 10%, 15% theo D1 ES1-T169', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
-    await expect(page.getByTestId('bundle-builder')).toHaveCount(0);
+    await expect(page.getByTestId('bundle-builder')).toHaveCount(1);
+    await expect(page.getByTestId('bundle-builder')).toHaveAttribute('data-tiers', '2:10,3:15');
     await expect(page.getByTestId('bundle-builder-placeholder')).toHaveCount(0);
     await expectNoSeriousAxe(page);
     expect(errors).toEqual([]);
