@@ -571,13 +571,16 @@ bundle-form {
   opacity: 0.5;
 }
 
+/* Nền #393942 (CR-9). Chữ phụ Figma #999999 chỉ 4.01:1 trên nền này: pha trắng 60% = 5.28:1 */
 .bundle-builder__panel {
+  --bundle-panel-muted: color-mix(in srgb, var(--color-background-dark-foreground) 60%, var(--color-background-panel));
+
   display: grid;
   gap: var(--space-5);
   min-inline-size: 0;
   padding: var(--space-5);
   border-radius: calc(var(--radius-card) + var(--space-1));
-  background-color: var(--color-background-dark);
+  background-color: var(--color-background-panel);
   color: var(--color-background-dark-foreground);
 }
 
@@ -630,7 +633,7 @@ bundle-form {
 .bundle-builder__selection {
   padding-block: var(--space-5);
   border-block: 1px solid color-mix(in srgb, var(--color-muted-on-dark) 40%, transparent);
-  color: var(--color-muted-on-dark);
+  color: var(--bundle-panel-muted);
   font-size: var(--font-size-base);
   line-height: 1.625;
 }
@@ -715,14 +718,14 @@ bundle-form {
 
 .bundle-builder__progress-text {
   min-block-size: 1.5em;
-  color: var(--color-muted-on-dark);
+  color: var(--bundle-panel-muted);
   font-size: var(--font-size-sm);
   line-height: 1.5;
 }
 
 .bundle-builder__note {
   margin: 0;
-  color: var(--color-muted-on-dark);
+  color: var(--bundle-panel-muted);
   font-size: var(--font-size-sm);
   line-height: 1.5;
 }
@@ -4509,14 +4512,14 @@ cart-drawer {
 }
 
 /** Product finder quiz (TE-11, Figma 1:506): panel 60, 2 cột từ 64rem, thẻ trắng 32.
-   Nền panel Figma không có token: dùng background_dark (ES1-T135 #5) */
+   Nền panel #393942 (CR-9); chữ trắng 11.43:1 */
 .quiz {
   display: grid;
   gap: var(--space-6);
   margin-block: var(--space-7);
   padding: var(--space-4);
   border-radius: var(--radius-hero);
-  background-color: var(--color-background-dark);
+  background-color: var(--color-background-panel);
   color: var(--color-background-dark-foreground);
 }
 
@@ -4665,7 +4668,7 @@ cart-drawer {
   margin-block-start: var(--space-5);
 }
 
-/* Trang trí: display none để ảnh lazy không tải dưới 48rem (AC4) */
+/* display none để ảnh lazy không tải và vùng bấm không nhận chạm dưới 48rem (AC4) */
 .quiz-step__map {
   display: none;
 }
@@ -4890,12 +4893,62 @@ cart-drawer {
     background-color: var(--color-background-sand);
   }
 
-  .quiz-step__map > img {
+  /* 2 class để thắng .image, .image > img */
+  .image.quiz-step__map-image {
     position: absolute;
     inset: 0;
     block-size: 100%;
+  }
+
+  .image.quiz-step__map-image > img {
+    block-size: 100%;
     object-fit: contain;
     mix-blend-mode: darken;
+  }
+
+  /* CR-10: Figma không vẽ vùng, 33 / 24 / 43 ước lượng trên ảnh 1:534 (đáy quần ở 57%, ranh ngực và bụng ở 33%); hàng từ 44px */
+  .quiz-step__regions {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: minmax(44px, 33fr) minmax(44px, 24fr) minmax(44px, 43fr);
+  }
+
+  .quiz-step__region {
+    cursor: pointer;
+  }
+
+  .quiz-step__region[data-body-region="upper"] {
+    grid-row: 1;
+  }
+
+  .quiz-step__region[data-body-region="core"] {
+    grid-row: 2;
+  }
+
+  .quiz-step__region[data-body-region="lower"] {
+    grid-row: 3;
+  }
+
+  @media (hover: hover) {
+    .quiz-step__region:hover {
+      background-color: color-mix(in srgb, var(--color-accent) 15%, transparent);
+    }
+  }
+
+  /* Trạng thái lấy từ input trong danh sách, không cần JS. Viền vào trong vì khung cắt overflow */
+  .quiz-step__body:has([data-body-option="upper"]:checked) [data-body-region="upper"],
+  .quiz-step__body:has([data-body-option="core"]:checked) [data-body-region="core"],
+  .quiz-step__body:has([data-body-option="lower"]:checked) [data-body-region="lower"] {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  .quiz-step__body:has([data-body-option="upper"]:focus-visible) [data-body-region="upper"],
+  .quiz-step__body:has([data-body-option="core"]:focus-visible) [data-body-region="core"],
+  .quiz-step__body:has([data-body-option="lower"]:focus-visible) [data-body-region="lower"] {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: -2px;
   }
 
   /* Figma 1:536: hàng cao 80, padding 12 / 24 */
