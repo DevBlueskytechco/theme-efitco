@@ -19,8 +19,9 @@
   Sold out badge. The title link always goes to the product page.
 
   Hooks for assets/bundle-form.js (BE ES1-T149; custom element bundle-form is
-  the root and has no definition until then). Rename only with a ticket comment.
-  - Root: data-tiers, data-cart-add-url, data-cart-url, data-cart-type,
+  the root, imported near the viewport by assets/lazy-module.js). Rename only with
+  a ticket comment.
+  - Root: data-lazy-module, data-tiers, data-cart-add-url, data-cart-url, data-cart-type,
     data-currency, data-locale, data-label-count-one, data-label-count-other,
     data-label-progress-one (%n is 1, %p), data-label-progress (%n, %p),
     data-label-progress-done (%p),
@@ -125,6 +126,7 @@
     data-label-discount="{{ label_discount | escape }}"
     data-label-status="{{ label_status | escape }}"
     data-label-error="{{ label_error | escape }}"
+    data-lazy-module="{{ 'bundle-form.js' | asset_url }}"
     data-testid="bundle-builder"
     {{ block.shopify_attributes }}
   >
@@ -306,6 +308,8 @@
         </div>
       </div>
     </form>
+
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
   </bundle-form>
 {%- elsif request.design_mode -%}
   <div class="bundle-builder__placeholder" data-testid="bundle-builder-placeholder" {{ block.shopify_attributes }}>

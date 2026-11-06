@@ -17,7 +17,8 @@
 
   Hooks for assets/bundle-form.js (BE ES1-T149; same contract as bundle-builder, no
   checkboxes, no progress and no line list). Rename only with a ticket comment.
-  - Root: data-tiers, data-cart-add-url, data-cart-url, data-cart-type, data-currency,
+  - Root: data-lazy-module (assets/lazy-module.js imports the module near the viewport),
+    data-tiers, data-cart-add-url, data-cart-url, data-cart-type, data-currency,
     data-locale, data-label-count-one, data-label-count-other, data-label-discount (%p),
     data-label-status (%n, %t), data-label-error. JS sets data-enhanced on the root.
   - Panel: data-bundle-live (hidden by CSS until data-enhanced, space kept; display none
@@ -101,6 +102,7 @@
     data-label-discount="{{ label_discount | escape }}"
     data-label-status="{{ label_status | escape }}"
     data-label-error="{{ label_error | escape }}"
+    data-lazy-module="{{ 'bundle-form.js' | asset_url }}"
     data-testid="shop-the-look"
     {{ block.shopify_attributes }}
   >
@@ -245,6 +247,8 @@
         </div>
       </form>
     </div>
+
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
   </bundle-form>
 {%- elsif request.design_mode -%}
   <div class="shop-the-look__placeholder" data-testid="shop-the-look-placeholder" {{ block.shopify_attributes }}>
