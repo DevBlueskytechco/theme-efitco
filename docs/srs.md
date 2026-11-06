@@ -1,6 +1,6 @@
-# SRS — theme-efitco · bản 0.1 · BA · 22/10/2026
+# SRS — theme-efitco · bản 0.2 · BA · 06/11/2026 (bản 0.1: 22/10/2026)
 
-Nguồn: charter, PRD, Figma Efitco T10 (home), Skeleton AGENTS.md, Theme Store requirements (chuẩn nội bộ, mã R), Canvas requirements (22/10/2026).
+Nguồn: charter, PRD, Figma Efitco T10 (home), Skeleton AGENTS.md, Theme Store requirements (chuẩn nội bộ, mã R), Canvas requirements (22/10/2026). Bản 0.2: ES1-T173, theo ES1-T167, T168, T169 và CTO duyệt 06/11. AC-H* có mã TC-H* tương ứng; bảng nội dung theo node ở `drafts/ba/ES1-T173/home-content.md`.
 
 ## 0. Thuật ngữ
 Block = đơn vị giao diện trong `blocks/` của Skeleton (thay cho section). Template = `templates/*.liquid` compose block. Partial = vùng HTML refresh không reload. Canvas = nơi merchant sửa theme; Sidekick = agent sửa file theme.
@@ -29,6 +29,8 @@ Là merchant, tôi muốn theme có header 2 cấp, footer, announcement bar và
 - AC7 Given mọi trang When kiểm Then html lang = request.locale.iso_code, meta-tags snippet có title/description/canonical/og/twitter, page_image.
 - AC8 Given token docs/tokens.json When render Then font heading Sofia Sans Condensed qua font_picker, body Inter; chữ phụ trên nền sáng dùng `--color-muted-light` #6B6B6B (≥ 4.5:1), #999999 chỉ trên nền tối.
 - AC9 (trả lời ES1-T8, Designer 30/10) Given trang chủ có hero ở đầu When render header Then header trong suốt đè lên hero, chữ/icon trắng; trang không có hero Then nền `--color-background`, chữ `--color-foreground`. Given hero có ảnh When render Then lớp phủ đen theo setting `overlay_opacity` (mặc định 30%) để chữ đạt AA. Given cuộn quá 80px When header sticky (setting `sticky_header`, mặc định bật) Then nền trắng, bóng nhẹ, chữ `--color-foreground`. Given footer When render localization Then 1 nút gộp "USD / EN" mở 2 danh sách country và language (thay cách tách 2 selector ở AC5).
+- AC-H28 (TC-H28, hàng 16) Given footer mặc định When render 1920 Then đủ: logo, mô tả, ảnh newsletter nếu đã chọn, heading 2 màu đạt AA, nút "Get 15% Off" + icon, "No spam. Unsubscribe anytime.", đúng 1:1104.
+- AC-H29 (TC-H29, hàng 1, 2; story TE-1, TE-2) Given hero thật trên `/` When ở đầu trang và cuộn quá 80px Then header trong suốt chữ trắng, rồi nền trắng chữ foreground; bật lại TE-1 TC-46, TC-47.
 
 Mã R: R4 menu đa cấp, newsletter, country/language, Follow on Shop, shopify-account; R7 layout; R11 SEO; R13 social; R14–R16 settings/font/màu
 
@@ -54,15 +56,20 @@ Phía: FE+BE · Ước lượng sơ bộ: 8 point (techlead chốt)
 
 Là merchant, tôi muốn đặt block hiện sản phẩm của một collection trên trang chủ để khách thấy hàng nổi bật mà không vào trang collection.
 
-- AC1 Given chọn collection When render Then hiện tối đa N sản phẩm (4–12, mặc định 8), lưới 2 cột ở 360, 3–5 cột ở 1280 theo setting.
+- AC1 Given chọn collection When render Then hiện tối đa N sản phẩm (4–12, mặc định 4 theo Figma, D7 của ES1-T169), lưới 2 cột ở 360, 3–5 cột ở 1280 theo setting.
 - AC2 Given sản phẩm có ≥ 2 màu có swatch When render card Then hiện swatch (swatch.color hoặc swatch.image); chọn swatch đổi ảnh card và link biến thể, không reload; keyboard chọn được.
 - AC3 Given compare_at_price > price When render Then giá gạch + badge sale với % giảm làm tròn, tính đúng với giá nhỏ.
 - AC4 Given product.price_varies When render Then hiện khoảng giá min–max; có unit_price Then hiện unit price.
 - AC5 Given collection rỗng hoặc chưa chọn When trong editor Then placeholder hướng dẫn; ngoài editor Then không render block.
-- AC6 Given keyboard When tab qua card Then focus thấy được, ảnh có alt từ sản phẩm; touch target ≥ 24px.
+- AC6 Given keyboard When tab qua card Then focus thấy được, ảnh có alt từ sản phẩm; touch target ≥ 44px; hình swatch giữ kích thước Figma, vùng bấm swatch ≥ 44px (D7 của ES1-T169, AGENTS.md).
 - AC7 Given bật nút Xem tất cả When render Then nút link tới collection.url, vị trí theo setting.
 
 - AC8 (Editions Fall '26 #20) Given collection đa nguồn có phần tử là variant When render card Then ảnh, giá, link ?variant= theo đúng variant đó, swatch chọn sẵn variant đó.
+- AC-H11 (TC-H11, hàng 5) Given 4 tab gắn 4 collection When bấm hoặc dùng bàn phím đổi tab Then lưới đổi không reload, tab chọn có trạng thái chọn đọc được bởi trình đọc màn hình; không JS thì 4 tab là link tới collection.
+- AC-H12 (TC-H12, hàng 5) Given tab có collection rỗng When chọn Then hiện thông báo rỗng, không còn card của tab trước.
+- AC-H13 (TC-H13, hàng 5) Given sản phẩm có metafield rating When render card Then hiện sao + số; không có metafield thì không có badge.
+- AC-H14 (TC-H14, hàng 5) Given sản phẩm thoả quy tắc New (CR-3) When render card Then badge New đạt 4.5:1; đang sale thì hiện badge % như Figma, quy tắc ưu tiên do CR-3 chốt.
+
 Mã R: R7 collection (giá, unit price, ảnh); R7 product swatch; R12 a11y; R17
 
 ### TE-4 — Trang sản phẩm
@@ -122,7 +129,9 @@ Là merchant, tôi muốn 4 block nội dung để kể chuyện thương hiệu
 - AC2 Given FAQ có 1–10 mục When render Then disclosure dùng được bằng bàn phím (Enter/Space mở), trình đọc màn hình đọc được trạng thái mở/đóng (details/summary, không JS — PO 06/11, ES1-T115), một hoặc nhiều mở theo setting.
 - AC3 Given image with text When render Then ảnh trái/phải theo setting, ở 360 ảnh trên; heading, richtext, nút.
 - AC4 Given multicolumn 2–4 cột When render Then icon/ảnh, heading, text, link mỗi cột; 360 xếp 1 cột.
-- AC5 Given mọi block When chưa có nội dung Then default text gợi cách dùng, không Lorem Ipsum; có Custom Liquid block với setting type liquid.
+- AC5 (CTO 06/11 11:14) Given mọi block When merchant chưa nhập nội dung Then hiện nội dung Figma theo bảng nội dung (AC-H5), không Lorem Ipsum; block Custom Liquid với setting type liquid vẫn có trong theme, không gọi trong `templates/index.liquid` (CR-5).
+- AC-H24 (TC-H24, hàng 12) Given 4 card, viewport 1920 When render Then 4 card rộng 456px, card 4 tràn như Figma, cuộn bằng chuột và bàn phím tới hết card 4; khác biệt theo cỡ màn do Designer ghi (CR-8).
+- AC-H25 (TC-H25, hàng 12) Given mặc định When render Then 4 review đúng 1:885 (card 2 là 4 sao), Verified tắt, ngoại lệ E9 có trong sổ.
 
 Mã R: R3 consistency; R5 Custom Liquid; R12 a11y; R14 settings
 
@@ -142,10 +151,10 @@ Phía: FE · Ước lượng sơ bộ: 5 point (techlead chốt)
 
 Là merchant, tôi muốn cài theme là có trang chủ hoàn chỉnh và các trang phụ đúng chuẩn để không bắt đầu từ trống.
 
-- AC1 Given settings_data.json When cài mới Then trang chủ 16 block đúng thứ tự docs/figma-inventory.md, text mặc định có nghĩa (không Lorem Ipsum), không resource default trỏ tới thứ không tồn tại.
+- AC1 (CTO 06/11 11:14) Given theme mới cài When mở `/` Then thứ tự block theo AC-H1, copy và số liệu mặc định theo AC-H5, không Lorem Ipsum, không resource default trỏ tới thứ không tồn tại.
 - AC2 Given 404 When Then thông báo rõ + search + link home; password Then logo/shop.name, password_message, form; page.contact Then form name/email/message có validation và thông báo; gift_card Then QR ≥ 120px, mã, Apple Wallet, logo.
 - AC3 Given blog/article When Then title, image, excerpt_or_content, published_at, comments phân trang, form comment hoạt động.
-- AC4 Given store hoa-qua-nhap-khau (efitco-ai-dev) When Then có dữ liệu demo: 24 sản phẩm (có sale, hết hàng, nhiều biến thể, gift card), 4 collection, 3 bài blog, ảnh tự do bản quyền.
+- AC4 Given store hoa-qua-nhap-khau (efitco-ai-dev) When kiểm Then có dữ liệu Figma theo `drafts/ba/ES1-T173/home-content.md` mục 3: 24 sản phẩm, 12 collection handle `figma-*` cho hàng 3, 4b, 5, tag quiz, metafield rating và spec, discount tự động 10%, 15%, 5 bài blog, menu, tên shop Efitco; handle và dữ liệu trong `tests/e2e/store-data.json` không đổi; ảnh demo chỉ dùng trên store dev, quyền dùng ghi ở ES1-T174.
 
 - AC5 (Editions #25) Given shop.policies When render footer/trang phụ Then link chính sách lấy từ shop.policies, không nhập tay URL.
 - AC6 (Editions #27) Given chưa chọn logo/màu trong theme When render Then dùng shop.brand (logo, màu chính) làm mặc định nếu có.
@@ -158,11 +167,17 @@ Là CTO, tôi muốn theme đạt ngưỡng chất lượng đo được và ch�
 
 - AC1 Given home/product/collection với dữ liệu benchmark When chạy lhci Then performance ≥ 96 desktop, ≥ 90 mobile; accessibility ≥ 98; CI chặn merge khi dưới ngưỡng.
 - AC2 Given toàn bộ repo When theme check Then 0 lỗi, .theme-check.yml không override; không console error trên 8 trang; không Sass, không minified, không robots.txt.liquid.
-- AC3 Given checklist Theme Store nội bộ When chạy Then nhóm bắt buộc (R4, R6–R17) pass 100%; nhóm tham khảo ghi N/A.
+- AC3 Given checklist Theme Store nội bộ When chạy Then nhóm bắt buộc (R4, R6–R17) pass 100%; nhóm tham khảo ghi N/A. R8 với nội dung mẫu (CTO 06/11 11:14, 11:15): copy, số liệu, review, bậc giảm mặc định tính đạt khi có đủ AC-H33 và ghi chú giảm giá ở AC-H18, H19; khi nộp Theme Store cần thêm demo store và ghi là nội dung mẫu.
 - AC4 Given zip upload lên yum-dev (store người, đã có Canvas) When checklist Canvas Then 5 bước pass; 10 yêu cầu Sidekick mẫu cho ra theme check 0 lỗi và cấu trúc không đổi.
 - AC5 Given tài liệu merchant When kiểm Then 16/16 block có docs/merchant, có hướng dẫn nâng cấp theme trong Canvas.
 
 - AC6 (Editions #6, #17, #30, #40, QA) Given Chrome có WebMCP và inspector của `shopify theme dev` When gọi add_to_cart, update_cart_lines, show_variant Then UI theme (drawer, cart-count, variant) cập nhật đúng, 0 console error; nút dynamic checkout không vỡ layout với Apple Pay QR trên Chrome/Edge/Firefox; widget Shopify Inbox không che sticky add-to-cart, back-to-top, cart drawer ở 360 và 1280; header/account không dùng customer.has_account làm điều kiện hiển thị.
+- AC-H30 (TC-H30) Given `/` hoặc URL đại diện có đủ 16 block và ảnh When chạy lhci desktop và mobile Then performance ≥ 96 và ≥ 90, accessibility ≥ 98; CI chặn merge khi dưới ngưỡng.
+- AC-H31 (TC-H31) Given `/` đủ 16 block When tải xong, rồi cuộn hết trang Then JS tải sẵn ≤ 40 960 B, tổng sau cuộn ≤ 65 536 B; vượt thì chặn merge. Tính cả tabs và block mới.
+- AC-H32 (TC-H32) Given spec của story P0 trên store dev đủ dữ liệu When chạy E2E Then 0 test skip do 429 hoặc thiếu dữ liệu.
+- AC-H33 (TC-H33) Given tài liệu merchant When kiểm Then có mục bắt buộc trước publish: thay nội dung mẫu, tạo discount thật khớp bậc giảm, gắn tag quiz, chỉ bật Verified khi đã xác thực; mỗi block có dòng info nhắc nội dung mẫu.
+- AC-H34 (TC-H34) Given zip giao bằng `scripts/theme-zip.sh` When liệt kê file Then 0 file `templates/index.te*` (grep hiện chưa thấy loại trừ).
+
 Mã R: R6 Lighthouse; R8 nhất quán; R9 trình duyệt; R10 assets; R12 a11y; Canvas 5 bước
 
 ### TE-11 — Block product finder quiz
@@ -173,7 +188,10 @@ Là khách mua, tôi muốn trả lời 3 câu hỏi để nhận tối đa 4 s�
 - AC1 Given block có 3 bước cấu hình bằng block con `quiz-step` (câu hỏi, 2–4 lựa chọn, mỗi lựa chọn gắn 1 tag sản phẩm) When render Then hiện bước 1, thanh tiến độ "Step 1 of 3"; không JS thì hiện cả 3 bước dạng form, nút Submit tới trang search với tag đã chọn.
 - AC2 Given chọn lựa chọn ở bước n When bấm Then sang bước n+1, tiến độ cập nhật, nút Back quay lại giữ lựa chọn cũ; bàn phím Tab/Enter/Space chọn được, focus chuyển vào tiêu đề bước mới.
 - AC3 Given hoàn tất bước 3 When có ≥ 1 sản phẩm khớp tag Then hiện tối đa 4 product card (snippet product-card) lấy qua `{% partial %}`; 0 sản phẩm Then hiện text rỗng cấu hình được + link tới collection mặc định.
-- AC4 Given mobile < 750px When render Then body map ẩn, chỉ còn danh sách lựa chọn, touch target ≥ 44px.
+- AC4 (ES1-T136 #6) Given màn hình < 48rem When render Then body map ẩn, chỉ còn danh sách lựa chọn, touch target ≥ 44px.
+- AC-H15 (TC-H15, hàng 6) Given theme mới cài When mở `/` Then quiz theo Q1 (mục 3); copy bước 1 đúng 1:506 gồm "Our most-loved feature", "20 seconds".
+- AC-H16 (TC-H16, hàng 6) Given store chưa gắn tag khớp quiz When hoàn tất 3 bước Then hiện text rỗng và link collection, 0 console error; tài liệu merchant nêu cần gắn tag.
+- AC-H17 (TC-H17, hàng 6) Given CR-10 được duyệt, từ 48rem When bấm vùng trên body map Then chọn đúng lựa chọn Upper body, Core hoặc Lower body như bấm danh sách, dùng được bằng bàn phím.
 
 Mã R: R12 a11y; R8 không app-like (logic gọn trong theme, không gọi dịch vụ ngoài)
 
@@ -182,13 +200,16 @@ Phía: FE1 markup/CSS + BE1 JS · Ước lượng sơ bộ: 13 point (techlead c
 
 Là khách mua, tôi muốn chọn nhiều sản phẩm và thêm vào giỏ một lần, thấy tổng tiền và mức giảm theo số lượng.
 
-- AC1 Given bundle builder nhận 1 collection (tối đa 9 sản phẩm) và bảng bậc giảm (vd 2 món 10%, 3 món 15%) cấu hình bằng setting When chọn/bỏ sản phẩm Then panel "Your Bundle" cập nhật danh sách, tạm tính, mức giảm, tổng, thanh tiến độ "add N more to get X% off".
+- AC1 (CTO 06/11 11:15) Given bundle builder nhận 1 collection (tối đa 9 sản phẩm) và bảng bậc giảm cấu hình bằng setting, mặc định 2 món 10%, 3 món 15% When chọn/bỏ sản phẩm Then panel "Your Bundle" cập nhật danh sách, tạm tính, mức giảm, tổng, thanh tiến độ theo AC-H18; luôn có ghi chú giảm giá chỉ áp dụng khi có discount tự động.
 - AC2 Given giảm theo bậc When hiển thị Then chỉ là hiển thị — giảm thật áp ở checkout bằng Shopify automatic discount do merchant tạo; tài liệu merchant ghi rõ; không tự tính giá trong cart.
 - AC3 Given bấm "Add Bundle To Cart" / "Add Setup To Cart" When thành công Then gọi `/cart/add.js` với `items[]` một lần, cart drawer (TE-5) mở và refresh qua partial; lỗi 422 (hết hàng) Then báo tên sản phẩm lỗi, không thêm phần còn lại.
 - AC4 Given sản phẩm hết hàng When render Then thẻ disabled, có nhãn Sold out, không chọn được.
-- AC5 Given shop the look (1:560) When render Then ảnh + tối đa 6 product row (block con), tổng tiền cộng giá variant mặc định, dùng chung JS add nhiều sản phẩm với bundle builder.
+- AC5 (CR-6) Given shop the look (1:560) When render Then ảnh + tối đa 6 product row (block con), tổng tiền cộng giá variant mặc định, dòng giảm và hotspot theo AC-H19, AC-H20, dùng chung JS add nhiều sản phẩm với bundle builder.
+- AC-H18 (TC-H18, hàng 9) Given mặc định chưa đổi và block có sản phẩm When chọn 1, 2, 3 món Then lần lượt: "còn 1 món để đạt 10%"; dòng giảm 10%; dòng giảm 15% và trạng thái đạt bậc cao nhất; luôn có ghi chú giảm giá chỉ áp dụng khi có discount tự động.
+- AC-H19 (TC-H19, hàng 7) Given CR-6 được duyệt When render shop the look Then có thẻ "Fits", dòng giảm và ghi chú cùng quy tắc AC-H18, tổng trừ đúng số tiền giảm tính từ giá thật, row hết hàng không tính vào tổng. KHÔNG CHẮC: Figma 4 món ghi 10%, bậc AC-H18 ra 15%; mặc định theo Figma 10%, chờ ES1-T199 #2.
+- AC-H20 (TC-H20, hàng 7) Given CR-6 được duyệt, 4 hotspot When hover, focus hoặc bấm hotspot Then row tương ứng có viền accent; bấm row thì hotspot tương ứng ở trạng thái chọn; dưới 64rem theo mặc định Designer ghi mới.
 
-Mã R: R8 không fake giảm giá; R12 a11y
+Mã R: R8 giảm giá thật do discount tự động, có ghi chú; R12 a11y
 
 ### TE-13 — Block featured product có countdown và video demo carousel
 Phía: FE1 markup/CSS + BE1 JS · Ước lượng sơ bộ: 8 point (techlead chốt) · Figma 1:759, 1:817
@@ -197,9 +218,12 @@ Là merchant, tôi muốn làm nổi bật 1 sản phẩm đang khuyến mãi c�
 
 - AC1 Given featured product chọn 1 sản phẩm + setting ngày giờ kết thúc khuyến mãi When còn hạn và sản phẩm có giá gạch (compare at price > price) và còn hàng Then hiện countdown ngày/giờ/phút/giây theo giờ store (PO 06/11, ES1-T155 #2); hết hạn hoặc không nhập ngày Then ẩn hẳn countdown (không reset, không đếm giả — R8).
 - AC2 Given featured product When render Then gallery, giá/giá gạch/% giảm, rating (metafield reviews nếu có, không có thì ẩn), bảng spec 4 dòng từ metafield, Add to cart + View detail; dùng chung logic variant TE-4.
-- AC3 Given video carousel nhận tối đa 8 block con `video-card` (Shopify video hoặc URL YouTube/Vimeo + 1 sản phẩm) When render Then video lazy (chỉ tải khi vào viewport), poster có sẵn, không autoplay có tiếng; 3 ô số liệu là text setting.
+- AC3 Given video carousel nhận tối đa 8 block con `video-card` (Shopify video hoặc URL YouTube/Vimeo + 1 sản phẩm) When render Then video lazy (chỉ tải khi vào viewport), poster có sẵn, bấm mới chạy, không tự chạy kể cả tắt tiếng (ES1-T155 #4); 3 ô số liệu là text setting, mặc định trống và không hiện vì 1:827 ẩn trong Figma (Q5, mục 3).
 - AC4 Given video lỗi tải When render Then hiện poster + link sản phẩm, không vỡ layout.
 - AC5 Given Lighthouse trang chủ When có 2 block này Then vẫn đạt ngưỡng TE-10 (≥ 96 desktop, ≥ 90 mobile).
+- AC-H21 (TC-H21, hàng 11) Given mặc định When render 1920 Then 6 thẻ 264 × 554, đúng copy 1:817, không có 3 ô số liệu, link, nhãn (theo Q5); poster hiển thị, bấm mới chạy.
+- AC-H22 (TC-H22, hàng 10) Given featured product trên `/` có JS When đổi variant Then giá, nút, ảnh cập nhật không reload; Add to cart mở drawer, số giỏ tăng đúng.
+- AC-H23 (TC-H23, hàng 10) Given store dev, ngày kết thúc dưới 24 giờ When render `/` Then ô ngày ẩn, 3 ô giờ phút giây giảm mỗi giây, F5 không reset; quá hạn thì ẩn countdown.
 
 Mã R: R8 không fake urgency; R6 Lighthouse; R12 a11y
 
@@ -215,8 +239,54 @@ Là CTO, tôi muốn theme có hướng dẫn máy đọc được và quy ướ
 
 Mã R: Canvas 5 bước; R8 nhất quán; Editions Fall '26 #1, #2, #10
 
+### TE-15 — Block collection list và shop by level
+Phía: FE + BE (next/back) · Ước lượng: 10 point theo plan ES1-T169 (FE1 4, BE1 3, FE2 3) · Figma 1:395, 1:464 · CR-2
+
+Là khách, tôi muốn thấy 5 danh mục và 3 trình độ tập ngay dưới hero để vào đúng collection từ trang chủ.
+
+- AC-H8 (TC-H8, hàng 3) Given block có 5 collection When render 1920 Then 5 card 336 × 270 đúng tên; bấm next/back cuộn 1 card; card link tới đúng collection.
+- AC-H9 (TC-H9, hàng 3) Given dưới 5 collection hoặc 0 collection When render Then chỉ hiện số card có, ẩn next/back khi không còn gì để cuộn; 0 collection thì storefront không render.
+- AC-H10 (TC-H10, hàng 4b) Given 3 card trình độ gắn collection When render Then badge số sản phẩm bằng `products_count` của collection, số ít nhiều đúng locale; store dev có 24 sản phẩm để khớp "24 Products". KHÔNG CHẮC: Figma chỉ card Beginner có node số sản phẩm, xem ES1-T198 #2.
+
+Mã R: R3, R14 (AC-H1, H2 áp chung); R12 a11y; R7 collection
+
+### TE-16 — Block blog posts
+Phía: FE · Ước lượng: 4 point theo plan ES1-T169 · Figma 1:1022 · CR-4
+
+Là khách, tôi muốn thấy 5 bài blog trên trang chủ kèm nhãn và thời gian đọc để chọn bài từ trang chủ.
+
+- AC-H26 (TC-H26, hàng 14) Given blog có từ 5 bài When render 1920 Then 5 card 300 × 448, ảnh, nhãn, tiêu đề, thời gian đọc; card link tới đúng bài; từ 5 card tràn thì cuộn được.
+- AC-H27 (TC-H27, hàng 14) Given blog dưới 5 bài hoặc không có nguồn thời gian đọc When render Then hiện số bài có, ẩn dòng thời gian đọc; 0 bài thì storefront không render.
+
+Thời gian đọc: tính trong Liquid từ số từ của bài, 200 từ/phút (D8 của ES1-T169).
+Mã R: R3, R14 (AC-H1, H2 áp chung); R12 a11y; R7 blog
+
+### TE-17 — Trang chủ giống Figma: nội dung mặc định, dữ liệu store dev, cổng đo
+Phía: FE + QA + DevOps + Designer · Ước lượng: 25 point dev theo plan ES1-T169 (FE0 3, FE1a 6, FE1b 5, FE1c 6, FE2 5) · Figma 1:359 · CR-1
+
+Là CTO, tôi muốn `/` trên store dev giống Figma và merchant mới cài thấy sẵn copy, số liệu Figma để đo được yêu cầu "giống 100% Figma" (CTO 06/11 11:12, 11:14).
+
+- AC-H1 (TC-H1) Given `/` trên store dev đủ dữ liệu When đọc thứ tự block trong DOM Then đúng 16 hàng inventory theo y, 0 block ngoài danh sách.
+- AC-H2 (TC-H2) Given bảng nội dung lấy từ node hiện trong Figma When so từng chuỗi với text block đã bỏ khoảng trắng thừa, so sau `text-transform` Then khớp 100%, trừ giá trị động đã che và ngoại lệ đã ký.
+- AC-H3 (TC-H3) Given viewport 1920, cùng scale với ảnh export, vùng động đã che When so từng block với ảnh node Then kích thước block lệch tối đa 2 px, số pixel khác tối đa 1%, sổ chênh lệch 0 mục mở.
+- AC-H4 (TC-H4) Given từng giá trị font, cỡ chữ, màu, bo góc, khoảng cách của node When đọc computed style Then bằng giá trị Figma, trừ ngoại lệ đã ký.
+- AC-H5 (TC-H5) Given theme mới cài, chưa mở editor When mở `/` Then copy và số liệu Figma của các hàng đã có setting chữ hiển thị, gồm "360+" ở hàng 15 và "Trusted by 10,000+ athletes" ở hàng 2; 0 chữ "Add a", "Customer name" hướng dẫn.
+- AC-H6 (TC-H6, tay trên editor) Given merchant sửa 1 setting chữ trong editor When lưu và mở `/` Then giá trị merchant hiển thị thay mặc định, ở cả block lặp (faq-item, testimonial-item, quiz-step, 2 image-with-text).
+- AC-H7 (TC-H7) Given từng control tương tác trên `/` When focus bằng bàn phím và hover Then có focus ring theo DESIGN.md, đổi trạng thái hover nếu control có quy định; axe 0 serious, 0 console error.
+- AC-H35 (TC-H35) Given `/` ở 360 và 768 When đo từng block Then không tràn ngang, control ≥ 44px, không chồng chữ, theo ES1-T116 #5, #6, ES1-T135 #4, ES1-T145 #1, #6, ES1-T154 #2, #8; TE-15, TE-16, CR-3 có mặc định Designer ghi trước khi làm.
+
+Ngưỡng 2 px, 1% chờ hiệu chuẩn ở cổng G1; chỉ CTO nới được. Chỉ so node có bản thân và mọi node cha không `visible:false`; ảnh export thắng snapshot khi lệch.
+Mã R: R3, R14 (AC-H1, H2); R8 (AC-H5, xem TE-10 AC3); R12 (AC-H7, H35)
+
 ## 3. Quyết định đã chốt (CTO 27/10/2026, trước là câu hỏi mở)
 - Hết hàng: sản phẩm vẫn hiện trong featured collection, bundle, shop the look, collection, kèm badge "Sold out"; nút thêm vào giỏ disabled. Áp cho TE-3, TE-4, TE-6, TE-12.
 - Cart: mặc định drawer (TE-5); setting `cart_type` cho đổi sang page.
 - Collection mobile: mặc định 2 cột (TE-6); setting cho chọn 1 hoặc 2.
 - Tên theme: Efitco (CTO 22/10).
+
+Chốt CTO 06/11/2026 (ES1-T167, T168, T169):
+- Trang chủ giống 100% Figma trên store dev là yêu cầu bắt buộc. Copy, số liệu, review mẫu, tên khách, sao, bậc giảm bundle 10%, 15% kèm ghi chú nằm trong mặc định của theme; Verified tắt. Thay ES1-T115 #2, T136 #8, T146 #2, T155 #8.
+- Merchant mới cài không có sẵn ảnh, video, countdown. Cổng PR đo qua `?view=figma`, nghiệm thu trên `/`.
+- Duyệt 10 CR của ES1-T167. Ngoại lệ so với Figma: E1–E9 của ES1-T167 mục 2.4, thêm E10 (số mẫu 1:560), E11 ("Add to cart" theo AGENTS.md), mở rộng E7 (bậc giảm 5% của 1:636).
+- Mặc định Q1–Q6 của ES1-T168: Q1 bundle dùng collection `all`, quiz hiện đủ và kết quả rỗng khi chưa có tag, featured product và shop the look ẩn tới khi chọn sản phẩm. Q2 rating và 4 giá trị spec hàng 10 lấy từ metafield, nhãn spec là mặc định. Q3 giữ nguyên văn copy Figma kể cả lỗi, Designer sửa Figma thì đổi theo. Q4 wordmark, copyright dùng `shop.name`. Q5 hàng 11 không hiện 3 ô số liệu. Q6 thêm E10, E11, mở rộng E7.
+- D7 của ES1-T169: mặc định `products_to_show` 4; vùng bấm swatch 44px.
