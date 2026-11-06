@@ -2,12 +2,12 @@
 // Ticket ES1-T94 TE-5-FE1: cart page (docs/srs.md#TE-5 AC1, AC3, AC4, AC5, AC6; drafts/techlead/ES1-T89/task-split.md D3, D4, D5, D6, D11, D12).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... [TE5_SHOP_COUNTRY=...] npx playwright test tests/e2e/ES1-T94.spec.ts -g "AC1|AC3|AC4|AC5|AC6|nojs"
 // Thiếu dữ liệu → skip có lý do. Automatic discount chưa có trên store dev (ES1-T91 #7) nên chỉ kiểm khi cart.js có discount.
-import { test, expect, type APIRequestContext, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
-import { getJson } from './support/http';
+import { pageJson, productData, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
 
 type CartItem = {
   key: string;
@@ -33,30 +33,33 @@ const ENV = {
 const tid = (page: Page, id: string) => page.getByTestId(id);
 const digits = (text: string | null) => (text ?? '').replace(/\D/g, '');
 
-async function readProduct(request: APIRequestContext, handle: string): Promise<Product> {
-  // getJson: cache file + thử lại + encode handle có dấu (store dev trả 429 khi gọi dồn, CI #80)
-  const r = await getJson<Product>(request, `/products/${handle}.js`);
-  test.skip(r.status === 429, `Shopify trả 429 cho ${handle}.js sau khi thử lại (giới hạn store dev)`);
-  expect(r.ok, `/products/${handle}.js trả ${r.status}`).toBeTruthy();
-  return r.body as Product;
-}
+// ES1-T100: đọc từ trang sản phẩm đã mở (support/product-data.ts), không gọi .js bằng page.request (store dev trả 429, PR #81).
+const readCart = (page: Page) => readCartJson<Cart>(page);
 
-async function readCart(request: APIRequestContext): Promise<Cart> {
-  const r = await getJson<Cart>(request, '/cart.js');
-  test.skip(r.status === 429, 'Shopify trả 429 cho /cart.js sau khi thử lại (giới hạn store dev)');
-  expect(r.ok, `/cart.js trả ${r.status}`).toBeTruthy();
-  return r.body as Cart;
-}
-
-async function addToCart(request: APIRequestContext, handle: string, quantity = 1, usePlan = false) {
-  const product = await readProduct(request, handle);
+async function postLine(page: Page, handle: string, product: Product, quantity: number, usePlan: boolean) {
   const variant = product.variants.find((v) => v.available && (!usePlan || v.selling_plan_allocations?.length));
   test.skip(!variant, `${handle} không có variant bán được`);
   const data: Record<string, unknown> = { id: variant!.id, quantity };
   if (usePlan) data.selling_plan = variant!.selling_plan_allocations![0].selling_plan_id;
-  const res = await request.post('/cart/add.js', { data });
+  const res = await page.request.post('/cart/add.js', { data });
+  // Store dev trả 429 cho POST ngoài trình duyệt khi tải cao; POST trong trang (fetch) kích hoạt Cloudflare challenge cả phiên (CI #82) → skip có lý do.
+  test.skip(res.status() === 429, 'Shopify trả 429 cho /cart/add.js (giới hạn store dev)');
   expect(res.ok(), `/cart/add.js trả ${res.status()}`).toBeTruthy();
   return variant!;
+}
+
+async function addToCart(page: Page, handle: string, quantity = 1, usePlan = false) {
+  await page.goto(`/products/${handle}`);
+  // selling plan không có trong JSON nhúng variant-json
+  const product: Product = usePlan
+    ? requireJson(await pageJson<Product>(page, `/products/${handle}.js`), `/products/${handle}.js`)
+    : await productData(page, handle);
+  return postLine(page, handle, product, quantity, usePlan);
+}
+
+async function addToCartNoScript(page: Page, handle: string) {
+  await page.goto(`/products/${handle}`);
+  return postLine(page, handle, await productDataNoScript(page, handle), 1, false);
 }
 
 async function noJsPage(browser: Browser) {
@@ -85,8 +88,8 @@ test.describe('ES1-T94 TE-5 cart page', () => {
 
   test('AC1 dòng hàng có đủ trường, số tiền khớp /cart.js', async ({ page }) => {
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-    await addToCart(page.request, ENV.product!, 2);
-    const cart = await readCart(page.request);
+    await addToCart(page, ENV.product!, 2);
+    const cart = await readCart(page);
     const item = cart.items[0];
     await page.goto('/cart');
 
@@ -112,16 +115,16 @@ test.describe('ES1-T94 TE-5 cart page', () => {
 
   test('AC1 selling plan hiện tên gói', async ({ page }) => {
     test.skip(!ENV.sellingPlan, 'Thiếu TE4_SELLING_PLAN_HANDLE');
-    await addToCart(page.request, ENV.sellingPlan!, 1, true);
-    const cart = await readCart(page.request);
+    await addToCart(page, ENV.sellingPlan!, 1, true);
+    const cart = await readCart(page);
     await page.goto('/cart');
     await expect(tid(page, 'cart-line-selling-plan').first()).toHaveText(cart.items[0].selling_plan_allocation!.selling_plan.name);
   });
 
   test('AC1 unit price hiện khi variant có đơn giá', async ({ page }) => {
     test.skip(!ENV.unitPrice, 'Thiếu TE4_UNIT_PRICE_HANDLE');
-    await addToCart(page.request, ENV.unitPrice!);
-    const cart = await readCart(page.request);
+    await addToCart(page, ENV.unitPrice!);
+    const cart = await readCart(page);
     test.skip(!cart.items[0].unit_price_measurement, `${ENV.unitPrice} không có unit_price_measurement`);
     await page.goto('/cart');
     await expect(tid(page, 'cart-line-unit-price').first()).toBeVisible();
@@ -131,7 +134,7 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     test.skip(!ENV.shopCountry, 'Thiếu TE5_SHOP_COUNTRY (ES1-T91 #7)');
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
     const cartUrl = `/cart?country=${ENV.shopCountry}`;
-    const variant = await addToCart(page.request, ENV.product!);
+    const variant = await addToCart(page, ENV.product!);
     await page.goto(cartUrl);
 
     const bar = tid(page, 'cart-free-shipping-progress');
@@ -150,11 +153,11 @@ test.describe('ES1-T94 TE-5 cart page', () => {
   test('AC3 market khác tiền shop: không có thanh', async ({ page }) => {
     test.skip(!ENV.shopCountry, 'Thiếu TE5_SHOP_COUNTRY (ES1-T91 #7)');
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-    await addToCart(page.request, ENV.product!);
+    await addToCart(page, ENV.product!);
     await page.goto(`/cart?country=${ENV.shopCountry}`);
-    const shopCurrency = (await readCart(page.request)).currency;
+    const shopCurrency = (await readCart(page)).currency;
     await page.goto('/cart?country=DE');
-    const currency = (await readCart(page.request)).currency;
+    const currency = (await readCart(page)).currency;
     test.skip(currency === shopCurrency, 'Store không có market khác tiền shop');
     await expect(tid(page, 'cart-free-shipping')).toHaveCount(0);
   });
@@ -173,7 +176,7 @@ test.describe('ES1-T94 TE-5 cart page', () => {
 
   test('AC5 hook cho BE: cart-items, live region, note gắn form ngoài partial', async ({ page }) => {
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-    await addToCart(page.request, ENV.product!);
+    await addToCart(page, ENV.product!);
     await page.goto('/cart');
     const items = tid(page, 'cart-items');
     await expect(items).toHaveAttribute('data-partials', 'cart-page cart-count');
@@ -208,13 +211,13 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     test('nojs đổi số lượng + Update, note lưu vào /cart.js', async ({ browser }) => {
       test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
       const { context, page } = await noJsPage(browser);
-      await addToCart(context.request, ENV.product!);
+      await addToCartNoScript(page, ENV.product!);
       await page.goto('/cart');
       await tid(page, 'cart-line-quantity').first().fill('2');
       await tid(page, 'cart-page-note').fill('ES1-T94 note');
       await tid(page, 'cart-update').click();
       await page.waitForLoadState();
-      const cart = await readCart(context.request);
+      const cart = await readCartNoScript<Cart>(page);
       expect(cart.items[0].quantity).toBe(2);
       expect(cart.note).toBe('ES1-T94 note');
       await expect(tid(page, 'cart-page-note')).toHaveValue('ES1-T94 note');
@@ -224,22 +227,22 @@ test.describe('ES1-T94 TE-5 cart page', () => {
     test('nojs Remove về trạng thái rỗng', async ({ browser }) => {
       test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
       const { context, page } = await noJsPage(browser);
-      await addToCart(context.request, ENV.product!);
+      await addToCartNoScript(page, ENV.product!);
       await page.goto('/cart');
       await tid(page, 'cart-line-remove').first().click();
       await expect(tid(page, 'cart-empty')).toBeVisible();
-      expect((await readCart(context.request)).item_count).toBe(0);
+      expect((await readCartNoScript<Cart>(page)).item_count).toBe(0);
       await context.close();
     });
 
     test('nojs Checkout chuyển sang checkout', async ({ browser }) => {
       test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
       const { context, page } = await noJsPage(browser);
-      await addToCart(context.request, ENV.product!);
+      await addToCartNoScript(page, ENV.product!);
       await page.goto('/cart');
       await tid(page, 'cart-page-note').fill('ES1-T94 checkout note');
       await Promise.all([page.waitForURL(/checkout/), tid(page, 'cart-checkout').click()]);
-      expect((await readCart(context.request)).note).toBe('ES1-T94 checkout note');
+      expect((await readCartNoScript<Cart>(page)).note).toBe('ES1-T94 checkout note');
       await context.close();
     });
   });
