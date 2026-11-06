@@ -30,7 +30,7 @@ const BLOCK = read('blocks/product-recommendations.liquid');
 
 const REC = /\/recommendations\/products\.json/;
 const REC_GLOB = '**/recommendations/products.json*';
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 // route.abort()/fulfill 500: Chrome tự log "Failed to load resource" (log mạng, không phải lỗi JS theme).
 const NETWORK_LOG = /Failed to load resource/i;
 

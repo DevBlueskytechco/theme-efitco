@@ -21,7 +21,7 @@ const T = {
 
 const HANDLE = env('TE4_OPTIONS_HANDLE', 'TE4_VARIANTS_HANDLE');
 const JS = readFileSync(join(process.cwd(), 'assets/product-variant-picker.js'), 'utf8');
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 // route.abort(): Chrome tự log "Failed to load resource" (log mạng, không phải lỗi JS theme).
 const NETWORK_LOG = /Failed to load resource/i;
 
