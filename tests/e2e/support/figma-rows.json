@@ -1,0 +1,101 @@
+{
+  "$comment": "ES1-T176: dữ liệu so Figma theo hàng (plan ES1-T169 D2, D3). image=active là đang đo; còn lại test.fixme ghi closedBy. masks là px CSS tính từ góc node. band là màu nền ghép baseline: 1:360 #1A1A1A cho 2 hàng đầu và hàng 3, frame trắng cho hàng node không có fill.",
+  "thresholds": {
+    "sizePx": 2,
+    "maxDiffRatio": 0.01,
+    "pixelThreshold": 0.2,
+    "probeThresholds": [0.1, 0.2, 0.3],
+    "status": "Đề xuất ES1-T167 mục 2.2, chưa hiệu chuẩn trên store. Chỉ CTO nới được, xem drafts/qa/ES1-T176/calibration.md"
+  },
+  "dataTicket": "ES1-T178",
+  "rows": [
+    {
+      "id": "1", "name": "Header", "node": "1:362", "src": "1-362.png", "band": "#1a1a1a", "snapshot": "row-1-1-362", "image": "active",
+      "clip": { "x": 252, "y": 24 },
+      "masks": [{ "x": 0, "y": 0, "w": 100, "h": 30, "why": "Logo 1:377 là ảnh, chọn trong editor (ES1-T173 hàng 1)" }],
+      "domMasks": [{ "testid": "header-logo", "why": "Logo hoặc tên shop trên store" }],
+      "geometry": [
+        { "name": "logo trái", "testid": "header-logo", "edge": "left", "node": "1:377" },
+        { "name": "mục menu đầu trái", "testid": "header-menu-item", "nth": 0, "edge": "left", "node": "1:366" },
+        { "name": "mục menu cuối phải", "testid": "header-menu-item", "nth": -1, "edge": "right", "node": "1:372" },
+        { "name": "icon search giữa", "testid": "header-search-link", "edge": "centerX", "node": "1:374" },
+        { "name": "icon account giữa", "testid": "header-account", "edge": "centerX", "node": "1:375" },
+        { "name": "icon cart giữa", "testid": "header-cart-link", "edge": "centerX", "node": "1:376" }
+      ],
+      "styles": [
+        { "name": "mục menu", "testid": "header-menu-item", "nth": 0, "inner": "a, summary", "node": "I1:366;2963:2083;1327:1245", "props": ["fontFamily", "fontWeight", "fontSize", "lineHeight", "letterSpacing", "color"] }
+      ],
+      "spacing": [],
+      "copyRoot": "header", "copyNeedsData": true
+    },
+    {
+      "id": "2-slide-1", "name": "Slideshow slide 1", "node": "1:422", "src": "1-422.png", "band": "#1a1a1a", "snapshot": "row-2-1-422", "image": "active", "slide": 0,
+      "clip": { "x": 61, "y": 80 },
+      "hideMedia": "slideshow-image",
+      "flatBackgroundFrom": { "x": 120, "y": 40, "w": 200, "h": 120 },
+      "masks": [
+        { "x": 670, "y": 0, "w": 980, "h": 827, "why": "Ảnh người mẫu 1:425, 1:426: che theo D2, Q3 chưa trả lời" },
+        { "x": 1650, "y": 470, "w": 148, "h": 357, "why": "Tạ tay trong ảnh, chừa nút Next phía trên" },
+        { "x": 431, "y": 512, "w": 239, "h": 315, "why": "Cánh tay trong ảnh, chừa CTA bên trái" }
+      ],
+      "domMasks": [
+        { "testid": "slideshow-dots", "why": "Export 1:422 không có dots (1:418 là node riêng)" },
+        { "testid": "slideshow-pause", "why": "Figma không có nút pause" }
+      ],
+      "geometry": [
+        { "name": "khung slide", "testid": "slideshow-slide", "nth": 0, "edge": "box", "node": "1:423" },
+        { "name": "CTA", "testid": "slideshow-button-primary", "nth": 0, "edge": "box", "node": "1:433" },
+        { "name": "Back", "testid": "slideshow-prev", "edge": "box", "node": "1:435" },
+        { "name": "Next", "testid": "slideshow-next", "edge": "box", "node": "1:436" }
+      ],
+      "styles": [
+        { "name": "eyebrow", "testid": "slideshow-slide", "nth": 0, "text": "Trusted by 10,000+ athletes", "node": "1:429", "props": ["fontFamily", "fontWeight", "fontSize", "lineHeight", "letterSpacing", "textTransform", "color"] },
+        { "name": "heading", "testid": "slideshow-heading", "nth": 0, "node": "1:431", "props": ["fontFamily", "fontWeight", "fontSize", "lineHeight", "letterSpacing", "textTransform", "color"] },
+        { "name": "sub", "testid": "slideshow-slide", "nth": 0, "text": "Upgrade your journey", "node": "1:432", "props": ["fontFamily", "fontWeight", "fontSize", "lineHeight", "letterSpacing", "color"] },
+        { "name": "CTA khung", "testid": "slideshow-button-primary", "nth": 0, "node": "1:433", "props": ["backgroundColor", "borderRadius", "paddingLeft", "paddingTop", "height", "width"] },
+        { "name": "CTA chữ", "testid": "slideshow-button-primary", "nth": 0, "node": "I1:433;377:1333", "props": ["fontFamily", "fontWeight", "fontSize", "lineHeight", "letterSpacing", "color"] },
+        { "name": "bo góc khung", "testid": "slideshow-track", "node": "1:423", "props": ["borderRadius"] },
+        { "name": "Back", "testid": "slideshow-prev", "node": "I1:435;1223:1022", "props": ["backgroundColor", "width", "height"] },
+        { "name": "Next", "testid": "slideshow-next", "node": "I1:436;1223:1032", "props": ["backgroundColor", "width", "height"] }
+      ],
+      "spacing": [
+        { "name": "eyebrow tới heading", "from": { "testid": "slideshow-slide", "nth": 0, "text": "Trusted by 10,000+ athletes" }, "to": { "testid": "slideshow-heading", "nth": 0 }, "fromNode": "1:429", "toNode": "1:431" },
+        { "name": "heading tới sub", "from": { "testid": "slideshow-heading", "nth": 0 }, "to": { "testid": "slideshow-slide", "nth": 0, "text": "Upgrade your journey" }, "fromNode": "1:431", "toNode": "1:432" },
+        { "name": "sub tới CTA", "from": { "testid": "slideshow-slide", "nth": 0, "text": "Upgrade your journey" }, "to": { "testid": "slideshow-button-primary", "nth": 0 }, "fromNode": "1:432", "toNode": "1:433" }
+      ],
+      "copyRow": "2", "copyRoot": "slideshow"
+    },
+    {
+      "id": "2-slide-2", "name": "Slideshow slide 2", "node": "1:437", "src": "1-437.png", "band": "#1a1a1a", "snapshot": "row-2-1-437", "image": "active", "slide": 1,
+      "clip": { "x": 61, "y": 80 },
+      "hideMedia": "slideshow-image",
+      "flatBackgroundFrom": { "x": 120, "y": 40, "w": 200, "h": 120 },
+      "masks": [
+        { "x": 670, "y": 0, "w": 980, "h": 827, "why": "Ảnh người mẫu 1:438–1:441: che theo D2, Q3 chưa trả lời" },
+        { "x": 1650, "y": 470, "w": 148, "h": 357, "why": "Thân người trong ảnh, chừa nút Next phía trên" }
+      ],
+      "domMasks": [
+        { "testid": "slideshow-dots", "why": "Export 1:437 không có dots" },
+        { "testid": "slideshow-pause", "why": "Figma không có nút pause" }
+      ],
+      "geometry": [{ "name": "khung slide", "testid": "slideshow-slide", "nth": 1, "edge": "box", "node": "1:438" }],
+      "styles": [],
+      "spacing": []
+    },
+    { "id": "3", "name": "Collection list", "node": "1:395", "src": "1-395.png", "band": "#1a1a1a", "snapshot": "row-3-1-395", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "3", "copyRoot": "container-figma-collection-list", "copyNeedsData": true },
+    { "id": "4a", "name": "Rich text", "node": "1:454", "src": "1-453.png", "crop": { "x": 252, "y": 120, "w": 1416, "h": 202 }, "band": "#ebe6e0", "snapshot": "row-4a-1-454", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "4a", "copyRoot": "rich-text" },
+    { "id": "4b", "name": "Shop by level", "node": "1:464", "src": "1-453.png", "crop": { "x": 252, "y": 442, "w": 1416, "h": 586 }, "band": "#ebe6e0", "snapshot": "row-4b-1-464", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "4b", "copyRoot": "shop-by-level", "copyNeedsData": true },
+    { "id": "5", "name": "Featured collection", "node": "1:490", "src": "1-490.png", "band": "#ffffff", "snapshot": "row-5-1-490", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "5", "copyRoot": "featured-collection" },
+    { "id": "6", "name": "Quiz", "node": "1:506", "src": "1-506.png", "band": "#ffffff", "snapshot": "row-6-1-506", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "6", "copyRoot": "quiz" },
+    { "id": "7", "name": "Shop the look", "node": "1:560", "src": "1-560.png", "band": "#ffffff", "snapshot": "row-7-1-560", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "7", "copyRoot": "shop-the-look" },
+    { "id": "8", "name": "Inspiration", "node": "1:625", "src": "1-625.png", "band": "#ebe6e0", "snapshot": "row-8-1-625", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "8", "copyRoot": "container-figma-inspiration" },
+    { "id": "9", "name": "Bundle builder", "node": "1:636", "src": "1-636.png", "band": "#f5f5f1", "snapshot": "row-9-1-636", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "9", "copyRoot": "bundle-builder" },
+    { "id": "10", "name": "Featured product", "node": "1:759", "src": "1-759.png", "band": "#ffffff", "snapshot": "row-10-1-759", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "10", "copyRoot": "featured-product", "copySkip": [{ "value": "Sale ends in", "why": "Countdown chỉ hiện khi có ngày kết thúc, nhập ở ES1-T178" }] },
+    { "id": "11", "name": "Video carousel", "node": "1:817", "src": "1-817.png", "band": "#ffffff", "bandNote": "KHÔNG CHẮC: node không có fill, template dùng background alt; xác nhận khi mở hàng này", "snapshot": "row-11-1-817", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "11", "copyRoot": "video-carousel" },
+    { "id": "12", "name": "Testimonials", "node": "1:885", "src": "1-885.png", "band": "#f5f5f1", "snapshot": "row-12-1-885", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "12", "copyRoot": "testimonials" },
+    { "id": "13", "name": "Why choose", "node": "1:992", "src": "1-992.png", "band": "#1c1c1c", "snapshot": "row-13-1-992", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "13", "copyRoot": "container-figma-why-choose" },
+    { "id": "14", "name": "Blog posts", "node": "1:1022", "src": "1-1022.png", "band": "#ffffff", "snapshot": "row-14-1-1022", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "14", "copyRoot": "container-figma-blog-posts", "copyNeedsData": true },
+    { "id": "15", "name": "FAQ", "node": "1:1057", "src": "1-1057.png", "band": "#f5f5f1", "snapshot": "row-15-1-1057", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "15", "copyRoot": "faq" },
+    { "id": "16", "name": "Newsletter, footer, trust", "node": "1:1104", "src": "1-1104.png", "band": "#151515", "snapshot": "row-16-1-1104", "image": "fixme", "closedBy": "ES1-T196", "copyRow": "16", "copyRoot": "footer" }
+  ]
+}
