@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy (phiên viết không có preview, chưa type-check); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép sang tests/e2e/ES1-T137.spec.ts.
 // Ticket ES1-T137 TE-11-FE1: quiz markup + CSS (docs/srs.md#TE-11 AC1, AC4; drafts/techlead/ES1-T132/task-split.md D1, D2, D4, D5, D7, D9).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T137.spec.ts -g "AC1|AC4|nojs"
-// BE1 (ES1-T139) chạy lại spec này khi đã có assets/quiz-finder.js: phần nào chỉ đúng trước khi JS nâng cấp thì kiểm data-enhanced trước.
+// ES1-T139: test chỉ đúng trước khi JS nâng cấp thì gọi withoutModule, vì quiz ở đầu ?view=te11 nên module nạp ngay.
 import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { watchShopPay403 } from './support/console-guard';
@@ -13,7 +13,7 @@ const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\
 const tid = (page: Page, id: string) => page.getByTestId(id);
 const step = (page: Page, n: number) => page.locator(`[data-testid="quiz-step"][data-quiz-step="${n}"]`);
 const option = (page: Page, tag: string) => page.locator(`[data-testid="quiz-option-input"][value="${tag}"]`);
-const isEnhanced = (page: Page) => tid(page, 'quiz').evaluate((el) => el.hasAttribute('data-enhanced'));
+const withoutModule = (page: Page) => page.route(/\/quiz-finder\.js/, (route) => route.abort());
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
@@ -61,6 +61,7 @@ test.describe('ES1-T137 TE-11 quiz', () => {
   });
 
   test('AC1 có JS trước khi module nâng cấp: chỉ bước 1, chọn xong bước kế mới hiện', async ({ page }) => {
+    await withoutModule(page);
     await page.goto(TE11);
     await expect(step(page, 1)).toBeVisible();
     await expect(step(page, 1).getByTestId('quiz-step-progress')).toHaveText('Step 1 of 3');
@@ -77,12 +78,12 @@ test.describe('ES1-T137 TE-11 quiz', () => {
     await expect(step(page, 3)).toBeVisible();
 
     await option(page, 'quiz-home').check();
-    if (!(await isEnhanced(page))) await expect(tid(page, 'quiz-submit')).toBeVisible();
+    await expect(tid(page, 'quiz-submit')).toBeVisible();
   });
 
   test('AC1 bỏ chọn bước 1 thì các bước sau ẩn lại (chưa có module)', async ({ page }) => {
+    await withoutModule(page);
     await page.goto(TE11);
-    test.skip(await isEnhanced(page), 'Module đổi checkbox thành radio, không bỏ chọn được');
     await option(page, 'quiz-upper').check();
     await option(page, 'quiz-beginner').check();
     await expect(step(page, 3)).toBeVisible();
@@ -92,6 +93,7 @@ test.describe('ES1-T137 TE-11 quiz', () => {
   });
 
   test('AC1 markup: form GET, fieldset, legend chứa h3, input đúng tên và tag', async ({ page }) => {
+    await withoutModule(page);
     await page.goto(TE11);
     const form = tid(page, 'quiz-form');
     await expect(form).toHaveAttribute('method', /get/i);
