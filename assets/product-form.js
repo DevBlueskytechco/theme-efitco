@@ -1,4 +1,4 @@
-// TE-4 AC5 AC6 AC8 (ES1-T67, ES1-T85). Submit → cart/add.js; page type or no <cart-drawer> → cart URL.
+// TE-4 AC5 AC6 AC8 (ES1-T67, ES1-T85, ES1-T96). Submit → cart/add.js; page type, no drawer dialog or drawer script not defined → cart URL.
 // 4xx → API description in role=alert; network/5xx without JSON → native submit.
 // shopify:cart:lines-update dispatched before the POST; its promise always resolves a CartLinesUpdateResult.
 const ADD = 'button[name="add"]';
@@ -112,10 +112,10 @@ class ProductForm extends HTMLElement {
         this.settle(ev, text, signal);
         return this.say(this.error, text);
       }
-      this.dispatchEvent(new CustomEvent("theme:cart:updated", { bubbles: true, detail: { source: "product-form", item: data } }));
+      this.dispatchEvent(new CustomEvent("theme:cart:updated", { bubbles: true, detail: { source: "product-form", item: data, opener: submitter } }));
       await this.settle(ev, "", signal);
       if (this.dataset.labelAdded) this.say(this.status, this.dataset.labelAdded);
-      leaving = this.dataset.cartType === "page" || !document.querySelector("cart-drawer");
+      leaving = this.dataset.cartType === "page" || !document.querySelector("cart-drawer dialog") || !customElements.get("cart-drawer");
       if (leaving) window.location.assign(this.dataset.cartUrl);
     } catch (err) {
       this.settle(ev, String(err?.message || err));
