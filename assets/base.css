@@ -3221,6 +3221,365 @@ cart-drawer {
   }
 }
 
+/** Product finder quiz (TE-11, Figma 1:506): panel 60, 2 cột từ 64rem, thẻ trắng 32.
+   Nền panel Figma không có token: dùng background_dark (ES1-T135 #5) */
+.quiz {
+  display: grid;
+  gap: var(--space-6);
+  margin-block: var(--space-7);
+  padding: var(--space-4);
+  border-radius: var(--radius-hero);
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+}
+
+.quiz__intro {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+.quiz__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-size: var(--font-size-sm);
+  line-height: calc(22 / 14);
+}
+
+.quiz__eyebrow::before {
+  content: "";
+  inline-size: var(--space-2);
+  block-size: var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: currentcolor;
+}
+
+/* Figma 1:514: 48 / 58, letter-spacing -0.96 */
+.quiz__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.quiz__subheading {
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: calc(26 / 16);
+}
+
+.quiz__notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+  margin-block-start: var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+.quiz__note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+.quiz-icon {
+  flex: none;
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+}
+
+.quiz__form {
+  display: grid;
+  gap: var(--space-6);
+  min-inline-size: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.quiz-step {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.quiz-step__legend {
+  display: block;
+  inline-size: 100%;
+  padding: 0;
+}
+
+.quiz-step__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-block-end: var(--space-5);
+}
+
+.quiz-step__bar {
+  flex: 1;
+  block-size: var(--space-1);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-border);
+}
+
+.quiz-step__bar::before {
+  content: "";
+  display: block;
+  inline-size: var(--quiz-progress);
+  block-size: 100%;
+  background-color: var(--color-accent);
+}
+
+.quiz-step__count {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+  white-space: nowrap;
+}
+
+/* Figma 1:531: 28 / 34, letter-spacing -0.56 */
+.quiz-step__title {
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: calc(34 / 28);
+}
+
+.quiz-step__subheading {
+  margin: 0;
+  margin-block-start: var(--space-1);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+.quiz-step__body {
+  display: grid;
+  gap: var(--space-5);
+  margin-block-start: var(--space-5);
+}
+
+/* Trang trí: display none để ảnh lazy không tải dưới 48rem (AC4) */
+.quiz-step__map {
+  display: none;
+}
+
+.quiz-step__options {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+/* Input phủ cả hàng, trong suốt: bấm ở đâu cũng chọn, focus vẫn nằm trên input thật */
+.quiz-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 44px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.quiz-option:has(:checked) {
+  background-color: var(--color-background-sand);
+}
+
+.quiz-option:has(:focus-visible) {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.quiz-option__input {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.quiz-option__thumb {
+  display: block;
+  flex: none;
+  inline-size: calc(var(--space-1) * 10);
+  block-size: calc(var(--space-1) * 10);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+}
+
+.quiz-option__thumb > img {
+  display: block;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.quiz-option__text {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.quiz-option__label {
+  display: block;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: calc(26 / 18);
+}
+
+.quiz-option__description {
+  display: block;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: calc(22 / 14);
+}
+
+/* Vòng chưa chọn muted_light để đạt 3:1 trên trắng; đã chọn có tick, không chỉ bằng màu */
+.quiz-option__mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+  border: 1px solid var(--color-muted-light);
+  border-radius: var(--radius-pill);
+  color: var(--color-accent-foreground);
+}
+
+.quiz-option__mark .quiz-icon {
+  visibility: hidden;
+}
+
+.quiz-option__input:checked ~ .quiz-option__mark {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+}
+
+.quiz-option__input:checked ~ .quiz-option__mark .quiz-icon {
+  visibility: visible;
+}
+
+.quiz__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* .button đặt display nên thắng thuộc tính hidden */
+.quiz__back[hidden] {
+  display: none;
+}
+
+.quiz__submit {
+  margin-inline-start: auto;
+}
+
+/* Chữ nút là trắng: viền mặc định currentcolor không thấy trên thẻ trắng */
+.quiz__submit:focus-visible {
+  outline-color: var(--color-foreground);
+}
+
+.quiz-placeholder {
+  padding: var(--space-4);
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+}
+
+/* Có JS, trước khi module nạp (ES1-T132 D5): ẩn mọi thứ sau bước chưa trả lời, tránh layout shift
+   khi module nâng cấp. JS tắt hoặc thiếu :has thì rule bị bỏ, hiện đủ 3 bước (AC1) */
+@media (scripting: enabled) {
+  .quiz:not([data-design-mode], [data-enhanced]) .quiz-step:not(:has(:checked)) ~ .quiz-step,
+  .quiz:not([data-design-mode], [data-enhanced]) .quiz-step:not(:has(:checked)) ~ .quiz__actions {
+    display: none;
+  }
+}
+
+/* Module đã nâng cấp: chỉ bước data-active hiện; hàng nút ẩn khi không còn nút nào */
+.quiz[data-enhanced]:not([data-design-mode]) .quiz-step:not([data-active]),
+.quiz[data-enhanced]:not([data-design-mode]) .quiz__submit,
+.quiz[data-enhanced]:not([data-design-mode]) .quiz__actions:not(:has(.quiz__back:not([hidden]))) {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .quiz {
+    padding: var(--space-7);
+  }
+
+  .quiz__form {
+    padding: var(--space-6);
+  }
+
+  .quiz-step__body--map {
+    grid-template-columns: calc(var(--space-1) * 38) minmax(0, 1fr);
+  }
+
+  .quiz-step__map {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background-color: var(--color-background-sand);
+  }
+
+  .quiz-step__map > img {
+    position: absolute;
+    inset: 0;
+    block-size: 100%;
+    object-fit: contain;
+    mix-blend-mode: darken;
+  }
+
+  /* Figma 1:536: hàng cao 80, padding 12 / 24 */
+  .quiz-option {
+    min-block-size: calc(var(--space-1) * 20);
+    padding: var(--space-3) var(--space-5);
+  }
+}
+
+@media (min-width: 64rem) {
+  /* 2 / 3: dưới 80rem thẻ 1 / 2 quá hẹp cho body map + hàng lựa chọn */
+  .quiz--split {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+    align-items: center;
+  }
+}
+
+@media (min-width: 80rem) {
+  .quiz {
+    padding: calc(var(--space-1) * 15);
+  }
+
+  .quiz--split {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--space-1) * 20);
+  }
+}
+
 /** Gift card template */
 .template-gift-card main {
   text-align: center;

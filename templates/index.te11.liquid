@@ -1,0 +1,92 @@
+{% comment %}
+  TE-11 test template, opened with /?view=te11 (drafts/techlead/ES1-T132/task-split.md D10).
+  A branch preview has no block settings, so this file sets them through block
+  parameters, with Figma 1:506 copy, tags from ES1-T134 and images from
+  collections.all. Steps 2 and 3 use placeholder copy (ES1-T135 #8).
+  Step 1 has 3 options, step 2 has 2, step 3 has 4. quiz-outdoor and quiz-travel
+  exist only to reach 4 options. Remove this file before a real store release.
+{% endcomment %}
+
+{%- liquid
+  assign te11_image_1 = collections.all.products[0].featured_image
+  assign te11_image_2 = collections.all.products[1].featured_image
+  assign te11_image_3 = collections.all.products[2].featured_image
+  assign te11_image_4 = collections.all.products[3].featured_image
+-%}
+
+{% block 'container', id: 'te11-title' %}
+  <h1 class="visually-hidden">{{ shop.name }}</h1>
+{% endblock %}
+
+{% block 'container', id: 'te11-quiz', tag: 'div' %}
+  {% block 'quiz',
+    id: 'te11-figma',
+    eyebrow: 'Our most-loved feature',
+    heading: 'Find Your Perfect Gear',
+    subheading: 'Three questions. One shortlist.',
+    note_1: '20 seconds',
+    note_2: 'No sign-up required'
+  %}
+    {% block 'quiz-step',
+      id: 'te11-step-1',
+      step: 1,
+      total: 3,
+      question: 'Where do you want to focus?',
+      subheading: 'Pick from the list.',
+      body_map: te11_image_1,
+      option_1_label: 'Upper body',
+      option_1_description: 'Shoulders, arms, chest',
+      option_1_tag: 'quiz-upper',
+      option_1_image: te11_image_2,
+      option_2_label: 'Core',
+      option_2_description: 'Abs, stability, balance',
+      option_2_tag: 'quiz-core',
+      option_2_image: te11_image_3,
+      option_3_label: 'Lower body',
+      option_3_description: 'Legs, glutes, calves',
+      option_3_tag: 'quiz-lower',
+      option_3_image: te11_image_4
+    %}{% endblock %}
+    {% block 'quiz-step',
+      id: 'te11-step-2',
+      step: 2,
+      total: 3,
+      question: 'What is your training level?',
+      option_1_label: 'Beginner',
+      option_1_description: 'New to regular training',
+      option_1_tag: 'quiz-beginner',
+      option_2_label: 'Advanced',
+      option_2_description: 'Training for years',
+      option_2_tag: 'quiz-advanced'
+    %}{% endblock %}
+    {% block 'quiz-step',
+      id: 'te11-step-3',
+      step: 3,
+      total: 3,
+      question: 'Where do you train?',
+      option_1_label: 'At home',
+      option_1_tag: 'quiz-home',
+      option_2_label: 'At the gym',
+      option_2_tag: 'quiz-gym',
+      option_3_label: 'Outdoors',
+      option_3_tag: 'quiz-outdoor',
+      option_4_label: 'While traveling',
+      option_4_tag: 'quiz-travel'
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} One valid option only: the step and the quiz render nothing. {% endcomment %}
+{% block 'container', id: 'te11-quiz-hidden', tag: 'div' %}
+  {% block 'quiz', id: 'te11-hidden', heading: 'Hidden quiz' %}
+    {% block 'quiz-step',
+      id: 'te11-hidden-step',
+      step: 1,
+      total: 1,
+      question: 'Hidden question',
+      option_1_label: 'Label and tag',
+      option_1_tag: 'quiz-upper',
+      option_2_label: 'Label without a tag'
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
