@@ -49,7 +49,7 @@ class CartDrawer extends HTMLElement {
   actions = () => {
     const a = window.Shopify?.actions;
     if (!a?.openCart?.configure || "actions" in this.dataset) return;
-    a.getCart?.configure?.({ handler: () => this.cart() });
+    // getCart isn't configurable: configure() throws (docs, ES1-T164).
     a.openCart.configure({ handler: () => this.open() });
     a.updateCart.configure({
       handler: async (run) => {
@@ -60,12 +60,6 @@ class CartDrawer extends HTMLElement {
     });
     this.dataset.actions = "";
   };
-
-  async cart() {
-    const res = await fetch(`${this.dataset.cartUrl}.js`, { cache: "no-store" });
-    const cart = await res.json();
-    return (await events)?.CartLinesUpdateEvent.createCartFromAjaxResponse(cart) ?? cart;
-  }
 
   async open() {
     if (this.dataset.mode === "drawer") return this.refresh(true, document.activeElement);

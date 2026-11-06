@@ -189,8 +189,10 @@ test.describe('ES1-T98 contract', () => {
     const items = read('assets/cart-items.js');
     expect(Buffer.byteLength(drawer), 'cart-drawer.js tối đa 4096 B').toBeLessThanOrEqual(4096);
     expect(Buffer.byteLength(items), 'cart-items.js tối đa 5632 B').toBeLessThanOrEqual(5632);
-    for (const action of ['getCart', 'openCart', 'updateCart']) expect(drawer).toMatch(new RegExp(`\\.${action}\\??\\.configure`));
-    expect([...drawer.matchAll(/\ba\.(\w+)\??\.configure\b/g)].map((m) => m[1]).sort()).toEqual(['getCart', 'openCart', 'updateCart']);
+    for (const action of ['openCart', 'updateCart']) expect(drawer).toMatch(new RegExp(`\\.${action}\\??\\.configure`));
+    expect([...drawer.matchAll(/\ba\.(\w+)\??\.configure\b/g)].map((m) => m[1]).sort()).toEqual(['openCart', 'updateCart']);
+    // getCart không configure được: gọi configure là TypeError (docs, ES1-T164).
+    expect(drawer).not.toMatch(/getCart\??\.configure/);
     // Không gán Shopify.actions.x = fn; không tự phát event trong override (ES1-T83).
     expect(drawer).not.toMatch(/actions\.\w+\s*=[^=]/);
     expect(drawer).not.toMatch(/dispatchEvent\(new E|new CartLinesUpdateEvent/);
@@ -277,20 +279,15 @@ test.describe('ES1-T98 TE-5 AC7', () => {
     await navigated;
   });
 
-  test('AC7 getCart: trả giỏ mới sau khi đổi bằng request ngoài, không cache', async ({ page }) => {
+  test('AC7 getCart mặc định của Shopify: trả giỏ mới sau khi đổi bằng request ngoài', async ({ page }) => {
     const variantId = await seed(page, [1]);
     await page.goto('/');
     await actionsReady(page);
-    const seen: string[] = [];
-    page.on('request', (r) => {
-      if (new URL(r.url()).pathname.endsWith('/cart.js')) seen.push(r.url());
-    });
     const total = (cart: { totalQuantity?: number; item_count?: number }) => cart.totalQuantity ?? cart.item_count;
     expect(total(await callAction(page, 'getCart'))).toBe(1);
     const add = await page.evaluate(async (id) => (await fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, quantity: 2, properties: { _t98: 'external' } }) })).status, variantId);
     test.skip(add === 429, 'Shopify trả 429 cho /cart/add.js (giới hạn store dev)');
     expect(total(await callAction(page, 'getCart'))).toBe(3);
-    expect(seen, 'mỗi lần gọi 1 GET /cart.js').toHaveLength(2);
     await expect(dialog(page)).toBeHidden();
   });
 
