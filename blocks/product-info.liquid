@@ -1,0 +1,119 @@
+{% doc %}
+  Product page info (TE-4 AC3 title, vendor, description, taxes; AC9 shipping
+  note; AC10; AC11). Reads the global `product`;
+  current_variant = product.selected_or_first_available_variant.
+
+  - h1 with the full product.title (never truncated).
+  - Vendor when the show_vendor setting is on (default on) and the product
+    has one.
+  - Partial product-price (name must match assets/product-variant-picker.js,
+    BE ES1-T66): snippets/price.liquid for current_variant plus the price
+    notes. Tax note from cart.taxes_included and cart.duties_included (set
+    per market): both → taxes_and_duties_included, taxes only →
+    taxes_included, duties only → duties_included, neither →
+    taxes_at_checkout. Shipping note (links shop.shipping_policy.url when the
+    store has one) only when current_variant.requires_shipping (AC9), so it is
+    inside the partial and follows the variant.
+  - product.description (rich text from the admin).
+  - snippets/product-structured-data.liquid: JSON-LD Product, static.
+  - Storefront event shopify:product:view (ES1-T76, TE-4 AC12): the content
+    sits in <s-view-event> with product | standard_event_data, context page.
+    No JS here: assets/standard-events.js (BE ES1-T81, loaded in layout)
+    defines the element; it dispatches the event on document.
+
+  Test hooks: product-info, product-view-event, product-title, product-vendor,
+  product-price (the snippet keeps price, price-regular, price-compare,
+  price-range, price-unit), product-notes, product-note-tax, product-note-shipping,
+  product-description, product-structured-data.
+
+  Empty state: no product (block used outside the product template) → a hint
+  in the theme editor, nothing on the storefront.
+
+  Self-contained: callers must leave the body empty.
+
+  @example
+  {% block 'container', id: 'product-main' %}
+    <div class="product__details">
+      {% block 'product-info' %}{% endblock %}
+    </div>
+  {% endblock %}
+{% enddoc %}
+
+{%- if product == blank -%}
+  {%- if request.design_mode -%}
+    <div class="product-info product-info--placeholder" {{ block.shopify_attributes }}>
+      {{ 'blocks.product_info.placeholder' | t }}
+    </div>
+  {%- endif -%}
+{%- else -%}
+  {%- liquid
+    assign current_variant = product.selected_or_first_available_variant
+
+    if cart.taxes_included and cart.duties_included
+      assign tax_note_key = 'blocks.product_info.taxes_and_duties_included'
+    elsif cart.taxes_included
+      assign tax_note_key = 'blocks.product_info.taxes_included'
+    elsif cart.duties_included
+      assign tax_note_key = 'blocks.product_info.duties_included'
+    else
+      assign tax_note_key = 'blocks.product_info.taxes_at_checkout'
+    endif
+
+    assign shipping_policy_url = shop.shipping_policy.url
+  -%}
+
+  <div class="product-info" data-testid="product-info" {{ block.shopify_attributes }}>
+    <s-view-event
+      class="product-info__view"
+      view-event-payload='{{ product | standard_event_data: "view", context: "page" | escape }}'
+      data-testid="product-view-event"
+    >
+      {%- if block.settings.show_vendor and product.vendor != blank -%}
+        <p class="product-info__vendor" data-testid="product-vendor">{{ product.vendor | escape }}</p>
+      {%- endif -%}
+
+      <h1 class="product-info__title" data-testid="product-title">{{ product.title | escape }}</h1>
+
+      {% partial 'product-price' %}
+        <div class="product-info__price" data-testid="product-price">
+          {% render 'price', product: product, variant: current_variant %}
+
+          <div class="product-info__notes" data-testid="product-notes">
+            <p class="product-info__note" data-testid="product-note-tax">{{ tax_note_key | t }}</p>
+            {%- if current_variant.requires_shipping -%}
+              <p class="product-info__note" data-testid="product-note-shipping">
+                {%- if shipping_policy_url != blank -%}
+                  {{- 'blocks.product_info.shipping_at_checkout_html' | t: link: shipping_policy_url -}}
+                {%- else -%}
+                  {{- 'blocks.product_info.shipping_at_checkout' | t -}}
+                {%- endif -%}
+              </p>
+            {%- endif -%}
+          </div>
+        </div>
+      {% endpartial %}
+
+      {%- if product.description != blank -%}
+        <div class="product-info__description" data-testid="product-description">
+          {{- product.description -}}
+        </div>
+      {%- endif -%}
+
+      {% render 'product-structured-data', product: product %}
+    </s-view-event>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.product_info",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "t:labels.show_vendor",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

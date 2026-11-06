@@ -1,0 +1,94 @@
+{% doc %}
+  Variant picker: custom element product-variant-picker, its variant JSON and
+  one fieldset of radios per option. Sits outside the form so its radios
+  (name option-{position}) are never submitted. Callers render it only when the
+  product has a variant choice, and load assets/product-variant-picker.js
+  themselves.
+
+  Without fetch_url and regions the picker fetches the current page and updates
+  ?variant= (product page). With them it fetches fetch_url and those regions
+  only, and the URL stays the same (a block on another page, TE-13).
+
+  Test hooks: product-variant-picker, product-option (fieldset),
+  product-option-value (label wrapping the radio).
+
+  @param {product} product - The product to pick a variant of
+  @param {variant} current_variant - The variant to check on load
+  @param {string} form_id - Id of the product form the picker updates
+  @param {string} [fetch_url] - URL to fetch regions from, output as data-fetch-url
+  @param {string} [regions] - Space-separated partial names, output as data-regions
+
+  @example
+  {% render 'product-variant-picker', product: product, current_variant: current_variant, form_id: form_id %}
+  {% render 'product-variant-picker',
+    product: featured,
+    current_variant: current_variant,
+    form_id: form_id,
+    fetch_url: fetch_url,
+    regions: 'product-price product-buy-buttons'
+  %}
+{% enddoc %}
+
+<product-variant-picker
+  class="product-variant-picker"
+  data-product-url="{{ product.url }}"
+  data-form-id="{{ form_id }}"
+  {% if fetch_url != blank %}
+    data-fetch-url="{{ fetch_url }}"
+  {% endif %}
+  {% if regions != blank %}
+    data-regions="{{ regions }}"
+  {% endif %}
+  data-testid="product-variant-picker"
+>
+  {%- render 'variant-json', product: product -%}
+  {%- for option in product.options_with_values -%}
+    {%- assign option_index = option.position | minus: 1 -%}
+    <fieldset
+      class="product-option"
+      data-option-position="{{ option.position }}"
+      data-testid="product-option"
+    >
+      <legend class="product-form__label">{{ option.name | escape }}</legend>
+      <div class="product-option__values">
+        {%- for value in option.values -%}
+          {%- liquid
+            assign checked = false
+            if current_variant.options[option_index] == value.name
+              assign checked = true
+            endif
+            assign swatch_style = ''
+            if value.swatch.image
+              assign swatch_url = value.swatch.image | image_url: width: 88
+              assign swatch_style = '--swatch-image: url(' | append: swatch_url | append: ');'
+            elsif value.swatch.color
+              assign swatch_style = '--swatch-color: ' | append: value.swatch.color | append: ';'
+            endif
+          -%}
+          <label
+            class="product-option__value{% if swatch_style != blank %} product-option__value--swatch{% endif %}"
+            {% if swatch_style != blank %}
+              style="{{ swatch_style }}"
+            {% endif %}
+            data-testid="product-option-value"
+          >
+            <input
+              class="product-option__input visually-hidden"
+              type="radio"
+              name="option-{{ option.position }}"
+              value="{{ value.name | escape }}"
+              data-option-value-id="{{ value.id }}"
+              data-available="{{ value.available }}"
+              {% if checked %}
+                checked
+              {% endif %}
+            >
+            <span class="product-option__text{% if swatch_style != blank %} visually-hidden{% endif %}">
+              {{- value.name | escape -}}
+            </span>
+          </label>
+        {%- endfor -%}
+      </div>
+    </fieldset>
+  {%- endfor -%}
+</product-variant-picker>

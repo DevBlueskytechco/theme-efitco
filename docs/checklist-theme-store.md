@@ -51,5 +51,5 @@ Chạy cuối mỗi sprint trên preview develop. Fail → bug gắn mã R.
 | R17 | srcset/sizes, lazy | Bắt buộc |  |  |
 | R18 | Tên 1–2 từ, không Shopify/Canvas/Sidekick | Tham khảo |  |  |
 | R19 | Version + release notes | Bắt buộc |  |  |
-| R20 | Demo store | Thay bằng efitco-ai-dev |  |  |
+| R20 | Demo store | Thay bằng hoa-qua-nhap-khau (efitco-ai-dev) |  |  |
 | R21–22 | Docs + contact form + SLA | Thay bằng docs/merchant |  |  |

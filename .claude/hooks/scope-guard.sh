@@ -9,6 +9,11 @@ REL="${FILE#"$PWD"/}"
 
 deny() { echo "scope-guard: $AGENT không được ghi $REL ($1)" >&2; exit 2; }
 
+# Memory riêng của agent (frontmatter memory: project) — chỉ thư mục của chính nó
+case "$REL" in
+  .claude/agent-memory/"$AGENT"/*) exit 0 ;;
+esac
+
 # Cấm chung
 case "$REL" in
   sections/*) deny "Skeleton không có sections/" ;;

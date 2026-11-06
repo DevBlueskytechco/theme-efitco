@@ -1,0 +1,47 @@
+{% doc %}
+  Free shipping progress (TE-5 AC3). The threshold is the free_shipping_threshold
+  theme setting, in the shop currency. Below it: progress bar and the amount
+  left. At or above it: full bar and the reached message.
+
+  Renders nothing when the threshold is 0, when the cart is empty, or when the
+  cart currency differs from the shop currency: Liquid has no exchange rate, so
+  no amount is better than a wrong one.
+
+  Test hooks: cart-free-shipping, cart-free-shipping-progress,
+  cart-free-shipping-text.
+
+  @param {object} cart - The cart to measure
+  @param {string} context - Where it renders, 'page' or 'drawer'. Part of the text id
+
+  @example
+  {% render 'cart-free-shipping', cart: cart, context: 'page' %}
+{% enddoc %}
+
+{%- liquid
+  assign threshold = settings.free_shipping_threshold | default: 0 | times: 100
+  assign show_bar = false
+  if threshold > 0 and cart.item_count > 0 and cart.currency.iso_code == shop.currency
+    assign show_bar = true
+  endif
+-%}
+
+{%- if show_bar -%}
+  {%- assign progress_value = cart.total_price | at_most: threshold -%}
+  <div class="cart-free-shipping" data-testid="cart-free-shipping">
+    <p id="cart-free-shipping-text-{{ context }}" class="cart-free-shipping__text" data-testid="cart-free-shipping-text">
+      {%- if cart.total_price < threshold -%}
+        {%- assign remaining = threshold | minus: cart.total_price | money -%}
+        {{- 'cart.free_shipping_remaining' | t: amount: remaining -}}
+      {%- else -%}
+        {{- 'cart.free_shipping_reached' | t -}}
+      {%- endif -%}
+    </p>
+    <progress
+      class="cart-free-shipping__progress"
+      value="{{ progress_value }}"
+      max="{{ threshold }}"
+      aria-labelledby="cart-free-shipping-text-{{ context }}"
+      data-testid="cart-free-shipping-progress"
+    ></progress>
+  </div>
+{%- endif -%}

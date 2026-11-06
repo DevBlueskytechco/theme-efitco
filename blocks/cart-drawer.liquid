@@ -1,0 +1,145 @@
+{% doc %}
+  Cart drawer (TE-5 AC1, AC2, AC4, AC6). Composed in layout/theme.liquid after
+  the footer container, with no container of its own: the dialog sits outside
+  the page flow and is not a band. Reads the global `cart` and the cart_type
+  theme setting.
+
+  Root custom element cart-drawer always renders, so its script loads on every
+  page. data-mode is 'drawer', or 'none' when cart_type is page or the template
+  is cart. Only 'drawer' renders the dialog.
+
+  Without JavaScript the dialog stays closed and the header cart link goes to
+  routes.cart_url. JavaScript opens it with showModal(). The close button uses
+  form method="dialog", so it closes without JavaScript.
+
+  Inside the dialog, in order:
+  - Head with the h2 and the close button, outside cart-items.
+  - Custom element cart-items holds cart-items-status (role status) and
+    cart-items-error (role alert), both empty on load.
+  - Partial cart-drawer (name must match the JS): root cart-drawer-body with
+    data-item-count, then form id cart-form-drawer with free shipping, lines
+    and summary. The dialog stays outside the partial so a refresh keeps it
+    open and keeps focus.
+  - Accelerated checkout wrapper, outside the partial because Shopify's script
+    mounts the buttons and a refresh would drop them. Hidden when the cart is
+    empty; JavaScript syncs hidden from data-item-count after a refresh.
+
+  cart-drawer hooks: data-mode, data-cart-url, data-items-src (assets/cart-items.js
+  URL, imported on first open).
+  cart-items hooks: data-cart-change-url, data-cart-url, data-partials,
+  data-label-updated, data-label-removed, data-label-error,
+  data-label-quantity-adjusted. JavaScript sets data-enhanced (CSS hides the
+  Update button) and aria-busy. Line hooks are listed in snippets/cart-lines.liquid.
+  Accelerated wrapper hook: data-cart-accelerated.
+
+  Test hooks: cart-drawer, cart-drawer-dialog, cart-drawer-heading,
+  cart-drawer-close, cart-drawer-body, cart-drawer-accelerated, plus cart-items,
+  cart-items-status, cart-items-error, cart-form and the snippet hooks.
+
+  Self-contained: callers must leave the body empty.
+
+  @example
+  {% block 'cart-drawer' -%}{%- endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign cart_type = settings.cart_type | default: 'drawer'
+  assign mode = 'drawer'
+  if cart_type == 'page' or template.name == 'cart'
+    assign mode = 'none'
+  endif
+-%}
+
+<cart-drawer
+  class="cart-drawer"
+  data-mode="{{ mode }}"
+  data-cart-url="{{ routes.cart_url }}"
+  data-items-src="{{ 'cart-items.js' | asset_url }}"
+  data-testid="cart-drawer"
+  {{ block.shopify_attributes }}
+>
+  {%- if mode == 'drawer' -%}
+    {%- liquid
+      assign label_updated = 'cart.updated' | t
+      assign label_removed = 'cart.removed' | t
+      assign label_error = 'cart.error' | t
+      assign label_quantity_adjusted = 'cart.quantity_adjusted' | t
+    -%}
+    <dialog
+      id="CartDrawer"
+      class="cart-drawer__dialog"
+      scroll-lock
+      aria-labelledby="CartDrawerHeading"
+      data-testid="cart-drawer-dialog"
+    >
+      <div class="cart-drawer__head">
+        <h2 id="CartDrawerHeading" class="cart-drawer__heading" data-testid="cart-drawer-heading">
+          {{- 'cart.title' | t -}}
+        </h2>
+        <form method="dialog">
+          {% # aria-label, not hidden text: the dialog is closed (display: none) on load, so a name from hidden content is empty. %}
+          <button
+            class="cart-drawer__close"
+            aria-label="{{ 'blocks.cart_drawer.close' | t }}"
+            data-testid="cart-drawer-close"
+          >
+            {% render 'header-icon', name: 'close' %}
+          </button>
+        </form>
+      </div>
+
+      <cart-items
+        class="cart-items cart-drawer__items"
+        data-cart-change-url="{{ routes.cart_change_url }}"
+        data-cart-url="{{ routes.cart_url }}"
+        data-partials="cart-drawer cart-count"
+        data-label-updated="{{ label_updated | escape }}"
+        data-label-removed="{{ label_removed | escape }}"
+        data-label-error="{{ label_error | escape }}"
+        data-label-quantity-adjusted="{{ label_quantity_adjusted | escape }}"
+        data-testid="cart-items"
+      >
+        <div class="visually-hidden" role="status" aria-live="polite" data-testid="cart-items-status"></div>
+        <div class="cart-items__error" role="alert" data-testid="cart-items-error"></div>
+
+        {% partial 'cart-drawer' %}
+          <div class="cart-drawer__body" data-item-count="{{ cart.item_count }}" data-testid="cart-drawer-body">
+            <form
+              id="cart-form-drawer"
+              class="cart-drawer__form"
+              action="{{ routes.cart_url }}"
+              method="post"
+              data-testid="cart-form"
+            >
+              <div class="cart-drawer__main">
+                {%- render 'cart-free-shipping', cart: cart, context: 'drawer' -%}
+                {%- render 'cart-lines', cart: cart, context: 'drawer' -%}
+              </div>
+              {%- render 'cart-summary', cart: cart, context: 'drawer' -%}
+            </form>
+          </div>
+        {% endpartial %}
+
+        {%- if additional_checkout_buttons -%}
+          <div
+            class="cart-drawer__accelerated"
+            {% if cart.item_count == 0 %}
+              hidden
+            {% endif %}
+            data-cart-accelerated
+            data-testid="cart-drawer-accelerated"
+          >
+            {{- content_for_additional_checkout_buttons -}}
+          </div>
+        {%- endif -%}
+      </cart-items>
+    </dialog>
+  {%- endif -%}
+  <script src="{{ 'cart-drawer.js' | asset_url }}" type="module"></script>
+</cart-drawer>
+
+{% schema %}
+{
+  "name": "t:general.cart_drawer"
+}
+{% endschema %}

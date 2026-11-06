@@ -1,27 +1,41 @@
-{% block 'container' %}
-  <h1>{{ 'collections.title' | t }}</h1>
+{% # TE-6 AC5 (drafts/techlead/ES1-T103/task-split.md D4). Test hooks: list-collections, list-collections-card, list-collections-card-title, and the hooks of snippets/pagination.liquid. %}
+{% block 'container', id: 'list-collections' %}
+  {%- assign pagination_label = 'collections.pagination.label' | t -%}
+  <div class="list-collections" data-testid="list-collections">
+    <h1 class="list-collections__title">{{ 'collections.title' | t }}</h1>
 
-  <div class="collections collections--full" style="--grid-gap: 10px">
-    {% for collection in collections %}
-      <a class="collection-card" href="{{ collection.url }}">
-        {% if collection.featured_image %}
-          {% render 'image',
-            class: 'collection-card__image',
-            image: collection.featured_image,
-            width: 600,
-            height: 600,
-            crop: 'center'
-          %}
-        {% endif %}
+    {% paginate collections by 24 %}
+      {%- if paginate.items == 0 -%}
+        <p class="list-collections__empty">{{ 'collections.empty' | t }}</p>
+      {%- else -%}
+        <ul class="list-collections__grid" role="list">
+          {%- for item in collections -%}
+            <li class="list-collections__item">
+              <a class="list-collections__card" href="{{ item.url }}" data-testid="list-collections-card">
+                {%- if item.featured_image != blank -%}
+                  {% render 'image',
+                    class: 'list-collections__image',
+                    image: item.featured_image,
+                    width: 720,
+                    widths: '360, 720',
+                    sizes: '(min-width: 80rem) 25vw, (min-width: 48rem) 33vw, 50vw',
+                    decorative: true
+                  %}
+                {%- else -%}
+                  <span class="list-collections__placeholder" aria-hidden="true">
+                    {{- 'collection-1' | placeholder_svg_tag: 'list-collections__placeholder-svg' -}}
+                  </span>
+                {%- endif -%}
+                <h2 class="list-collections__card-title" data-testid="list-collections-card-title">
+                  {{- item.title | escape -}}
+                </h2>
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
 
-        <div class="collection-card__content">
-          <p>{{ collection.title }}</p>
-
-          {% if collection.description %}
-            <p>{{ collection.description | strip_html | truncatewords: 15 }}</p>
-          {% endif %}
-        </div>
-      </a>
-    {% endfor %}
+        {% render 'pagination', paginate: paginate, label: pagination_label %}
+      {%- endif -%}
+    {% endpaginate %}
   </div>
 {% endblock %}

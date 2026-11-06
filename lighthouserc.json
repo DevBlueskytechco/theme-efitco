@@ -2,13 +2,15 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "url": [
-        "${PREVIEW_URL}/",
-        "${PREVIEW_URL}/products/${BENCH_PRODUCT}",
-        "${PREVIEW_URL}/collections/${BENCH_COLLECTION}"
-      ],
       "settings": {
-        "preset": "desktop"
+        "preset": "desktop",
+        "disableStorageReset": true
+      },
+      "puppeteerScript": "scripts/lhci-auth.js",
+      "puppeteerLaunchOptions": {
+        "args": [
+          "--no-sandbox"
+        ]
       }
     },
     "assert": {
@@ -26,6 +28,10 @@
           }
         ]
       }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".lighthouseci/desktop"
     }
   }
 }

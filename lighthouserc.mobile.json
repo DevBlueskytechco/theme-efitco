@@ -2,11 +2,15 @@
   "ci": {
     "collect": {
       "numberOfRuns": 3,
-      "url": [
-        "${PREVIEW_URL}/",
-        "${PREVIEW_URL}/products/${BENCH_PRODUCT}",
-        "${PREVIEW_URL}/collections/${BENCH_COLLECTION}"
-      ]
+      "puppeteerScript": "scripts/lhci-auth.js",
+      "puppeteerLaunchOptions": {
+        "args": [
+          "--no-sandbox"
+        ]
+      },
+      "settings": {
+        "disableStorageReset": true
+      }
     },
     "assert": {
       "assertions": {
@@ -23,6 +27,10 @@
           }
         ]
       }
+    },
+    "upload": {
+      "target": "filesystem",
+      "outputDir": ".lighthouseci/mobile"
     }
   }
 }

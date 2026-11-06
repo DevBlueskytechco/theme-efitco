@@ -1,37 +1,21 @@
-{% block 'container' %}
-  <div class="product-images">
-    {% for image in product.images %}
-      {% render 'image', class: 'product-image', image: image %}
-    {% endfor %}
+{% # TE-4 composition (drafts/techlead/ES1-T59/task-split.md D1). Each FE task adds only its own block call. %}
+{% block 'container', id: 'product-main' %}
+  <div class="product">
+    {% block 'product-media' %}{% endblock %}
+
+    <div class="product__details">
+      {% block 'product-info' %}{% endblock %}
+      {% block 'product-form' %}{% endblock %}
+    </div>
   </div>
 
-  <div class="product-info">
-    <h1>{{ product.title }}</h1>
-    <p>{{ product.price | money }}</p>
-    <p>{{ product.description }}</p>
-  </div>
+  {% block 'product-sticky-bar' %}{% endblock %}
+{% endblock %}
 
-  <div class="product-form">
-    {% form 'product', product %}
-      {% assign current_variant = product.selected_or_first_available_variant %}
+{% block 'container', id: 'product-related' %}
+  {% block 'product-recommendations', id: 'product-recommendations-related', intent: 'related' %}{% endblock %}
+{% endblock %}
 
-      <select name="id">
-        {% for variant in product.variants %}
-          <option
-            value="{{ variant.id }}"
-            {% if variant == current_variant %}
-              selected="selected"
-            {% endif %}
-          >
-            {{ variant.title }} - {{ variant.price | money }}
-          </option>
-        {% endfor %}
-      </select>
-
-      <input type="text" name="quantity" min="1" value="1">
-
-      <input type="submit" value="Add to cart">
-      {{ form | payment_button }}
-    {% endform %}
-  </div>
+{% block 'container', id: 'product-complementary' %}
+  {% block 'product-recommendations', id: 'product-recommendations-complementary', intent: 'complementary' %}{% endblock %}
 {% endblock %}

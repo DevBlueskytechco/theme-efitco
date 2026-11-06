@@ -1,28 +1,14 @@
-{% block 'container' %}
-  <h1>{{ collection.title }}</h1>
+{% # TE-6 composition (drafts/techlead/ES1-T103/task-split.md D1). <collection-filters> stays here because it wraps 2 blocks and a block cannot call a block; assets/collection-filters.js (BE) upgrades it and reads data-label-price-invalid. %}
+{% block 'container', id: 'collection-banner' %}
+  {% block 'collection-banner' %}{% endblock %}
+{% endblock %}
 
-  <div class="collection-products">
-    {% paginate collection.products by 20 %}
-      {% for product in collection.products %}
-        <div class="collection-product">
-          {% if product.featured_image %}
-            {% render 'image',
-              class: 'collection-product__image',
-              image: product.featured_image,
-              url: product.url,
-              width: 400,
-              height: 400,
-              crop: 'center'
-            %}
-          {% endif %}
-          <div class="collection-product__content">
-            <p>{{ product.title | escape | link_to: product.url }}</p>
-            <p>{{ product.price | money }}</p>
-          </div>
-        </div>
-      {% endfor %}
-
-      {{ paginate | default_pagination }}
-    {% endpaginate %}
-  </div>
+{% block 'container', id: 'collection-main' %}
+  <collection-filters
+    class="collection-layout"
+    data-label-price-invalid="{{ 'blocks.collection_filters.price_invalid' | t | escape }}"
+  >
+    {% block 'collection-filters' %}{% endblock %}
+    {% block 'collection-products' %}{% endblock %}
+  </collection-filters>
 {% endblock %}

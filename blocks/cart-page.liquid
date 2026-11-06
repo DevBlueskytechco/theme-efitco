@@ -1,0 +1,114 @@
+{% doc %}
+  Cart page (TE-5 AC1, AC3, AC4, AC5). Reads the global `cart`. Works without
+  JavaScript: form post to routes.cart_url with updates[], note, Update and
+  Checkout; Remove is a link. The empty state is the AC4 message, shown in the
+  theme editor and on the storefront.
+
+  Root h1 has tabindex -1 so JavaScript can move focus to it.
+
+  Custom element cart-items (grid from assets/base.css) holds, in order:
+  - cart-items-status (role status) and cart-items-error (role alert): live
+    regions, empty on load.
+  - Partial cart-page (name must match the JS): root cart-page-body with
+    data-item-count, then form id cart-form-page with free shipping, lines and
+    summary.
+  - Accelerated checkout wrapper, outside the partial because Shopify's script
+    mounts the buttons and a refresh would drop them. Hidden when the cart is
+    empty; JavaScript syncs hidden from data-item-count after a refresh.
+  - Note textarea name note, outside the partial, tied by the form attribute.
+    Saved on form submit only. CSS hides it when data-item-count is 0.
+
+  cart-items hooks: data-cart-change-url, data-cart-url, data-partials,
+  data-label-updated, data-label-removed, data-label-error,
+  data-label-quantity-adjusted. JavaScript sets data-enhanced (CSS hides the
+  Update button) and aria-busy. The textarea sits inside cart-items, so a
+  delegated change listener must filter on the quantity input. Line hooks are
+  listed in snippets/cart-lines.liquid.
+
+  Test hooks: cart-page, cart-page-heading, cart-items, cart-items-status,
+  cart-items-error, cart-page-body, cart-form, cart-page-accelerated,
+  cart-page-note.
+
+  Self-contained: callers must leave the body empty.
+
+  @example
+  {% block 'container', id: 'cart-main' %}
+    {% block 'cart-page' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign label_updated = 'cart.updated' | t
+  assign label_removed = 'cart.removed' | t
+  assign label_error = 'cart.error' | t
+  assign label_quantity_adjusted = 'cart.quantity_adjusted' | t
+-%}
+
+<div class="cart-page" data-testid="cart-page" {{ block.shopify_attributes }}>
+  <h1 class="cart-page__heading" tabindex="-1" data-testid="cart-page-heading">{{ 'cart.title' | t }}</h1>
+
+  <cart-items
+    class="cart-items cart-page__items"
+    data-cart-change-url="{{ routes.cart_change_url }}"
+    data-cart-url="{{ routes.cart_url }}"
+    data-partials="cart-page cart-count"
+    data-label-updated="{{ label_updated | escape }}"
+    data-label-removed="{{ label_removed | escape }}"
+    data-label-error="{{ label_error | escape }}"
+    data-label-quantity-adjusted="{{ label_quantity_adjusted | escape }}"
+    data-testid="cart-items"
+  >
+    <div class="visually-hidden" role="status" aria-live="polite" data-testid="cart-items-status"></div>
+    <div class="cart-items__error" role="alert" data-testid="cart-items-error"></div>
+
+    {% partial 'cart-page' %}
+      <div class="cart-page__body" data-item-count="{{ cart.item_count }}" data-testid="cart-page-body">
+        <form
+          id="cart-form-page"
+          class="cart-page__form"
+          action="{{ routes.cart_url }}"
+          method="post"
+          data-testid="cart-form"
+        >
+          <div class="cart-page__main">
+            {%- render 'cart-free-shipping', cart: cart, context: 'page' -%}
+            {%- render 'cart-lines', cart: cart, context: 'page' -%}
+          </div>
+          {%- render 'cart-summary', cart: cart, context: 'page' -%}
+        </form>
+      </div>
+    {% endpartial %}
+
+    {%- if additional_checkout_buttons -%}
+      <div
+        class="cart-page__accelerated"
+        {% if cart.item_count == 0 %}
+          hidden
+        {% endif %}
+        data-cart-accelerated
+        data-testid="cart-page-accelerated"
+      >
+        {{- content_for_additional_checkout_buttons -}}
+      </div>
+    {%- endif -%}
+
+    <div class="cart-page__note">
+      <label class="cart-page__note-label" for="cart-note">{{ 'cart.note_label' | t }}</label>
+      <textarea
+        id="cart-note"
+        class="cart-page__note-input"
+        name="note"
+        rows="3"
+        form="cart-form-page"
+        data-testid="cart-page-note"
+      >{{ cart.note | escape }}</textarea>
+    </div>
+  </cart-items>
+  <script src="{{ 'cart-items.js' | asset_url }}" type="module"></script>
+</div>
+
+{% schema %}
+{
+  "name": "t:general.cart_page"
+}
+{% endschema %}

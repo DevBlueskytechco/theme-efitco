@@ -1,0 +1,81 @@
+{% doc %}
+  Renders an eyebrow, a heading and a list of multicolumn-column blocks. No
+  JavaScript. The parent cannot read its children: the body is a rendered string,
+  so there is no column setting. The number of calls in the template decides the
+  columns, 2 to 4, and CSS lays them out: 1 column under 48rem, 2 columns from
+  48rem, all on one row from 64rem (assets/base.css). When the body is empty, the
+  editor shows a placeholder and the storefront renders nothing.
+
+  Test hooks: data-testid="multicolumn", "multicolumn-heading",
+  "multicolumn-list", "multicolumn-placeholder".
+
+  @param {string} [id] - Static block id, needed when a template has more than one multicolumn block
+  @param {string} content - One multicolumn-column block call per column, 2 to 4
+
+  @example
+  {% block 'container', id: 'home-multicolumn' %}
+    {% block 'multicolumn' %}
+      {% block 'multicolumn-column', id: 'multicolumn-1' %}{% endblock %}
+      {% block 'multicolumn-column', id: 'multicolumn-2' %}{% endblock %}
+      {% block 'multicolumn-column', id: 'multicolumn-3' %}{% endblock %}
+    {% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- assign columns = content | strip -%}
+
+{%- if columns != blank -%}
+  <div
+    class="multicolumn"
+    {% if id != blank %}
+      data-multicolumn-id="{{ id }}"
+    {% endif %}
+    data-testid="multicolumn"
+    {{ block.shopify_attributes }}
+  >
+    {%- if block.settings.eyebrow != blank or block.settings.heading != blank -%}
+      <div class="multicolumn__header">
+        {%- if block.settings.eyebrow != blank -%}
+          <p class="multicolumn__eyebrow">{{ block.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if block.settings.heading != blank -%}
+          <h2 class="multicolumn__heading" data-testid="multicolumn-heading">
+            {{- block.settings.heading | escape -}}
+          </h2>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+    {%- comment -%} role="list": Safari drops list semantics with list-style: none. {%- endcomment -%}
+    <ul class="multicolumn__list" role="list" data-testid="multicolumn-list">
+      {{ content }}
+    </ul>
+  </div>
+{%- elsif request.design_mode -%}
+  <p
+    class="multicolumn multicolumn--placeholder"
+    data-testid="multicolumn-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.multicolumn.placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.multicolumn",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.multicolumn_eyebrow",
+      "default": "Add a short label"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.multicolumn_heading",
+      "default": "Add a heading for these columns"
+    }
+  ]
+}
+{% endschema %}

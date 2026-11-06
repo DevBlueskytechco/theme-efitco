@@ -1,0 +1,491 @@
+{% doc %}
+  One product highlighted on the home page (TE-13 AC1, AC2, Figma 1:759):
+  image gallery, title, countdown frame, price with discount, rating,
+  description, spec table, Add to cart and View Detail. Reads the product from
+  block.settings.product, never the global product. templates/product.featured-product
+  passes the global product as the product parameter, so ?view=featured-product
+  returns the 2 partials below with the same markup for the requested variant.
+
+  Gallery: image media only, 8 at most, scroll-snap, lazy. From 2 images the list
+  takes keyboard focus and thumbnails are in-page links, no JavaScript needed.
+
+  Countdown: countdown_end is YYYY-MM-DD HH:MM in store time, with the store
+  offset added before it is read as epoch seconds. There is no element at all
+  when the value is empty, malformed or not after now, when the product is sold
+  out, or when the current variant has no compare-at price above its price (R8,
+  ES1-T155 #2). A malformed value shows a warning in the editor only. CSS keeps
+  the frame invisible until the root has data-enhanced (assets/featured-product.js)
+  or data-design-mode; numbers that do not move would be a fake countdown.
+
+  Rating: reviews.rating metafield, .value.rating over .value.scale_max, brought
+  to a scale of 5. Hidden when the metafield is missing. reviews.rating_count adds
+  the review count.
+
+  Spec table: label from spec_n_label, value from metafield custom.spec_n. A row
+  without either stays hidden; with no row left the table stays hidden.
+
+  Form: same contract as blocks/product-form, so assets/product-form.js and
+  assets/product-variant-picker.js run unchanged. A product that requires a
+  selling plan has no form, only View Detail, because this block has no plan picker.
+
+  JS hooks: featured-product (custom element, data-enhanced, data-design-mode);
+  data-end (epoch seconds) on the countdown; data-countdown-unit (days, hours,
+  minutes, seconds) on each cell with data-countdown-value on its number;
+  data-featured-media-id on each image and thumbnail; product-form with
+  data-product-id, data-product-url, data-cart-add-url, data-cart-url,
+  data-cart-type, data-label-add, data-label-added, data-label-sold-out,
+  data-label-unavailable; data-fetch-url and data-regions on product-variant-picker.
+  Partials: product-price, product-buy-buttons.
+
+  Test hooks: featured-product, featured-product-eyebrow, featured-product-title,
+  featured-product-media, featured-product-media-item, featured-product-thumbnail,
+  featured-product-price, featured-product-discount, featured-product-rating,
+  featured-product-rating-count, featured-product-description,
+  featured-product-specs, featured-product-spec, featured-product-countdown,
+  featured-product-countdown-days, featured-product-countdown-hours,
+  featured-product-countdown-minutes, featured-product-countdown-seconds,
+  featured-product-add, featured-product-view-detail, featured-product-status,
+  featured-product-error, featured-product-placeholder. Also product-variant-picker,
+  product-option, product-option-value, product-variant-select and price*.
+
+  Empty state: no product selected → a hint in the theme editor, nothing on the
+  storefront.
+
+  Self-contained: callers must leave the body empty.
+
+  @param {string} [id] - Static block id, needed when a template has more than one featured product
+
+  @example
+  {% block 'container', id: 'home-featured-product', tag: 'div' %}
+    {% block 'featured-product', id: 'featured-product' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- assign featured = block.settings.product -%}
+
+{%- if featured == blank -%}
+  {%- if request.design_mode -%}
+    <div
+      class="featured-product featured-product--placeholder"
+      data-testid="featured-product-placeholder"
+      {{ block.shopify_attributes }}
+    >
+      {{ 'blocks.featured_product.placeholder' | t }}
+    </div>
+  {%- endif -%}
+{%- else -%}
+  {%- liquid
+    assign current_variant = featured.selected_or_first_available_variant
+    assign form_id = 'product-form-' | append: featured.id
+    assign cart_type = settings.cart_type | default: 'drawer'
+
+    assign label_add = 'blocks.product_form.add_to_cart' | t
+    assign label_added = 'blocks.product_form.added_to_cart' | t
+    assign label_sold_out = 'blocks.product_form.sold_out' | t
+    assign label_unavailable = 'blocks.product_form.unavailable' | t
+
+    assign has_variant_choice = true
+    if featured.has_only_default_variant or featured.variants.size == 1
+      assign has_variant_choice = false
+    endif
+    assign fetch_url = featured.url | append: '?view=featured-product'
+
+    assign images = featured.media | where: 'media_type', 'image'
+    assign image_total = images.size | at_most: 8
+    assign description = featured.description | strip_html | strip | truncatewords: 50
+
+    # Countdown: 16 characters in the shape 0000-00-00 00:00, then a clean read as epoch seconds
+    assign now_epoch = 'now' | date: '%s' | plus: 0
+    assign countdown_text = block.settings.countdown_end | strip
+    assign countdown_invalid = false
+    assign end_epoch = 0
+    if countdown_text != blank
+      assign countdown_invalid = true
+      assign separator_1 = countdown_text | slice: 4
+      assign separator_2 = countdown_text | slice: 7
+      assign separator_3 = countdown_text | slice: 10
+      assign separator_4 = countdown_text | slice: 13
+      assign separators = separator_1 | append: separator_2 | append: separator_3 | append: separator_4
+      assign countdown_digits = countdown_text | remove: '-' | remove: ' ' | remove: ':'
+      assign digits_check = countdown_digits | plus: 0 | append: ''
+      if countdown_text.size == 16 and separators == '-- :' and digits_check == countdown_digits
+        assign store_offset = 'now' | date: '%z'
+        assign countdown_stamp = countdown_text | append: ' ' | append: store_offset
+        assign end_text = countdown_stamp | date: '%s'
+        assign end_check = end_text | plus: 0 | append: ''
+        if end_check == end_text
+          assign end_epoch = end_text | plus: 0
+          assign countdown_invalid = false
+        endif
+      endif
+    endif
+
+    assign show_countdown = false
+    if end_epoch > now_epoch and featured.available and current_variant.compare_at_price > current_variant.price
+      assign show_countdown = true
+      assign remaining = end_epoch | minus: now_epoch
+      assign days = remaining | divided_by: 86400
+      assign days_text = days | append: ''
+      if days < 10
+        assign days_text = days | prepend: '0'
+      endif
+      assign hours_text = remaining | modulo: 86400 | divided_by: 3600 | prepend: '0' | slice: -2, 2
+      assign minutes_text = remaining | modulo: 3600 | divided_by: 60 | prepend: '0' | slice: -2, 2
+      assign seconds_text = remaining | modulo: 60 | prepend: '0' | slice: -2, 2
+    endif
+
+    assign rating_data = featured.metafields.reviews.rating.value
+    assign rating_value = rating_data.rating
+    if rating_value != blank
+      assign rating_scale = rating_data.scale_max | plus: 0
+      if rating_scale <= 0
+        assign rating_scale = 5
+      endif
+      assign rating_on_five = rating_value | times: 5.0 | divided_by: rating_scale | round: 1
+      assign rating_count = featured.metafields.reviews.rating_count.value
+      if rating_count != blank
+        assign rating_count_number = rating_count | plus: 0
+      endif
+    endif
+  -%}
+
+  {%- capture spec_rows -%}
+    {%- for index in (1..4) -%}
+      {%- liquid
+        assign label_id = 'spec_' | append: index | append: '_label'
+        assign metafield_key = 'spec_' | append: index
+        assign spec_label = block.settings[label_id] | strip
+        assign spec_value = featured.metafields.custom[metafield_key].value | strip
+      -%}
+      {%- if spec_label != blank and spec_value != blank -%}
+        <tr class="featured-product__spec" data-testid="featured-product-spec">
+          <th class="featured-product__spec-label" scope="row">{{ spec_label | escape }}</th>
+          <td class="featured-product__spec-value">{{ spec_value | escape }}</td>
+        </tr>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+
+  <featured-product
+    class="featured-product"
+    {% if id != blank %}
+      data-featured-product-id="{{ id }}"
+    {% endif %}
+    {% if request.design_mode %}
+      data-design-mode
+    {% endif %}
+    data-testid="featured-product"
+    {{ block.shopify_attributes }}
+  >
+    <s-view-event
+      class="featured-product__view"
+      view-event-trigger="intersect"
+      view-event-payload='{{ featured | standard_event_data: "view", context: "recommendation" | escape }}'
+    >
+      <div class="featured-product__gallery">
+        <ul
+          class="featured-product__media-list"
+          role="list"
+          {% if image_total > 1 %}
+            tabindex="0"
+          {% endif %}
+          aria-label="{{ 'blocks.featured_product.media_label' | t }}"
+          data-testid="featured-product-media"
+        >
+          {%- for media in images limit: 8 -%}
+            <li
+              class="featured-product__media-item"
+              id="FeaturedMedia-{{ featured.id }}-{{ media.id }}"
+              data-featured-media-id="{{ media.id }}"
+              data-testid="featured-product-media-item"
+            >
+              {% render 'image',
+                image: media,
+                width: 1440,
+                widths: '360, 720, 1080, 1440',
+                sizes: '(min-width: 64rem) 50vw, 100vw',
+                loading: 'lazy'
+              %}
+            </li>
+          {%- else -%}
+            <li class="featured-product__media-item">
+              {{- 'product-1' | placeholder_svg_tag: 'featured-product__placeholder-svg' -}}
+            </li>
+          {%- endfor -%}
+        </ul>
+
+        {%- if image_total > 1 -%}
+          <ul class="featured-product__thumbnails" role="list" aria-label="{{ 'blocks.featured_product.thumbnails_label' | t }}">
+            {%- for media in images limit: 8 -%}
+              <li>
+                <a
+                  class="featured-product__thumbnail"
+                  href="#FeaturedMedia-{{ featured.id }}-{{ media.id }}"
+                  data-featured-media-id="{{ media.id }}"
+                  data-testid="featured-product-thumbnail"
+                >
+                  {% render 'image',
+                    image: media,
+                    width: 128,
+                    height: 128,
+                    crop: 'center',
+                    widths: '64, 128',
+                    sizes: '64px',
+                    loading: 'lazy',
+                    inline: true,
+                    decorative: true
+                  %}
+                  <span class="visually-hidden">
+                    {{- 'blocks.featured_product.thumbnail_label' | t: index: forloop.index, total: image_total -}}
+                  </span>
+                </a>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+
+      <div class="featured-product__details">
+        <div class="featured-product__header">
+          {%- if block.settings.eyebrow != blank -%}
+            <p class="featured-product__eyebrow" data-testid="featured-product-eyebrow">
+              {{- block.settings.eyebrow | escape -}}
+            </p>
+          {%- endif -%}
+          <h2 class="featured-product__title" data-testid="featured-product-title">{{ featured.title | escape }}</h2>
+        </div>
+
+        {%- if countdown_invalid and request.design_mode -%}
+          <p class="featured-product__notice">{{ 'blocks.featured_product.countdown_invalid' | t }}</p>
+        {%- endif -%}
+
+        {%- if show_countdown -%}
+          <div
+            class="featured-product__countdown"
+            role="timer"
+            {% if block.settings.countdown_label != blank %}
+              aria-labelledby="FeaturedCountdown-{{ featured.id }}"
+            {% endif %}
+            data-end="{{ end_epoch }}"
+            data-testid="featured-product-countdown"
+          >
+            {%- if block.settings.countdown_label != blank -%}
+              <span class="featured-product__countdown-label" id="FeaturedCountdown-{{ featured.id }}">
+                {{- block.settings.countdown_label | escape -}}
+              </span>
+            {%- endif -%}
+            <div class="featured-product__countdown-units">
+              <span
+                class="featured-product__countdown-unit"
+                data-countdown-unit="days"
+                data-testid="featured-product-countdown-days"
+                {% if days == 0 %}
+                  hidden
+                {% endif %}
+              >
+                <span data-countdown-value>{{ days_text }}</span>
+                <span class="visually-hidden">{{ 'blocks.featured_product.countdown_days' | t }}</span>
+              </span>
+              <span
+                class="featured-product__countdown-unit"
+                data-countdown-unit="hours"
+                data-testid="featured-product-countdown-hours"
+              >
+                <span data-countdown-value>{{ hours_text }}</span>
+                <span class="visually-hidden">{{ 'blocks.featured_product.countdown_hours' | t }}</span>
+              </span>
+              <span
+                class="featured-product__countdown-unit"
+                data-countdown-unit="minutes"
+                data-testid="featured-product-countdown-minutes"
+              >
+                <span data-countdown-value>{{ minutes_text }}</span>
+                <span class="visually-hidden">{{ 'blocks.featured_product.countdown_minutes' | t }}</span>
+              </span>
+              <span
+                class="featured-product__countdown-unit"
+                data-countdown-unit="seconds"
+                data-testid="featured-product-countdown-seconds"
+              >
+                <span data-countdown-value>{{ seconds_text }}</span>
+                <span class="visually-hidden">{{ 'blocks.featured_product.countdown_seconds' | t }}</span>
+              </span>
+            </div>
+          </div>
+        {%- endif -%}
+
+        <div class="featured-product__summary">
+          {% partial 'product-price' %}
+            <div class="featured-product__price" data-testid="featured-product-price">
+              {% render 'price', product: featured, variant: current_variant %}
+              {%- if current_variant.compare_at_price > current_variant.price -%}
+                {%- assign discount_percent = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
+                <span class="featured-product__discount" data-testid="featured-product-discount">
+                  {%- if discount_percent > 0 -%}
+                    {{- 'products.card.sale_percent' | t: percent: discount_percent -}}
+                  {%- else -%}
+                    {{- 'products.card.sale' | t -}}
+                  {%- endif -%}
+                </span>
+              {%- endif -%}
+            </div>
+          {% endpartial %}
+
+          {%- if rating_value != blank -%}
+            <div class="featured-product__rating" data-testid="featured-product-rating">
+              {% render 'rating-stars', rating: rating_on_five %}
+              <span class="featured-product__rating-value">
+                {{- 'blocks.featured_product.rating_value' | t: rating: rating_on_five -}}
+              </span>
+              {%- if rating_count != blank -%}
+                <span class="featured-product__rating-count" data-testid="featured-product-rating-count">
+                  {{- 'blocks.featured_product.rating_count' | t: count: rating_count_number -}}
+                </span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          {%- if description != blank -%}
+            <p class="featured-product__description" data-testid="featured-product-description">{{ description }}</p>
+          {%- endif -%}
+        </div>
+
+        {%- if spec_rows != blank -%}
+          <table class="featured-product__specs" data-testid="featured-product-specs">
+            <caption class="visually-hidden">{{ 'blocks.featured_product.specs_label' | t }}</caption>
+            <tbody>
+              {{- spec_rows -}}
+            </tbody>
+          </table>
+        {%- endif -%}
+
+        {%- if featured.requires_selling_plan -%}
+          <div class="featured-product__actions">
+            <a class="button button--secondary featured-product__view-detail" href="{{ featured.url }}" data-testid="featured-product-view-detail">
+              {{- 'blocks.featured_product.view_detail' | t -}}
+              {% render 'slideshow-icon', name: 'arrow' %}
+            </a>
+          </div>
+        {%- else -%}
+          <product-form
+            class="featured-product__buy"
+            data-product-id="{{ featured.id }}"
+            data-product-url="{{ featured.url }}"
+            data-cart-add-url="{{ routes.cart_add_url }}"
+            data-cart-url="{{ routes.cart_url }}"
+            data-cart-type="{{ cart_type | escape }}"
+            data-label-add="{{ label_add | escape }}"
+            data-label-added="{{ label_added | escape }}"
+            data-label-sold-out="{{ label_sold_out | escape }}"
+            data-label-unavailable="{{ label_unavailable | escape }}"
+          >
+            {%- if has_variant_choice -%}
+              {%- render 'product-variant-picker',
+                product: featured,
+                current_variant: current_variant,
+                form_id: form_id,
+                fetch_url: fetch_url,
+                regions: 'product-price product-buy-buttons'
+              -%}
+            {%- endif -%}
+
+            {%- form 'product', featured, id: form_id, class: 'featured-product__actions' -%}
+              <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+              {%- if has_variant_choice -%}
+                {%- render 'product-variant-select', product: featured, current_variant: current_variant, form_id: form_id -%}
+              {%- endif -%}
+
+              {% partial 'product-buy-buttons' %}
+                <div class="featured-product__add-wrapper">
+                  <button
+                    class="button featured-product__add"
+                    type="submit"
+                    name="add"
+                    {% unless current_variant.available %}
+                      disabled
+                    {% endunless %}
+                    data-testid="featured-product-add"
+                  >
+                    {%- if current_variant.available -%}
+                      {% render 'header-icon', name: 'bag' %}
+                    {%- endif -%}
+                    <span class="product-form__add-label">
+                      {%- if current_variant.available -%}
+                        {{- label_add -}}
+                      {%- else -%}
+                        {{- label_sold_out -}}
+                      {%- endif -%}
+                    </span>
+                  </button>
+                </div>
+              {% endpartial %}
+
+              <a class="button button--secondary featured-product__view-detail" href="{{ featured.url }}" data-testid="featured-product-view-detail">
+                {{- 'blocks.featured_product.view_detail' | t -}}
+                {% render 'slideshow-icon', name: 'arrow' %}
+              </a>
+            {%- endform -%}
+
+            <div class="visually-hidden" role="status" aria-live="polite" data-testid="featured-product-status"></div>
+            <div class="product-form__error" role="alert" data-testid="featured-product-error"></div>
+          </product-form>
+        {%- endif -%}
+      </div>
+    </s-view-event>
+  </featured-product>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.featured_product",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:labels.featured_product"
+    },
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "countdown_label",
+      "label": "t:labels.countdown_label",
+      "default": "Sale ends in"
+    },
+    {
+      "type": "text",
+      "id": "countdown_end",
+      "label": "t:labels.countdown_end",
+      "info": "t:info.countdown_end"
+    },
+    {
+      "type": "text",
+      "id": "spec_1_label",
+      "label": "t:labels.spec_1_label",
+      "info": "t:info.spec_label"
+    },
+    {
+      "type": "text",
+      "id": "spec_2_label",
+      "label": "t:labels.spec_2_label",
+      "info": "t:info.spec_label"
+    },
+    {
+      "type": "text",
+      "id": "spec_3_label",
+      "label": "t:labels.spec_3_label",
+      "info": "t:info.spec_label"
+    },
+    {
+      "type": "text",
+      "id": "spec_4_label",
+      "label": "t:labels.spec_4_label",
+      "info": "t:info.spec_label"
+    }
+  ]
+}
+{% endschema %}

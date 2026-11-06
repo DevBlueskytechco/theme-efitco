@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# CHỈ DevOps người chạy. Upload zip lên store efitco-canvas thành theme mới (unpublished) qua Admin GraphQL themeCreate.
+# PHA 0–1: KHÔNG DÙNG — upload zip tay lên yum-dev (Admin → Themes → Add theme → Upload zip file). Script giữ cho pha 2 khi có store thật.
+# CHỈ DevOps người chạy. Upload zip lên store yum-dev (store người, đã có Canvas) thành theme mới (unpublished) qua Admin GraphQL themeCreate.
 # Cần: CANVAS_STORE (xxx.myshopify.com), CANVAS_ADMIN_TOKEN (scope write_themes), ZIP_URL (zip đã đưa lên nơi tải được, ví dụ GitHub release asset).
 set -euo pipefail
 : "${CANVAS_STORE:?}" "${CANVAS_ADMIN_TOKEN:?}" "${ZIP_URL:?}"

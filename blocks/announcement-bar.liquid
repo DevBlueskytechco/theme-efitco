@@ -1,0 +1,67 @@
+{% doc %}
+  Renders a one-line announcement above the header, with an optional link
+  wrapping the text. Composed in layout/theme.liquid in its own container
+  so it appears on every page. Hidden by default: when the text setting is
+  empty nothing is rendered on the storefront; in the theme editor a
+  placeholder explains how to turn it on. Self-contained: callers must
+  leave the body empty.
+
+  Test hooks: data-testid="announcement-bar", "announcement-bar-link",
+  "announcement-bar-placeholder" (editor only).
+
+  @example
+  {% block 'container', tag: 'div' %}
+    {% block 'announcement-bar' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign announcement_text = block.settings.text | strip
+  assign announcement_link = block.settings.link
+-%}
+
+{%- if announcement_text != blank -%}
+  <aside
+    class="announcement-bar full-width"
+    aria-label="{{ 'blocks.announcement_bar.label' | t }}"
+    data-testid="announcement-bar"
+    {{ block.shopify_attributes }}
+  >
+    <p class="announcement-bar__text">
+      {%- if announcement_link != blank -%}
+        <a class="announcement-bar__link" href="{{ announcement_link }}" data-testid="announcement-bar-link">
+          {{- announcement_text | escape -}}
+        </a>
+      {%- else -%}
+        {{- announcement_text | escape -}}
+      {%- endif -%}
+    </p>
+  </aside>
+{%- elsif request.design_mode -%}
+  <div
+    class="announcement-bar announcement-bar--placeholder full-width"
+    data-testid="announcement-bar-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    <p class="announcement-bar__text">{{ 'blocks.announcement_bar.placeholder' | t }}</p>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.announcement_bar",
+  "settings": [
+    {
+      "type": "text",
+      "id": "text",
+      "label": "t:labels.announcement_text",
+      "info": "t:info.announcement_text"
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "t:labels.announcement_link"
+    }
+  ]
+}
+{% endschema %}

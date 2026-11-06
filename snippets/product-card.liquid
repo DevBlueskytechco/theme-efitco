@@ -1,0 +1,292 @@
+{% doc %}
+  Renders one product card (Figma 1:502): square image, sale or sold out badge,
+  title link, price and up to 5 color swatches.
+
+  Every value (image, price, links, preselected swatch) comes from the card
+  variant: `variant` when passed (a variant item in a multi-source collection),
+  otherwise product.selected_or_first_available_variant.
+
+  Swatches are native radio inputs and work without JavaScript (selection only).
+  assets/product-swatch.js (BE) upgrades the root `product-swatch` element and
+  swaps image, links and price from the data-* hooks below. No partial is used.
+
+  JS hooks: on each swatch input `data-variant-id`, `data-variant-url`,
+  `data-image-src`, `data-image-srcset`, `data-image-alt`, `data-badge`
+  (sale | sold_out | none) and `data-badge-label` (translated text, empty for
+  none); `data-card-image` on the img, `data-card-link` on the image and title
+  links (the "+N" link keeps product.url and has no hook), `data-card-price` on
+  the price wrapper; when the price varies, one
+  `template[data-price-for="<variant id>"]` per swatch holds that variant's
+  price markup.
+
+  Badge: one `[data-card-badge]` element is always rendered, `hidden` when
+  none. To show a swatch's badge, copy its data-badge to the badge's
+  data-badge (CSS styles from it), set the text to data-badge-label, toggle
+  `hidden` for none and set data-testid to product-card-badge-sale,
+  product-card-badge-sold-out or product-card-badge.
+  Rule: sold_out when the product or the variant is unavailable; sale when
+  compare_at_price > price, label -N% (rounded) or Sale when N rounds to 0.
+
+  Storefront event shopify:product:view (ES1-T76, TE-4 AC12): the card sits in
+  <s-view-event view-event-trigger="intersect"> with product |
+  standard_event_data, so the event fires when the card scrolls into view.
+  The element is defined by assets/standard-events.js (BE ES1-T81, layout).
+  Context: collection (grids) or recommendation (product recommendations,
+  ES1-T65); any other value falls back to collection.
+
+  @param {product} product - The product to render
+  @param {variant} [variant] - Variant to show. Default: product.selected_or_first_available_variant
+  @param {string} [id_prefix] - Prefix for input ids and radio names, so the same product can appear twice on a page. Default: 'card'
+  @param {string} [sizes] - The image sizes attribute. Default: '(min-width: 80rem) 25vw, (min-width: 48rem) 33vw, 50vw'
+  @param {string} [loading] - The image loading attribute. Default: 'lazy'
+  @param {string} [heading_level] - Tag for the title: h2 to h6. Default: 'h3'
+  @param {string} [card_context] - View event context: 'collection' or 'recommendation'. Default: 'collection'
+  @param {boolean} [show_swatches] - false: no swatch fieldset, for a card fixed to one variant (blocks/bundle-builder). Default: true
+
+  @example
+  {% render 'product-card', product: product %}
+  {% render 'product-card', product: product, id_prefix: 'related', card_context: 'recommendation' %}
+  {% render 'product-card', product: item.product, variant: item, id_prefix: 'featured', loading: 'eager' %}
+{% enddoc %}
+
+{%- liquid
+  assign card_variant = variant | default: product.selected_or_first_available_variant
+
+  assign uid = id_prefix | default: 'card' | append: '-' | append: product.id
+  if variant != blank
+    assign uid = uid | append: '-' | append: variant.id
+  endif
+
+  assign image_sizes = sizes | default: '(min-width: 80rem) 25vw, (min-width: 48rem) 33vw, 50vw'
+  assign image_loading = loading | default: 'lazy'
+
+  assign heading_tag = 'h3'
+  case heading_level
+    when 'h2', 'h3', 'h4', 'h5', 'h6'
+      assign heading_tag = heading_level
+  endcase
+
+  assign view_context = 'collection'
+  if card_context == 'recommendation'
+    assign view_context = 'recommendation'
+  endif
+
+  assign card_image =card_variant.featured_image | default: product.featured_image
+  assign card_alt = card_image.alt | default: product.title
+
+  # Badge of the card variant. Same rule as data-badge on each swatch below.
+  assign badge = 'none'
+  assign badge_label = ''
+  if product.available == false or card_variant.available == false
+    assign badge = 'sold_out'
+    assign badge_label = 'products.card.sold_out' | t
+  elsif card_variant.compare_at_price > card_variant.price
+    assign badge = 'sale'
+    assign sale_percent = card_variant.compare_at_price | minus: card_variant.price | times: 100.0 | divided_by: card_variant.compare_at_price | round
+    if sale_percent > 0
+      assign badge_label = 'products.card.sale_percent' | t: percent: sale_percent
+    else
+      assign badge_label = 'products.card.sale' | t
+    endif
+  endif
+
+  case badge
+    when 'sale'
+      assign badge_testid = 'product-card-badge-sale'
+    when 'sold_out'
+      assign badge_testid = 'product-card-badge-sold-out'
+    else
+      assign badge_testid = 'product-card-badge'
+  endcase
+
+  assign swatch_option = nil
+  for option in product.options_with_values
+    if option.values.size > 1 and option.values.first.swatch != blank
+      assign swatch_option = option
+      break
+    endif
+  endfor
+
+  assign default_variant = false
+  if card_variant.id == product.selected_or_first_available_variant.id
+    assign default_variant = true
+  endif
+-%}
+
+<s-view-event
+  class="product-card__view"
+  view-event-trigger="intersect"
+  view-event-payload='{{ product | standard_event_data: "view", context: view_context | escape }}'
+  data-testid="product-card-view-event"
+>
+<product-swatch class="product-card" data-testid="product-card" data-product-id="{{ product.id }}">
+  <div class="product-card__media">
+    <a
+      class="product-card__media-link"
+      href="{{ card_variant.url | default: product.url }}"
+      tabindex="-1"
+      aria-hidden="true"
+      data-card-link
+    >
+      {%- if card_image -%}
+        {{
+          card_image
+          | image_url: width: 1080
+          | image_tag:
+            widths: '360, 720, 1080',
+            sizes: image_sizes,
+            loading: image_loading,
+            alt: card_alt,
+            class: 'product-card__image',
+            data-card-image: 'card',
+            data-testid: 'product-card-image'
+        }}
+      {%- else -%}
+        <span class="product-card__placeholder" data-testid="product-card-placeholder-image">
+          {{- 'product-1' | placeholder_svg_tag: 'product-card__placeholder-svg' -}}
+        </span>
+      {%- endif -%}
+    </a>
+
+    <span
+      class="product-card__badge"
+      data-card-badge
+      data-badge="{{ badge }}"
+      data-testid="{{ badge_testid }}"
+      {% if badge == 'none' %}
+        hidden
+      {% endif %}
+    >
+      {{- badge_label -}}
+    </span>
+  </div>
+
+  <{{ heading_tag }} class="product-card__title">
+    <a
+      class="product-card__link"
+      href="{{ card_variant.url | default: product.url }}"
+      data-card-link
+      data-testid="product-card-title"
+    >
+      {{- product.title | escape -}}
+    </a>
+  </{{ heading_tag }}>
+
+  <div class="product-card__price" data-card-price>
+    {%- render 'price', product: product, variant: variant -%}
+  </div>
+
+  {%- if swatch_option and show_swatches != false -%}
+    {%- assign option_index = swatch_option.position | minus: 1 -%}
+    <fieldset class="product-card__swatches" data-testid="product-card-swatches">
+      <legend class="visually-hidden">{{ swatch_option.name | escape }}</legend>
+
+      {%- for value in swatch_option.values limit: 5 -%}
+        {%- liquid
+          # Variant for this value, keeping the card variant's other options (AC8)
+          assign swatch_variant = value.variant
+          unless default_variant
+            assign swatch_variant = nil
+            assign fallback_variant = nil
+            for candidate in product.variants
+              if candidate.options[option_index] == value.name
+                if fallback_variant == nil
+                  assign fallback_variant = candidate
+                endif
+                assign same_options = true
+                for candidate_value in candidate.options
+                  if forloop.index0 != option_index and candidate_value != card_variant.options[forloop.index0]
+                    assign same_options = false
+                    break
+                  endif
+                endfor
+                if same_options
+                  assign swatch_variant = candidate
+                  break
+                endif
+              endif
+            endfor
+            if swatch_variant == nil
+              assign swatch_variant = fallback_variant
+            endif
+          endunless
+
+          assign swatch_image = swatch_variant.featured_image | default: product.featured_image
+          assign swatch_alt = swatch_image.alt | default: product.title
+          assign input_id = uid | append: '-swatch-' | append: forloop.index
+          assign checked = false
+          if card_variant.options[option_index] == value.name
+            assign checked = true
+          endif
+
+          assign swatch_badge = 'none'
+          assign swatch_badge_label = ''
+          if product.available == false or swatch_variant.available == false
+            assign swatch_badge = 'sold_out'
+            assign swatch_badge_label = 'products.card.sold_out' | t
+          elsif swatch_variant.compare_at_price > swatch_variant.price
+            assign swatch_badge = 'sale'
+            assign swatch_percent = swatch_variant.compare_at_price | minus: swatch_variant.price | times: 100.0 | divided_by: swatch_variant.compare_at_price | round
+            if swatch_percent > 0
+              assign swatch_badge_label = 'products.card.sale_percent' | t: percent: swatch_percent
+            else
+              assign swatch_badge_label = 'products.card.sale' | t
+            endif
+          endif
+        -%}
+        <input
+          class="product-card__swatch-input visually-hidden"
+          type="radio"
+          id="{{ input_id }}"
+          name="{{ uid }}-option"
+          value="{{ value.name | escape }}"
+          {% if checked %}
+            checked
+          {% endif %}
+          {% if swatch_variant %}
+            data-variant-id="{{ swatch_variant.id }}"
+            data-variant-url="{{ swatch_variant.url }}"
+            data-badge="{{ swatch_badge }}"
+            data-badge-label="{{ swatch_badge_label | escape }}"
+          {% endif %}
+          {% if swatch_image %}
+            data-image-src="{{ swatch_image | image_url: width: 1080 }}"
+            data-image-srcset="{{ swatch_image | image_url: width: 360 }} 360w, {{ swatch_image | image_url: width: 720 }} 720w, {{ swatch_image | image_url: width: 1080 }} 1080w"
+            data-image-alt="{{ swatch_alt | escape }}"
+          {% endif %}
+        >
+        <label
+          class="product-card__swatch"
+          for="{{ input_id }}"
+          data-testid="product-card-swatch"
+          {% if value.swatch.image %}
+            style="--swatch-image: url({{ value.swatch.image | image_url: width: 64 }});"
+          {% elsif value.swatch.color %}
+            style="--swatch-color: {{ value.swatch.color }};"
+          {% endif %}
+        >
+          <span class="visually-hidden">{{ value.name | escape }}</span>
+        </label>
+        {%- if product.price_varies and swatch_variant -%}
+          <template data-price-for="{{ swatch_variant.id }}">
+            {%- render 'price', product: product, variant: swatch_variant -%}
+          </template>
+        {%- endif -%}
+      {%- endfor -%}
+
+      {%- if swatch_option.values.size > 5 -%}
+        {%- assign more_count = swatch_option.values.size | minus: 5 -%}
+        <a
+          class="product-card__swatch-more"
+          href="{{ product.url }}"
+          tabindex="-1"
+          aria-hidden="true"
+          data-testid="product-card-swatch-more"
+        >
+          {{- 'products.card.more_swatches' | t: count: more_count -}}
+        </a>
+      {%- endif -%}
+    </fieldset>
+  {%- endif -%}
+</product-swatch>
+</s-view-event>

@@ -58,10 +58,7 @@
 {%- endif -%}
 
 {%- if request.page_type == 'product' -%}
-  <script type="application/ld+json">
-    {{ product | structured_data }}
-  </script>
-
+  {% # JSON-LD Product: snippets/product-structured-data.liquid (blocks/product-info.liquid, TE-4 AC11) %}
   <meta
     property="og:price:amount"
     content="{{ product.price | money_without_currency | strip_html }}"

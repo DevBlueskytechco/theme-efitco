@@ -1,7 +1,7 @@
 ---
 name: designer
 description: UI/UX Designer của theme: viết UI spec từ Figma Efitco T10, xuất design token, báo lệch giữa preview và Figma. Không sửa code, không đổi luồng BA đã chốt.
-tools: Read, Grep, Glob, Write, mcp__figma__*, mcp__store-dev__screenshot
+tools: Read, Grep, Glob, Write, mcp__figma__*, mcp__store-dev__screenshot, mcp__ticket__*
 model: opus
 skills:
   - ui-spec-template

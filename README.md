@@ -5,7 +5,7 @@ Theme Shopify mới cho Canvas, dựng từ Skeleton Theme commit `a7a655e79b21e
 - Quy tắc kiến trúc: `AGENTS.md` (giữ nguyên từ Skeleton, nguồn sự thật số 1).
 - Hướng dẫn agent và team: `CLAUDE.md`, `.claude/`.
 - Tài liệu dự án: `docs/`.
-- Lệnh: `shopify theme dev --store efitco-dev` (người) · `shopify theme check` · `npx playwright test` · `npx lhci autorun`.
+- Lệnh: `shopify theme dev --store yum-dev (efitco-dev)` (người) · `shopify theme check` · `npx playwright test` · `npx lhci autorun`.
 
 ---
 

@@ -1,0 +1,302 @@
+{% doc %}
+  Product finder quiz (Figma 1:506): dark panel with intro text and a white
+  card holding a GET form. The steps are quiz-step blocks in the caller's body.
+  Below 64rem the panel has one column, from 64rem two.
+
+  Works without JavaScript: all steps show, and the form submits the chosen
+  tags to the search page. With scripting enabled, CSS shows a step only after
+  the previous steps have an answer, and the submit button only after the last
+  one (assets/base.css). A script takes over by setting data-enhanced on the
+  root. In the theme editor, data-design-mode keeps every step visible.
+
+  Form parameters without JavaScript (drafts/techlead/ES1-T132/task-split.md D4,
+  ES1-T133 #2, #3): hidden q=* and type=product, plus one filter.p.tag per
+  checked option. The store must have the Product tag filter on in Search and
+  Discovery; ES1-T140 records how Shopify treats the repeated parameter.
+
+  Results (ES1-T132 D6): partial quiz-results is written once, here, after the
+  form, because the swatches in a card are inputs and must stay out of the form.
+  With results_view (templates/collection.quiz.liquid) the root is a plain div,
+  the block renders only the heading, the partial with up to 4 cards and the
+  empty message, and shows them. Without it the partial is empty and the panel
+  is hidden until a script applies the partial from that template.
+
+  A tag no product uses makes Shopify redirect to the URL without that tag
+  (ES1-T133 #1), which would list too many products. So fewer current_tags than
+  required_tags counts as 0 results.
+
+  The empty message and its link sit outside the partial, because another
+  template cannot read this block's settings. On collection.quiz the text comes
+  from the locale. Link: setting collection, otherwise the current collection,
+  otherwise all products. data-results-url uses the same value. The theme editor
+  shows the panel and the empty message so the merchant can see the text.
+
+  When the body is empty and results_view is off, the editor shows a placeholder
+  and the storefront renders nothing.
+
+  JavaScript hooks: custom element quiz-finder (root), data-enhanced,
+  data-design-mode, data-results-url, data-results-view, data-label-results
+  (%n stands for the count), data-quiz-submit, data-quiz-back, data-quiz-status,
+  data-quiz-results-panel, data-quiz-title (results heading, tabindex -1),
+  data-quiz-count (partial root, number of cards), data-quiz-empty; partial
+  quiz-results.
+  Test hooks: data-testid="quiz", "quiz-eyebrow", "quiz-heading",
+  "quiz-subheading", "quiz-note", "quiz-form", "quiz-submit", "quiz-back",
+  "quiz-status", "quiz-placeholder", "quiz-results", "quiz-results-heading",
+  "quiz-results-grid", "quiz-empty", "quiz-empty-text", "quiz-empty-cta".
+
+  @param {string} [content] - The quiz-step blocks of this quiz. Leave empty with results_view
+  @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading id. Default: block.id
+  @param {boolean} [results_view] - Render only the results, with cards from the global collection. Default: false
+  @param {number} [required_tags] - With results_view: tags the URL must apply, one per quiz step. Default: 3
+
+  @example
+  {% block 'container', id: 'home-quiz', tag: 'div' %}
+    {% block 'quiz', id: 'quiz' %}
+      {% block 'quiz-step', id: 'quiz-step-1', step: 1, total: 3 %}{% endblock %}
+      {% block 'quiz-step', id: 'quiz-step-2', step: 2, total: 3 %}{% endblock %}
+      {% block 'quiz-step', id: 'quiz-step-3', step: 3, total: 3 %}{% endblock %}
+    {% endblock %}
+  {% endblock %}
+
+  @example
+  {% block 'quiz', id: 'quiz-results', results_view: true, required_tags: 3 %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign steps = content | strip
+  assign eyebrow = block.settings.eyebrow
+  assign heading = block.settings.heading
+  assign subheading = block.settings.subheading
+  assign note_1 = block.settings.note_1
+  assign note_2 = block.settings.note_2
+  assign heading_id = id | default: block.id | append: '-heading'
+
+  assign results_only = false
+  if results_view == true
+    assign results_only = true
+  endif
+
+  assign has_intro = false
+  unless results_only
+    if eyebrow != blank or heading != blank or subheading != blank or note_1 != blank or note_2 != blank
+      assign has_intro = true
+    endif
+  endunless
+
+  assign root_tag = 'quiz-finder'
+  if results_only
+    assign root_tag = 'div'
+  endif
+
+  assign results_url = block.settings.collection.url | default: collection.url | default: routes.all_products_collection_url
+  assign results_label = 'blocks.quiz.results_count' | t: count: '%n'
+
+  assign empty_text = 'blocks.quiz.empty_text' | t
+  unless results_only
+    assign empty_text = block.settings.empty_text | default: empty_text
+  endunless
+
+  # current_tags is nil without tags, and nil never compares as less than a number
+  assign applied_tags = current_tags.size | default: 0
+  assign tags_needed = required_tags | default: 3
+
+  assign card_count = 0
+  if results_only and applied_tags >= tags_needed
+    for item in collection.products limit: 4
+      assign card_count = card_count | plus: 1
+    endfor
+  endif
+
+  # Liquid has no parentheses and reads and/or from the right, so these are separate checks
+  assign empty_hidden = true
+  if results_only or request.design_mode
+    assign empty_hidden = false
+  endif
+  if card_count > 0
+    assign empty_hidden = true
+  endif
+-%}
+
+{%- if steps != blank or results_only -%}
+  <{{ root_tag }}
+    class="quiz{% if has_intro %} quiz--split{% endif %}"
+    {% if request.design_mode %}
+      data-design-mode
+    {% endif %}
+    {% unless results_only %}
+      data-results-url="{{ results_url }}"
+      data-results-view="quiz"
+      data-label-results="{{ results_label | escape }}"
+    {% endunless %}
+    data-testid="quiz"
+    {{ block.shopify_attributes }}
+  >
+    {%- if has_intro -%}
+      <div class="quiz__intro">
+        {%- if eyebrow != blank -%}
+          <p class="quiz__eyebrow" data-testid="quiz-eyebrow">{{ eyebrow | escape }}</p>
+        {%- endif -%}
+        {%- if heading != blank -%}
+          <h2 class="quiz__heading" id="{{ heading_id }}" data-testid="quiz-heading">{{ heading | escape }}</h2>
+        {%- endif -%}
+        {%- if subheading != blank -%}
+          <p class="quiz__subheading" data-testid="quiz-subheading">{{ subheading | escape }}</p>
+        {%- endif -%}
+        {%- if note_1 != blank or note_2 != blank -%}
+          <ul class="quiz__notes" role="list">
+            {%- if note_1 != blank -%}
+              <li class="quiz__note" data-testid="quiz-note">
+                {%- render 'quiz-icon', name: 'clock' -%}
+                {{- note_1 | escape -}}
+              </li>
+            {%- endif -%}
+            {%- if note_2 != blank -%}
+              <li class="quiz__note" data-testid="quiz-note">
+                {%- render 'quiz-icon', name: 'badge' -%}
+                {{- note_2 | escape -}}
+              </li>
+            {%- endif -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- unless results_only -%}
+      <form
+        class="quiz__form"
+        action="{{ routes.search_url }}"
+        method="get"
+        {% if heading != blank %}
+          aria-labelledby="{{ heading_id }}"
+        {% endif %}
+        data-testid="quiz-form"
+      >
+        <input type="hidden" name="q" value="*">
+        <input type="hidden" name="type" value="product">
+        {{ content }}
+        <div class="quiz__actions">
+          <button class="button button--secondary quiz__back" type="button" hidden data-quiz-back data-testid="quiz-back">
+            {{- 'blocks.quiz.back' | t -}}
+          </button>
+          <button class="button quiz__submit" type="submit" data-quiz-submit data-testid="quiz-submit">
+            {{- 'blocks.quiz.submit' | t -}}
+          </button>
+        </div>
+        <div class="visually-hidden" role="status" data-quiz-status data-testid="quiz-status"></div>
+      </form>
+    {%- endunless -%}
+
+    <div
+      class="quiz__results"
+      {% unless results_only or request.design_mode %}
+        hidden
+      {% endunless %}
+      data-quiz-results-panel
+    >
+      <h3 class="quiz__results-heading" tabindex="-1" data-quiz-title data-testid="quiz-results-heading">
+        {{- 'blocks.quiz.results_heading' | t -}}
+      </h3>
+
+      {% partial 'quiz-results' %}
+        <div class="quiz__results-body" data-quiz-count="{{ card_count }}" data-testid="quiz-results">
+          {%- if card_count > 0 -%}
+            <ul class="quiz__results-grid" role="list" data-testid="quiz-results-grid">
+              {%- for item in collection.products limit: 4 -%}
+                {%- liquid
+                  assign card_product = item
+                  assign card_variant = nil
+                  if item.product != blank
+                    assign card_product = item.product
+                    assign card_variant = item
+                  endif
+                -%}
+                <li class="quiz__results-item">
+                  {% render 'product-card',
+                    product: card_product,
+                    variant: card_variant,
+                    id_prefix: 'quiz',
+                    sizes: '(min-width: 64rem) 25vw, 50vw',
+                    card_context: 'recommendation',
+                    heading_level: 'h4'
+                  %}
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </div>
+      {% endpartial %}
+
+      <div
+        class="quiz__empty"
+        {% if empty_hidden %}
+          hidden
+        {% endif %}
+        data-quiz-empty
+        data-testid="quiz-empty"
+      >
+        <p class="quiz__empty-text" data-testid="quiz-empty-text">{{ empty_text | escape }}</p>
+        <a class="button button--secondary" href="{{ results_url }}" data-testid="quiz-empty-cta">
+          {{- 'blocks.quiz.empty_cta' | t -}}
+        </a>
+      </div>
+    </div>
+
+    <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
+  </{{ root_tag }}>
+{%- elsif request.design_mode -%}
+  <p class="quiz-placeholder" data-testid="quiz-placeholder" {{ block.shopify_attributes }}>
+    {{ 'blocks.quiz.placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.quiz",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Find Your Perfect Gear"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "t:labels.quiz_subheading",
+      "default": "Three questions. One shortlist."
+    },
+    {
+      "type": "text",
+      "id": "note_1",
+      "label": "t:labels.quiz_note_1",
+      "info": "t:info.quiz_note"
+    },
+    {
+      "type": "text",
+      "id": "note_2",
+      "label": "t:labels.quiz_note_2",
+      "info": "t:info.quiz_note",
+      "default": "No sign-up required"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection",
+      "info": "t:info.quiz_collection"
+    },
+    {
+      "type": "text",
+      "id": "empty_text",
+      "label": "t:labels.quiz_empty_text",
+      "info": "t:info.quiz_empty_text",
+      "default": "No products match all your answers. Browse the full collection instead."
+    }
+  ]
+}
+{% endschema %}

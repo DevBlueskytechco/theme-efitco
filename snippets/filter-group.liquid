@@ -1,0 +1,164 @@
+{% doc %}
+  Renders one storefront filter as an open `details` group of native inputs, for
+  a form GET (TE-6 AC2, ES1-T103 D5). Reads only `filter`, never `collection`, so
+  search.filters can use it too (TE-8).
+
+  Branches on filter.type, not on the filter name: Search and Discovery decides
+  which filters exist. Parameter names and values come from the filter object.
+  - boolean: filter.true_value, filter.false_value (either can be nil).
+  - list: filter.values. filter.presentation swatch uses value.swatch, image uses
+    value.image, otherwise text. The input stays a native checkbox in a label.
+  - price_range: 2 number inputs. filter.min_value.value, filter.max_value.value
+    and filter.range_max are in cents; the URL takes the shop currency's main unit
+    (ES1-T104 #2), so they go through money_without_currency. step="any" keeps a
+    price like 20.40 valid.
+
+  A value with count 0 that is not active is disabled.
+
+  JS hook: data-filter-param on the group, to restore open or closed groups.
+  Test hooks: collection-filter-group, collection-filter-option,
+  collection-filter-input, collection-filter-swatch, collection-filter-price-min,
+  collection-filter-price-max.
+
+  @param {object} filter - The filter to render, from collection.filters or search.filters
+
+  @example
+  {% for filter in collection.filters %}
+    {% render 'filter-group', filter: filter %}
+  {% endfor %}
+{% enddoc %}
+
+<details class="filter-group" open data-filter-param="{{ filter.param_name | escape }}" data-testid="collection-filter-group">
+  <summary class="filter-group__summary">
+    <span>{{ filter.label | escape }}</span>
+    {% render 'header-icon', name: 'chevron' %}
+  </summary>
+
+  {%- if filter.type == 'price_range' -%}
+    {%- liquid
+      assign price_ceiling = filter.range_max | money_without_currency | replace: ',', ''
+
+      assign price_min = ''
+      if filter.min_value.value != nil
+        assign price_min = filter.min_value.value | money_without_currency | replace: ',', ''
+      endif
+
+      assign price_max = ''
+      if filter.max_value.value != nil
+        assign price_max = filter.max_value.value | money_without_currency | replace: ',', ''
+      endif
+    -%}
+    <div class="filter-group__price">
+      <label class="filter-group__price-field">
+        <span>{{ 'blocks.collection_filters.price_min' | t }}</span>
+        <input
+          class="filter-group__price-input"
+          type="number"
+          inputmode="decimal"
+          name="{{ filter.min_value.param_name | escape }}"
+          min="0"
+          max="{{ price_ceiling }}"
+          step="any"
+          placeholder="0"
+          value="{{ price_min }}"
+          data-testid="collection-filter-price-min"
+        >
+      </label>
+      <label class="filter-group__price-field">
+        <span>{{ 'blocks.collection_filters.price_max' | t }}</span>
+        <input
+          class="filter-group__price-input"
+          type="number"
+          inputmode="decimal"
+          name="{{ filter.max_value.param_name | escape }}"
+          min="0"
+          max="{{ price_ceiling }}"
+          step="any"
+          placeholder="{{ price_ceiling }}"
+          value="{{ price_max }}"
+          data-testid="collection-filter-price-max"
+        >
+      </label>
+    </div>
+  {%- else -%}
+    {%- liquid
+      assign option_total = filter.values.size
+      if filter.type == 'boolean'
+        assign option_total = 2
+      endif
+    -%}
+    <ul class="filter-group__options" role="list">
+      {%- for option_number in (1..option_total) -%}
+        {%- liquid
+          if filter.type == 'boolean'
+            if option_number == 1
+              assign value = filter.true_value
+            else
+              assign value = filter.false_value
+            endif
+          else
+            assign value_index = option_number | minus: 1
+            assign value = filter.values[value_index]
+          endif
+        -%}
+        {%- if value -%}
+          <li>
+            <label class="filter-option" data-testid="collection-filter-option">
+              {%- capture option_input -%}
+                <input
+                  class="filter-option__input"
+                  type="checkbox"
+                  name="{{ value.param_name | escape }}"
+                  value="{{ value.value | escape }}"
+                  {% if value.active %}
+                    checked
+                  {% endif %}
+                  {% if value.count == 0 and value.active == false %}
+                    disabled
+                  {% endif %}
+                  data-testid="collection-filter-input"
+                >
+              {%- endcapture -%}
+
+              {%- if filter.presentation == 'swatch' -%}
+                <span class="filter-option__control">
+                  {{- option_input -}}
+                  <span
+                    class="filter-option__swatch"
+                    data-testid="collection-filter-swatch"
+                    {% if value.swatch.image %}
+                      style="--swatch-image: url({{ value.swatch.image | image_url: width: 64 }});"
+                    {% elsif value.swatch.color %}
+                      style="--swatch-color: {{ value.swatch.color }};"
+                    {% endif %}
+                  ></span>
+                </span>
+              {%- elsif filter.presentation == 'image' and value.image -%}
+                <span class="filter-option__control">
+                  {{- option_input -}}
+                  <span class="filter-option__swatch" data-testid="collection-filter-swatch">
+                    {%- render 'image',
+                      image: value.image,
+                      width: 64,
+                      height: 64,
+                      crop: 'center',
+                      widths: '64',
+                      sizes: '24px',
+                      inline: true,
+                      decorative: true
+                    -%}
+                  </span>
+                </span>
+              {%- else -%}
+                {{- option_input -}}
+              {%- endif -%}
+
+              <span class="filter-option__label">{{ value.label | escape }}</span>
+              <span class="filter-option__count">{{ value.count }}</span>
+            </label>
+          </li>
+        {%- endif -%}
+      {%- endfor -%}
+    </ul>
+  {%- endif -%}
+</details>

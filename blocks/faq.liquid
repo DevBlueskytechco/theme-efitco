@@ -1,0 +1,203 @@
+{% doc %}
+  Renders frequently asked questions: eyebrow, heading, a list of faq-item blocks
+  and an optional column with one image and up to two stat tiles. No JavaScript.
+
+  A child cannot read this block's settings because the body is rendered first and
+  arrives as a string. So when allow_multiple is off, this block replaces the
+  opening text of each details tag in the body to add the same name attribute to
+  every question, and the browser then keeps one question open at a time.
+
+  A stat tile renders when any of its 3 settings has text. Without an image and
+  stats, the column is not rendered and the questions take the full row. When the
+  body is empty, the editor shows a placeholder and the storefront renders nothing.
+
+  Test hooks: data-testid="faq", "faq-heading", "faq-list", "faq-placeholder",
+  "faq-image", "faq-stat-1", "faq-stat-2".
+
+  @param {string} [id] - Static block id, needed when a template has more than one faq block
+  @param {string} content - One faq-item block call per question, 1 to 10
+
+  @example
+  {% block 'container', id: 'home-faq', background: 'cream' %}
+    {% block 'faq' %}
+      {% block 'faq-item', id: 'faq-1', open: true %}{% endblock %}
+      {% block 'faq-item', id: 'faq-2' %}{% endblock %}
+    {% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign items = content | strip
+
+  unless block.settings.allow_multiple
+    assign named_details = '<details name="faq-' | append: block.id | append: '" class="faq-item"'
+    assign items = items | replace: '<details class="faq-item"', named_details
+  endunless
+
+  assign faq_image = block.settings.image
+
+  assign has_stat_1 = false
+  if block.settings.stat_1_label != blank or block.settings.stat_1_value != blank or block.settings.stat_1_text != blank
+    assign has_stat_1 = true
+  endif
+
+  assign has_stat_2 = false
+  if block.settings.stat_2_label != blank or block.settings.stat_2_value != blank or block.settings.stat_2_text != blank
+    assign has_stat_2 = true
+  endif
+
+  assign has_stats = false
+  if has_stat_1 or has_stat_2
+    assign has_stats = true
+  endif
+
+  assign has_media = false
+  if faq_image != blank or has_stats
+    assign has_media = true
+  endif
+-%}
+
+{%- if items != blank -%}
+  <div
+    class="faq{% if has_media %} faq--with-media{% endif %}"
+    {% if id != blank %}
+      data-faq-id="{{ id }}"
+    {% endif %}
+    data-testid="faq"
+    {{ block.shopify_attributes }}
+  >
+    <div class="faq__content">
+      {%- if block.settings.eyebrow != blank or block.settings.heading != blank -%}
+        <div class="faq__header">
+          {%- if block.settings.eyebrow != blank -%}
+            <p class="faq__eyebrow">{{ block.settings.eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if block.settings.heading != blank -%}
+            <h2 class="faq__heading" data-testid="faq-heading">{{ block.settings.heading | escape }}</h2>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+      <div class="faq__list" data-testid="faq-list">
+        {{ items }}
+      </div>
+    </div>
+
+    {%- if has_media -%}
+      <div class="faq__media{% if faq_image != blank and has_stats %} faq__media--overlay{% endif %}">
+        {%- if faq_image != blank -%}
+          {% render 'image',
+            image: faq_image,
+            class: 'faq__image',
+            width: 1018,
+            widths: '360, 509, 720, 1018',
+            sizes: '(min-width: 64rem) 38vw, 100vw',
+            loading: 'lazy',
+            testid: 'faq-image'
+          %}
+        {%- endif -%}
+        {%- if has_stats -%}
+          <div class="faq__stats">
+            {%- if has_stat_1 -%}
+              <div class="faq__stat faq__stat--accent" data-testid="faq-stat-1">
+                {%- if block.settings.stat_1_label != blank -%}
+                  <p class="faq__stat-label">{{ block.settings.stat_1_label | escape }}</p>
+                {%- endif -%}
+                {%- if block.settings.stat_1_value != blank -%}
+                  <p class="faq__stat-value">{{ block.settings.stat_1_value | escape }}</p>
+                {%- endif -%}
+                {%- if block.settings.stat_1_text != blank -%}
+                  <p class="faq__stat-text">{{ block.settings.stat_1_text | escape }}</p>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+            {%- if has_stat_2 -%}
+              <div class="faq__stat faq__stat--dark" data-testid="faq-stat-2">
+                {%- if block.settings.stat_2_label != blank -%}
+                  <p class="faq__stat-label">{{ block.settings.stat_2_label | escape }}</p>
+                {%- endif -%}
+                {%- if block.settings.stat_2_value != blank -%}
+                  <p class="faq__stat-value">{{ block.settings.stat_2_value | escape }}</p>
+                {%- endif -%}
+                {%- if block.settings.stat_2_text != blank -%}
+                  <p class="faq__stat-text">{{ block.settings.stat_2_text | escape }}</p>
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+{%- elsif request.design_mode -%}
+  <p
+    class="faq faq--placeholder"
+    data-testid="faq-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.faq.placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.faq",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "default": "Questions and answers"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Add a heading for your questions"
+    },
+    {
+      "type": "checkbox",
+      "id": "allow_multiple",
+      "label": "t:labels.faq_allow_multiple",
+      "info": "t:info.faq_allow_multiple",
+      "default": false
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.faq_image"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_label",
+      "label": "t:labels.faq_stat_1_label",
+      "info": "t:info.faq_stat"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_value",
+      "label": "t:labels.faq_stat_1_value"
+    },
+    {
+      "type": "text",
+      "id": "stat_1_text",
+      "label": "t:labels.faq_stat_1_text"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_label",
+      "label": "t:labels.faq_stat_2_label",
+      "info": "t:info.faq_stat"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_value",
+      "label": "t:labels.faq_stat_2_value"
+    },
+    {
+      "type": "text",
+      "id": "stat_2_text",
+      "label": "t:labels.faq_stat_2_text"
+    }
+  ]
+}
+{% endschema %}

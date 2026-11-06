@@ -1,15 +1,33 @@
 name: CI
 on:
   push:
-    branches: [develop, "feature/**"]
+    branches: [develop]   # nhánh feature chạy qua pull_request, tránh chạy 2 lần
   pull_request:
 jobs:
   theme-check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: shopify/theme-check-action@v2
-        with: { token: "${{ github.token }}" }
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      # Dùng CLI 4 giống máy CTO và agent; theme-check-action@v2 kéo bản cũ báo lỗi giả string[] (ES1-T10)
+      # Ghim chính xác 4.9.5, nguồn duy nhất: PINNED_CLI trong scripts/shopify-cli.sh (ES1-T32). Nâng 5.x khi job cli5-canary xanh ổn định.
+      - run: npm i -g "@shopify/cli@$(scripts/shopify-cli.sh pinned)"
+      - name: Test parser JSON CLI 4.9.5 + 5.0
+        run: bash scripts/shopify-cli.test.sh
+      - name: Test preview-push với shopify giả (ES1-T162)
+        run: bash scripts/preview-push.test.sh
+      # Runner có sẵn shellcheck. Chỉ báo, không chặn: script cũ chưa từng chạy shellcheck (ES1-T162).
+      - name: shellcheck scripts
+        continue-on-error: true
+        run: shellcheck scripts/*.sh
+      - run: scripts/shopify-cli.sh assert-version
+      - name: theme check (JSON → annotation, dòng/cột từ 1)
+        run: |
+          rc=0
+          shopify theme check --output json --fail-level error > "$RUNNER_TEMP/check.json" || rc=$?
+          scripts/shopify-cli.sh check-report "$RUNNER_TEMP/check.json" || rc=1
+          exit $rc
   preview:
     needs: theme-check
     runs-on: ubuntu-latest
@@ -17,45 +35,80 @@ jobs:
       url: ${{ steps.push.outputs.url }}
       theme_id: ${{ steps.push.outputs.theme_id }}
     env:
-      SHOPIFY_FLAG_STORE: efitco-ai-dev.myshopify.com
+      SHOPIFY_FLAG_STORE: hoa-qua-nhap-khau.myshopify.com
       SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: npm i -g @shopify/cli@latest
-      - id: push
+      - run: npm i -g "@shopify/cli@$(scripts/shopify-cli.sh pinned)" && scripts/shopify-cli.sh assert-version
+      # Chỉ cảnh báo, không chặn PR khác (ES1-T162). Chạy trước push để vẫn thấy khi push của nhánh trùng tên bị dừng.
+      - name: Cảnh báo live theme tên ai-*
+        continue-on-error: true
         run: |
-          B=$(echo "${GITHUB_REF_NAME}" | tr '/' '-')
-          OUT=$(shopify theme push --unpublished --json --theme "ai-$B" --path .)
-          echo "url=$(echo "$OUT" | jq -r .theme.preview_url)" >> $GITHUB_OUTPUT
-          echo "theme_id=$(echo "$OUT" | jq -r .theme.id)" >> $GITHUB_OUTPUT
-  lighthouse:
-    needs: preview
+          shopify theme list --json > "$RUNNER_TEMP/theme-list.json"
+          scripts/shopify-cli.sh live-theme-warn "$RUNNER_TEMP/theme-list.json"
+      # Dùng lại theme ai-<nhánh>; list {themes:[...]}/mảng, id chuỗi/số/gid; push partial + issues[] = lỗi (ES1-T32)
+      - id: push
+        run: scripts/preview-push.sh
+  # Thử CLI 5.x: không chặn merge (continue-on-error). Chạy sau lighthouse/e2e để không đẩy đè theme khi đang đo.
+  # Xanh ổn định nhiều PR liên tiếp → mở ticket nâng PINNED_CLI. Không đặt job này làm required check.
+  cli5-canary:
+    needs: [preview, lighthouse, e2e]
+    if: always() && needs.preview.result == 'success'
     runs-on: ubuntu-latest
+    continue-on-error: true
     env:
-      PREVIEW_URL: ${{ needs.preview.outputs.url }}
-      BENCH_PRODUCT: ${{ vars.BENCH_PRODUCT }}
-      BENCH_COLLECTION: ${{ vars.BENCH_COLLECTION }}
+      SHOPIFY_FLAG_STORE: hoa-qua-nhap-khau.myshopify.com
+      SHOPIFY_CLI_THEME_TOKEN: ${{ secrets.SHOPIFY_CLI_THEME_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with: { node-version: 22 }
-      - run: npm i -g @lhci/cli
-      - run: lhci autorun --config=lighthouserc.json
-      - run: lhci autorun --config=lighthouserc.mobile.json
-  e2e:
+      - run: npm i -g @shopify/cli@5 && shopify version
+      - name: theme check (CLI 5)
+        run: |
+          rc=0
+          shopify theme check --output json --fail-level error > "$RUNNER_TEMP/check.json" || rc=$?
+          scripts/shopify-cli.sh check-report "$RUNNER_TEMP/check.json" || rc=1
+          exit $rc
+      - name: preview (CLI 5, cùng theme ai-<nhánh>)
+        id: push
+        run: scripts/preview-push.sh
+      - name: So theme id với job preview 4.9.5
+        env:
+          WANT: ${{ needs.preview.outputs.theme_id }}
+          GOT: ${{ steps.push.outputs.theme_id }}
+        run: |
+          [ "$WANT" = "$GOT" ] || { echo "::error::CLI 5 đọc theme id $GOT, 4.9.5 là $WANT"; exit 1; }
+          echo "CLI 5 preview OK: theme_id=$GOT"
+  # Mỗi lần 1 PR dùng store: e2e + lhci song song của nhiều PR gây 429 và trang bot protection (ES1-T162).
+  # theme-check, preview vẫn song song. Group giữ 1 chạy + 1 chờ: run thứ 3 vào hàng thì run đang chờ bị huỷ,
+  # check lighthouse, e2e của run đó đỏ và phải chạy lại (docs/runbook.md mục 9).
+  store-tests:
     needs: preview
-    runs-on: ubuntu-latest
-    env:
-      PREVIEW_URL: ${{ needs.preview.outputs.url }}
+    concurrency: { group: store-hoa-qua-e2e, cancel-in-progress: false }
+    uses: ./.github/workflows/store-tests.yml
+    with:
+      theme_id: ${{ needs.preview.outputs.theme_id }}
+    secrets:
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+  # Check bắt buộc tên "lighthouse", "e2e" (merge_pr.sh, dashboard): đỏ cả khi store-tests bị huỷ hoặc không chạy
+  lighthouse:
+    needs: store-tests
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      RESULT: ${{ needs.store-tests.outputs.lighthouse_result }}
+      GROUP_RESULT: ${{ needs.store-tests.result }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 22 }
-      - run: npm ci && npx playwright install --with-deps chromium
-      - run: npx playwright test
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with: { name: playwright-report, path: playwright-report }
+      - run: '[ "$RESULT" = "success" ] || { echo "::error::lighthouse: ${RESULT:-không chạy} (store-tests: $GROUP_RESULT)"; exit 1; }'
+  e2e:
+    needs: store-tests
+    if: always()
+    runs-on: ubuntu-latest
+    env:
+      RESULT: ${{ needs.store-tests.outputs.e2e_result }}
+      GROUP_RESULT: ${{ needs.store-tests.result }}
+    steps:
+      - run: '[ "$RESULT" = "success" ] || { echo "::error::e2e desktop/mobile: ${RESULT:-không chạy} (store-tests: $GROUP_RESULT)"; exit 1; }'

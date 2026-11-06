@@ -1,5 +1,69 @@
 {% block 'container' %}
-  {% block 'hello-world' %}
-    {% block 'liquid-tips', tips: ['hello_world.liquid_tips_1', 'hello_world.liquid_tips_2', 'hello_world.liquid_tips_3'] %}{% endblock %}
+  {% block 'slideshow' %}
+    {% block 'slideshow-slide', id: 'slide-1', priority: true %}{% endblock %}
+    {% block 'slideshow-slide', id: 'slide-2' %}{% endblock %}
   {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-intro', background: 'sand' %}
+  {% block 'rich-text' %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-featured-collection', tag: 'div' %}
+  {% block 'featured-collection', id: 'featured-collection', default_collection: 'all' %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-quiz', tag: 'div' %}
+  {% block 'quiz', id: 'quiz' %}
+    {% block 'quiz-step', id: 'quiz-step-1', step: 1, total: 3 %}{% endblock %}
+    {% block 'quiz-step', id: 'quiz-step-2', step: 2, total: 3 %}{% endblock %}
+    {% block 'quiz-step', id: 'quiz-step-3', step: 3, total: 3 %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-inspiration', background: 'sand' %}
+  {% block 'image-with-text', id: 'inspiration', layout: 'banner' %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-bundle-builder', tag: 'div', background: 'cream' %}
+  {% block 'bundle-builder', id: 'bundle-builder' %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-featured-product', tag: 'div' %}
+  {% block 'featured-product', id: 'featured-product' %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-testimonials', background: 'cream' %}
+  {% block 'testimonials' %}
+    {% block 'testimonial-item', id: 'testimonial-1' %}{% endblock %}
+    {% block 'testimonial-item', id: 'testimonial-2' %}{% endblock %}
+    {% block 'testimonial-item', id: 'testimonial-3' %}{% endblock %}
+    {% block 'testimonial-item', id: 'testimonial-4' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-why-choose', background: 'dark' %}
+  {% block 'image-with-text', id: 'why-choose' %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-faq', background: 'cream' %}
+  {% block 'faq' %}
+    {% block 'faq-item', id: 'faq-1', open: true %}{% endblock %}
+    {% block 'faq-item', id: 'faq-2' %}{% endblock %}
+    {% block 'faq-item', id: 'faq-3' %}{% endblock %}
+    {% block 'faq-item', id: 'faq-4' %}{% endblock %}
+    {% block 'faq-item', id: 'faq-5' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-multicolumn' %}
+  {% block 'multicolumn' %}
+    {% block 'multicolumn-column', id: 'multicolumn-1' %}{% endblock %}
+    {% block 'multicolumn-column', id: 'multicolumn-2' %}{% endblock %}
+    {% block 'multicolumn-column', id: 'multicolumn-3' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'home-custom-liquid' %}
+  {% block 'custom-liquid' %}{% endblock %}
 {% endblock %}

@@ -1,0 +1,26 @@
+diff --git a/tests/e2e/TE-3.spec.ts b/tests/e2e/TE-3.spec.ts
+index 3f4f512..ddd6b0a 100644
+--- a/tests/e2e/TE-3.spec.ts
++++ b/tests/e2e/TE-3.spec.ts
+@@ -613,11 +613,18 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
+   });
+ 
+   // AC3 x AC4: giá thay đổi + variant card đang sale. CTO 3/11: hiện khoảng giá kèm nhãn ẩn 'Sale price' và giá gạch compare_at_price của variant card (ES1-T56).
+-  test.fixme('TC-25 AC3 AC4: card sale có khoảng giá vẫn có giá gạch và nhãn Sale price', async ({ page }) => {
+-    const card = await requireCard(page, T.range, undefined, 'sản phẩm sale có khoảng giá');
+-    await expect(card.getByTestId(T.sale)).toHaveCount(1);
++  test('TC-25 AC3 AC4: card sale có khoảng giá vẫn có giá gạch và nhãn Sale price', async ({ page }) => {
++    const cards = await cardsOn(page, ALL);
++    const card = cards.filter({ has: page.getByTestId(T.range) }).filter({ has: page.getByTestId(T.sale) }).first();
++    test.skip((await card.count()) === 0, `Không có sản phẩm sale có khoảng giá trên trang đầu ${ALL}`);
+     await expect(card.getByTestId(T.compare)).toHaveCount(1);
++    expect(await card.getByTestId(T.compare).evaluate(el => el.tagName)).toBe('S');
++    expect(await card.getByTestId(T.price).getAttribute('class')).toContain('price--on-sale');
+     expect(norm(await card.getByTestId(T.price).textContent())).toContain('Sale price');
++    const p = await productJs(page, await handleOf(card));
++    const vid = await variantIdOf(card);
++    const v = p.variants.find(x => x.id === vid) ?? p.variants.find(x => x.available) ?? p.variants[0];
++    expect(toCents(money(await card.getByTestId(T.compare).textContent())), 'giá gạch = compare_at_price variant card').toBe(v.compare_at_price);
+   });
+ 
+   // Hết hàng (SRS mục 3)

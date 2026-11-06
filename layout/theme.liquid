@@ -10,10 +10,12 @@
       2. Preload only the critical font variant (base weight)
       3. Additional variants load on-demand via @font-face
     {% endcomment %}
-    {% unless settings.type_primary_font.system? %}
+    {% unless settings.type_primary_font.system? and settings.type_heading_font.system? %}
       <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {% endunless %}
 
-      {% comment %} Preload the base font variant for initial page render {% endcomment %}
+    {% unless settings.type_primary_font.system? %}
+      {% comment %} Preload only the body font base variant (ADR 0003: preload 1 font) {% endcomment %}
       {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
     {% endunless %}
 
@@ -25,9 +27,16 @@
     {% render 'meta-tags' %}
 
     {{ content_for_header }}
+    <script src="{{ 'standard-events.js' | asset_url }}" type="module"></script>
   </head>
 
   <body>
+    <div class="header-sticky-sentinel" data-testid="header-sticky-sentinel" aria-hidden="true"></div>
+
+    {% block 'container', tag: 'div' %}
+      {% block 'announcement-bar' -%}{%- endblock %}
+    {% endblock %}
+
     {% block 'container', tag: 'div' %}
       {% block 'header' -%}{%- endblock %}
     {% endblock %}
@@ -39,5 +48,8 @@
     {% block 'container', tag: 'div' %}
       {% block 'footer' -%}{%- endblock %}
     {% endblock %}
+
+    {% # No container: the dialog sits outside the page flow, it is not a band. %}
+    {% block 'cart-drawer' -%}{%- endblock %}
   </body>
 </html>
