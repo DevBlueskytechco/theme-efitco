@@ -1,0 +1,146 @@
+{% comment %}
+  TE-7 test template, opened with /?view=te7 (drafts/techlead/ES1-T114/task-split.md D2).
+  A branch preview has no block settings, so this file sets them through block
+  parameters and uses Figma copy, with images and products from collections.all.
+  Each TE-7 task adds its own band here. Remove this file before a real store release.
+{% endcomment %}
+
+{%- liquid
+  assign te7_product_1 = collections.all.products[0]
+  assign te7_product_2 = collections.all.products[1]
+  assign te7_product_3 = collections.all.products[2]
+  assign te7_product_4 = collections.all.products[3]
+  assign te7_image_1 = te7_product_1.featured_image
+  assign te7_image_2 = te7_product_2.featured_image
+  assign te7_image_3 = te7_product_3.featured_image
+  assign te7_image_4 = te7_product_4.featured_image
+-%}
+
+{% block 'container', id: 'te7-title' %}
+  <h1 class="visually-hidden">{{ shop.name }}</h1>
+{% endblock %}
+
+{% comment %} Figma 1:885: 4 reviews, 4 columns from 80rem. Rating 4 on the second review. {% endcomment %}
+{% block 'container', id: 'te7-testimonials', background: 'cream' %}
+  {% block 'testimonials', id: 'te7-figma', eyebrow: 'Testimonial', heading: 'What Our Customers Say?' %}
+    {% block 'testimonial-item',
+      id: 'te7-figma-1',
+      author: 'E. Johnson',
+      verified: true,
+      rating: 5,
+      title: 'Versatile Gear For All Exercises',
+      quote: "High quality equipment that doesn't break the bank. I am very impressed with the overall durability.",
+      image: te7_image_1,
+      product: te7_product_1
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'te7-figma-2',
+      author: 'S. Williams',
+      verified: true,
+      rating: 4,
+      title: 'Folds Away In Seconds',
+      quote: 'The rack folds flat against the wall. My garage is a garage again between sessions.',
+      image: te7_image_2,
+      product: te7_product_2
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'te7-figma-3',
+      author: 'M. Anderson',
+      verified: true,
+      rating: 5,
+      title: 'Smooth Every Single Rep',
+      quote: 'The dial switches weight fast, no jamming at all. Saves an entire corner of my room.',
+      image: te7_image_3,
+      product: te7_product_3
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'te7-figma-4',
+      author: 'J. Miller',
+      verified: true,
+      rating: 5,
+      title: 'Worth Every Penny',
+      quote: 'Spins so smoothly, no tangling even at high speed. Best rope I have owned.',
+      image: te7_image_4,
+      product: te7_product_4
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} 1 review: 1 card, nothing to scroll. {% endcomment %}
+{% block 'container', id: 'te7-testimonials-one', background: 'cream' %}
+  {% block 'testimonials', id: 'te7-one', eyebrow: 'Testimonial', heading: 'One review' %}
+    {% block 'testimonial-item',
+      id: 'te7-one-1',
+      author: 'E. Johnson',
+      rating: 5,
+      title: 'Versatile Gear For All Exercises',
+      quote: 'High quality equipment that does not break the bank.',
+      image: te7_image_1,
+      product: te7_product_1
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %}
+  6 reviews: 3 columns from 80rem. Item 1 rating 0, item 2 no image, item 3 no
+  product, item 4 no image and no product, item 5 no title, item 6 no author.
+{% endcomment %}
+{% block 'container', id: 'te7-testimonials-six', background: 'cream' %}
+  {% block 'testimonials', id: 'te7-six', eyebrow: 'Testimonial', heading: 'Six reviews' %}
+    {% block 'testimonial-item',
+      id: 'te7-six-1',
+      author: 'Rating zero',
+      rating: 0,
+      title: 'Rating zero',
+      quote: 'Five empty stars and a name that says zero.',
+      image: te7_image_1,
+      product: te7_product_1
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'te7-six-2',
+      author: 'No image',
+      rating: 4,
+      title: 'No image',
+      quote: 'The card starts with the text, with no gap above it.',
+      product: te7_product_2
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'te7-six-3',
+      author: 'No product',
+      rating: 5,
+      title: 'No product',
+      quote: 'The product row and its divider are both gone.',
+      image: te7_image_3
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'te7-six-4',
+      author: 'No image, no product',
+      rating: 3,
+      title: 'Text only',
+      quote: 'Only the text remains.'
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'te7-six-5',
+      author: 'No title',
+      rating: 2,
+      title: '',
+      quote: 'The quote follows the author row directly.',
+      image: te7_image_4
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'te7-six-6',
+      author: '',
+      rating: 1,
+      title: 'No author',
+      quote: 'The stars stay on the row without a name.',
+      image: te7_image_2
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} Empty review: no card, no list, no band (blocks/container.liquid). {% endcomment %}
+{% block 'container', id: 'te7-testimonials-empty', background: 'cream' %}
+  {% block 'testimonials', id: 'te7-empty', eyebrow: 'Testimonial', heading: 'Hidden' %}
+    {% block 'testimonial-item', id: 'te7-empty-1', author: '', quote: '' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
