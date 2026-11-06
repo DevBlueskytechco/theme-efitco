@@ -107,7 +107,7 @@ Là khách, tôi muốn lọc theo tình trạng, giá, loại, hãng, option v�
 
 - AC1 Given collection When render Then title, description, image (focal), lưới 2/3/4 cột theo setting, mỗi card như TE-3; paginate 24; thông báo khi rỗng.
 - AC2 Given collection.filters When render Then faceted filter: availability, price range, product type, vendor, variant options (swatch nếu có); áp dụng cập nhật URL + partial collection-products/collection-filters không reload; không JS vẫn submit form được.
-- AC3 Given sort_options When chọn Then URL sort_by cập nhật, danh sách refresh; sort mặc định theo setting.
+- AC3 Given sort_options When chọn Then URL sort_by cập nhật, danh sách refresh; sort mặc định là sort của collection trong admin (collection.default_sort_by), không có theme setting (PO 06/11, ES1-T106).
 - AC4 Given mobile 360 When Then filter trong drawer, nút Lọc có badge số filter đang áp; keyboard đóng/mở.
 - AC5 Given list-collections When render Then title + collection.featured_image, phân trang.
 
@@ -119,7 +119,7 @@ Phía: FE · Ước lượng sơ bộ: 8 point (techlead chốt)
 Là merchant, tôi muốn 4 block nội dung để kể chuyện thương hiệu đúng bố cục Figma.
 
 - AC1 Given testimonials có 1–6 mục When render Then carousel ở 360, lưới ở 1280; mỗi mục quote, tên, sao (0–5), ảnh tuỳ chọn.
-- AC2 Given FAQ có 1–10 mục When render Then accordion: button có aria-expanded/aria-controls, Enter/Space mở, một hoặc nhiều mở theo setting.
+- AC2 Given FAQ có 1–10 mục When render Then disclosure dùng được bằng bàn phím (Enter/Space mở), trình đọc màn hình đọc được trạng thái mở/đóng (details/summary, không JS — PO 06/11, ES1-T115), một hoặc nhiều mở theo setting.
 - AC3 Given image with text When render Then ảnh trái/phải theo setting, ở 360 ảnh trên; heading, richtext, nút.
 - AC4 Given multicolumn 2–4 cột When render Then icon/ảnh, heading, text, link mỗi cột; 360 xếp 1 cột.
 - AC5 Given mọi block When chưa có nội dung Then default text gợi cách dùng, không Lorem Ipsum; có Custom Liquid block với setting type liquid.
@@ -195,7 +195,7 @@ Phía: FE1 markup/CSS + BE1 JS · Ước lượng sơ bộ: 8 point (techlead ch
 
 Là merchant, tôi muốn làm nổi bật 1 sản phẩm đang khuyến mãi có thời hạn và cho khách xem video ngắn sản phẩm đang dùng.
 
-- AC1 Given featured product chọn 1 sản phẩm + setting ngày giờ kết thúc khuyến mãi When còn hạn Then hiện countdown ngày/giờ/phút/giây theo giờ store; hết hạn hoặc không nhập ngày Then ẩn hẳn countdown (không reset, không đếm giả — R8).
+- AC1 Given featured product chọn 1 sản phẩm + setting ngày giờ kết thúc khuyến mãi When còn hạn và sản phẩm có giá gạch (compare at price > price) và còn hàng Then hiện countdown ngày/giờ/phút/giây theo giờ store (PO 06/11, ES1-T155 #2); hết hạn hoặc không nhập ngày Then ẩn hẳn countdown (không reset, không đếm giả — R8).
 - AC2 Given featured product When render Then gallery, giá/giá gạch/% giảm, rating (metafield reviews nếu có, không có thì ẩn), bảng spec 4 dòng từ metafield, Add to cart + View detail; dùng chung logic variant TE-4.
 - AC3 Given video carousel nhận tối đa 8 block con `video-card` (Shopify video hoặc URL YouTube/Vimeo + 1 sản phẩm) When render Then video lazy (chỉ tải khi vào viewport), poster có sẵn, không autoplay có tiếng; 3 ô số liệu là text setting.
 - AC4 Given video lỗi tải When render Then hiện poster + link sản phẩm, không vỡ layout.

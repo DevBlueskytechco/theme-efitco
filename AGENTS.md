@@ -258,7 +258,9 @@ Every block must:
 - Handle the empty state: when the required resource or text is empty, render
   a placeholder with instructions inside `{% if request.design_mode %}` and
   render nothing on the storefront (`blocks/announcement-bar.liquid`,
-  `blocks/rich-text.liquid`).
+  `blocks/rich-text.liquid`). Exception: an empty page result (collection
+  with no products, search with no results) is content, not missing setup —
+  show the empty message to shoppers (`templates/collection.liquid`, ES1-T113).
   Why: the merchant sees how to fill the block, shoppers never see an empty
   frame.
 - Keep existing `data-testid` attributes and JavaScript hooks (`data-*`,
@@ -346,11 +348,13 @@ Accessibility for blocks and snippets:
   does not apply; keep selectors scoped to the block class
   (`.rich-text__heading`) and remove CSS when you remove markup.
   Why: every rule ships on every page.
-- Images: the first hero slide loads `loading="eager"` with
-  `fetchpriority="high"` (`priority: true` on the first `slideshow-slide`);
+- Images: only the LCP image of each page loads `loading="eager"` with
+  `fetchpriority="high"`: the first hero slide on the home page
+  (`priority: true` on the first `slideshow-slide`), the banner on a
+  collection page or its first card row when there is no banner (ES1-T113);
   every other image is lazy; hero image at most 200 KB WebP; preload one font
   only (ADR 0003).
-  Why: only the hero is the LCP element; extra eager loads slow it down.
+  Why: one LCP element per page; extra eager loads slow it down.
 - Breakpoints are mobile-first `min-width` media queries at `48rem`, `64rem`,
   `80rem`.
   Why: the same three steps everywhere keep blocks aligned with each other.
@@ -489,7 +493,7 @@ Accessibility for blocks and snippets:
 | Change a band background | Set `background:` on the template's `container` call | `{% block 'container', id: 'home-intro', background: 'sand' %}` in `templates/index.liquid` |
 | Add styles | Block-scoped classes in `assets/base.css`; above-the-fold only in `assets/critical.css` (at most 10 KB); logical properties | `.button--link` in `assets/base.css` |
 | Add an icon | Add a named case to the matching icon snippet; `aria-hidden`, `currentColor` | `snippets/slideshow-icon.liquid`, `snippets/header-icon.liquid` |
-| Add an image | `{% render 'image' %}`; eager + high priority only for the first hero slide | `snippets/image.liquid`, `blocks/slideshow-slide.liquid` (`priority`) |
+| Add an image | `{% render 'image' %}`; eager + high priority only for the page's LCP image (first hero slide, collection banner or first card row) | `snippets/image.liquid`, `blocks/slideshow-slide.liquid` (`priority`) |
 | Add a string | Key under `blocks.<block_name>` in `locales/en.default.json`, literal `\| t` call | `blocks.announcement_bar.*` used in `blocks/announcement-bar.liquid` |
 | Add a page type | New `templates/<type>.liquid` composing `container` blocks; no JSON template | `templates/page.liquid`, `templates/product.liquid` |
 | Link to a storefront page | `routes.*` (`routes.root_url`, `routes.cart_url`, `routes.search_url`) | `blocks/header.liquid` |
