@@ -1,0 +1,97 @@
+{% doc %}
+  Renders one card of the collection-list block as a list item: a link to the
+  collection with its image and title. Self-contained: callers must leave the body
+  empty.
+
+  The collection comes from the setting, then from the handle parameter, which lets
+  a template without saved settings pass a resource (templates/index.figma.liquid).
+  A handle that does not exist counts as no collection.
+
+  The title comes from the setting, then from the collection. It has no sample
+  text: the card only renders with a collection, and a sample title would label the
+  merchant's collection with the wrong name. The image comes from the setting, then
+  from the collection, and is decorative because the title already names the link.
+  Without any image the card keeps its frame so the row stays aligned.
+
+  When there is no collection, the editor shows a placeholder and the storefront
+  renders nothing.
+
+  Test hooks: data-testid="collection-card", "collection-card-link",
+  "collection-card-image", "collection-card-title", "collection-card-placeholder".
+
+  @param {string} id - Unique card id within the template, such as 'collection-card-1'
+  @param {string} [handle] - Collection handle used when the collection setting is empty
+
+  @example
+  {% block 'collection-card', id: 'collection-card-1', handle: 'free-weights' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign card_collection = block.settings.collection
+  if card_collection.handle == blank and handle != blank
+    assign card_collection = collections[handle]
+  endif
+  assign card_title = block.settings.title | default: card_collection.title
+  assign card_image = block.settings.image | default: card_collection.featured_image
+-%}
+
+{%- if card_collection.handle != blank -%}
+  <li
+    class="collection-card"
+    data-collection-card-id="{{ id }}"
+    data-testid="collection-card"
+    {{ block.shopify_attributes }}
+  >
+    <a class="collection-card__link" href="{{ card_collection.url }}" data-testid="collection-card-link">
+      {%- if card_image != blank -%}
+        {% render 'image',
+          image: card_image,
+          class: 'collection-card__image',
+          width: 672,
+          widths: '252, 336, 504, 672',
+          sizes: '(min-width: 48rem) min(40vw, 336px), min(70vw, 336px)',
+          loading: 'lazy',
+          decorative: true,
+          testid: 'collection-card-image'
+        %}
+      {%- else -%}
+        <div class="collection-card__image" data-testid="collection-card-image"></div>
+      {%- endif -%}
+      <h3 class="collection-card__title" data-testid="collection-card-title">{{ card_title | escape }}</h3>
+    </a>
+  </li>
+{%- elsif request.design_mode -%}
+  <li
+    class="collection-card collection-card--placeholder"
+    data-collection-card-id="{{ id }}"
+    data-testid="collection-card-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.collection_list.card_placeholder' | t }}
+  </li>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.collection_card",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "t:labels.collection_card_title",
+      "info": "t:info.collection_card_title"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.collection_card_image",
+      "info": "t:info.collection_card_image"
+    }
+  ]
+}
+{% endschema %}

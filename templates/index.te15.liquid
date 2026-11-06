@@ -1,0 +1,34 @@
+{% comment %}
+  TE-15 test template, opened with /?view=te15 (ES1-T184). A branch preview has no
+  block settings, so cards get their collection through the handle parameter. The
+  all collection exists on every store, so this file needs no imported data; names
+  and links of the real collections are checked on /?view=figma.
+  Remove this file before a real store release.
+{% endcomment %}
+
+{% block 'container', id: 'te15-title' %}
+  <h1 class="visually-hidden">{{ shop.name }}</h1>
+{% endblock %}
+
+{% comment %} 0 cards: a handle that does not exist renders no card, so no list and no band. {% endcomment %}
+{% block 'container', id: 'te15-empty', background: 'dark' %}
+  {% block 'collection-list', id: 'te15-list-empty' %}
+    {% block 'collection-card', id: 'te15-empty-1', handle: 'te15-no-such-collection' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te15-one', background: 'dark' %}
+  {% block 'collection-list', id: 'te15-list-one' %}
+    {% block 'collection-card', id: 'te15-one-1', handle: 'all' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te15-five', background: 'dark' %}
+  {% block 'collection-list', id: 'te15-list-five' %}
+    {% block 'collection-card', id: 'te15-five-1', handle: 'all' %}{% endblock %}
+    {% block 'collection-card', id: 'te15-five-2', handle: 'all' %}{% endblock %}
+    {% block 'collection-card', id: 'te15-five-3', handle: 'all' %}{% endblock %}
+    {% block 'collection-card', id: 'te15-five-4', handle: 'all' %}{% endblock %}
+    {% block 'collection-card', id: 'te15-five-5', handle: 'all' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
