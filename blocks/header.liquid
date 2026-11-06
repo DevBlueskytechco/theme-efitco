@@ -14,6 +14,10 @@
   - header-sticky-sentinel: 80px element in layout/theme.liquid. It sits
     outside the sticky container so it scrolls away with the page.
   - Partial region: cart-count.
+  - data-cart-link, aria-haspopup="dialog": on the cart link when the cart drawer
+    is active (cart_type is drawer and the template is not cart). JS opens the
+    drawer from it; without JS it stays a plain link to routes.cart_url. Same
+    condition as data-mode in blocks/cart-drawer.liquid.
   - Custom element host: <header-menu>, <header-drawer>, <sticky-header> (ẩn) — JS ở assets/header-menu.js, assets/header-sticky.js.
 
   Self-contained block: callers leave the body empty.
@@ -28,6 +32,12 @@
   assign has_menu = false
   if menu.links.size > 0
     assign has_menu = true
+  endif
+
+  assign cart_type = settings.cart_type | default: 'drawer'
+  assign cart_drawer_active = true
+  if cart_type == 'page' or template.name == 'cart'
+    assign cart_drawer_active = false
   endif
 -%}
 
@@ -207,6 +217,10 @@
           href="{{ routes.cart_url }}"
           data-testid="header-cart-link"
           aria-label="{{ 'blocks.header.cart_count' | t: count: cart.item_count }}"
+          {% if cart_drawer_active %}
+            data-cart-link
+            aria-haspopup="dialog"
+          {% endif %}
         >
           <span aria-hidden="true">{{ 'icon-cart.svg' | inline_asset_content }}</span>
           {% if cart.item_count > 0 %}

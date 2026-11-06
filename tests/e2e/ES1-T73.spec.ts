@@ -10,7 +10,7 @@ const PAGE_SIZE = 20;
 const MAX_PAGES = 5;
 const SWATCH = 'input[type="radio"][data-variant-id]';
 const T = { collection: 'collection-products', card: 'product-card', title: 'product-card-title', swatch: 'product-card-swatch' } as const;
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 function trackErrors(page: Page): string[] {
   const errors: string[] = [];
