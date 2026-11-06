@@ -4,6 +4,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-1.spec.ts
 // Biến tuỳ chọn: EXPECT_ANNOUNCEMENT=off|text|link (mặc định off), EXPECT_MENU_ITEMS=<n>
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
+import { pageJson } from './support/product-data';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -78,9 +79,11 @@ type Product = { handle: string; variantId: number; hasImage: boolean; hasDescri
 
 // Dữ liệu TE-9: không có sản phẩm thì trả null, test tự skip phần liên quan.
 async function findProduct(page: Page): Promise<Product | null> {
-  const res = await page.request.get('/products.json?limit=50');
-  if (!res.ok()) return null;
-  const data = (await res.json().catch(() => null)) as { products?: Array<{ handle: string; body_html: string | null; images: unknown[]; variants: Array<{ id: number; available: boolean }> }> } | null;
+  // ES1-T100: fetch trong trang, trang chưa mở thì mở trang chủ trước
+  if (!/^https?:/.test(page.url())) await page.goto('/');
+  const res = await pageJson<{ products?: Array<{ handle: string; body_html: string | null; images: unknown[]; variants: Array<{ id: number; available: boolean }> }> }>(page, '/products.json?limit=50');
+  if (!res.ok) return null;
+  const data = res.body;
   const available = (data?.products ?? []).filter(p => p.variants.some(v => v.available));
   const p = available.find(x => x.images.length > 0 && x.body_html) ?? available[0];
   if (!p) return null;
@@ -367,6 +370,7 @@ test.describe('ES1-T23', () => {
     await page.goto('/');
     await page.request.post('/cart/clear.js');
     const add = await page.request.post('/cart/add.js', { data: { items: [{ id: product!.variantId, quantity: 2 }] } });
+    test.skip(add.status() === 429, 'Shopify trả 429 cho /cart/add.js (giới hạn store dev)');
     expect(add.ok()).toBeTruthy();
     await page.reload();
     const cart = page.getByTestId(T.header).getByTestId(T.cart);

@@ -7,6 +7,8 @@
 //   TE3_SWATCH_HANDLE, TE3_SOLD_OUT_HANDLE, TE3_BADGE_SWATCH_HANDLE (ES1-T57), TE3_AC8_VARIANT_ID, TE3_AC8_PATH. Không đặt thì tự tìm card đầu tiên có testid, không có thì skip.
 // Setting block khác mặc định: EXPECT_PRODUCTS_TO_SHOW, EXPECT_COLUMNS_DESKTOP, EXPECT_VIEW_ALL=header|bottom, EXPECT_VIEW_ALL_PATH.
 import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { getJson } from './support/http';
+import { pageJson, requireJson } from './support/product-data';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
@@ -140,10 +142,7 @@ function blockSchema(): { presets?: unknown; settings: Array<Record<string, unkn
 type InPage<J> = { ok: boolean; status: number; body: J | null };
 async function inPageJson<J>(page: Page, path: string): Promise<InPage<J>> {
   if (!/^https?:/.test(page.url())) await page.goto(ALL); // fetch tương đối cần origin store
-  return page.evaluate(async p => {
-    const r = await fetch(p, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
-    return { ok: r.ok, status: r.status, body: r.ok ? await r.json().catch(() => null) : null };
-  }, path);
+  return pageJson<J>(page, path); // ES1-T100: thử lại 429 trong trang
 }
 
 type MoneyCtx = { country: string | null; active: string | null; rate: string | null; cart: string | null };
@@ -182,9 +181,7 @@ async function storeProductCount(page: Page): Promise<number | null> {
 
 async function productJs(page: Page, handle: string): Promise<JsProduct> {
   await requireSameCurrency(page);
-  const r = await inPageJson<JsProduct>(page, `/products/${handle}.js`);
-  expect(r.ok && !!r.body, `/products/${handle}.js (fetch trong trang) trả ${r.status}`).toBe(true);
-  return r.body!;
+  return requireJson(await inPageJson<JsProduct>(page, `/products/${handle}.js`), `/products/${handle}.js (fetch trong trang)`);
 }
 
 async function handleOf(card: Locator): Promise<string> {
@@ -808,7 +805,8 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     const want = (await card.getByTestId(T.range).count()) ? inPage.price_min : v.price;
     expect(Math.abs(toCents(shown) - want), `${handle}: giá card = .js trong trang (${ctx.active})`).toBeLessThanOrEqual(1);
 
-    const viaRequest = await page.request.get(`/products/${handle}.js`).then(r => (r.ok() ? r.json() : null)).catch(() => null) as JsProduct | null;
+    // Chủ đích gọi qua APIRequestContext để so với in-page; 1 lần, không thử lại, lỗi/429 chỉ ghi 'lỗi'.
+    const viaRequest = await getJson<JsProduct>(page.request, `/products/${handle}.js`, 1).then(r => r.body).catch(() => null);
     test.info().annotations.push({
       type: 'page.request .js',
       description: `${handle}: in-page price_min=${inPage.price_min}, page.request price_min=${viaRequest?.price_min ?? 'lỗi'}${viaRequest && viaRequest.price_min !== inPage.price_min ? ' (LỆCH: nguyên nhân TC-30 cũ)' : ''}`,
