@@ -27,6 +27,20 @@
   Rule: sold_out when the product or the variant is unavailable; sale when
   compare_at_price > price, label -N% (rounded) or Sale when N rounds to 0.
 
+  New badge (AC-H14, ES1-T174): product tag `new`, lowercase, exact match. It is
+  a separate element without data-card-badge, so assets/product-swatch.js leaves
+  it alone. Only 1 badge shows on the start corner, Sold out > -N% > New: CSS
+  hides New while `[data-card-badge]` is visible, also after a swatch change.
+
+  Rating badge (AC-H13): reviews.rating metafield, .value.rating over
+  .value.scale_max, brought to a scale of 5 as in blocks/featured-product. It sits
+  on the end corner. Without the metafield there is no badge and no default value.
+  Star and visible number are hidden from assistive tech; a translated
+  visually hidden sentence is read instead.
+
+  Test hooks for badges: product-card-badge-new, product-card-rating,
+  product-card-rating-value.
+
   Storefront event shopify:product:view (ES1-T76, TE-4 AC12): the card sits in
   <s-view-event view-event-trigger="intersect"> with product |
   standard_event_data, so the event fires when the card scrolls into view.
@@ -99,6 +113,21 @@
       assign badge_testid = 'product-card-badge'
   endcase
 
+  assign is_new = false
+  if product.tags contains 'new'
+    assign is_new = true
+  endif
+
+  assign rating_data = product.metafields.reviews.rating.value
+  assign rating_value = rating_data.rating
+  if rating_value != blank
+    assign rating_scale = rating_data.scale_max | plus: 0
+    if rating_scale <= 0
+      assign rating_scale = 5
+    endif
+    assign rating_on_five = rating_value | times: 5.0 | divided_by: rating_scale | round: 1
+  endif
+
   assign swatch_option = nil
   for option in product.options_with_values
     if option.values.size > 1 and option.values.first.swatch != blank
@@ -159,6 +188,28 @@
     >
       {{- badge_label -}}
     </span>
+
+    {%- if is_new -%}
+      <span class="product-card__badge product-card__badge--new" data-testid="product-card-badge-new">
+        {{- 'products.card.new' | t -}}
+      </span>
+    {%- endif -%}
+
+    {%- if rating_value != blank -%}
+      <span class="product-card__rating" data-testid="product-card-rating">
+        <svg
+          class="product-card__rating-star"
+          viewBox="2.2 2.5 19.6 18.6"
+          fill="currentColor"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M12 2.5l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8-6.1-3.4-6.1 3.4 1.4-6.8-5.1-4.7 6.9-.8z"/>
+        </svg>
+        <span aria-hidden="true" data-testid="product-card-rating-value">{{ rating_on_five }}</span>
+        <span class="visually-hidden">{{ 'products.card.rating_label' | t: rating: rating_on_five }}</span>
+      </span>
+    {%- endif -%}
   </div>
 
   <{{ heading_tag }} class="product-card__title">

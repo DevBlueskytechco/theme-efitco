@@ -55,7 +55,7 @@ const ENV = {
   ac8Variant: process.env.TE3_AC8_VARIANT_ID,
   ac8Path: process.env.TE3_AC8_PATH || HOME,
 };
-const LIMIT = Number(process.env.EXPECT_PRODUCTS_TO_SHOW ?? 8);
+const LIMIT = Number(process.env.EXPECT_PRODUCTS_TO_SHOW ?? 4);
 const DESKTOP_COLUMNS = Number(process.env.EXPECT_COLUMNS_DESKTOP ?? 4);
 const VIEW_ALL = process.env.EXPECT_VIEW_ALL ?? '';
 const VIEW_ALL_PATH = process.env.EXPECT_VIEW_ALL_PATH || ALL;
@@ -402,7 +402,6 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
       const grid = block.getByTestId(T.grid);
       expect(await grid.evaluate(el => el.tagName)).toBe('UL');
       const cols = await grid.evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').filter(Boolean).length);
-      expect(cols, `số cột ở ${vp.width}px`).toBe(vp.columns);
 
       const items = grid.locator(':scope > li');
       const total = await storeProductCount(page);
@@ -410,6 +409,9 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
       const n = await items.count();
       expect(n).toBeGreaterThan(0);
       expect(n).toBeLessThanOrEqual(12);
+      // ES1-T174: đúng 4 card thì 4 cột từ 48rem, không để 1 card lẻ; từ 80rem theo columns_desktop
+      const wantCols = n === 4 && vp.width >= 768 && vp.width < 1280 ? 4 : vp.columns;
+      expect(cols, `số cột ở ${vp.width}px với ${n} card`).toBe(wantCols);
       for (let i = 0; i < n; i++) await expect(items.nth(i).getByTestId(T.card)).toHaveCount(1);
 
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
@@ -426,13 +428,13 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  test('TC-04 AC1: schema products_to_show 4–12 (8), columns_desktop 3–5 (4), không presets', async ({}, ti) => {
+  test('TC-04 AC1: schema products_to_show 4–12 (4, D7), columns_desktop 3–5 (4), không presets', async ({}, ti) => {
     test.skip(isMobile(ti), 'static, chạy 1 lần ở desktop');
     const schema = blockSchema();
     expect(schema.presets, 'không presets (AGENTS.md)').toBeUndefined();
     const byId = Object.fromEntries(schema.settings.filter(s => s.id).map(s => [s.id!, s]));
     expect(byId.collection?.type).toBe('collection');
-    expect(byId.products_to_show).toMatchObject({ type: 'range', min: 4, max: 12, step: 1, default: 8 });
+    expect(byId.products_to_show).toMatchObject({ type: 'range', min: 4, max: 12, step: 1, default: 4 });
     expect(byId.columns_desktop).toMatchObject({ type: 'range', min: 3, max: 5, default: 4 });
   });
 
@@ -769,7 +771,7 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     expect(p.available).toBe(false);
   });
 
-  test('TC-81 AC1: sản phẩm hết hàng trong 8 sản phẩm đầu vẫn có trên trang chủ', async ({ page }) => {
+  test('TC-81 AC1: sản phẩm hết hàng trong các sản phẩm đầu vẫn có trên trang chủ', async ({ page }) => {
     const cards = await cardsOn(page, HOME);
     const sold = ENV.soldOut ? byHandle(page, cards, ENV.soldOut) : cards.filter({ has: page.getByTestId(T.soldOut) });
     test.skip((await sold.count()) === 0, 'Không có sản phẩm hết hàng trong lưới trang chủ');
@@ -918,12 +920,16 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
   });
 
   for (const path of PAGES) {
-    test(`TC-54 AC6: vùng bấm swatch ≥ 24px, tiêu đề ≥ 24px hoặc đủ khoảng cách (${path})`, async ({ page }) => {
+    test(`TC-54 AC6: vùng bấm swatch ≥ 44px (D7), tiêu đề ≥ 24px hoặc đủ khoảng cách (${path})`, async ({ page }) => {
       const cards = await cardsOn(page, path);
       for (const sw of await cards.getByTestId(T.swatch).all()) {
-        const b = (await sw.boundingBox())!;
-        expect(b.width, 'swatch rộng').toBeGreaterThanOrEqual(24);
-        expect(b.height, 'swatch cao').toBeGreaterThanOrEqual(24);
+        // Vùng bấm là ::after của label, hình swatch giữ cỡ Figma; đo chi tiết ở ES1-T190
+        const hit = await sw.evaluate(el => {
+          const s = getComputedStyle(el, '::after');
+          return { width: parseFloat(s.width), height: parseFloat(s.height) };
+        });
+        expect(hit.width, 'vùng bấm swatch rộng').toBeGreaterThanOrEqual(44);
+        expect(hit.height, 'vùng bấm swatch cao').toBeGreaterThanOrEqual(44);
       }
       const view = page.getByTestId(T.viewAll);
       if (await view.count()) expect((await view.boundingBox())!.height).toBeGreaterThanOrEqual(24);
