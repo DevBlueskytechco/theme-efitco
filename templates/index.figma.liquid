@@ -16,12 +16,12 @@
 {% endcomment %}
 
 {%- liquid
-  assign figma_images = collections['figma-images']
+  assign figma_images = collections['figma-level-beginner']
   unless figma_images.products_count > 0
     assign figma_images = collections.all
   endunless
 
-  assign figma_featured_collection = collections['figma-featured-collection']
+  assign figma_featured_collection = collections['figma-tab-all']
   unless figma_featured_collection.products_count > 0
     assign figma_featured_collection = collections.all
   endunless
@@ -31,9 +31,9 @@
     assign figma_bundle = collections.all
   endunless
 
-  assign figma_featured_product = collections['figma-featured-product']
-  unless figma_featured_product.products_count > 0
-    assign figma_featured_product = collections.all
+  assign figma_featured_product = all_products['figma-ativafit-lava-featured']
+  unless figma_featured_product.id
+    assign figma_featured_product = collections.all.products[0]
   endunless
 
   assign figma_product_1 = figma_images.products[0]
@@ -136,7 +136,7 @@
 {% endblock %}
 
 {% block 'container', id: 'figma-featured-product', tag: 'div' %}
-  {% block 'featured-product', id: 'figma-featured-product', product: figma_featured_product.products[0] %}{% endblock %}
+  {% block 'featured-product', id: 'figma-featured-product', product: figma_featured_product %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'figma-testimonials', background: 'cream' %}

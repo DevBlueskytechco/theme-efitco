@@ -78,10 +78,10 @@ test.describe('ES1-T175 template cổng /?view=figma', () => {
     await page.goto(FIGMA);
     const meta = page.getByTestId('figma-meta');
     for (const [attribute, handle] of [
-      ['data-images', 'figma-images'],
-      ['data-featured-collection', 'figma-featured-collection'],
+      ['data-images', 'figma-level-beginner'],
+      ['data-featured-collection', 'figma-tab-all'],
       ['data-bundle', 'figma-bundle'],
-      ['data-featured-product', 'figma-featured-product'],
+      ['data-featured-product', 'figma-ativafit-lava-featured'],
     ]) {
       const value = await meta.getAttribute(attribute);
       expect([handle, 'all'], attribute).toContain(value);
