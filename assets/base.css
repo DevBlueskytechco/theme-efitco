@@ -3832,6 +3832,62 @@ cart-drawer {
   outline-offset: -1px;
 }
 
+/* Kết quả (ES1-T135 #2, #3): thẻ trắng dưới hàng 2 cột, 2 cột card, 4 cột từ 64rem.
+   Rỗng cũng trong thẻ này. Ẩn sẵn trên trang chủ, không chiếm gap của panel */
+.quiz__results {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: var(--space-5);
+  min-inline-size: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.quiz__results[hidden],
+.quiz__empty[hidden] {
+  display: none;
+}
+
+.quiz__results-heading {
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: calc(34 / 28);
+}
+
+/* 0 card: gốc partial rỗng không được tạo thêm một gap giữa tiêu đề và text rỗng */
+.quiz__results-body:empty {
+  display: none;
+}
+
+.quiz__results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz__results-item {
+  min-inline-size: 0;
+}
+
+.quiz__empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-4);
+}
+
+.quiz__empty-text {
+  margin: 0;
+}
+
+.quiz-results-title {
+  margin-block: var(--space-7) 0;
+}
+
 /* Có JS, trước khi module nạp (ES1-T132 D5): ẩn mọi thứ sau bước chưa trả lời, tránh layout shift
    khi module nâng cấp. JS tắt hoặc thiếu :has thì rule bị bỏ, hiện đủ 3 bước (AC1) */
 @media (scripting: enabled) {
@@ -3853,7 +3909,8 @@ cart-drawer {
     padding: var(--space-7);
   }
 
-  .quiz__form {
+  .quiz__form,
+  .quiz__results {
     padding: var(--space-6);
   }
 
@@ -3890,6 +3947,10 @@ cart-drawer {
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     align-items: center;
   }
+
+  .quiz__results-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 80rem) {
@@ -3899,7 +3960,7 @@ cart-drawer {
 
   .quiz--split {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: calc(var(--space-1) * 20);
+    gap: var(--space-6) calc(var(--space-1) * 20);
   }
 }
 

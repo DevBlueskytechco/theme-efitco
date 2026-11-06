@@ -1,0 +1,5 @@
+{% # TE-11 quiz results, opened with /collections/{handle}/{tag}+{tag}+{tag}?view=quiz (drafts/techlead/ES1-T132/task-split.md D3, D6). assets/quiz-finder.js fetches partial quiz-results from here, and the URL also works as a page of its own. required_tags is the number of steps of the quiz in templates/index.liquid. %}
+{% block 'container', id: 'quiz-results' %}
+  <h1 class="quiz-results-title">{{ collection.title | escape }}</h1>
+  {% block 'quiz', id: 'quiz-results', results_view: true, required_tags: 3 %}{% endblock %}
+{% endblock %}
