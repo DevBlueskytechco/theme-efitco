@@ -1,29 +1,10 @@
-{% block 'container' %}
-  <h1>{{ collection.title }}</h1>
+{% # TE-6 composition (drafts/techlead/ES1-T103/task-split.md D1). <collection-filters> stays here because it wraps 2 blocks and a block cannot call a block; assets/collection-filters.js (BE) upgrades it. FE2 adds block collection-filters before collection-products. %}
+{% block 'container', id: 'collection-banner' %}
+  {% block 'collection-banner' %}{% endblock %}
+{% endblock %}
 
-  <div class="collection-products" data-testid="collection-products">
-    {% paginate collection.products by 20 %}
-      {% for product in collection.products %}
-        {% liquid
-          # First row loads eagerly: it holds the LCP image on every breakpoint
-          assign card_loading = 'lazy'
-          if forloop.index <= 4
-            assign card_loading = 'eager'
-          endif
-        %}
-        <div class="collection-product" data-testid="collection-product">
-          {% render 'product-card',
-            product: product,
-            id_prefix: 'collection',
-            sizes: '(min-width: 80rem) 25vw, (min-width: 48rem) 50vw, 100vw',
-            loading: card_loading
-          %}
-        </div>
-      {% endfor %}
-
-      {{ paginate | default_pagination }}
-    {% endpaginate %}
-  </div>
-
-  <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
+{% block 'container', id: 'collection-main' %}
+  <collection-filters class="collection-layout">
+    {% block 'collection-products' %}{% endblock %}
+  </collection-filters>
 {% endblock %}
