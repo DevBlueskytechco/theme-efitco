@@ -1,7 +1,35 @@
+{%- comment -%} Sample content for a new install (plan ES1-T169 D1): a setting the merchant saved wins. Figma has the same copy on both slides. Same list in templates/index.figma.liquid. {%- endcomment -%}
+{%- liquid
+  assign slide_eyebrow = 'blocks.slideshow_slide.default_eyebrow' | t
+  assign slide_heading = 'blocks.slideshow_slide.default_heading_html' | t
+  assign slide_subheading = 'blocks.slideshow_slide.default_text' | t
+  assign slide_button_label = 'blocks.slideshow_slide.default_button_label' | t
+  assign banner_heading = 'blocks.image_with_text.banner_heading_html' | t
+  assign banner_body = 'blocks.image_with_text.banner_text_html' | t
+  assign banner_button_label = 'blocks.image_with_text.banner_button_label' | t
+  assign why_eyebrow = 'blocks.image_with_text.why_eyebrow' | t
+  assign why_heading = 'blocks.image_with_text.why_heading_html' | t
+  assign why_body = 'blocks.image_with_text.why_text_html' | t
+  assign why_button_label = 'blocks.image_with_text.why_button_label' | t
+-%}
+
 {% block 'container' %}
   {% block 'slideshow' %}
-    {% block 'slideshow-slide', id: 'slide-1', priority: true %}{% endblock %}
-    {% block 'slideshow-slide', id: 'slide-2' %}{% endblock %}
+    {% block 'slideshow-slide',
+      id: 'slide-1',
+      priority: true,
+      default_eyebrow: slide_eyebrow,
+      default_heading: slide_heading,
+      default_subheading: slide_subheading,
+      default_button_label: slide_button_label
+    %}{% endblock %}
+    {% block 'slideshow-slide',
+      id: 'slide-2',
+      default_eyebrow: slide_eyebrow,
+      default_heading: slide_heading,
+      default_subheading: slide_subheading,
+      default_button_label: slide_button_label
+    %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
@@ -22,7 +50,13 @@
 {% endblock %}
 
 {% block 'container', id: 'home-inspiration', background: 'sand' %}
-  {% block 'image-with-text', id: 'inspiration', layout: 'banner' %}{% endblock %}
+  {% block 'image-with-text',
+    id: 'inspiration',
+    layout: 'banner',
+    default_heading: banner_heading,
+    default_body: banner_body,
+    default_button_label: banner_button_label
+  %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-bundle-builder', tag: 'div', background: 'cream' %}
@@ -85,7 +119,13 @@
 {% endblock %}
 
 {% block 'container', id: 'home-why-choose', background: 'dark' %}
-  {% block 'image-with-text', id: 'why-choose' %}{% endblock %}
+  {% block 'image-with-text',
+    id: 'why-choose',
+    default_eyebrow: why_eyebrow,
+    default_heading: why_heading,
+    default_body: why_body,
+    default_button_label: why_button_label
+  %}{% endblock %}
 {% endblock %}
 
 {%- comment -%} Sample content for a new install (plan ES1-T169 D1). Figma has one answer, used for all 5 questions. Same list in templates/index.figma.liquid. {%- endcomment -%}

@@ -3850,6 +3850,27 @@ cart-drawer {
   max-inline-size: 8.8em;
 }
 
+/* Dòng 2 của Figma dài 8.5em, rộng hơn màn nhỏ: bỏ xuống dòng cố định, để text-wrap chia */
+.image-with-text--banner .image-with-text__heading br {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .image-with-text--banner .image-with-text__heading br {
+    display: inline;
+  }
+}
+
+/* CR-7, Figma 1:629: chữ trong strong giữ màu band, phần còn lại muted. Heading merchant không có strong nên giữ màu band */
+.block-container--sand .image-with-text--banner .image-with-text__heading:has(strong) {
+  color: var(--color-muted);
+}
+
+.block-container--sand .image-with-text--banner .image-with-text__heading strong {
+  color: var(--color-background-sand-foreground);
+  font-weight: inherit;
+}
+
 /* Figma 1:630: 18 / 28, bold */
 .image-with-text--banner .image-with-text__body {
   font-size: var(--font-size-lg);
