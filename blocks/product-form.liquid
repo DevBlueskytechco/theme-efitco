@@ -6,7 +6,9 @@
   available variant loads by default and ?variant= deep links render that
   variant's radios, hidden id, stock state and button.
 
-  Variant picker (custom element product-variant-picker) sits outside the
+  Variant picker (custom element product-variant-picker, markup in
+  snippets/product-variant-picker, noscript select in
+  snippets/product-variant-select) sits outside the
   form so its radios (name option-{position}) are never submitted. One
   fieldset + legend per option; each value is a label wrapping a radio,
   shown as a pill, or as a swatch when value.swatch is set. Radios carry
@@ -118,63 +120,7 @@
     {{ block.shopify_attributes }}
   >
     {%- if has_variant_choice -%}
-      <product-variant-picker
-        class="product-variant-picker"
-        data-product-url="{{ product.url }}"
-        data-form-id="{{ form_id }}"
-        data-testid="product-variant-picker"
-      >
-        {%- render 'variant-json', product: product -%}
-        {%- for option in product.options_with_values -%}
-          {%- assign option_index = option.position | minus: 1 -%}
-          <fieldset
-            class="product-option"
-            data-option-position="{{ option.position }}"
-            data-testid="product-option"
-          >
-            <legend class="product-form__label">{{ option.name | escape }}</legend>
-            <div class="product-option__values">
-              {%- for value in option.values -%}
-                {%- liquid
-                  assign checked = false
-                  if current_variant.options[option_index] == value.name
-                    assign checked = true
-                  endif
-                  assign swatch_style = ''
-                  if value.swatch.image
-                    assign swatch_url = value.swatch.image | image_url: width: 88
-                    assign swatch_style = '--swatch-image: url(' | append: swatch_url | append: ');'
-                  elsif value.swatch.color
-                    assign swatch_style = '--swatch-color: ' | append: value.swatch.color | append: ';'
-                  endif
-                -%}
-                <label
-                  class="product-option__value{% if swatch_style != blank %} product-option__value--swatch{% endif %}"
-                  {% if swatch_style != blank %}
-                    style="{{ swatch_style }}"
-                  {% endif %}
-                  data-testid="product-option-value"
-                >
-                  <input
-                    class="product-option__input visually-hidden"
-                    type="radio"
-                    name="option-{{ option.position }}"
-                    value="{{ value.name | escape }}"
-                    data-option-value-id="{{ value.id }}"
-                    data-available="{{ value.available }}"
-                    {% if checked %}
-                      checked
-                    {% endif %}
-                  >
-                  <span class="product-option__text{% if swatch_style != blank %} visually-hidden{% endif %}">
-                    {{- value.name | escape -}}
-                  </span>
-                </label>
-              {%- endfor -%}
-            </div>
-          </fieldset>
-        {%- endfor -%}
-      </product-variant-picker>
+      {%- render 'product-variant-picker', product: product, current_variant: current_variant, form_id: form_id -%}
       <script src="{{ 'product-variant-picker.js' | asset_url }}" type="module"></script>
     {%- endif -%}
 
@@ -187,42 +133,7 @@
       >
 
       {%- if has_variant_choice -%}
-        <noscript>
-          <div class="product-form__field">
-            <label class="product-form__label" for="{{ form_id }}-variant">
-              {{- 'blocks.product_form.variant_label' | t -}}
-            </label>
-            <select
-              id="{{ form_id }}-variant"
-              class="product-form__input product-form__select"
-              name="id"
-              data-testid="product-variant-select"
-            >
-              {%- for variant in product.variants -%}
-                {%- liquid
-                  assign variant_title = variant.title | escape
-                  if variant.available
-                    assign variant_price = variant.price | money
-                    assign variant_text = 'blocks.product_form.variant_option' | t: title: variant_title, price: variant_price
-                  else
-                    assign variant_text = 'blocks.product_form.variant_option_sold_out' | t: title: variant_title
-                  endif
-                -%}
-                <option
-                  value="{{ variant.id }}"
-                  {% if variant.id == current_variant.id %}
-                    selected
-                  {% endif %}
-                  {% unless variant.available %}
-                    disabled
-                  {% endunless %}
-                >
-                  {{- variant_text -}}
-                </option>
-              {%- endfor -%}
-            </select>
-          </div>
-        </noscript>
+        {%- render 'product-variant-select', product: product, current_variant: current_variant, form_id: form_id -%}
       {%- endif -%}
 
       {% partial 'product-installments' %}

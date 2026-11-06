@@ -41,6 +41,7 @@
   @param {string} [loading] - The image loading attribute. Default: 'lazy'
   @param {string} [heading_level] - Tag for the title: h2 to h6. Default: 'h3'
   @param {string} [card_context] - View event context: 'collection' or 'recommendation'. Default: 'collection'
+  @param {boolean} [show_swatches] - false: no swatch fieldset, for a card fixed to one variant (blocks/bundle-builder). Default: true
 
   @example
   {% render 'product-card', product: product %}
@@ -175,7 +176,7 @@
     {%- render 'price', product: product, variant: variant -%}
   </div>
 
-  {%- if swatch_option -%}
+  {%- if swatch_option and show_swatches != false -%}
     {%- assign option_index = swatch_option.position | minus: 1 -%}
     <fieldset class="product-card__swatches" data-testid="product-card-swatches">
       <legend class="visually-hidden">{{ swatch_option.name | escape }}</legend>

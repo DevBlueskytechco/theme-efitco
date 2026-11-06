@@ -1,0 +1,42 @@
+{% comment %}
+  TE-12 test template, opened with /?view=te12 (drafts/techlead/ES1-T141/task-split.md D12).
+  A branch preview has no block settings, so this file sets them through block
+  parameters, with Figma 1:636 copy. The collection is te12-bundle (ES1-T144),
+  or all products while it does not exist on the store.
+  First bundle: tiers 2:10 and 3:15. Second bundle: no tier above 0.
+  Remove this file before a real store release.
+{% endcomment %}
+
+{%- assign te12_collection = collections['te12-bundle'] | default: collections.all -%}
+
+{% block 'container', id: 'te12-title' %}
+  <h1 class="visually-hidden">{{ shop.name }}</h1>
+{% endblock %}
+
+{% block 'container', id: 'te12-bundle', tag: 'div', background: 'cream' %}
+  {% block 'bundle-builder',
+    id: 'te12-bundle-tiers',
+    eyebrow: 'Build your bundle',
+    heading: 'Pick Your Kit, Save As You Go',
+    link_label: 'View Preset Bundles',
+    link_url: routes.all_products_collection_url,
+    collection: te12_collection,
+    tier_1_quantity: 2,
+    tier_1_percent: 10,
+    tier_2_quantity: 3,
+    tier_2_percent: 15,
+    discount_note: 'Your discount is applied at checkout.'
+  %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te12-bundle-no-tiers', tag: 'div' %}
+  {% block 'bundle-builder',
+    id: 'te12-no-tiers',
+    eyebrow: 'No tiers',
+    heading: 'Bundle Without Tiers',
+    collection: te12_collection,
+    tier_1_percent: 0,
+    tier_2_percent: 0,
+    tier_3_percent: 0
+  %}{% endblock %}
+{% endblock %}

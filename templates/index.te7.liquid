@@ -20,6 +20,87 @@
   <h1 class="visually-hidden">{{ shop.name }}</h1>
 {% endblock %}
 
+{% comment %} Figma 1:625: banner on sand, no main image, 3 scattered images. {% endcomment %}
+{% block 'container', id: 'te7-iwt-banner', background: 'sand' %}
+  {% block 'image-with-text',
+    id: 'te7-banner',
+    layout: 'banner',
+    heading: 'Make fitness a natural part of your everyday life !',
+    body: '<p>Just simple, effective workouts you can do anytime at home</p>',
+    button_label: 'Get Started Now',
+    image: te7_image_4,
+    accent_image_1: te7_image_1,
+    accent_image_2: te7_image_2,
+    accent_image_3: te7_image_3
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} Banner with an eyebrow on sand and 1 accent image: the 2 empty ones are skipped. {% endcomment %}
+{% block 'container', id: 'te7-iwt-banner-one', background: 'sand' %}
+  {% block 'image-with-text',
+    id: 'te7-banner-one',
+    layout: 'banner',
+    eyebrow: 'Inspiration',
+    heading: 'One accent image',
+    body: '<p>The other two are empty.</p>',
+    button_label: 'Get Started Now',
+    accent_image_1: te7_image_1
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} Figma 1:992: split on dark, image left. accent_image_3 must not render in this layout. {% endcomment %}
+{% block 'container', id: 'te7-iwt-left', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'te7-left',
+    eyebrow: 'We are about',
+    heading: 'Why Choose Efitco?',
+    body: "<p>Affordable, high-quality fitness gear that supports beginners to elite athletes.</p><p>We design for the home first — equipment that folds, stacks or disappears when you're done, so your living room stays a living room between sessions.</p>",
+    button_label: 'View About Us',
+    image: te7_image_1,
+    image_position: 'left',
+    accent_image_1: te7_image_2,
+    accent_image_2: te7_image_3,
+    accent_image_3: te7_image_4
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} Same content with the image on the right. {% endcomment %}
+{% block 'container', id: 'te7-iwt-right', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'te7-right',
+    eyebrow: 'We are about',
+    heading: 'Why Choose Efitco?',
+    body: "<p>Affordable, high-quality fitness gear that supports beginners to elite athletes.</p><p>We design for the home first — equipment that folds, stacks or disappears when you're done, so your living room stays a living room between sessions.</p>",
+    button_label: 'View About Us',
+    image: te7_image_1,
+    image_position: 'right',
+    accent_image_1: te7_image_2,
+    accent_image_2: te7_image_3
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} No main image on sand: the dark frame stays and the text keeps sand colors. {% endcomment %}
+{% block 'container', id: 'te7-iwt-no-image', background: 'sand' %}
+  {% block 'image-with-text',
+    id: 'te7-no-image',
+    eyebrow: 'No main image',
+    heading: 'Dark frame',
+    body: '<p>The storefront keeps the dark frame next to this text.</p>',
+    button_label: 'View About Us'
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} All text and images empty: no block, no band (blocks/container.liquid). {% endcomment %}
+{% block 'container', id: 'te7-iwt-empty', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'te7-empty-split',
+    eyebrow: '',
+    heading: '',
+    body: '',
+    button_label: ''
+  %}{% endblock %}
+{% endblock %}
+
 {% comment %} Figma 1:885: 4 reviews, 4 columns from 80rem. Rating 4 on the second review. {% endcomment %}
 {% block 'container', id: 'te7-testimonials', background: 'cream' %}
   {% block 'testimonials', id: 'te7-figma', eyebrow: 'Testimonial', heading: 'What Our Customers Say?' %}
@@ -242,5 +323,94 @@
 {% block 'container', id: 'te7-testimonials-empty', background: 'cream' %}
   {% block 'testimonials', id: 'te7-empty', eyebrow: 'Testimonial', heading: 'Hidden' %}
     {% block 'testimonial-item', id: 'te7-empty-1', author: '', quote: '' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} Figma 1:1057: one open at a time, image and 2 stats. Figma has one answer; the others are test text. {% endcomment %}
+{% block 'container', id: 'te7-faq', background: 'cream' %}
+  {% block 'faq',
+    id: 'te7-faq-figma',
+    eyebrow: 'Questions and Answers',
+    heading: "We're Proud To Be The Best At Training",
+    image: te7_image_1,
+    stat_1_label: 'Products',
+    stat_1_value: '360+',
+    stat_1_text: 'Home gym gear in stock.',
+    stat_2_label: 'Warranty',
+    stat_2_value: '12',
+    stat_2_text: 'Months on every item.'
+  %}
+    {% block 'faq-item',
+      id: 'te7-faq-figma-1',
+      open: true,
+      question: 'How long does shipping take?',
+      answer: '<p>Orders ship within one business day. Standard delivery is 2-4 business days across the continental US, and shipping is free on orders over $99.</p>'
+    %}{% endblock %}
+    {% block 'faq-item',
+      id: 'te7-faq-figma-2',
+      question: 'Are adjustable dumbbells easy for beginners?',
+      answer: '<p>Test answer for question 2.</p>'
+    %}{% endblock %}
+    {% block 'faq-item',
+      id: 'te7-faq-figma-3',
+      question: 'How much floor space do i actually need?',
+      answer: '<p>Test answer for question 3.</p>'
+    %}{% endblock %}
+    {% block 'faq-item',
+      id: 'te7-faq-figma-4',
+      question: 'Does equipment arrive assembled?',
+      answer: '<p>Test answer for question 4.</p>'
+    %}{% endblock %}
+    {% block 'faq-item',
+      id: 'te7-faq-figma-5',
+      question: "What's covered by the warranty?",
+      answer: '<p>Test answer for question 5.</p>'
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} allow_multiple on, no image, no stats: questions take the full row. Question 3 has no answer. {% endcomment %}
+{% block 'container', id: 'te7-faq-multiple', background: 'cream' %}
+  {% block 'faq', id: 'te7-faq-many', eyebrow: 'Questions and Answers', heading: 'Several open', allow_multiple: true %}
+    {% block 'faq-item', id: 'te7-faq-many-1', open: true, question: 'Multiple question 1', answer: '<p>Multiple answer 1.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-many-2', question: 'Multiple question 2', answer: '<p>Multiple answer 2.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-many-3', question: 'Multiple question 3', answer: '' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} 1 question, image, no stats. {% endcomment %}
+{% block 'container', id: 'te7-faq-one', background: 'cream' %}
+  {% block 'faq', id: 'te7-faq-single', eyebrow: 'Questions and Answers', heading: 'One question', image: te7_image_2 %}
+    {% block 'faq-item', id: 'te7-faq-single-1', question: 'Single question', answer: '<p>Single answer.</p>' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} 10 questions, stat 1 only, no image. {% endcomment %}
+{% block 'container', id: 'te7-faq-ten', background: 'cream' %}
+  {% block 'faq',
+    id: 'te7-faq-tens',
+    eyebrow: 'Questions and Answers',
+    heading: 'Ten questions',
+    stat_1_label: 'Products',
+    stat_1_value: '360+',
+    stat_1_text: 'Home gym gear in stock.'
+  %}
+    {% block 'faq-item', id: 'te7-faq-tens-1', question: 'Question 1', answer: '<p>Answer 1.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-tens-2', question: 'Question 2', answer: '<p>Answer 2.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-tens-3', question: 'Question 3', answer: '<p>Answer 3.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-tens-4', question: 'Question 4', answer: '<p>Answer 4.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-tens-5', question: 'Question 5', answer: '<p>Answer 5.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-tens-6', question: 'Question 6', answer: '<p>Answer 6.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-tens-7', question: 'Question 7', answer: '<p>Answer 7.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-tens-8', question: 'Question 8', answer: '<p>Answer 8.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-tens-9', question: 'Question 9', answer: '<p>Answer 9.</p>' %}{% endblock %}
+    {% block 'faq-item', id: 'te7-faq-tens-10', question: 'Question 10', answer: '<p>Answer 10.</p>' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} Empty question: no question, no list, no band. {% endcomment %}
+{% block 'container', id: 'te7-faq-empty', background: 'cream' %}
+  {% block 'faq', id: 'te7-faq-none', eyebrow: 'Questions and Answers', heading: 'Hidden' %}
+    {% block 'faq-item', id: 'te7-faq-none-1', question: '' %}{% endblock %}
   {% endblock %}
 {% endblock %}

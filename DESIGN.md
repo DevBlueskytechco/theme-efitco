@@ -49,9 +49,9 @@ become hyphens).
 | border | #E5E5E5 | `border_color` | `--color-border` | Dividers, input and card borders |
 | background_alt | #F4F4F4 | `background_alt_color` | `--color-background-alt` | Alternate band |
 | background_alt_foreground | #1A1A1A | `background_alt_foreground_color` | `--color-background-alt-foreground` | Text on alt |
-| background_cream | #F5F5F1 | `background_cream_color` | `--color-background-cream` | Inspiration banner, highlight cards |
+| background_cream | #F5F5F1 | `background_cream_color` | `--color-background-cream` | Highlight cards |
 | background_cream_foreground | #1A1A1A | `background_cream_foreground_color` | `--color-background-cream-foreground` | Text on cream |
-| background_sand | #EBE6E0 | `background_sand_color` | `--color-background-sand` | Rich text + training level band, product cards |
+| background_sand | #EBE6E0 | `background_sand_color` | `--color-background-sand` | Rich text + training level band, inspiration banner (1:625, ES1-T116), product cards |
 | background_sand_foreground | #1A1A1A | `background_sand_foreground_color` | `--color-background-sand-foreground` | Text on sand |
 | background_dark | #1E1E1E | `background_dark_color` | `--color-background-dark` | Footer, hero fallback, image overlay |
 | background_dark_foreground | #FFFFFF | `background_dark_foreground_color` | `--color-background-dark-foreground` | Text on dark and on hero images |

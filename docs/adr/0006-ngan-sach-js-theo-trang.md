@@ -18,3 +18,9 @@ B. Ngân sách 40 960 B cho tổng `assets/*.js` mà HTML 1 trang tham chiếu (
 
 ## Hệ quả
 Tốt: TE-4..TE-13 giữ 1 tính năng 1 file; Lighthouse vẫn là cổng chặn. Xấu: lệnh `wc -c assets/*.js` không còn đủ; trang nạp nhiều block (trang chủ) phải cộng theo block. Việc: DevOps thêm bước CI đo JS theo URL (tải trang preview, cộng `transferSize` các script từ `assets/`), tới khi có thì DoD ghi phép cộng tay theo file. Đo: CI theo URL; lhci performance từ 96/90.
+
+## Bổ sung 2026-11-06 — JS nạp động (CTO 06/11, ES1-T160 phương án B)
+- Bối cảnh: TE-8, TE-11..13 nạp JS động qua `assets/lazy-module.js` khi block vào viewport hoặc khi tương tác. Trần 40 960 B ở trên chỉ tính JS tải sẵn; cuộn hết trang chủ thực tải ~60 614 B, Lighthouse không cuộn nên không thấy.
+- Quyết định: giữ trần 40 960 B cho JS tải sẵn; thêm trần thứ 2: tổng `transferSize` các script từ `assets/` sau khi cuộn hết trang (và mở search) tối đa 65 536 B mỗi trang. Mỗi file vẫn tối đa 8 192 B.
+- Đo: QA/DevOps thêm bước Playwright trong TE-10 (cuộn tới cuối trang, chờ network idle, cộng `transferSize` của `performance.getEntriesByType('resource')` có đường dẫn `/assets/` và đuôi `.js`); vượt thì chặn merge. Tới khi có: DoD chia task ghi phép cộng tay JS tải sẵn + nạp động theo trang.
+- Đã cân nhắc: A (không tính JS nạp động) — không chặn được trang nặng dần sau cuộn, loại; C (tổng sau cuộn ≤ 40 KB) — buộc gộp quiz, bundle, featured product, video, predictive, loại.

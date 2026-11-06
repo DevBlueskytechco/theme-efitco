@@ -1,0 +1,67 @@
+{% doc %}
+  Renders one question of the faq block as a details disclosure, so Enter, Space
+  and the open state come from the browser with no JavaScript. When the question
+  is empty, the editor shows a placeholder and the storefront renders nothing.
+  Self-contained: callers must leave the body empty.
+
+  The details opening tag must start with its class attribute, with class="faq-item"
+  alone: blocks/faq.liquid replaces that exact text to add the name attribute.
+
+  Test hooks: data-testid="faq-item", "faq-question", "faq-answer",
+  "faq-item-placeholder".
+
+  @param {string} id - Unique item id within the template, such as 'faq-1'
+  @param {boolean} [open] - Template parameter, not a setting: starts this question open. Use it on the first question only.
+
+  @example
+  {% block 'faq-item', id: 'faq-1', open: true %}{% endblock %}
+  {% block 'faq-item', id: 'faq-2' %}{% endblock %}
+{% enddoc %}
+
+{%- if block.settings.question != blank -%}
+  <details class="faq-item"
+    {% if open %}
+      open
+    {% endif %}
+    data-faq-item-id="{{ id }}"
+    data-testid="faq-item"
+    {{ block.shopify_attributes }}
+  >
+    <summary class="faq-item__summary" data-testid="faq-question">
+      <h3 class="faq-item__question">{{ block.settings.question | escape }}</h3>
+    </summary>
+    {%- if block.settings.answer != blank -%}
+      <div class="faq-item__answer" data-testid="faq-answer">{{ block.settings.answer }}</div>
+    {%- endif -%}
+  </details>
+{%- elsif request.design_mode -%}
+  <p
+    class="faq-item faq-item--placeholder"
+    data-faq-item-id="{{ id }}"
+    data-testid="faq-item-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.faq.item_placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.faq_item",
+  "settings": [
+    {
+      "type": "text",
+      "id": "question",
+      "label": "t:labels.faq_question",
+      "info": "t:info.faq_question",
+      "default": "Add a question your customers often ask"
+    },
+    {
+      "type": "richtext",
+      "id": "answer",
+      "label": "t:labels.faq_answer",
+      "default": "<p>Add a short, clear answer to this question.</p>"
+    }
+  ]
+}
+{% endschema %}

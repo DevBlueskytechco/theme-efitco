@@ -8,6 +8,7 @@ import { test, expect, type Page, type Request } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getJson } from './support/http';
+import { CART_GLOB } from './support/cart-api';
 
 const T = {
   form: 'product-form',
@@ -87,7 +88,7 @@ function fields(req: Request) {
 
 async function mockAdd(page: Page) {
   const requests: Request[] = [];
-  await page.route('**/cart/add.js', async (route) => {
+  await page.route(CART_GLOB.add, async (route) => {
     requests.push(route.request());
     await route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ id: 1, variant_id: 1, quantity: 1 }) });
   });
