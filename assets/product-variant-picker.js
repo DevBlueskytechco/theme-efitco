@@ -1,5 +1,4 @@
-// <product-variant-picker> TE-4 AC2 AC4 AC12 (ES1-T66, ES1-T81, ES1-T87). Unknown variant: Unavailable, no fetch.
-// partials.fetch(...names, { url, signal }) + apply; ProductSelectEvent from CDN (no import map).
+// <product-variant-picker> TE-4, TE-13 (ES1-T66, ES1-T158).
 import { partials } from "@shopify/partial-rendering";
 
 const REGIONS = ["product-price", "product-buy-buttons", "product-installments", "product-pickup", "product-selling-plans", "product-sticky-bar"];
@@ -24,6 +23,8 @@ class ProductVariantPicker extends HTMLElement {
     this.idInput = this.form?.querySelector('input[type="hidden"][name="id"]');
     this.save();
     this.listen("addEventListener");
+    // Lazy: radios may differ.
+    if (this.dataset.fetchUrl && this.match(this.selection())?.id !== Number(this.idInput?.value)) this.select();
   }
 
   disconnectedCallback() {
@@ -42,7 +43,6 @@ class ProductVariantPicker extends HTMLElement {
       const v = this.variants.find((x) => x.id === id);
       if (v && id !== Number(this.idInput?.value)) this.show(v);
     } else if (type === "pageshow") {
-      // bfcache: radios may differ from id.
       const v = this.match(this.selection());
       if (v && v.id !== Number(this.idInput?.value)) this.update(v);
     } else if (target instanceof HTMLInputElement && target.checked) {
@@ -77,7 +77,6 @@ class ProductVariantPicker extends HTMLElement {
     this.update(v);
   }
 
-  // Value is buyable together with the other options as selected.
   syncAvailable(selected) {
     this.querySelectorAll(FIELDSET).forEach((f, i) => {
       for (const input of f.querySelectorAll(OPTION)) {
@@ -88,7 +87,6 @@ class ProductVariantPicker extends HTMLElement {
     });
   }
 
-  // AC12; lookup is sync so the promise resolves at once. No match → { variant: null }.
   emitSelect(selected, v) {
     const { product: p = {}, options: names = [], currency } = this.data;
     const selectedOptions = names.map((name, i) => ({ name, value: selected[i] })).filter((o) => o.value != null);
@@ -109,9 +107,7 @@ class ProductVariantPicker extends HTMLElement {
         const ok = typeof d?.resolve === "function";
         target.dispatchEvent(new E({ product, selectedOptions, promise: ok ? d.promise : Promise.resolve({ variant }) }));
         if (ok) d.resolve({ variant });
-      } catch {
-        // Shape mismatch: skip.
-      }
+      } catch {}
     });
   }
 
@@ -124,7 +120,6 @@ class ProductVariantPicker extends HTMLElement {
     return [...document.querySelectorAll('button[name="add"]')].filter((b) => b.form === this.form);
   }
 
-  // Last rendered add buttons + inventory (ES1-T87).
   save() {
     const i = (this.inv = this.root?.querySelector(INVENTORY));
     this.saved = [...this.buttons(), i].filter(Boolean).map((el) => [el, el.disabled, el.dataset.state, el.innerHTML]);
@@ -158,25 +153,30 @@ class ProductVariantPicker extends HTMLElement {
     const controller = (this.controller = new AbortController());
     if (this.idInput) this.idInput.value = v.id;
 
-    const url = new URL(window.location.href);
+    const { fetchUrl, regions } = this.dataset;
+    const url = new URL(fetchUrl || window.location.href, window.location.href);
     url.searchParams.set("variant", v.id);
     const plan = this.form?.querySelector(`${PLAN}:checked`)?.value;
     if (plan) url.searchParams.set("selling_plan", plan);
     else url.searchParams.delete("selling_plan");
-    window.history.replaceState(window.history.state, "", url);
+    if (!fetchUrl) window.history.replaceState(window.history.state, "", url);
 
     this.dispatchEvent(new CustomEvent("theme:variant:change", { bubbles: true, detail: { variantId: v.id, featuredMediaId: v.featured_media } }));
 
+    // Partial names repeat: featured-product.js renders JSON (ES1-T169 D4).
+    if (document.querySelectorAll("featured-product").length > 1) return;
+
     this.root?.setAttribute("aria-busy", "true");
     try {
-      const update = await partials.fetch(...REGIONS, { url: url.toString(), signal: controller.signal });
+      const names = regions ? regions.split(" ") : REGIONS;
+      const update = await partials.fetch(...names, { url: url.toString(), signal: controller.signal });
       if (controller.signal.aborted) return;
       await partials.apply(update);
       if (plan) for (const input of this.form.querySelectorAll(PLAN)) input.checked = input.value === plan;
       this.save();
-      if (this.inv) this.announce(this.inv.textContent.trim());
+      const said = this.inv || this.closest("featured-product")?.querySelector(".price");
+      if (said) this.announce(said.textContent.trim());
     } catch {
-      // Own abort: newer update owns the UI. Network/apply error: restore.
       if (!controller.signal.aborted) this.restore();
     } finally {
       if (this.controller === controller) this.root?.removeAttribute("aria-busy");

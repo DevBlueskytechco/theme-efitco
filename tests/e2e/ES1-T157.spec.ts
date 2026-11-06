@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy (phiên viết không có preview, chưa type-check, CI đang tắt e2e theo CTO 06/11); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép sang tests/e2e/ES1-T157.spec.ts.
 // Ticket ES1-T157 TE-13-FE2: video carousel markup (TE-13 AC3, AC4; drafts/techlead/ES1-T142/task-split.md D1, D6, D7, D9, D10, D11; plan ES1-T169 D4; AC-H21 phần markup).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T157.spec.ts -g "AC3-markup|AC4-markup|nojs"
-// Chưa có JS của BE1 (ES1-T158): bấm mới chạy, lỗi video kiểm ở spec của BE1. Video Shopify cần media-dủ-loại có video (ES1-T153): thiếu thì skip có lý do.
+// JS của BE1 ở tests/e2e/ES1-T158.spec.ts: bấm mới chạy, lỗi video. Test "0 video" chặn file module vì module clone video khi vào khung. Video Shopify cần media-dủ-loại có video (ES1-T153): thiếu thì skip có lý do.
 import { readFileSync } from 'node:fs';
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -119,6 +119,7 @@ test.describe('ES1-T157 TE-13 video carousel', () => {
     page.on('request', (request) => {
       if (VIDEO_REQUEST.test(request.url())) requests.push(request.url());
     });
+    await page.route(/\/video-carousel\.js/, (route) => route.abort());
     await page.goto(TE13);
     await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await page.waitForLoadState('load');

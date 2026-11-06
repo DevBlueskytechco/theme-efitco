@@ -7,13 +7,17 @@
   - currency: cart.currency.iso_code (presentment currency of the prices)
   - variants: one object per variant: id, title, options (option values in
     position order), available, price (cents), featured_media (media id or
-    null), requires_shipping.
+    null), requires_shipping; with price_html also price_html: inner markup of
+    the product-price region of blocks/featured-product for that variant. Keep
+    it the same as that region: assets/featured-product.js swaps it in when the
+    partial names repeat on the page (ES1-T158, plan ES1-T169 D4).
 
   Rendered inside the product-variant-picker element of
   blocks/product-form.liquid, which reads it with querySelector.
   product.variants returns at most 250 variants.
 
   @param {product} product - Product whose variants are exported
+  @param {boolean} [price_html] - Add price_html to each variant (a block outside the product page)
 
   @example
   {% render 'variant-json', product: product %}
@@ -37,6 +41,22 @@
           "available": {{ variant.available | json }},
           "price": {{ variant.price | json }},
           "featured_media": {{ variant.featured_media.id | json }},
+          {%- if price_html -%}
+            {%- capture variant_price -%}
+              {%- render 'price', product: product, variant: variant -%}
+              {%- if variant.compare_at_price > variant.price -%}
+                {%- assign discount_percent = variant.compare_at_price | minus: variant.price | times: 100.0 | divided_by: variant.compare_at_price | round -%}
+                <span class="featured-product__discount" data-testid="featured-product-discount">
+                  {%- if discount_percent > 0 -%}
+                    {{- 'products.card.sale_percent' | t: percent: discount_percent -}}
+                  {%- else -%}
+                    {{- 'products.card.sale' | t -}}
+                  {%- endif -%}
+                </span>
+              {%- endif -%}
+            {%- endcapture -%}
+            "price_html": {{ variant_price | json }},
+          {%- endif -%}
           "requires_shipping": {{ variant.requires_shipping | json }}
         }
         {%- unless forloop.last %},{% endunless -%}
