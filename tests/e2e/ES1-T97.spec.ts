@@ -7,6 +7,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
+import { CART, CART_GLOB, cartApi } from './support/cart-api';
 import { productData, readCartJson } from './support/product-data';
 
 type CartItem = { key: string; quantity: number; final_line_price: number };
@@ -17,7 +18,7 @@ type Surface = { name: string; open: (page: Page) => Promise<void> };
 const HANDLE = env('TE4_VARIANTS_HANDLE', 'TE4_SINGLE_HANDLE');
 const LIMITED = env('TE5_LIMITED_HANDLE');
 const PAGE_MODE = process.env.EXPECT_CART_TYPE === 'page';
-const CHANGE = '**/cart/change.js';
+const CHANGE = CART_GLOB.change;
 const IGNORE_CONSOLE = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)|status of 429/i;
 const NETWORK_LOG = /Failed to load resource/i;
 const MOCK_422 = 'ES1-T97 mock: only 1 item available.';
@@ -56,9 +57,8 @@ async function seed(page: Page, quantities: number[], handle = HANDLE) {
   const variant = (await productData(page, handle!)).variants.find((v) => v.available);
   test.skip(!variant, `${handle} không có variant bán được`);
   const items = quantities.map((quantity, i) => ({ id: variant!.id, quantity, properties: { _t97: String(i) } }));
-  const res = await page.request.post('/cart/add.js', { data: { items } });
-  test.skip(res.status() === 429, 'Shopify trả 429 cho /cart/add.js (giới hạn store dev)');
-  expect(res.ok(), `/cart/add.js trả ${res.status()}`).toBeTruthy();
+  const res = await cartApi(page, CART.add, { data: { items } });
+  expect(res.ok(), `${CART.add} trả ${res.status()}`).toBeTruthy();
 }
 
 async function ready(page: Page) {
@@ -105,7 +105,7 @@ const idle = (page: Page) => expect(tid(page, 'cart-items')).not.toHaveAttribute
 
 // Chờ POST trả về rồi hết busy.
 async function changeAndWait(page: Page, key: string, value: string) {
-  const response = page.waitForResponse((r) => r.url().includes('/cart/change.js'));
+  const response = page.waitForResponse((r) => r.url().includes(CART.change));
   await setQuantity(page, key, value);
   await response;
   await idle(page);
@@ -125,7 +125,7 @@ async function expectNoSeriousAxe(page: Page) {
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
 }
 
-// Partial fetch cùng pathname với trang (url: location.href), /cart.js và /cart/change.js khác pathname.
+// Partial fetch cùng pathname với trang (url: location.href), /cart.js và cart/change.js khác pathname.
 function countRefreshes(page: Page) {
   const path = new URL(page.url()).pathname;
   const seen: string[] = [];
@@ -138,7 +138,7 @@ function countRefreshes(page: Page) {
 function countWrites(page: Page) {
   const seen: { id: string; quantity: number }[] = [];
   page.on('request', (r) => {
-    if (r.url().includes('/cart/change.js')) seen.push(r.postDataJSON());
+    if (r.url().includes(CART.change)) seen.push(r.postDataJSON());
   });
   return seen;
 }
@@ -187,8 +187,7 @@ const SURFACES: Surface[] = [
 for (const surface of SURFACES) {
   test.describe(`ES1-T97 TE-5 ${surface.name}`, () => {
     test.beforeEach(async ({ page }) => {
-      const res = await page.request.post('/cart/clear.js');
-      test.skip(res.status() === 429, 'Shopify trả 429 cho /cart/clear.js (giới hạn store dev)');
+      await cartApi(page, CART.clear);
       await page.emulateMedia({ reducedMotion: 'reduce' });
     });
 
@@ -234,7 +233,7 @@ for (const surface of SURFACES) {
       await surface.open(page);
       const key = (await readCart(page)).items[0].key;
       const writes = countWrites(page);
-      const response = page.waitForResponse((r) => r.url().includes('/cart/change.js'));
+      const response = page.waitForResponse((r) => r.url().includes(CART.change));
       await quantityOf(page, key).evaluate((el: HTMLInputElement) => {
         for (const value of ['2', '3', '2']) {
           el.value = value;
@@ -312,7 +311,7 @@ for (const surface of SURFACES) {
       await seed(page, [1]);
       await surface.open(page);
       const key = (await readCart(page)).items[0].key;
-      const response = page.waitForResponse((r) => r.url().includes('/cart/change.js'));
+      const response = page.waitForResponse((r) => r.url().includes(CART.change));
       await quantityOf(page, key).fill('2');
       await quantityOf(page, key).press('Enter');
       await response;
@@ -447,7 +446,7 @@ for (const surface of SURFACES) {
       await expect(tid(page, 'cart-items-error')).toHaveText((await label(page, 'error'))!);
       await expect(quantityOf(page, key)).toHaveValue('1');
 
-      const response = page.waitForResponse((r) => r.url().includes('/cart/change.js'));
+      const response = page.waitForResponse((r) => r.url().includes(CART.change));
       await tid(page, 'cart-line-remove').click();
       await response;
       await idle(page);

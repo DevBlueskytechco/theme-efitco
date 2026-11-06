@@ -8,6 +8,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
 import { getJson } from './support/http';
+import { CART, cartApi } from './support/cart-api';
 
 type Product = { variants: { id: number; available: boolean }[] };
 
@@ -24,9 +25,8 @@ async function addToCart(request: APIRequestContext, handle: string) {
   expect(r.ok, `/products/${handle}.js trả ${r.status}`).toBeTruthy();
   const variant = (r.body as Product).variants.find((v) => v.available);
   test.skip(!variant, `${handle} không có variant bán được`);
-  const res = await request.post('/cart/add.js', { data: { id: variant!.id, quantity: 1 } });
-  test.skip(res.status() === 429, 'Shopify trả 429 cho /cart/add.js (giới hạn store dev)');
-  expect(res.ok(), `/cart/add.js trả ${res.status()}`).toBeTruthy();
+  const res = await cartApi(request, CART.add, { data: { id: variant!.id, quantity: 1 } });
+  expect(res.ok(), `${CART.add} trả ${res.status()}`).toBeTruthy();
 }
 
 // reduced motion: đo và chụp không dính animation trượt vào.
@@ -56,7 +56,7 @@ async function noJsPage(browser: Browser) {
 
 test.describe('ES1-T95 TE-5 cart drawer', () => {
   test.beforeEach(async ({ page }) => {
-    await page.request.post('/cart/clear.js');
+    await cartApi(page, CART.clear);
   });
 
   test('AC1-markup đúng 1 cart-drawer sau footer, ngoài container, mọi trang', async ({ page }) => {

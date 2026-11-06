@@ -7,6 +7,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
+import { CART, CART_GLOB, cartApi } from './support/cart-api';
 import { readCartJson } from './support/product-data';
 
 type CartJs = { item_count: number; items: { key: string; variant_id: number; quantity: number }[] };
@@ -108,8 +109,7 @@ test.describe('ES1-T96 contract', () => {
 
 test.describe('ES1-T96 TE-5 cart drawer', () => {
   test.beforeEach(async ({ page }) => {
-    const res = await page.request.post('/cart/clear.js');
-    test.skip(res.status() === 429, 'Shopify trả 429 cho /cart/clear.js (giới hạn store dev)');
+    await cartApi(page, CART.clear);
     await page.emulateMedia({ reducedMotion: 'reduce' });
   });
 
@@ -243,7 +243,7 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
   test('AC1 lỗi 422: không mở drawer, lỗi ở role=alert', async ({ page, guard }) => {
     guard.allowNetworkLog();
     await openDrawerProduct(page);
-    await page.route('**/cart/add.js', (route) => route.fulfill({ status: 422, contentType: 'application/json', body: JSON.stringify(MOCK_422) }));
+    await page.route(CART_GLOB.add, (route) => route.fulfill({ status: 422, contentType: 'application/json', body: JSON.stringify(MOCK_422) }));
     await add(page).click();
     await expect(tid(page, 'product-form-error')).toHaveText(MOCK_422.description);
     await expect(dialog(page)).toBeHidden();
