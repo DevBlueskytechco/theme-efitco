@@ -192,7 +192,7 @@ test.describe('ES1-T189 nâng cấp', () => {
 test.describe('ES1-T189 đổi tab', () => {
   test('bấm: không reload, không đổi URL, 0 fetch, xhr, lưới đổi đúng tab', async ({ page }) => {
     await open(page);
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('load');
     await page.evaluate(() => {
       (window as unknown as { __noReload: boolean }).__noReload = true;
     });
