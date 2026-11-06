@@ -4,6 +4,7 @@
 // Dữ liệu (ES1-T105 chưa trả lời): thiếu TE6_* → dùng /collections/all, test cần filter skip khi trang không có collection-filter-group.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
 import { watchShopPay403 } from './support/console-guard';
 
@@ -31,6 +32,7 @@ function watchErrors(page: Page): string[] {
 }
 
 async function expectAxeClean(page: Page, include: string) {
+  await expectNotChallenged(page);
   const r = await new AxeBuilder({ page }).include(include).analyze();
   const bad = r.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''));
   const report = bad.map((v) => `${v.impact} ${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`);

@@ -9,7 +9,7 @@ import { CART, themeAdd } from './support/cart-api';
 import { test as mockTest, type MockCart } from './support/cart-mock';
 import { productData, readCartJson } from './support/product-data';
 import { env } from './support/store-data';
-import { expectStoreAllowed, gotoStore, watchStore } from './support/store-guard';
+import { expectStoreAllowed, gotoStore, watchStore, expectNotChallenged } from './support/store-guard';
 
 const TE12 = '/?view=te12';
 const JS_FILE = 'assets/bundle-form.js';
@@ -53,6 +53,7 @@ async function expectTotals(root: Locator, subtotal: number, percent: number) {
 
 async function expectNoSeriousAxe(page: Page, root: Locator) {
   const selector = `[data-testid="${await root.getAttribute('data-testid')}"]`;
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).include(selector).analyze();
   expect(violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
 }
@@ -64,7 +65,7 @@ type Recorded = {
 
 // Listener capture trên document, không phụ thuộc thời điểm module nạp.
 const record = (page: Page) =>
-  page.addInitScript(() => {
+  page.addInitScript((addPath) => {
     const log: Recorded = { events: [], updated: [] };
     (window as unknown as { __t149: Recorded }).__t149 = log;
     document.addEventListener(
@@ -76,7 +77,7 @@ const record = (page: Page) =>
           context: d.context,
           lines: d.lines,
           target: (e.target as Element).tagName.toLowerCase(),
-          addSentBefore: performance.getEntriesByType('resource').some((r) => r.name.includes('/cart/add.js')),
+          addSentBefore: performance.getEntriesByType('resource').some((r) => r.name.includes(addPath)),
         };
         log.events.push(entry);
         Promise.resolve(d.promise).then(
@@ -90,7 +91,7 @@ const record = (page: Page) =>
       const { source, opener } = (e as CustomEvent).detail ?? {};
       log.updated.push({ source, opener: opener?.dataset?.testid });
     });
-  });
+  }, CART.add);
 
 const recorded = (page: Page) => page.evaluate(() => (window as unknown as { __t149: Recorded }).__t149);
 const markPage = (page: Page) => page.evaluate(() => ((window as unknown as { __stay: number }).__stay = 1));

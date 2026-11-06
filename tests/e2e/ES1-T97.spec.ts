@@ -3,6 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... [EXPECT_CART_TYPE=page] npx playwright test tests/e2e/ES1-T97.spec.ts -g "AC2|AC4"
 import type { Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test, type AjaxCart, type MockCart } from './support/cart-mock';
@@ -74,6 +75,7 @@ async function expectTotals(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).include('[data-testid="cart-items"]').analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);

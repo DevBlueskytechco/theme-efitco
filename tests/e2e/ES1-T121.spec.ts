@@ -4,6 +4,7 @@
 // Biến thể chạy trên /?view=te7 (templates/index.te7.liquid), mặc định schema chạy trên /.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 
 const TE7 = '/?view=te7';
@@ -28,6 +29,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);

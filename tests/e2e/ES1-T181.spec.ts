@@ -4,6 +4,7 @@
 // Logo và ảnh newsletter là block setting của footer trong layout, preview không đặt được: phần có ảnh cần người kiểm trong editor.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 
 const PAGES = ['/', '/collections/all', '/cart', '/search'];
@@ -103,6 +104,7 @@ test.describe('ES1-T181 TE-17 hàng 16 footer', () => {
     });
     page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
     await page.goto('/');
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('[data-testid="footer"]').analyze();
     const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);

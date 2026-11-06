@@ -9,11 +9,16 @@ const CLOUDFLARE_SOURCE = /\/cdn-cgi\/challenge-platform|challenges\.cloudflare\
 
 export const isCloudflareLog = (msg: Pick<ConsoleMessage, 'text' | 'location'>) => CLOUDFLARE_SOURCE.test(msg.location().url) || CLOUDFLARE_SOURCE.test(msg.text());
 
+// ES1-T217: Chrome tự log mỗi tài nguyên bị store trả 429 (run 42209030471: 64 dòng). Đó là giới hạn store dev, không phải lỗi theme.
+// Chỉ khớp đúng log mạng của Chrome, không khớp status khác hay lỗi JS có nhắc tới 429. Hành vi khi request hỏng vẫn do assert của từng test kiểm.
+export const isResource429Log = (msg: Pick<ConsoleMessage, 'type' | 'text'>) =>
+  msg.type() === 'error' && /^Failed to load resource: the server responded with a status of 429\b/.test(msg.text());
+
 export function watchShopPay403(page: Pick<Page, 'on'>): (msg: ConsoleMessage) => boolean {
   let blocked = false;
   page.on('response', (r) => {
     if (r.status() === 403 && r.url().startsWith('https://shop.app/')) blocked = true;
   });
   return (msg) =>
-    isCloudflareLog(msg) || (blocked && msg.type() === 'error' && /status of 403/.test(msg.text()) && msg.location().url.startsWith('chrome-error://'));
+    isCloudflareLog(msg) || isResource429Log(msg) || (blocked && msg.type() === 'error' && /status of 403/.test(msg.text()) && msg.location().url.startsWith('chrome-error://'));
 }

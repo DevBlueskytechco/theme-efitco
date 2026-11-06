@@ -5,6 +5,7 @@
 // Blog figma-blog do ES1-T178 nhập: thiếu thì các test cần bài skip có lý do.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { watchShopPay403 } from './support/console-guard';
 
@@ -192,6 +193,7 @@ test.describe('ES1-T191 cổng Figma', () => {
     await page.goto(FIGMA);
     const root = band(page, 'figma-blog-posts');
     test.skip((await root.count()) === 0, NO_DATA);
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('[data-testid="container-figma-blog-posts"]').analyze();
     const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);

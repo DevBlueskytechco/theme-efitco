@@ -10,6 +10,7 @@ import { test, expect, type Locator, type Page, type TestInfo } from '@playwrigh
 import { getJson } from './support/http';
 import { pageJson, requireJson } from './support/product-data';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { watchShopPay403 } from './support/console-guard';
@@ -377,6 +378,7 @@ async function badgeSwatchCard(page: Page): Promise<Locator | null> {
 }
 
 async function axeBad(page: Page, include: string) {
+  await expectNotChallenged(page);
   const r = await new AxeBuilder({ page }).include(include).analyze();
   return r.violations.filter(seriousOrCritical).map(v => `${v.impact} ${v.id}: ${v.nodes.slice(0, 3).map(n => n.target.join(' ')).join(' | ')}`);
 }

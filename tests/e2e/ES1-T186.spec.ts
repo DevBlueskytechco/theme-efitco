@@ -4,6 +4,7 @@
 // /?view=te15 dùng collection all nên không cần dữ liệu nhập. 3 tên thật trên /?view=figma cần figma-level-* (ES1-T178): thiếu thì skip có lý do.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { watchShopPay403 } from './support/console-guard';
 import { fetchRetry429 } from './support/cart-api';
@@ -70,7 +71,9 @@ test.describe('ES1-T186 tĩnh', () => {
     const css = readFileSync('assets/base.css', 'utf8');
     const start = css.indexOf('/** Shop by level (TE-15');
     expect(start).toBeGreaterThan(0);
-    const section = css.slice(start, css.indexOf('/** Testimonials (TE-7', start));
+    // ES1-T217: chỉ mục của block này, mục kế là Blog posts. Bỏ comment: ghi chú Figma có mã màu không phải giá trị CSS.
+    const section = css.slice(start, css.indexOf('/** Blog posts (TE-16', start)).replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(section.length).toBeGreaterThan(0);
     expect(section).not.toMatch(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/i);
     expect(section).not.toMatch(/(^|\s)(left|right|top|bottom|margin-left|margin-right|padding-left|padding-right)\s*:/m);
   });
@@ -139,6 +142,7 @@ test.describe('ES1-T186 /?view=te15', () => {
   test('0 console error, axe 0 serious', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(TE15);
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).analyze();
     const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);

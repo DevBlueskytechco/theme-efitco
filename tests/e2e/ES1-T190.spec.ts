@@ -4,6 +4,7 @@
 // Dữ liệu P01, P02, P04 từ ES1-T178: thiếu thì skip có lý do. T190_NEW_SALE_HANDLE: sản phẩm vừa tag new vừa sale, không có thì test thứ tự dùng DOM.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { watchShopPay403 } from './support/console-guard';
 
@@ -286,6 +287,7 @@ test.describe('ES1-T190 chất lượng', () => {
 
     const block = await openFigma(page);
     test.skip((await block.count()) === 0, 'Không có hàng 5');
+    await expectNotChallenged(page);
     const r = await new AxeBuilder({ page }).include('[data-testid="featured-collection"]').analyze();
     const bad = r.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => v.id);
     expect(bad).toEqual([]);

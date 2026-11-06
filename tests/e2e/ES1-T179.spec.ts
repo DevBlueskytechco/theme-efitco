@@ -4,6 +4,7 @@
 // Merchant sửa trong editor (TC-H6) là bước tay; ở đây param trùng tên setting đóng vai giá trị đã lưu, trên /?view=te7.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 
 const HOME = '/';
@@ -45,6 +46,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);

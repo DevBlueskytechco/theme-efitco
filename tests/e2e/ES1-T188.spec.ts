@@ -4,6 +4,7 @@
 // 4 tab trên /?view=figma cần figma-tab-* (ES1-T178): thiếu thì skip có lý do. Đổi tab bằng JS kiểm ở ES1-T189.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { watchShopPay403 } from './support/console-guard';
 
@@ -201,6 +202,7 @@ test.describe('ES1-T188 trang /?view=figma', () => {
   test('axe 0 serious trong block, 0 console error', async ({ page }) => {
     const errors = watchConsole(page);
     await openFigma(page);
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('[data-testid="featured-collection"]').analyze();
     const bad = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(bad.map((v) => v.id)).toEqual([]);

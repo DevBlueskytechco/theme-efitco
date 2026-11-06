@@ -5,6 +5,7 @@
 import { readFileSync } from 'node:fs';
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
 import { readCartNoScript } from './support/product-data';
 import { watchShopPay403 } from './support/console-guard';
@@ -222,6 +223,7 @@ test.describe('ES1-T156 TE-13 featured product', () => {
   test('AC2 axe 0 serious, 0 console error trên /?view=te13', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(TE13);
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).analyze();
     const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);

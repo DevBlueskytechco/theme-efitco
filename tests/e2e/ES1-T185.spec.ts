@@ -6,6 +6,7 @@
 import { readFileSync, statSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 
 const TE15 = '/?view=te15';
@@ -305,6 +306,7 @@ test.describe('ES1-T185 chất lượng', () => {
     await open(page);
     await next(page).click();
     await expect(prev(page)).toBeVisible();
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).analyze();
     const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
