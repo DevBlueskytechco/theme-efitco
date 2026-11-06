@@ -85,13 +85,16 @@ test.describe('ES1-T96 contract', () => {
     const form = read('assets/product-form.js');
     const block = read('blocks/cart-drawer.liquid');
     const header = read('blocks/header.liquid');
-    expect(Buffer.byteLength(js), 'cart-drawer.js tối đa 2816 B').toBeLessThanOrEqual(2816);
+    // Trần BE1 2816 B nâng lên 4096 B ở BE3 (ES1-T98, D10).
+    expect(Buffer.byteLength(js), 'cart-drawer.js tối đa 4096 B').toBeLessThanOrEqual(4096);
     expect(Buffer.byteLength(form), 'product-form.js tối đa 6900 B').toBeLessThanOrEqual(6900);
     expect([...block.matchAll(/<script src="\{\{ 'cart-drawer\.js' \| asset_url \}\}" type="module"><\/script>/g)]).toHaveLength(1);
     expect(block).toMatch(/<cart-drawer\b/);
     expect(js).toContain('customElements.define("cart-drawer"');
-    // Tên partial là rest args, khớp {% partial %} ở block và header.
-    expect(js).toContain('partials.fetch("cart-drawer", "cart-count", {');
+    // Tên partial là rest args, lấy từ data-partials của cart-items (ES1-T98: dùng chung cho /cart), khớp {% partial %} ở block và header.
+    expect(js).toContain('document.querySelector("cart-items")?.dataset.partials || "cart-count"');
+    expect(js).toContain('partials.fetch(...names.split(" "), {');
+    expect(block).toContain('data-partials="cart-drawer cart-count"');
     expect(block).toContain("{% partial 'cart-drawer' %}");
     expect(header).toContain("{% partial 'cart-count' %}");
     for (const hook of ['data-mode=', 'data-items-src=', 'data-cart-url=', 'data-item-count=', 'data-cart-accelerated', 'name="updates[]"']) {

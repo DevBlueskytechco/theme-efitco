@@ -1,10 +1,13 @@
-// <cart-items> TE-5 AC2 AC4 (ES1-T97). Serial writes; only the refresh aborts.
-// input.defaultValue = last known server quantity.
+// <cart-items> TE-5 AC2 AC4 AC7. Serial writes; only the refresh aborts.
+// input.defaultValue = server quantity.
+// https://shopify.dev/docs/api/storefront-events-and-actions/events/cart-lines-update (ES1-T91 #3)
 import { partials } from "@shopify/partial-rendering";
 
 const QTY = '[name="updates[]"]';
 const LINE = "[data-line-key]";
 const keyOf = (el) => el.closest(LINE)?.dataset.lineKey;
+let E;
+import("https://cdn.shopify.com/storefront/standard-events.js").then((m) => (E = m.CartLinesUpdateEvent), () => {});
 
 class CartItems extends HTMLElement {
   timers = new Map();
@@ -17,14 +20,13 @@ class CartItems extends HTMLElement {
 
   handleEvent(e) {
     const { type, target } = e;
-    // Enter in an input: change already ran.
+    // Enter: change already ran.
     if (type === "submit") return e.submitter?.matches("[data-cart-update]") && e.preventDefault();
     const key = keyOf(target);
-    const click = type === "click";
-    if (!key || !target.closest(click ? "[data-cart-remove]" : QTY) || e.metaKey || e.ctrlKey) return;
+    if (!key || !target.closest(type === "click" ? "[data-cart-remove]" : QTY) || e.metaKey || e.ctrlKey) return;
     clearTimeout(this.timers.get(key));
     this.timers.delete(key);
-    if (click) {
+    if (type === "click") {
       e.preventDefault();
       this.add(key, 0);
     } else this.timers.set(key, setTimeout(() => this.commit(key), 300));
@@ -38,7 +40,7 @@ class CartItems extends HTMLElement {
     this.timers.delete(key);
     const i = this.input(key);
     if (!i) return;
-    const q = Number(i.value);
+    const q = +i.value;
     if (!i.value || q < 0 || q % 1) i.value = i.defaultValue;
     else if (this.running || q != i.defaultValue) this.add(key, q);
   }
@@ -53,7 +55,6 @@ class CartItems extends HTMLElement {
     this.querySelector(`[role="${role}"]`).textContent = text;
   }
 
-  // Keep focus: skip the focused button.
   lock(on) {
     for (const b of this.querySelectorAll("button[form]")) b.disabled = on && b !== document.activeElement;
   }
@@ -61,11 +62,10 @@ class CartItems extends HTMLElement {
   async run() {
     if (this.running) return;
     this.running = true;
-    this.setAttribute("aria-busy", "true");
+    this.ariaBusy = "true";
     this.say("status");
     this.say("alert");
     try {
-      // Live iterator: sees lines queued meanwhile.
       for (const [key, q] of this.queue) {
         this.queue.delete(key);
         this.lock(true);
@@ -76,28 +76,40 @@ class CartItems extends HTMLElement {
       this.say("alert", this.dataset.labelError);
     } finally {
       this.lock(false);
-      this.removeAttribute("aria-busy");
+      this.ariaBusy = null;
       this.running = false;
     }
   }
 
+  // Library not loaded: no event. Resolve only (ES1-T85).
+  emit(id, quantity) {
+    let d;
+    try {
+      d = E.createPromise();
+      this.dispatchEvent(new E({ action: quantity ? "update" : "remove", context: this.closest("dialog") ? "dialog" : "cart", lines: [{ id, quantity }], promise: d.promise }));
+    } catch {}
+    return (cart, message) => d?.resolve({ cart: message ? null : E.createCartFromAjaxResponse(cart), userErrors: message ? [{ message }] : [], warnings: [] });
+  }
+
   async write(key, quantity) {
     const d = this.dataset;
+    const settle = this.emit(key, quantity);
     let res, data = {};
     this.note = "";
     try {
       res = await fetch(`${d.cartChangeUrl}.js`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: key, quantity }) });
-      data = (await res.json().catch(() => 0)) || {};
+      data = await res.json();
     } catch {}
     if (data.items) {
       this.changed = true;
       this.sync((this.items = data.items));
       this.removed = !quantity && key;
       this.note = !quantity ? d.labelRemoved : (data.items.find((i) => i.key === key)?.quantity ?? 0) < quantity ? d.labelQuantityAdjusted : d.labelUpdated;
-      return;
+      return settle(data);
     }
     const text = res?.status < 500 && data.description;
     this.say("alert", text || d.labelError);
+    settle(0, text || d.labelError);
     const i = this.input(key);
     if (i) i.value = i.defaultValue;
     if (text) {
@@ -106,7 +118,6 @@ class CartItems extends HTMLElement {
     }
   }
 
-  // apply() keeps input values: write server quantities back.
   sync(items) {
     for (const i of this.querySelectorAll(QTY)) {
       const k = keyOf(i);
@@ -120,8 +131,8 @@ class CartItems extends HTMLElement {
   async refresh() {
     const { signal } = (this.ctl = new AbortController());
     const a = document.activeElement;
-    const keys = [...this.querySelectorAll(LINE)].map((l) => l.dataset.lineKey);
-    // Safari does not focus a clicked link.
+    const keys = [...this.querySelectorAll(LINE)].map(keyOf);
+    // Safari: no focus on click.
     const key = this.contains(a) ? keyOf(a) : a === document.body && this.removed;
     const update = await partials.fetch(...this.dataset.partials.split(" "), { url: location.href, signal }).catch((err) => {
       if (!signal.aborted) throw err;

@@ -154,7 +154,8 @@ test.describe('ES1-T97 contract', () => {
     const page = read('blocks/cart-page.liquid');
     const drawer = read('blocks/cart-drawer.liquid');
     const lines = read('snippets/cart-lines.liquid');
-    expect(Buffer.byteLength(js), 'cart-items.js tối đa 5120 B').toBeLessThanOrEqual(5120);
+    // Trần BE2 5120 B nâng lên 5632 B ở BE3 (ES1-T98, D10).
+    expect(Buffer.byteLength(js), 'cart-items.js tối đa 5632 B').toBeLessThanOrEqual(5632);
     expect([...page.matchAll(/<script src="\{\{ 'cart-items\.js' \| asset_url \}\}" type="module"><\/script>/g)]).toHaveLength(1);
     // Drawer nạp động qua data-items-src (ES1-T96), không có thẻ script; literal để theme check kiểm được asset (ES1-T102).
     expect(drawer).not.toMatch(/<script src="\{\{ 'cart-items\.js'/);
