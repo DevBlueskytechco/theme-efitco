@@ -6,6 +6,8 @@
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import { pageJson } from './support/product-data';
 import { CART, cartApi } from './support/cart-api';
+import { watchShopPay403 } from './support/console-guard';
+import { HARDCODED_RADIUS } from './support/css-lint';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
@@ -210,7 +212,7 @@ test.describe('ES1-T23', () => {
         else if (/:\s*(?:white|black)\b/i.test(line)) bad.push(at);
         // (?!\s) chặn \s* lùi về 0 ký tự rồi lọt qua lookahead
         else if (/font-family\s*:\s*(?!\s|var\(|inherit)/.test(line)) bad.push(at);
-        else if (/border-radius\s*:\s*(?!\s|var\(|0(?:px)?\s*[;}]|50%|inherit)/.test(line)) bad.push(at);
+        else if (HARDCODED_RADIUS.test(line)) bad.push(at);
       });
     }
     expect(bad, 'giá trị hardcode trong assets/*.css').toEqual([]);
@@ -825,16 +827,13 @@ test.describe('ES1-T23', () => {
 
   test('TB-28 không console error khi thao tác header', async ({ page }, ti) => {
     const errors: string[] = [];
+    const isShopPay403 = watchShopPay403(page);
     page.on('console', (m) => {
-      if (m.type() !== 'error') return;
+      if (m.type() !== 'error' || isShopPay403(m)) return;
       const text = `${m.text()} @ ${m.location().url}`;
       if (!IGNORE_CONSOLE.some(r => r.test(text))) errors.push(text);
     });
     page.on('pageerror', e => errors.push(e.message));
-    // Accelerated checkout trong cart drawer (ES1-T95) nhúng iframe shop.app/pay ở mọi trang; shop.app trả 403 cho
-    // trình duyệt CI → lỗi console ghi vị trí chrome-error. Chỉ bỏ qua khi đúng iframe shop.app bị chặn.
-    let shopApp403 = 0;
-    page.on('response', r => { if (r.status() === 403 && /^https:\/\/shop\.app\//.test(r.url())) shopApp403++; });
     await page.goto('/');
     if (isDesktop(ti)) {
       const { item, submenu } = await parentItem(page);
@@ -845,7 +844,7 @@ test.describe('ES1-T23', () => {
       const acc = drawer.getByTestId(T.drawerAcc);
       if (await acc.count()) await acc.first().click();
     }
-    expect(errors.filter(e => !(shopApp403 && /status of 403 .*@ chrome-error:\/\//.test(e)))).toEqual([]);
+    expect(errors).toEqual([]);
   });
 });
 

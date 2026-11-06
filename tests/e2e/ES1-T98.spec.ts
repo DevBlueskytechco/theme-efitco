@@ -6,6 +6,8 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
 import { productData, readCartJson } from './support/product-data';
+import { watchShopPay403 } from './support/console-guard';
+import { CART, CART_GLOB, cartApi } from './support/cart-api';
 
 type CartJs = { item_count: number; items: { key: string; quantity: number }[] };
 type Guard = { allowNetworkLog: () => void };
@@ -28,7 +30,7 @@ const EVENT = 'shopify:cart:lines-update';
 const CDN = 'https://cdn.shopify.com/storefront/standard-events.js';
 const HANDLE = env('TE4_VARIANTS_HANDLE', 'TE4_SINGLE_HANDLE');
 const PAGE_MODE = process.env.EXPECT_CART_TYPE === 'page';
-const CHANGE = '**/cart/change.js';
+const CHANGE = CART_GLOB.change;
 const MOCK_422 = 'ES1-T98 mock: only 1 item available.';
 const IGNORE_CONSOLE = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)|status of 429/i;
 const NETWORK_LOG = /Failed to load resource/i;
@@ -39,8 +41,10 @@ const test = base.extend<{ guard: Guard }>({
     async ({ page }, use, info) => {
       const errors: string[] = [];
       let allowNetwork = false;
+      const isShopPay403 = watchShopPay403(page);
       page.on('console', (msg) => {
         if (msg.type() !== 'error') return;
+        if (isShopPay403(msg)) return;
         const text = msg.text();
         const source = msg.location().url;
         if (IGNORE_CONSOLE.test(text) || IGNORE_CONSOLE.test(source)) return;
@@ -65,7 +69,7 @@ const idle = (page: Page) => expect(tid(page, 'cart-items')).not.toHaveAttribute
 
 // Ghi nhận mọi event từ trước khi trang chạy; payload nằm trên event hoặc detail (như ES1-T85).
 async function listen(page: Page) {
-  await page.addInitScript((type) => {
+  await page.addInitScript(({ type, changePath }) => {
     const w = window as unknown as Win;
     w.__t98 = [];
     document.addEventListener(
@@ -77,7 +81,7 @@ async function listen(page: Page) {
           context: d.context,
           lines: d.lines,
           target: (e.target as Element)?.tagName?.toLowerCase(),
-          beforeChange: !performance.getEntriesByType('resource').some((r) => r.name.includes('/cart/change.js')),
+          beforeChange: !performance.getEntriesByType('resource').some((r) => r.name.includes(changePath)),
         };
         w.__t98.push(entry);
         Promise.resolve(d.promise).then(
@@ -90,7 +94,7 @@ async function listen(page: Page) {
       },
       true,
     );
-  }, EVENT);
+  }, { type: EVENT, changePath: CART.change });
 }
 
 async function seed(page: Page, quantities: number[]) {
@@ -99,9 +103,8 @@ async function seed(page: Page, quantities: number[]) {
   const variant = (await productData(page, HANDLE!)).variants.find((v) => v.available);
   test.skip(!variant, `${HANDLE} không có variant bán được`);
   const items = quantities.map((quantity, i) => ({ id: variant!.id, quantity, properties: { _t98: String(i) } }));
-  const res = await page.request.post('/cart/add.js', { data: { items } });
-  test.skip(res.status() === 429, 'Shopify trả 429 cho /cart/add.js (giới hạn store dev)');
-  expect(res.ok(), `/cart/add.js trả ${res.status()}`).toBeTruthy();
+  const res = await cartApi(page, CART.add, { data: { items } });
+  expect(res.ok(), `${CART.add} trả ${res.status()}`).toBeTruthy();
   return variant!.id;
 }
 
@@ -140,7 +143,7 @@ async function setQuantity(page: Page, key: string, value: string) {
 }
 
 async function changeAndWait(page: Page, key: string, value: string) {
-  const response = page.waitForResponse((r) => r.url().includes('/cart/change.js'));
+  const response = page.waitForResponse((r) => r.url().includes(CART.change));
   await setQuantity(page, key, value);
   await response;
   await idle(page);
@@ -217,8 +220,8 @@ test.describe('ES1-T98 contract', () => {
 
 test.describe('ES1-T98 TE-5 AC7', () => {
   test.beforeEach(async ({ page }) => {
-    const res = await page.request.post('/cart/clear.js');
-    test.skip(res.status() === 429, 'Shopify trả 429 cho /cart/clear.js (giới hạn store dev)');
+    const res = await cartApi(page, CART.clear);
+    expect(res.ok(), `${CART.clear} trả ${res.status()}`).toBeTruthy();
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await listen(page);
   });
@@ -285,8 +288,8 @@ test.describe('ES1-T98 TE-5 AC7', () => {
     await actionsReady(page);
     const total = (cart: { totalQuantity?: number; item_count?: number }) => cart.totalQuantity ?? cart.item_count;
     expect(total(await callAction(page, 'getCart'))).toBe(1);
-    const add = await page.evaluate(async (id) => (await fetch('/cart/add.js', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, quantity: 2, properties: { _t98: 'external' } }) })).status, variantId);
-    test.skip(add === 429, 'Shopify trả 429 cho /cart/add.js (giới hạn store dev)');
+    const add = await cartApi(page, CART.add, { data: { id: variantId, quantity: 2, properties: { _t98: 'external' } } });
+    expect(add.ok(), `${CART.add} trả ${add.status()}`).toBeTruthy();
     expect(total(await callAction(page, 'getCart'))).toBe(3);
     await expect(dialog(page)).toBeHidden();
   });
@@ -402,7 +405,7 @@ test.describe('ES1-T98 TE-5 AC7', () => {
         await seed(page, [1]);
         await surface.open(page);
         const key = (await readCart(page)).items[0].key;
-        const response = page.waitForResponse((r) => r.url().includes('/cart/change.js'));
+        const response = page.waitForResponse((r) => r.url().includes(CART.change));
         await quantityOf(page, key).evaluate((el: HTMLInputElement) => {
           for (const value of ['2', '3', '2']) {
             el.value = value;

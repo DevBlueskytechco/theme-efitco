@@ -7,6 +7,8 @@ import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { env } from './support/store-data';
 import { readCartNoScript } from './support/product-data';
+import { watchShopPay403 } from './support/console-guard';
+import { CART, cartApi } from './support/cart-api';
 
 const TE13 = '/?view=te13';
 const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
@@ -20,8 +22,10 @@ const money = (text: string | null) => Number((text ?? '').replace(/[^\d]/g, '')
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
@@ -242,7 +246,8 @@ test.describe('ES1-T156 TE-13 nojs', () => {
   });
 
   test('nojs select variant, form POST vào giỏ đúng variant', async ({ page }) => {
-    await page.request.post('/cart/clear.js');
+    const cleared = await cartApi(page, CART.clear);
+    expect(cleared.ok(), `${CART.clear} trả ${cleared.status()}`).toBeTruthy();
     await page.goto(TE13);
     const b = band(page, 'b');
     await expect(tid(b, 'product-variant-picker')).toBeHidden();
@@ -255,6 +260,5 @@ test.describe('ES1-T156 TE-13 nojs', () => {
     await page.waitForURL(/\/cart/);
     const cart = await readCartNoScript<{ items: { variant_id: number }[] }>(page);
     expect(cart.items.map((i) => String(i.variant_id))).toEqual([values[1]]);
-    await page.request.post('/cart/clear.js');
   });
 });

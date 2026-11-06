@@ -14,18 +14,24 @@ function trackErrors(page: Page): string[] {
   return errors;
 }
 
-// Setting autoplay mặc định tắt: sửa HTML trang chủ thay vì đổi cấu hình store.
+// Setting autoplay mặc định tắt: đổi thuộc tính ngay trước connectedCallback thay vì đổi cấu hình store.
+// Không dùng route.fetch: gọi lại store từ Node nhận trang bot protection "Your connection needs to be verified" (ES1-T171).
+// Chỉ đổi thuộc tính markup đã có: block mất hook data-autoplay thì autoplay không bật và test fail.
 async function enableAutoplay(page: Page) {
-  await page.route(url => url.pathname === '/', async route => {
-    const response = await route.fetch();
-    const body = (await response.text())
-      .replace(/data-autoplay="false"/, 'data-autoplay="true"')
-      .replace(/data-autoplay-speed="\d+"/, `data-autoplay-speed="${SPEED_SECONDS}"`);
-    const headers = { ...response.headers() };
-    delete headers['content-encoding']; // body đã giải nén, giữ header thì trình duyệt giải nén lần 2
-    delete headers['content-length'];
-    await route.fulfill({ response, body, headers });
-  });
+  await page.addInitScript(speed => {
+    const define = customElements.define;
+    customElements.define = function (name, element, options) {
+      if (name === 'slideshow-carousel') {
+        const connected = element.prototype.connectedCallback;
+        element.prototype.connectedCallback = function (this: HTMLElement) {
+          if (this.hasAttribute('data-autoplay')) this.setAttribute('data-autoplay', 'true');
+          if (this.hasAttribute('data-autoplay-speed')) this.setAttribute('data-autoplay-speed', String(speed));
+          connected.call(this);
+        };
+      }
+      define.call(customElements, name, element, options);
+    };
+  }, SPEED_SECONDS);
 }
 
 async function open(page: Page) {

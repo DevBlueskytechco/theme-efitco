@@ -4,6 +4,7 @@
 // Đọc giỏ của trang đang mở vẫn dùng readCartJson (support/product-data.ts): cùng market với HTML (ES1-T74).
 // Log: '[cartApi] 429 lần' = 1 lần bị 429, 'trả 429' = 1 test skip; scripts/e2e-429-count.sh đếm 2 loại theo job (mỗi job 1 shard).
 import { test, type APIRequestContext, type APIResponse, type Page } from '@playwright/test';
+import { basename } from 'node:path';
 
 export const CART = {
   add: '/cart/add.js',
@@ -33,8 +34,13 @@ export function retryDelayMs(retryAfter: string | undefined, waitedMs: number): 
 // path /cart.js mặc định GET, còn lại POST. Trả response mọi status khác 429; caller tự kiểm res.ok().
 // Page → page.request (chung cookie giỏ với trang).
 export async function cartApi(target: Page | APIRequestContext, path: CartPath, init: CartInit = {}): Promise<APIResponse> {
+  return fetchRetry429(target, path, { method: path === CART.read ? 'GET' : 'POST', ...init });
+}
+
+// ES1-T171: cùng quy tắc 429 cho request không phải Cart API (TC-06 của ES1-T45: đích của CTA, asset). Mặc định GET.
+// Giữ tiền tố log [cartApi] để scripts/e2e-429-count.sh đếm chung.
+export async function fetchRetry429(target: Page | APIRequestContext, path: string, options: CartInit = {}): Promise<APIResponse> {
   const request = 'request' in target ? target.request : target;
-  const options = { method: path === CART.read ? 'GET' : 'POST', ...init };
   const info = test.info();
   let waited = 0;
   for (let tries = 1; ; tries++) {
@@ -45,7 +51,7 @@ export async function cartApi(target: Page | APIRequestContext, path: CartPath, 
     const delay = tries <= MAX_WAITS ? retryDelayMs(retryAfter, waited) : 0;
     if (delay === 0) {
       const reason = `429 sau ${tries} lần thử: ${path}`;
-      console.log(`[cartApi] Shopify trả 429, skip: ${reason}`);
+      console.log(`[cartApi] Shopify trả 429, skip: ${reason} (${basename(info.file)})`);
       test.skip(true, reason);
       return res;
     }

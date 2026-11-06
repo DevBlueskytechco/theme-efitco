@@ -4,6 +4,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T73.spec.ts
 // Dữ liệu: card ≥ 2 swatch trên /collections/all (5 trang đầu) hoặc TE3_SWATCH_HANDLE; không có thì skip.
 import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { watchShopPay403 } from './support/console-guard';
 
 const ALL = '/collections/all';
 const PAGE_SIZE = 20;
@@ -15,8 +16,10 @@ const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shop
 function trackErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(`pageerror: ${e.message}`));
-  page.on('console', m => {
+  const isShopPay403 = watchShopPay403(page);
+  page.on('console', (m) => {
     if (m.type() !== 'error') return;
+    if (isShopPay403(m)) return;
     const text = `${m.text()} @ ${m.location().url}`;
     if (!IGNORE_CONSOLE.some(r => r.test(text))) errors.push(text);
   });

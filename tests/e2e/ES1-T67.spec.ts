@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getJson } from './support/http';
 import { CART_GLOB } from './support/cart-api';
+import { watchShopPay403 } from './support/console-guard';
 
 const T = {
   form: 'product-form',
@@ -48,8 +49,10 @@ const isCart = (url: URL) => /\/cart\/?$/.test(url.pathname);
 
 function watchConsole(page: Page, ignoreNetwork = false) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     const text = msg.text();
     if (IGNORE_CONSOLE.some((r) => r.test(text) || r.test(msg.location().url))) return;
     if (ignoreNetwork && NETWORK_LOG.test(text)) return;

@@ -4,6 +4,7 @@
 // BE1 (ES1-T139) chạy lại spec này khi đã có assets/quiz-finder.js: phần nào chỉ đúng trước khi JS nâng cấp thì kiểm data-enhanced trước.
 import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { watchShopPay403 } from './support/console-guard';
 
 const TE11 = '/?view=te11';
 const HOME = '/';
@@ -16,8 +17,10 @@ const isEnhanced = (page: Page) => tid(page, 'quiz').evaluate((el) => el.hasAttr
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
