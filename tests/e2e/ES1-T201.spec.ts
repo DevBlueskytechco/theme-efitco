@@ -48,12 +48,12 @@ test.describe('ES1-T201 quy ước spec (tĩnh)', () => {
     expect(offenders).toEqual([]);
   });
 
-  test('TC-04 ES1-T97, T98 seed 1 request, đọc line key từ DOM, không fetch /cart.js chỉ để lấy key', () => {
+  // ES1-T203: T97, T98 seed vào giỏ mock trong bộ nhớ, không còn request seed. Vẫn đọc line key từ DOM.
+  test('TC-04 ES1-T97, T98 đọc line key từ DOM, không fetch /cart.js chỉ để lấy key', () => {
     for (const spec of ['ES1-T97.spec.ts', 'ES1-T98.spec.ts']) {
       const source = readFileSync(join(E2E, spec), 'utf8');
-      expect(source, spec).toContain('seedCart(page');
+      expect(source, spec).toContain('await lineKeys(page)');
       expect(source, spec).not.toMatch(/readCart\(page\)\)\.items\[0\]\.key|readCart\(page\)\)\.items\.map/);
-      expect(source, spec).not.toContain('page.goto(`/products/${handle}`);\n  const variant');
     }
   });
 
