@@ -81,10 +81,6 @@ async function expectNoSeriousAxe(page: Page) {
 }
 
 test.describe('ES1-T94 TE-5 cart page', () => {
-  test.beforeEach(async ({ page }) => {
-    await cartApi(page, CART.clear);
-  });
-
   test('AC1 dòng hàng có đủ trường, số tiền khớp /cart.js', async ({ page }) => {
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
     await addToCart(page, ENV.product!, 2);

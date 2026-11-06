@@ -6,7 +6,6 @@
 import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { watchShopPay403 } from './support/console-guard';
-import { CART, cartApi } from './support/cart-api';
 import { readCartNoScript } from './support/product-data';
 
 const TE12 = '/?view=te12';
@@ -252,8 +251,6 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
 
   test('nojs AC1 chọn 2 món, submit, /cart.js có đúng 2 món quantity 1', async ({ browser }) => {
     const { context, page } = await noJsPage(browser);
-    const cleared = await cartApi(page, CART.clear);
-    expect(cleared.ok(), `${CART.clear} trả ${cleared.status()}`).toBeTruthy();
     await page.goto(TE12);
 
     const inputs = available(page);

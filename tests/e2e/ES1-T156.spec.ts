@@ -8,7 +8,6 @@ import AxeBuilder from '@axe-core/playwright';
 import { env } from './support/store-data';
 import { readCartNoScript } from './support/product-data';
 import { watchShopPay403 } from './support/console-guard';
-import { CART, cartApi } from './support/cart-api';
 
 const TE13 = '/?view=te13';
 const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
@@ -246,8 +245,6 @@ test.describe('ES1-T156 TE-13 nojs', () => {
   });
 
   test('nojs select variant, form POST vào giỏ đúng variant', async ({ page }) => {
-    const cleared = await cartApi(page, CART.clear);
-    expect(cleared.ok(), `${CART.clear} trả ${cleared.status()}`).toBeTruthy();
     await page.goto(TE13);
     const b = band(page, 'b');
     await expect(tid(b, 'product-variant-picker')).toBeHidden();

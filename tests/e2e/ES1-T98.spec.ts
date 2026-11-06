@@ -1,16 +1,16 @@
-// KHÔNG CHẮC: spec chưa chạy (phiên agent không mở được trình duyệt) → chờ CI. Shape cart trả về từ getCart/createCartFromAjaxResponse chưa thấy → đọc totalQuantity, không có thì item_count (ES1-T91 #2, câu hỏi ES1-T164).
 // Ticket ES1-T98 TE-5-BE3: override Shopify.actions + CartLinesUpdateEvent khi đổi số lượng và xoá (docs/srs.md#TE-5 AC7; drafts/techlead/ES1-T89/task-split.md D9, D10; ES1-T91).
+// ES1-T203: Cart API và partial mock trong bộ nhớ (support/cart-mock.ts), trang, JS và thư viện standard-events thật, 0 request Cart API tới store.
+// getCart, updateCart ghi qua Storefront API (ES1-T164), mock Cart API không tới: các test đó nằm trong luồng thật ở ES1-T203.spec.ts.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... [EXPECT_CART_TYPE=page] npx playwright test tests/e2e/ES1-T98.spec.ts -g "AC7"
-import { test as base, expect, type Page, type Route } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
-import { productData, readCartJson } from './support/product-data';
-import { watchShopPay403 } from './support/console-guard';
-import { CART, CART_GLOB, cartApi } from './support/cart-api';
+import { readCartJson } from './support/product-data';
+import { CART } from './support/cart-api';
+import { expect, test, type AjaxCart, type MockCart } from './support/cart-mock';
+import { lineKeys } from './support/cart-seed';
 
-type CartJs = { item_count: number; items: { key: string; quantity: number }[] };
-type Guard = { allowNetworkLog: () => void };
 type Entry = {
   action?: string;
   context?: string;
@@ -23,46 +23,20 @@ type Entry = {
   warnings?: unknown[];
   rejected?: string;
 };
-type Surface = { name: string; context: string; open: (page: Page) => Promise<void> };
+type Surface = { name: string; context: string; open: (page: Page, cart: MockCart) => Promise<void> };
 type Win = { __t98: Entry[]; __t98Stay?: number; Shopify: { actions: Record<string, (...args: unknown[]) => Promise<unknown>> } };
 
 const EVENT = 'shopify:cart:lines-update';
 const CDN = 'https://cdn.shopify.com/storefront/standard-events.js';
 const HANDLE = env('TE4_VARIANTS_HANDLE', 'TE4_SINGLE_HANDLE');
 const PAGE_MODE = process.env.EXPECT_CART_TYPE === 'page';
-const CHANGE = CART_GLOB.change;
 const MOCK_422 = 'ES1-T98 mock: only 1 item available.';
-const IGNORE_CONSOLE = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)|status of 429/i;
-const NETWORK_LOG = /Failed to load resource/i;
 const isCart = (url: URL) => /\/cart\/?$/.test(url.pathname);
-
-const test = base.extend<{ guard: Guard }>({
-  guard: [
-    async ({ page }, use, info) => {
-      const errors: string[] = [];
-      let allowNetwork = false;
-      const isShopPay403 = watchShopPay403(page);
-      page.on('console', (msg) => {
-        if (msg.type() !== 'error') return;
-        if (isShopPay403(msg)) return;
-        const text = msg.text();
-        const source = msg.location().url;
-        if (IGNORE_CONSOLE.test(text) || IGNORE_CONSOLE.test(source)) return;
-        if (allowNetwork && NETWORK_LOG.test(text)) return;
-        errors.push(`${text} @ ${source}`);
-      });
-      page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
-      await use({ allowNetworkLog: () => (allowNetwork = true) });
-      if (info.status !== 'skipped') expect(errors, `console error:\n${errors.join('\n')}`).toEqual([]);
-    },
-    { auto: true },
-  ],
-});
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
 const dialog = (page: Page) => tid(page, 'cart-drawer-dialog');
 const quantityOf = (page: Page, key: string) => page.locator(`[data-line-key="${key}"] [data-testid="cart-line-quantity"]`);
-const readCart = (page: Page) => readCartJson<CartJs>(page);
+const readCart = (page: Page) => readCartJson<AjaxCart>(page);
 const stayed = (page: Page) => page.evaluate(() => (window as unknown as Win).__t98Stay === 1);
 const entries = (page: Page) => page.evaluate(() => (window as unknown as Win).__t98.map((e) => ({ ...e })));
 const idle = (page: Page) => expect(tid(page, 'cart-items')).not.toHaveAttribute('aria-busy', /.*/);
@@ -97,17 +71,6 @@ async function listen(page: Page) {
   }, { type: EVENT, changePath: CART.change });
 }
 
-async function seed(page: Page, quantities: number[]) {
-  test.skip(!HANDLE, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-  await page.goto(`/products/${HANDLE}`);
-  const variant = (await productData(page, HANDLE!)).variants.find((v) => v.available);
-  test.skip(!variant, `${HANDLE} không có variant bán được`);
-  const items = quantities.map((quantity, i) => ({ id: variant!.id, quantity, properties: { _t98: String(i) } }));
-  const res = await cartApi(page, CART.add, { data: { items } });
-  expect(res.ok(), `${CART.add} trả ${res.status()}`).toBeTruthy();
-  return variant!.id;
-}
-
 // cart-drawer.js đặt data-actions sau khi configure xong. Thiếu thì Shopify.actions chưa có tới window load (ES1-T91 #1).
 async function actionsReady(page: Page) {
   await expect(tid(page, 'cart-drawer'), 'Shopify.actions chưa được configure').toHaveAttribute('data-actions', '', { timeout: 15_000 });
@@ -115,20 +78,21 @@ async function actionsReady(page: Page) {
 }
 
 // Thư viện đã nạp thì cart-items.js mới dispatch được (không chờ khi ghi).
+// Chuỗi, không truyền function: Playwright biên dịch import() trong spec thành require.
 async function libraryReady(page: Page) {
   await expect(tid(page, 'cart-items')).toHaveAttribute('data-enhanced', '', { timeout: 15_000 });
-  await page.evaluate((url) => import(url).then(() => new Promise((r) => setTimeout(r, 0))), CDN);
+  await page.evaluate(`import(${JSON.stringify(CDN)}).then(() => new Promise((r) => setTimeout(r, 0)))`);
 }
 
 // Test event không phụ thuộc Shopify.actions: chỉ chờ custom element và thư viện.
-async function openPage(page: Page) {
-  await page.goto('/cart');
+async function openPage(page: Page, cart: MockCart) {
+  await cart.goto('/cart');
   await libraryReady(page);
 }
 
-async function openDrawer(page: Page) {
+async function openDrawer(page: Page, cart: MockCart) {
   test.skip(PAGE_MODE, 'Preview đặt cart_type page: không có dialog');
-  await page.goto('/');
+  await cart.goto('/');
   await page.waitForFunction(() => !!customElements.get('cart-drawer'));
   await tid(page, 'header-cart-link').click();
   await expect(dialog(page)).toBeVisible();
@@ -147,16 +111,6 @@ async function changeAndWait(page: Page, key: string, value: string) {
   await setQuantity(page, key, value);
   await response;
   await idle(page);
-}
-
-// Partial fetch cùng pathname với trang (url: location.href).
-function countRefreshes(page: Page) {
-  const path = new URL(page.url()).pathname;
-  const seen: string[] = [];
-  page.on('request', (r) => {
-    if (r.resourceType() === 'fetch' && new URL(r.url()).pathname === path) seen.push(r.url());
-  });
-  return seen;
 }
 
 function callAction(page: Page, name: string, ...args: unknown[]) {
@@ -220,34 +174,31 @@ test.describe('ES1-T98 contract', () => {
 
 test.describe('ES1-T98 TE-5 AC7', () => {
   test.beforeEach(async ({ page }) => {
-    const res = await cartApi(page, CART.clear);
-    expect(res.ok(), `${CART.clear} trả ${res.status()}`).toBeTruthy();
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await listen(page);
   });
 
-  test('AC7 openCart ở chế độ drawer: dialog mở, URL không đổi, giỏ theo server, Esc trả focus', async ({ page }) => {
+  test('AC7 openCart ở chế độ drawer: dialog mở, URL không đổi, giỏ theo server, Esc trả focus', async ({ page, cart }) => {
     test.skip(PAGE_MODE, 'Preview đặt cart_type page: không có dialog');
-    await seed(page, [1]);
-    await page.goto('/');
+    cart.seed([1]);
+    await cart.goto('/');
     await actionsReady(page);
     const url = page.url();
-    const refreshes = countRefreshes(page);
     expect(await callAction(page, 'openCart')).toBeNull();
     await expect(dialog(page)).toBeVisible();
     expect(await dialog(page).evaluate((el) => el.matches(':modal'))).toBe(true);
     expect(page.url()).toBe(url);
     expect(await stayed(page)).toBe(true);
-    expect(refreshes).toHaveLength(1);
+    expect(cart.calls.partial).toHaveLength(1);
     await expect(tid(page, 'cart-drawer-body')).toHaveAttribute('data-item-count', String((await readCart(page)).item_count));
     await page.keyboard.press('Escape');
     await expect(dialog(page)).toBeHidden();
     await expect(tid(page, 'header-cart-link')).toBeFocused();
   });
 
-  test('AC7 openCart ở /cart: focus h1, không điều hướng', async ({ page }) => {
-    await seed(page, [1]);
-    await page.goto('/cart');
+  test('AC7 openCart ở /cart: focus h1, không điều hướng', async ({ page, cart }) => {
+    cart.seed([1]);
+    await cart.goto('/cart');
     await actionsReady(page);
     const url = page.url();
     await callAction(page, 'openCart');
@@ -256,9 +207,10 @@ test.describe('ES1-T98 TE-5 AC7', () => {
     expect(await stayed(page)).toBe(true);
   });
 
-  test('AC7 chế độ page: openCart chuyển /cart (flip data-mode trên DOM)', async ({ page }) => {
+  test('AC7 chế độ page: openCart chuyển /cart (flip data-mode trên DOM)', async ({ page, cart }) => {
     test.skip(PAGE_MODE, 'Nhánh thật ở test cart_type page');
-    await page.goto('/');
+    await cart.stubCartDocument();
+    await cart.goto('/');
     await actionsReady(page);
     await tid(page, 'cart-drawer').evaluate((el) => el.setAttribute('data-mode', 'none'));
     const navigated = page.waitForURL(isCart);
@@ -267,88 +219,21 @@ test.describe('ES1-T98 TE-5 AC7', () => {
     await expect(tid(page, 'cart-page')).toBeVisible();
   });
 
-  test('AC7 cart_type page thật: openCart chuyển /cart, updateCart chỉ làm mới cart-count', async ({ page }) => {
+  test('AC7 cart_type page thật: openCart chuyển /cart', async ({ page, cart }) => {
     test.skip(!PAGE_MODE, 'Cần preview đặt cart_type page + EXPECT_CART_TYPE=page (D12)');
-    const variantId = await seed(page, [1]);
-    await page.goto('/');
+    await cart.stubCartDocument();
+    await cart.goto('/');
     await actionsReady(page);
     await expect(dialog(page)).toHaveCount(0);
-    const refreshes = countRefreshes(page);
-    await callAction(page, 'updateCart', { lines: [{ merchandiseId: variantId, quantity: 1 }] });
-    await expect(tid(page, 'header-cart-count')).toHaveText(String((await readCart(page)).item_count));
-    expect(refreshes).toHaveLength(1);
     const navigated = page.waitForURL(isCart);
     await page.evaluate(() => void (window as unknown as Win).Shopify.actions.openCart());
     await navigated;
   });
 
-  test('AC7 getCart mặc định của Shopify: trả giỏ mới sau khi đổi bằng request ngoài', async ({ page }) => {
-    const variantId = await seed(page, [1]);
-    await page.goto('/');
-    await actionsReady(page);
-    const total = (cart: { totalQuantity?: number; item_count?: number }) => cart.totalQuantity ?? cart.item_count;
-    expect(total(await callAction(page, 'getCart'))).toBe(1);
-    const add = await cartApi(page, CART.add, { data: { id: variantId, quantity: 2, properties: { _t98: 'external' } } });
-    expect(add.ok(), `${CART.add} trả ${add.status()}`).toBeTruthy();
-    expect(total(await callAction(page, 'getCart'))).toBe(3);
-    await expect(dialog(page)).toBeHidden();
-  });
-
-  test('AC7 updateCart trên drawer: partial + cart-count khớp /cart.js, 1 refresh, 1 event standard-action, không mở, không reload', async ({ page }) => {
-    test.skip(PAGE_MODE, 'Preview đặt cart_type page: không có dialog');
-    const variantId = await seed(page, [1]);
-    await page.goto('/');
-    await actionsReady(page);
-    const refreshes = countRefreshes(page);
-    const result = await callAction(page, 'updateCart', { lines: [{ merchandiseId: variantId, quantity: 2, attributes: [{ key: '_t98', value: 'action' }] }] });
-    expect(result.userErrors ?? []).toEqual([]);
-    const cart = await readCart(page);
-    expect(cart.item_count).toBe(3);
-    await expect(tid(page, 'cart-drawer-body')).toHaveAttribute('data-item-count', String(cart.item_count));
-    await expect(tid(page, 'cart-line')).toHaveCount(cart.items.length);
-    await expect(tid(page, 'header-cart-count')).toHaveText(String(cart.item_count));
-    expect(refreshes, 'không có refresh lặp').toHaveLength(1);
-    await expect(dialog(page)).toBeHidden();
-    expect(await stayed(page), 'không reload').toBe(true);
-    const list = await entries(page);
-    expect(list.map((e) => e.context), 'override không phát thêm event').toEqual(['standard-action']);
-    expect(list[0].action).toBe('add');
-  });
-
-  test('AC7 updateCart ở /cart: refresh partial cart-page, ô số lượng theo server', async ({ page }) => {
-    await seed(page, [2]);
-    await openPage(page);
-    await actionsReady(page);
-    const { items } = await readCart(page);
-    const key = items[0].key;
-    const refreshes = countRefreshes(page);
-    await callAction(page, 'updateCart', { lines: [{ id: key, quantity: 3 }] });
-    const cart = await readCart(page);
-    await expect(tid(page, 'cart-page-body')).toHaveAttribute('data-item-count', String(cart.item_count));
-    await expect(tid(page, 'header-cart-count')).toHaveText(String(cart.item_count));
-    await expect(quantityOf(page, cart.items[0].key)).toHaveValue(String(cart.items[0].quantity));
-    expect(refreshes).toHaveLength(1);
-    expect(await stayed(page), 'không reload').toBe(true);
-  });
-
-  test('AC7 updateCart: refresh partial lỗi không ném, giỏ vẫn đổi', async ({ page, guard }) => {
-    test.skip(PAGE_MODE, 'Preview đặt cart_type page: không có dialog');
-    guard.allowNetworkLog();
-    const variantId = await seed(page, [1]);
-    await page.goto('/');
-    await actionsReady(page);
-    const path = new URL(page.url()).pathname;
-    await page.route((u) => u.pathname === path, (route: Route) => (route.request().resourceType() === 'fetch' ? route.abort() : route.fallback()));
-    await callAction(page, 'updateCart', { lines: [{ merchandiseId: variantId, quantity: 1, attributes: [{ key: '_t98', value: 'fail' }] }] });
-    expect((await readCart(page)).item_count).toBe(2);
-    expect(await stayed(page)).toBe(true);
-    await expect(dialog(page)).not.toHaveAttribute('aria-busy', /.*/);
-  });
-
-  test('AC7 thêm giỏ từ trang sản phẩm: đúng 1 event context product, không dispatch lần 2', async ({ page }) => {
+  test('AC7 thêm giỏ từ trang sản phẩm: đúng 1 event context product, không dispatch lần 2', async ({ page, cart }) => {
     test.skip(PAGE_MODE, 'Preview đặt cart_type page: thêm giỏ rời trang');
     test.skip(!HANDLE, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-    await page.goto(`/products/${HANDLE}`);
+    await cart.goto(`/products/${HANDLE}`);
     await actionsReady(page);
     const add = tid(page, 'product-form-add');
     test.skip(await add.isDisabled(), 'Variant mặc định hết hàng');
@@ -365,10 +250,10 @@ test.describe('ES1-T98 TE-5 AC7', () => {
 
   for (const surface of SURFACES) {
     test.describe(surface.name, () => {
-      test(`AC7 đổi số lượng: 1 event update context ${surface.context}, promise có cart`, async ({ page }) => {
-        await seed(page, [1]);
-        await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+      test(`AC7 đổi số lượng: 1 event update context ${surface.context}, promise có cart`, async ({ page, cart }) => {
+        cart.seed([1]);
+        await surface.open(page, cart);
+        const [key] = await lineKeys(page);
         await changeAndWait(page, key, '2');
         const list = await settled(page);
         expect(list).toHaveLength(1);
@@ -377,9 +262,9 @@ test.describe('ES1-T98 TE-5 AC7', () => {
         expect(list[0].userErrors).toEqual([]);
       });
 
-      test('AC7 xoá bằng Remove: 1 event remove, quantity 0, promise có cart', async ({ page }) => {
-        await seed(page, [1, 1]);
-        await surface.open(page);
+      test('AC7 xoá bằng Remove: 1 event remove, quantity 0, promise có cart', async ({ page, cart }) => {
+        cart.seed([1, 1]);
+        await surface.open(page, cart);
         const line = tid(page, 'cart-line').first();
         const key = (await line.getAttribute('data-line-key'))!;
         await line.getByTestId('cart-line-remove').click();
@@ -391,20 +276,20 @@ test.describe('ES1-T98 TE-5 AC7', () => {
         expect(list[0].hasCart).toBe(true);
       });
 
-      test('AC7 nhập 0: event remove', async ({ page }) => {
-        await seed(page, [1]);
-        await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+      test('AC7 nhập 0: event remove', async ({ page, cart }) => {
+        cart.seed([1]);
+        await surface.open(page, cart);
+        const [key] = await lineKeys(page);
         await changeAndWait(page, key, '0');
         const list = await settled(page);
         expect(list).toHaveLength(1);
         expectLineEvent(list[0], 'remove', surface.context, key, 0);
       });
 
-      test('AC7 debounce: 3 lần đổi trong 300 ms chỉ 1 event, 1 POST', async ({ page }) => {
-        await seed(page, [1]);
-        await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+      test('AC7 debounce: 3 lần đổi trong 300 ms chỉ 1 event, 1 POST', async ({ page, cart }) => {
+        cart.seed([1]);
+        await surface.open(page, cart);
+        const [key] = await lineKeys(page);
         const response = page.waitForResponse((r) => r.url().includes(CART.change));
         await quantityOf(page, key).evaluate((el: HTMLInputElement) => {
           for (const value of ['2', '3', '2']) {
@@ -417,24 +302,25 @@ test.describe('ES1-T98 TE-5 AC7', () => {
         const list = await settled(page);
         expect(list).toHaveLength(1);
         expect(list[0].lines).toEqual([{ id: key, quantity: 2 }]);
+        expect(cart.calls.change).toHaveLength(1);
       });
 
-      test('AC7 ô trống: không event', async ({ page }) => {
-        await seed(page, [2]);
-        await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+      test('AC7 ô trống: không event', async ({ page, cart }) => {
+        cart.seed([2]);
+        await surface.open(page, cart);
+        const [key] = await lineKeys(page);
         await setQuantity(page, key, '');
         await expect(quantityOf(page, key)).toHaveValue('2');
         await page.waitForTimeout(500);
         expect(await entries(page)).toEqual([]);
       });
 
-      test('AC7 mock 422: resolve cart null + userErrors, không reject', async ({ page, guard }) => {
+      test('AC7 mock 422: resolve cart null + userErrors, không reject', async ({ page, cart, guard }) => {
         guard.allowNetworkLog();
-        await seed(page, [1]);
-        await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
-        await page.route(CHANGE, (route: Route) => route.fulfill({ status: 422, json: { status: 422, message: 'Cart Error', description: MOCK_422 } }));
+        cart.seed([1]);
+        await surface.open(page, cart);
+        const [key] = await lineKeys(page);
+        cart.respond('change', { status: 422, json: { status: 422, message: 'Cart Error', description: MOCK_422 } });
         await changeAndWait(page, key, '99');
         await expect(tid(page, 'cart-items-error')).toHaveText(MOCK_422);
         const list = await settled(page);
@@ -444,13 +330,13 @@ test.describe('ES1-T98 TE-5 AC7', () => {
         expect(list[0].userErrors).toEqual([{ message: MOCK_422 }]);
       });
 
-      test('AC7 route.abort: resolve cart null + userErrors là data-label-error, 0 pageerror', async ({ page, guard }) => {
+      test('AC7 route.abort: resolve cart null + userErrors là data-label-error, 0 pageerror', async ({ page, cart, guard }) => {
         guard.allowNetworkLog();
-        await seed(page, [1]);
-        await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+        cart.seed([1]);
+        await surface.open(page, cart);
+        const [key] = await lineKeys(page);
         const message = await tid(page, 'cart-items').getAttribute('data-label-error');
-        await page.route(CHANGE, (route: Route) => route.abort());
+        cart.respond('change', { abort: true });
         await setQuantity(page, key, '2');
         await expect(tid(page, 'cart-items-error')).toHaveText(message!);
         const list = await settled(page);
@@ -462,13 +348,13 @@ test.describe('ES1-T98 TE-5 AC7', () => {
     });
   }
 
-  test('AC7 thư viện CDN lỗi: không event, đổi số lượng vẫn chạy', async ({ page, guard }) => {
+  test('AC7 thư viện CDN lỗi: không event, đổi số lượng vẫn chạy', async ({ page, cart, guard }) => {
     guard.allowNetworkLog();
-    await seed(page, [1]);
-    await page.route(CDN, (route: Route) => route.abort());
-    await page.goto('/cart');
+    cart.seed([1]);
+    await page.route(CDN, (route) => route.abort());
+    await cart.goto('/cart');
     await expect(tid(page, 'cart-items')).toHaveAttribute('data-enhanced', '', { timeout: 15_000 });
-    const key = (await readCart(page)).items[0].key;
+    const [key] = await lineKeys(page);
     await changeAndWait(page, key, '2');
     expect(await entries(page)).toEqual([]);
     expect((await readCart(page)).items[0].quantity).toBe(2);

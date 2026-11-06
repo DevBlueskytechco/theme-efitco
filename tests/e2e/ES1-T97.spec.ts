@@ -1,68 +1,25 @@
-// KHÔNG CHẮC: spec chưa chạy (phiên agent không mở được trình duyệt) → chờ CI.
 // Ticket ES1-T97 TE-5-BE2: assets/cart-items.js (docs/srs.md#TE-5 AC2, AC4; drafts/techlead/ES1-T89/task-split.md D8, D10, D11).
-// Chạy: PREVIEW_URL=... STORE_PASSWORD=... [TE5_LIMITED_HANDLE=...] [EXPECT_CART_TYPE=page] npx playwright test tests/e2e/ES1-T97.spec.ts -g "AC2|AC4"
-// Drawer: có assets/cart-drawer.js (ES1-T96) thì mở bằng cart link; chưa có thì showModal + import data-items-src, để spec chạy được theo cả 2 thứ tự merge.
-import { test as base, expect, type Page, type Route } from '@playwright/test';
+// ES1-T203: Cart API và partial mock trong bộ nhớ (support/cart-mock.ts), trang và JS thật, 0 request Cart API tới store. Luồng thật ở ES1-T203.spec.ts.
+// Chạy: PREVIEW_URL=... STORE_PASSWORD=... [EXPECT_CART_TYPE=page] npx playwright test tests/e2e/ES1-T97.spec.ts -g "AC2|AC4"
+import type { Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { env } from './support/store-data';
-import { CART, CART_GLOB, cartApi } from './support/cart-api';
-import { productData, readCartJson } from './support/product-data';
-import { watchShopPay403 } from './support/console-guard';
+import { expect, test, type AjaxCart, type MockCart } from './support/cart-mock';
+import { CART } from './support/cart-api';
+import { lineKeys } from './support/cart-seed';
+import { readCartJson } from './support/product-data';
 
-type CartItem = { key: string; quantity: number; final_line_price: number };
-type Cart = { item_count: number; total_price: number; items: CartItem[] };
-type Guard = { allowNetworkLog: () => void };
-type Surface = { name: string; open: (page: Page) => Promise<void> };
+type Surface = { name: string; open: (page: Page, cart: MockCart) => Promise<void> };
 
-const HANDLE = env('TE4_VARIANTS_HANDLE', 'TE4_SINGLE_HANDLE');
-const LIMITED = env('TE5_LIMITED_HANDLE');
 const PAGE_MODE = process.env.EXPECT_CART_TYPE === 'page';
-const CHANGE = CART_GLOB.change;
-const IGNORE_CONSOLE = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)|status of 429/i;
-const NETWORK_LOG = /Failed to load resource/i;
 const MOCK_422 = 'ES1-T97 mock: only 1 item available.';
-
-const test = base.extend<{ guard: Guard }>({
-  guard: [
-    async ({ page }, use, info) => {
-      const errors: string[] = [];
-      let allowNetwork = false;
-      const isShopPay403 = watchShopPay403(page);
-      page.on('console', (msg) => {
-        if (msg.type() !== 'error') return;
-        if (isShopPay403(msg)) return;
-        const text = msg.text();
-        const source = msg.location().url;
-        if (IGNORE_CONSOLE.test(text) || IGNORE_CONSOLE.test(source)) return;
-        if (allowNetwork && NETWORK_LOG.test(text)) return;
-        errors.push(`${text} @ ${source}`);
-      });
-      page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
-      await use({ allowNetworkLog: () => (allowNetwork = true) });
-      if (info.status !== 'skipped') expect(errors, `console error:\n${errors.join('\n')}`).toEqual([]);
-    },
-    { auto: true },
-  ],
-});
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
 const digits = (text: string | null) => (text ?? '').replace(/\D/g, '');
-const readCart = (page: Page) => readCartJson<Cart>(page);
+const readCart = (page: Page) => readCartJson<AjaxCart>(page);
 const quantityOf = (page: Page, key: string) => page.locator(`[data-line-key="${key}"] [data-testid="cart-line-quantity"]`);
 const stayed = (page: Page) => page.evaluate(() => (window as unknown as { __t97?: number }).__t97 === 1);
-
-// Thêm dòng cùng variant, khác property ẩn: mỗi dòng 1 line key riêng, không cần sản phẩm thứ 2 (D8).
-async function seed(page: Page, quantities: number[], handle = HANDLE) {
-  test.skip(!handle, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-  await page.goto(`/products/${handle}`);
-  const variant = (await productData(page, handle!)).variants.find((v) => v.available);
-  test.skip(!variant, `${handle} không có variant bán được`);
-  const items = quantities.map((quantity, i) => ({ id: variant!.id, quantity, properties: { _t97: String(i) } }));
-  const res = await cartApi(page, CART.add, { data: { items } });
-  expect(res.ok(), `${CART.add} trả ${res.status()}`).toBeTruthy();
-}
 
 async function ready(page: Page) {
   await expect(tid(page, 'cart-items')).toHaveAttribute('data-enhanced', '', { timeout: 15_000 });
@@ -74,27 +31,21 @@ async function ready(page: Page) {
   });
 }
 
-async function openPage(page: Page) {
-  await page.goto('/cart');
+async function openPage(page: Page, cart: MockCart) {
+  await cart.goto('/cart');
   await ready(page);
 }
 
-async function openDrawer(page: Page) {
+async function openDrawer(page: Page, cart: MockCart) {
   test.skip(PAGE_MODE, 'Preview đặt cart_type page: không có dialog');
-  await page.goto('/');
-  if (await page.locator('script[src*="cart-drawer.js"]').count()) {
-    await page.waitForFunction(() => !!customElements.get('cart-drawer'));
-    await tid(page, 'header-cart-link').click();
-    await expect(tid(page, 'cart-drawer-dialog')).toBeVisible();
-    await expect(tid(page, 'cart-drawer-dialog')).not.toHaveAttribute('aria-busy', /.*/);
-  } else {
-    await page.evaluate(async () => {
-      const root = document.querySelector('cart-drawer') as HTMLElement;
-      root.querySelector('dialog')!.showModal();
-      await import(root.dataset.itemsSrc!);
-    });
-  }
+  await cart.goto('/');
+  await page.waitForFunction(() => !!customElements.get('cart-drawer'));
+  await tid(page, 'header-cart-link').click();
+  await expect(tid(page, 'cart-drawer-dialog')).toBeVisible();
+  await expect(tid(page, 'cart-drawer-dialog')).not.toHaveAttribute('aria-busy', /.*/);
   await ready(page);
+  // Refresh lúc mở drawer không tính vào phần test đếm.
+  cart.calls.partial.length = 0;
 }
 
 // fill không phát change với input number cho tới khi blur; phát tay để focus nằm yên trong ô.
@@ -115,35 +66,17 @@ async function changeAndWait(page: Page, key: string, value: string) {
 }
 
 async function expectTotals(page: Page) {
-  const cart = await readCart(page);
-  if (cart.item_count > 0) expect(digits(await tid(page, 'cart-total').textContent())).toBe(String(cart.total_price));
-  if (cart.item_count > 0) await expect(tid(page, 'header-cart-count')).toHaveText(String(cart.item_count));
+  const state = await readCart(page);
+  if (state.item_count > 0) expect(digits(await tid(page, 'cart-total').textContent())).toBe(String(state.total_price));
+  if (state.item_count > 0) await expect(tid(page, 'header-cart-count')).toHaveText(String(state.item_count));
   else await expect(tid(page, 'header-cart-count')).toHaveCount(0);
-  return cart;
+  return state;
 }
 
 async function expectNoSeriousAxe(page: Page) {
   const { violations } = await new AxeBuilder({ page }).include('[data-testid="cart-items"]').analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
-}
-
-// Partial fetch cùng pathname với trang (url: location.href), /cart.js và cart/change.js khác pathname.
-function countRefreshes(page: Page) {
-  const path = new URL(page.url()).pathname;
-  const seen: string[] = [];
-  page.on('request', (r) => {
-    if (r.resourceType() === 'fetch' && new URL(r.url()).pathname === path) seen.push(r.url());
-  });
-  return seen;
-}
-
-function countWrites(page: Page) {
-  const seen: { id: string; quantity: number }[] = [];
-  page.on('request', (r) => {
-    if (r.url().includes(CART.change)) seen.push(r.postDataJSON());
-  });
-  return seen;
 }
 
 const events = (page: Page) => page.evaluate(() => (window as unknown as { __t97Events: string[] }).__t97Events);
@@ -191,52 +124,42 @@ const SURFACES: Surface[] = [
 for (const surface of SURFACES) {
   test.describe(`ES1-T97 TE-5 ${surface.name}`, () => {
     test.beforeEach(async ({ page }) => {
-      await cartApi(page, CART.clear);
       await page.emulateMedia({ reducedMotion: 'reduce' });
     });
 
-    test('AC2 đổi số lượng: tổng và cart-count theo /cart.js, không reload, giữ focus, aria-busy, status, event', async ({ page }) => {
-      await seed(page, [1]);
-      await surface.open(page);
-      const { items } = await readCart(page);
-      const key = items[0].key;
+    test('AC2 đổi số lượng: tổng và cart-count theo /cart.js, không reload, giữ focus, aria-busy, status, event', async ({ page, cart }) => {
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
       await expect(tid(page, 'cart-update')).toBeHidden();
       await expect(tid(page, 'cart-items')).not.toHaveAttribute('aria-busy', /.*/);
-      const refreshes = countRefreshes(page);
 
       // Giữ POST để chắc chắn quan sát được trạng thái đang tải.
-      let release = () => {};
-      const held = new Promise<void>((r) => (release = r));
-      await page.route(CHANGE, async (route: Route) => {
-        await held;
-        await route.continue();
-      });
+      const release = cart.hold('change');
       await setQuantity(page, key, '2');
       await expect(tid(page, 'cart-items')).toHaveAttribute('aria-busy', 'true');
       await expect(tid(page, 'cart-checkout')).toBeDisabled();
       release();
       await idle(page);
-      await page.unroute(CHANGE);
 
-      const cart = await expectTotals(page);
-      expect(cart.items[0].quantity).toBe(2);
+      const state = await expectTotals(page);
+      expect(state.items[0].quantity).toBe(2);
       await expect(quantityOf(page, key)).toHaveValue('2');
       await expect(quantityOf(page, key)).toBeFocused();
       await expect(tid(page, 'cart-checkout')).toBeEnabled();
-      expect(digits(await tid(page, 'cart-line-total').textContent())).toBe(String(cart.items[0].final_line_price));
+      expect(digits(await tid(page, 'cart-line-total').textContent())).toBe(String(state.items[0].final_line_price));
       await expect(tid(page, 'cart-items-status')).toHaveText((await label(page, 'updated'))!);
       await expect(tid(page, 'cart-items-error')).toBeEmpty();
       expect(await stayed(page), 'không reload').toBe(true);
-      expect(refreshes, '1 lần refresh partial').toHaveLength(1);
+      expect(cart.calls.partial, '1 lần refresh partial').toHaveLength(1);
       expect(await events(page)).toEqual(['cart-items']);
       await expectNoSeriousAxe(page);
     });
 
-    test('AC2 debounce: đổi liên tiếp trong 300 ms chỉ gửi 1 POST với số cuối', async ({ page }) => {
-      await seed(page, [1]);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
-      const writes = countWrites(page);
+    test('AC2 debounce: đổi liên tiếp trong 300 ms chỉ gửi 1 POST với số cuối', async ({ page, cart }) => {
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
       const response = page.waitForResponse((r) => r.url().includes(CART.change));
       await quantityOf(page, key).evaluate((el: HTMLInputElement) => {
         for (const value of ['2', '3', '2']) {
@@ -246,75 +169,52 @@ for (const surface of SURFACES) {
       });
       await response;
       await idle(page);
-      expect(writes).toEqual([{ id: key, quantity: 2 }]);
+      expect(cart.calls.change).toEqual([{ id: key, quantity: 2 }]);
       expect((await expectTotals(page)).items[0].quantity).toBe(2);
     });
 
-    test('AC2 ghi tuần tự: 2 dòng đổi cùng lúc không chồng POST, đúng line key, 1 lần refresh', async ({ page }) => {
-      await seed(page, [1, 1]);
-      await surface.open(page);
-      const [a, b] = (await readCart(page)).items.map((i) => i.key);
-      const refreshes = countRefreshes(page);
-      const writes = countWrites(page);
-      let release = () => {};
-      const held = new Promise<void>((r) => (release = r));
-      let first = true;
-      await page.route(CHANGE, async (route: Route) => {
-        if (first) {
-          first = false;
-          await held;
-        }
-        await route.continue();
-      });
+    test('AC2 ghi tuần tự: 2 dòng đổi cùng lúc không chồng POST, đúng line key, 1 lần refresh', async ({ page, cart }) => {
+      cart.seed([1, 1]);
+      await surface.open(page, cart);
+      const [a, b] = await lineKeys(page);
+      const release = cart.hold('change');
       await setQuantity(page, a, '2');
       await setQuantity(page, b, '3');
-      await expect.poll(() => writes.length).toBe(1);
+      await expect.poll(() => cart.calls.change.length).toBe(1);
       // Quá debounce của dòng thứ 2 mà POST đầu chưa xong: không được có POST thứ 2.
       await page.waitForTimeout(500);
-      expect(writes).toHaveLength(1);
+      expect(cart.calls.change).toHaveLength(1);
       release();
-      await expect.poll(() => writes.length).toBe(2);
+      await expect.poll(() => cart.calls.change.length).toBe(2);
       await idle(page);
-      await page.unroute(CHANGE);
-      const cart = await expectTotals(page);
-      expect(cart.items.find((i) => i.key === a)?.quantity).toBe(2);
-      expect(cart.items.find((i) => i.key === b)?.quantity).toBe(3);
+      const state = await expectTotals(page);
+      expect(state.items.find((i) => i.key === a)?.quantity).toBe(2);
+      expect(state.items.find((i) => i.key === b)?.quantity).toBe(3);
       await expect(quantityOf(page, a)).toHaveValue('2');
       await expect(quantityOf(page, b)).toHaveValue('3');
-      expect(refreshes, 'gộp 1 refresh cho cả hàng đợi').toHaveLength(1);
+      expect(cart.calls.partial, 'gộp 1 refresh cho cả hàng đợi').toHaveLength(1);
     });
 
-    test('AC2 đổi trong lúc refresh: huỷ refresh cũ, kết quả theo lần đổi cuối, không lỗi', async ({ page }) => {
-      await seed(page, [1]);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
-      const path = new URL(page.url()).pathname;
-      let release = () => {};
-      const held = new Promise<void>((r) => (release = r));
-      let count = 0;
-      await page.route(
-        (url) => url.pathname === path,
-        async (route: Route) => {
-          if (route.request().resourceType() !== 'fetch') return route.fallback();
-          if (++count === 1) await held;
-          await route.continue().catch(() => {});
-        },
-      );
+    test('AC2 đổi trong lúc refresh: huỷ refresh cũ, kết quả theo lần đổi cuối, không lỗi', async ({ page, cart }) => {
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
+      const release = cart.hold('partial');
       await setQuantity(page, key, '2');
-      await expect.poll(() => count).toBe(1);
+      await expect.poll(() => cart.calls.partial.length).toBe(1);
       await changeAndWait(page, key, '3');
       release();
-      expect(count, 'refresh thứ 2 sau lần đổi cuối').toBe(2);
-      const cart = await expectTotals(page);
-      expect(cart.items[0].quantity).toBe(3);
+      expect(cart.calls.partial, 'refresh thứ 2 sau lần đổi cuối').toHaveLength(2);
+      const state = await expectTotals(page);
+      expect(state.items[0].quantity).toBe(3);
       await expect(quantityOf(page, key)).toHaveValue('3');
       await expect(tid(page, 'cart-items-error')).toBeEmpty();
     });
 
-    test('AC2 Enter trong ô số lượng không rời trang', async ({ page }) => {
-      await seed(page, [1]);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+    test('AC2 Enter trong ô số lượng không rời trang', async ({ page, cart }) => {
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
       const response = page.waitForResponse((r) => r.url().includes(CART.change));
       await quantityOf(page, key).fill('2');
       await quantityOf(page, key).press('Enter');
@@ -324,20 +224,20 @@ for (const surface of SURFACES) {
       expect((await expectTotals(page)).items[0].quantity).toBe(2);
     });
 
-    test('AC2 ô để trống: về số cũ, không gửi POST', async ({ page }) => {
-      await seed(page, [2]);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
-      const writes = countWrites(page);
+    test('AC2 ô để trống: về số cũ, không gửi POST', async ({ page, cart }) => {
+      cart.seed([2]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
       await setQuantity(page, key, '');
       await expect(quantityOf(page, key)).toHaveValue('2');
-      expect(writes).toEqual([]);
+      await page.waitForTimeout(500);
+      expect(cart.calls.change).toEqual([]);
     });
 
-    test('AC2 xoá 1 trong 2 dòng: focus sang input dòng kế, tổng đúng, status', async ({ page }) => {
-      await seed(page, [1, 1]);
-      await surface.open(page);
-      const [a, b] = (await readCart(page)).items.map((i) => i.key);
+    test('AC2 xoá 1 trong 2 dòng: focus sang input dòng kế, tổng đúng, status', async ({ page, cart }) => {
+      cart.seed([1, 1]);
+      await surface.open(page, cart);
+      const [a, b] = await lineKeys(page);
       const lines = tid(page, 'cart-line');
       const firstKey = await lines.first().getAttribute('data-line-key');
       const otherKey = firstKey === a ? b : a;
@@ -345,16 +245,16 @@ for (const surface of SURFACES) {
       await expect(lines).toHaveCount(1);
       await idle(page);
       await expect(quantityOf(page, otherKey)).toBeFocused();
-      const cart = await expectTotals(page);
-      expect(cart.items.map((i) => i.key)).toEqual([otherKey]);
+      const state = await expectTotals(page);
+      expect(state.items.map((i) => i.key)).toEqual([otherKey]);
       await expect(tid(page, 'cart-items-status')).toHaveText((await label(page, 'removed'))!);
       expect(await stayed(page), 'không điều hướng theo link Remove').toBe(true);
       await expectNoSeriousAxe(page);
     });
 
-    test('AC2 xoá dòng cuối của danh sách khi còn dòng trước: focus về dòng trước', async ({ page }) => {
-      await seed(page, [1, 1]);
-      await surface.open(page);
+    test('AC2 xoá dòng cuối của danh sách khi còn dòng trước: focus về dòng trước', async ({ page, cart }) => {
+      cart.seed([1, 1]);
+      await surface.open(page, cart);
       const lines = tid(page, 'cart-line');
       const firstKey = await lines.first().getAttribute('data-line-key');
       await lines.last().getByTestId('cart-line-remove').click();
@@ -363,9 +263,9 @@ for (const surface of SURFACES) {
       await expect(quantityOf(page, firstKey!)).toBeFocused();
     });
 
-    test('AC4 xoá dòng cuối: trạng thái rỗng, focus đúng, accelerated ẩn, cart-count mất', async ({ page }) => {
-      await seed(page, [1]);
-      await surface.open(page);
+    test('AC4 xoá dòng cuối: trạng thái rỗng, focus đúng, accelerated ẩn, cart-count mất', async ({ page, cart }) => {
+      cart.seed([1]);
+      await surface.open(page, cart);
       await tid(page, 'cart-line-remove').click();
       await expect(tid(page, 'cart-empty')).toBeVisible();
       await idle(page);
@@ -380,72 +280,71 @@ for (const surface of SURFACES) {
       await expectNoSeriousAxe(page);
     });
 
-    test('AC4 nhập 0 cũng xoá dòng, về trạng thái rỗng', async ({ page }) => {
-      await seed(page, [1]);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+    test('AC4 nhập 0 cũng xoá dòng, về trạng thái rỗng', async ({ page, cart }) => {
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
       await changeAndWait(page, key, '0');
       await expect(tid(page, 'cart-empty')).toBeVisible();
       expect((await expectTotals(page)).item_count).toBe(0);
     });
 
-    test('AC2 mock 422: text API trong cart-items-error, input về số server, không refresh, không event', async ({ page }) => {
-      await seed(page, [1]);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
-      const refreshes = countRefreshes(page);
-      await page.route(CHANGE, (route: Route) => route.fulfill({ status: 422, json: { status: 422, message: 'Cart Error', description: MOCK_422 } }));
+    test('AC2 mock 422: text API trong cart-items-error, input về số server, không refresh, không event', async ({ page, cart, guard }) => {
+      guard.allowNetworkLog();
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
+      cart.respond('change', { status: 422, json: { status: 422, message: 'Cart Error', description: MOCK_422 } });
       await changeAndWait(page, key, '99');
       await expect(tid(page, 'cart-items-error')).toHaveText(MOCK_422);
       await expect(quantityOf(page, key)).toHaveValue('1');
       await expect(quantityOf(page, key)).toBeFocused();
       await expect(tid(page, 'cart-items-status')).toBeEmpty();
       await expect(tid(page, 'cart-checkout')).toBeEnabled();
-      expect(refreshes).toEqual([]);
+      expect(cart.calls.partial).toEqual([]);
       expect(await events(page)).toEqual([]);
       await expectNoSeriousAxe(page);
     });
 
-    test('AC2 mock 200 giảm quantity: input theo server và có thông báo', async ({ page }) => {
-      await seed(page, [2]);
-      await surface.open(page);
-      const cart = await readCart(page);
-      const key = cart.items[0].key;
-      // Response đúng bằng giỏ thật (số 2) dù yêu cầu 5: partial và /cart.js vẫn khớp, apply giữ số 5 nên JS phải gán lại.
-      await page.route(CHANGE, (route: Route) => route.fulfill({ status: 200, json: cart }));
+    test('AC2 mock 200 giảm quantity: input theo server và có thông báo', async ({ page, cart }) => {
+      cart.seed([2]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
+      // Giới hạn tồn trong giỏ mock: yêu cầu 5 nhưng server còn 2, partial và /cart.js đều theo số 2; apply giữ số 5 nên JS phải gán lại.
+      cart.stock = 2;
       await changeAndWait(page, key, '5');
       await expect(quantityOf(page, key)).toHaveValue('2');
       await expect(tid(page, 'cart-items-status')).toHaveText((await label(page, 'quantity-adjusted'))!);
       await expect(tid(page, 'cart-items-error')).toBeEmpty();
       await expect(quantityOf(page, key)).toBeFocused();
+      expect((await expectTotals(page)).items[0].quantity).toBe(2);
     });
 
-    test('AC2 route.abort: input về cũ, data-label-error, nút bật lại, đổi lại được', async ({ page, guard }) => {
+    test('AC2 route.abort: input về cũ, data-label-error, nút bật lại, đổi lại được', async ({ page, cart, guard }) => {
       guard.allowNetworkLog();
-      await seed(page, [1]);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
-      const refreshes = countRefreshes(page);
-      await page.route(CHANGE, (route: Route) => route.abort());
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
+      cart.respond('change', { abort: true });
       await setQuantity(page, key, '2');
       await expect(tid(page, 'cart-items-error')).toHaveText((await label(page, 'error'))!);
       await idle(page);
       await expect(quantityOf(page, key)).toHaveValue('1');
       await expect(tid(page, 'cart-checkout')).toBeEnabled();
-      expect(refreshes).toEqual([]);
+      expect(cart.calls.partial).toEqual([]);
 
-      await page.unroute(CHANGE);
+      cart.reset('change');
       await changeAndWait(page, key, '2');
       await expect(tid(page, 'cart-items-error')).toBeEmpty();
       expect((await expectTotals(page)).items[0].quantity).toBe(2);
     });
 
-    test('AC2 mock 500: input về cũ, data-label-error, Remove không đổi giỏ', async ({ page, guard }) => {
+    test('AC2 mock 500: input về cũ, data-label-error, Remove không đổi giỏ', async ({ page, cart, guard }) => {
       guard.allowNetworkLog();
-      await seed(page, [1]);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
-      await page.route(CHANGE, (route: Route) => route.fulfill({ status: 500, contentType: 'text/html', body: '<h1>500</h1>' }));
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
+      cart.respond('change', { status: 500, html: '<h1>500</h1>' });
       await changeAndWait(page, key, '2');
       await expect(tid(page, 'cart-items-error')).toHaveText((await label(page, 'error'))!);
       await expect(quantityOf(page, key)).toHaveValue('1');
@@ -460,16 +359,12 @@ for (const surface of SURFACES) {
       expect((await readCart(page)).item_count).toBe(1);
     });
 
-    test('AC2 refresh partial lỗi: số lượng theo server, báo lỗi, hết busy', async ({ page, guard }) => {
+    test('AC2 refresh partial lỗi: số lượng theo server, báo lỗi, hết busy', async ({ page, cart, guard }) => {
       guard.allowNetworkLog();
-      await seed(page, [1]);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
-      const path = new URL(page.url()).pathname;
-      await page.route(
-        (url) => url.pathname === path,
-        (route: Route) => (route.request().resourceType() === 'fetch' ? route.abort() : route.fallback()),
-      );
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
+      cart.respond('partial', { abort: true });
       await changeAndWait(page, key, '2');
       await expect(tid(page, 'cart-items-error')).toHaveText((await label(page, 'error'))!);
       await expect(quantityOf(page, key)).toHaveValue('2');
@@ -477,42 +372,39 @@ for (const surface of SURFACES) {
       expect((await readCart(page)).items[0].quantity).toBe(2);
     });
 
-    test('AC2 quá tồn thật trên store: input về số server, có thông báo', async ({ page }) => {
-      test.skip(!LIMITED, 'Thiếu TE5_LIMITED_HANDLE (ES1-T91 #7): store dev chưa có sản phẩm giới hạn tồn; nhánh 422 và 200 giảm đã có test mock');
-      await seed(page, [1], LIMITED);
-      await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
-      await changeAndWait(page, key, '9999');
-      const cart = await expectTotals(page);
-      const quantity = cart.items[0].quantity;
-      expect(quantity).toBeLessThan(9999);
-      await expect(quantityOf(page, key)).toHaveValue(String(quantity));
-      const message = `${await tid(page, 'cart-items-error').textContent()}${await tid(page, 'cart-items-status').textContent()}`;
-      expect(message.trim()).not.toBe('');
+    test('AC2 POST chậm: vẫn busy trong lúc chờ, xong thì đúng số', async ({ page, cart }) => {
+      cart.seed([1]);
+      await surface.open(page, cart);
+      const [key] = await lineKeys(page);
+      cart.respond('change', { delayMs: 800, times: 1 });
+      await setQuantity(page, key, '4');
+      await expect(tid(page, 'cart-items')).toHaveAttribute('aria-busy', 'true');
+      await idle(page);
+      await expect(quantityOf(page, key)).toHaveValue('4');
+      expect((await readCart(page)).items[0].quantity).toBe(4);
     });
   });
 }
 
 test.describe('ES1-T97 progressive enhancement', () => {
-  test('AC2 script lỗi: không data-enhanced, nút Update còn, Remove vẫn là link', async ({ page, guard }) => {
+  test('AC2 script lỗi: không data-enhanced, nút Update còn, Remove vẫn là link', async ({ page, cart, guard }) => {
     guard.allowNetworkLog();
-    await seed(page, [1]);
-    await page.route('**/cart-items.js*', (route: Route) => route.abort());
-    await page.goto('/cart');
+    cart.seed([1]);
+    await page.route('**/cart-items.js*', (route) => route.abort());
+    await cart.goto('/cart');
     await expect(tid(page, 'cart-update')).toBeVisible();
     await expect(tid(page, 'cart-items')).not.toHaveAttribute('data-enhanced', /.*/);
     await expect(tid(page, 'cart-line-remove')).toHaveAttribute('href', /\/cart\/change/);
   });
 
-  test('AC2 note ở /cart: đổi textarea không gửi POST và không bị hàng đợi đụng tới', async ({ page }) => {
-    await seed(page, [1]);
-    await openPage(page);
-    const key = (await readCart(page)).items[0].key;
-    const writes = countWrites(page);
+  test('AC2 note ở /cart: đổi textarea không gửi POST và không bị hàng đợi đụng tới', async ({ page, cart }) => {
+    cart.seed([1]);
+    await openPage(page, cart);
+    const [key] = await lineKeys(page);
     await tid(page, 'cart-page-note').fill('ES1-T97 note');
     await tid(page, 'cart-page-note').blur();
     await page.waitForTimeout(500);
-    expect(writes).toEqual([]);
+    expect(cart.calls.change).toEqual([]);
     await changeAndWait(page, key, '2');
     await expect(tid(page, 'cart-page-note')).toHaveValue('ES1-T97 note');
   });

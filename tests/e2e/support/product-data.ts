@@ -6,6 +6,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { basename } from 'node:path';
 import { getJson } from './http';
+import { record429 } from './report-429';
 
 export type JsonResult<T> = { ok: boolean; status: number; body: T | null };
 export type ProductVariant = { id: number; available: boolean; price: number };
@@ -46,6 +47,7 @@ export function requireJson<T>(r: JsonResult<T>, label: string): T {
   if (r.status === 429) {
     const reason = `Shopify trả 429 cho ${label} sau khi thử lại (giới hạn store dev)`;
     console.log(`[ES1-T100] ${reason} (${basename(test.info().file)})`);
+    record429('skip', basename(test.info().file));
     test.skip(true, reason);
   }
   expect(r.ok && r.body !== null, `${label} trả ${r.status}`).toBeTruthy();

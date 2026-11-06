@@ -1,61 +1,31 @@
-// KHÔNG CHẮC: spec chưa chạy (phiên agent không mở được trình duyệt, không có node_modules) → chờ CI.
 // Ticket ES1-T96 TE-5-BE1: assets/cart-drawer.js + assets/product-form.js (docs/srs.md#TE-5 AC1, AC6; TE-4 AC8; drafts/techlead/ES1-T89/task-split.md D7, D10, D11).
+// ES1-T203: Cart API và partial mock trong bộ nhớ (support/cart-mock.ts), trang và JS thật, 0 request Cart API tới store. Luồng thật ở ES1-T203.spec.ts.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... [EXPECT_CART_TYPE=page] npx playwright test tests/e2e/ES1-T96.spec.ts -g "AC1|AC6|AC8"
 // Preview chỉ có 1 giá trị cart_type: AC6 flip data-cart-type trên DOM; EXPECT_CART_TYPE=page chạy nhánh thật (D12).
-import { test as base, expect, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
-import { CART, CART_GLOB, cartApi } from './support/cart-api';
+import { expect, test, type AjaxCart, type MockCart } from './support/cart-mock';
 import { readCartJson } from './support/product-data';
-import { watchShopPay403 } from './support/console-guard';
-
-type CartJs = { item_count: number; items: { key: string; variant_id: number; quantity: number }[] };
-type Guard = { allowNetworkLog: () => void };
 
 const HANDLE = env('TE4_VARIANTS_HANDLE', 'TE4_SINGLE_HANDLE');
 const PAGE_MODE = process.env.EXPECT_CART_TYPE === 'page';
 const ROOT = process.cwd();
-const IGNORE_CONSOLE = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)|status of 429/i;
-const NETWORK_LOG = /Failed to load resource/i;
-// assets/cart-items.js thuộc ES1-T97, chưa có thì lần mở đầu import 404. Chỉ bỏ log mạng của đúng file này; lỗi JS vẫn bị bắt.
 const ITEMS_ASSET = /\/cart-items\.js/;
 const MOCK_422 = { status: 422, message: 'Cart Error', description: 'ES1-T96 mock: sold out.' };
 
 const isCart = (url: URL) => /\/cart\/?$/.test(url.pathname);
-
-const test = base.extend<{ guard: Guard }>({
-  guard: [
-    async ({ page }, use, info) => {
-      const errors: string[] = [];
-      let allowNetwork = false;
-      const isShopPay403 = watchShopPay403(page);
-      page.on('console', (msg) => {
-        if (msg.type() !== 'error') return;
-        if (isShopPay403(msg)) return;
-        const text = msg.text();
-        const source = msg.location().url;
-        if (IGNORE_CONSOLE.test(text) || IGNORE_CONSOLE.test(source)) return;
-        if (NETWORK_LOG.test(text) && (allowNetwork || ITEMS_ASSET.test(source))) return;
-        errors.push(`${text} @ ${source}`);
-      });
-      page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
-      await use({ allowNetworkLog: () => (allowNetwork = true) });
-      if (info.status !== 'skipped') expect(errors, `console error:\n${errors.join('\n')}`).toEqual([]);
-    },
-    { auto: true },
-  ],
-});
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
 const dialog = (page: Page) => tid(page, 'cart-drawer-dialog');
 const add = (page: Page) => tid(page, 'product-form-add');
 const stayed = (page: Page) => page.evaluate(() => (window as unknown as { __t96?: number }).__t96 === 1);
 
-async function openProduct(page: Page, elements = ['product-form', 'cart-drawer']) {
+async function openProduct(page: Page, cart: MockCart, elements = ['product-form', 'cart-drawer']) {
   test.skip(!HANDLE, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-  await page.goto(`/products/${HANDLE}`);
+  await cart.goto(`/products/${HANDLE}`);
   await expect(tid(page, 'product-form')).toHaveCount(1);
   await page.waitForFunction((names) => names.every((n) => !!customElements.get(n)), elements);
   test.skip(await add(page).isDisabled(), 'Variant mặc định hết hàng, không thêm giỏ được');
@@ -63,9 +33,9 @@ async function openProduct(page: Page, elements = ['product-form', 'cart-drawer'
   await page.evaluate(() => ((window as unknown as { __t96: number }).__t96 = 1));
 }
 
-async function openDrawerProduct(page: Page) {
+async function openDrawerProduct(page: Page, cart: MockCart) {
   test.skip(PAGE_MODE, 'Preview đặt cart_type page: không có dialog');
-  await openProduct(page);
+  await openProduct(page, cart);
 }
 
 // Mở bằng thêm giỏ; chờ partial xong và product-form mở khoá thì opener mới nhận focus được.
@@ -115,25 +85,24 @@ test.describe('ES1-T96 contract', () => {
 
 test.describe('ES1-T96 TE-5 cart drawer', () => {
   test.beforeEach(async ({ page }) => {
-    await cartApi(page, CART.clear);
     await page.emulateMedia({ reducedMotion: 'reduce' });
   });
 
-  test('AC1 thêm giỏ: dialog modal mở, có line vừa thêm, cart-count đúng, không điều hướng, axe', async ({ page }) => {
-    await openDrawerProduct(page);
+  test('AC1 thêm giỏ: dialog modal mở, có line vừa thêm, cart-count đúng, không điều hướng, axe', async ({ page, cart }) => {
+    await openDrawerProduct(page, cart);
     const variantId = Number(await tid(page, 'product-form-variant-id').inputValue());
     await addAndOpen(page);
     await expectModal(page);
     expect(await stayed(page)).toBe(true);
 
-    const cart = await readCartJson<CartJs>(page);
-    const line = cart.items.find((i) => i.variant_id === variantId);
+    const state = await readCartJson<AjaxCart>(page);
+    const line = state.items.find((i) => i.variant_id === variantId);
     expect(line, 'giỏ có variant vừa thêm').toBeTruthy();
     const body = tid(page, 'cart-drawer-body');
-    await expect(body).toHaveAttribute('data-item-count', String(cart.item_count));
-    await expect(body.getByTestId('cart-line')).toHaveCount(cart.items.length);
+    await expect(body).toHaveAttribute('data-item-count', String(state.item_count));
+    await expect(body.getByTestId('cart-line')).toHaveCount(state.items.length);
     await expect(body.getByTestId('cart-line-quantity')).toHaveValue(String(line!.quantity));
-    await expect(tid(page, 'header-cart-count')).toHaveText(String(cart.item_count));
+    await expect(tid(page, 'header-cart-count')).toHaveText(String(state.item_count));
     await expect(body.getByTestId('cart-checkout')).toBeVisible();
 
     // Giỏ rỗng lúc tải → accelerated hidden; có hàng → hiện sau apply. Store không bật wallet thì không có wrapper.
@@ -145,22 +114,23 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     expect(violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
   });
 
-  test('AC1 thêm lần 2 cùng variant: ô số lượng theo server, apply không giữ số cũ', async ({ page }) => {
-    await openDrawerProduct(page);
+  test('AC1 thêm lần 2 cùng variant: ô số lượng theo server, apply không giữ số cũ', async ({ page, cart }) => {
+    await openDrawerProduct(page, cart);
     await addAndOpen(page);
     const quantity = tid(page, 'cart-line-quantity');
-    await expect(quantity).toHaveValue(/^\d+$/);
+    await expect(quantity).toHaveValue('1');
     await page.keyboard.press('Escape');
     await expect(dialog(page)).toBeHidden();
     await addAndOpen(page);
-    const cart = await readCartJson<CartJs>(page);
-    expect(cart.items).toHaveLength(1);
-    await expect(quantity).toHaveValue(String(cart.items[0].quantity));
-    await expect(tid(page, 'header-cart-count')).toHaveText(String(cart.item_count));
+    const state = await readCartJson<AjaxCart>(page);
+    expect(state.items).toHaveLength(1);
+    expect(state.items[0].quantity).toBe(2);
+    await expect(quantity).toHaveValue('2');
+    await expect(tid(page, 'header-cart-count')).toHaveText('2');
   });
 
-  test('AC1 Esc và nút đóng trả focus về nút thêm giỏ', async ({ page }) => {
-    await openDrawerProduct(page);
+  test('AC1 Esc và nút đóng trả focus về nút thêm giỏ', async ({ page, cart }) => {
+    await openDrawerProduct(page, cart);
     await addAndOpen(page);
     await page.keyboard.press('Escape');
     await expect(dialog(page)).toBeHidden();
@@ -172,9 +142,9 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     await expect(add(page)).toBeFocused();
   });
 
-  test('AC1 bấm backdrop đóng, bấm trong dialog không đóng', async ({ page }) => {
+  test('AC1 bấm backdrop đóng, bấm trong dialog không đóng', async ({ page, cart }) => {
     test.skip((page.viewportSize()?.width ?? 0) < 768, 'Dưới 48rem drawer toàn màn, không có backdrop');
-    await openDrawerProduct(page);
+    await openDrawerProduct(page, cart);
     await addAndOpen(page);
     await tid(page, 'cart-drawer-heading').click();
     await expect(dialog(page)).toBeVisible();
@@ -183,8 +153,8 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     await expect(add(page)).toBeFocused();
   });
 
-  test('AC1 opener bị gỡ hoặc disabled: focus về cart link', async ({ page }) => {
-    await openDrawerProduct(page);
+  test('AC1 opener bị gỡ hoặc disabled: focus về cart link', async ({ page, cart }) => {
+    await openDrawerProduct(page, cart);
     await addAndOpen(page);
     await add(page).evaluate((el: HTMLButtonElement) => (el.disabled = true));
     await page.keyboard.press('Escape');
@@ -197,8 +167,8 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     await expect(tid(page, 'header-cart-link')).toBeFocused();
   });
 
-  test('AC1 cart link: chặn điều hướng, refresh rồi mở, Esc về link; sau khi partial thay link vẫn mở được', async ({ page }) => {
-    await openDrawerProduct(page);
+  test('AC1 cart link: chặn điều hướng, refresh rồi mở, Esc về link, mở lại được', async ({ page, cart }) => {
+    await openDrawerProduct(page, cart);
     for (let i = 0; i < 2; i++) {
       await tid(page, 'header-cart-link').click();
       await expectModal(page);
@@ -209,8 +179,8 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     }
   });
 
-  test('AC1 cart link bấm kèm phím bổ trợ: giữ hành vi trình duyệt', async ({ page }) => {
-    await openDrawerProduct(page);
+  test('AC1 cart link bấm kèm phím bổ trợ: giữ hành vi trình duyệt', async ({ page, cart }) => {
+    await openDrawerProduct(page, cart);
     const prevented = await tid(page, 'header-cart-link').evaluate((el) => {
       let result: boolean | null = null;
       // window chạy sau document: đọc kết quả rồi tự chặn để test không mở tab.
@@ -222,10 +192,10 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     await expect(dialog(page)).toBeHidden();
   });
 
-  test('AC1 cart-items.js: chưa tải trước khi mở, chỉ import 1 lần', async ({ page }) => {
+  test('AC1 cart-items.js: chưa tải trước khi mở, chỉ import 1 lần', async ({ page, cart }) => {
     const requests: string[] = [];
     page.on('request', (r) => { if (ITEMS_ASSET.test(r.url())) requests.push(r.url()); });
-    await openDrawerProduct(page);
+    await openDrawerProduct(page, cart);
     expect(requests).toHaveLength(0);
     await tid(page, 'header-cart-link').click();
     await expectModal(page);
@@ -236,60 +206,76 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     expect(requests).toHaveLength(1);
   });
 
-  test('AC1 refresh lỗi khi thêm giỏ: chuyển /cart, giỏ vẫn có hàng', async ({ page, guard }) => {
+  test('AC1 refresh lỗi khi thêm giỏ: chuyển /cart, giỏ vẫn có hàng', async ({ page, cart, guard }) => {
     guard.allowNetworkLog();
-    await openDrawerProduct(page);
-    const path = new URL(page.url()).pathname;
-    await page.route((url) => url.pathname === path, (route) => (route.request().resourceType() === 'fetch' ? route.abort() : route.fallback()));
+    await cart.stubCartDocument();
+    await openDrawerProduct(page, cart);
+    cart.respond('partial', { abort: true });
     await add(page).click();
     await page.waitForURL(isCart);
-    expect((await readCartJson<CartJs>(page)).item_count).toBeGreaterThan(0);
+    expect((await readCartJson<AjaxCart>(page)).item_count).toBeGreaterThan(0);
   });
 
-  test('AC1 lỗi 422: không mở drawer, lỗi ở role=alert', async ({ page, guard }) => {
+  test('AC1 lỗi 422: không mở drawer, lỗi ở role=alert', async ({ page, cart, guard }) => {
     guard.allowNetworkLog();
-    await openDrawerProduct(page);
-    await page.route(CART_GLOB.add, (route) => route.fulfill({ status: 422, contentType: 'application/json', body: JSON.stringify(MOCK_422) }));
+    await openDrawerProduct(page, cart);
+    cart.respond('add', { status: 422, json: MOCK_422 });
     await add(page).click();
     await expect(tid(page, 'product-form-error')).toHaveText(MOCK_422.description);
     await expect(dialog(page)).toBeHidden();
     expect(await stayed(page)).toBe(true);
+    expect(cart.state().item_count).toBe(0);
   });
 
-  test('AC1 event source cart-items: bỏ qua, không refresh, không mở', async ({ page }) => {
-    await openDrawerProduct(page);
-    const path = new URL(page.url()).pathname;
-    let fetched = 0;
-    page.on('request', (r) => { if (r.resourceType() === 'fetch' && new URL(r.url()).pathname === path) fetched++; });
+  test('AC1 mock 500 không JSON khi thêm giỏ: submit form thường, không mở drawer', async ({ page, cart, guard }) => {
+    guard.allowNetworkLog();
+    await openDrawerProduct(page, cart);
+    // Form submit thường sang /cart/add: chặn lại, chỉ cần biết theme đã rơi về fallback.
+    const fallback = page.waitForRequest((r) => r.isNavigationRequest() && r.method() === 'POST');
+    await page.route(/\/cart\/add\/?$/, (route) => route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>add</title>' }));
+    cart.respond('add', { status: 500, html: '<h1>500</h1>' });
+    await add(page).click();
+    await fallback;
+    expect(cart.state().item_count).toBe(0);
+  });
+
+  test('AC1 thêm giỏ chậm: nút khoá trong lúc chờ, drawer mở sau khi xong, 1 POST', async ({ page, cart }) => {
+    await openDrawerProduct(page, cart);
+    cart.respond('add', { delayMs: 500, times: 1 });
+    await add(page).click();
+    await expect(add(page)).toBeDisabled();
+    await expect(dialog(page)).toBeVisible();
+    await expect(add(page)).toBeEnabled();
+    expect(cart.calls.add).toHaveLength(1);
+  });
+
+  test('AC1 event source cart-items: bỏ qua, không refresh, không mở', async ({ page, cart }) => {
+    await openDrawerProduct(page, cart);
     await page.evaluate(() => document.dispatchEvent(new CustomEvent('theme:cart:updated', { bubbles: true, detail: { source: 'cart-items' } })));
     await page.waitForTimeout(500);
-    expect(fetched).toBe(0);
+    expect(cart.calls.partial).toEqual([]);
     await expect(dialog(page)).toBeHidden();
   });
 
-  test('AC1 bfcache: refresh cart-count từ server, không mở; refresh lỗi không rời trang', async ({ page, guard }) => {
+  test('AC1 bfcache: refresh cart-count từ server, không mở; refresh lỗi không rời trang', async ({ page, cart, guard }) => {
     guard.allowNetworkLog();
-    await openDrawerProduct(page);
-    const url = await tid(page, 'product-form').getAttribute('data-cart-add-url');
-    const id = await tid(page, 'product-form-variant-id').inputValue();
-    await page.evaluate(async ({ url, id }) => {
-      await fetch(`${url}.js`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: Number(id), quantity: 1 }) });
-    }, { url, id });
+    await openDrawerProduct(page, cart);
+    // Thêm thẳng vào giỏ mock để trang đang mở lệch server.
+    cart.add(Number(await tid(page, 'product-form-variant-id').inputValue()), 1);
     const persisted = () => page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
     await persisted();
-    await expect(tid(page, 'header-cart-count')).toHaveText(String((await readCartJson<CartJs>(page)).item_count));
-    await expect(tid(page, 'cart-drawer-body')).toHaveAttribute('data-item-count', /^[1-9]/);
+    await expect(tid(page, 'header-cart-count')).toHaveText('1');
+    await expect(tid(page, 'cart-drawer-body')).toHaveAttribute('data-item-count', '1');
     await expect(dialog(page)).toBeHidden();
 
-    const path = new URL(page.url()).pathname;
-    await page.route((u) => u.pathname === path, (route) => (route.request().resourceType() === 'fetch' ? route.abort() : route.fallback()));
+    cart.respond('partial', { abort: true });
     await persisted();
     await expect(dialog(page)).not.toHaveAttribute('aria-busy', /.*/);
     expect(await stayed(page)).toBe(true);
   });
 
-  test('AC1 theme editor: shopify:block:select mở, deselect đóng', async ({ page }) => {
-    await openDrawerProduct(page);
+  test('AC1 theme editor: shopify:block:select mở, deselect đóng', async ({ page, cart }) => {
+    await openDrawerProduct(page, cart);
     const fire = (type: string) => tid(page, 'cart-drawer').evaluate((el, t) => el.dispatchEvent(new CustomEvent(t, { bubbles: true })), type);
     await fire('shopify:block:select');
     await expectModal(page);
@@ -297,48 +283,55 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     await expect(dialog(page)).toBeHidden();
   });
 
-  test('AC6 flip data-cart-type page: thêm giỏ chuyển /cart', async ({ page }) => {
-    await openDrawerProduct(page);
+  test('AC6 flip data-cart-type page: thêm giỏ chuyển /cart', async ({ page, cart }) => {
+    await cart.stubCartDocument();
+    await openDrawerProduct(page, cart);
     await tid(page, 'product-form').evaluate((el) => el.setAttribute('data-cart-type', 'page'));
     await add(page).click();
     await page.waitForURL(isCart);
-    expect((await readCartJson<CartJs>(page)).item_count).toBeGreaterThan(0);
+    expect((await readCartJson<AjaxCart>(page)).item_count).toBeGreaterThan(0);
   });
 
-  test('AC6 cart_type page thật: không dialog, thêm giỏ chuyển /cart', async ({ page }) => {
+  test('AC6 cart_type page thật: không dialog, thêm giỏ chuyển /cart', async ({ page, cart }) => {
     test.skip(!PAGE_MODE, 'Cần preview đặt cart_type page + EXPECT_CART_TYPE=page (D12)');
-    await openProduct(page);
+    await cart.stubCartDocument();
+    await openProduct(page, cart);
     await expect(dialog(page)).toHaveCount(0);
     await add(page).click();
     await page.waitForURL(isCart);
   });
 
-  test('AC6 trang /cart: data-mode none, cart link điều hướng thường, không lỗi', async ({ page }) => {
-    await page.goto('/cart');
+  test('AC6 trang /cart: data-mode none, cart link điều hướng thường, không lỗi', async ({ page, cart }) => {
+    await cart.goto('/cart');
     await page.waitForFunction(() => !!customElements.get('cart-drawer'));
     await expect(tid(page, 'cart-drawer')).toHaveAttribute('data-mode', 'none');
+    await expect(tid(page, 'cart-page')).toBeVisible();
+    // Lần tải /cart thứ 2 chỉ để biết link điều hướng thường: dùng trang tối giản.
+    await cart.stubCartDocument();
+    const reload = page.waitForRequest((r) => r.isNavigationRequest() && isCart(new URL(r.url())));
     await tid(page, 'header-cart-link').click();
-    await page.waitForURL(isCart);
+    await reload;
     await expect(tid(page, 'cart-page')).toBeVisible();
   });
 
-  test('AC8 script drawer lỗi (route.abort cart-drawer.js): thêm giỏ vẫn chuyển /cart', async ({ page, guard }) => {
+  test('AC8 script drawer lỗi (route.abort cart-drawer.js): thêm giỏ vẫn chuyển /cart', async ({ page, cart, guard }) => {
     guard.allowNetworkLog();
     await page.route(/\/cart-drawer\.js(\?|$)/, (route) => route.abort());
-    await openProduct(page, ['product-form']);
+    await cart.stubCartDocument();
+    await openProduct(page, cart, ['product-form']);
     expect(await page.evaluate(() => !!customElements.get('cart-drawer'))).toBe(false);
     await add(page).click();
     await page.waitForURL(isCart);
-    expect((await readCartJson<CartJs>(page)).item_count).toBeGreaterThan(0);
+    expect((await readCartJson<AjaxCart>(page)).item_count).toBeGreaterThan(0);
   });
 
-  test('AC8 theme:cart:updated có opener là nút đã bấm', async ({ page }) => {
+  test('AC8 theme:cart:updated có opener là nút đã bấm', async ({ page, cart }) => {
     await page.addInitScript(() => {
       document.addEventListener('theme:cart:updated', (e) => {
         (window as unknown as { __opener?: string | null }).__opener = (e as CustomEvent).detail?.opener?.getAttribute('data-testid') ?? null;
       });
     });
-    await openDrawerProduct(page);
+    await openDrawerProduct(page, cart);
     await addAndOpen(page);
     expect(await page.evaluate(() => (window as unknown as { __opener?: string | null }).__opener)).toBe('product-form-add');
   });
