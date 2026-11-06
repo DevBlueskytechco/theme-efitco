@@ -4,10 +4,23 @@
   parameters, with Figma 1:636 copy. The collection is te12-bundle (ES1-T144),
   or all products while it does not exist on the store.
   First bundle: tiers 2:10 and 3:15. Second bundle: no tier above 0.
+  Shop the look (ES1-T148), handles from tests/e2e/store-data.json because Liquid cannot
+  read env: te12-look has 6 rows with 1 sold out and copy from Figma 1:560 (schema
+  default). te12-look-single has 1 row and no image. te12-look-sold-out only has a sold
+  out row. te12-look-partial has an image, 2 rows and no tier above 0.
   Remove this file before a real store release.
 {% endcomment %}
 
-{%- assign te12_collection = collections['te12-bundle'] | default: collections.all -%}
+{%- liquid
+  assign te12_collection = collections['te12-bundle'] | default: collections.all
+  assign look_single = all_products['sản-phẩm-chỉ-1-variant']
+  assign look_variants = all_products['variant-co-ảnh-rieng']
+  assign look_sale = all_products['sale-gia-nhỏ']
+  assign look_sold_out = all_products['hết-hang-toan-bộ']
+  assign look_media = all_products['media-dủ-loại']
+  assign look_unit_price = all_products['unit-price']
+  assign look_image = look_media.featured_image
+-%}
 
 {% block 'container', id: 'te12-title' %}
   <h1 class="visually-hidden">{{ shop.name }}</h1>
@@ -40,4 +53,50 @@
     tier_2_percent: 0,
     tier_3_percent: 0
   %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te12-look', tag: 'div' %}
+  {% block 'shop-the-look', id: 'te12-shop-the-look', image: look_image %}
+    {% block 'shop-the-look-row', id: 'te12-look-row-1', look_row: 1, product: look_single %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'te12-look-row-2', look_row: 2, product: look_variants %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'te12-look-row-3', look_row: 3, product: look_sale %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'te12-look-row-4', look_row: 4, product: look_sold_out %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'te12-look-row-5', look_row: 5, product: look_media %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'te12-look-row-6', look_row: 6, product: look_unit_price %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te12-look-single', tag: 'div' %}
+  {% block 'shop-the-look',
+    id: 'te12-shop-the-look-single',
+    eyebrow: '',
+    heading: 'Look With One Row',
+    link_label: '',
+    note_title: '',
+    note_text: ''
+  %}
+    {% block 'shop-the-look-row', id: 'te12-look-single-row', look_row: 1, product: look_single %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te12-look-sold-out', tag: 'div' %}
+  {% block 'shop-the-look', id: 'te12-shop-the-look-sold-out', eyebrow: '', heading: 'Look Sold Out', link_label: '' %}
+    {% block 'shop-the-look-row', id: 'te12-look-sold-out-row', look_row: 1, product: look_sold_out %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te12-look-partial', tag: 'div' %}
+  {% block 'shop-the-look',
+    id: 'te12-shop-the-look-partial',
+    eyebrow: '',
+    heading: 'Look Without Tiers',
+    link_label: '',
+    image: look_image,
+    tier_1_percent: 0,
+    tier_2_percent: 0,
+    tier_3_percent: 0
+  %}
+    {% block 'shop-the-look-row', id: 'te12-look-partial-row-1', look_row: 1, product: look_single %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'te12-look-partial-row-2', look_row: 2, product: look_variants %}{% endblock %}
+  {% endblock %}
 {% endblock %}
