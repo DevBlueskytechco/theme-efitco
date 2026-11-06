@@ -9,7 +9,8 @@
   products; the image regions are masked when screenshots are compared here.
   Exception: collection cards and level cards have no fallback. Their name, link and
   product count are the thing being checked, so a missing figma-cat-* or figma-level-*
-  collection shows one card fewer.
+  collection shows one card fewer. The blog band has none either: without the figma-blog
+  blog it renders nothing.
 
   Copy stays in the block defaults or, for repeated blocks, in locales passed as
   default_* (plan ES1-T169 D1), same list as templates/index.liquid.
@@ -420,6 +421,10 @@
     default_body: why_body,
     default_button_label: why_button_label
   %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'figma-blog-posts' %}
+  {% block 'blog-posts', id: 'figma-blog-posts', handle: 'figma-blog' %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'figma-faq', background: 'cream' %}
