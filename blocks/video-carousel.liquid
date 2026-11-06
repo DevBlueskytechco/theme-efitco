@@ -14,8 +14,8 @@
   stay empty. A stat without a value stays hidden; the link needs both a label and
   a URL.
 
-  JavaScript hooks are on the video-card block; assets/video-carousel.js (ES1-T158)
-  adds data-lazy-module on the root.
+  JavaScript hooks are on the video-card block; data-lazy-module on the root is the
+  URL of assets/video-carousel.js, read by assets/lazy-module.js.
 
   Test hooks: data-testid="video-carousel", "video-carousel-eyebrow",
   "video-carousel-heading", "video-carousel-subheading", "video-carousel-link",
@@ -64,6 +64,7 @@
 
   <div
     class="video-carousel full-width"
+    data-lazy-module="{{ 'video-carousel.js' | asset_url }}"
     {% if id != blank %}
       data-video-carousel-id="{{ id }}"
     {% endif %}
@@ -118,6 +119,7 @@
     >
       {{ content }}
     </ul>
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
   </div>
 {%- elsif request.design_mode -%}
   <p

@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy (phiên viết không có preview, chưa type-check); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép sang tests/e2e/ES1-T156.spec.ts.
 // Ticket ES1-T156 TE-13-FE1: featured product markup (docs/srs.md#TE-13 AC1, AC2; drafts/techlead/ES1-T142/task-split.md D2, D3, D4, D10, D11).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T156.spec.ts -g "AC1-markup|AC2|nojs"
-// Chưa có JS của BE1 (ES1-T158): product-variant-picker chưa defined nên CSS ẩn, kiểm bằng count/attribute; khung countdown còn visibility hidden.
+// JS của BE1 ở tests/e2e/ES1-T158.spec.ts; test trạng thái trước nâng cấp chặn file module (ES1-T158).
 import { readFileSync } from 'node:fs';
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -74,11 +74,11 @@ test.describe('ES1-T156 TE-13 featured product', () => {
   });
 
   test('AC1-markup chưa có data-enhanced: khung giữ chỗ nhưng không nhìn thấy', async ({ page }) => {
+    await page.route(/\/featured-product\.js/, (route) => route.abort());
     await page.goto(TE13);
     const a = band(page, 'a');
     test.skip(!(await onSale(a)), 'Band A không sale');
-    const root = tid(a, 'featured-product');
-    test.skip((await root.getAttribute('data-enhanced')) !== null, 'BE1 đã nâng cấp');
+    await expect(tid(a, 'featured-product')).not.toHaveAttribute('data-enhanced', /.*/);
     await expect(tid(a, COUNTDOWN)).toBeHidden();
     const box = await tid(a, COUNTDOWN).boundingBox();
     expect(box?.height ?? 0).toBeGreaterThan(0);

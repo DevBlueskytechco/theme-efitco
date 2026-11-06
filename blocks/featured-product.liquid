@@ -30,6 +30,9 @@
   selling plan has no form, only View Detail, because this block has no plan picker.
 
   JS hooks: featured-product (custom element, data-enhanced, data-design-mode);
+  data-lazy-module (URL read by assets/lazy-module.js) on featured-product and,
+  outside the theme editor, on product-form and on .featured-product__summary for
+  the picker, which has display none until defined and so never intersects;
   data-end (epoch seconds) on the countdown; data-countdown-unit (days, hours,
   minutes, seconds) on each cell with data-countdown-value on its number;
   data-featured-media-id on each image and thumbnail; product-form with
@@ -176,6 +179,7 @@
     {% if request.design_mode %}
       data-design-mode
     {% endif %}
+    data-lazy-module="{{ 'featured-product.js' | asset_url }}"
     data-testid="featured-product"
     {{ block.shopify_attributes }}
   >
@@ -319,7 +323,14 @@
           </div>
         {%- endif -%}
 
-        <div class="featured-product__summary">
+        <div
+          class="featured-product__summary"
+          {% if has_variant_choice %}
+            {% unless request.design_mode or featured.requires_selling_plan %}
+              data-lazy-module="{{ 'product-variant-picker.js' | asset_url }}"
+            {% endunless %}
+          {% endif %}
+        >
           {% partial 'product-price' %}
             <div class="featured-product__price" data-testid="featured-product-price">
               {% render 'price', product: featured, variant: current_variant %}
@@ -374,6 +385,9 @@
         {%- else -%}
           <product-form
             class="featured-product__buy"
+            {% unless request.design_mode %}
+              data-lazy-module="{{ 'product-form.js' | asset_url }}"
+            {% endunless %}
             data-product-id="{{ featured.id }}"
             data-product-url="{{ featured.url }}"
             data-cart-add-url="{{ routes.cart_add_url }}"
@@ -438,6 +452,7 @@
         {%- endif -%}
       </div>
     </s-view-event>
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
   </featured-product>
 {%- endif -%}
 

@@ -175,6 +175,8 @@ test.describe('ES1-T66 TE-4 variant picker', () => {
     // ES1-T81: không có import map → import thẳng URL CDN.
     expect(JS).toMatch(/import\(\s*"https:\/\/cdn\.shopify\.com\/storefront\/standard-events\.js"\s*\)/);
     expect(JS).not.toMatch(/["']@shopify\/standard-events["']/);
-    expect(JS).toMatch(/partials\.fetch\(\.\.\.REGIONS,/);
+    // ES1-T158: names = data-regions hoặc REGIONS.
+    expect(JS).toMatch(/regions \? regions\.split\(" "\) : REGIONS/);
+    expect(JS).toMatch(/partials\.fetch\(\.\.\.names,/);
   });
 });
