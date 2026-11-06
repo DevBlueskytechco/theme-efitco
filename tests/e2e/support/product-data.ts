@@ -7,9 +7,9 @@ import { expect, test, type Page } from '@playwright/test';
 import { basename } from 'node:path';
 import { getJson } from './http';
 import { record429 } from './report-429';
-import { expectNotChallenged } from './store-guard';
+import { expectJsonAllowed, expectNotChallenged } from './store-guard';
 
-export type JsonResult<T> = { ok: boolean; status: number; body: T | null };
+export type JsonResult<T> = { ok: boolean; status: number; body: T | null; challenged?: boolean };
 export type ProductVariant = { id: number; available: boolean; price: number };
 export type ProductData = { id: number; handle: string; variants: ProductVariant[] };
 
@@ -45,6 +45,7 @@ export async function pageJson<T>(page: Page, path: string, attempts = 4): Promi
 
 // Lấy body; 429 sau khi thử lại → skip có lý do; lỗi khác → fail.
 export function requireJson<T>(r: JsonResult<T>, label: string): T {
+  expectJsonAllowed(r, label);
   if (r.status === 429) {
     const reason = `Shopify trả 429 cho ${label} sau khi thử lại (giới hạn store dev)`;
     console.log(`[ES1-T100] ${reason} (${basename(test.info().file)})`);

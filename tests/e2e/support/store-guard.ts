@@ -1,7 +1,7 @@
 // ES1-T203: nhận biết store chặn, phân biệt với lỗi code. Trang thử thách Cloudflare → test fail với thông báo 'bị Cloudflare chặn', không skip.
 // Không dựa vào script /cdn-cgi/challenge-platform: Cloudflare chèn script đó cả vào trang thường, chỉ title, phần tử thử thách hoặc header cf-mitigated mới là bị chặn.
 // watchStore gộp console guard của T96, T97, T98 và luồng thật; ghi số 429, trang thử thách vào [429-tong-ket].
-import { expect, test, type Page, type Response } from '@playwright/test';
+import { expect, test, type Page, type Request, type Response } from '@playwright/test';
 import { basename } from 'node:path';
 import { MAX_WAITS, retryDelayMs } from './cart-api';
 import { isCloudflareLog, watchShopPay403 } from './console-guard';
@@ -36,6 +36,35 @@ export function isStoreRefresh(requestUrl: string, pageUrl: string) {
   return request.origin === current.origin && request.pathname === current.pathname;
 }
 
+// ES1-T229: request lấy dữ liệu tab do theme gửi: cùng origin store, tới collections, products, partial hoặc section. Allowlist, nên analytics (otlp-http-production.shopifysvc.com, /api/collect, monorail), login_with_shop, challenges.cloudflare.com, /cdn-cgi không được tính.
+const STORE_DATA_PATH = /^(?:\/[a-z]{2}(?:-[a-z]{2})?)?\/(?:collections|products)(?:[/.]|$)/i;
+export function isTabDataRequest(requestUrl: string, pageUrl: string) {
+  const request = new URL(requestUrl);
+  if (request.origin !== new URL(pageUrl).origin) return false;
+  return STORE_DATA_PATH.test(request.pathname) || request.searchParams.has('section_id') || request.searchParams.has('sections') || isStoreRefresh(requestUrl, pageUrl);
+}
+
+// Document của khung chính. Iframe (login_with_shop, Turnstile) cũng là navigation request nhưng không phải tải lại trang.
+// request.frame() ném lỗi khi iframe chưa tạo xong (docs Playwright), trường hợp đó không phải khung chính.
+function isMainDocument(request: Request, page: Page) {
+  if (!request.isNavigationRequest()) return false;
+  try {
+    return request.frame() === page.mainFrame();
+  } catch {
+    return false;
+  }
+}
+
+// Gọi trước lúc đổi tab. Trả danh sách lớn dần: request dữ liệu tab và lần tải lại trang.
+export function watchTabDataRequests(page: Page): string[] {
+  const requests: string[] = [];
+  page.on('request', (r) => {
+    if (isMainDocument(r, page)) requests.push(`document: ${r.url()}`);
+    else if (['fetch', 'xhr'].includes(r.resourceType()) && isTabDataRequest(r.url(), page.url())) requests.push(r.url());
+  });
+  return requests;
+}
+
 export const isChallengeResponse = (res: Pick<Response, 'headers'>) => res.headers()['cf-mitigated'] === 'challenge';
 
 // Trang đang mở là màn thử thách thì ném lỗi rõ ràng và tính vào tổng kết.
@@ -53,6 +82,38 @@ export function expectStoreAllowed(res: Pick<Response, 'headers' | 'status' | 'u
     throw blockedError(`cf-mitigated, status ${res.status()}`, res.url());
   }
   if (res.status() === 429) throw new Error(`store trả 429 cho ${res.url()}: giới hạn store dev, không phải lỗi code`);
+}
+
+// ES1-T229: JSON lấy bằng APIRequestContext (support/http.ts) bị chặn thì nêu Cloudflare, không để thành 'trả 403'.
+export function expectJsonAllowed(result: { challenged?: boolean; status: number }, url: string) {
+  if (!result.challenged) return;
+  record429('challenge', specName());
+  throw blockedError(`cf-mitigated, status ${result.status}`, url);
+}
+
+// ES1-T229: sau page.reload(), page.goBack(): trang vừa mở bị chặn thì fail ngay, không chờ tới timeout. goBack từ bfcache trả null.
+export async function expectLoaded(page: Page, res: Response | null) {
+  if (res) expectStoreAllowed(res);
+  await expectNotChallenged(page);
+}
+
+// ES1-T229: bấm link hoặc nút submit có điều hướng, gồm cả trang tắt JS. Chờ khung chính sang trang mới rồi kiểm bị chặn.
+// Màn thử thách giữ nguyên URL, nên assert URL hay chờ phần tử sau đó không phân biệt được bị chặn với lỗi code.
+// Trang checkout không phải storefront, có thể có script Turnstile thường: chỉ tin header, không xét DOM.
+export async function clickAndLoad(page: Page, click: () => Promise<unknown>) {
+  let blocked: Response | undefined;
+  const onResponse = (res: Response) => {
+    if (isMainDocument(res.request(), page) && (isChallengeResponse(res) || res.status() === 429)) blocked ??= res;
+  };
+  page.on('response', onResponse);
+  try {
+    await Promise.all([page.waitForEvent('framenavigated', { predicate: (f) => f === page.mainFrame(), timeout: 20_000 }), click()]);
+    await page.waitForLoadState('domcontentloaded');
+  } finally {
+    page.off('response', onResponse);
+  }
+  if (blocked) expectStoreAllowed(blocked);
+  if (!/\/checkouts?(\/|$)/.test(new URL(page.url()).pathname)) await expectNotChallenged(page);
 }
 
 // Mở trang thật. 429 chờ 2, 4, 8 s rồi thử lại, hết lượt thì fail nói rõ 429; không skip.

@@ -6,7 +6,7 @@
 import { readFileSync, statSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
+import { expectNotChallenged, watchTabDataRequests } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 
 const FIGMA = '/?view=figma';
@@ -15,8 +15,6 @@ const LIQUID_FILE = 'blocks/featured-collection.liquid';
 const MODULE = /\/collection-tabs\.js/;
 const SWATCH = 'input[type="radio"][data-variant-id]';
 const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
-// Fetch nền của Shopify, không do theme gọi khi đổi tab.
-const IGNORE_REQUEST = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|\.well-known\/shopify|\/api\/collect|\/cdn-cgi\//i;
 
 const T = {
   block: 'featured-collection',
@@ -197,11 +195,8 @@ test.describe('ES1-T189 đổi tab', () => {
       (window as unknown as { __noReload: boolean }).__noReload = true;
     });
     const url = page.url();
-    const requests: string[] = [];
-    page.on('request', (r) => {
-      if ((r.resourceType() === 'fetch' || r.resourceType() === 'xhr') && !IGNORE_REQUEST.test(r.url())) requests.push(r.url());
-      if (r.resourceType() === 'document') requests.push(`document: ${r.url()}`);
-    });
+    // ES1-T229: chỉ đếm dữ liệu tab cùng origin và tải lại khung chính. Dịch vụ ngoài theme, iframe không tính.
+    const requests = watchTabDataRequests(page);
 
     for (const i of [1, 2, 3, 0]) {
       await tab(page, i).click();

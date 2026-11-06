@@ -6,7 +6,7 @@
 import { test, expect, type BrowserContext, type Page, type TestInfo } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { CART } from './support/cart-api';
+import { actionCartCount, CART } from './support/cart-api';
 import { installPartials, MOCK_HEADER, MockCart, test as mockTest } from './support/cart-mock';
 import { isCloudflareLog } from './support/console-guard';
 import { summary429 } from './support/report-429';
@@ -337,7 +337,6 @@ test.describe('ES1-T203 nhận biết Cloudflare', () => {
 // Luồng thật. getCart, updateCart nằm ở đây vì ghi qua Storefront API, mock Cart API không tới (ES1-T164).
 type Line = { key: string; quantity: number };
 type RealCart = { item_count: number; total_price: number; items: Line[] };
-type ActionCart = { totalQuantity?: number; item_count?: number } | null;
 type Win = {
   __t203: { action?: string; context?: string }[];
   __t203Stay?: number;
@@ -411,15 +410,6 @@ test.describe.serial('ES1-T203 luồng mua thật', () => {
     await expect(tid('cart-drawer'), 'Shopify.actions chưa được configure').toHaveAttribute('data-actions', '', { timeout: 15_000 });
     await markStay();
   }
-
-  // Giỏ chưa có trên Storefront API có thể trả null: tính là 0.
-  // ES1-T227: shape lạ không được tính là 0, nếu không thì assert giỏ rỗng trước updateCart đạt với mọi giá trị. Lưu ý callAction clone qua JSON.
-  const total = (cart: ActionCart) => {
-    if (cart === null) return 0;
-    const count = cart.totalQuantity ?? cart.item_count;
-    expect(typeof count, `getCart không có totalQuantity, item_count. Key sau clone JSON: ${Object.keys(cart).join(', ') || '(rỗng)'}`).toBe('number');
-    return count as number;
-  };
 
   test.beforeAll(async ({ browser }, info: TestInfo) => {
     test.skip(PAGE_MODE, 'Luồng mua thật đi qua drawer; preview cart_type page chạy test riêng bên dưới');
@@ -542,7 +532,7 @@ test.describe.serial('ES1-T203 luồng mua thật', () => {
   test('TC-25 AC7 getCart, updateCart thật trên drawer: partial khớp /cart.js, 1 event standard-action, không mở, không reload', async () => {
     await gotoStore(page, '/');
     await actionsReady();
-    expect(total(await callAction<ActionCart>('getCart'))).toBe(0);
+    expect(actionCartCount(await callAction<unknown>('getCart'))).toBe(0);
     const refreshes = countRefreshes();
     const result = await callAction<{ userErrors?: unknown[] }>('updateCart', { lines: [{ merchandiseId: variantId, quantity: 2, attributes: [{ key: '_t203', value: 'action' }] }] });
     expect(result.userErrors ?? []).toEqual([]);
@@ -556,7 +546,7 @@ test.describe.serial('ES1-T203 luồng mua thật', () => {
     refreshes.stop();
     expect(refreshes.seen, 'không có refresh lặp').toHaveLength(1);
     expect((await page.evaluate(() => (window as unknown as Win).__t203)).map((e) => e.context), 'override không phát thêm event').toEqual(['standard-action']);
-    expect(total(await callAction<ActionCart>('getCart')), 'getCart trả giỏ mới').toBe(2);
+    expect(actionCartCount(await callAction<unknown>('getCart')), 'getCart trả giỏ mới').toBe(2);
   });
 
   test('TC-26 AC7 updateCart ở /cart: refresh partial cart-page, ô số lượng theo server', async () => {

@@ -21,7 +21,8 @@ function toDisk(path: string, body: unknown) {
   try { mkdirSync(DIR, { recursive: true }); writeFileSync(file(path), JSON.stringify(body)); } catch { /* cache là tối ưu, lỗi ghi bỏ qua */ }
 }
 
-export async function getJson<T>(request: APIRequestContext, path: string, attempts = 4): Promise<{ ok: boolean; status: number; body: T | null }> {
+// challenged (ES1-T229): lần trả cuối có header cf-mitigated, để store-guard báo Cloudflare thay vì 'trả 403'.
+export async function getJson<T>(request: APIRequestContext, path: string, attempts = 4): Promise<{ ok: boolean; status: number; body: T | null; challenged?: boolean }> {
   const cacheable = /^\/products\/[^/]+\.js$/.test(path);
   if (cacheable && CACHE.has(path)) return { ok: true, status: 200, body: CACHE.get(path) as T };
   if (cacheable) {
@@ -29,10 +30,12 @@ export async function getJson<T>(request: APIRequestContext, path: string, attem
     if (disk !== undefined) { CACHE.set(path, disk); return { ok: true, status: 200, body: disk as T }; }
   }
   let status = 0;
+  let challenged = false;
   for (let i = 0; i < attempts; i++) {
     // Handle có dấu: encode như trình duyệt (đường dẫn UTF-8 thô bị store dev trả 429 liên tục)
     const res = await request.get(/%[0-9A-F]{2}/i.test(path) ? path : encodeURI(path), { headers: { Accept: 'application/json' } });
     status = res.status();
+    challenged = res.headers()['cf-mitigated'] === 'challenge';
     if (res.ok()) {
       // /products/<handle>.js trả content-type JavaScript nhưng body là JSON: parse body, không dựa content-type.
       const text = await res.text();
@@ -45,5 +48,5 @@ export async function getJson<T>(request: APIRequestContext, path: string, attem
     const after = Number(res.headers()['retry-after']);
     await new Promise(r => setTimeout(r, Number.isFinite(after) && after > 0 ? Math.min(after, 5) * 1000 : 1000 * 2 ** i));
   }
-  return { ok: false, status, body: null };
+  return { ok: false, status, body: null, challenged };
 }
