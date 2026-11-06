@@ -5,6 +5,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { CART } from './support/cart-api';
 
 const EVENT = 'shopify:cart:lines-update';
 const CDN = 'https://cdn.shopify.com/storefront/standard-events.js';
@@ -44,7 +45,7 @@ function watchConsole(page: Page, ignoreNetwork = false) {
 
 // Listener trên document (capture), ghi sessionStorage vì luồng thành công / lỗi mạng chuyển sang /cart.
 async function listen(page: Page) {
-  await page.addInitScript((type) => {
+  await page.addInitScript(({ type, addPath }) => {
     document.addEventListener(
       type,
       (e) => {
@@ -54,7 +55,7 @@ async function listen(page: Page) {
           context: d.context,
           lines: d.lines,
           target: (e.target as Element)?.tagName?.toLowerCase(),
-          addSentBefore: performance.getEntriesByType('resource').some((r) => r.name.includes('/cart/add.js')),
+          addSentBefore: performance.getEntriesByType('resource').some((r) => r.name.includes(addPath)),
         };
         const save = () => sessionStorage.setItem('__t85', JSON.stringify(entry));
         save();
@@ -75,7 +76,7 @@ async function listen(page: Page) {
       },
       true
     );
-  }, EVENT);
+  }, { type: EVENT, addPath: CART.add });
 }
 
 // Đang chuyển trang thì evaluate có thể ném "context destroyed" → null để poll thử lại.

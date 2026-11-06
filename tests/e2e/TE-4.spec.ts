@@ -8,6 +8,7 @@ import { test as base, expect, type Page, type Request, type Route } from '@play
 import AxeBuilder from '@axe-core/playwright';
 import { env } from './support/store-data';
 import { pageJson, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
+import { CART, CART_GLOB, cartApi } from './support/cart-api';
 
 // DoD: 0 console error trên mọi test. Fixture tự chạy, kiểm sau mỗi test.
 // Bỏ qua: script Shopify/analytics, YouTube/Vimeo/model-viewer (nguồn ngoài theme) và 429 (giới hạn store dev).
@@ -140,7 +141,7 @@ const TAX_NOTES = ['Taxes and duties included.', 'Taxes included.', 'Duties incl
 const EXTERNAL_HOSTS = /youtube\.com|youtube-nocookie\.com|ytimg\.com|vimeo\.com|vimeocdn\.com/i;
 const REC = /\/recommendations\/products\.json/;
 const REC_GLOB = '**/recommendations/products.json*';
-const ADD_GLOB = '**/cart/add.js';
+const ADD_GLOB = CART_GLOB.add;
 const EVENT_VIEW = 'shopify:product:view';
 const EVENT_SELECT = 'shopify:product:select';
 const EVENT_CART = 'shopify:cart:lines-update';
@@ -233,7 +234,7 @@ const cartItems = async (page: Page) => (await readCartJson<CartJs>(page)).items
 // Nhóm nojs: không fetch trong trang được.
 const cartItemsNoScript = async (page: Page) => (await readCartNoScript<CartJs>(page)).items;
 
-const clearCart = (page: Page) => page.request.post('/cart/clear.js');
+const clearCart = (page: Page) => cartApi(page, CART.clear);
 
 function optionValue(page: Page, index: number, value: string) {
   return tid(page, T.option).nth(index).getByTestId(T.optionValue).filter({
@@ -364,7 +365,7 @@ async function scrollPastAdd(page: Page) {
 
 // Listener capture trên document, gắn trước script trang. Lưu sessionStorage vì luồng thêm giỏ chuyển sang /cart.
 async function captureEvents(page: Page, types: string[]) {
-  await page.addInitScript((names) => {
+  await page.addInitScript(({ names, addPath }) => {
     // Đọc sessionStorage muộn: init script chạy cả ở about:blank, nơi sessionStorage có thể ném lỗi.
     let events: CapturedEvent[] | null = null;
     const list = () => (events ??= JSON.parse(sessionStorage.getItem('__te4Events') ?? '[]') as CapturedEvent[]);
@@ -385,7 +386,7 @@ async function captureEvents(page: Page, types: string[]) {
             selectedOptions: d.selectedOptions as CapturedEvent['selectedOptions'],
             action: d.action as string | undefined,
             lines: d.lines as CapturedEvent['lines'],
-            addSentBefore: performance.getEntriesByType('resource').some((r) => r.name.includes('/cart/add.js')),
+            addSentBefore: performance.getEntriesByType('resource').some((r) => r.name.includes(addPath)),
           };
           list().push(entry);
           save();
@@ -413,7 +414,7 @@ async function captureEvents(page: Page, types: string[]) {
         true
       );
     }
-  }, types);
+  }, { names: types, addPath: CART.add });
 }
 
 // Đang chuyển trang thì evaluate có thể ném "context destroyed" → [] để poll thử lại.
@@ -1378,7 +1379,7 @@ test.describe('ES1-T70 TE-4 AC8 thêm giỏ', () => {
     await openBuyable(page);
     await skipIfDrawer(page);
     const variantId = await currentId(page);
-    const add = page.waitForResponse((r) => r.url().includes('/cart/add.js') && r.request().method() === 'POST');
+    const add = page.waitForResponse((r) => r.url().includes(CART.add) && r.request().method() === 'POST');
     await tid(page, T.add).click();
     expect((await add).status()).toBe(200);
     await page.waitForURL(isCart);
