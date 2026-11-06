@@ -4,6 +4,7 @@
 // Preview chỉ có 1 giá trị cart_type: AC6 flip data-cart-type trên DOM; EXPECT_CART_TYPE=page chạy nhánh thật (D12).
 import type { Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
@@ -110,6 +111,7 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     if (await wallet.count()) expect(await wallet.evaluate((el: HTMLElement) => el.hidden)).toBe(false);
 
     expect(await page.evaluate(() => !!document.activeElement?.closest('dialog')), 'focus trong dialog').toBe(true);
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('[data-testid="cart-drawer-dialog"]').analyze();
     expect(violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
   });

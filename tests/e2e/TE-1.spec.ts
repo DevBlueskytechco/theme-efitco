@@ -9,6 +9,7 @@ import { CART, cartApi } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
 import { HARDCODED_RADIUS } from './support/css-lint';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -135,6 +136,7 @@ async function scrollTo(page: Page, y: number) {
 }
 
 async function axeChrome(page: Page) {
+  await expectNotChallenged(page);
   const b = new AxeBuilder({ page });
   for (const id of [T.bar, T.header, T.footer]) {
     if (await page.getByTestId(id).count()) b.include(`[data-testid="${id}"]`);

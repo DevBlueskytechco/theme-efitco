@@ -4,6 +4,7 @@
 // Merchant sửa trong editor (TC-H6) là bước tay; ở đây param trùng tên setting đóng vai giá trị đã lưu, trên /?view=te7.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 
 const HOME = '/';
@@ -50,6 +51,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
@@ -159,7 +161,9 @@ test.describe('ES1-T180 TE-17 hàng 2, 4a, 8, 13 mặc định', () => {
     await page.goto(HOME);
     const heading = tid(band(page, 'home-inspiration'), 'image-with-text-heading');
     expect(await heading.evaluate(breaks)).toEqual(['inline', 'inline']);
-    const lines = await heading.evaluate((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)));
+    // ES1-T217: font display swap, đếm dòng trước khi font về là đo trên font dự phòng.
+    await page.evaluate(() => document.fonts.ready.then(() => undefined));
+    const lines =await heading.evaluate((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)));
     expect(lines).toBe(3);
 
     await page.setViewportSize({ width: 360, height: 740 });

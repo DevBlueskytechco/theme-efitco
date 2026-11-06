@@ -7,10 +7,10 @@
 import { readFileSync, statSync } from 'node:fs';
 import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { themeAdd } from './support/cart-api';
+import { CART_GLOB, themeAdd } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
 import { readCartJson } from './support/product-data';
-import { gotoStore, watchStore } from './support/store-guard';
+import { gotoStore, watchStore, expectNotChallenged } from './support/store-guard';
 
 const TE13 = '/?view=te13';
 const STATES = '/?view=te13-states';
@@ -386,7 +386,7 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
 
   test('AC2 lỗi 422 hiện trong vùng alert, nút bật lại', async ({ page }) => {
     const message = 'ES1-T158 mock: all in your cart.';
-    await page.route('**/cart/add.js', (route) => route.fulfill({ status: 422, contentType: 'application/json', body: JSON.stringify({ status: 422, message: 'Cart Error', description: message }) }));
+    await page.route(CART_GLOB.add, (route) => route.fulfill({ status: 422, contentType: 'application/json', body: JSON.stringify({ status: 422, message: 'Cart Error', description: message }) }));
     await page.goto(TE13);
     const scope = band(page, 'te13-a');
     const root = scope.locator('product-form');
@@ -410,7 +410,7 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
       await route.continue();
     });
     const posted: string[] = [];
-    await page.route('**/cart/add.js', (route) => {
+    await page.route(CART_GLOB.add, (route) => {
       posted.push(route.request().postData() ?? '');
       return route.fulfill({ status: 422, contentType: 'application/json', body: JSON.stringify({ description: 'ES1-T158 mock' }) });
     });
@@ -701,6 +701,7 @@ test.describe('ES1-T158 AC4 lỗi video', () => {
     expect(after?.width).toBe(size?.width);
     expect(after?.height).toBe(size?.height);
 
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('[data-testid="video-carousel"]').analyze();
     expect(violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
     expect(errors).toEqual([]);
@@ -756,6 +757,7 @@ test.describe('ES1-T158 chất lượng', () => {
     await scope.scrollIntoViewIfNeeded();
     await expect(scope.locator('video')).toHaveCount(1);
     await scope.getByTestId('video-card-poster').click();
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('[data-testid="video-carousel"]').include('[data-testid="featured-product"]').analyze();
     expect(violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
     expect(errors).toEqual([]);

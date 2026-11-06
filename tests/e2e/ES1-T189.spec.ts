@@ -6,6 +6,7 @@
 import { readFileSync, statSync } from 'node:fs';
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 
 const FIGMA = '/?view=figma';
@@ -91,6 +92,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).include(`[data-testid="${T.block}"]`).analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
@@ -101,7 +103,9 @@ test.describe('ES1-T189 tĩnh', () => {
     test.skip(ti.project.name !== 'desktop', 'static, chạy 1 lần ở desktop');
     expect(statSync(JS_FILE).size).toBeLessThanOrEqual(1536);
     const js = readFileSync(JS_FILE, 'utf8');
-    expect(js).not.toMatch(/fetch|XMLHttpRequest|partials|innerHTML|insertAdjacentHTML|console\./);
+    // ES1-T217: kiểm code, không kiểm comment: dòng 1 của file ghi "no fetch". Chỉ bỏ dòng comment nguyên dòng, không đụng chuỗi.
+    const code = js.replace(/^\s*\/\/.*$/gm, '');
+    expect(code).not.toMatch(/fetch|XMLHttpRequest|partials|innerHTML|insertAdjacentHTML|console\./);
     const liquid = readFileSync(LIQUID_FILE, 'utf8');
     expect(js).toContain('"collection-tabs"');
     expect(liquid).toContain('<collection-tabs');

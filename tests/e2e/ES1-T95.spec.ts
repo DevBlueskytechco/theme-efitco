@@ -4,6 +4,7 @@
 // Chưa có JS (ES1-T96): mở thử bằng thuộc tính open. EXPECT_CART_TYPE=page chỉ đặt khi preview có cart_type page (D12).
 import { test, expect, type APIRequestContext, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
@@ -36,6 +37,7 @@ async function forceOpen(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).include('[data-testid="cart-drawer-dialog"]').analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
@@ -178,7 +180,8 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
 
   test('CSS drawer: 0 literal màu, chỉ logical properties, có reduced-motion', () => {
     const css = readFileSync(join(process.cwd(), 'assets/base.css'), 'utf8');
-    const part = css.slice(css.indexOf('/** Cart drawer (TE-5'), css.indexOf('/** Gift card template'));
+    // ES1-T217: mục kế sau drawer là Image with text; toàn file do ES1-T217.spec.ts kiểm.
+    const part = css.slice(css.indexOf('/** Cart drawer (TE-5'), css.indexOf('/** Image with text (TE-7'));
     expect(part.length).toBeGreaterThan(0);
     expect(part.match(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/gi)).toBeNull();
     expect(part.match(/^\s*(left|right|top|bottom|width|height|(margin|padding)-(left|right|top|bottom))\s*:/gm)).toBeNull();

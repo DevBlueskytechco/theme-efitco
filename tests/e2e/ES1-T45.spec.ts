@@ -4,6 +4,7 @@
 // Theme chưa có locale RTL: bật RTL bằng document.documentElement.dir = 'rtl' (D6), không sửa layout.
 import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { fetchRetry429 } from './support/cart-api';
 
 const isDesktop = (ti: TestInfo) => ti.project.name === 'desktop';
@@ -207,6 +208,7 @@ test.describe('ES1-T45 rich-text (ES1-T44, ADR 0005)', () => {
 
   test('TC-13 axe vùng home-intro: 0 color-contrast, 0 serious/critical', async ({ page }) => {
     await openHome(page);
+    await expectNotChallenged(page);
     const axe = await new AxeBuilder({ page }).include('[data-testid="container-home-intro"]').analyze();
     const bad = axe.violations.filter(v => v.id === 'color-contrast' || ['serious', 'critical'].includes(v.impact || ''));
     const report = bad.map(v => `${v.impact} ${v.id}: ` + v.nodes.slice(0, 5).map(n => n.target.join(' ')).join(', ')).join('\n');

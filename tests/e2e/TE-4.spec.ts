@@ -6,6 +6,7 @@
 // So tiền: .js lấy bằng fetch trong trang để cùng market (ES1-T74). Nhóm nojs không chạy script trong trang: sản phẩm đọc JSON nhúng variant-json, giỏ đọc qua context phụ (ES1-T100, support/product-data.ts).
 import { test as base, expect, type Page, type Request, type Route } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
 import { pageJson, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
 import { CART, CART_GLOB } from './support/cart-api';
@@ -316,6 +317,7 @@ async function onPartial(page: Page, handle: string, handler: (route: Route) => 
 }
 
 async function expectNoSerious(page: Page, ...testIds: string[]) {
+  await expectNotChallenged(page);
   let builder = new AxeBuilder({ page });
   for (const id of testIds) builder = builder.include(`[data-testid="${id}"]`);
   const result = await builder.analyze();
