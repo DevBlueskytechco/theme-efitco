@@ -55,11 +55,14 @@ become hyphens).
 | background_sand_foreground | #1A1A1A | `background_sand_foreground_color` | `--color-background-sand-foreground` | Text on sand |
 | background_dark | #1E1E1E | `background_dark_color` | `--color-background-dark` | Footer, hero fallback, image overlay |
 | background_dark_foreground | #FFFFFF | `background_dark_foreground_color` | `--color-background-dark-foreground` | Text on dark and on hero images |
+| background_panel | #393942 | `background_panel_color` | `--color-background-panel` | Quiz, shop the look and bundle panels (1:507, 1:611, 1:718). Text uses `background_dark_foreground` |
 | muted_on_dark | #999999 | `muted_on_dark_color` | `--color-muted-on-dark` | Secondary text on dark only |
 | accent | #C8400E | `accent_color` | `--color-accent` | Primary buttons, active controls |
 | accent_foreground | #FFFFFF | `accent_foreground_color` | `--color-accent-foreground` | Text on accent |
 | sale | #BD1616 | `sale_color` | `--color-sale` | Sale badge, sale price |
 | sale_foreground | #FFFFFF | `sale_foreground_color` | `--color-sale-foreground` | Text on sale badge |
+| badge_new | #4B824D | `badge_new_color` | `--color-badge-new` | New badge background only, with white text (4.57:1). Never as text color |
+| badge_new_foreground | #FFFFFF | `badge_new_foreground_color` | `--color-badge-new-foreground` | Text on New badge |
 | rating | #FFC107 | `rating_color` | `--color-rating` | Rating stars only, never text |
 
 Section backgrounds are set in the template, not in a block setting:
@@ -76,6 +79,7 @@ These override the colors read from Figma. Visual diffs must not flag them.
 | Accent | #D94610 | #C8400E | 5.01:1 white text on accent, 4.55:1 on #F4F4F4 | #D94610 is 4.34:1, fails AA for 16px CTA text (CTO 30/10) |
 | Secondary gray on light | #999999, #808080 | #6B6B6B (`muted_light`) | 5.33 on white, 4.85 on #F4F4F4, 4.88 on #F5F5F1 | Figma grays are 2.85:1 and 3.95:1 (CTO 27/10) |
 | Gray on dark | #999999 | #999999 (`muted_on_dark`) | 5.85 on #1E1E1E | Allowed on dark only |
+| Gray on panel | #999999 | `background_dark_foreground` 60% mixed with `background_panel` (#B0B0B3) | 5.28 on #393942 | #999999 is 4.01:1 on the panel, fails AA for 14px and 16px text (ES1-T183) |
 | Text on sand | — | `muted` #4D4D4D for secondary text | 6.81 | `muted_light` is 4.30 on sand, fails AA |
 | Accent text on sand | — | only ≥ 24px or ≥ 18.66px bold | 4.03 | Passes AA large text only (ADR 0005) |
 
