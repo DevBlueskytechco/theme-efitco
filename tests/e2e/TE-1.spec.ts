@@ -371,7 +371,6 @@ test.describe('ES1-T23', () => {
     const product = await findProduct(page);
     test.skip(!product, 'store dev không có sản phẩm còn hàng');
     await page.goto('/');
-    await cartApi(page, CART.clear);
     const add = await cartApi(page, CART.add, { data: { items: [{ id: product!.variantId, quantity: 2 }] } });
     expect(add.ok()).toBeTruthy();
     await page.reload();
@@ -711,8 +710,6 @@ test.describe('ES1-T23', () => {
   // ---------- Case biên ----------
   test('TB-05 giỏ rỗng: không badge, cart link vẫn có accessible name', async ({ page }) => {
     await page.goto('/');
-    await cartApi(page, CART.clear);
-    await page.reload();
     const cart = page.getByTestId(T.header).getByTestId(T.cart);
     await expect(cart).toHaveAccessibleName(/\S/);
     await expect(cart.getByTestId(T.cartCount)).toHaveCount(0);

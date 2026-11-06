@@ -8,7 +8,7 @@ import { test as base, expect, type Page, type Request, type Route } from '@play
 import AxeBuilder from '@axe-core/playwright';
 import { env } from './support/store-data';
 import { pageJson, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
-import { CART, CART_GLOB, cartApi } from './support/cart-api';
+import { CART, CART_GLOB } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
 
 // DoD: 0 console error trên mọi test. Fixture tự chạy, kiểm sau mỗi test.
@@ -238,8 +238,6 @@ type CartJs = { items: Array<{ variant_id: number; quantity: number; properties:
 const cartItems = async (page: Page) => (await readCartJson<CartJs>(page)).items;
 // Nhóm nojs: không fetch trong trang được.
 const cartItemsNoScript = async (page: Page) => (await readCartNoScript<CartJs>(page)).items;
-
-const clearCart = (page: Page) => cartApi(page, CART.clear);
 
 function optionValue(page: Page, index: number, value: string) {
   return tid(page, T.option).nth(index).getByTestId(T.optionValue).filter({
@@ -1380,7 +1378,6 @@ test.describe('ES1-T70 TE-4 AC8 thêm giỏ', () => {
     await page.addInitScript(() => {
       document.addEventListener('theme:cart:updated', (e) => sessionStorage.setItem('__te4Cart', JSON.stringify((e as CustomEvent).detail ?? null)));
     });
-    await clearCart(page);
     await openBuyable(page);
     await skipIfDrawer(page);
     const variantId = await currentId(page);
@@ -1392,12 +1389,10 @@ test.describe('ES1-T70 TE-4 AC8 thêm giỏ', () => {
     expect(detail?.source).toBe('product-form');
     expect(detail?.item?.variant_id).toBe(variantId);
     expect((await cartItems(page)).some((i) => i.variant_id === variantId)).toBeTruthy();
-    await clearCart(page);
   });
 
   test('AC8 TC-802 thành công: shopify:cart:lines-update action add, GID đúng, dispatch trước POST, promise resolve cart', async ({ page }) => {
     await captureEvents(page, [EVENT_CART]);
-    await clearCart(page);
     await openBuyable(page);
     const variantId = await currentId(page);
     await tid(page, T.add).click();
@@ -1413,7 +1408,6 @@ test.describe('ES1-T70 TE-4 AC8 thêm giỏ', () => {
     expect(e.warnings).toEqual([]);
     expect(e.cart).toContain(String(variantId));
     expect(e.rejected).toBeUndefined();
-    await clearCart(page);
   });
 
   test('AC8 TC-807 lỗi 422: shopify:cart:lines-update resolve userErrors từ API, không reject', async ({ page, consoleGuard }) => {
@@ -1456,24 +1450,20 @@ test.describe('ES1-T70 TE-4 AC8 thêm giỏ', () => {
 
   test('AC8 TC-804 mất mạng (route.abort): không lỗi JS, rơi về submit form thường, tới /cart', async ({ page, consoleGuard }) => {
     consoleGuard.allowNetworkLog();
-    await clearCart(page);
     await openBuyable(page);
     const variantId = await currentId(page);
     await page.route(ADD_GLOB, (route) => route.abort());
     await tid(page, T.add).click();
     await page.waitForURL(isCart);
     expect((await cartItems(page)).some((i) => i.variant_id === variantId)).toBeTruthy();
-    await clearCart(page);
   });
 
   test('AC8 TC-805 HTTP 500 không có JSON: rơi về submit form thường, tới /cart', async ({ page, consoleGuard }) => {
     consoleGuard.allowNetworkLog();
-    await clearCart(page);
     await openBuyable(page);
     await page.route(ADD_GLOB, (route) => route.fulfill({ status: 500, contentType: 'text/html', body: '<html></html>' }));
     await tid(page, T.add).click();
     await page.waitForURL(isCart);
-    await clearCart(page);
   });
 
   test('AC8 TC-806 keyboard: Enter trên nút Add to cart gửi cart/add.js đúng 1 lần', async ({ page }) => {
@@ -1691,7 +1681,6 @@ test.describe('ES1-T70 TE-4 nojs', () => {
   });
 
   test('AC2 TC-251 nojs chọn variant thứ 2 trong select, submit: /cart.js đúng variant', async ({ page }) => {
-    await clearCart(page);
     const handle = await open(page, DATA.variants, 'TE4_VARIANTS_HANDLE');
     const js = await productDataNoScript(page, handle);
     const target = js.variants.filter((v) => v.available)[1];
@@ -1705,7 +1694,6 @@ test.describe('ES1-T70 TE-4 nojs', () => {
     await tid(page, T.add).click();
     await page.waitForURL(isCart);
     expect((await cartItemsNoScript(page)).map((i) => i.variant_id)).toEqual([target.id]);
-    await clearCart(page);
   });
 
   test('AC2 TC-252 nojs ?variant= render đúng variant trong select và hidden id', async ({ page }) => {
@@ -1732,7 +1720,6 @@ test.describe('ES1-T70 TE-4 nojs', () => {
   });
 
   test('AC6 TC-651 nojs gift card submit có 4 properties', async ({ page }) => {
-    await clearCart(page);
     await open(page, DATA.giftCard, 'TE4_GIFT_CARD_HANDLE');
     await tid(page, T.giftToggle).check();
     await tid(page, T.giftEmail).fill('recipient@example.com');
@@ -1746,7 +1733,6 @@ test.describe('ES1-T70 TE-4 nojs', () => {
     expect(props['Recipient name']).toBe('Recipient Test');
     expect(props['Message']).toBe('Happy birthday');
     expect(props['Send on']).toBeTruthy();
-    await clearCart(page);
   });
 
   test('AC7 TC-751 nojs 2 khối recommendations hidden, data hook đúng, list rỗng', async ({ page }) => {
@@ -1768,14 +1754,12 @@ test.describe('ES1-T70 TE-4 nojs', () => {
   });
 
   test('AC8 TC-851 nojs thêm giỏ không chọn gì: POST form thường, tới /cart, đúng variant mặc định', async ({ page }) => {
-    await clearCart(page);
     await open(page, DATA.variants, 'TE4_VARIANTS_HANDLE');
     test.skip(await tid(page, T.add).isDisabled(), 'Variant mặc định hết hàng');
     const id = Number(await tid(page, T.variantSelect).inputValue());
     await tid(page, T.add).click();
     await page.waitForURL(isCart);
     expect((await cartItemsNoScript(page)).map((i) => i.variant_id)).toEqual([id]);
-    await clearCart(page);
   });
 
   test('AC9 TC-951 nojs sản phẩm 1 variant: không picker, không select, có hidden id', async ({ page }) => {

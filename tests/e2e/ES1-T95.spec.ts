@@ -8,7 +8,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
 import { getJson } from './support/http';
-import { CART, cartApi } from './support/cart-api';
+import { CART, cartApi, skip429 } from './support/cart-api';
 
 type Product = { variants: { id: number; available: boolean }[] };
 
@@ -21,7 +21,7 @@ const tid = (page: Page, id: string) => page.getByTestId(id);
 
 async function addToCart(request: APIRequestContext, handle: string) {
   const r = await getJson<Product>(request, `/products/${handle}.js`);
-  test.skip(r.status === 429, `Shopify trả 429 cho ${handle}.js sau khi thử lại (giới hạn store dev)`);
+  if (r.status === 429) skip429(`Shopify trả 429 cho ${handle}.js sau khi thử lại (giới hạn store dev)`);
   expect(r.ok, `/products/${handle}.js trả ${r.status}`).toBeTruthy();
   const variant = (r.body as Product).variants.find((v) => v.available);
   test.skip(!variant, `${handle} không có variant bán được`);
@@ -55,10 +55,6 @@ async function noJsPage(browser: Browser) {
 }
 
 test.describe('ES1-T95 TE-5 cart drawer', () => {
-  test.beforeEach(async ({ page }) => {
-    await cartApi(page, CART.clear);
-  });
-
   test('AC1-markup đúng 1 cart-drawer sau footer, ngoài container, mọi trang', async ({ page }) => {
     for (const path of ['/', '/collections/all', '/search?q=a', '/cart', ...(ENV.product ? [`/products/${ENV.product}`] : [])]) {
       await page.goto(path);

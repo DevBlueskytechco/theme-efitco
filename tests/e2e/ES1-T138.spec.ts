@@ -8,6 +8,7 @@ import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { env } from './support/store-data';
 import { watchShopPay403 } from './support/console-guard';
+import { skip429 } from './support/cart-api';
 
 const TE11 = '/?view=te11';
 const MANY = '/collections/all/quiz-upper+quiz-beginner+quiz-home?view=quiz';
@@ -170,7 +171,7 @@ test.describe('ES1-T138 TE-11 kết quả quiz', () => {
     await expect(first).toBeVisible();
     const handle = new URL((await first.getAttribute('href'))!, page.url()).pathname.split('/').pop()!;
     const product = await context.request.get(`${url.origin}/products/${handle}.json`);
-    test.skip(product.status() === 429, 'Store trả 429 cho /products/*.json, không đọc được tag (xem ES1-T100)');
+    if (product.status() === 429) skip429('Store trả 429 cho /products/*.json, không đọc được tag (xem ES1-T100)');
     expect(product.ok()).toBeTruthy();
     const { product: data } = (await product.json()) as { product: { tags: string } };
     const tags = data.tags.split(',').map((tag) => tag.trim());

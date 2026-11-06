@@ -5,9 +5,10 @@ import { test as base, expect, type Page, type Route } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
-import { productData, readCartJson } from './support/product-data';
+import { readCartJson } from './support/product-data';
 import { watchShopPay403 } from './support/console-guard';
-import { CART, CART_GLOB, cartApi } from './support/cart-api';
+import { CART, CART_GLOB, cartApi, skip429, themeAdd } from './support/cart-api';
+import { lineKeys, seedCart } from './support/cart-seed';
 
 type CartJs = { item_count: number; items: { key: string; quantity: number }[] };
 type Guard = { allowNetworkLog: () => void };
@@ -99,13 +100,7 @@ async function listen(page: Page) {
 
 async function seed(page: Page, quantities: number[]) {
   test.skip(!HANDLE, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-  await page.goto(`/products/${HANDLE}`);
-  const variant = (await productData(page, HANDLE!)).variants.find((v) => v.available);
-  test.skip(!variant, `${HANDLE} không có variant bán được`);
-  const items = quantities.map((quantity, i) => ({ id: variant!.id, quantity, properties: { _t98: String(i) } }));
-  const res = await cartApi(page, CART.add, { data: { items } });
-  expect(res.ok(), `${CART.add} trả ${res.status()}`).toBeTruthy();
-  return variant!.id;
+  return seedCart(page, HANDLE!, quantities, '_t98');
 }
 
 // cart-drawer.js đặt data-actions sau khi configure xong. Thiếu thì Shopify.actions chưa có tới window load (ES1-T91 #1).
@@ -145,7 +140,7 @@ async function setQuantity(page: Page, key: string, value: string) {
 async function changeAndWait(page: Page, key: string, value: string) {
   const response = page.waitForResponse((r) => r.url().includes(CART.change));
   await setQuantity(page, key, value);
-  await response;
+  if ((await response).status() === 429) skip429(`theme nhận 429: ${CART.change}`);
   await idle(page);
 }
 
@@ -220,8 +215,6 @@ test.describe('ES1-T98 contract', () => {
 
 test.describe('ES1-T98 TE-5 AC7', () => {
   test.beforeEach(async ({ page }) => {
-    const res = await cartApi(page, CART.clear);
-    expect(res.ok(), `${CART.clear} trả ${res.status()}`).toBeTruthy();
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await listen(page);
   });
@@ -319,8 +312,7 @@ test.describe('ES1-T98 TE-5 AC7', () => {
     await seed(page, [2]);
     await openPage(page);
     await actionsReady(page);
-    const { items } = await readCart(page);
-    const key = items[0].key;
+    const [key] = await lineKeys(page);
     const refreshes = countRefreshes(page);
     await callAction(page, 'updateCart', { lines: [{ id: key, quantity: 3 }] });
     const cart = await readCart(page);
@@ -348,11 +340,14 @@ test.describe('ES1-T98 TE-5 AC7', () => {
   test('AC7 thêm giỏ từ trang sản phẩm: đúng 1 event context product, không dispatch lần 2', async ({ page }) => {
     test.skip(PAGE_MODE, 'Preview đặt cart_type page: thêm giỏ rời trang');
     test.skip(!HANDLE, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-    await page.goto(`/products/${HANDLE}`);
-    await actionsReady(page);
+    const open = async () => {
+      await page.goto(`/products/${HANDLE}`);
+      await actionsReady(page);
+    };
+    await open();
     const add = tid(page, 'product-form-add');
     test.skip(await add.isDisabled(), 'Variant mặc định hết hàng');
-    await add.click();
+    await themeAdd(page, () => add.click(), open);
     await expect(dialog(page)).toBeVisible();
     const list = await settled(page);
     expect(list.map((e) => `${e.action}/${e.context}`)).toEqual(['add/product']);
@@ -368,7 +363,7 @@ test.describe('ES1-T98 TE-5 AC7', () => {
       test(`AC7 đổi số lượng: 1 event update context ${surface.context}, promise có cart`, async ({ page }) => {
         await seed(page, [1]);
         await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+        const [key] = await lineKeys(page);
         await changeAndWait(page, key, '2');
         const list = await settled(page);
         expect(list).toHaveLength(1);
@@ -394,7 +389,7 @@ test.describe('ES1-T98 TE-5 AC7', () => {
       test('AC7 nhập 0: event remove', async ({ page }) => {
         await seed(page, [1]);
         await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+        const [key] = await lineKeys(page);
         await changeAndWait(page, key, '0');
         const list = await settled(page);
         expect(list).toHaveLength(1);
@@ -404,7 +399,7 @@ test.describe('ES1-T98 TE-5 AC7', () => {
       test('AC7 debounce: 3 lần đổi trong 300 ms chỉ 1 event, 1 POST', async ({ page }) => {
         await seed(page, [1]);
         await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+        const [key] = await lineKeys(page);
         const response = page.waitForResponse((r) => r.url().includes(CART.change));
         await quantityOf(page, key).evaluate((el: HTMLInputElement) => {
           for (const value of ['2', '3', '2']) {
@@ -422,7 +417,7 @@ test.describe('ES1-T98 TE-5 AC7', () => {
       test('AC7 ô trống: không event', async ({ page }) => {
         await seed(page, [2]);
         await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+        const [key] = await lineKeys(page);
         await setQuantity(page, key, '');
         await expect(quantityOf(page, key)).toHaveValue('2');
         await page.waitForTimeout(500);
@@ -433,7 +428,7 @@ test.describe('ES1-T98 TE-5 AC7', () => {
         guard.allowNetworkLog();
         await seed(page, [1]);
         await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+        const [key] = await lineKeys(page);
         await page.route(CHANGE, (route: Route) => route.fulfill({ status: 422, json: { status: 422, message: 'Cart Error', description: MOCK_422 } }));
         await changeAndWait(page, key, '99');
         await expect(tid(page, 'cart-items-error')).toHaveText(MOCK_422);
@@ -448,7 +443,7 @@ test.describe('ES1-T98 TE-5 AC7', () => {
         guard.allowNetworkLog();
         await seed(page, [1]);
         await surface.open(page);
-        const key = (await readCart(page)).items[0].key;
+        const [key] = await lineKeys(page);
         const message = await tid(page, 'cart-items').getAttribute('data-label-error');
         await page.route(CHANGE, (route: Route) => route.abort());
         await setQuantity(page, key, '2');
@@ -468,7 +463,7 @@ test.describe('ES1-T98 TE-5 AC7', () => {
     await page.route(CDN, (route: Route) => route.abort());
     await page.goto('/cart');
     await expect(tid(page, 'cart-items')).toHaveAttribute('data-enhanced', '', { timeout: 15_000 });
-    const key = (await readCart(page)).items[0].key;
+    const [key] = await lineKeys(page);
     await changeAndWait(page, key, '2');
     expect(await entries(page)).toEqual([]);
     expect((await readCart(page)).items[0].quantity).toBe(2);

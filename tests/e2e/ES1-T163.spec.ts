@@ -50,22 +50,22 @@ test.describe('ES1-T163 cartApi logic', () => {
     expect(Date.now() - started).toBeGreaterThanOrEqual(1900);
   });
 
-  test('TC-03 429 cả 3 lần: chờ đúng 2 lần, skip với lý do có N và path, log đúng dạng script đếm', async () => {
+  test('TC-03 429 cả 4 lần: chờ đúng 3 lần 2, 4, 8 s (ES1-T201), skip với lý do có N và path, log đúng dạng script đếm', async () => {
     replies = always429('1');
     const lines: string[] = [];
     const log = console.log;
     console.log = (...args: unknown[]) => { lines.push(args.join(' ')); };
     const started = Date.now();
     try {
-      await expectSkip(() => cartApi(fake, CART.clear), `429 sau 3 lần thử: ${CART.clear}`);
+      await expectSkip(() => cartApi(fake, CART.clear), `429 sau 4 lần thử: ${CART.clear}`);
     } finally {
       console.log = log;
     }
-    expect(calls).toHaveLength(3);
+    expect(calls).toHaveLength(4);
     const elapsed = Date.now() - started;
-    expect(elapsed).toBeGreaterThanOrEqual(1900);
-    expect(elapsed).toBeLessThan(3000); // lần 429 thứ 3 không chờ thêm
-    expect(lines.filter((l) => l.includes('[cartApi] 429 lần'))).toHaveLength(3);
+    expect(elapsed).toBeGreaterThanOrEqual(13_900);
+    expect(elapsed).toBeLessThan(15_000); // lần 429 thứ 4 không chờ thêm
+    expect(lines.filter((l) => l.includes('[cartApi] 429 lần'))).toHaveLength(4);
     expect(lines.filter((l) => l.includes('trả 429'))).toHaveLength(1);
   });
 
@@ -81,7 +81,7 @@ test.describe('ES1-T163 cartApi logic', () => {
 
   test('TC-05 retryDelayMs: giá trị hợp lệ, không hợp lệ, chạm ngân sách', () => {
     expect(retryDelayMs('3', 0)).toBe(3000);
-    expect(retryDelayMs('1.5', 0)).toBe(1500);
+    expect(retryDelayMs('1.5', 0)).toBe(2000); // nhỏ hơn mức chờ của lượt (ES1-T201)
     expect(retryDelayMs(undefined, 0)).toBe(2000);
     expect(retryDelayMs('', 0)).toBe(2000);
     expect(retryDelayMs('0', 0)).toBe(2000);

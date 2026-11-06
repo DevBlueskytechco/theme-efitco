@@ -7,7 +7,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
-import { CART, CART_GLOB, cartApi } from './support/cart-api';
+import { CART, CART_GLOB, cartApi, themeAdd } from './support/cart-api';
 import { readCartJson } from './support/product-data';
 import { watchShopPay403 } from './support/console-guard';
 
@@ -68,9 +68,12 @@ async function openDrawerProduct(page: Page) {
   await openProduct(page);
 }
 
+// Bấm thêm giỏ thật. Theme nhận 429 thì mở lại trang và bấm lại (support/cart-api.ts).
+const clickAdd = (page: Page, reopen: () => Promise<void> = () => openProduct(page)) => themeAdd(page, () => add(page).click(), reopen);
+
 // Mở bằng thêm giỏ; chờ partial xong và product-form mở khoá thì opener mới nhận focus được.
 async function addAndOpen(page: Page) {
-  await add(page).click();
+  await clickAdd(page);
   await expect(dialog(page)).toBeVisible();
   await expect(dialog(page)).not.toHaveAttribute('aria-busy', /.*/);
   await expect(add(page)).toBeEnabled();
@@ -115,7 +118,6 @@ test.describe('ES1-T96 contract', () => {
 
 test.describe('ES1-T96 TE-5 cart drawer', () => {
   test.beforeEach(async ({ page }) => {
-    await cartApi(page, CART.clear);
     await page.emulateMedia({ reducedMotion: 'reduce' });
   });
 
@@ -241,7 +243,7 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     await openDrawerProduct(page);
     const path = new URL(page.url()).pathname;
     await page.route((url) => url.pathname === path, (route) => (route.request().resourceType() === 'fetch' ? route.abort() : route.fallback()));
-    await add(page).click();
+    await clickAdd(page);
     await page.waitForURL(isCart);
     expect((await readCartJson<CartJs>(page)).item_count).toBeGreaterThan(0);
   });
@@ -270,11 +272,10 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
   test('AC1 bfcache: refresh cart-count từ server, không mở; refresh lỗi không rời trang', async ({ page, guard }) => {
     guard.allowNetworkLog();
     await openDrawerProduct(page);
-    const url = await tid(page, 'product-form').getAttribute('data-cart-add-url');
     const id = await tid(page, 'product-form-variant-id').inputValue();
-    await page.evaluate(async ({ url, id }) => {
-      await fetch(`${url}.js`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: Number(id), quantity: 1 }) });
-    }, { url, id });
+    // Thêm ngoài trang (cùng cookie giỏ) để trang đang mở lệch server. POST bằng fetch trong trang kích hoạt Cloudflare challenge (CI #82).
+    const added = await cartApi(page, CART.add, { data: { id: Number(id), quantity: 1 } });
+    expect(added.ok(), `${CART.add} trả ${added.status()}`).toBeTruthy();
     const persisted = () => page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: true })));
     await persisted();
     await expect(tid(page, 'header-cart-count')).toHaveText(String((await readCartJson<CartJs>(page)).item_count));
@@ -299,8 +300,12 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
 
   test('AC6 flip data-cart-type page: thêm giỏ chuyển /cart', async ({ page }) => {
     await openDrawerProduct(page);
-    await tid(page, 'product-form').evaluate((el) => el.setAttribute('data-cart-type', 'page'));
-    await add(page).click();
+    const flip = () => tid(page, 'product-form').evaluate((el) => el.setAttribute('data-cart-type', 'page'));
+    await flip();
+    await clickAdd(page, async () => {
+      await openProduct(page);
+      await flip();
+    });
     await page.waitForURL(isCart);
     expect((await readCartJson<CartJs>(page)).item_count).toBeGreaterThan(0);
   });
@@ -309,7 +314,7 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     test.skip(!PAGE_MODE, 'Cần preview đặt cart_type page + EXPECT_CART_TYPE=page (D12)');
     await openProduct(page);
     await expect(dialog(page)).toHaveCount(0);
-    await add(page).click();
+    await clickAdd(page);
     await page.waitForURL(isCart);
   });
 
@@ -327,7 +332,7 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     await page.route(/\/cart-drawer\.js(\?|$)/, (route) => route.abort());
     await openProduct(page, ['product-form']);
     expect(await page.evaluate(() => !!customElements.get('cart-drawer'))).toBe(false);
-    await add(page).click();
+    await clickAdd(page, () => openProduct(page, ['product-form']));
     await page.waitForURL(isCart);
     expect((await readCartJson<CartJs>(page)).item_count).toBeGreaterThan(0);
   });

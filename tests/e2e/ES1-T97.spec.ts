@@ -7,8 +7,9 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
-import { CART, CART_GLOB, cartApi } from './support/cart-api';
-import { productData, readCartJson } from './support/product-data';
+import { CART, CART_GLOB, skip429 } from './support/cart-api';
+import { lineKeys, seedCart } from './support/cart-seed';
+import { readCartJson } from './support/product-data';
 import { watchShopPay403 } from './support/console-guard';
 
 type CartItem = { key: string; quantity: number; final_line_price: number };
@@ -56,12 +57,7 @@ const stayed = (page: Page) => page.evaluate(() => (window as unknown as { __t97
 // Thêm dòng cùng variant, khác property ẩn: mỗi dòng 1 line key riêng, không cần sản phẩm thứ 2 (D8).
 async function seed(page: Page, quantities: number[], handle = HANDLE) {
   test.skip(!handle, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-  await page.goto(`/products/${handle}`);
-  const variant = (await productData(page, handle!)).variants.find((v) => v.available);
-  test.skip(!variant, `${handle} không có variant bán được`);
-  const items = quantities.map((quantity, i) => ({ id: variant!.id, quantity, properties: { _t97: String(i) } }));
-  const res = await cartApi(page, CART.add, { data: { items } });
-  expect(res.ok(), `${CART.add} trả ${res.status()}`).toBeTruthy();
+  await seedCart(page, handle!, quantities, '_t97');
 }
 
 async function ready(page: Page) {
@@ -110,7 +106,7 @@ const idle = (page: Page) => expect(tid(page, 'cart-items')).not.toHaveAttribute
 async function changeAndWait(page: Page, key: string, value: string) {
   const response = page.waitForResponse((r) => r.url().includes(CART.change));
   await setQuantity(page, key, value);
-  await response;
+  if ((await response).status() === 429) skip429(`theme nhận 429: ${CART.change}`);
   await idle(page);
 }
 
@@ -191,15 +187,13 @@ const SURFACES: Surface[] = [
 for (const surface of SURFACES) {
   test.describe(`ES1-T97 TE-5 ${surface.name}`, () => {
     test.beforeEach(async ({ page }) => {
-      await cartApi(page, CART.clear);
       await page.emulateMedia({ reducedMotion: 'reduce' });
     });
 
     test('AC2 đổi số lượng: tổng và cart-count theo /cart.js, không reload, giữ focus, aria-busy, status, event', async ({ page }) => {
       await seed(page, [1]);
       await surface.open(page);
-      const { items } = await readCart(page);
-      const key = items[0].key;
+      const [key] = await lineKeys(page);
       await expect(tid(page, 'cart-update')).toBeHidden();
       await expect(tid(page, 'cart-items')).not.toHaveAttribute('aria-busy', /.*/);
       const refreshes = countRefreshes(page);
@@ -235,7 +229,7 @@ for (const surface of SURFACES) {
     test('AC2 debounce: đổi liên tiếp trong 300 ms chỉ gửi 1 POST với số cuối', async ({ page }) => {
       await seed(page, [1]);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       const writes = countWrites(page);
       const response = page.waitForResponse((r) => r.url().includes(CART.change));
       await quantityOf(page, key).evaluate((el: HTMLInputElement) => {
@@ -253,7 +247,7 @@ for (const surface of SURFACES) {
     test('AC2 ghi tuần tự: 2 dòng đổi cùng lúc không chồng POST, đúng line key, 1 lần refresh', async ({ page }) => {
       await seed(page, [1, 1]);
       await surface.open(page);
-      const [a, b] = (await readCart(page)).items.map((i) => i.key);
+      const [a, b] = await lineKeys(page);
       const refreshes = countRefreshes(page);
       const writes = countWrites(page);
       let release = () => {};
@@ -287,7 +281,7 @@ for (const surface of SURFACES) {
     test('AC2 đổi trong lúc refresh: huỷ refresh cũ, kết quả theo lần đổi cuối, không lỗi', async ({ page }) => {
       await seed(page, [1]);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       const path = new URL(page.url()).pathname;
       let release = () => {};
       const held = new Promise<void>((r) => (release = r));
@@ -314,7 +308,7 @@ for (const surface of SURFACES) {
     test('AC2 Enter trong ô số lượng không rời trang', async ({ page }) => {
       await seed(page, [1]);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       const response = page.waitForResponse((r) => r.url().includes(CART.change));
       await quantityOf(page, key).fill('2');
       await quantityOf(page, key).press('Enter');
@@ -327,7 +321,7 @@ for (const surface of SURFACES) {
     test('AC2 ô để trống: về số cũ, không gửi POST', async ({ page }) => {
       await seed(page, [2]);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       const writes = countWrites(page);
       await setQuantity(page, key, '');
       await expect(quantityOf(page, key)).toHaveValue('2');
@@ -337,7 +331,7 @@ for (const surface of SURFACES) {
     test('AC2 xoá 1 trong 2 dòng: focus sang input dòng kế, tổng đúng, status', async ({ page }) => {
       await seed(page, [1, 1]);
       await surface.open(page);
-      const [a, b] = (await readCart(page)).items.map((i) => i.key);
+      const [a, b] = await lineKeys(page);
       const lines = tid(page, 'cart-line');
       const firstKey = await lines.first().getAttribute('data-line-key');
       const otherKey = firstKey === a ? b : a;
@@ -383,7 +377,7 @@ for (const surface of SURFACES) {
     test('AC4 nhập 0 cũng xoá dòng, về trạng thái rỗng', async ({ page }) => {
       await seed(page, [1]);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       await changeAndWait(page, key, '0');
       await expect(tid(page, 'cart-empty')).toBeVisible();
       expect((await expectTotals(page)).item_count).toBe(0);
@@ -392,7 +386,7 @@ for (const surface of SURFACES) {
     test('AC2 mock 422: text API trong cart-items-error, input về số server, không refresh, không event', async ({ page }) => {
       await seed(page, [1]);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       const refreshes = countRefreshes(page);
       await page.route(CHANGE, (route: Route) => route.fulfill({ status: 422, json: { status: 422, message: 'Cart Error', description: MOCK_422 } }));
       await changeAndWait(page, key, '99');
@@ -424,7 +418,7 @@ for (const surface of SURFACES) {
       guard.allowNetworkLog();
       await seed(page, [1]);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       const refreshes = countRefreshes(page);
       await page.route(CHANGE, (route: Route) => route.abort());
       await setQuantity(page, key, '2');
@@ -444,7 +438,7 @@ for (const surface of SURFACES) {
       guard.allowNetworkLog();
       await seed(page, [1]);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       await page.route(CHANGE, (route: Route) => route.fulfill({ status: 500, contentType: 'text/html', body: '<h1>500</h1>' }));
       await changeAndWait(page, key, '2');
       await expect(tid(page, 'cart-items-error')).toHaveText((await label(page, 'error'))!);
@@ -464,7 +458,7 @@ for (const surface of SURFACES) {
       guard.allowNetworkLog();
       await seed(page, [1]);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       const path = new URL(page.url()).pathname;
       await page.route(
         (url) => url.pathname === path,
@@ -481,7 +475,7 @@ for (const surface of SURFACES) {
       test.skip(!LIMITED, 'Thiếu TE5_LIMITED_HANDLE (ES1-T91 #7): store dev chưa có sản phẩm giới hạn tồn; nhánh 422 và 200 giảm đã có test mock');
       await seed(page, [1], LIMITED);
       await surface.open(page);
-      const key = (await readCart(page)).items[0].key;
+      const [key] = await lineKeys(page);
       await changeAndWait(page, key, '9999');
       const cart = await expectTotals(page);
       const quantity = cart.items[0].quantity;
@@ -507,7 +501,7 @@ test.describe('ES1-T97 progressive enhancement', () => {
   test('AC2 note ở /cart: đổi textarea không gửi POST và không bị hàng đợi đụng tới', async ({ page }) => {
     await seed(page, [1]);
     await openPage(page);
-    const key = (await readCart(page)).items[0].key;
+    const [key] = await lineKeys(page);
     const writes = countWrites(page);
     await tid(page, 'cart-page-note').fill('ES1-T97 note');
     await tid(page, 'cart-page-note').blur();

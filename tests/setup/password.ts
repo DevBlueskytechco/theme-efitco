@@ -1,6 +1,8 @@
 import { chromium } from '@playwright/test';
+import { printSummary429, startLog429 } from '../e2e/support/report-429';
 // Mở khoá password store dev, rồi mở PREVIEW_URL (?preview_theme_id=...) để phiên giữ theme preview cho mọi trang test.
 export default async () => {
+  startLog429();
   const preview = process.env.PREVIEW_URL!;
   const origin = new URL(preview).origin;
   const b = await chromium.launch(); const p = await b.newPage();
@@ -17,5 +19,12 @@ export default async () => {
   if (new URL(p.url()).pathname.startsWith('/password')) {
     throw new Error('Không mở khoá được store: kiểm STORE_PASSWORD (secret GitHub / .env)');
   }
+  // ES1-T201: spec dựa vào giỏ rỗng ở mỗi context mới, không gọi /cart/clear.js. Có cookie cart thì mọi test dùng chung 1 giỏ: xoá và ghi log. Chỉ in tên cookie.
+  const cookies = await p.context().cookies();
+  const hasCart = cookies.some((c) => c.name === 'cart');
+  console.log(`[state] cookie: ${cookies.map((c) => c.name).join(' ')} | cookie cart: ${hasCart ? 'có, đã xoá' : 'không'}`);
+  if (hasCart) await p.context().clearCookies({ name: 'cart' });
   await p.context().storageState({ path: 'tests/setup/state.json' }); await b.close();
+  // Hàm trả về là global teardown: in tổng kết 429 theo spec ở cuối shard.
+  return printSummary429;
 };
