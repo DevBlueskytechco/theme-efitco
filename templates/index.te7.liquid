@@ -20,6 +20,87 @@
   <h1 class="visually-hidden">{{ shop.name }}</h1>
 {% endblock %}
 
+{% comment %} Figma 1:625: banner on sand, no main image, 3 scattered images. {% endcomment %}
+{% block 'container', id: 'te7-iwt-banner', background: 'sand' %}
+  {% block 'image-with-text',
+    id: 'te7-banner',
+    layout: 'banner',
+    heading: 'Make fitness a natural part of your everyday life !',
+    body: '<p>Just simple, effective workouts you can do anytime at home</p>',
+    button_label: 'Get Started Now',
+    image: te7_image_4,
+    accent_image_1: te7_image_1,
+    accent_image_2: te7_image_2,
+    accent_image_3: te7_image_3
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} Banner with an eyebrow on sand and 1 accent image: the 2 empty ones are skipped. {% endcomment %}
+{% block 'container', id: 'te7-iwt-banner-one', background: 'sand' %}
+  {% block 'image-with-text',
+    id: 'te7-banner-one',
+    layout: 'banner',
+    eyebrow: 'Inspiration',
+    heading: 'One accent image',
+    body: '<p>The other two are empty.</p>',
+    button_label: 'Get Started Now',
+    accent_image_1: te7_image_1
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} Figma 1:992: split on dark, image left. accent_image_3 must not render in this layout. {% endcomment %}
+{% block 'container', id: 'te7-iwt-left', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'te7-left',
+    eyebrow: 'We are about',
+    heading: 'Why Choose Efitco?',
+    body: "<p>Affordable, high-quality fitness gear that supports beginners to elite athletes.</p><p>We design for the home first — equipment that folds, stacks or disappears when you're done, so your living room stays a living room between sessions.</p>",
+    button_label: 'View About Us',
+    image: te7_image_1,
+    image_position: 'left',
+    accent_image_1: te7_image_2,
+    accent_image_2: te7_image_3,
+    accent_image_3: te7_image_4
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} Same content with the image on the right. {% endcomment %}
+{% block 'container', id: 'te7-iwt-right', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'te7-right',
+    eyebrow: 'We are about',
+    heading: 'Why Choose Efitco?',
+    body: "<p>Affordable, high-quality fitness gear that supports beginners to elite athletes.</p><p>We design for the home first — equipment that folds, stacks or disappears when you're done, so your living room stays a living room between sessions.</p>",
+    button_label: 'View About Us',
+    image: te7_image_1,
+    image_position: 'right',
+    accent_image_1: te7_image_2,
+    accent_image_2: te7_image_3
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} No main image on sand: the dark frame stays and the text keeps sand colors. {% endcomment %}
+{% block 'container', id: 'te7-iwt-no-image', background: 'sand' %}
+  {% block 'image-with-text',
+    id: 'te7-no-image',
+    eyebrow: 'No main image',
+    heading: 'Dark frame',
+    body: '<p>The storefront keeps the dark frame next to this text.</p>',
+    button_label: 'View About Us'
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} All text and images empty: no block, no band (blocks/container.liquid). {% endcomment %}
+{% block 'container', id: 'te7-iwt-empty', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'te7-empty-split',
+    eyebrow: '',
+    heading: '',
+    body: '',
+    button_label: ''
+  %}{% endblock %}
+{% endblock %}
+
 {% comment %} Figma 1:885: 4 reviews, 4 columns from 80rem. Rating 4 on the second review. {% endcomment %}
 {% block 'container', id: 'te7-testimonials', background: 'cream' %}
   {% block 'testimonials', id: 'te7-figma', eyebrow: 'Testimonial', heading: 'What Our Customers Say?' %}
