@@ -484,3 +484,80 @@
     {% block 'testimonial-item', id: 'te7-d1-none', author: 'No rating' %}{% endblock %}
   {% endblock %}
 {% endblock %}
+
+{% comment %}
+  D1 (plan ES1-T169, ES1-T180): a value in a setting wins over default_*, an empty
+  setting takes default_*, show_item off hides the slide or the block. The heading
+  setting is plain text, so its ampersand and angle brackets stay text.
+{% endcomment %}
+{% block 'container', id: 'te7-d1-slideshow' %}
+  {% block 'slideshow' %}
+    {% block 'slideshow-slide',
+      id: 'te7-d1-slide-set',
+      eyebrow: 'Setting eyebrow',
+      heading: 'Setting <b>heading</b> & more',
+      subheading: 'Setting subheading',
+      button_label: 'Setting button',
+      default_eyebrow: 'Sample eyebrow',
+      default_heading: 'Sample<br> heading',
+      default_subheading: 'Sample subheading',
+      default_button_label: 'Sample button'
+    %}{% endblock %}
+    {% block 'slideshow-slide',
+      id: 'te7-d1-slide-sample',
+      default_eyebrow: 'Sample eyebrow',
+      default_heading: 'Sample<br> heading',
+      default_subheading: 'Sample subheading',
+      default_button_label: 'Sample button'
+    %}{% endblock %}
+    {% block 'slideshow-slide',
+      id: 'te7-d1-slide-hidden',
+      show_item: false,
+      default_heading: 'Sample hidden'
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te7-d1-iwt-set', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'te7-d1-iwt-set-block',
+    eyebrow: 'Setting eyebrow',
+    heading: 'Setting <b>heading</b> & more',
+    body: '<p>Setting body</p>',
+    button_label: 'Setting button',
+    default_eyebrow: 'Sample eyebrow',
+    default_heading: 'Sample<br> heading',
+    default_body: '<p>Sample body</p>',
+    default_button_label: 'Sample button'
+  %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te7-d1-iwt-sample', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'te7-d1-iwt-sample-block',
+    default_eyebrow: 'Sample eyebrow',
+    default_heading: 'Sample<br> heading',
+    default_body: '<p>Sample body</p>',
+    default_button_label: 'Sample button'
+  %}{% endblock %}
+{% endblock %}
+
+{% comment %} A merchant heading has no strong element, so the whole banner heading keeps the band color. {% endcomment %}
+{% block 'container', id: 'te7-d1-iwt-banner', background: 'sand' %}
+  {% block 'image-with-text',
+    id: 'te7-d1-iwt-banner-block',
+    layout: 'banner',
+    heading: 'Setting banner heading',
+    default_heading: '<strong>Sample</strong> heading',
+    default_button_label: 'Sample button'
+  %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'te7-d1-iwt-hidden', background: 'dark' %}
+  {% block 'image-with-text',
+    id: 'te7-d1-iwt-hidden-block',
+    show_item: false,
+    default_heading: 'Sample hidden',
+    default_button_label: 'Sample button'
+  %}{% endblock %}
+{% endblock %}

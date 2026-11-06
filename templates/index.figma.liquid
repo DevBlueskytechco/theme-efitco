@@ -46,6 +46,18 @@
   assign figma_image_3 = figma_product_3.featured_image
   assign figma_image_4 = figma_product_4.featured_image
 
+  assign slide_eyebrow = 'blocks.slideshow_slide.default_eyebrow' | t
+  assign slide_heading = 'blocks.slideshow_slide.default_heading_html' | t
+  assign slide_subheading = 'blocks.slideshow_slide.default_text' | t
+  assign slide_button_label = 'blocks.slideshow_slide.default_button_label' | t
+  assign banner_heading = 'blocks.image_with_text.banner_heading_html' | t
+  assign banner_body = 'blocks.image_with_text.banner_text_html' | t
+  assign banner_button_label = 'blocks.image_with_text.banner_button_label' | t
+  assign why_eyebrow = 'blocks.image_with_text.why_eyebrow' | t
+  assign why_heading = 'blocks.image_with_text.why_heading_html' | t
+  assign why_body = 'blocks.image_with_text.why_text_html' | t
+  assign why_button_label = 'blocks.image_with_text.why_button_label' | t
+
   assign testimonials_eyebrow = 'blocks.testimonials.default_eyebrow' | t
   assign testimonials_heading = 'blocks.testimonials.default_heading' | t
   assign r1_name = 'blocks.testimonial_item.r1_name' | t
@@ -88,8 +100,23 @@
 
 {% block 'container', id: 'figma-hero' %}
   {% block 'slideshow' %}
-    {% block 'slideshow-slide', id: 'figma-slide-1', priority: true, image: figma_image_1 %}{% endblock %}
-    {% block 'slideshow-slide', id: 'figma-slide-2', image: figma_image_2 %}{% endblock %}
+    {% block 'slideshow-slide',
+      id: 'figma-slide-1',
+      priority: true,
+      image: figma_image_1,
+      default_eyebrow: slide_eyebrow,
+      default_heading: slide_heading,
+      default_subheading: slide_subheading,
+      default_button_label: slide_button_label
+    %}{% endblock %}
+    {% block 'slideshow-slide',
+      id: 'figma-slide-2',
+      image: figma_image_2,
+      default_eyebrow: slide_eyebrow,
+      default_heading: slide_heading,
+      default_subheading: slide_subheading,
+      default_button_label: slide_button_label
+    %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
@@ -158,7 +185,10 @@
     layout: 'banner',
     accent_image_1: figma_image_1,
     accent_image_2: figma_image_2,
-    accent_image_3: figma_image_3
+    accent_image_3: figma_image_3,
+    default_heading: banner_heading,
+    default_body: banner_body,
+    default_button_label: banner_button_label
   %}{% endblock %}
 {% endblock %}
 
@@ -216,7 +246,11 @@
     id: 'figma-why-choose',
     image: figma_image_1,
     accent_image_1: figma_image_2,
-    accent_image_2: figma_image_3
+    accent_image_2: figma_image_3,
+    default_eyebrow: why_eyebrow,
+    default_heading: why_heading,
+    default_body: why_body,
+    default_button_label: why_button_label
   %}{% endblock %}
 {% endblock %}
 
