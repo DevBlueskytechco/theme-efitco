@@ -1,0 +1,167 @@
+{% doc %}
+  Collection page results (TE-6 AC1, AC2 partial region, ES1-T103 D3). Reads the
+  global `collection`. columns_mobile columns below 48rem; from 48rem
+  columns_desktop, at most 3; from 80rem columns_desktop.
+
+  Partial collection-products (name must match assets/collection-filters.js, BE
+  ES1-T110) wraps the whole paginate of 24: result count, grid, pagination and
+  empty message. `data-results-label` on the root inside the partial holds the
+  translated result count for the live region.
+
+  Variant items (multi-source collections, TE-3 AC8): same rule as
+  blocks/featured-collection.liquid. An item with a parent `product` is a
+  variant, and the card gets the parent product plus `variant: item`.
+
+  Card images: all lazy when the collection has a banner image (the banner is
+  the LCP element); otherwise the first columns_desktop cards are eager.
+
+  Loads assets/product-swatch.js outside the partial, always, because the grid
+  can change from empty to filled when JavaScript applies the partial.
+
+  Empty result (paginate.items is 0): a message for shoppers, also outside the
+  editor, because this is the page result and not a block missing its
+  configuration. No collection (block used outside the collection template): a
+  hint in the theme editor, nothing on the storefront.
+
+  Test hooks: collection-products (root), collection-results, collection-count,
+  collection-grid, collection-product, collection-empty, collection-empty-cta,
+  and the hooks of snippets/pagination.liquid. JS hook: data-results-label.
+
+  Self-contained: callers must leave the body empty.
+
+  @example
+  {% block 'container', id: 'collection-main' %}
+    <collection-filters class="collection-layout">
+      {% block 'collection-products' %}{% endblock %}
+    </collection-filters>
+  {% endblock %}
+{% enddoc %}
+
+{%- if collection == blank -%}
+  {%- if request.design_mode -%}
+    <div class="collection-products__hint" {{ block.shopify_attributes }}>
+      {{ 'blocks.collection_products.placeholder' | t }}
+    </div>
+  {%- endif -%}
+{%- else -%}
+  {%- liquid
+    # Select settings are strings; forloop.index needs a number to compare
+    assign columns_desktop = block.settings.columns_desktop | plus: 0
+    assign columns_mobile = block.settings.columns_mobile | plus: 0
+    assign columns_tablet = columns_desktop | at_most: 3
+
+    assign image_sizes = '(min-width: 80rem) calc(' | append: settings.max_page_width | append: ' / ' | append: columns_desktop | append: '), (min-width: 48rem) calc(100vw / ' | append: columns_tablet | append: '), calc(100vw / ' | append: columns_mobile | append: ')'
+    assign pagination_label = 'collections.pagination.label' | t
+  -%}
+
+  <div
+    class="collection-products"
+    style="--columns: {{ columns_desktop }}; --columns-tablet: {{ columns_tablet }}; --columns-mobile: {{ columns_mobile }};"
+    data-testid="collection-products"
+    {{ block.shopify_attributes }}
+  >
+    {% partial 'collection-products' %}
+      {% paginate collection.products by 24 %}
+        {%- assign results_label = 'blocks.collection_products.results_count' | t: count: paginate.items -%}
+        <div
+          class="collection-products__results"
+          data-results-label="{{ results_label | escape }}"
+          data-testid="collection-results"
+        >
+          {%- if paginate.items == 0 -%}
+            <div class="collection-products__empty" data-testid="collection-empty">
+              <p class="collection-products__empty-text">{{ 'blocks.collection_products.empty' | t }}</p>
+              <a
+                class="button button--secondary"
+                href="{{ routes.all_products_collection_url }}"
+                data-testid="collection-empty-cta"
+              >
+                {{- 'blocks.collection_products.empty_cta' | t -}}
+              </a>
+            </div>
+          {%- else -%}
+            <p class="collection-products__count" data-testid="collection-count">{{ results_label }}</p>
+
+            <ul class="collection-products__grid" role="list" data-testid="collection-grid">
+              {%- for item in collection.products -%}
+                {%- liquid
+                  assign card_product = item
+                  assign card_variant = nil
+                  if item.product != blank
+                    assign card_product = item.product
+                    assign card_variant = item
+                  endif
+
+                  assign card_loading = 'lazy'
+                  if collection.image == blank and forloop.index <= columns_desktop
+                    assign card_loading = 'eager'
+                  endif
+                -%}
+                <li class="collection-products__item" data-testid="collection-product">
+                  {% render 'product-card',
+                    product: card_product,
+                    variant: card_variant,
+                    id_prefix: 'collection',
+                    sizes: image_sizes,
+                    loading: card_loading,
+                    heading_level: 'h2'
+                  %}
+                </li>
+              {%- endfor -%}
+            </ul>
+
+            {% render 'pagination', paginate: paginate, label: pagination_label %}
+          {%- endif -%}
+        </div>
+      {% endpaginate %}
+    {% endpartial %}
+
+    <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.collection_products",
+  "settings": [
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "t:labels.columns_desktop",
+      "info": "t:info.collection_columns_desktop",
+      "options": [
+        {
+          "value": "2",
+          "label": "t:options.columns.two"
+        },
+        {
+          "value": "3",
+          "label": "t:options.columns.three"
+        },
+        {
+          "value": "4",
+          "label": "t:options.columns.four"
+        }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "t:labels.columns_mobile",
+      "info": "t:info.collection_columns_mobile",
+      "options": [
+        {
+          "value": "1",
+          "label": "t:options.columns.one"
+        },
+        {
+          "value": "2",
+          "label": "t:options.columns.two"
+        }
+      ],
+      "default": "2"
+    }
+  ]
+}
+{% endschema %}
