@@ -17,15 +17,23 @@ case "$NAME" in ai-*) ;; *) echo "::error::tên theme preview phải bắt đầ
 W="${RUNNER_TEMP:-${TMPDIR:-/tmp}}/preview-push"; mkdir -p "$W"
 find_id() {
   shopify theme list --json > "$W/list.json" 2> "$W/list.err" || { cat "$W/list.json" "$W/list.err" >&2; return 1; }
-  "$H" theme-id "$NAME" "$W/list.json"
+  "$H" preview-id "$NAME" "$W/list.json"
+}
+# Gán ID ở shell hiện tại. preview-id thoát 4 (theme cùng tên đang live, ES1-T162): dừng cả script trước mọi lệnh push/delete.
+lookup_id() {
+  local rc=0
+  ID="$(find_id)" || rc=$?
+  [ "$rc" != 4 ] || exit 1
+  [ "$rc" = 0 ] || ID=""
 }
 
 shopify version
-# Store dev giới hạn 20 theme: nhánh chưa có theme và store đã ≥ 16 theme → xoá theme ai-* cũ nhất (trừ ai-develop, không đụng live) (#45)
-if [ -z "$(find_id || true)" ]; then
+lookup_id
+# Store dev giới hạn 20 theme: nhánh chưa có theme và store đã ≥ 16 theme → xoá theme ai-* cũ nhất (trừ ai-develop, chỉ role unpublished/development) (#45)
+if [ -z "$ID" ]; then
   n=$(jq -r '(if type=="array" then . else (.themes // .data // []) end) | map(select(.role != "live")) | length' "$W/list.json" 2>/dev/null || echo 0)
   if [ "${n:-0}" -ge 16 ]; then
-    old=$(jq -r '(if type=="array" then . else (.themes // .data // []) end) | map(select((.name|startswith("ai-")) and .name != "ai-develop" and .role != "live")) | sort_by(.id|tostring|ltrimstr("gid://shopify/OnlineStoreTheme/")|tonumber) | .[0].id // empty' "$W/list.json")
+    old=$(jq -r '(if type=="array" then . else (.themes // .data // []) end) | map(select((.name|startswith("ai-")) and .name != "ai-develop" and ((.role // "") | tostring | ascii_downcase | IN("unpublished", "development")))) | sort_by(.id|tostring|ltrimstr("gid://shopify/OnlineStoreTheme/")|tonumber) | .[0].id // empty' "$W/list.json")
     [ -n "$old" ] && { echo "::warning::store đủ theme ($n), xoá preview cũ nhất ${old##*/}"; shopify theme delete --theme "${old##*/}" --force; }
   fi
 fi
@@ -33,7 +41,7 @@ TID=""
 # Shopify đôi khi trả 502 khi tạo theme: thử 3 lần, mỗi lần kiểm lại theme đã được tạo chưa.
 # status partial / issues[] (CLI 5.0 thoát != 0) là lỗi nội dung theme: in issues, dừng ngay, không thử lại.
 for i in 1 2 3; do
-  ID="$(find_id || true)"
+  lookup_id
   if [ -n "$ID" ]; then ARGS=(--theme "$ID"); else ARGS=(--unpublished --theme "$NAME"); fi
   rc=0; shopify theme push "${ARGS[@]}" --json --path . > "$W/push.json" 2> "$W/push.err" || rc=$?
   prc=0; TID="$("$H" push-result "$W/push.json")" || prc=$?
@@ -41,7 +49,7 @@ for i in 1 2 3; do
   cat "$W/push.json" "$W/push.err" >&2 || true
   [ "$prc" = 3 ] && { echo "::error::theme push partial/issues (rc=$rc) — sửa file theme theo issues ở trên"; exit 1; }
   # 4.x có lúc thoát 0 mà JSON thiếu id: lấy lại id theo tên
-  if [ "$rc" = 0 ]; then TID="$(find_id || true)"; [ -n "$TID" ] && break; fi
+  if [ "$rc" = 0 ]; then lookup_id; TID="$ID"; [ -n "$TID" ] && break; fi
   echo "::warning::theme push lần $i lỗi (rc=$rc)"
   [ "$i" = 3 ] && { echo "::error::theme push lỗi sau 3 lần"; exit 1; }
   sleep $((i * 20))

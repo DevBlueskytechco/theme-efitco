@@ -22,11 +22,17 @@ const test = base.extend<{ consoleGuard: ConsoleGuard }>({
     async ({ page }, use, info) => {
       const errors: string[] = [];
       let allowNetwork = false;
+      // Iframe Shop Pay (shop.app) trả 403 cho runner CI: log dạng 403 @ chrome-error:// (như TE-1 TB-28).
+      let shopApp403 = false;
+      page.on('response', (r) => {
+        if (r.status() === 403 && /^https:\/\/shop\.app\//.test(r.url())) shopApp403 = true;
+      });
       page.on('console', (msg) => {
         if (msg.type() !== 'error') return;
         const text = msg.text();
         const source = msg.location().url;
         if (IGNORE_CONSOLE.test(text) || IGNORE_CONSOLE.test(source)) return;
+        if (shopApp403 && /status of 403/.test(text) && source.startsWith('chrome-error://')) return;
         if (allowNetwork && NETWORK_LOG.test(text)) return;
         // ES1-T96: thêm giỏ thành công mở drawer, drawer import assets/cart-items.js (ES1-T97, chưa có thì 404). Chỉ bỏ log mạng của đúng file này.
         if (NETWORK_LOG.test(text) && /\/cart-items\.js/.test(source)) return;

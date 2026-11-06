@@ -3,6 +3,8 @@
 #   shopify-cli.sh pinned                     in phiên bản ghim (nguồn duy nhất cho CI)
 #   shopify-cli.sh assert-version [ver]       thoát 1 nếu `shopify version` khác ver (mặc định: bản ghim)
 #   shopify-cli.sh theme-id <name> <list.json>  in id (chuỗi số) theme đầu tiên trùng tên, rỗng nếu không có
+#   shopify-cli.sh preview-id <name> <list.json>  in id theme cùng tên role unpublished|development, rỗng nếu không có; thoát 4 nếu cùng tên đang live hoặc không đọc được role (ES1-T162)
+#   shopify-cli.sh live-theme-warn <list.json>    in ::warning:: nếu live theme tên ai-*; không chặn (thoát 0)
 #   shopify-cli.sh push-result <push.json>    in theme id; thoát 3 nếu status partial|failed có issues (in issues), 1 nếu lỗi khác
 #   shopify-cli.sh check-report <check.json>  in annotation GitHub (dòng/cột từ 1); thoát 1 nếu có lỗi severity error
 # Schema:
@@ -19,6 +21,9 @@ PINNED_CLI="4.9.5"
 JQ_LIB='
 def idnum: if . == null then empty else (tostring | sub(".*/"; "")) end;
 def themes: if type == "array" then . elif type == "object" then (.themes // .data.themes // .data // []) else [] end;
+def rolekey: (.role // "") | tostring | ascii_downcase;
+def is_live: rolekey | IN("live", "main");
+def id_or_unknown: [.id | idnum][0] // "không rõ";
 def sev: if type == "number" then (["error","warning","info"][.] // "info")
          elif type == "string" then ascii_downcase
          else "error" end;
@@ -48,6 +53,44 @@ case "$cmd" in
     jq -r --arg n "$1" "$JQ_LIB"'
       if type == "object" and has("error") then empty
       else themes | map(select(.name == $n)) | (.[0].id // null) | idnum end' "$2" ;;
+
+  preview-id)
+    [ $# -eq 2 ] || die "dùng: preview-id <name> <list.json>"
+    need_file "$2"
+    # Chặn cả role trống: không xác nhận được theme không live thì không dùng id đó để push.
+    parsed="$(jq -r --arg n "$1" "$JQ_LIB"'
+      if type == "object" and has("error") then empty
+      else [themes[] | select(.name == $n)] as $same
+        | ($same | map(select(is_live or rolekey == ""))) as $stop
+        | ($same | map(select(rolekey | IN("unpublished", "development")))) as $ok
+        | if ($stop | length) > 0 then
+            "STOP\t" + ($stop[0] | id_or_unknown) + "\t" + ($stop[0] | rolekey | if . == "" then "không rõ" else . end)
+          elif ($ok | length) > 0 then "OK\t" + ($ok[0] | id_or_unknown)
+          else ($same[] | "SKIP\t" + id_or_unknown + "\t" + rolekey) end
+      end' "$2")"
+    while IFS=$'\t' read -r kind a b; do
+      case "$kind" in
+        STOP)
+          echo "::error::theme '$1' (id $a) có role $b nên preview dừng: không push, không xoá, không đổi theme này. CTO cần đưa theme đúng trở lại live rồi chạy lại job." >&2
+          exit 4 ;;
+        OK) echo "$a" ;;
+        SKIP) echo "::warning::bỏ qua theme '$1' (id $a) role $b, không dùng làm preview" >&2 ;;
+      esac
+    done <<<"$parsed" ;;
+
+  live-theme-warn)
+    [ $# -eq 1 ] || die "dùng: live-theme-warn <list.json>"
+    need_file "$1"
+    jq -r "$JQ_LIB"'
+      if type == "object" and has("error") then "::warning::không đọc được danh sách theme: " + ((.error.message // (.error | tostring)) | esc)
+      else [themes[] | select(is_live)] as $live
+        | if ($live | length) == 0 then "::warning::danh sách theme không có theme live"
+          else $live[]
+            | if ((.name // "") | tostring | startswith("ai-")) then
+                "::warning::live theme đang là preview " + (.name | esc) + " (id " + id_or_unknown + "). CTO cần đưa theme đúng trở lại live; PR của nhánh này sẽ bị chặn ở bước push."
+              else "live theme: " + ((.name // "") | tostring | esc) + " (id " + id_or_unknown + ")" end
+          end
+      end' "$1" ;;
 
   push-result)
     [ $# -eq 1 ] || die "dùng: push-result <push.json>"
@@ -106,5 +149,5 @@ case "$cmd" in
     [ "$errs" = "0" ] || exit 1 ;;
 
   *)
-    sed -n '2,7p' "$0" >&2; exit 2 ;;
+    sed -n '2,9p' "$0" >&2; exit 2 ;;
 esac
