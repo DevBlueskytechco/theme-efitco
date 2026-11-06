@@ -2,7 +2,7 @@
   Outputs one decorative trust bar icon. The text next to it carries the
   meaning, so the SVG is hidden from assistive tech.
 
-  @param {string} icon - One of: truck, return, shield, support, quality.
+  @param {string} icon - One of: truck, return, shield, support, quality, check.
 
   @example
   {% render 'icon-trust', icon: 'truck' %}
@@ -27,5 +27,8 @@
     {%- when 'quality' -%}
       <circle cx="12" cy="9" r="5"/>
       <path d="m9 13.5-1.5 7.5 4.5-2.5 4.5 2.5-1.5-7.5"/>
+    {%- when 'check' -%}
+      <rect x="6" y="6" width="12" height="12" rx="3"/>
+      <path d="m9.5 11.5 2.5 2.5 7-7"/>
   {%- endcase -%}
 </svg>
