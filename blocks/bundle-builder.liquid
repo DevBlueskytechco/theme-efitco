@@ -1,0 +1,410 @@
+{% doc %}
+  Bundle builder (TE-12, Figma 1:636): eyebrow, h2 heading, optional link, a grid
+  of up to 9 selectable product cards from one collection and the Your Bundle
+  panel. 2 columns below 48rem, 3 from 48rem; the panel sits below the grid
+  under 64rem and next to it from 64rem.
+
+  Works without JavaScript: a POST form to routes.cart_add_url whose checked
+  checkboxes (name id[]) are the variants to add. CSS hides the submit button
+  (visibility) until an item is checked, so the button has no disabled attribute.
+
+  Discounts are display only (AC2, R8): the real price comes from an automatic
+  discount the merchant creates. Liquid never computes a price; it only outputs
+  data-tiers ("2:10,3:15") with the tiers whose percent is above 0. No tier
+  above 0: no data-tiers, discount row, progress bar or note.
+
+  Sold out (product or variant unavailable, AC4): the input is disabled, the
+  item has data-sold-out, there is no selection ring and the card keeps its
+  Sold out badge. The title link always goes to the product page.
+
+  Hooks for assets/bundle-form.js (BE ES1-T149; custom element bundle-form is
+  the root and has no definition until then). Rename only with a ticket comment.
+  - Root: data-tiers, data-cart-add-url, data-cart-url, data-cart-type,
+    data-currency, data-locale, data-label-count-one, data-label-count-other,
+    data-label-progress (%n, %p), data-label-progress-done (%p),
+    data-label-discount (%p), data-label-status (%n, %t), data-label-error.
+    JS sets data-enhanced on the root once the panel is rendered.
+  - Item input: data-bundle-item, data-title, data-price (cents), value is the
+    variant id.
+  - Panel: data-bundle-live (hidden by CSS until data-enhanced, space kept;
+    display none without scripting), data-bundle-count, data-bundle-lines,
+    data-bundle-line-template (data-bundle-line-title, data-bundle-line-price),
+    data-bundle-empty, data-bundle-subtotal, data-bundle-discount-row,
+    data-bundle-discount-label, data-bundle-discount (amount without a sign, CSS
+    adds the minus), data-bundle-total, data-bundle-progress (sets
+    --bundle-progress), data-bundle-progress-text, data-bundle-submit,
+    data-bundle-status (role status), data-bundle-error (role alert).
+
+  Test hooks: bundle-builder, bundle-builder-eyebrow, bundle-builder-heading,
+  bundle-builder-link, bundle-builder-list, bundle-builder-item,
+  bundle-builder-input, bundle-builder-panel, bundle-builder-count,
+  bundle-builder-lines, bundle-builder-line, bundle-builder-empty,
+  bundle-builder-subtotal, bundle-builder-discount-row, bundle-builder-discount,
+  bundle-builder-total, bundle-builder-progress, bundle-builder-progress-text,
+  bundle-builder-note, bundle-builder-submit, bundle-builder-status,
+  bundle-builder-error, bundle-builder-placeholder.
+
+  Empty state: no collection or no products → a hint in the theme editor,
+  nothing on the storefront.
+
+  Self-contained: callers must leave the body empty.
+
+  @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading and input ids. Default: block.id
+
+  @example
+  {% block 'container', id: 'home-bundle-builder', tag: 'div', background: 'cream' %}
+    {% block 'bundle-builder', id: 'bundle-builder' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign source = block.settings.collection
+
+  assign has_products = false
+  if source != blank and source.products_count > 0
+    assign has_products = true
+  endif
+
+  assign tiers = ''
+  if block.settings.tier_1_percent > 0
+    assign tiers = tiers | append: block.settings.tier_1_quantity | append: ':' | append: block.settings.tier_1_percent | append: ','
+  endif
+  if block.settings.tier_2_percent > 0
+    assign tiers = tiers | append: block.settings.tier_2_quantity | append: ':' | append: block.settings.tier_2_percent | append: ','
+  endif
+  if block.settings.tier_3_percent > 0
+    assign tiers = tiers | append: block.settings.tier_3_quantity | append: ':' | append: block.settings.tier_3_percent | append: ','
+  endif
+  # split drops the trailing empty value, so the last comma goes away
+  assign tiers = tiers | split: ',' | join: ','
+
+  assign eyebrow = block.settings.eyebrow
+  assign heading = block.settings.heading
+  assign link_label = block.settings.link_label
+  assign link_url = block.settings.link_url
+  assign discount_note = block.settings.discount_note
+  assign block_key = id | default: block.id
+  assign heading_id = block_key | append: '-heading'
+  assign cart_type = settings.cart_type | default: 'drawer'
+  assign image_sizes = '(min-width: 80rem) 270px, (min-width: 64rem) 20vw, (min-width: 48rem) 33vw, 50vw'
+
+  assign label_count_one = 'blocks.bundle_builder.count_one' | t
+  assign label_count_other = 'blocks.bundle_builder.count_other' | t
+  assign label_progress = 'blocks.bundle_builder.progress' | t
+  assign label_progress_done = 'blocks.bundle_builder.progress_done' | t
+  assign label_discount = 'blocks.bundle_builder.discount' | t
+  assign label_status = 'blocks.bundle_builder.status' | t
+  assign label_error = 'blocks.bundle_builder.error' | t
+-%}
+
+{%- if has_products -%}
+  <bundle-form
+    class="bundle-builder"
+    {% if tiers != blank %}
+      data-tiers="{{ tiers }}"
+    {% endif %}
+    data-cart-add-url="{{ routes.cart_add_url }}"
+    data-cart-url="{{ routes.cart_url }}"
+    data-cart-type="{{ cart_type | escape }}"
+    data-currency="{{ cart.currency.iso_code }}"
+    data-locale="{{ request.locale.iso_code }}"
+    data-label-count-one="{{ label_count_one | escape }}"
+    data-label-count-other="{{ label_count_other | escape }}"
+    data-label-progress="{{ label_progress | escape }}"
+    data-label-progress-done="{{ label_progress_done | escape }}"
+    data-label-discount="{{ label_discount | escape }}"
+    data-label-status="{{ label_status | escape }}"
+    data-label-error="{{ label_error | escape }}"
+    data-testid="bundle-builder"
+    {{ block.shopify_attributes }}
+  >
+    {%- if eyebrow != blank or heading != blank or link_label != blank and link_url != blank -%}
+      <div class="bundle-builder__header">
+        {%- if eyebrow != blank or heading != blank -%}
+          <div class="bundle-builder__titles">
+            {%- if eyebrow != blank -%}
+              <p class="bundle-builder__eyebrow" data-testid="bundle-builder-eyebrow">{{ eyebrow | escape }}</p>
+            {%- endif -%}
+            {%- if heading != blank -%}
+              <h2 class="bundle-builder__heading" id="{{ heading_id }}" data-testid="bundle-builder-heading">
+                {{- heading -}}
+              </h2>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+        {%- if link_label != blank and link_url != blank -%}
+          <a class="bundle-builder__link" href="{{ link_url }}" data-testid="bundle-builder-link">
+            {{- link_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <form
+      class="bundle-builder__form"
+      method="post"
+      action="{{ routes.cart_add_url }}"
+      {% if heading != blank %}
+        aria-labelledby="{{ heading_id }}"
+      {% endif %}
+    >
+      <ul class="bundle-builder__list" role="list" data-testid="bundle-builder-list">
+        {%- for item in source.products limit: 9 -%}
+          {%- liquid
+            # A multi-source collection can hold variants: they have a parent product
+            assign card_product = item
+            assign card_variant = item.selected_or_first_available_variant
+            if item.product != blank
+              assign card_product = item.product
+              assign card_variant = item
+            endif
+            assign card_variant = card_variant | default: card_product.variants.first
+
+            assign sold_out = false
+            if card_product.available == false or card_variant.available == false
+              assign sold_out = true
+            endif
+
+            assign item_title = card_product.title | escape
+            assign input_id = block_key | append: '-item-' | append: card_variant.id
+          -%}
+          <li
+            class="bundle-builder__item"
+            {% if sold_out %}
+              data-sold-out
+            {% endif %}
+            data-testid="bundle-builder-item"
+          >
+            {% render 'product-card',
+              product: card_product,
+              variant: card_variant,
+              id_prefix: 'bundle',
+              sizes: image_sizes,
+              show_swatches: false,
+              heading_level: 'h3'
+            %}
+            <input
+              class="bundle-builder__input"
+              type="checkbox"
+              id="{{ input_id }}"
+              name="id[]"
+              value="{{ card_variant.id }}"
+              data-bundle-item
+              data-title="{{ item_title }}"
+              data-price="{{ card_variant.price }}"
+              data-testid="bundle-builder-input"
+              {% if sold_out %}
+                disabled
+              {% endif %}
+            >
+            <label class="bundle-builder__select" for="{{ input_id }}">
+              <span class="visually-hidden">
+                {%- if sold_out -%}
+                  {{- 'blocks.bundle_builder.item_sold_out' | t: title: item_title -}}
+                {%- else -%}
+                  {{- 'blocks.bundle_builder.item_select' | t: title: item_title -}}
+                {%- endif -%}
+              </span>
+            </label>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      <div class="bundle-builder__panel" data-testid="bundle-builder-panel">
+        <div class="bundle-builder__panel-header">
+          <h3 class="bundle-builder__panel-title">{{ 'blocks.bundle_builder.panel_title' | t }}</h3>
+          <span
+            class="bundle-builder__count"
+            data-bundle-live
+            data-bundle-count
+            data-testid="bundle-builder-count"
+          ></span>
+        </div>
+
+        <div class="bundle-builder__selection" data-bundle-live>
+          <ul class="bundle-builder__lines" data-bundle-lines data-testid="bundle-builder-lines"></ul>
+          <template data-bundle-line-template>
+            <li class="bundle-builder__line" data-testid="bundle-builder-line">
+              <span class="bundle-builder__line-title" data-bundle-line-title></span>
+              <span class="bundle-builder__line-price" data-bundle-line-price></span>
+            </li>
+          </template>
+          <p class="bundle-builder__empty" data-bundle-empty data-testid="bundle-builder-empty">
+            {{- 'blocks.bundle_builder.empty' | t -}}
+          </p>
+        </div>
+
+        <div class="bundle-builder__summary">
+          <div class="bundle-builder__row" data-bundle-live>
+            <span>{{ 'blocks.bundle_builder.subtotal' | t }}</span>
+            <span data-bundle-subtotal data-testid="bundle-builder-subtotal"></span>
+          </div>
+
+          {%- if tiers != blank -%}
+            <div
+              class="bundle-builder__row"
+              data-bundle-live
+              data-bundle-discount-row
+              data-testid="bundle-builder-discount-row"
+            >
+              <span data-bundle-discount-label></span>
+              <span
+                class="bundle-builder__discount"
+                data-bundle-discount
+                data-testid="bundle-builder-discount"
+              ></span>
+            </div>
+
+            <div class="bundle-builder__tier" data-bundle-live>
+              <div
+                class="bundle-builder__progress"
+                style="--bundle-progress: 0%;"
+                aria-hidden="true"
+                data-bundle-progress
+                data-testid="bundle-builder-progress"
+              ></div>
+              <div
+                class="bundle-builder__progress-text"
+                data-bundle-progress-text
+                data-testid="bundle-builder-progress-text"
+              ></div>
+            </div>
+          {%- endif -%}
+
+          <div class="bundle-builder__row bundle-builder__row--total" data-bundle-live>
+            <span>{{ 'blocks.bundle_builder.total' | t }}</span>
+            <span class="bundle-builder__total" data-bundle-total data-testid="bundle-builder-total"></span>
+          </div>
+        </div>
+
+        {%- if tiers != blank and discount_note != blank -%}
+          <p class="bundle-builder__note" data-testid="bundle-builder-note">{{ discount_note | escape }}</p>
+        {%- endif -%}
+
+        <div class="bundle-builder__actions">
+          <button
+            class="button bundle-builder__submit"
+            type="submit"
+            data-bundle-submit
+            data-testid="bundle-builder-submit"
+          >
+            {{- 'blocks.bundle_builder.submit' | t -}}
+            {%- render 'slideshow-icon', name: 'arrow' -%}
+          </button>
+          <div class="visually-hidden" role="status" data-bundle-status data-testid="bundle-builder-status"></div>
+          <div class="bundle-builder__error" role="alert" data-bundle-error data-testid="bundle-builder-error"></div>
+        </div>
+      </div>
+    </form>
+  </bundle-form>
+{%- elsif request.design_mode -%}
+  <div class="bundle-builder__placeholder" data-testid="bundle-builder-placeholder" {{ block.shopify_attributes }}>
+    {{ 'blocks.bundle_builder.placeholder' | t }}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.bundle_builder",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "default": "Build your bundle"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "Pick Your Kit"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "t:labels.link_label",
+      "info": "t:info.bundle_builder_link"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:labels.link_url"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "t:labels.collection",
+      "info": "t:info.bundle_builder_collection"
+    },
+    {
+      "type": "header",
+      "content": "t:general.bundle_builder_tiers",
+      "info": "t:info.bundle_builder_tiers"
+    },
+    {
+      "type": "range",
+      "id": "tier_1_quantity",
+      "min": 2,
+      "max": 9,
+      "step": 1,
+      "label": "t:labels.tier_1_quantity",
+      "default": 2
+    },
+    {
+      "type": "range",
+      "id": "tier_1_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.tier_1_percent",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "tier_2_quantity",
+      "min": 2,
+      "max": 9,
+      "step": 1,
+      "label": "t:labels.tier_2_quantity",
+      "default": 3
+    },
+    {
+      "type": "range",
+      "id": "tier_2_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.tier_2_percent",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "tier_3_quantity",
+      "min": 2,
+      "max": 9,
+      "step": 1,
+      "label": "t:labels.tier_3_quantity",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "tier_3_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.tier_3_percent",
+      "default": 0
+    },
+    {
+      "type": "text",
+      "id": "discount_note",
+      "label": "t:labels.discount_note",
+      "info": "t:info.bundle_builder_discount_note",
+      "default": "Your discount is applied at checkout."
+    }
+  ]
+}
+{% endschema %}
