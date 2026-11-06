@@ -3580,6 +3580,163 @@ cart-drawer {
   }
 }
 
+/** Multicolumn (TE-7, không có frame Figma, ES1-T116 #7): dưới 48rem 1 cột, 48rem 2 cột, từ 64rem mọi cột 1 hàng.
+   Cha không đếm được con nên từ 64rem dùng cột tự sinh, 2-4 cột do số dòng gọi trong template */
+.multicolumn {
+  display: grid;
+  gap: var(--space-5);
+  min-inline-size: 0;
+  padding-block: var(--space-7);
+}
+
+.multicolumn--placeholder {
+  margin: 0;
+  padding-inline: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+.multicolumn__header {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.multicolumn__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Accent không đạt AA trên sand và dark (ES1-T116 #4) */
+.block-container--sand .multicolumn__eyebrow {
+  color: var(--color-muted);
+}
+
+.block-container--dark .multicolumn__eyebrow {
+  color: var(--color-muted-on-dark);
+}
+
+.multicolumn__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.multicolumn__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.multicolumn-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.multicolumn-column--placeholder {
+  padding: var(--space-5);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+.multicolumn-column__image {
+  border-radius: var(--radius-card);
+}
+
+.multicolumn-column__image img {
+  aspect-ratio: 3 / 2;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+/* --text-align từ container: start, center, end hợp lệ cho cả justify-content và align-self */
+.multicolumn-column__icon {
+  display: flex;
+  justify-content: var(--text-align, start);
+}
+
+.multicolumn-column__icon .icon-trust {
+  inline-size: 40px;
+  block-size: 40px;
+}
+
+.multicolumn-column__heading {
+  margin: 0;
+  font-size: var(--font-size-h3);
+  letter-spacing: -0.02em;
+  line-height: calc(34 / 28);
+}
+
+.multicolumn-column__text > * {
+  margin-block: 0;
+}
+
+.multicolumn-column__text > * + * {
+  margin-block-start: var(--space-2);
+}
+
+/* margin auto đẩy link xuống đáy để các cột cùng hàng thẳng link */
+.multicolumn-column__link {
+  display: inline-flex;
+  align-self: var(--text-align, start);
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 44px;
+  margin-block-start: auto;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.multicolumn-column__link:hover .multicolumn-column__link-label {
+  text-decoration: underline;
+}
+
+.custom-liquid--placeholder {
+  margin: 0;
+  padding: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+@media (min-width: 48rem) {
+  .multicolumn__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .multicolumn {
+    gap: calc(var(--space-1) * 10);
+    padding-block: var(--space-8);
+  }
+
+  .multicolumn__list {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+}
+
 /** Gift card template */
 .template-gift-card main {
   text-align: center;

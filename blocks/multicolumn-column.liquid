@@ -1,0 +1,131 @@
+{% doc %}
+  Renders one column inside the multicolumn block as a list item: image or icon,
+  heading, rich text and link. The image wins over the icon. The icon is
+  decorative, so a column with only an icon counts as empty. When heading, text,
+  image and link label are all empty, the editor shows a placeholder and the
+  storefront renders nothing. Self-contained: callers must leave the body empty.
+
+  Test hooks: data-testid="multicolumn-column", "multicolumn-icon",
+  "multicolumn-image", "multicolumn-column-heading", "multicolumn-text",
+  "multicolumn-link", "multicolumn-placeholder" (empty column, editor only).
+
+  @param {string} id - Unique column id within the template, such as 'multicolumn-1'
+
+  @example
+  {% block 'multicolumn-column', id: 'multicolumn-1' %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign column_icon = block.settings.icon
+  assign column_image = block.settings.image
+  assign column_heading = block.settings.heading
+  assign column_text = block.settings.text
+  assign column_link_label = block.settings.link_label
+  assign column_link_url = block.settings.link_url | default: routes.all_products_collection_url
+-%}
+
+{%- if column_heading != blank or column_text != blank or column_image != blank or column_link_label != blank -%}
+  <li
+    class="multicolumn-column"
+    data-multicolumn-column-id="{{ id }}"
+    data-testid="multicolumn-column"
+    {{ block.shopify_attributes }}
+  >
+    {%- if column_image != blank -%}
+      {%- comment -%} Upper bound: 50vw is the widest column from 48rem, with 2 columns. {%- endcomment -%}
+      {% render 'image',
+        image: column_image,
+        class: 'multicolumn-column__image',
+        width: 1080,
+        widths: '360, 540, 720, 1080',
+        sizes: '(min-width: 48rem) 50vw, 100vw',
+        loading: 'lazy',
+        testid: 'multicolumn-image'
+      %}
+    {%- elsif column_icon != blank and column_icon != 'none' -%}
+      <div class="multicolumn-column__icon" data-testid="multicolumn-icon">
+        {%- render 'icon-trust', icon: column_icon -%}
+      </div>
+    {%- endif -%}
+
+    {%- if column_heading != blank -%}
+      <h3 class="multicolumn-column__heading" data-testid="multicolumn-column-heading">
+        {{- column_heading | escape -}}
+      </h3>
+    {%- endif -%}
+
+    {%- if column_text != blank -%}
+      <div class="multicolumn-column__text" data-testid="multicolumn-text">{{ column_text }}</div>
+    {%- endif -%}
+
+    {%- if column_link_label != blank -%}
+      <a class="multicolumn-column__link" href="{{ column_link_url }}" data-testid="multicolumn-link">
+        <span class="multicolumn-column__link-label">{{ column_link_label | escape }}</span>
+        {%- render 'slideshow-icon', name: 'arrow' -%}
+      </a>
+    {%- endif -%}
+  </li>
+{%- elsif request.design_mode -%}
+  <li
+    class="multicolumn-column multicolumn-column--placeholder"
+    data-multicolumn-column-id="{{ id }}"
+    data-testid="multicolumn-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.multicolumn.column_placeholder' | t }}
+  </li>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.multicolumn_column",
+  "settings": [
+    {
+      "type": "select",
+      "id": "icon",
+      "label": "t:labels.multicolumn_icon",
+      "options": [
+        { "value": "none", "label": "t:options.trust_icon.none" },
+        { "value": "truck", "label": "t:options.trust_icon.truck" },
+        { "value": "return", "label": "t:options.trust_icon.return" },
+        { "value": "shield", "label": "t:options.trust_icon.shield" },
+        { "value": "support", "label": "t:options.trust_icon.support" },
+        { "value": "quality", "label": "t:options.trust_icon.quality" }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.multicolumn_image",
+      "info": "t:info.multicolumn_image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.multicolumn_column_heading",
+      "info": "t:info.multicolumn_column_heading",
+      "default": "Add a short benefit"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "t:labels.multicolumn_column_text",
+      "default": "<p>Explain this benefit in a sentence or two. Choose an icon or an image for this column in its settings.</p>"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "t:labels.multicolumn_link_label",
+      "info": "t:info.multicolumn_link_label",
+      "default": "Shop All Products"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:labels.multicolumn_link_url",
+      "info": "t:info.multicolumn_link_url"
+    }
+  ]
+}
+{% endschema %}

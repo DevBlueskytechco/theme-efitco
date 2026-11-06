@@ -138,6 +138,106 @@
   {% endblock %}
 {% endblock %}
 
+{% comment %} Multicolumn has no Figma frame, so this copy is test text. 2 columns, icons, default and set link. {% endcomment %}
+{% block 'container', id: 'te7-multicolumn-two', background: 'cream' %}
+  {% block 'multicolumn', id: 'te7-mc-two', eyebrow: 'Two columns', heading: 'Two columns with icons' %}
+    {% block 'multicolumn-column',
+      id: 'te7-mc-two-1',
+      icon: 'truck',
+      heading: 'Fast delivery',
+      text: '<p>Link falls back to all products.</p>',
+      link_label: 'Shop All Products'
+    %}{% endblock %}
+    {% block 'multicolumn-column',
+      id: 'te7-mc-two-2',
+      icon: 'return',
+      heading: 'Easy returns',
+      text: '<p>Link goes to the list of collections.</p>',
+      link_label: 'See Collections',
+      link_url: routes.collections_url
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} 3 columns, images. {% endcomment %}
+{% block 'container', id: 'te7-multicolumn-three' %}
+  {% block 'multicolumn', id: 'te7-mc-three', eyebrow: 'Three columns', heading: 'Three columns with images' %}
+    {% block 'multicolumn-column',
+      id: 'te7-mc-three-1',
+      image: te7_image_1,
+      heading: 'Strength',
+      text: '<p>Image at 3 / 2, lazy.</p>',
+      link_label: 'Shop All Products'
+    %}{% endblock %}
+    {% block 'multicolumn-column',
+      id: 'te7-mc-three-2',
+      image: te7_image_2,
+      heading: 'Mobility',
+      text: '<p>A longer text checks that links stay on one line across the row when one column runs taller than the others.</p>',
+      link_label: 'Shop All Products'
+    %}{% endblock %}
+    {% block 'multicolumn-column',
+      id: 'te7-mc-three-3',
+      image: te7_image_3,
+      heading: 'Endurance',
+      text: '<p>Image at 3 / 2, lazy.</p>',
+      link_label: 'Shop All Products'
+    %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} 4 columns on the dark band: eyebrow and text must keep contrast. {% endcomment %}
+{% block 'container', id: 'te7-multicolumn-four', background: 'dark' %}
+  {% block 'multicolumn', id: 'te7-mc-four', eyebrow: 'Four columns', heading: 'Four columns on dark' %}
+    {% block 'multicolumn-column', id: 'te7-mc-four-1', icon: 'shield', heading: 'Warranty', text: '<p>Column one.</p>', link_label: 'Shop All Products' %}{% endblock %}
+    {% block 'multicolumn-column', id: 'te7-mc-four-2', icon: 'support', heading: 'Support', text: '<p>Column two.</p>', link_label: 'Shop All Products' %}{% endblock %}
+    {% block 'multicolumn-column', id: 'te7-mc-four-3', icon: 'quality', heading: 'Quality', text: '<p>Column three.</p>', link_label: 'Shop All Products' %}{% endblock %}
+    {% block 'multicolumn-column', id: 'te7-mc-four-4', icon: 'truck', heading: 'Delivery', text: '<p>Column four.</p>', link_label: 'Shop All Products' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{%- comment -%}
+  Sand band. Column 1 has both image and icon: the image wins. Column 2 has no
+  image, no icon, no link. Column 3 has only an icon: it counts as empty, so 2
+  columns remain on one row.
+{%- endcomment -%}
+{% block 'container', id: 'te7-multicolumn-mixed', background: 'sand' %}
+  {% block 'multicolumn', id: 'te7-mc-mixed', eyebrow: 'Mixed columns', heading: 'Image wins, empty column hidden' %}
+    {% block 'multicolumn-column',
+      id: 'te7-mc-mixed-1',
+      icon: 'truck',
+      image: te7_image_4,
+      heading: 'Image and icon',
+      text: '<p>Only the image shows.</p>',
+      link_label: ''
+    %}{% endblock %}
+    {% block 'multicolumn-column',
+      id: 'te7-mc-mixed-2',
+      heading: 'Text only',
+      text: '<p>No image, no icon, no link.</p>',
+      link_label: ''
+    %}{% endblock %}
+    {% block 'multicolumn-column', id: 'te7-mc-mixed-3', icon: 'truck', heading: '', text: '', link_label: '' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} Empty column: no column, no list, no band. {% endcomment %}
+{% block 'container', id: 'te7-multicolumn-empty' %}
+  {% block 'multicolumn', id: 'te7-mc-empty', eyebrow: 'Hidden', heading: 'Hidden' %}
+    {% block 'multicolumn-column', id: 'te7-mc-empty-1', heading: '', text: '', link_label: '' %}{% endblock %}
+  {% endblock %}
+{% endblock %}
+
+{% comment %} Fixed text plus one Liquid expression, compared with the h1 of te7-title. {% endcomment %}
+{% block 'container', id: 'te7-custom-liquid' %}
+  {% block 'custom-liquid', id: 'te7-cl', custom_liquid: '<p>Custom Liquid runs on <strong>{{ shop.name }}</strong></p>' %}{% endblock %}
+{% endblock %}
+
+{% comment %} Empty setting: no block, no band. {% endcomment %}
+{% block 'container', id: 'te7-custom-liquid-empty' %}
+  {% block 'custom-liquid', id: 'te7-cl-empty' %}{% endblock %}
+{% endblock %}
+
 {% comment %} Empty review: no card, no list, no band (blocks/container.liquid). {% endcomment %}
 {% block 'container', id: 'te7-testimonials-empty', background: 'cream' %}
   {% block 'testimonials', id: 'te7-empty', eyebrow: 'Testimonial', heading: 'Hidden' %}
