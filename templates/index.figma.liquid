@@ -8,9 +8,10 @@
   that collection is missing or empty. Images are the featured images of those
   products; the image regions are masked when screenshots are compared here.
 
-  Copy stays in the block defaults. The only exception is the quiz steps, which
-  render nothing without a question and 2 options: same values as
-  templates/index.te11.liquid.
+  Copy stays in the block defaults or, for repeated blocks, in locales passed as
+  default_* (plan ES1-T169 D1), same list as templates/index.liquid. The only
+  exception is the quiz steps, which render nothing without a question and 2
+  options: same values as templates/index.te11.liquid.
 
   Remove this file before a real store release.
 {% endcomment %}
@@ -44,6 +45,36 @@
   assign figma_image_2 = figma_product_2.featured_image
   assign figma_image_3 = figma_product_3.featured_image
   assign figma_image_4 = figma_product_4.featured_image
+
+  assign testimonials_eyebrow = 'blocks.testimonials.default_eyebrow' | t
+  assign testimonials_heading = 'blocks.testimonials.default_heading' | t
+  assign r1_name = 'blocks.testimonial_item.r1_name' | t
+  assign r1_title = 'blocks.testimonial_item.r1_title' | t
+  assign r1_quote = 'blocks.testimonial_item.r1_quote' | t
+  assign r2_name = 'blocks.testimonial_item.r2_name' | t
+  assign r2_title = 'blocks.testimonial_item.r2_title' | t
+  assign r2_quote = 'blocks.testimonial_item.r2_quote' | t
+  assign r3_name = 'blocks.testimonial_item.r3_name' | t
+  assign r3_title = 'blocks.testimonial_item.r3_title' | t
+  assign r3_quote = 'blocks.testimonial_item.r3_quote' | t
+  assign r4_name = 'blocks.testimonial_item.r4_name' | t
+  assign r4_title = 'blocks.testimonial_item.r4_title' | t
+  assign r4_quote = 'blocks.testimonial_item.r4_quote' | t
+
+  assign faq_eyebrow = 'blocks.faq.default_eyebrow' | t
+  assign faq_heading = 'blocks.faq.default_heading' | t
+  assign faq_stat_1_label = 'blocks.faq.default_stat_1_label' | t
+  assign faq_stat_1_value = 'blocks.faq.default_stat_1_value' | t
+  assign faq_stat_1_text = 'blocks.faq.default_stat_1_text' | t
+  assign faq_stat_2_label = 'blocks.faq.default_stat_2_label' | t
+  assign faq_stat_2_value = 'blocks.faq.default_stat_2_value' | t
+  assign faq_stat_2_text = 'blocks.faq.default_stat_2_text' | t
+  assign faq_answer = 'blocks.faq_item.default_answer_html' | t
+  assign faq_q1 = 'blocks.faq_item.q1_question' | t
+  assign faq_q2 = 'blocks.faq_item.q2_question' | t
+  assign faq_q3 = 'blocks.faq_item.q3_question' | t
+  assign faq_q4 = 'blocks.faq_item.q4_question' | t
+  assign faq_q5 = 'blocks.faq_item.q5_question' | t
 -%}
 
 <div
@@ -140,11 +171,43 @@
 {% endblock %}
 
 {% block 'container', id: 'figma-testimonials', background: 'cream' %}
-  {% block 'testimonials' %}
-    {% block 'testimonial-item', id: 'figma-testimonial-1', image: figma_image_1, product: figma_product_1 %}{% endblock %}
-    {% block 'testimonial-item', id: 'figma-testimonial-2', image: figma_image_2, product: figma_product_2 %}{% endblock %}
-    {% block 'testimonial-item', id: 'figma-testimonial-3', image: figma_image_3, product: figma_product_3 %}{% endblock %}
-    {% block 'testimonial-item', id: 'figma-testimonial-4', image: figma_image_4, product: figma_product_4 %}{% endblock %}
+  {% block 'testimonials', default_eyebrow: testimonials_eyebrow, default_heading: testimonials_heading %}
+    {% block 'testimonial-item',
+      id: 'figma-testimonial-1',
+      image: figma_image_1,
+      product: figma_product_1,
+      default_author: r1_name,
+      default_rating: 5,
+      default_title: r1_title,
+      default_quote: r1_quote
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'figma-testimonial-2',
+      image: figma_image_2,
+      product: figma_product_2,
+      default_author: r2_name,
+      default_rating: 4,
+      default_title: r2_title,
+      default_quote: r2_quote
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'figma-testimonial-3',
+      image: figma_image_3,
+      product: figma_product_3,
+      default_author: r3_name,
+      default_rating: 5,
+      default_title: r3_title,
+      default_quote: r3_quote
+    %}{% endblock %}
+    {% block 'testimonial-item',
+      id: 'figma-testimonial-4',
+      image: figma_image_4,
+      product: figma_product_4,
+      default_author: r4_name,
+      default_rating: 5,
+      default_title: r4_title,
+      default_quote: r4_quote
+    %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
@@ -158,11 +221,21 @@
 {% endblock %}
 
 {% block 'container', id: 'figma-faq', background: 'cream' %}
-  {% block 'faq', image: figma_image_1 %}
-    {% block 'faq-item', id: 'figma-faq-1', open: true %}{% endblock %}
-    {% block 'faq-item', id: 'figma-faq-2' %}{% endblock %}
-    {% block 'faq-item', id: 'figma-faq-3' %}{% endblock %}
-    {% block 'faq-item', id: 'figma-faq-4' %}{% endblock %}
-    {% block 'faq-item', id: 'figma-faq-5' %}{% endblock %}
+  {% block 'faq',
+    image: figma_image_1,
+    default_eyebrow: faq_eyebrow,
+    default_heading: faq_heading,
+    default_stat_1_label: faq_stat_1_label,
+    default_stat_1_value: faq_stat_1_value,
+    default_stat_1_text: faq_stat_1_text,
+    default_stat_2_label: faq_stat_2_label,
+    default_stat_2_value: faq_stat_2_value,
+    default_stat_2_text: faq_stat_2_text
+  %}
+    {% block 'faq-item', id: 'figma-faq-1', open: true, default_question: faq_q1, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'figma-faq-2', default_question: faq_q2, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'figma-faq-3', default_question: faq_q3, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'figma-faq-4', default_question: faq_q4, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'figma-faq-5', default_question: faq_q5, default_answer: faq_answer %}{% endblock %}
   {% endblock %}
 {% endblock %}

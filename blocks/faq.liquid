@@ -7,19 +7,35 @@
   opening text of each details tag in the body to add the same name attribute to
   every question, and the browser then keeps one question open at a time.
 
-  A stat tile renders when any of its 3 settings has text. Without an image and
-  stats, the column is not rendered and the questions take the full row. When the
-  body is empty, the editor shows a placeholder and the storefront renders nothing.
+  Sample content (plan ES1-T169 D1): the template passes default_* from locales.
+  They have other names than the settings, so they stay plain variables and a
+  value the merchant saved always wins. Clearing a setting brings the sample back,
+  so show_stat_1 and show_stat_2 are how a merchant hides a stat. Text from the t
+  filter may already be escaped, so it goes through escape_once.
+
+  A stat tile renders when its show setting is on and any of its 3 texts is
+  present. Without an image and stats, the column is not rendered and the questions
+  take the full row. When the body is empty, the editor shows a placeholder and the
+  storefront renders nothing.
 
   Test hooks: data-testid="faq", "faq-heading", "faq-list", "faq-placeholder",
   "faq-image", "faq-stat-1", "faq-stat-2".
 
   @param {string} [id] - Static block id, needed when a template has more than one faq block
+  @param {string} [default_eyebrow] - Sample text used when the eyebrow setting is empty
+  @param {string} [default_heading] - Sample text used when the heading setting is empty
+  @param {string} [default_stat_1_label] - Sample text used when the stat 1 label setting is empty
+  @param {string} [default_stat_1_value] - Sample text used when the stat 1 value setting is empty
+  @param {string} [default_stat_1_text] - Sample text used when the stat 1 text setting is empty
+  @param {string} [default_stat_2_label] - Sample text used when the stat 2 label setting is empty
+  @param {string} [default_stat_2_value] - Sample text used when the stat 2 value setting is empty
+  @param {string} [default_stat_2_text] - Sample text used when the stat 2 text setting is empty
   @param {string} content - One faq-item block call per question, 1 to 10
 
   @example
+  {% assign sample_heading = 'blocks.faq.default_heading' | t %}
   {% block 'container', id: 'home-faq', background: 'cream' %}
-    {% block 'faq' %}
+    {% block 'faq', default_heading: sample_heading %}
       {% block 'faq-item', id: 'faq-1', open: true %}{% endblock %}
       {% block 'faq-item', id: 'faq-2' %}{% endblock %}
     {% endblock %}
@@ -29,6 +45,15 @@
 {%- liquid
   assign items = content | strip
 
+  assign faq_eyebrow = block.settings.eyebrow | default: default_eyebrow
+  assign faq_heading = block.settings.heading | default: default_heading
+  assign stat_1_label = block.settings.stat_1_label | default: default_stat_1_label
+  assign stat_1_value = block.settings.stat_1_value | default: default_stat_1_value
+  assign stat_1_text = block.settings.stat_1_text | default: default_stat_1_text
+  assign stat_2_label = block.settings.stat_2_label | default: default_stat_2_label
+  assign stat_2_value = block.settings.stat_2_value | default: default_stat_2_value
+  assign stat_2_text = block.settings.stat_2_text | default: default_stat_2_text
+
   unless block.settings.allow_multiple
     assign named_details = '<details name="faq-' | append: block.id | append: '" class="faq-item"'
     assign items = items | replace: '<details class="faq-item"', named_details
@@ -37,13 +62,19 @@
   assign faq_image = block.settings.image
 
   assign has_stat_1 = false
-  if block.settings.stat_1_label != blank or block.settings.stat_1_value != blank or block.settings.stat_1_text != blank
+  if stat_1_label != blank or stat_1_value != blank or stat_1_text != blank
     assign has_stat_1 = true
+  endif
+  if block.settings.show_stat_1 == false
+    assign has_stat_1 = false
   endif
 
   assign has_stat_2 = false
-  if block.settings.stat_2_label != blank or block.settings.stat_2_value != blank or block.settings.stat_2_text != blank
+  if stat_2_label != blank or stat_2_value != blank or stat_2_text != blank
     assign has_stat_2 = true
+  endif
+  if block.settings.show_stat_2 == false
+    assign has_stat_2 = false
   endif
 
   assign has_stats = false
@@ -67,13 +98,13 @@
     {{ block.shopify_attributes }}
   >
     <div class="faq__content">
-      {%- if block.settings.eyebrow != blank or block.settings.heading != blank -%}
+      {%- if faq_eyebrow != blank or faq_heading != blank -%}
         <div class="faq__header">
-          {%- if block.settings.eyebrow != blank -%}
-            <p class="faq__eyebrow">{{ block.settings.eyebrow | escape }}</p>
+          {%- if faq_eyebrow != blank -%}
+            <p class="faq__eyebrow">{{ faq_eyebrow | escape_once }}</p>
           {%- endif -%}
-          {%- if block.settings.heading != blank -%}
-            <h2 class="faq__heading" data-testid="faq-heading">{{ block.settings.heading | escape }}</h2>
+          {%- if faq_heading != blank -%}
+            <h2 class="faq__heading" data-testid="faq-heading">{{ faq_heading | escape_once }}</h2>
           {%- endif -%}
         </div>
       {%- endif -%}
@@ -99,27 +130,27 @@
           <div class="faq__stats">
             {%- if has_stat_1 -%}
               <div class="faq__stat faq__stat--accent" data-testid="faq-stat-1">
-                {%- if block.settings.stat_1_label != blank -%}
-                  <p class="faq__stat-label">{{ block.settings.stat_1_label | escape }}</p>
+                {%- if stat_1_label != blank -%}
+                  <p class="faq__stat-label">{{ stat_1_label | escape_once }}</p>
                 {%- endif -%}
-                {%- if block.settings.stat_1_value != blank -%}
-                  <p class="faq__stat-value">{{ block.settings.stat_1_value | escape }}</p>
+                {%- if stat_1_value != blank -%}
+                  <p class="faq__stat-value">{{ stat_1_value | escape_once }}</p>
                 {%- endif -%}
-                {%- if block.settings.stat_1_text != blank -%}
-                  <p class="faq__stat-text">{{ block.settings.stat_1_text | escape }}</p>
+                {%- if stat_1_text != blank -%}
+                  <p class="faq__stat-text">{{ stat_1_text | escape_once }}</p>
                 {%- endif -%}
               </div>
             {%- endif -%}
             {%- if has_stat_2 -%}
               <div class="faq__stat faq__stat--dark" data-testid="faq-stat-2">
-                {%- if block.settings.stat_2_label != blank -%}
-                  <p class="faq__stat-label">{{ block.settings.stat_2_label | escape }}</p>
+                {%- if stat_2_label != blank -%}
+                  <p class="faq__stat-label">{{ stat_2_label | escape_once }}</p>
                 {%- endif -%}
-                {%- if block.settings.stat_2_value != blank -%}
-                  <p class="faq__stat-value">{{ block.settings.stat_2_value | escape }}</p>
+                {%- if stat_2_value != blank -%}
+                  <p class="faq__stat-value">{{ stat_2_value | escape_once }}</p>
                 {%- endif -%}
-                {%- if block.settings.stat_2_text != blank -%}
-                  <p class="faq__stat-text">{{ block.settings.stat_2_text | escape }}</p>
+                {%- if stat_2_text != blank -%}
+                  <p class="faq__stat-text">{{ stat_2_text | escape_once }}</p>
                 {%- endif -%}
               </div>
             {%- endif -%}
@@ -146,13 +177,13 @@
       "type": "text",
       "id": "eyebrow",
       "label": "t:labels.eyebrow",
-      "default": "Questions and answers"
+      "info": "t:info.sample_text"
     },
     {
       "type": "text",
       "id": "heading",
       "label": "t:labels.heading",
-      "default": "Add a heading for your questions"
+      "info": "t:info.sample_text"
     },
     {
       "type": "checkbox",
@@ -167,10 +198,16 @@
       "label": "t:labels.faq_image"
     },
     {
+      "type": "checkbox",
+      "id": "show_stat_1",
+      "label": "t:labels.faq_show_stat_1",
+      "info": "t:info.faq_show_stat",
+      "default": true
+    },
+    {
       "type": "text",
       "id": "stat_1_label",
-      "label": "t:labels.faq_stat_1_label",
-      "info": "t:info.faq_stat"
+      "label": "t:labels.faq_stat_1_label"
     },
     {
       "type": "text",
@@ -183,10 +220,16 @@
       "label": "t:labels.faq_stat_1_text"
     },
     {
+      "type": "checkbox",
+      "id": "show_stat_2",
+      "label": "t:labels.faq_show_stat_2",
+      "info": "t:info.faq_show_stat",
+      "default": true
+    },
+    {
       "type": "text",
       "id": "stat_2_label",
-      "label": "t:labels.faq_stat_2_label",
-      "info": "t:info.faq_stat"
+      "label": "t:labels.faq_stat_2_label"
     },
     {
       "type": "text",

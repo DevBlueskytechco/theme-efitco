@@ -4226,6 +4226,31 @@ cart-drawer {
   }
 }
 
+/* CR-8, Figma 1:885: đúng 4 mục thì 4 card 456 tràn tới mép màn hình, cuộn bằng chuột và bàn phím.
+   Khối chiếm cả hàng của .block-container; padding bằng đúng lề để card đầu thẳng hàng tiêu đề. Không dùng 100vw vì tính cả thanh cuộn.
+   Mốc 120rem nằm ngoài 3 mốc của AGENTS.md: xem KHÔNG CHẮC trong PR ES1-T179 */
+@media (min-width: 120rem) {
+  .block-container > .testimonials:has(> .testimonials__list > :nth-child(4):last-child) {
+    grid-column: 1 / -1;
+  }
+
+  .testimonials:has(> .testimonials__list > :nth-child(4):last-child) > .testimonials__header {
+    padding-inline: calc((100% - var(--content-width)) / 2);
+  }
+
+  .testimonials__list:has(> :nth-child(4):last-child) {
+    display: flex;
+    padding-inline: calc((100% - var(--content-width)) / 2);
+    overflow-x: auto;
+    scroll-padding-inline: calc((100% - var(--content-width)) / 2);
+    scroll-snap-type: x proximity;
+  }
+
+  .testimonials__list:has(> :nth-child(4):last-child) > .testimonial-item {
+    flex: 0 0 456px;
+  }
+}
+
 /** Product finder quiz (TE-11, Figma 1:506): panel 60, 2 cột từ 64rem, thẻ trắng 32.
    Nền panel Figma không có token: dùng background_dark (ES1-T135 #5) */
 .quiz {
