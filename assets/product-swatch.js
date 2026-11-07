@@ -70,6 +70,7 @@ class ProductSwatch extends HTMLElement {
     if (!image || !input?.dataset.imageSrc) return;
     image.srcset = input.dataset.imageSrcset ?? '';
     image.src = input.dataset.imageSrc;
+    if (input.dataset.imageAlt !== undefined) image.alt = input.dataset.imageAlt;
   }
 
   /**
@@ -128,6 +129,7 @@ class ProductSwatch extends HTMLElement {
   swapImage(src, srcset, alt) {
     const image = this.querySelector('img[data-card-image]');
     if (!(image instanceof HTMLImageElement) || !src) return;
+    if (alt !== undefined) image.alt = alt;
     if (image.getAttribute('src') === src) return;
 
     if (srcset) {
@@ -136,7 +138,6 @@ class ProductSwatch extends HTMLElement {
       image.removeAttribute('srcset');
     }
     image.src = src;
-    if (alt !== undefined) image.alt = alt;
   }
 
   /** @param {string | undefined} variantId */
