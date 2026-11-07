@@ -1,0 +1,426 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ES1-T243 mockup: Blog</title>
+<!-- Chỉ cho mockup. Theme tải font qua font_picker (sofia_sans_condensed_n7, inter_n4), không nhúng Google Fonts. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sofia+Sans+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* Token: giá trị mặc định trong DESIGN.md / snippets/css-variables.liquid. Không có màu mới. */
+:root {
+  --color-background: #fff; --color-foreground: #1a1a1a; --color-muted: #4d4d4d; --color-muted-light: #6b6b6b;
+  --color-border: #e5e5e5; --color-background-alt: #f4f4f4; --color-background-sand: #ebe6e0;
+  --color-background-dark: #1e1e1e; --color-background-dark-foreground: #fff; --color-muted-on-dark: #999;
+  --color-accent: #c8400e; --color-accent-foreground: #fff; --color-sale: #bd1616; --figma-1a1a1a: #1a1a1a;
+  --font-heading: 'Sofia Sans Condensed', sans-serif; --font-primary: Inter, sans-serif;
+  --font-size-xs: .8125rem; --font-size-sm: .875rem; --font-size-base: 1rem; --font-size-lg: 1.125rem;
+  --font-size-h3: clamp(1.375rem, 1.2rem + .6vw, 1.75rem); --font-size-h2: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+  --font-size-h1: clamp(2rem, 1.5rem + 2.5vw, 3rem); --font-size-wordmark: clamp(4rem, 10.4vw, 12.5rem);
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 120px;
+  --radius-input: 4px; --figma-radius-8: 8px; --radius-card: 12px; --figma-radius-16: 16px; --figma-radius-24: 24px; --radius-pill: 999px;
+  --page-width: 91rem; --page-margin: 20px;
+  --motion-fast: 150ms; --motion-base: 250ms; --motion-slow: 500ms; --ease-out: cubic-bezier(.22, 1, .36, 1);
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--color-background); color: var(--color-foreground); font: 400 var(--font-size-base)/1.5 var(--font-primary); -webkit-font-smoothing: antialiased; }
+img { display: block; max-width: 100%; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid currentcolor; outline-offset: 2px; }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.wrap { width: 100%; max-width: var(--page-width); margin-inline: auto; padding-inline: var(--page-margin); }
+.blog-head, .blog-head__row, .ftr__news, .ftr__top, .demo-row { grid-template-columns: minmax(0, 1fr); }
+.blog-head__row > *, .blog-head > * { min-width: 0; }
+.icon-btn { display: inline-grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: inherit; cursor: pointer; }
+.icon-btn svg { width: 24px; height: 24px; }
+
+/* Header: dùng lại blocks/header.liquid, biến thể nền sáng (trang không có hero) */
+.hdr { position: sticky; inset-block-start: 0; z-index: 5; background: var(--color-background); border-block-end: 1px solid var(--color-border); }
+.hdr__in { display: flex; align-items: center; gap: var(--space-2); min-height: 64px; }
+.hdr__logo { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-foreground); }
+.hdr__logo svg { width: 100px; height: 30px; }
+.hdr__nav { display: none; }
+.hdr__icons { display: flex; margin-inline-start: auto; }
+.hdr__account { display: none; }
+@media (min-width: 48rem) { .hdr__account { display: inline-grid; } }
+@media (min-width: 64rem) {
+  .hdr__in { min-height: 80px; }
+  .hdr__burger { display: none; }
+  .hdr__nav { display: block; margin-inline: auto; }
+  .hdr__menu { display: flex; gap: var(--space-6); margin: 0; padding: 0; list-style: none; }
+  .hdr__icons { margin-inline-start: 0; }
+  .hdr__link { display: inline-flex; align-items: center; gap: var(--space-1); min-height: 44px; font-weight: 500; letter-spacing: -.04em; text-decoration: none; text-underline-offset: 8px; text-decoration-thickness: 2px; }
+  .hdr__link:hover { text-decoration-line: underline; }
+  .hdr__link[aria-current='page'] { color: var(--color-accent); text-decoration-line: underline; }
+}
+@media (min-width: 80rem) { .hdr__menu { gap: 40px; } }
+
+/* Breadcrumb (ĐỀ XUẤT, chưa có trong Figma) */
+.crumbs ol { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; font-size: var(--font-size-sm); color: var(--color-muted-light); }
+.crumbs li + li::before { content: '/'; margin-inline-end: var(--space-2); }
+.crumbs a { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
+.crumbs a:hover { color: var(--color-foreground); text-decoration: underline; }
+.crumbs [aria-current] { color: var(--color-foreground); }
+
+/* Đầu trang blog: eyebrow + heading theo Figma 1:1024, 1:1025 */
+.blog-head { display: grid; gap: var(--space-3); padding-block: var(--space-4) var(--space-6); }
+.eyebrow { margin: 0; color: var(--color-accent); font: var(--font-heading); font-family: var(--font-heading); font-size: var(--font-size-base); font-weight: 800; letter-spacing: .04em; line-height: 1.25; text-transform: uppercase; }
+.blog-head h1 { margin: 0; font-family: var(--font-heading); font-size: var(--font-size-h1); font-weight: 700; letter-spacing: -.02em; line-height: calc(58 / 48); text-wrap: balance; }
+.blog-head__row { display: grid; gap: var(--space-5); margin-block-start: var(--space-3); }
+.blog-head__count { margin: 0; color: var(--color-muted-light); font-size: var(--font-size-sm); }
+@media (min-width: 64rem) { .blog-head { padding-block: var(--space-5) var(--space-7); } .blog-head__row { grid-template-columns: 1fr auto; align-items: center; } }
+
+/* Lọc theo tag (ĐỀ XUẤT): link tới /blogs/<handle>/tagged/<tag>, không JS */
+.chips { display: flex; gap: var(--space-2); margin: 0 calc(var(--page-margin) * -1); padding: var(--space-1) var(--page-margin); overflow-x: auto; list-style: none; scrollbar-width: none; }
+.chip { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 20px; border: 1px solid var(--color-border); border-radius: var(--radius-pill); font-size: var(--font-size-sm); font-weight: 600; white-space: nowrap; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out); }
+.chip:hover { border-color: var(--color-foreground); }
+.chip[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); }
+.chip:focus-visible { outline-color: var(--color-accent); }
+@media (min-width: 64rem) { .chips { margin: 0; padding: 0; } }
+
+/* Lưới bài: card dùng lại snippets/article-card (Figma 1:1027, 336 x 448 ở 1416 / 4 cột) + dòng ngày và excerpt (AC3) */
+.blog-grid { display: grid; gap: 40px var(--space-5); margin: 0; padding: 0; list-style: none; }
+@media (min-width: 48rem) { .blog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 64rem) { .blog-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 80rem) { .blog-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-7) var(--space-5); } }
+.acard__link { position: relative; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 3 / 4; overflow: hidden; border-radius: var(--figma-radius-16); background: var(--color-background-dark); color: var(--color-background-dark-foreground); text-decoration: none; }
+.acard__link:focus-visible { outline-color: var(--color-accent); }
+.acard__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.acard__link::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 55%, var(--color-background-dark)); }
+.acard__tag { position: absolute; z-index: 1; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); margin: 0; padding: 3px var(--space-3); border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-accent-foreground); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: -.02em; line-height: calc(20 / 13); }
+.acard__content { position: relative; z-index: 1; display: grid; gap: var(--space-1); padding: 0 var(--space-4) var(--space-4); }
+.acard__title { margin: 0; font-size: var(--font-size-lg); font-weight: 700; letter-spacing: -.01em; line-height: calc(28 / 18); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.acard__meta { margin: 0; font-size: var(--font-size-sm); font-weight: 500; line-height: calc(22 / 14); }
+.acard__excerpt { margin: var(--space-4) 0 0; color: var(--color-muted); display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.acard__link:hover .acard__title { text-decoration: underline; text-underline-offset: .1em; }
+@media (min-width: 48rem) { .acard__content { padding: 0 var(--space-5) var(--space-5); } }
+@media (prefers-reduced-motion: no-preference) {
+  .acard__img { transition: scale var(--motion-slow) var(--ease-out); }
+  .acard__link:hover .acard__img { scale: 1.04; }
+}
+
+/* Phân trang: snippets/pagination.liquid */
+.pagination { padding-block: var(--space-7); }
+.pagination ul { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.pg { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-width: 44px; min-height: 44px; padding-inline: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--figma-radius-8); font-size: var(--font-size-sm); font-weight: 600; text-decoration: none; }
+a.pg:hover { border-color: var(--color-foreground); }
+.pg--current { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); }
+.pg svg { width: 16px; height: 16px; }
+@media (min-width: 64rem) { .pagination { padding-block: 64px var(--space-8); } }
+
+/* Nút: .button Figma (16/26, 600, padding 13 32, bo 8, cao 52) */
+.button { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: 52px; padding: 13px 32px; border: 0; border-radius: var(--figma-radius-8); background: var(--color-accent); color: var(--color-accent-foreground); font: 600 var(--font-size-base)/26px var(--font-primary); letter-spacing: -.01em; text-decoration: none; cursor: pointer; }
+.button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.button--link { min-height: 44px; padding: 0; background: none; color: var(--color-foreground); font: 700 var(--font-size-h3)/1.2 var(--font-heading); }
+.button--link svg { width: 20px; height: 16px; }
+.button--link:hover span { text-decoration: underline; }
+
+/* Footer: blocks/footer.liquid (Figma 1:1104) */
+.ftr { background: var(--figma-1a1a1a); color: var(--color-background-dark-foreground); padding-block: var(--space-7) var(--space-5); }
+.ftr__news { display: grid; gap: var(--space-5); padding-block-end: var(--space-7); }
+.ftr__news-img { width: 104px; height: 128px; object-fit: cover; border-radius: var(--figma-radius-8); }
+.ftr__news-title { margin: 0; font: 800 var(--font-size-h3)/1.1 var(--font-heading); text-transform: uppercase; letter-spacing: -.01em; }
+.ftr__news-title span { color: var(--color-accent); }
+.ftr__news p { margin: var(--space-3) 0 0; color: var(--color-muted-on-dark); }
+.ftr__field { display: flex; border: 1px solid var(--color-muted-on-dark); border-radius: var(--figma-radius-8); overflow: hidden; }
+.ftr__field input { flex: 1; min-width: 0; min-height: 52px; padding-inline: var(--space-5); border: 0; background: none; color: inherit; font: inherit; }
+.ftr__field input::placeholder { color: var(--color-muted-on-dark); }
+.ftr__field .button { border-radius: 0; padding-inline: var(--space-5); }
+.ftr__note { margin: var(--space-3) 0 0; color: var(--color-muted-on-dark); font-size: var(--font-size-sm); }
+.ftr__panel { padding: var(--space-6) var(--space-5); border-radius: var(--figma-radius-24); background: var(--color-background-dark); }
+.ftr__top { display: grid; gap: var(--space-6); }
+.ftr__brand svg.logo { width: 100px; height: 30px; }
+.ftr__brand p { max-width: 460px; margin: var(--space-5) 0; color: var(--color-muted-on-dark); }
+.ftr__social { display: flex; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.ftr__social a { display: inline-grid; place-items: center; width: 44px; height: 44px; }
+.ftr__social svg { width: 28px; height: 28px; }
+.ftr__cols { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+.ftr__cols h3 { margin: 0 0 var(--space-3); font-size: var(--font-size-lg); font-weight: 600; }
+.ftr__cols ul { margin: 0; padding: 0; list-style: none; }
+.ftr__cols a { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-muted-on-dark); text-decoration: none; }
+.ftr__cols a:hover { color: var(--color-background-dark-foreground); }
+.ftr__trust { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin: var(--space-6) 0 0; padding: var(--space-5) 0 0; border-block-start: 1px solid rgb(255 255 255 / .12); list-style: none; color: var(--color-muted-on-dark); font-size: var(--font-size-sm); }
+.ftr__trust li { display: flex; align-items: center; gap: var(--space-3); }
+.ftr__trust svg { width: 28px; height: 28px; flex: none; }
+.ftr__bottom { display: grid; justify-items: center; gap: var(--space-4); padding-block-start: var(--space-6); color: var(--color-muted-on-dark); font-size: var(--font-size-sm); text-align: center; }
+.ftr__wordmark { order: -1; margin: 0; color: var(--color-background-dark-foreground); font: 800 var(--font-size-wordmark)/.9 var(--font-heading); letter-spacing: -.02em; }
+.ftr__commerce { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-4); }
+.ftr__locale { display: inline-flex; align-items: center; gap: var(--space-1); min-height: 44px; padding: 0; border: 0; background: none; color: inherit; font: inherit; }
+.ftr__pay { display: flex; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
+.ftr__pay li { display: grid; place-items: center; width: 34px; height: 24px; border-radius: var(--radius-input); background: var(--color-background-dark-foreground); color: var(--color-foreground); font-size: 7px; font-weight: 700; }
+@media (min-width: 48rem) { .ftr__trust { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 64rem) {
+  .ftr { padding-block: 60px var(--space-6); }
+  .ftr__news { grid-template-columns: auto minmax(0, 1fr) minmax(0, 520px); align-items: start; gap: var(--space-8); column-gap: 64px; }
+  .ftr__panel { margin-inline: calc(var(--page-margin) * -1); padding: var(--space-8) 0 var(--space-6); }
+  .ftr__panel > * { max-width: calc(1416px + var(--page-margin) * 2); margin-inline: auto; padding-inline: var(--page-margin); }
+  .ftr__panel > .ftr__trust { max-width: 1416px; padding-inline: 0; }
+  .ftr__top { grid-template-columns: 1fr 480px; }
+  .ftr__bottom { grid-template-columns: 1fr auto 1fr; align-items: end; text-align: start; }
+  .ftr__wordmark { order: 0; }
+  .ftr__commerce { justify-content: flex-end; }
+  .ftr__bottom > p:first-child { justify-self: start; }
+}
+@media (min-width: 120rem) { .ftr__panel { margin-inline: -192px; } }
+
+/* Khung trạng thái (chỉ trong mockup) */
+.state { border-block-start: 4px dashed var(--color-foreground); }
+.state__label { margin: 0; padding: var(--space-3) var(--page-margin); background: var(--color-foreground); color: var(--color-background); font-weight: 700; }
+.empty { display: grid; justify-items: center; gap: var(--space-4); margin-block-end: var(--space-7); padding: var(--space-7) var(--space-5); border-radius: var(--figma-radius-16); background: var(--color-background-alt); text-align: center; }
+.empty h2 { margin: 0; font: 700 var(--font-size-h2)/1.1 var(--font-heading); }
+.empty p { max-width: 520px; margin: 0; color: var(--color-muted); }
+.demo-hover .acard__img { scale: 1.04; }
+.demo-hover .acard__title { text-decoration: underline; text-underline-offset: .1em; }
+.demo-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.demo-row { display: grid; gap: var(--space-5); padding-block: var(--space-6) var(--space-7); }
+@media (min-width: 48rem) { .demo-row { grid-template-columns: repeat(2, minmax(0, 336px)); } }
+.demo-note { margin: 0; color: var(--color-muted); font-size: var(--font-size-sm); }
+</style>
+</head>
+<body>
+<!-- Sprite icon: position absolute, kích thước 0 (svg hidden không ẩn được sprite) -->
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-logo" viewBox="0 0 100 30"><path fill="currentColor" d="M69.2 25.06c-3.4 0-6.16-2.78-6.16-6.22s2.76-6.22 6.16-6.22c1.66 0 3.17.67 4.27 1.75l3.13-3.16a10.5 10.5 0 0 0-7.4-3.04c-5.85 0-10.57 4.77-10.57 10.67s4.72 10.68 10.57 10.68c2.89 0 5.48-1.17 7.4-3.05l-3.13-3.15a6.1 6.1 0 0 1-4.27 1.74ZM4.9 17.86h13.2v-4.12H4.9V6.35h14.12V2.21H0v27.21h19.1v-4.12H4.9v-7.44ZM30.45.93c-1.16 0-2.22.22-3.18.69a5.1 5.1 0 0 0-2.28 2.04c-.57.91-.85 2.06-.85 3.43v1.93h-3v3.71h3v16.69h4.79V12.73h5.28V9.02h-5.3V7.4c0-.8.18-1.4.55-1.83.37-.43.99-.65 1.88-.65.38 0 .71.04 1.03.09l.77.19.96-3.71c-.31-.12-.77-.23-1.42-.36-.66-.13-1.4-.2-2.23-.2ZM41.79 9.02h-4.77v20.42h4.77V9.02ZM54.86 25.58c-.25.04-.53.07-.83.07-.39 0-.75-.05-1.08-.18-.33-.13-.59-.35-.79-.7-.2-.34-.3-.84-.3-1.49V12.73h5.1V9.02h-5.1v-4.9H47.1V9h-2.87v3.72h2.87v11.34c0 1.28.26 2.34.83 3.19.55.86 1.3 1.49 2.28 1.88.96.4 2.02.6 3.22.56.68-.02 1.25-.08 1.71-.19.48-.11.83-.2 1.08-.3l-.81-3.77c-.11.08-.31.11-.55.15ZM88.52 8.26c-5.85 0-10.57 4.77-10.57 10.67s4.72 10.68 10.57 10.68c5.85 0 10.58-4.78 10.58-10.68S94.37 8.26 88.52 8.26Zm0 16.9c-3.4 0-6.16-2.79-6.16-6.23s2.76-6.22 6.16-6.22 6.16 2.79 6.16 6.22c0 3.44-2.76 6.22-6.16 6.22ZM97.7 11.06a12 12 0 0 0-2.32-2.11c.81-.99 1.82-2.64 1.4-3.66-.2-.5-1.42-2.12-8.26-2.12s-8.06 1.64-8.26 2.14c-.42 1.02.6 2.69 1.4 3.66a12 12 0 0 0-2.32 2.11c-1.03-1.22-3.13-4.17-1.97-7 .57-1.35 1.75-2.37 3.59-3.04C82.8.33 85.3 0 88.47 0h.09c6.35.02 9.97 1.36 11.09 4.07 1.18 2.82-.92 5.77-1.95 7ZM39.32 6.4a2.77 2.77 0 0 0 2.76-2.78 2.77 2.77 0 0 0-2.76-2.79 2.77 2.77 0 0 0-2.76 2.79 2.77 2.77 0 0 0 2.76 2.79Z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="8" r="4"/><path d="M4 21c1-4 4-6 8-6s7 2 8 6"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 8h14l-1 13H6L5 8Z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h18M3 12h18M3 17h18"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.4"><path d="m1 1 4 4 4-4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 8h17M11 1l7 7-7 7"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M21 3 10 14M21 3l-7 18-4-7-7-4 18-7Z"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 3v12a4 4 0 1 1-4-4M14 3c.5 3 2.5 5 5 5"/></symbol>
+  <symbol id="i-ig" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/></symbol>
+  <symbol id="i-yt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="5" width="20" height="14" rx="4"/><path d="m10 9 5 3-5 3V9Z"/></symbol>
+  <symbol id="i-fb" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h-2a4 4 0 0 0-4 4v3H7v4h2v7h4v-7h3l1-4h-4V8a1 1 0 0 1 1-1h2V3Z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3Z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 6h12v10H2zM14 10h4l4 3v3h-8"/><circle cx="6" cy="18" r="2"/><circle cx="18" cy="18" r="2"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="9" r="6"/><path d="m8 14-2 7 6-3 6 3-2-7"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 9h14l-3-3M20 15H6l3 3"/></symbol>
+</svg>
+
+<a class="sr-only" href="#main">Skip to content</a>
+
+<header class="hdr" data-testid="header">
+  <div class="wrap hdr__in">
+    <button class="icon-btn hdr__burger" type="button" aria-label="Open menu"><svg><use href="#i-menu"/></svg></button>
+    <a class="hdr__logo" href="#" aria-label="Efitco home"><svg><use href="#i-logo"/></svg></a>
+    <nav class="hdr__nav" aria-label="Main menu">
+      <ul class="hdr__menu">
+        <li><a class="hdr__link" href="#">Shop <svg width="10" height="6"><use href="#i-chev"/></svg></a></li>
+        <li><a class="hdr__link" href="#">Collection <svg width="10" height="6"><use href="#i-chev"/></svg></a></li>
+        <li><a class="hdr__link" href="#">Sale</a></li>
+        <li><a class="hdr__link" href="#">Our Story</a></li>
+        <li><a class="hdr__link" href="#" aria-current="page">Blog</a></li>
+        <li><a class="hdr__link" href="#">Contact</a></li>
+        <li><a class="hdr__link" href="#">Help</a></li>
+      </ul>
+    </nav>
+    <div class="hdr__icons">
+      <a class="icon-btn" href="#" aria-label="Search"><svg><use href="#i-search"/></svg></a>
+      <a class="icon-btn hdr__account" href="#" aria-label="Account"><svg><use href="#i-user"/></svg></a>
+      <a class="icon-btn" href="#" aria-label="Cart, 0 items"><svg><use href="#i-bag"/></svg></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <!-- ===== TRANG BLOG: /blogs/news (trang 1) ===== -->
+  <section class="wrap blog-head" data-testid="blog-header">
+    <nav class="crumbs" aria-label="Breadcrumb">
+      <ol><li><a href="#">Home</a></li><li><span aria-current="page">Blog</span></li></ol>
+    </nav>
+    <p class="eyebrow">From the Efitco blog</p>
+    <!-- blog.title (ví dụ) -->
+    <h1>Training Tips &amp; Inspiration</h1>
+    <div class="blog-head__row">
+      <nav aria-label="Filter articles by topic">
+        <!-- blog.all_tags; "All" trỏ blog.url -->
+        <ul class="chips" role="list">
+          <li><a class="chip" href="#" aria-current="page">All</a></li>
+          <li><a class="chip" href="#">Articles</a></li>
+          <li><a class="chip" href="#">Diet plans</a></li>
+          <li><a class="chip" href="#">Exercises</a></li>
+          <li><a class="chip" href="#">Featured</a></li>
+        </ul>
+      </nav>
+      <p class="blog-head__count">4 articles</p>
+    </div>
+  </section>
+
+  <section class="wrap" aria-labelledby="blog-list-title">
+    <h2 id="blog-list-title" class="sr-only">Articles</h2>
+    <ul class="blog-grid" role="list" data-testid="blog-grid">
+      <li class="acard" data-testid="article-card">
+        <a class="acard__link" href="#">
+          <img class="acard__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg?width=720" alt="" width="720" height="960" fetchpriority="high">
+          <p class="acard__tag">Exercises</p>
+          <div class="acard__content">
+            <h3 class="acard__title">How to stretch properly after training</h3>
+            <p class="acard__meta"><time datetime="2026-11-05">Nov 5, 2026</time> · 2 min read</p>
+          </div>
+        </a>
+        <!-- article.excerpt_or_content, strip_html, truncatewords: 30 (nội dung ví dụ) -->
+        <p class="acard__excerpt">A short cool-down routine to ease tight muscles after a session, with the stretches to hold and how long to hold them.</p>
+      </li>
+      <li class="acard" data-testid="article-card">
+        <a class="acard__link" href="#">
+          <img class="acard__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960">
+          <p class="acard__tag">Featured</p>
+          <div class="acard__content">
+            <h3 class="acard__title">Set up a perfect home gym in just 15m²</h3>
+            <p class="acard__meta"><time datetime="2026-11-04">Nov 4, 2026</time> · 5 min read</p>
+          </div>
+        </a>
+        <p class="acard__excerpt">Plan the layout, flooring and core equipment so a small room works as a full training space.</p>
+      </li>
+      <li class="acard" data-testid="article-card">
+        <a class="acard__link" href="#">
+          <img class="acard__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-3.jpg?width=720" alt="" width="720" height="960">
+          <p class="acard__tag">Articles</p>
+          <div class="acard__content">
+            <h3 class="acard__title">How to choose the right adjustable dumbbell</h3>
+            <p class="acard__meta"><time datetime="2026-11-03">Nov 3, 2026</time> · 6 min read</p>
+          </div>
+        </a>
+        <p class="acard__excerpt">Weight range, adjustment system and footprint: what to check before you buy a pair.</p>
+      </li>
+      <li class="acard" data-testid="article-card">
+        <a class="acard__link" href="#">
+          <img class="acard__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960">
+          <p class="acard__tag">Diet plans</p>
+          <div class="acard__content">
+            <h3 class="acard__title">What to eat before and after a heavy session</h3>
+            <p class="acard__meta"><time datetime="2026-11-02">Nov 2, 2026</time> · 7 min read</p>
+          </div>
+        </a>
+        <p class="acard__excerpt">Simple meal timing and food choices to fuel heavy lifting and support recovery.</p>
+      </li>
+    </ul>
+
+    <!-- Trình diễn phân trang: paginate by 12, minh hoạ khi blog có > 12 bài -->
+    <nav class="pagination" aria-label="Blog pages" data-testid="pagination">
+      <ul role="list">
+        <li><span class="pg pg--current" aria-current="page" data-testid="pagination-current">1</span></li>
+        <li><a class="pg" href="#" aria-label="Page 2" data-testid="pagination-page">2</a></li>
+        <li><a class="pg" href="#" aria-label="Page 3" data-testid="pagination-page">3</a></li>
+        <li><a class="pg" href="#" data-testid="pagination-next">Next <svg><use href="#i-arrow"/></svg></a></li>
+      </ul>
+    </nav>
+  </section>
+</main>
+
+<footer class="ftr" data-testid="footer">
+  <div class="wrap">
+    <div class="ftr__news">
+      <img class="ftr__news-img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=240" alt="" width="104" height="128">
+      <div>
+        <h2 class="ftr__news-title"><span>Get 15% off</span> your first order</h2>
+        <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+      </div>
+      <form class="ftr__form" action="#">
+        <div class="ftr__field">
+          <label class="sr-only" for="f-email">Email</label>
+          <input id="f-email" type="email" placeholder="Email" autocomplete="email">
+          <button class="button" type="submit"><svg width="20" height="20"><use href="#i-send"/></svg>Get 15% Off</button>
+        </div>
+        <p class="ftr__note">No spam. Unsubscribe anytime.</p>
+      </form>
+    </div>
+    <div class="ftr__panel">
+      <div class="ftr__top">
+        <div class="ftr__brand">
+          <svg class="logo" aria-label="Efitco" role="img"><use href="#i-logo"/></svg>
+          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+          <ul class="ftr__social" role="list">
+            <li><a href="#" aria-label="TikTok"><svg><use href="#i-tiktok"/></svg></a></li>
+            <li><a href="#" aria-label="Instagram"><svg><use href="#i-ig"/></svg></a></li>
+            <li><a href="#" aria-label="YouTube"><svg><use href="#i-yt"/></svg></a></li>
+            <li><a href="#" aria-label="Facebook"><svg><use href="#i-fb"/></svg></a></li>
+          </ul>
+        </div>
+        <div class="ftr__cols">
+          <div><h3>Shop</h3><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></div>
+          <div><h3>Information</h3><ul><li><a href="#">Our Story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li></ul></div>
+        </div>
+      </div>
+      <ul class="ftr__trust" role="list">
+        <li><svg><use href="#i-shield"/></svg>1 Year Warranty</li>
+        <li><svg><use href="#i-truck"/></svg>Fast Shipping</li>
+        <li><svg><use href="#i-award"/></svg>Premium Quality</li>
+        <li><svg><use href="#i-swap"/></svg>90 Day Money Back</li>
+      </ul>
+    </div>
+    <div class="ftr__bottom">
+      <p>© 2026 Efitco, Powered by Shopify</p>
+      <p class="ftr__wordmark" aria-hidden="true">EFITCO</p>
+      <div class="ftr__commerce">
+        <button class="ftr__locale" type="button">USD / EN <svg width="10" height="6"><use href="#i-chev"/></svg></button>
+        <ul class="ftr__pay" role="list" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DINERS</li><li>AMEX</li><li>PAYPAL</li></ul>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ================= TRẠNG THÁI (chỉ trong mockup) ================= -->
+<section class="state" aria-label="State: empty blog">
+  <p class="state__label">TRẠNG THÁI 1: Blog rỗng (blog.articles_count = 0). Ẩn chip lọc, số bài, phân trang. ĐỀ XUẤT</p>
+  <div class="wrap">
+    <div class="blog-head">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="#">Home</a></li><li><span aria-current="page">Blog</span></li></ol></nav>
+      <p class="eyebrow">From the Efitco blog</p>
+      <h1>Training Tips &amp; Inspiration</h1>
+    </div>
+    <div class="empty" data-testid="blog-empty">
+      <h2>No Articles Yet</h2>
+      <p>New training tips are on the way. In the meantime, browse our equipment.</p>
+      <a class="button" href="#">Explore Equipment</a>
+    </div>
+  </div>
+</section>
+
+<section class="state" aria-label="State: tag with no articles">
+  <p class="state__label">TRẠNG THÁI 2: Trang tag không có bài (/blogs/news/tagged/x). ĐỀ XUẤT</p>
+  <div class="wrap">
+    <div class="blog-head">
+      <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="#">Home</a></li><li><a href="#">Blog</a></li><li><span aria-current="page">Diet plans</span></li></ol></nav>
+      <h1>Training Tips &amp; Inspiration</h1>
+    </div>
+    <div class="empty">
+      <h2>No Articles In “Diet plans”</h2>
+      <p>Try another topic or see every article.</p>
+      <a class="button button--link" href="#"><span>View All Articles</span> <svg><use href="#i-arrow"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<section class="state" aria-label="State: hover and focus">
+  <p class="state__label">TRẠNG THÁI 3: Hover (ảnh phóng 1.04, tiêu đề gạch chân) và focus-visible (viền accent 2px, offset 2px)</p>
+  <div class="wrap demo-row">
+    <div class="acard demo-hover">
+      <a class="acard__link" href="#">
+        <img class="acard__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960">
+        <p class="acard__tag">Featured</p>
+        <div class="acard__content"><h3 class="acard__title">Set up a perfect home gym in just 15m²</h3><p class="acard__meta">Nov 4, 2026 · 5 min read</p></div>
+      </a>
+      <p class="demo-note">Hover</p>
+    </div>
+    <div class="acard">
+      <a class="acard__link demo-focus" href="#">
+        <div class="acard__content"><h3 class="acard__title">What to eat before and after a heavy session</h3><p class="acard__meta">Nov 2, 2026 · 7 min read</p></div>
+      </a>
+      <p class="demo-note">Focus-visible, bài không có ảnh: giữ nền tối, không ảnh vỡ</p>
+    </div>
+  </div>
+  <div class="wrap" style="padding-block-end: var(--space-7)">
+    <ul class="chips" role="list" style="margin:0;padding:var(--space-1) 0">
+      <li><span class="chip" style="border-color:var(--color-foreground)">Chip hover</span></li>
+      <li><span class="chip demo-focus" style="outline-color:var(--color-accent)">Chip focus</span></li>
+      <li><span class="pg" style="border-color:var(--color-foreground)">2</span></li>
+      <li><span class="pg demo-focus" style="outline-color:var(--color-foreground)">3</span></li>
+    </ul>
+  </div>
+</section>
+</body>
+</html>
