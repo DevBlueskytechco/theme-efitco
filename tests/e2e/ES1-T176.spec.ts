@@ -72,6 +72,9 @@ async function showSlide(page: Page, row: Row) {
   const { x } = nodeBox(nodes, row.node);
   const slide = page.getByTestId('slideshow-slide').nth(row.slide);
   for (let i = 0; i < row.slide; i++) await page.getByTestId('slideshow-next').click();
+  // Chuột còn trên Next thì nút ở trạng thái hover, không phải trạng thái Figma
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(400);
   await expect.poll(async () => Math.abs(((await boxOf(slide))?.x ?? 9999) - x), { message: `slide ${row.slide} chưa về khung` }).toBeLessThan(1);
 }
 
@@ -202,9 +205,10 @@ test.describe('ES1-T176 so Figma', () => {
   });
 
   test.describe('Dữ liệu đối chiếu', () => {
-    test('Đủ E1 đến E11, mỗi mục có nguồn', () => {
+    test('Đủ ngoại lệ còn hiệu lực, mỗi mục có nguồn', () => {
       const keys = Object.keys(exceptions).filter((key) => /^E\d+$/.test(key));
-      expect(keys).toEqual(Array.from({ length: 11 }, (_, i) => `E${i + 1}`));
+      // E6, E11 đã bỏ: theo Figma (CTO 07/11)
+      expect(keys).toEqual(Array.from({ length: 11 }, (_, i) => `E${i + 1}`).filter((key) => !['E6', 'E11'].includes(key)));
       for (const key of keys) expect((exceptions as unknown as Record<string, { source: string }>)[key].source, key).toBeTruthy();
     });
 
@@ -254,6 +258,8 @@ test.describe('ES1-T176 so Figma', () => {
       for (const row of ready) {
         const root = page.getByTestId(row.copyRoot).first();
         await expect.soft(root, `Hàng ${row.copyRow}: không có ${row.copyRoot}`).toHaveCount(1);
+        await root.scrollIntoViewIfNeeded().catch(() => {});
+        await page.waitForTimeout(800); // module lazy tính số liệu panel
         const text = (await root.innerText().catch(() => '')).replace(/\s+/g, ' ').trim();
         const skip = new Set((row.copySkip ?? []).map((s: { value: string }) => s.value));
         const missing = content[row.copyRow].filter((line) => line.kind === 'copy' && !skip.has(line.value)).map((line) => line.expected).filter((expected) => !text.includes(expected));

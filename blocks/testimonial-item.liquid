@@ -99,10 +99,9 @@
       {%- if item_product != blank -%}
         <div class="testimonial-item__product" data-testid="testimonial-product">
           <div class="testimonial-item__thumb">
-            {%- assign thumb_image = thumb | default: item_product.featured_image -%}
-            {%- if thumb_image != blank and thumb_blank != true -%}
+            {%- if item_product.featured_image != blank -%}
               {% render 'image',
-                image: thumb_image,
+                image: item_product.featured_image,
                 width: 128,
                 height: 128,
                 crop: 'center',

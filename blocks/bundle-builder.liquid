@@ -90,8 +90,6 @@
   assign heading = block.settings.heading
   assign link_label = block.settings.link_label
   assign link_url = block.settings.link_url | default: routes.all_products_collection_url
-  assign discount_note = 'blocks.bundle_builder.discount_note' | t
-  assign discount_note = block.settings.discount_note | default: discount_note
   assign block_key = id | default: block.id
   assign heading_id = block_key | append: '-heading'
   assign cart_type = settings.cart_type | default: 'drawer'
@@ -292,10 +290,6 @@
           </div>
         </div>
 
-        {%- if tiers != blank -%}
-          <p class="bundle-builder__note visually-hidden" data-testid="bundle-builder-note">{{ discount_note | escape }}</p>
-        {%- endif -%}
-
         <div class="bundle-builder__actions">
           <button
             class="button bundle-builder__submit"
@@ -415,13 +409,6 @@
       "unit": "t:labels.unit_percent",
       "label": "t:labels.tier_3_percent",
       "default": 0
-    },
-    {
-      "type": "text",
-      "id": "discount_note",
-      "label": "t:labels.discount_note",
-      "info": "t:info.bundle_builder_discount_note",
-      "default": "Discount applies when an automatic discount is active."
     }
   ]
 }

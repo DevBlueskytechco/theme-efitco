@@ -191,7 +191,8 @@ test.describe('ES1-T190 vùng bấm swatch (D7, AC6)', () => {
         const pill = getComputedStyle(el, '::before');
         return { hitW: parseFloat(hit.width), hitH: parseFloat(hit.height), pillW: parseFloat(pill.width), pillH: parseFloat(pill.height) };
       });
-      expect(size.hitW, 'vùng bấm rộng').toBeGreaterThanOrEqual(44);
+      // Từ 1280: Figma cách nhau 4 px nên vùng bấm rộng 36 để không chồng (CTO 07/11: theo Figma)
+      expect(size.hitW, 'vùng bấm rộng').toBeGreaterThanOrEqual((page.viewportSize()?.width ?? 0) >= 1280 ? 36 : 44);
       expect(size.hitH, 'vùng bấm cao').toBeGreaterThanOrEqual(44);
       expect(size.pillW, 'hình rộng').toBeCloseTo(32, 0);
       expect(size.pillH, 'hình cao').toBeCloseTo(16, 0);
@@ -206,7 +207,8 @@ test.describe('ES1-T190 vùng bấm swatch (D7, AC6)', () => {
       const r = el.getBoundingClientRect();
       const cx = r.left + r.width / 2;
       const cy = r.top + r.height / 2;
-      return [[-21, 0], [21, 0], [0, -21], [0, 21]].map(([dx, dy]) => el.contains(document.elementFromPoint(cx + dx, cy + dy)));
+      const reach = innerWidth >= 1280 ? 17 : 21;
+      return [[-reach, 0], [reach, 0], [0, -21], [0, 21]].map(([dx, dy]) => el.contains(document.elementFromPoint(cx + dx, cy + dy)));
     });
     expect(hits).toEqual([true, true, true, true]);
   });

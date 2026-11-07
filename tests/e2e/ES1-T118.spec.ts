@@ -207,9 +207,10 @@ test.describe('ES1-T118 TE-7 testimonials', () => {
     await expect(tid(home, 'testimonials-heading')).toHaveText('What Our Customers Say?');
     await expect(tid(home, 'testimonial-item')).toHaveCount(4);
     await expect(tid(home, 'testimonial-author').first()).toHaveText('E. Johnson');
-    await expect(tid(home, 'testimonial-verified')).toHaveCount(0);
-    await expect(tid(home, 'testimonial-product')).toHaveCount(0);
-    await expect(tid(home, 'testimonial-image')).toHaveCount(0);
+    // Store dev có bộ ảnh mẫu nên bật như Figma; store mới cài vẫn tắt
+    await expect(tid(home, 'testimonial-verified')).toHaveCount(4);
+    await expect(tid(home, 'testimonial-product')).toHaveCount(4); // trang chủ đã nối dữ liệu (CTO 07/11)
+    await expect(tid(home, 'testimonial-image')).toHaveCount(4);
     const text = await home.innerText();
     expect(text.toLowerCase()).not.toContain('lorem');
     expect(text).not.toContain('Customer name');

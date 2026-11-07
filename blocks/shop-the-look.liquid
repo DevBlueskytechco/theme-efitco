@@ -73,8 +73,6 @@
   assign note_title = block.settings.note_title
   assign note_text = block.settings.note_text
   assign note_icon = block.settings.note_icon
-  assign discount_note = 'blocks.shop_the_look.discount_note' | t
-  assign discount_note = block.settings.discount_note | default: discount_note
   assign block_key = id | default: block.id
   assign heading_id = block_key | append: '-heading'
   assign cart_type = settings.cart_type | default: 'drawer'
@@ -227,12 +225,6 @@
             </div>
           </div>
 
-          {%- if tiers != blank -%}
-            <p class="shop-the-look__discount-note visually-hidden" data-testid="shop-the-look-discount-note">
-              {{- discount_note | escape -}}
-            </p>
-          {%- endif -%}
-
           <div class="shop-the-look__actions">
             <button
               class="button shop-the-look__submit"
@@ -372,13 +364,6 @@
       "unit": "t:labels.unit_percent",
       "label": "t:labels.tier_3_percent",
       "default": 0
-    },
-    {
-      "type": "text",
-      "id": "discount_note",
-      "label": "t:labels.discount_note",
-      "info": "t:info.bundle_builder_discount_note",
-      "default": "Discount applies when an automatic discount is active."
     },
     {
       "type": "header",

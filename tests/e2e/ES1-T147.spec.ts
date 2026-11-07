@@ -128,7 +128,6 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
     await expect(root.getByTestId('bundle-builder-discount-row')).toHaveCount(1);
     await expect(root.getByTestId('bundle-builder-progress')).toHaveCount(1);
     await expect(root.getByTestId('bundle-builder-progress-text')).toHaveCount(1);
-    await expect(root.getByTestId('bundle-builder-note')).toBeVisible();
     await expect(root.getByTestId('bundle-builder-subtotal')).toHaveCount(1);
     await expect(root.getByTestId('bundle-builder-total')).toHaveCount(1);
     await expect(root.locator('template[data-bundle-line-template]')).toHaveCount(1);
@@ -143,7 +142,6 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
     expect(await root.getAttribute('data-tiers')).toBeNull();
     await expect(root.getByTestId('bundle-builder-discount-row')).toHaveCount(0);
     await expect(root.getByTestId('bundle-builder-progress')).toHaveCount(0);
-    await expect(root.getByTestId('bundle-builder-note')).toHaveCount(0);
     await expect(root.getByTestId('bundle-builder-link')).toHaveCount(0);
   });
 
@@ -241,7 +239,6 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
     await page.goto(TE12);
     const root = bundle(page);
     await expect(root.getByTestId('bundle-builder-panel')).toContainText('Your Bundle');
-    await expect(root.getByTestId('bundle-builder-note')).toBeVisible();
     for (const id of ['count', 'subtotal', 'discount', 'total', 'progress', 'empty']) {
       await expect(root.getByTestId(`bundle-builder-${id}`), id).toBeHidden();
     }

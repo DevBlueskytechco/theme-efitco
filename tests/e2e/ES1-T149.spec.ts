@@ -193,7 +193,6 @@ test.describe('ES1-T149 panel', () => {
     await expectTotals(root, await sum([a, b, c]), 15);
     const progress = () => part(root, 'progress').evaluate((el: HTMLElement) => el.style.getPropertyValue('--bundle-progress'));
     expect(await progress()).toBe('100%');
-    await expect(part(root, 'note')).toBeVisible();
     await expectNoSeriousAxe(page, root);
 
     await c.uncheck();

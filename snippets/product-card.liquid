@@ -128,10 +128,6 @@
     assign rating_on_five = rating_value | times: 5.0 | divided_by: rating_scale | round: 1
   endif
 
-  assign custom_badge = product.metafields.custom.badge_text.value
-  if badge == 'sale' and custom_badge != blank
-    assign badge_label = custom_badge
-  endif
   # custom.swatch_colors: hex colors separated by commas, for a color option without native swatches
   assign swatch_colors = product.metafields.custom.swatch_colors.value | split: ','
   assign swatch_option = nil
@@ -178,6 +174,19 @@
             data-card-image: 'card',
             data-testid: 'product-card-image'
         }}
+        {%- assign hover_media = product.media | where: 'media_type', 'image' -%}
+        {%- if variant == blank and hover_media.size > 1 and swatch_option == nil -%}
+          {{
+            hover_media[1]
+            | image_url: width: 720
+            | image_tag:
+              widths: '360, 720',
+              sizes: image_sizes,
+              loading: 'lazy',
+              alt: '',
+              class: 'product-card__image-hover'
+          }}
+        {%- endif -%}
       {%- else -%}
         <span class="product-card__placeholder" data-testid="product-card-placeholder-image">
           {{- 'product-1' | placeholder_svg_tag: 'product-card__placeholder-svg' -}}
@@ -327,7 +336,6 @@
           {% endif %}
         >
           <span class="visually-hidden">{{ value.name | escape }}</span>
-          <span class="product-card__swatch-tick">{%- render 'quiz-icon', name: 'check' -%}</span>
         </label>
         {%- if product.price_varies and swatch_variant -%}
           <template data-price-for="{{ swatch_variant.id }}">

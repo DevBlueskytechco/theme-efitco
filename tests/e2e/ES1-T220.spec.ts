@@ -104,7 +104,8 @@ test.describe('ES1-T220 không cướp focus', () => {
     await leaveStart(page);
     await track(page).focus();
     await track(page).evaluate((el) => el.scrollTo({ left: 0 }));
-    await expect(prev(page)).toBeHidden();
+    // Có thuộc tính hidden; trang chủ vẫn vẽ nút theo Figma 1:400 (CTO 07/11), trang khác ẩn hẳn
+    await expect(prev(page)).toHaveAttribute('hidden', '');
     await expect(track(page)).toBeFocused();
   });
 

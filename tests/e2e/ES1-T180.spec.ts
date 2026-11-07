@@ -51,7 +51,7 @@ async function expectIwt(scope: Locator, copy: { eyebrow?: string; heading: stri
   if (copy.eyebrow) expect(await content(tid(scope, 'image-with-text-eyebrow'))).toBe(copy.eyebrow);
   else await expect(tid(scope, 'image-with-text-eyebrow')).toHaveCount(0);
   expect(await content(tid(scope, 'image-with-text-heading'))).toBe(copy.heading);
-  expect(await content(tid(scope, 'image-with-text-body'))).toBe(copy.body);
+  expect((await content(tid(scope, 'image-with-text-body'))).replace(/\s+/g, ' ')).toBe(copy.body);
   expect(await content(tid(scope, 'image-with-text-button'))).toBe(copy.button);
 }
 

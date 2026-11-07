@@ -540,6 +540,8 @@ test.describe('ES1-T23', () => {
     const pays = await page.getByTestId(T.footer).getByTestId(T.payment).all();
     test.skip(pays.length === 0, 'store dev chưa bật payment type');
     for (const p of pays) {
+      // Store có bộ ảnh Figma dùng thẻ ảnh thay svg của Shopify
+      if ((await p.locator('img').count()) > 0) continue;
       const svg = p.locator('svg');
       await expect(svg.locator('title')).toHaveCount(1);
       const fills = await svg.evaluate(el => new Set(Array.from(el.querySelectorAll('[fill]')).map(n => n.getAttribute('fill')?.toLowerCase())).size);
@@ -672,7 +674,8 @@ test.describe('ES1-T23', () => {
     await expect(header).toHaveAttribute('data-scrolled', '');
     await expect(header).not.toHaveCSS('box-shadow', 'none');
     await expect.poll(async () => Math.round((await header.boundingBox())!.y)).toBe(0);
-    await expect(header).toHaveCSS('color', rgb(tokens.color.foreground));
+    // Trang chủ: header tối như Figma 1:362 (CTO 07/11)
+    await expect(header).toHaveCSS('color', 'rgb(255, 255, 255)');
   });
 
   test('TC-44 AC9 schema sticky_header mặc định bật', async ({}, ti) => {

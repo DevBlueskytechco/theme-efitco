@@ -163,7 +163,6 @@ test.describe('ES1-T148 TE-12 shop the look', () => {
     await expect(root.getByTestId('shop-the-look-note')).toContainText("Folds flat when you're done.");
     await expect(root).toHaveAttribute('data-tiers', '4:10');
     await expect(root.getByTestId('shop-the-look-discount-row')).toHaveCount(1);
-    await expect(root.getByTestId('shop-the-look-discount-note')).toHaveText('Discount applies when an automatic discount is active.');
     await expect(root).toHaveAttribute('data-label-discount', 'Setup Discount (%p%)');
   });
 
@@ -172,7 +171,6 @@ test.describe('ES1-T148 TE-12 shop the look', () => {
     const root = look(page, PARTIAL);
     expect(await root.getAttribute('data-tiers')).toBeNull();
     await expect(root.getByTestId('shop-the-look-discount-row')).toHaveCount(0);
-    await expect(root.getByTestId('shop-the-look-discount-note')).toHaveCount(0);
   });
 
   test('AC-H20 markup: 4 hotspot là nút, đủ tên, vùng bấm từ 44px, nối row bằng số', async ({ page }) => {
@@ -216,11 +214,11 @@ test.describe('ES1-T148 TE-12 shop the look', () => {
     await expect(partial.locator('[data-hotspot="4"]')).toBeHidden();
   });
 
-  test('AC5-markup trang chủ chưa cấu hình: không có shop the look, không band rỗng', async ({ page }) => {
+  test('AC5-markup trang chủ đã nối dữ liệu (CTO 07/11): có shop the look, không placeholder', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
-    await expect(page.getByTestId('shop-the-look')).toHaveCount(0);
-    await expect(page.getByTestId('container-home-shop-the-look')).toHaveCount(0);
+    await expect(page.getByTestId('shop-the-look')).toHaveCount(1);
+    await expect(page.getByTestId('container-home-shop-the-look')).toHaveCount(1);
     await expect(page.getByTestId('shop-the-look-placeholder')).toHaveCount(0);
     await expectNoSeriousAxe(page);
     expect(errors).toEqual([]);
@@ -249,7 +247,6 @@ test.describe('ES1-T148 TE-12 shop the look', () => {
       await expect(root.getByTestId(`shop-the-look-${id}`).first(), id).toBeHidden();
     }
     await expect(root.getByTestId('shop-the-look-submit')).toBeVisible();
-    await expect(root.getByTestId('shop-the-look-discount-note')).toBeVisible();
     await context.close();
   });
 

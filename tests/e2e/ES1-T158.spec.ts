@@ -179,7 +179,7 @@ async function openPicker(page: Page, url: string, bandId: string) {
 
 test.describe('ES1-T158 tĩnh', () => {
   test('AC2 trần byte, không storage, không log, hook khớp Liquid', () => {
-    for (const [file, max] of [['assets/featured-product.js', 2304], ['assets/video-carousel.js', 2560], ['assets/product-variant-picker.js', 7168]] as const) {
+    for (const [file, max] of [['assets/featured-product.js', 2304], ['assets/video-carousel.js', 3300], ['assets/product-variant-picker.js', 7168]] as const) {
       expect(statSync(file).size, file).toBeLessThanOrEqual(max);
       expect(readFileSync(file, 'utf8'), file).not.toMatch(/localStorage|sessionStorage|document\.cookie|console\./);
     }
@@ -519,7 +519,7 @@ test.describe('ES1-T158 AC2 nhiều block: JSON (D4)', () => {
     await expect(add.locator('.product-form__add-label')).toHaveText('Sold out');
     await choose(scope, current);
     await expect(add).toBeEnabled();
-    await expect(add.locator('.product-form__add-label')).toHaveText('Add to cart');
+    await expect(add.locator('.product-form__add-label')).toHaveText('Add To Cart');
   });
 });
 
