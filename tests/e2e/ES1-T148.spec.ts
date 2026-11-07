@@ -159,7 +159,7 @@ test.describe('ES1-T148 TE-12 shop the look', () => {
   test('AC-H19 thẻ Fits, dòng giảm, ghi chú theo bậc mặc định 4 món 10%', async ({ page }) => {
     await page.goto(TE12);
     const root = look(page);
-    await expect(root.getByTestId('shop-the-look-note')).toContainText('Fits: 2.4×2.0 m');
+    await expect(root.getByTestId('shop-the-look-note')).toContainText('Fits: 2.4x2.0 m');
     await expect(root.getByTestId('shop-the-look-note')).toContainText("Folds flat when you're done.");
     await expect(root).toHaveAttribute('data-tiers', '4:10');
     await expect(root.getByTestId('shop-the-look-discount-row')).toHaveCount(1);

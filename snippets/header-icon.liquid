@@ -8,27 +8,15 @@
   {% render 'header-icon', name: 'search' %}
 {% enddoc %}
 
-<svg
-  xmlns="http://www.w3.org/2000/svg"
-  viewBox="0 0 20 20"
-  fill="none"
-  stroke="currentColor"
-  stroke-linecap="round"
-  stroke-linejoin="round"
-  stroke-width="var(--icon-stroke-width)"
-  aria-hidden="true"
-  focusable="false"
->
-  {%- case name -%}
-    {%- when 'menu' -%}
-      <path d="M3 5.5h14M3 10h14M3 14.5h14" />
-    {%- when 'close' -%}
-      <path d="m5 5 10 10M15 5 5 15" />
-    {%- when 'search' -%}
-      <circle cx="9" cy="9" r="5.25" /><path d="m13 13 4 4" />
-    {%- when 'chevron' -%}
-      <path d="m5.5 8 4.5 4.5L14.5 8" />
-    {%- when 'bag' -%}
-      <path d="M3.5 7.5h13l.75 8a2 2 0 0 1-2 2.2H4.75a2 2 0 0 1-2-2.2zM7 10V5.5a3 3 0 0 1 6 0V10" />
-  {%- endcase -%}
-</svg>
+{%- case name -%}
+  {%- when 'menu' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="var(--icon-stroke-width)" aria-hidden="true" focusable="false"><path d="M3 5.5h14M3 10h14M3 14.5h14" /></svg>
+  {%- when 'close' -%}
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="var(--icon-stroke-width)" aria-hidden="true" focusable="false"><path d="m5 5 10 10M15 5 5 15" /></svg>
+  {%- when 'search' -%}
+    <svg aria-hidden="true" focusable="false" class="site-header__svg-search" width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M8.80781 1.79429C4.91628 1.79429 1.76156 5.00762 1.76156 8.97147C1.76156 12.9353 4.91628 16.1486 8.80781 16.1486C12.6994 16.1486 15.8541 12.9353 15.8541 8.97147C15.8541 5.00762 12.6994 1.79429 8.80781 1.79429ZM0 8.97147C0 4.01666 3.94339 0 8.80781 0C13.6722 0 17.6156 4.01666 17.6156 8.97147C17.6156 13.9263 13.6722 17.9429 8.80781 17.9429C3.94339 17.9429 0 13.9263 0 8.97147Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/><path d="M14.3505 14.6171C14.6944 14.2668 15.2521 14.2668 15.5961 14.6171L19.742 18.4685C20.086 18.8188 20.086 19.3869 19.742 19.7372C19.3981 20.0876 18.8404 20.0876 18.4964 19.7372L14.3505 15.8859C14.0065 15.5355 14.0065 14.9675 14.3505 14.6171Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>
+  {%- when 'chevron' -%}
+    <svg aria-hidden="true" focusable="false" class="site-header__svg-chevron" width="9" height="5" viewBox="0 0 9 5" fill="none"><path d="M0.188289 0.183058C0.43934 -0.0610194 0.846374 -0.0610194 1.09743 0.183058L4.5 3.49112L7.90257 0.183058C8.15363 -0.0610194 8.56066 -0.0610194 8.81171 0.183058C9.06276 0.427136 9.06276 0.822864 8.81171 1.06694L4.95457 4.81694C4.70352 5.06102 4.29648 5.06102 4.04543 4.81694L0.188289 1.06694C-0.0627628 0.822864 -0.0627628 0.427136 0.188289 0.183058Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>
+  {%- when 'bag' -%}
+    <svg aria-hidden="true" focusable="false" class="site-header__svg-bag" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M18.5847 21.5999H5.97177C5.55495 21.6025 5.1423 21.5168 4.76097 21.3484C4.37964 21.1801 4.03825 20.933 3.75925 20.6233C3.48025 20.3136 3.26995 19.9483 3.14219 19.5516C3.01442 19.1548 2.97207 18.7355 3.01793 18.3212L4.00747 9.62206C4.04762 9.25915 4.22079 8.92398 4.49353 8.68124C4.76628 8.43849 5.11927 8.30538 5.48439 8.3076H19.072C19.4372 8.30538 19.7902 8.43849 20.0629 8.68124C20.3357 8.92398 20.5088 9.25915 20.549 9.62206L21.509 18.3212C21.5545 18.733 21.513 19.1498 21.387 19.5445C21.2609 19.9392 21.0533 20.303 20.7775 20.6122C20.5017 20.9215 20.1639 21.1692 19.7862 21.3394C19.4084 21.5095 18.999 21.5983 18.5847 21.5999Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M6.37085 8.30771C6.37085 6.74089 6.99326 5.23824 8.10117 4.13033C9.20907 3.02242 10.7117 2.4 12.2785 2.4C13.8453 2.4 15.348 3.02242 16.4559 4.13033C17.5638 5.23824 18.1862 6.74089 18.1862 8.30771" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/><path d="M8.58496 12.7385H15.9696" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke="currentColor"/></svg>
+{%- endcase -%}

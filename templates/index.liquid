@@ -1,5 +1,125 @@
-{%- comment -%} Sample content for a new install (plan ES1-T169 D1): a setting the merchant saved wins. Figma has the same copy on both slides. Same list in templates/index.figma.liquid. {%- endcomment -%}
+{%- comment -%} Home page: resources and sample copy on the template (CTO 07/11: no view=figma). A setting the merchant saved wins; a store without these Files and products falls back to empty blocks. {%- endcomment -%}
+
 {%- liquid
+  assign figma_featured_collection = collections['figma-tab-all']
+  unless figma_featured_collection.products_count > 0
+    assign figma_featured_collection = collections.all
+  endunless
+
+  assign figma_bundle = collections['figma-bundle']
+  unless figma_bundle.products_count > 0
+    assign figma_bundle = collections.all
+  endunless
+
+  assign figma_featured_product = all_products['figma-ativafit-lava-featured']
+  unless figma_featured_product.id
+    assign figma_featured_product = collections.all.products[0]
+  endunless
+
+  assign figma_setup = collections['figma-setup']
+  unless figma_setup.products_count > 0
+    assign figma_setup = collections.all
+  endunless
+  assign figma_setup_1 = figma_setup.products[0]
+  assign figma_setup_2 = figma_setup.products[1]
+  assign figma_setup_3 = figma_setup.products[2]
+  assign figma_setup_4 = figma_setup.products[3]
+
+  # Figma has no video files (ES1-T199 #3). A figma-* product uses its own video; until
+  # then the cards share the test product video, then a public YouTube id, so 6 cards
+  # always render. Cards 7 and 8 have no source and render nothing, as in Figma.
+  assign figma_video_media = all_products['media-dủ-loại'].media
+  assign figma_video_fallback = figma_video_media | where: 'media_type', 'video' | first
+  assign figma_video_external = figma_video_media | where: 'media_type', 'external_video' | first
+  assign figma_video_id = figma_video_external.external_id | default: 'aqz-KE-bpKQ'
+  assign figma_video_host = figma_video_external.host | default: 'youtube'
+
+  assign figma_video_product_1 = all_products['figma-ativafit-lava']
+  assign figma_video_product_2 = all_products['figma-compact-power-rack']
+  assign figma_video_product_3 = all_products['figma-olympic-plate-set']
+  assign figma_video_product_4 = all_products['figma-home-starter-kit']
+  assign figma_video_product_5 = all_products['figma-recovery-roller-pro']
+  assign figma_video_product_6 = all_products['figma-resistance-band-set-pro']
+  unless figma_video_product_1.id
+    assign figma_video_product_1 = collections.all.products[0]
+  endunless
+  unless figma_video_product_2.id
+    assign figma_video_product_2 = collections.all.products[1]
+  endunless
+  unless figma_video_product_3.id
+    assign figma_video_product_3 = collections.all.products[2]
+  endunless
+  unless figma_video_product_4.id
+    assign figma_video_product_4 = collections.all.products[3]
+  endunless
+  unless figma_video_product_5.id
+    assign figma_video_product_5 = collections.all.products[4]
+  endunless
+  unless figma_video_product_6.id
+    assign figma_video_product_6 = collections.all.products[5]
+  endunless
+  assign figma_video_1 = figma_video_product_1.metafields.custom.demo_video.value | default: figma_video_fallback
+  assign figma_video_2 = figma_video_product_2.metafields.custom.demo_video.value | default: figma_video_fallback
+  assign figma_video_3 = figma_video_product_3.metafields.custom.demo_video.value | default: figma_video_fallback
+  assign figma_video_4 = figma_video_product_4.metafields.custom.demo_video.value | default: figma_video_fallback
+  assign figma_video_5 = figma_video_product_5.metafields.custom.demo_video.value | default: figma_video_fallback
+  assign figma_video_6 = figma_video_product_6.metafields.custom.demo_video.value | default: figma_video_fallback
+
+
+  # Ảnh đúng vị trí trên store dev: Content, Files (ES1-T178). Store khác không có file nên rơi về trống, block vẫn chạy.
+  assign fi_slide_1 = images['efx-slide-1.jpg']
+  assign fi_slide_2 = images['efx-slide-2.jpg']
+  assign fi_inline = images['efx-inline.jpg']
+  assign fi_body_map = images['efx-body.jpg']
+  assign fi_thumb_1 = images['efx-thumb-1.jpg']
+  assign fi_thumb_2 = images['efx-thumb-2.jpg']
+  assign fi_thumb_3 = images['efx-thumb-3.jpg']
+  assign fi_look = images['efx-look.jpg']
+  assign fi_insp_1 = images['efx-insp-1.jpg']
+  assign fi_insp_2 = images['efx-insp-2.jpg']
+  assign fi_insp_3 = images['efx-insp-3.jpg']
+  assign fi_why = images['efx-why.jpg']
+  assign fi_why_1 = images['efx-why-1.jpg']
+  assign fi_why_2 = images['efx-why-2.jpg']
+  assign fi_rev_1 = images['efx-rev-1.jpg']
+  assign fi_rev_2 = images['efx-rev-2.jpg']
+  assign fi_rev_3 = images['efx-rev-3.jpg']
+  assign fi_rev_4 = images['efx-rev-4.jpg']
+  assign fi_faq = images['efx-faq.jpg']
+  assign fi_col_1 = images['efx-col-1.jpg']
+  assign fi_col_2 = images['efx-col-2.jpg']
+  assign fi_col_3 = images['efx-col-3.jpg']
+  assign fi_col_4 = images['efx-col-4.jpg']
+  assign fi_col_5 = images['efx-col-5.jpg']
+  assign fi_lvl_1 = images['efx-lvl-1.jpg']
+  assign fi_lvl_2 = images['efx-lvl-2.jpg']
+  assign fi_lvl_3 = images['efx-lvl-3.jpg']
+  assign fi_pos_1 = images['efx-pos-1.jpg']
+  assign fi_pos_2 = images['efx-pos-2.jpg']
+  assign fi_pos_3 = images['efx-pos-3.jpg']
+  assign fi_pos_4 = images['efx-pos-4.jpg']
+  assign fi_pos_5 = images['efx-pos-5.jpg']
+  assign fi_pos_6 = images['efx-pos-6.jpg']
+  assign fi_vt_1 = images['efx-vthumb-1.jpg']
+  assign fi_vt_2 = images['efx-vthumb-2.jpg']
+  assign fi_vt_3 = images['efx-vthumb-3.jpg']
+  assign fi_vt_4 = images['efx-vthumb-4.jpg']
+  assign fi_vt_5 = images['efx-vthumb-5.jpg']
+  assign fi_vt_6 = images['efx-vthumb-6.jpg']
+  assign fi_rt_1 = images['efx-rthumb-1.jpg']
+  assign fi_rt_2 = images['efx-rthumb-2.jpg']
+
+  # Store có bộ ảnh mẫu: nhãn Verified và đếm ngược như Figma. Store mới cài không có file nên tắt (CTO 06/11).
+  assign home_demo = false
+  if fi_slide_1 != blank
+    assign home_demo = true
+    assign demo_countdown_end = 'now' | date: '%s' | plus: 81360 | date: '%Y-%m-%d %H:%M'
+  endif
+  assign fp_rev_1 = all_products['figma-ativafit-lava']
+  assign fp_rev_2 = all_products['figma-compact-power-rack-r3']
+  assign fp_rev_3 = all_products['figma-flexfold-adjustable-bench-2']
+  assign fp_rev_4 = all_products['figma-revllen-speed-rope']
+
   assign slide_eyebrow = 'blocks.slideshow_slide.default_eyebrow' | t
   assign slide_heading = 'blocks.slideshow_slide.default_heading_html' | t
   assign slide_subheading = 'blocks.slideshow_slide.default_text' | t
@@ -37,20 +157,63 @@
   assign s3_option_2_text = 'blocks.quiz_step.s3_option_2_text' | t
   assign s3_option_3_label = 'blocks.quiz_step.s3_option_3_label' | t
   assign s3_option_3_text = 'blocks.quiz_step.s3_option_3_text' | t
+
+  assign testimonials_eyebrow = 'blocks.testimonials.default_eyebrow' | t
+  assign testimonials_heading = 'blocks.testimonials.default_heading' | t
+  assign r1_name = 'blocks.testimonial_item.r1_name' | t
+  assign r1_title = 'blocks.testimonial_item.r1_title' | t
+  assign r1_quote = 'blocks.testimonial_item.r1_quote' | t
+  assign r2_name = 'blocks.testimonial_item.r2_name' | t
+  assign r2_title = 'blocks.testimonial_item.r2_title' | t
+  assign r2_quote = 'blocks.testimonial_item.r2_quote' | t
+  assign r3_name = 'blocks.testimonial_item.r3_name' | t
+  assign r3_title = 'blocks.testimonial_item.r3_title' | t
+  assign r3_quote = 'blocks.testimonial_item.r3_quote' | t
+  assign r4_name = 'blocks.testimonial_item.r4_name' | t
+  assign r4_title = 'blocks.testimonial_item.r4_title' | t
+  assign r4_quote = 'blocks.testimonial_item.r4_quote' | t
+
+  assign faq_eyebrow = 'blocks.faq.default_eyebrow' | t
+  assign faq_heading = 'blocks.faq.default_heading' | t
+  assign faq_stat_1_label = 'blocks.faq.default_stat_1_label' | t
+  assign faq_stat_1_value = 'blocks.faq.default_stat_1_value' | t
+  assign faq_stat_1_text = 'blocks.faq.default_stat_1_text' | t
+  assign faq_stat_2_label = 'blocks.faq.default_stat_2_label' | t
+  assign faq_stat_2_value = 'blocks.faq.default_stat_2_value' | t
+  assign faq_stat_2_text = 'blocks.faq.default_stat_2_text' | t
+  assign faq_answer = 'blocks.faq_item.default_answer_html' | t
+  assign faq_q1 = 'blocks.faq_item.q1_question' | t
+  assign faq_q2 = 'blocks.faq_item.q2_question' | t
+  assign faq_q3 = 'blocks.faq_item.q3_question' | t
+  assign faq_q4 = 'blocks.faq_item.q4_question' | t
+  assign faq_q5 = 'blocks.faq_item.q5_question' | t
 -%}
 
-{% block 'container' %}
+{% block 'container', id: 'home-hero' %}
   {% block 'slideshow' %}
     {% block 'slideshow-slide',
-      id: 'slide-1',
+      id: 'home-slide-1',
       priority: true,
+      image: fi_slide_1,
+      overlay_opacity: 0,
       default_eyebrow: slide_eyebrow,
       default_heading: slide_heading,
       default_subheading: slide_subheading,
       default_button_label: slide_button_label
     %}{% endblock %}
     {% block 'slideshow-slide',
-      id: 'slide-2',
+      id: 'home-slide-2',
+      image: fi_slide_2,
+      overlay_opacity: 0,
+      default_eyebrow: slide_eyebrow,
+      default_heading: slide_heading,
+      default_subheading: slide_subheading,
+      default_button_label: slide_button_label
+    %}{% endblock %}
+    {% block 'slideshow-slide',
+      id: 'home-slide-3',
+      image: fi_slide_1,
+      overlay_opacity: 0,
       default_eyebrow: slide_eyebrow,
       default_heading: slide_heading,
       default_subheading: slide_subheading,
@@ -61,33 +224,44 @@
 
 {% block 'container', id: 'home-collection-list', background: 'dark' %}
   {% block 'collection-list' %}
-    {% block 'collection-card', id: 'collection-card-1' %}{% endblock %}
-    {% block 'collection-card', id: 'collection-card-2' %}{% endblock %}
-    {% block 'collection-card', id: 'collection-card-3' %}{% endblock %}
-    {% block 'collection-card', id: 'collection-card-4' %}{% endblock %}
-    {% block 'collection-card', id: 'collection-card-5' %}{% endblock %}
+    {% block 'collection-card', id: 'home-collection-card-1', handle: 'figma-cat-free-weights', image: fi_col_1 %}{% endblock %}
+    {% block 'collection-card', id: 'home-collection-card-2', handle: 'figma-cat-functional-training', image: fi_col_2 %}{% endblock %}
+    {% block 'collection-card', id: 'home-collection-card-3', handle: 'figma-cat-benches-racks', image: fi_col_3 %}{% endblock %}
+    {% block 'collection-card', id: 'home-collection-card-4', handle: 'figma-cat-recovery-mobility', image: fi_col_4 %}{% endblock %}
+    {% block 'collection-card', id: 'home-collection-card-5', handle: 'figma-cat-accessories', image: fi_col_5 %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-intro', background: 'sand' %}
-  {% block 'rich-text' %}{% endblock %}
+  {% block 'rich-text', inline_image: fi_inline %}{% endblock %}
   {% block 'shop-by-level' %}
-    {% block 'level-card', id: 'level-card-1', default_label: level_label %}{% endblock %}
-    {% block 'level-card', id: 'level-card-2', default_label: level_label %}{% endblock %}
-    {% block 'level-card', id: 'level-card-3', default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'home-level-card-1', handle: 'figma-level-beginner', image: fi_lvl_1, default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'home-level-card-2', handle: 'figma-level-intermediate', image: fi_lvl_2, default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'home-level-card-3', handle: 'figma-level-advanced', image: fi_lvl_3, default_label: level_label %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-featured-collection', tag: 'div' %}
-  {% block 'featured-collection', id: 'featured-collection', default_collection: 'all' %}{% endblock %}
+  {% block 'featured-collection',
+    id: 'home-featured-collection',
+    collection: figma_featured_collection,
+    default_tab_2_collection: 'figma-tab-weight',
+    default_tab_3_collection: 'figma-tab-portable-fitness',
+    default_tab_4_collection: 'figma-tab-accessories'
+  %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-quiz', tag: 'div' %}
-  {% block 'quiz', id: 'quiz' %}
+  {% block 'quiz', id: 'home-quiz' %}
     {% block 'quiz-step',
-      id: 'quiz-step-1',
+      id: 'home-quiz-step-1',
       step: 1,
+      default_checked: 1,
       total: 3,
+      body_map: fi_body_map,
+      option_1_image: fi_thumb_1,
+      option_2_image: fi_thumb_2,
+      option_3_image: fi_thumb_3,
       default_question: s1_question,
       default_subheading: s1_hint,
       default_option_1_label: s1_option_1_label,
@@ -101,7 +275,7 @@
       default_option_3_tag: 'quiz-lower'
     %}{% endblock %}
     {% block 'quiz-step',
-      id: 'quiz-step-2',
+      id: 'home-quiz-step-2',
       step: 2,
       total: 3,
       default_question: s2_question,
@@ -117,7 +291,7 @@
       default_option_3_tag: 'quiz-advanced'
     %}{% endblock %}
     {% block 'quiz-step',
-      id: 'quiz-step-3',
+      id: 'home-quiz-step-3',
       step: 3,
       total: 3,
       default_question: s3_question,
@@ -136,18 +310,21 @@
 {% endblock %}
 
 {% block 'container', id: 'home-shop-the-look', tag: 'div' %}
-  {% block 'shop-the-look', id: 'shop-the-look' %}
-    {% block 'shop-the-look-row', id: 'look-row-1', look_row: 1 %}{% endblock %}
-    {% block 'shop-the-look-row', id: 'look-row-2', look_row: 2 %}{% endblock %}
-    {% block 'shop-the-look-row', id: 'look-row-3', look_row: 3 %}{% endblock %}
-    {% block 'shop-the-look-row', id: 'look-row-4', look_row: 4 %}{% endblock %}
+  {% block 'shop-the-look', id: 'home-shop-the-look', image: fi_look %}
+    {% block 'shop-the-look-row', id: 'home-look-row-1', look_row: 1, product: figma_setup_1 %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'home-look-row-2', look_row: 2, product: figma_setup_2 %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'home-look-row-3', look_row: 3, product: figma_setup_3 %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'home-look-row-4', look_row: 4, product: figma_setup_4 %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-inspiration', background: 'sand' %}
   {% block 'image-with-text',
-    id: 'inspiration',
+    id: 'home-inspiration',
     layout: 'banner',
+    accent_image_1: fi_insp_1,
+    accent_image_2: fi_insp_2,
+    accent_image_3: fi_insp_3,
     default_heading: banner_heading,
     default_body: banner_body,
     default_button_label: banner_button_label
@@ -155,69 +332,115 @@
 {% endblock %}
 
 {% block 'container', id: 'home-bundle-builder', tag: 'div', background: 'cream' %}
-  {% block 'bundle-builder', id: 'bundle-builder', default_collection: 'all' %}{% endblock %}
+  {% block 'bundle-builder', id: 'home-bundle-builder', collection: figma_bundle, preselect: ',1,2,3,5,6,' %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-featured-product', tag: 'div' %}
-  {% block 'featured-product', id: 'featured-product' %}{% endblock %}
+  {% block 'featured-product', id: 'home-featured-product', product: figma_featured_product, hide_options: true, default_countdown_end: demo_countdown_end %}{% endblock %}
 {% endblock %}
 
-{% block 'container', id: 'home-video-carousel', background: 'alt' %}
-  {% block 'video-carousel', id: 'video-carousel' %}
-    {% block 'video-card', id: 'video-card-1' %}{% endblock %}
-    {% block 'video-card', id: 'video-card-2' %}{% endblock %}
-    {% block 'video-card', id: 'video-card-3' %}{% endblock %}
-    {% block 'video-card', id: 'video-card-4' %}{% endblock %}
-    {% block 'video-card', id: 'video-card-5' %}{% endblock %}
-    {% block 'video-card', id: 'video-card-6' %}{% endblock %}
-    {% block 'video-card', id: 'video-card-7' %}{% endblock %}
-    {% block 'video-card', id: 'video-card-8' %}{% endblock %}
+{% block 'container', id: 'home-video-carousel' %}
+  {% block 'video-carousel', id: 'home-video-carousel' %}
+    {% block 'video-card',
+      id: 'home-video-card-1',
+      video: figma_video_1,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: fi_pos_1,
+      thumb: fi_vt_1,
+      product: figma_video_product_1
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'home-video-card-2',
+      video: figma_video_2,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: fi_pos_2,
+      thumb: fi_vt_2,
+      product: figma_video_product_2
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'home-video-card-3',
+      video: figma_video_3,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: fi_pos_3,
+      thumb: fi_vt_3,
+      product: figma_video_product_3
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'home-video-card-4',
+      video: figma_video_4,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: fi_pos_4,
+      thumb: fi_vt_4,
+      product: figma_video_product_4
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'home-video-card-5',
+      video: figma_video_5,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: fi_pos_5,
+      thumb: fi_vt_5,
+      product: figma_video_product_5
+    %}{% endblock %}
+    {% block 'video-card',
+      id: 'home-video-card-6',
+      video: figma_video_6,
+      video_id: figma_video_id,
+      video_host: figma_video_host,
+      poster: fi_pos_6,
+      thumb: fi_vt_6,
+      product: figma_video_product_6
+    %}{% endblock %}
+    {% block 'video-card', id: 'home-video-card-7' %}{% endblock %}
+    {% block 'video-card', id: 'home-video-card-8' %}{% endblock %}
   {% endblock %}
 {% endblock %}
-
-{%- comment -%} Sample content for a new install (plan ES1-T169 D1): a setting the merchant saved wins. Same list in templates/index.figma.liquid. {%- endcomment -%}
-{%- liquid
-  assign testimonials_eyebrow = 'blocks.testimonials.default_eyebrow' | t
-  assign testimonials_heading = 'blocks.testimonials.default_heading' | t
-  assign r1_name = 'blocks.testimonial_item.r1_name' | t
-  assign r1_title = 'blocks.testimonial_item.r1_title' | t
-  assign r1_quote = 'blocks.testimonial_item.r1_quote' | t
-  assign r2_name = 'blocks.testimonial_item.r2_name' | t
-  assign r2_title = 'blocks.testimonial_item.r2_title' | t
-  assign r2_quote = 'blocks.testimonial_item.r2_quote' | t
-  assign r3_name = 'blocks.testimonial_item.r3_name' | t
-  assign r3_title = 'blocks.testimonial_item.r3_title' | t
-  assign r3_quote = 'blocks.testimonial_item.r3_quote' | t
-  assign r4_name = 'blocks.testimonial_item.r4_name' | t
-  assign r4_title = 'blocks.testimonial_item.r4_title' | t
-  assign r4_quote = 'blocks.testimonial_item.r4_quote' | t
--%}
 
 {% block 'container', id: 'home-testimonials', background: 'cream' %}
   {% block 'testimonials', default_eyebrow: testimonials_eyebrow, default_heading: testimonials_heading %}
     {% block 'testimonial-item',
-      id: 'testimonial-1',
+      id: 'home-testimonial-1',
+      image: fi_rev_1,
+      thumb: fi_rt_1,
+      default_verified: home_demo,
+      product: fp_rev_1,
       default_author: r1_name,
       default_rating: 5,
       default_title: r1_title,
       default_quote: r1_quote
     %}{% endblock %}
     {% block 'testimonial-item',
-      id: 'testimonial-2',
+      id: 'home-testimonial-2',
+      image: fi_rev_2,
+      thumb: fi_rt_2,
+      default_verified: home_demo,
+      product: fp_rev_2,
       default_author: r2_name,
       default_rating: 4,
       default_title: r2_title,
       default_quote: r2_quote
     %}{% endblock %}
     {% block 'testimonial-item',
-      id: 'testimonial-3',
+      id: 'home-testimonial-3',
+      image: fi_rev_3,
+      thumb_blank: home_demo,
+      default_verified: home_demo,
+      product: fp_rev_3,
       default_author: r3_name,
       default_rating: 5,
       default_title: r3_title,
       default_quote: r3_quote
     %}{% endblock %}
     {% block 'testimonial-item',
-      id: 'testimonial-4',
+      id: 'home-testimonial-4',
+      image: fi_rev_4,
+      thumb_blank: home_demo,
+      default_verified: home_demo,
+      product: fp_rev_4,
       default_author: r4_name,
       default_rating: 5,
       default_title: r4_title,
@@ -228,7 +451,10 @@
 
 {% block 'container', id: 'home-why-choose', background: 'dark' %}
   {% block 'image-with-text',
-    id: 'why-choose',
+    id: 'home-why-choose',
+    image: fi_why,
+    accent_image_1: fi_why_1,
+    accent_image_2: fi_why_2,
     default_eyebrow: why_eyebrow,
     default_heading: why_heading,
     default_body: why_body,
@@ -237,29 +463,12 @@
 {% endblock %}
 
 {% block 'container', id: 'home-blog-posts' %}
-  {% block 'blog-posts', id: 'blog-posts' %}{% endblock %}
+  {% block 'blog-posts', id: 'home-blog-posts', handle: 'figma-blog' %}{% endblock %}
 {% endblock %}
-
-{%- comment -%} Sample content for a new install (plan ES1-T169 D1). Figma has one answer, used for all 5 questions. Same list in templates/index.figma.liquid. {%- endcomment -%}
-{%- liquid
-  assign faq_eyebrow = 'blocks.faq.default_eyebrow' | t
-  assign faq_heading = 'blocks.faq.default_heading' | t
-  assign faq_stat_1_label = 'blocks.faq.default_stat_1_label' | t
-  assign faq_stat_1_value = 'blocks.faq.default_stat_1_value' | t
-  assign faq_stat_1_text = 'blocks.faq.default_stat_1_text' | t
-  assign faq_stat_2_label = 'blocks.faq.default_stat_2_label' | t
-  assign faq_stat_2_value = 'blocks.faq.default_stat_2_value' | t
-  assign faq_stat_2_text = 'blocks.faq.default_stat_2_text' | t
-  assign faq_answer = 'blocks.faq_item.default_answer_html' | t
-  assign faq_q1 = 'blocks.faq_item.q1_question' | t
-  assign faq_q2 = 'blocks.faq_item.q2_question' | t
-  assign faq_q3 = 'blocks.faq_item.q3_question' | t
-  assign faq_q4 = 'blocks.faq_item.q4_question' | t
-  assign faq_q5 = 'blocks.faq_item.q5_question' | t
--%}
 
 {% block 'container', id: 'home-faq', background: 'cream' %}
   {% block 'faq',
+    image: fi_faq,
     default_eyebrow: faq_eyebrow,
     default_heading: faq_heading,
     default_stat_1_label: faq_stat_1_label,
@@ -269,10 +478,10 @@
     default_stat_2_value: faq_stat_2_value,
     default_stat_2_text: faq_stat_2_text
   %}
-    {% block 'faq-item', id: 'faq-1', open: true, default_question: faq_q1, default_answer: faq_answer %}{% endblock %}
-    {% block 'faq-item', id: 'faq-2', default_question: faq_q2, default_answer: faq_answer %}{% endblock %}
-    {% block 'faq-item', id: 'faq-3', default_question: faq_q3, default_answer: faq_answer %}{% endblock %}
-    {% block 'faq-item', id: 'faq-4', default_question: faq_q4, default_answer: faq_answer %}{% endblock %}
-    {% block 'faq-item', id: 'faq-5', default_question: faq_q5, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'home-faq-1', open: true, default_question: faq_q1, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'home-faq-2', default_question: faq_q2, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'home-faq-3', default_question: faq_q3, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'home-faq-4', default_question: faq_q4, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'home-faq-5', default_question: faq_q5, default_answer: faq_answer %}{% endblock %}
   {% endblock %}
 {% endblock %}

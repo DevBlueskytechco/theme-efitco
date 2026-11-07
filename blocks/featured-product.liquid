@@ -93,15 +93,18 @@
     if featured.has_only_default_variant or featured.variants.size == 1
       assign has_variant_choice = false
     endif
+    if hide_options
+      assign has_variant_choice = false
+    endif
     assign fetch_url = featured.url | append: '?view=featured-product'
 
     assign images = featured.media | where: 'media_type', 'image'
     assign image_total = images.size | at_most: 8
-    assign description = featured.description | strip_html | strip | truncatewords: 50
+    assign description = featured.description | strip_html | strip | truncatewords: 80
 
     # Countdown: 16 characters in the shape 0000-00-00 00:00, then a clean read as epoch seconds
     assign now_epoch = 'now' | date: '%s' | plus: 0
-    assign countdown_text = block.settings.countdown_end | strip
+    assign countdown_text = block.settings.countdown_end | default: default_countdown_end | strip
     assign countdown_invalid = false
     assign end_epoch = 0
     if countdown_text != blank

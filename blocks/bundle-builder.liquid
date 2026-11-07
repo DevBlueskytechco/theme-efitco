@@ -207,6 +207,9 @@
               data-testid="bundle-builder-input"
               {% if sold_out %}
                 disabled
+              {% else %}
+                {%- assign preselect_key = ',' | append: forloop.index | append: ',' -%}
+                {%- if preselect contains preselect_key %} checked{% endif -%}
               {% endif %}
             >
             <label class="bundle-builder__select" for="{{ input_id }}">
@@ -290,7 +293,7 @@
         </div>
 
         {%- if tiers != blank -%}
-          <p class="bundle-builder__note" data-testid="bundle-builder-note">{{ discount_note | escape }}</p>
+          <p class="bundle-builder__note visually-hidden" data-testid="bundle-builder-note">{{ discount_note | escape }}</p>
         {%- endif -%}
 
         <div class="bundle-builder__actions">
