@@ -203,11 +203,11 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     await expect(page.getByTestId('product-selling-plans')).toHaveCount(0);
   });
 
-  test('AC2 trang chủ chưa cấu hình không có featured product', async ({ page }) => {
+  test('AC2 trang chủ đã nối dữ liệu (CTO 07/11): có featured product, không placeholder', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('featured-product')).toHaveCount(0);
+    await expect(page.locator('featured-product')).toHaveCount(1);
     await expect(page.getByTestId('featured-product-placeholder')).toHaveCount(0);
-    await expect(page.getByTestId('container-home-featured-product')).toHaveCount(0);
+    await expect(page.getByTestId('container-home-featured-product')).toHaveCount(1);
   });
 
   test('AC2 trang sản phẩm: picker không có 2 thuộc tính mới', async ({ page }) => {

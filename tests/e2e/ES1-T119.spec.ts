@@ -258,7 +258,7 @@ test.describe('ES1-T119 TE-7 FAQ', () => {
     await expect(tid(home, 'faq-item')).toHaveCount(5);
     await expect(home.locator('details[open]')).toHaveCount(1);
     await expect(openItem(page, 'faq-1')).toHaveCount(1);
-    await expect(tid(home, 'faq-image')).toHaveCount(0);
+    await expect(tid(home, 'faq-image')).toHaveCount(1); // trang chủ đã nối ảnh (CTO 07/11)
     await expect(tid(home, 'faq-stat-1')).toContainText('360+');
     await expect(tid(home, 'faq-stat-2')).toBeVisible();
 
