@@ -1,0 +1,35 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>ES1-T239 contrast check</title>
+<style>body{font:14px/1.5 monospace;margin:16px;background:#fff;color:#000}table{border-collapse:collapse}td,th{border:1px solid #999;padding:2px 8px;text-align:start}</style>
+<table><thead><tr><th>Cặp</th><th>Chữ</th><th>Nền</th><th>Tỉ lệ</th><th>Ngưỡng</th><th>KQ</th></tr></thead><tbody id="o"></tbody></table>
+<script>
+var pairs=[
+["Chữ chính / nền trắng","#1a1a1a","#ffffff",4.5],
+["Mô tả, giá gạch, ghi chú / trắng","#4d4d4d","#ffffff",4.5],
+["Dấu / breadcrumb / trắng","#6b6b6b","#ffffff",4.5],
+["Giá sale / trắng","#bd1616","#ffffff",4.5],
+["Eyebrow accent / trắng","#c8400e","#ffffff",4.5],
+["Chữ nút / accent","#ffffff","#c8400e",4.5],
+["Chữ pill giảm / sale","#ffffff","#bd1616",4.5],
+["Pill option / F4F4F5","#1a1a1a","#f4f4f5",4.5],
+["Option hết hàng / F4F4F5","#4d4d4d","#f4f4f5",4.5],
+["Pill option chọn / 1A1A1A","#ffffff","#1a1a1a",4.5],
+["Nút disabled / F4F4F4","#4d4d4d","#f4f4f4",4.5],
+["Spec nhãn / sand","#4d4d4d","#ebe6e0",4.5],
+["Spec giá trị / sand","#1a1a1a","#ebe6e0",4.5],
+["Alert / F4F4F4","#1a1a1a","#f4f4f4",4.5],
+["Footer phụ / 1A1A1A","#999999","#1a1a1a",4.5],
+["Footer heading / 1A1A1A","#ffffff","#1a1a1a",4.5],
+["Chữ nút hết hàng badge / 1A1A1A","#ffffff","#1a1a1a",4.5],
+["Chấm In stock / trắng (non-text)","#4b824d","#ffffff",3],
+["Viền input ĐỀ XUẤT / trắng (non-text)","#6b6b6b","#ffffff",3],
+["Viền input hiện tại / trắng (non-text)","#e5e5e5","#ffffff",3],
+["Viền thumbnail chọn / trắng (non-text)","#c8400e","#ffffff",3],
+["Sao rating / trắng (non-text, có số kèm)","#ffc107","#ffffff",3]
+];
+function l(h){var c=[1,3,5].map(function(i){var v=parseInt(h.substr(i,2),16)/255;return v<=.03928?v/12.92:Math.pow((v+.055)/1.055,2.4)});return .2126*c[0]+.7152*c[1]+.0722*c[2]}
+function r(a,b){var x=l(a),y=l(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05)}
+var o=document.getElementById('o');
+pairs.forEach(function(p){var v=r(p[1],p[2]),t=document.createElement('tr');t.innerHTML='<td>'+p[0]+'</td><td>'+p[1]+'</td><td>'+p[2]+'</td><td>'+v.toFixed(2)+'</td><td>'+p[3]+'</td><td>'+(v>=p[3]?'ĐẠT':'KHÔNG ĐẠT')+'</td>';o.appendChild(t)});
+</script>
