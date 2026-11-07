@@ -136,7 +136,8 @@
         {% assign logo_render_width = block.settings.logo_width | times: 2 %}
         {% render 'image', image: logo, class: 'site-header__logo-image', width: logo_render_width %}
       {%- else -%}
-        {{- shop.name | escape -}}
+        <span class="visually-hidden">{{ shop.name | escape }}</span>
+        {%- render 'logo-efitco', class: 'site-header__logo-svg' -%}
       {%- endif -%}
     </a>
 

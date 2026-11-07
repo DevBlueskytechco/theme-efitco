@@ -152,7 +152,8 @@
             {%- assign logo_render_width = block.settings.logo_width | times: 2 -%}
             {%- render 'image', image: logo, class: 'site-footer__logo-image', width: logo_render_width -%}
           {%- else -%}
-            {{- shop.name | escape -}}
+            <span class="visually-hidden">{{ shop.name | escape }}</span>
+            {%- render 'logo-efitco', class: 'site-footer__logo-svg' -%}
           {%- endif -%}
         </a>
 
@@ -280,7 +281,9 @@
           <details class="site-footer__disclosure">
             <summary class="site-footer__summary" data-testid="footer-localization-toggle">
               <span class="site-footer__hidden-label">{{ 'blocks.footer.localization_label' | t }}</span>
-              {{ localization.country.currency.iso_code }} / {{ localization.language.iso_code | upcase }}
+              {{ localization.country | image_url: width: 52 | image_tag: class: 'site-footer__flag', width: 26, height: 26, alt: '', loading: 'lazy' }}
+              <span>{{ localization.country.currency.iso_code }} / {{ localization.language.iso_code | upcase }}</span>
+              <svg aria-hidden="true" focusable="false" class="site-footer__chevron" width="9" height="5" viewBox="0 0 9 5" fill="none"><path d="M0.17192 0.168975C0.401146 -0.0563249 0.77273 -0.0563249 1.00196 0.168975L4.49999 3.60715L7.998 0.168975C8.22722 -0.056325 8.59887 -0.056325 8.82809 0.168975C9.0573 0.394275 9.0573 0.759568 8.82809 0.984845L4.91501 4.831C4.80497 4.93923 4.65565 5 4.49999 5C4.34433 5 4.19501 4.93923 4.08497 4.831L0.17192 0.984845C-0.0573072 0.759568 -0.0573072 0.394275 0.17192 0.168975Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>
             </summary>
 
             <div class="site-footer__panel">
@@ -341,7 +344,15 @@
         {%- endform -%}
       {%- endif -%}
 
-      {%- if show_payment_icons -%}
+      {%- assign figma_pay = images['efx-pay-1.png'] -%}
+      {%- if figma_pay != blank -%}
+        <ul class="site-footer__payment site-footer__payment--images" aria-label="{{ 'blocks.footer.payment_label' | t }}">
+          {%- for n in (1..5) -%}
+            {%- assign pay_name = 'efx-pay-' | append: n | append: '.png' -%}
+            <li data-testid="footer-payment-icon">{{ images[pay_name] | image_url: width: 64 | image_tag: width: 32, height: 22, alt: '', loading: 'lazy' }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- elsif show_payment_icons -%}
         <ul class="site-footer__payment" aria-label="{{ 'blocks.footer.payment_label' | t }}">
           {%- for type in shop.enabled_payment_types -%}
             <li data-testid="footer-payment-icon">{{ type | payment_type_svg_tag }}</li>

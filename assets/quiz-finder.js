@@ -23,7 +23,8 @@ class QuizFinder extends HTMLElement {
         o.type = "radio";
       }
     });
-    const open = this.steps.findIndex((s) => !s.querySelector(CHECKED));
+    // A sample choice from the template still opens on its own step.
+    const open = this.steps.findIndex((s) => !s.querySelector(CHECKED) || s.querySelector(`${CHECKED}[data-default-checked]`));
     const i = open < 0 ? this.steps.length - 1 : open;
     const f = document.activeElement;
     this.show(i, this.form.contains(f) && !this.steps[i].contains(f));

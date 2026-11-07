@@ -124,6 +124,10 @@
           {% endif %}
           data-tag-handle="{{ option_tag | handleize }}"
           data-testid="quiz-option-input"
+          {% if default_checked == n %}
+            checked
+            data-default-checked
+          {% endif %}
         >
         {%- if option_image != blank -%}
           {% render 'image',

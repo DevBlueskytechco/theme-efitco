@@ -153,9 +153,10 @@
         {%- assign default_variant = card_product.selected_or_first_available_variant -%}
         <div class="video-card__product" data-testid="video-card-product">
           <div class="video-card__thumb">
-            {%- if card_product.featured_image != blank -%}
+            {%- assign thumb_image = thumb | default: card_product.featured_image -%}
+            {%- if thumb_image != blank -%}
               {% render 'image',
-                image: card_product.featured_image,
+                image: thumb_image,
                 width: 120,
                 height: 120,
                 crop: 'center',

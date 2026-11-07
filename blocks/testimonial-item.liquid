@@ -78,7 +78,7 @@
             {%- if item_author != blank -%}
               <p class="testimonial-item__author" data-testid="testimonial-author">{{ item_author | escape_once }}</p>
             {%- endif -%}
-            {%- if block.settings.verified -%}
+            {%- if block.settings.verified or default_verified -%}
               <p class="testimonial-item__verified" data-testid="testimonial-verified">
                 {%- render 'icon-trust', icon: 'check' -%}
                 {{- 'blocks.testimonials.verified' | t -}}
@@ -99,9 +99,10 @@
       {%- if item_product != blank -%}
         <div class="testimonial-item__product" data-testid="testimonial-product">
           <div class="testimonial-item__thumb">
-            {%- if item_product.featured_image != blank -%}
+            {%- assign thumb_image = thumb | default: item_product.featured_image -%}
+            {%- if thumb_image != blank and thumb_blank != true -%}
               {% render 'image',
-                image: item_product.featured_image,
+                image: thumb_image,
                 width: 128,
                 height: 128,
                 crop: 'center',

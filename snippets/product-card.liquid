@@ -128,11 +128,19 @@
     assign rating_on_five = rating_value | times: 5.0 | divided_by: rating_scale | round: 1
   endif
 
+  assign custom_badge = product.metafields.custom.badge_text.value
+  if badge == 'sale' and custom_badge != blank
+    assign badge_label = custom_badge
+  endif
+  # custom.swatch_colors: hex colors separated by commas, for a color option without native swatches
+  assign swatch_colors = product.metafields.custom.swatch_colors.value | split: ','
   assign swatch_option = nil
   for option in product.options_with_values
-    if option.values.size > 1 and option.values.first.swatch != blank
-      assign swatch_option = option
-      break
+    if option.values.size > 1
+      if option.values.first.swatch != blank or swatch_colors.size > 0
+        assign swatch_option = option
+        break
+      endif
     endif
   endfor
 
@@ -199,12 +207,12 @@
       <span class="product-card__rating" data-testid="product-card-rating">
         <svg
           class="product-card__rating-star"
-          viewBox="2.2 2.5 19.6 18.6"
+          viewBox="0 0 14 13"
           fill="currentColor"
           aria-hidden="true"
           focusable="false"
         >
-          <path d="M12 2.5l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8-6.1-3.4-6.1 3.4 1.4-6.8-5.1-4.7 6.9-.8z"/>
+          <path d="M13.9635 4.91254C13.8718 4.63786 13.6204 4.44277 13.3229 4.41679L9.28214 4.06127L7.68431 0.437487C7.56649 0.171911 7.29817 0 7.00006 0C6.70194 0 6.43362 0.171911 6.31581 0.438108L4.71797 4.06127L0.676558 4.41679C0.379615 4.44339 0.128816 4.63786 0.0366355 4.91254C-0.0555451 5.18723 0.0295857 5.48851 0.254216 5.67843L3.30856 8.27396L2.40791 12.1182C2.342 12.4008 2.45523 12.693 2.69727 12.8626C2.82737 12.9536 2.97958 13 3.13307 13C3.26541 13 3.39669 12.9654 3.5145 12.8971L7.00006 10.8786L10.4843 12.8971C10.7393 13.0457 11.0607 13.0322 11.3022 12.8626C11.5444 12.6925 11.6575 12.4002 11.5916 12.1182L10.6909 8.27396L13.7453 5.67895C13.9699 5.48851 14.0557 5.18775 13.9635 4.91254Z" />
         </svg>
         <span aria-hidden="true" data-testid="product-card-rating-value">{{ rating_on_five }}</span>
         <span class="visually-hidden">{{ 'products.card.rating_label' | t: rating: rating_on_five }}</span>
@@ -314,9 +322,12 @@
             style="--swatch-image: url({{ value.swatch.image | image_url: width: 64 }});"
           {% elsif value.swatch.color %}
             style="--swatch-color: {{ value.swatch.color }};"
+          {% elsif swatch_colors[forloop.index0] != blank %}
+            style="--swatch-color: {{ swatch_colors[forloop.index0] | strip }};"
           {% endif %}
         >
           <span class="visually-hidden">{{ value.name | escape }}</span>
+          <span class="product-card__swatch-tick">{%- render 'quiz-icon', name: 'check' -%}</span>
         </label>
         {%- if product.price_varies and swatch_variant -%}
           <template data-price-for="{{ swatch_variant.id }}">
