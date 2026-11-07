@@ -21,12 +21,10 @@
   Toolbar (TE-6 AC3, AC4, ES1-T103 D5, D6), outside the results partial:
   - collection-filter-open opens the dialog of blocks/collection-filters.liquid
     with popovertarget, hidden when the collection has no filters. Partial
-    collection-filter-count sits inside it: a badge with the number of filters
-    applied and the same number as text for screen readers. Filters applied =
-    all active_values + 1 when price_range has a min or a max.
-  - Sort select with form="collection-filter-form", so sort and filters submit
-    together. Selected: collection.sort_by, then collection.default_sort_by. No
-    sort setting (ES1-T103 D5, ES1-T106 #1). Its Apply button is in noscript.
+    collection-filter-count sits inside it and renders snippets/filter-count.liquid
+    (shared with blocks/search-results.liquid).
+  - snippets/sort-select.liquid: select with form="collection-filter-form", so
+    sort and filters submit together. No sort setting (ES1-T103 D5, ES1-T106 #1).
   - collection-status: live region, empty until JavaScript fills it.
 
   Empty result (paginate.items is 0): a message for shoppers, also outside the
@@ -73,18 +71,11 @@
     endif
     assign pagination_label = 'collections.pagination.label' | t
 
-    # Same rule as Clear all in blocks/collection-filters.liquid
-    assign active_filter_count = 0
-    for filter in collection.filters
-      assign active_filter_count = active_filter_count | plus: filter.active_values.size
-      if filter.type == 'price_range'
-        if filter.min_value.value != nil or filter.max_value.value != nil
-          assign active_filter_count = active_filter_count | plus: 1
-        endif
-      endif
-    endfor
-
-    assign current_sort = collection.sort_by | default: collection.default_sort_by
+    # Same rule as Clear all in blocks/collection-filters.liquid (snippets/filter-count.liquid)
+    capture active_filter_count
+      render 'filter-count', filters: collection.filters, count_only: true
+    endcapture
+    assign active_filter_count = active_filter_count | strip | plus: 0
   -%}
 
   <div
@@ -105,50 +96,15 @@
       >
         <span>{{ 'blocks.collection_products.filter' | t }}</span>
         {% partial 'collection-filter-count' %}
-          <span class="collection-toolbar__count">
-            {%- if active_filter_count > 0 -%}
-              <span class="collection-toolbar__badge" aria-hidden="true" data-testid="collection-filter-count">
-                {{- active_filter_count -}}
-              </span>
-              <span class="visually-hidden">
-                {{- 'blocks.collection_products.filters_applied' | t: count: active_filter_count -}}
-              </span>
-            {%- endif -%}
-          </span>
+          {% render 'filter-count', filters: collection.filters %}
         {% endpartial %}
       </button>
 
-      <div class="collection-toolbar__sort">
-        <label for="collection-sort">{{ 'blocks.collection_products.sort_label' | t }}</label>
-        <select
-          class="collection-toolbar__select"
-          id="collection-sort"
-          name="sort_by"
-          form="collection-filter-form"
-          data-testid="collection-sort"
-        >
-          {%- for option in collection.sort_options -%}
-            <option
-              value="{{ option.value | escape }}"
-              {% if option.value == current_sort %}
-                selected
-              {% endif %}
-            >
-              {{- option.name | escape -}}
-            </option>
-          {%- endfor -%}
-        </select>
-        <noscript>
-          <button
-            class="button button--secondary"
-            type="submit"
-            form="collection-filter-form"
-            data-testid="collection-sort-apply"
-          >
-            {{- 'blocks.collection_products.sort_apply' | t -}}
-          </button>
-        </noscript>
-      </div>
+      {% render 'sort-select',
+        sort_options: collection.sort_options,
+        sort_by: collection.sort_by,
+        default_sort_by: collection.default_sort_by
+      %}
 
       <div class="visually-hidden" role="status" data-testid="collection-status"></div>
     </div>

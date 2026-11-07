@@ -1,0 +1,53 @@
+{% doc %}
+  Number of storefront filters applied (TE-6 AC4, TE-8 AC2, ES1-T123 D4). One
+  rule for the collection and search pages: all active_values, plus 1 when a
+  price_range filter has a min or a max.
+
+  Default output: the badge inside the filter open button (aria-hidden number +
+  the same number as visually hidden text), or an empty span when none is
+  applied. The caller wraps it in partial collection-filter-count, because a
+  partial cannot sit inside a snippet.
+
+  count_only: true prints only the number, so a block can capture it for its own
+  logic (Clear all, empty message).
+
+  Test hook: collection-filter-count.
+
+  @param {filter[]} filters - collection.filters or search.filters
+  @param {boolean} [count_only] - true: print only the number. Default: false
+
+  @example
+  {% partial 'collection-filter-count' %}
+    {% render 'filter-count', filters: collection.filters %}
+  {% endpartial %}
+
+  {%- capture active_filter_count -%}{% render 'filter-count', filters: collection.filters, count_only: true %}{%- endcapture -%}
+  {%- assign active_filter_count = active_filter_count | strip | plus: 0 -%}
+{% enddoc %}
+
+{%- liquid
+  assign active_filter_count = 0
+  for filter in filters
+    assign active_filter_count = active_filter_count | plus: filter.active_values.size
+    if filter.type == 'price_range'
+      if filter.min_value.value != nil or filter.max_value.value != nil
+        assign active_filter_count = active_filter_count | plus: 1
+      endif
+    endif
+  endfor
+-%}
+
+{%- if count_only -%}
+  {{- active_filter_count -}}
+{%- else -%}
+  <span class="collection-toolbar__count">
+    {%- if active_filter_count > 0 -%}
+      <span class="collection-toolbar__badge" aria-hidden="true" data-testid="collection-filter-count">
+        {{- active_filter_count -}}
+      </span>
+      <span class="visually-hidden">
+        {{- 'blocks.collection_products.filters_applied' | t: count: active_filter_count -}}
+      </span>
+    {%- endif -%}
+  </span>
+{%- endif -%}

@@ -1,0 +1,54 @@
+{% doc %}
+  Sort select for the collection and search toolbars (TE-6 AC3, TE-8 AC2,
+  ES1-T123 D4). The select joins the filter form of blocks/collection-filters
+  with form="collection-filter-form", so sort and filters submit together.
+  Selected: sort_by, then default_sort_by. Its Apply button is in noscript: with
+  JavaScript, assets/collection-filters.js applies the change.
+
+  Test hooks: collection-sort, collection-sort-apply.
+
+  @param {sort_option[]} sort_options - collection.sort_options or search.sort_options
+  @param {string} [sort_by] - collection.sort_by or search.sort_by
+  @param {string} [default_sort_by] - collection.default_sort_by or search.default_sort_by
+
+  @example
+  {% render 'sort-select',
+    sort_options: collection.sort_options,
+    sort_by: collection.sort_by,
+    default_sort_by: collection.default_sort_by
+  %}
+{% enddoc %}
+
+{%- assign current_sort = sort_by | default: default_sort_by -%}
+
+<div class="collection-toolbar__sort">
+  <label for="collection-sort">{{ 'blocks.collection_products.sort_label' | t }}</label>
+  <select
+    class="collection-toolbar__select"
+    id="collection-sort"
+    name="sort_by"
+    form="collection-filter-form"
+    data-testid="collection-sort"
+  >
+    {%- for option in sort_options -%}
+      <option
+        value="{{ option.value | escape }}"
+        {% if option.value == current_sort %}
+          selected
+        {% endif %}
+      >
+        {{- option.name | escape -}}
+      </option>
+    {%- endfor -%}
+  </select>
+  <noscript>
+    <button
+      class="button button--secondary"
+      type="submit"
+      form="collection-filter-form"
+      data-testid="collection-sort-apply"
+    >
+      {{- 'blocks.collection_products.sort_apply' | t -}}
+    </button>
+  </noscript>
+</div>

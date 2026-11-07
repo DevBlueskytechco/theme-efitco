@@ -1,0 +1,11 @@
+--- a/tests/e2e/ES1-T138.spec.ts
++++ b/tests/e2e/ES1-T138.spec.ts
+@@ -169,7 +169,7 @@
+     expect(url.searchParams.get('type')).toBe('product');
+     expect(url.searchParams.getAll('filter.p.tag').sort()).toEqual(['quiz-beginner', 'quiz-home', 'quiz-upper']);
+ 
+-    const first = page.locator('.search-result a').first();
++    const first = page.getByTestId('search-results-product').getByTestId('product-card-title').first();
+     await expect(first).toBeVisible();
+     const handle = new URL((await first.getAttribute('href'))!, page.url()).pathname.split('/').pop()!;
+     const product = await context.request.get(`${url.origin}/products/${handle}.json`);

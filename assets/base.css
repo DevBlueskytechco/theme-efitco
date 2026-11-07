@@ -1961,15 +1961,130 @@ a.pagination__link:focus-visible {
   }
 }
 
-/** Search page */
-.search-results {
+/** Trang search (TE-8 AC2, ES1-T123 D1, D2). Thanh công cụ, lưới card, drawer filter, rỗng dùng lại class TE-6.
+   Bố cục theo mặc định ES1-T127 #4, #5 (Figma không có frame trang search) */
+.search-header {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: var(--space-4);
+  padding-block-start: var(--space-6);
 }
-.search-results .prev,
-.search-results .page,
-.search-results .next {
-  grid-column: 1 / -1;
+
+.search-header__title {
+  margin: 0;
+}
+
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-inline-size: 40rem;
+}
+
+.search-form__input {
+  flex: 1 1 16rem;
+  min-inline-size: 0;
+  min-block-size: 44px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .search-form__input {
+    transition: border-color var(--motion-fast) var(--ease-out);
+  }
+}
+
+.search-form__input::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+.search-form__input:focus-visible {
+  border-color: var(--color-foreground);
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.search-form__submit {
+  flex: none;
+}
+
+.search-results {
+  min-inline-size: 0;
+}
+
+.search-results__results {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.search-results__group {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.search-results__group-heading {
+  margin: 0;
+  font-size: var(--font-size-h3);
+}
+
+.search-results__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Article, page: hàng chữ, article có ảnh nhỏ 6rem ở đầu hàng */
+.search-results__entry {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.search-results__entry:first-child {
+  border-block-start: 1px solid var(--color-border);
+}
+
+/* 2 class để thắng .image nằm sau trong file */
+.image.search-results__entry-image {
+  flex: none;
+  inline-size: 6rem;
+  aspect-ratio: 1;
+  border-radius: var(--radius-input);
+  overflow: hidden;
+}
+
+.search-results__entry-body {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+.search-results__entry-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+/* Vùng chạm 44: link 1 dòng chữ lg chưa đủ cao */
+.search-results__entry-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+
+.search-results__entry-text {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
 }
 
 /** Header placeholder: only rendered in the theme editor */
