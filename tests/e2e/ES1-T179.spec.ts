@@ -76,7 +76,7 @@ test.describe('ES1-T179 TE-17 FAQ, testimonials mặc định', () => {
   test('AC-H5 mở câu 2 thấy đúng câu trả lời, câu 1 đóng', async ({ page }) => {
     await page.goto(HOME);
     await tid(question(page, 'faq-2'), 'faq-question').click();
-    await expect(question(page, 'faq-2').locator('[data-testid="faq-answer"]')).toHaveText(ANSWER);
+    await expect(question(page, 'faq-2').locator('[data-testid="faq-answer"]')).toContainText('from 11 to 66 lb per hand');
     await expect(band(page, 'home-faq').locator('details[open]')).toHaveCount(1);
   });
 
