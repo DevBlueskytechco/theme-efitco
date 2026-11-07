@@ -1,30 +1,57 @@
 {% doc %}
   One step of the quiz block: a fieldset with the progress bar and question in
-  its legend, an optional decorative body map, and 2 to 4 options. Self-contained:
-  callers must leave the body empty.
+  its legend, an optional body map, and 2 to 4 options. Self-contained: callers
+  must leave the body empty.
 
-  An option is valid when it has both a label and a tag. With no question or
-  fewer than 2 valid options, the editor shows a placeholder and the storefront
-  renders nothing.
+  An option is valid when it has both a label and a tag. With show_item off, no
+  question or fewer than 2 valid options, the editor shows a placeholder and the
+  storefront renders nothing.
+
+  Sample content (plan ES1-T169 D1): the template passes default_* from locales.
+  They have other names than the settings, so they stay plain variables and a
+  value the merchant saved always wins, field by field. Clearing a setting brings
+  the sample back, so show_item is how a merchant hides the step. Text from the t
+  filter may already be escaped, so it goes through escape_once. Option 4 has no
+  sample.
 
   Options are checkboxes named filter.p.tag, so the GET form can send one tag
   per step without JavaScript (drafts/techlead/ES1-T132/task-split.md D4). A
   script may turn them into radios per step.
 
-  The body map is hidden below 48rem and takes no space when it is empty.
+  The body map is hidden below 48rem and takes no space when it is empty. Its
+  upper, middle and lower regions are extra labels of options 1, 2 and 3, so they
+  select without JavaScript and add no input. A region shows only for a valid
+  option. Regions are hidden from assistive technology and hold no text: the
+  list row stays the one accessible label (aria-labelledby on the input), and
+  keyboard focus stays on the list input. CSS mirrors the checked and focus state
+  of the input on its region through data-body-option.
 
   JavaScript hooks: data-quiz-step (step number), data-active (set by the
-  script), data-quiz-title (h3, tabindex -1), data-tag-handle (tag as a handle).
+  script), data-quiz-title (h3, tabindex -1), data-tag-handle (tag as a handle),
+  data-body-region on a region and data-body-option on its input (upper, core,
+  lower).
   Test hooks: data-testid="quiz-step", "quiz-step-title", "quiz-step-progress",
-  "quiz-step-progress-bar", "quiz-body-map", "quiz-option", "quiz-option-input",
-  "quiz-placeholder".
+  "quiz-step-progress-bar", "quiz-body-map", "quiz-body-region", "quiz-option",
+  "quiz-option-input", "quiz-placeholder".
 
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for element ids. Default: block.id
   @param {number} [step] - This step's number, from 1. Default: 1
   @param {number} [total] - Number of steps in the quiz. Default: 1
+  @param {string} [default_question] - Sample question used when the question setting is empty
+  @param {string} [default_subheading] - Sample subheading used when the subheading setting is empty
+  @param {string} [default_option_1_label] - Sample label of option 1
+  @param {string} [default_option_1_description] - Sample description of option 1
+  @param {string} [default_option_1_tag] - Sample product tag of option 1
+  @param {string} [default_option_2_label] - Sample label of option 2
+  @param {string} [default_option_2_description] - Sample description of option 2
+  @param {string} [default_option_2_tag] - Sample product tag of option 2
+  @param {string} [default_option_3_label] - Sample label of option 3
+  @param {string} [default_option_3_description] - Sample description of option 3
+  @param {string} [default_option_3_tag] - Sample product tag of option 3
 
   @example
-  {% block 'quiz-step', id: 'quiz-step-1', step: 1, total: 3 %}{% endblock %}
+  {% assign sample_question = 'blocks.quiz_step.s1_question' | t %}
+  {% block 'quiz-step', id: 'quiz-step-1', step: 1, total: 3, default_question: sample_question %}{% endblock %}
 {% enddoc %}
 
 {%- liquid
@@ -32,24 +59,126 @@
   assign step_index = step | default: 1
   assign step_total = total | default: 1 | at_least: 1
   assign step_progress = step_index | times: 100.0 | divided_by: step_total | round: 2
-  assign question = block.settings.question
-  assign subheading = block.settings.subheading
+  assign question = block.settings.question | default: default_question
+  assign subheading = block.settings.subheading | default: default_subheading
   assign body_map = block.settings.body_map
   assign subheading_id = step_id | append: '-subheading'
-
   assign option_count = 0
-  for n in (1..4)
-    assign label_key = 'option_' | append: n | append: '_label'
-    assign tag_key = 'option_' | append: n | append: '_tag'
-    assign option_label = block.settings[label_key] | strip
-    assign option_tag = block.settings[tag_key] | strip
-    if option_label != blank and option_tag != blank
-      assign option_count = option_count | plus: 1
-    endif
-  endfor
+  assign body_regions = ''
 -%}
 
-{%- if question != blank and option_count >= 2 -%}
+{%- capture options -%}
+  {%- for n in (1..4) -%}
+    {%- liquid
+      # Liquid cannot read a variable by a built name, so the samples are picked here
+      assign sample_label = nil
+      assign sample_description = nil
+      assign sample_tag = nil
+      assign region_name = nil
+      case n
+        when 1
+          assign sample_label = default_option_1_label
+          assign sample_description = default_option_1_description
+          assign sample_tag = default_option_1_tag
+          assign region_name = 'upper'
+        when 2
+          assign sample_label = default_option_2_label
+          assign sample_description = default_option_2_description
+          assign sample_tag = default_option_2_tag
+          assign region_name = 'core'
+        when 3
+          assign sample_label = default_option_3_label
+          assign sample_description = default_option_3_description
+          assign sample_tag = default_option_3_tag
+          assign region_name = 'lower'
+      endcase
+      if body_map == blank
+        assign region_name = nil
+      endif
+
+      assign label_key = 'option_' | append: n | append: '_label'
+      assign description_key = 'option_' | append: n | append: '_description'
+      assign tag_key = 'option_' | append: n | append: '_tag'
+      assign image_key = 'option_' | append: n | append: '_image'
+      assign option_label = block.settings[label_key] | strip | default: sample_label
+      assign option_description = block.settings[description_key] | default: sample_description
+      assign option_tag = block.settings[tag_key] | strip | default: sample_tag
+      assign option_image = block.settings[image_key]
+    -%}
+    {%- if option_label != blank and option_tag != blank -%}
+      {%- liquid
+        assign option_count = option_count | plus: 1
+        assign option_id = step_id | append: '-option-' | append: n
+        assign option_label_id = option_id | append: '-label'
+      -%}
+      <label class="quiz-option" id="{{ option_label_id }}" data-testid="quiz-option">
+        <input
+          class="quiz-option__input"
+          id="{{ option_id }}"
+          type="checkbox"
+          name="filter.p.tag"
+          value="{{ option_tag | escape }}"
+          {% if region_name %}
+            aria-labelledby="{{ option_label_id }}"
+            data-body-option="{{ region_name }}"
+          {% endif %}
+          data-tag-handle="{{ option_tag | handleize }}"
+          data-testid="quiz-option-input"
+          {% if default_checked == n %}
+            data-sample-choice
+          {% endif %}
+        >
+        {%- if option_image != blank -%}
+          {% render 'image',
+            image: option_image,
+            class: 'quiz-option__thumb',
+            inline: true,
+            decorative: true,
+            width: 80,
+            height: 80,
+            crop: 'center',
+            widths: '40, 80',
+            sizes: '40px',
+            loading: 'lazy'
+          %}
+        {%- endif -%}
+        <span class="quiz-option__text">
+          <span class="quiz-option__label">{{ option_label | escape_once }}</span>
+          {%- if option_description != blank -%}
+            <span class="quiz-option__description">{{ option_description | escape_once }}</span>
+          {%- endif -%}
+        </span>
+        <span class="quiz-option__mark">
+          {%- render 'quiz-icon', name: 'check' -%}
+        </span>
+      </label>
+      {%- if region_name -%}
+        {%- capture body_region -%}
+          <label
+            class="quiz-step__region"
+            for="{{ option_id }}"
+            aria-hidden="true"
+            data-body-region="{{ region_name }}"
+            data-testid="quiz-body-region"
+          ></label>
+        {%- endcapture -%}
+        {%- assign body_regions = body_regions | append: body_region -%}
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- liquid
+  assign show_item = false
+  if question != blank and option_count >= 2
+    assign show_item = true
+  endif
+  if block.settings.show_item == false
+    assign show_item = false
+  endif
+-%}
+
+{%- if show_item -%}
   <fieldset
     class="quiz-step"
     {% if subheading != blank %}
@@ -69,74 +198,28 @@
         ></span>
         <span class="quiz-step__count">{{ 'blocks.quiz_step.progress' | t: step: step_index, total: step_total }}</span>
       </span>
-      <h3 class="quiz-step__title" tabindex="-1" data-quiz-title data-testid="quiz-step-title">{{ question | escape }}</h3>
+      <h3 class="quiz-step__title" tabindex="-1" data-quiz-title data-testid="quiz-step-title">{{ question | escape_once }}</h3>
     </legend>
     {%- if subheading != blank -%}
-      <p class="quiz-step__subheading" id="{{ subheading_id }}">{{ subheading | escape }}</p>
+      <p class="quiz-step__subheading" id="{{ subheading_id }}">{{ subheading | escape_once }}</p>
     {%- endif -%}
 
     <div class="quiz-step__body{% if body_map != blank %} quiz-step__body--map{% endif %}">
       {%- if body_map != blank -%}
-        {% render 'image',
-          image: body_map,
-          class: 'quiz-step__map',
-          decorative: true,
-          width: 304,
-          widths: '152, 304',
-          sizes: '152px',
-          loading: 'lazy',
-          testid: 'quiz-body-map'
-        %}
+        <div class="quiz-step__map" data-testid="quiz-body-map">
+          {% render 'image',
+            image: body_map,
+            class: 'quiz-step__map-image',
+            decorative: true,
+            width: 304,
+            widths: '152, 304',
+            sizes: '152px',
+            loading: 'lazy'
+          %}
+          <div class="quiz-step__regions">{{ body_regions }}</div>
+        </div>
       {%- endif -%}
-      <div class="quiz-step__options">
-        {%- for n in (1..4) -%}
-          {%- liquid
-            assign label_key = 'option_' | append: n | append: '_label'
-            assign description_key = 'option_' | append: n | append: '_description'
-            assign tag_key = 'option_' | append: n | append: '_tag'
-            assign image_key = 'option_' | append: n | append: '_image'
-            assign option_label = block.settings[label_key] | strip
-            assign option_description = block.settings[description_key]
-            assign option_tag = block.settings[tag_key] | strip
-            assign option_image = block.settings[image_key]
-          -%}
-          {%- if option_label != blank and option_tag != blank -%}
-            <label class="quiz-option" data-testid="quiz-option">
-              <input
-                class="quiz-option__input"
-                type="checkbox"
-                name="filter.p.tag"
-                value="{{ option_tag | escape }}"
-                data-tag-handle="{{ option_tag | handleize }}"
-                data-testid="quiz-option-input"
-              >
-              {%- if option_image != blank -%}
-                {% render 'image',
-                  image: option_image,
-                  class: 'quiz-option__thumb',
-                  inline: true,
-                  decorative: true,
-                  width: 80,
-                  height: 80,
-                  crop: 'center',
-                  widths: '40, 80',
-                  sizes: '40px',
-                  loading: 'lazy'
-                %}
-              {%- endif -%}
-              <span class="quiz-option__text">
-                <span class="quiz-option__label">{{ option_label | escape }}</span>
-                {%- if option_description != blank -%}
-                  <span class="quiz-option__description">{{ option_description | escape }}</span>
-                {%- endif -%}
-              </span>
-              <span class="quiz-option__mark">
-                {%- render 'quiz-icon', name: 'check' -%}
-              </span>
-            </label>
-          {%- endif -%}
-        {%- endfor -%}
-      </div>
+      <div class="quiz-step__options">{{ options }}</div>
     </div>
   </fieldset>
 {%- elsif request.design_mode -%}
@@ -150,14 +233,23 @@
   "name": "t:general.quiz_step",
   "settings": [
     {
+      "type": "checkbox",
+      "id": "show_item",
+      "label": "t:labels.quiz_step_show_item",
+      "info": "t:info.quiz_step_show_item",
+      "default": true
+    },
+    {
       "type": "text",
       "id": "question",
-      "label": "t:labels.quiz_question"
+      "label": "t:labels.quiz_question",
+      "info": "t:info.sample_text"
     },
     {
       "type": "text",
       "id": "subheading",
-      "label": "t:labels.quiz_subheading"
+      "label": "t:labels.quiz_subheading",
+      "info": "t:info.sample_text"
     },
     {
       "type": "image_picker",

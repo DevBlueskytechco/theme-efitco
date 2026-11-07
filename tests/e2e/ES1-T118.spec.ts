@@ -4,6 +4,8 @@
 // Biến thể chạy trên /?view=te7 (templates/index.te7.liquid), mặc định schema chạy trên /.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
+import { watchShopPay403 } from './support/console-guard';
 
 const TE7 = '/?view=te7';
 const HOME = '/';
@@ -15,8 +17,10 @@ const item = (page: Page, id: string) => page.locator(`[data-testimonial-id="${i
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
@@ -25,6 +29,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
@@ -194,20 +199,22 @@ test.describe('ES1-T118 TE-7 testimonials', () => {
     expect(errors).toEqual([]);
   });
 
-  test('AC5 trang chủ: 4 mục mặc định gợi cách dùng, không Lorem, không tên khách', async ({ page }) => {
+  test('AC5 trang chủ: 4 review Figma, Verified tắt, không Lorem, không chữ hướng dẫn', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
     const home = band(page, 'home-testimonials');
     await expect(home).toHaveClass(/block-container--cream/);
-    await expect(tid(home, 'testimonials-heading')).toHaveText('Add a heading for your customer reviews');
+    await expect(tid(home, 'testimonials-heading')).toHaveText('What Our Customers Say?');
     await expect(tid(home, 'testimonial-item')).toHaveCount(4);
-    await expect(tid(home, 'testimonial-author').first()).toHaveText('Customer name');
-    await expect(tid(home, 'testimonial-verified')).toHaveCount(0);
-    await expect(tid(home, 'testimonial-product')).toHaveCount(0);
-    await expect(tid(home, 'testimonial-image')).toHaveCount(0);
-    const text = (await home.innerText()).toLowerCase();
-    expect(text).not.toContain('lorem');
-    expect(text).not.toContain('johnson');
+    await expect(tid(home, 'testimonial-author').first()).toHaveText('E. Johnson');
+    // Store dev có bộ ảnh mẫu nên bật như Figma; store mới cài vẫn tắt
+    await expect(tid(home, 'testimonial-verified')).toHaveCount(4);
+    await expect(tid(home, 'testimonial-product')).toHaveCount(4); // trang chủ đã nối dữ liệu (CTO 07/11)
+    await expect(tid(home, 'testimonial-image')).toHaveCount(4);
+    const text = await home.innerText();
+    expect(text.toLowerCase()).not.toContain('lorem');
+    expect(text).not.toContain('Customer name');
+    expect(text).not.toContain('Add a');
     await expectNoSeriousAxe(page);
     expect(errors).toEqual([]);
   });

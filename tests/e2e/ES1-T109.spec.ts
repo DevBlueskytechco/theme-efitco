@@ -4,7 +4,9 @@
 // Dữ liệu (ES1-T105 chưa trả lời): thiếu TE6_* → dùng /collections/all, test cần filter skip khi trang không có collection-filter-group.
 import { test, expect, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
+import { watchShopPay403 } from './support/console-guard';
 
 const ALL = '/collections/all';
 const ENV = {
@@ -18,8 +20,10 @@ const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\
 
 function watchErrors(page: Page): string[] {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (m) => {
     if (m.type() !== 'error') return;
+    if (isShopPay403(m)) return;
     const text = `${m.text()} @ ${m.location().url}`;
     if (!IGNORE_CONSOLE.some((r) => r.test(text))) errors.push(text);
   });
@@ -28,6 +32,7 @@ function watchErrors(page: Page): string[] {
 }
 
 async function expectAxeClean(page: Page, include: string) {
+  await expectNotChallenged(page);
   const r = await new AxeBuilder({ page }).include(include).analyze();
   const bad = r.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''));
   const report = bad.map((v) => `${v.impact} ${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`);

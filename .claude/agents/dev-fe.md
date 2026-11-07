@@ -4,6 +4,7 @@ description: Dev FE của theme: Liquid block/snippet/template, CSS theo token, 
 tools: Read, Grep, Glob, Edit, Write, Bash, mcp__ticket__get, mcp__ticket__list, mcp__ticket__create, mcp__ticket__comment, mcp__ticket__set_label, mcp__figma__get_node, mcp__figma__export_image, mcp__figma__get_styles
 model: opus
 skills:
+  - ux-motion
   - skeleton-structure
   - liquid-convention
   - block-settings-schema

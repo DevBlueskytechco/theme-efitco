@@ -2,12 +2,14 @@
   Variant picker: custom element product-variant-picker, its variant JSON and
   one fieldset of radios per option. Sits outside the form so its radios
   (name option-{position}) are never submitted. Callers render it only when the
-  product has a variant choice, and load assets/product-variant-picker.js
-  themselves.
+  product has a variant choice.
 
   Without fetch_url and regions the picker fetches the current page and updates
-  ?variant= (product page). With them it fetches fetch_url and those regions
-  only, and the URL stays the same (a block on another page, TE-13).
+  ?variant= (product page), and the caller loads assets/product-variant-picker.js.
+  With them it fetches fetch_url and those regions only, and the URL stays the
+  same (a block on another page, TE-13), and the JSON carries price_html. The
+  caller loads the module there too: this element has display none until it is
+  defined, so data-lazy-module here would never intersect.
 
   Test hooks: product-variant-picker, product-option (fieldset),
   product-option-value (label wrapping the radio).
@@ -41,7 +43,13 @@
   {% endif %}
   data-testid="product-variant-picker"
 >
-  {%- render 'variant-json', product: product -%}
+  {%- liquid
+    assign with_price_html = false
+    if fetch_url != blank
+      assign with_price_html = true
+    endif
+  -%}
+  {%- render 'variant-json', product: product, price_html: with_price_html -%}
   {%- for option in product.options_with_values -%}
     {%- assign option_index = option.position | minus: 1 -%}
     <fieldset

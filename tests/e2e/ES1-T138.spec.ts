@@ -6,7 +6,10 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
+import { watchShopPay403 } from './support/console-guard';
+import { skip429 } from './support/cart-api';
 
 const TE11 = '/?view=te11';
 const MANY = '/collections/all/quiz-upper+quiz-beginner+quiz-home?view=quiz';
@@ -26,8 +29,10 @@ const option = (page: Page, tag: string) => page.locator(`[data-testid="quiz-opt
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
@@ -36,6 +41,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
@@ -167,7 +173,7 @@ test.describe('ES1-T138 TE-11 kết quả quiz', () => {
     await expect(first).toBeVisible();
     const handle = new URL((await first.getAttribute('href'))!, page.url()).pathname.split('/').pop()!;
     const product = await context.request.get(`${url.origin}/products/${handle}.json`);
-    test.skip(product.status() === 429, 'Store trả 429 cho /products/*.json, không đọc được tag (xem ES1-T100)');
+    if (product.status() === 429) skip429('Store trả 429 cho /products/*.json, không đọc được tag (xem ES1-T100)');
     expect(product.ok()).toBeTruthy();
     const { product: data } = (await product.json()) as { product: { tags: string } };
     const tags = data.tags.split(',').map((tag) => tag.trim());

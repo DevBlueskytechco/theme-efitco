@@ -1,8 +1,16 @@
 {% doc %}
   Renders one question of the faq block as a details disclosure, so Enter, Space
-  and the open state come from the browser with no JavaScript. When the question
-  is empty, the editor shows a placeholder and the storefront renders nothing.
-  Self-contained: callers must leave the body empty.
+  and the open state come from the browser with no JavaScript. Self-contained:
+  callers must leave the body empty.
+
+  Sample content (plan ES1-T169 D1): the template passes default_question and
+  default_answer from locales. They have other names than the settings, so they
+  stay plain variables and a value the merchant saved always wins. Clearing a
+  setting brings the sample back, so show_item is how a merchant hides the item.
+  Text from the t filter may already be escaped, so it goes through escape_once.
+
+  When show_item is off or there is no question at all, the editor shows a
+  placeholder and the storefront renders nothing.
 
   The details opening tag must start with its class attribute, with class="faq-item"
   alone: blocks/faq.liquid replaces that exact text to add the name attribute.
@@ -12,13 +20,26 @@
 
   @param {string} id - Unique item id within the template, such as 'faq-1'
   @param {boolean} [open] - Template parameter, not a setting: starts this question open. Use it on the first question only.
+  @param {string} [default_question] - Sample question used when the question setting is empty
+  @param {string} [default_answer] - Sample answer as HTML, used when the answer setting is empty
 
   @example
-  {% block 'faq-item', id: 'faq-1', open: true %}{% endblock %}
-  {% block 'faq-item', id: 'faq-2' %}{% endblock %}
+  {% assign sample_question = 'blocks.faq_item.q1_question' | t %}
+  {% assign sample_answer = 'blocks.faq_item.default_answer_html' | t %}
+  {% block 'faq-item', id: 'faq-1', open: true, default_question: sample_question, default_answer: sample_answer %}{% endblock %}
 {% enddoc %}
 
-{%- if block.settings.question != blank -%}
+{%- liquid
+  assign item_question = block.settings.question | default: default_question
+  assign item_answer = block.settings.answer | default: default_answer
+
+  assign show_item = true
+  if block.settings.show_item == false or item_question == blank
+    assign show_item = false
+  endif
+-%}
+
+{%- if show_item -%}
   <details class="faq-item"
     {% if open %}
       open
@@ -28,10 +49,10 @@
     {{ block.shopify_attributes }}
   >
     <summary class="faq-item__summary" data-testid="faq-question">
-      <h3 class="faq-item__question">{{ block.settings.question | escape }}</h3>
+      <h3 class="faq-item__question">{{ item_question | escape_once }}</h3>
     </summary>
-    {%- if block.settings.answer != blank -%}
-      <div class="faq-item__answer" data-testid="faq-answer">{{ block.settings.answer }}</div>
+    {%- if item_answer != blank -%}
+      <div class="faq-item__answer" data-testid="faq-answer">{{ item_answer }}</div>
     {%- endif -%}
   </details>
 {%- elsif request.design_mode -%}
@@ -50,17 +71,21 @@
   "name": "t:general.faq_item",
   "settings": [
     {
+      "type": "checkbox",
+      "id": "show_item",
+      "label": "t:labels.faq_show_item",
+      "info": "t:info.faq_show_item",
+      "default": true
+    },
+    {
       "type": "text",
       "id": "question",
-      "label": "t:labels.faq_question",
-      "info": "t:info.faq_question",
-      "default": "Add a question your customers often ask"
+      "label": "t:labels.faq_question"
     },
     {
       "type": "richtext",
       "id": "answer",
-      "label": "t:labels.faq_answer",
-      "default": "<p>Add a short, clear answer to this question.</p>"
+      "label": "t:labels.faq_answer"
     }
   ]
 }

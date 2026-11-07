@@ -6,7 +6,10 @@
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
 import { pageJson } from './support/product-data';
 import { CART, cartApi } from './support/cart-api';
+import { watchShopPay403 } from './support/console-guard';
+import { HARDCODED_RADIUS } from './support/css-lint';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -133,6 +136,7 @@ async function scrollTo(page: Page, y: number) {
 }
 
 async function axeChrome(page: Page) {
+  await expectNotChallenged(page);
   const b = new AxeBuilder({ page });
   for (const id of [T.bar, T.header, T.footer]) {
     if (await page.getByTestId(id).count()) b.include(`[data-testid="${id}"]`);
@@ -210,7 +214,7 @@ test.describe('ES1-T23', () => {
         else if (/:\s*(?:white|black)\b/i.test(line)) bad.push(at);
         // (?!\s) chặn \s* lùi về 0 ký tự rồi lọt qua lookahead
         else if (/font-family\s*:\s*(?!\s|var\(|inherit)/.test(line)) bad.push(at);
-        else if (/border-radius\s*:\s*(?!\s|var\(|0(?:px)?\s*[;}]|50%|inherit)/.test(line)) bad.push(at);
+        else if (HARDCODED_RADIUS.test(line)) bad.push(at);
       });
     }
     expect(bad, 'giá trị hardcode trong assets/*.css').toEqual([]);
@@ -369,7 +373,6 @@ test.describe('ES1-T23', () => {
     const product = await findProduct(page);
     test.skip(!product, 'store dev không có sản phẩm còn hàng');
     await page.goto('/');
-    await cartApi(page, CART.clear);
     const add = await cartApi(page, CART.add, { data: { items: [{ id: product!.variantId, quantity: 2 }] } });
     expect(add.ok()).toBeTruthy();
     await page.reload();
@@ -537,6 +540,8 @@ test.describe('ES1-T23', () => {
     const pays = await page.getByTestId(T.footer).getByTestId(T.payment).all();
     test.skip(pays.length === 0, 'store dev chưa bật payment type');
     for (const p of pays) {
+      // Store có bộ ảnh Figma dùng thẻ ảnh thay svg của Shopify
+      if ((await p.locator('img').count()) > 0) continue;
       const svg = p.locator('svg');
       await expect(svg.locator('title')).toHaveCount(1);
       const fills = await svg.evaluate(el => new Set(Array.from(el.querySelectorAll('[fill]')).map(n => n.getAttribute('fill')?.toLowerCase())).size);
@@ -669,7 +674,8 @@ test.describe('ES1-T23', () => {
     await expect(header).toHaveAttribute('data-scrolled', '');
     await expect(header).not.toHaveCSS('box-shadow', 'none');
     await expect.poll(async () => Math.round((await header.boundingBox())!.y)).toBe(0);
-    await expect(header).toHaveCSS('color', rgb(tokens.color.foreground));
+    // Trang chủ: header tối như Figma 1:362 (CTO 07/11)
+    await expect(header).toHaveCSS('color', 'rgb(255, 255, 255)');
   });
 
   test('TC-44 AC9 schema sticky_header mặc định bật', async ({}, ti) => {
@@ -709,8 +715,6 @@ test.describe('ES1-T23', () => {
   // ---------- Case biên ----------
   test('TB-05 giỏ rỗng: không badge, cart link vẫn có accessible name', async ({ page }) => {
     await page.goto('/');
-    await cartApi(page, CART.clear);
-    await page.reload();
     const cart = page.getByTestId(T.header).getByTestId(T.cart);
     await expect(cart).toHaveAccessibleName(/\S/);
     await expect(cart.getByTestId(T.cartCount)).toHaveCount(0);
@@ -825,16 +829,13 @@ test.describe('ES1-T23', () => {
 
   test('TB-28 không console error khi thao tác header', async ({ page }, ti) => {
     const errors: string[] = [];
+    const isShopPay403 = watchShopPay403(page);
     page.on('console', (m) => {
-      if (m.type() !== 'error') return;
+      if (m.type() !== 'error' || isShopPay403(m)) return;
       const text = `${m.text()} @ ${m.location().url}`;
       if (!IGNORE_CONSOLE.some(r => r.test(text))) errors.push(text);
     });
     page.on('pageerror', e => errors.push(e.message));
-    // Accelerated checkout trong cart drawer (ES1-T95) nhúng iframe shop.app/pay ở mọi trang; shop.app trả 403 cho
-    // trình duyệt CI → lỗi console ghi vị trí chrome-error. Chỉ bỏ qua khi đúng iframe shop.app bị chặn.
-    let shopApp403 = 0;
-    page.on('response', r => { if (r.status() === 403 && /^https:\/\/shop\.app\//.test(r.url())) shopApp403++; });
     await page.goto('/');
     if (isDesktop(ti)) {
       const { item, submenu } = await parentItem(page);
@@ -845,7 +846,7 @@ test.describe('ES1-T23', () => {
       const acc = drawer.getByTestId(T.drawerAcc);
       if (await acc.count()) await acc.first().click();
     }
-    expect(errors.filter(e => !(shopApp403 && /status of 403 .*@ chrome-error:\/\//.test(e)))).toEqual([]);
+    expect(errors).toEqual([]);
   });
 });
 

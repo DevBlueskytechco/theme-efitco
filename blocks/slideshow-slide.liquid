@@ -6,15 +6,30 @@
   storefront shows the dark background color. Self-contained: callers must
   leave the body empty.
 
+  Sample content (plan ES1-T169 D1): the template passes default_* from locales.
+  They have other names than the settings, so they stay plain variables and a
+  value the merchant saved always wins. Clearing a setting brings the sample back,
+  so show_item is how a merchant hides the slide. Text from the t filter may
+  already be escaped, so it goes through escape_once; default_heading is HTML.
+
+  When show_item is off, the storefront renders nothing and the editor keeps an
+  empty slide with a hint, so the merchant can still select it. Turning off the
+  slide with priority removes the h1 of the page.
+
   Test hooks: data-testid="slideshow-slide", "slideshow-image",
   "slideshow-video", "slideshow-heading", "slideshow-button-primary",
-  "slideshow-button-secondary".
+  "slideshow-button-secondary", "slideshow-slide-placeholder".
 
   @param {string} id - Unique slide id within the template, such as 'slide-1'
   @param {boolean} [priority] - True on the first slide only: renders the h1 and loads its image eagerly with high fetch priority. Move this parameter when reordering slides.
+  @param {string} [default_eyebrow] - Sample text used when the eyebrow setting is empty
+  @param {string} [default_heading] - Sample heading as HTML, used when the heading setting is empty
+  @param {string} [default_subheading] - Sample text used when the subheading setting is empty
+  @param {string} [default_button_label] - Sample text used when the button label setting is empty
 
   @example
-  {% block 'slideshow-slide', id: 'slide-1', priority: true %}{% endblock %}
+  {% assign sample_heading = 'blocks.slideshow_slide.default_heading_html' | t %}
+  {% block 'slideshow-slide', id: 'slide-1', priority: true, default_heading: sample_heading %}{% endblock %}
 {% enddoc %}
 
 {%- liquid
@@ -38,8 +53,31 @@
   assign button_url = block.settings.button_url | default: routes.all_products_collection_url
   assign button_2_url = block.settings.button_2_url | default: routes.all_products_collection_url
   assign image_sizes = '(min-width: 80rem) 94vw, calc(100vw - 40px)'
+
+  assign slide_eyebrow = block.settings.eyebrow | default: default_eyebrow
+  assign slide_heading = block.settings.heading | escape | default: default_heading
+  assign slide_subheading = block.settings.subheading | default: default_subheading
+  assign slide_button_label = block.settings.button_label | default: default_button_label
 -%}
 
+{%- if block.settings.show_item == false -%}
+  {%- if request.design_mode -%}
+    <div
+      class="slideshow__slide"
+      role="group"
+      aria-roledescription="slide"
+      data-slide-id="{{ id }}"
+      data-testid="slideshow-slide"
+      {{ block.shopify_attributes }}
+    >
+      <div class="slideshow__content">
+        <p class="slideshow__subheading" data-testid="slideshow-slide-placeholder">
+          {{- 'blocks.slideshow_slide.placeholder' | t -}}
+        </p>
+      </div>
+    </div>
+  {%- endif -%}
+{%- else -%}
 <div
   class="slideshow__slide"
   role="group"
@@ -54,8 +92,8 @@
     <div class="slideshow__media" data-testid="slideshow-image">
       {% render 'image',
         image: slide_image,
-        width: 1800,
-        widths: '360, 540, 720, 1080, 1440, 1800',
+        width: 3596,
+        widths: '360, 540, 720, 1080, 1440, 1798, 2400, 3596',
         sizes: image_sizes,
         loading: image_loading,
         fetchpriority: image_fetchpriority
@@ -85,22 +123,22 @@
   <div class="slideshow__overlay"></div>
 
   <div class="slideshow__content">
-    {%- if block.settings.eyebrow != blank -%}
-      <p class="slideshow__eyebrow">{{ block.settings.eyebrow | escape }}</p>
+    {%- if slide_eyebrow != blank -%}
+      <p class="slideshow__eyebrow">{{ slide_eyebrow | escape_once }}</p>
     {%- endif -%}
-    {%- if block.settings.heading != blank -%}
+    {%- if slide_heading != blank -%}
       <{{ heading_tag }} class="slideshow__heading" data-testid="slideshow-heading">
-        {{- block.settings.heading | escape -}}
+        {{- slide_heading -}}
       </{{ heading_tag }}>
     {%- endif -%}
-    {%- if block.settings.subheading != blank -%}
-      <p class="slideshow__subheading">{{ block.settings.subheading | escape }}</p>
+    {%- if slide_subheading != blank -%}
+      <p class="slideshow__subheading">{{ slide_subheading | escape_once }}</p>
     {%- endif -%}
-    {%- if block.settings.button_label != blank or block.settings.button_2_label != blank -%}
+    {%- if slide_button_label != blank or block.settings.button_2_label != blank -%}
       <div class="slideshow__buttons">
-        {%- if block.settings.button_label != blank -%}
+        {%- if slide_button_label != blank -%}
           <a class="button" href="{{ button_url }}" data-testid="slideshow-button-primary">
-            {{- block.settings.button_label | escape -}}
+            {{- slide_button_label | escape_once -}}
             {%- render 'slideshow-icon', name: 'arrow' -%}
           </a>
         {%- endif -%}
@@ -113,11 +151,19 @@
     {%- endif -%}
   </div>
 </div>
+{%- endif -%}
 
 {% schema %}
 {
   "name": "t:general.slideshow_slide",
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_item",
+      "label": "t:labels.slide_show_item",
+      "info": "t:info.slide_show_item",
+      "default": true
+    },
     {
       "type": "image_picker",
       "id": "image",
@@ -143,26 +189,25 @@
       "type": "text",
       "id": "eyebrow",
       "label": "t:labels.slide_eyebrow",
-      "default": "Trusted by 10,000+ athletes"
+      "info": "t:info.sample_text"
     },
     {
       "type": "text",
       "id": "heading",
       "label": "t:labels.slide_heading",
-      "default": "Level Up Your Fitness"
+      "info": "t:info.sample_text"
     },
     {
       "type": "textarea",
       "id": "subheading",
       "label": "t:labels.slide_subheading",
-      "default": "Upgrade your journey with Efitco gear made for every workout."
+      "info": "t:info.sample_text"
     },
     {
       "type": "text",
       "id": "button_label",
       "label": "t:labels.slide_button_label",
-      "info": "t:info.slide_button_label",
-      "default": "Explore Equipment"
+      "info": "t:info.sample_text"
     },
     {
       "type": "url",

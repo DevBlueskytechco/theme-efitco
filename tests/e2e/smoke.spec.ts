@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
+import { watchShopPay403 } from './support/console-guard';
 
 // Trang có sẵn trên mọi store (không phụ thuộc dữ liệu): /pages/contact chỉ có khi merchant tạo trang → bỏ khỏi smoke.
 const PAGES: { path: string; status: number }[] = [
@@ -17,8 +19,10 @@ const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shop
 for (const { path, status } of PAGES) {
   test(`smoke ${path}`, async ({ page }) => {
     const errors: string[] = [];
+    const isShopPay403 = watchShopPay403(page);
     page.on('console', (m) => {
       if (m.type() !== 'error') return;
+      if (isShopPay403(m)) return;
       const text = `${m.text()} @ ${m.location().url}`;
       if (!IGNORE_CONSOLE.some((r) => r.test(text))) errors.push(text);
     });
@@ -31,6 +35,7 @@ for (const { path, status } of PAGES) {
 
     expect(errors, `console errors trên ${path}:\n${errors.join('\n')}`).toEqual([]);
 
+    await expectNotChallenged(page);
     const axe = await new AxeBuilder({ page }).analyze();
     const bad = axe.violations.filter((v) => ['serious', 'critical'].includes(v.impact || ''));
     // In rõ rule + selector để biết sửa ở block nào

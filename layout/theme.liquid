@@ -28,6 +28,7 @@
 
     {{ content_for_header }}
     <script src="{{ 'standard-events.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'motion.js' | asset_url }}" type="module"></script>
   </head>
 
   <body>
@@ -46,7 +47,7 @@
     </main>
 
     {% block 'container', tag: 'div' %}
-      {% block 'footer' -%}{%- endblock %}
+      {% block 'footer', newsletter_image: images['efx-news.jpg'] -%}{%- endblock %}
     {% endblock %}
 
     {% # No container: the dialog sits outside the page flow, it is not a band. %}

@@ -1,0 +1,135 @@
+{% doc %}
+  One product row of shop-the-look (TE-12 AC5, AC4, Figma 1:583): thumbnail, title
+  link, price and a hidden input with the default variant. A list item, so the
+  template calls it inside the shop-the-look body. At most 6 rows: the template
+  decides, because a parent cannot count its children (AGENTS.md).
+
+  Uses selected_or_first_available_variant; there is no variant picker (ES1-T146 #6).
+  Sold out (product or variant unavailable, AC4): the row stays with a Sold out
+  badge and has no input, so it is not counted and not submitted (ES1-T146 #5).
+
+  Hooks for assets/bundle-form.js (BE ES1-T149). Rename only with a ticket comment.
+  - Input: data-bundle-item, data-title, data-price (cents), value is the variant id,
+    name id[].
+  - Row: data-look-row (matches data-hotspot of the parent; rows 5 and 6 have no
+    hotspot), data-look-active (the selected row: accent border; JS moves it). Row 1
+    starts selected as in Figma.
+
+  Test hooks: shop-the-look-row, shop-the-look-row-image, shop-the-look-row-title,
+  shop-the-look-row-price, shop-the-look-row-badge, shop-the-look-row-input,
+  shop-the-look-row-placeholder.
+
+  Empty state: no product → a hint in the theme editor, nothing on the storefront.
+
+  Self-contained: callers must leave the body empty.
+
+  @param {string} id - Unique row id within the template, such as 'look-row-1'
+  @param {number} [look_row] - Row number from 1 to 6, links the row to the hotspot with the same number
+
+  @example
+  {% block 'shop-the-look-row', id: 'look-row-1', look_row: 1 %}{% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign row_product = block.settings.product
+  assign row_variant = row_product.selected_or_first_available_variant | default: row_product.variants.first
+  assign row_image = row_variant.featured_image | default: row_product.featured_image
+
+  assign has_product = false
+  if row_product != blank and row_variant != blank
+    assign has_product = true
+  endif
+
+  assign sold_out = false
+  if row_product.available == false or row_variant.available == false
+    assign sold_out = true
+  endif
+
+  assign row_title = row_product.title | escape
+-%}
+
+{%- if has_product -%}
+  <li
+    id="{{ id }}"
+    class="shop-the-look-row"
+    {% if look_row != blank %}
+      data-look-row="{{ look_row }}"
+    {% endif %}
+    {% if look_row == 1 %}
+      data-look-active
+    {% endif %}
+    {% if sold_out %}
+      data-sold-out
+    {% endif %}
+    data-testid="shop-the-look-row"
+    {{ block.shopify_attributes }}
+  >
+    <div class="shop-the-look-row__thumb">
+      {%- if row_image != blank -%}
+        {% render 'image',
+          image: row_image,
+          class: 'shop-the-look-row__image',
+          width: 134,
+          height: 134,
+          crop: 'center',
+          widths: '67, 134',
+          sizes: '67px',
+          loading: 'lazy',
+          decorative: true,
+          testid: 'shop-the-look-row-image'
+        %}
+      {%- endif -%}
+    </div>
+
+    <div class="shop-the-look-row__info">
+      <a class="shop-the-look-row__title" href="{{ row_product.url }}" data-testid="shop-the-look-row-title">
+        {{- row_title -}}
+      </a>
+      <div class="shop-the-look-row__meta">
+        <div data-testid="shop-the-look-row-price">
+          {% render 'price', product: row_product, variant: row_variant %}
+        </div>
+        {%- if sold_out -%}
+          <span class="shop-the-look-row__badge" data-testid="shop-the-look-row-badge">
+            {{- 'products.card.sold_out' | t -}}
+          </span>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- unless sold_out -%}
+      <input
+        type="hidden"
+        name="id[]"
+        value="{{ row_variant.id }}"
+        data-bundle-item
+        data-title="{{ row_title }}"
+        data-price="{{ row_variant.price }}"
+        data-testid="shop-the-look-row-input"
+      >
+    {%- endunless -%}
+  </li>
+{%- elsif request.design_mode -%}
+  <li
+    id="{{ id }}"
+    class="shop-the-look-row shop-the-look-row--placeholder"
+    data-testid="shop-the-look-row-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.shop_the_look.row_placeholder' | t }}
+  </li>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.shop_the_look_row",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "t:labels.shop_the_look_row_product",
+      "info": "t:info.shop_the_look_row_product"
+    }
+  ]
+}
+{% endschema %}

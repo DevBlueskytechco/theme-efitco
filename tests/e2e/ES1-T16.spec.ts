@@ -176,7 +176,9 @@ test.describe('ES1-T16 sticky-header', () => {
       probe.remove();
       return value;
     });
-    await expect(header).toHaveCSS('background-color', background);
+    // Trang chủ: nền tối như Figma 1:362 (CTO 07/11), không dùng --color-background
+    expect(background).not.toBe('rgb(26, 26, 26)');
+    await expect(header).toHaveCSS('background-color', 'rgb(26, 26, 26)');
 
     await scrollTo(page, 0);
     await expect(header).not.toHaveAttribute('data-scrolled');

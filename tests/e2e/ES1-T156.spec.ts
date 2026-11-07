@@ -1,14 +1,17 @@
 // KHÔNG CHẮC: spec chưa chạy (phiên viết không có preview, chưa type-check); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép sang tests/e2e/ES1-T156.spec.ts.
 // Ticket ES1-T156 TE-13-FE1: featured product markup (docs/srs.md#TE-13 AC1, AC2; drafts/techlead/ES1-T142/task-split.md D2, D3, D4, D10, D11).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T156.spec.ts -g "AC1-markup|AC2|nojs"
-// Chưa có JS của BE1 (ES1-T158): product-variant-picker chưa defined nên CSS ẩn, kiểm bằng count/attribute; khung countdown còn visibility hidden.
+// JS của BE1 ở tests/e2e/ES1-T158.spec.ts; test trạng thái trước nâng cấp chặn file module (ES1-T158).
 import { readFileSync } from 'node:fs';
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page, type Response } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged, expectStoreAllowed, gotoStore } from './support/store-guard';
 import { env } from './support/store-data';
 import { readCartNoScript } from './support/product-data';
+import { watchShopPay403 } from './support/console-guard';
 
-const TE13 = '/?view=te13';
+// Plan ES1-T169 D4: band A-E chuyển sang index.te13-states (ES1-T157).
+const TE13 = '/?view=te13-states';
 const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 const band = (page: Page, id: string) => page.getByTestId(`container-te13-${id}`);
@@ -20,8 +23,10 @@ const money = (text: string | null) => Number((text ?? '').replace(/[^\d]/g, '')
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
@@ -70,11 +75,11 @@ test.describe('ES1-T156 TE-13 featured product', () => {
   });
 
   test('AC1-markup chưa có data-enhanced: khung giữ chỗ nhưng không nhìn thấy', async ({ page }) => {
+    await page.route(/\/featured-product\.js/, (route) => route.abort());
     await page.goto(TE13);
     const a = band(page, 'a');
     test.skip(!(await onSale(a)), 'Band A không sale');
-    const root = tid(a, 'featured-product');
-    test.skip((await root.getAttribute('data-enhanced')) !== null, 'BE1 đã nâng cấp');
+    await expect(tid(a, 'featured-product')).not.toHaveAttribute('data-enhanced', /.*/);
     await expect(tid(a, COUNTDOWN)).toBeHidden();
     const box = await tid(a, COUNTDOWN).boundingBox();
     expect(box?.height ?? 0).toBeGreaterThan(0);
@@ -198,11 +203,11 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     await expect(page.getByTestId('product-selling-plans')).toHaveCount(0);
   });
 
-  test('AC2 trang chủ chưa cấu hình không có featured product', async ({ page }) => {
+  test('AC2 trang chủ đã nối dữ liệu (CTO 07/11): có featured product, không placeholder', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('featured-product')).toHaveCount(0);
+    await expect(page.locator('featured-product')).toHaveCount(1);
     await expect(page.getByTestId('featured-product-placeholder')).toHaveCount(0);
-    await expect(page.getByTestId('container-home-featured-product')).toHaveCount(0);
+    await expect(page.getByTestId('container-home-featured-product')).toHaveCount(1);
   });
 
   test('AC2 trang sản phẩm: picker không có 2 thuộc tính mới', async ({ page }) => {
@@ -218,6 +223,7 @@ test.describe('ES1-T156 TE-13 featured product', () => {
   test('AC2 axe 0 serious, 0 console error trên /?view=te13', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(TE13);
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).analyze();
     const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
@@ -242,8 +248,8 @@ test.describe('ES1-T156 TE-13 nojs', () => {
   });
 
   test('nojs select variant, form POST vào giỏ đúng variant', async ({ page }) => {
-    await page.request.post('/cart/clear.js');
-    await page.goto(TE13);
+    // ES1-T224: tắt JS thì ảnh lazy tải ngay, nên không chờ load của trang nhiều band (repro R5). Mỗi bước có timeout riêng để CI nêu đúng bước treo; POST bị chặn báo Cloudflare, không thành timeout.
+    await gotoStore(page, TE13, { waitUntil: 'domcontentloaded' });
     const b = band(page, 'b');
     await expect(tid(b, 'product-variant-picker')).toBeHidden();
     const select = tid(b, 'product-variant-select');
@@ -251,10 +257,17 @@ test.describe('ES1-T156 TE-13 nojs', () => {
     const values = await select.locator('option:not([disabled])').evaluateAll((els) => els.map((el) => (el as HTMLOptionElement).value));
     test.skip(values.length < 2, 'TE4_VARIANTS_HANDLE cần từ 2 variant còn hàng');
     await select.selectOption(values[1]);
-    await tid(b, 'featured-product-add').click();
-    await page.waitForURL(/\/cart/);
+    const isCartAdd = (res: Response) => res.request().method() === 'POST' && new URL(res.url()).pathname.endsWith('/cart/add');
+    const [post] = await Promise.all([
+      page.waitForResponse(isCartAdd, { timeout: 15_000 }),
+      tid(b, 'featured-product-add').click({ timeout: 10_000 }),
+    ]);
+    expectStoreAllowed(post);
+    expect(post.status(), 'POST /cart/add').toBeLessThan(400);
+    // Regex /\/cart/ cũ khớp cả /cart/add, kể cả khi đang ở màn thử thách (repro R7).
+    await page.waitForURL((url) => url.pathname.endsWith('/cart'), { waitUntil: 'domcontentloaded', timeout: 15_000 });
+    await expectNotChallenged(page);
     const cart = await readCartNoScript<{ items: { variant_id: number }[] }>(page);
     expect(cart.items.map((i) => String(i.variant_id))).toEqual([values[1]]);
-    await page.request.post('/cart/clear.js');
   });
 });

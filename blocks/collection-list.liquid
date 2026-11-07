@@ -1,0 +1,114 @@
+{% doc %}
+  Renders the Browse Categories row: heading, back and next buttons, and a list
+  of collection-card blocks that scrolls sideways with scroll-snap, mouse, touch
+  and keyboard without JavaScript (assets/base.css). The list runs to the viewport
+  edge, so the first card lines up with the heading and the last one can be cut off.
+
+  The parent cannot read its children: the body is a rendered string, so a shorter
+  list just shows fewer cards. When no card renders, the editor shows a placeholder
+  and the storefront renders nothing, so the container leaves no empty band.
+
+  The buttons stay hidden until a script sets data-enhanced on the root, and always
+  stay hidden below 48rem (ES1-T174). assets/lazy-module.js imports
+  assets/scroll-buttons.js when the block comes near the viewport (ES1-T185).
+
+  JavaScript hooks: custom element scroll-buttons (root), data-enhanced (root),
+  data-lazy-module (root, URL of assets/scroll-buttons.js), data-scroll-track (list),
+  data-scroll-prev, data-scroll-next (buttons). A script hides one button with the
+  hidden attribute.
+
+  Test hooks: data-testid="collection-list", "collection-list-heading",
+  "collection-list-nav", "collection-list-prev", "collection-list-next",
+  "collection-list-track", "collection-list-placeholder".
+
+  @param {string} [id] - Static block id, needed when a template has more than one collection-list block
+  @param {string} content - One collection-card block call per card
+
+  @example
+  {% block 'container', id: 'home-collection-list', background: 'dark' %}
+    {% block 'collection-list' %}
+      {% block 'collection-card', id: 'collection-card-1' %}{% endblock %}
+      {% block 'collection-card', id: 'collection-card-2' %}{% endblock %}
+    {% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- assign items = content | strip -%}
+
+{%- if items != blank -%}
+  <scroll-buttons
+    class="collection-list full-width"
+    {% if id != blank %}
+      data-collection-list-id="{{ id }}"
+    {% endif %}
+    data-lazy-module="{{ 'scroll-buttons.js' | asset_url }}"
+    data-testid="collection-list"
+    {{ block.shopify_attributes }}
+  >
+    <div class="collection-list__header">
+      {%- if block.settings.heading != blank -%}
+        <h2 class="collection-list__heading" data-testid="collection-list-heading">
+          {{- block.settings.heading | escape -}}
+        </h2>
+      {%- endif -%}
+      <div class="collection-list__nav" data-testid="collection-list-nav">
+        <button
+          type="button"
+          class="collection-list__button collection-list__button--prev"
+          aria-label="{{ 'blocks.collection_list.previous' | t }}"
+          data-scroll-prev
+          data-testid="collection-list-prev"
+        >
+          {% render 'slideshow-icon', name: 'previous' %}
+        </button>
+        <button
+          type="button"
+          class="collection-list__button collection-list__button--next"
+          aria-label="{{ 'blocks.collection_list.next' | t }}"
+          data-scroll-next
+          data-testid="collection-list-next"
+        >
+          {% render 'slideshow-icon', name: 'next' %}
+        </button>
+      </div>
+    </div>
+    {%- comment -%}
+      role="list": list-style none removes the list role in Safari, and tabindex lets
+      keyboard users scroll the list (same as blocks/testimonials.liquid).
+    {%- endcomment -%}
+    <ul
+      class="collection-list__track"
+      role="list"
+      tabindex="0"
+      aria-label="{{ 'blocks.collection_list.list_label' | t }}"
+      data-scroll-track
+      data-testid="collection-list-track"
+    >
+      {{ content }}
+    </ul>
+
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
+  </scroll-buttons>
+{%- elsif request.design_mode -%}
+  <p
+    class="collection-list--placeholder"
+    data-testid="collection-list-placeholder"
+    {{ block.shopify_attributes }}
+  >
+    {{ 'blocks.collection_list.placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.collection_list",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.collection_list_heading",
+      "default": "Browse Categories"
+    }
+  ]
+}
+{% endschema %}

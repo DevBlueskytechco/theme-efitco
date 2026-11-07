@@ -1,29 +1,43 @@
 {% doc %}
   Renders customer reviews: eyebrow, heading and a list of testimonial-item
   blocks. No JavaScript: under 48rem the list scrolls sideways with scroll-snap
-  and takes keyboard focus, from 48rem it is a grid (assets/base.css).
+  and takes keyboard focus, from 48rem it is a grid, and from 120rem exactly 4
+  reviews are 456px cards that run past the viewport edge and scroll sideways with
+  mouse and keyboard (assets/base.css).
 
   The parent cannot read its children: the body is a rendered string, so columns
   come from CSS and adding a review means adding one line in the template. When
   the body is empty, the editor shows a placeholder and the storefront renders
   nothing.
 
+  Sample content (plan ES1-T169 D1): the template passes default_eyebrow and
+  default_heading from locales. They have other names than the settings, so a value
+  the merchant saved always wins. Text from the t filter may already be escaped, so
+  it goes through escape_once.
+
   Test hooks: data-testid="testimonials", "testimonials-heading",
   "testimonials-list", "testimonials-placeholder".
 
   @param {string} [id] - Static block id, needed when a template has more than one testimonials block
+  @param {string} [default_eyebrow] - Sample text used when the eyebrow setting is empty
+  @param {string} [default_heading] - Sample text used when the heading setting is empty
   @param {string} content - One testimonial-item block call per review, 1 to 6
 
   @example
+  {% assign sample_heading = 'blocks.testimonials.default_heading' | t %}
   {% block 'container', id: 'home-testimonials', background: 'cream' %}
-    {% block 'testimonials' %}
+    {% block 'testimonials', default_heading: sample_heading %}
       {% block 'testimonial-item', id: 'testimonial-1' %}{% endblock %}
       {% block 'testimonial-item', id: 'testimonial-2' %}{% endblock %}
     {% endblock %}
   {% endblock %}
 {% enddoc %}
 
-{%- assign items = content | strip -%}
+{%- liquid
+  assign items = content | strip
+  assign testimonials_eyebrow = block.settings.eyebrow | default: default_eyebrow
+  assign testimonials_heading = block.settings.heading | default: default_heading
+-%}
 
 {%- if items != blank -%}
   <div
@@ -34,14 +48,14 @@
     data-testid="testimonials"
     {{ block.shopify_attributes }}
   >
-    {%- if block.settings.eyebrow != blank or block.settings.heading != blank -%}
+    {%- if testimonials_eyebrow != blank or testimonials_heading != blank -%}
       <div class="testimonials__header">
-        {%- if block.settings.eyebrow != blank -%}
-          <p class="testimonials__eyebrow">{{ block.settings.eyebrow | escape }}</p>
+        {%- if testimonials_eyebrow != blank -%}
+          <p class="testimonials__eyebrow">{{ testimonials_eyebrow | escape_once }}</p>
         {%- endif -%}
-        {%- if block.settings.heading != blank -%}
+        {%- if testimonials_heading != blank -%}
           <h2 class="testimonials__heading" data-testid="testimonials-heading">
-            {{- block.settings.heading | escape -}}
+            {{- testimonials_heading | escape_once -}}
           </h2>
         {%- endif -%}
       </div>
@@ -78,13 +92,13 @@
       "type": "text",
       "id": "eyebrow",
       "label": "t:labels.testimonials_eyebrow",
-      "default": "Testimonials"
+      "info": "t:info.sample_text"
     },
     {
       "type": "text",
       "id": "heading",
       "label": "t:labels.testimonials_heading",
-      "default": "Add a heading for your customer reviews"
+      "info": "t:info.sample_text"
     }
   ]
 }

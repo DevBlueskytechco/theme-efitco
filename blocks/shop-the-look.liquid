@@ -1,0 +1,455 @@
+{% doc %}
+  Shop the look (TE-12 AC5, AC-H19, AC-H20, Figma 1:560): eyebrow, h2 heading,
+  optional link, a large image with 4 hotspots, a Fits note, the product rows from
+  the body and a totals panel. One column with the image on top below 64rem, two
+  columns from 64rem. No image: the list takes the full width.
+
+  Works without JavaScript: a POST form to routes.cart_add_url with one hidden input
+  (name id[]) per row in stock. The rows keep their prices; the count, totals and
+  hotspots need JavaScript, so they stay hidden. CSS hides the panel when no row is
+  in stock, and hides a hotspot when its row does not exist.
+
+  A parent cannot read its children and Liquid cannot add them up (AGENTS.md), so
+  assets/bundle-form.js sums data-price. Discounts are display only (R8): Liquid only
+  outputs data-tiers, the real price comes from an automatic discount. With a tier
+  above 0 the note always shows (AC-H19): an empty setting takes the locale text. No
+  tier above 0: no data-tiers, discount row or note.
+
+  Hooks for assets/bundle-form.js (BE ES1-T149; same contract as bundle-builder, no
+  checkboxes, no progress and no line list). Rename only with a ticket comment.
+  - Root: data-lazy-module (assets/lazy-module.js imports the module near the viewport),
+    data-tiers, data-cart-add-url, data-cart-url, data-cart-type, data-currency,
+    data-locale, data-label-count-one, data-label-count-other, data-label-discount (%p),
+    data-label-status (%n, %t), data-label-error. JS sets data-enhanced on the root.
+  - Panel: data-bundle-live (hidden by CSS until data-enhanced, space kept; display none
+    without scripting), data-bundle-count, data-bundle-subtotal, data-bundle-discount-row,
+    data-bundle-discount-label, data-bundle-discount (amount without a sign, CSS adds the
+    minus), data-bundle-total, data-bundle-submit, data-bundle-status, data-bundle-error.
+  - Hotspot: data-hotspot (1 to 4, matches data-look-row of a row), aria-pressed (the
+    selected hotspot has a ring; hotspot 1 starts selected as in Figma, JS moves it).
+
+  Test hooks: shop-the-look, shop-the-look-eyebrow, shop-the-look-heading,
+  shop-the-look-link, shop-the-look-image, shop-the-look-hotspot, shop-the-look-note,
+  shop-the-look-rows, shop-the-look-panel, shop-the-look-count, shop-the-look-subtotal,
+  shop-the-look-discount-row, shop-the-look-discount, shop-the-look-total,
+  shop-the-look-discount-note, shop-the-look-submit, shop-the-look-status,
+  shop-the-look-error, shop-the-look-placeholder.
+
+  Empty state: no row with a product → a hint in the theme editor, nothing on the
+  storefront (ES1-T168 Q1).
+
+  @param {string} [content] - The shop-the-look-row blocks, at most 6
+  @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading id. Default: block.id
+
+  @example
+  {% block 'container', id: 'home-shop-the-look', tag: 'div' %}
+    {% block 'shop-the-look', id: 'shop-the-look' %}
+      {% block 'shop-the-look-row', id: 'look-row-1', look_row: 1 %}{% endblock %}
+    {% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign rows = content | strip
+
+  assign tiers = ''
+  if block.settings.tier_1_percent > 0
+    assign tiers = tiers | append: block.settings.tier_1_quantity | append: ':' | append: block.settings.tier_1_percent | append: ','
+  endif
+  if block.settings.tier_2_percent > 0
+    assign tiers = tiers | append: block.settings.tier_2_quantity | append: ':' | append: block.settings.tier_2_percent | append: ','
+  endif
+  if block.settings.tier_3_percent > 0
+    assign tiers = tiers | append: block.settings.tier_3_quantity | append: ':' | append: block.settings.tier_3_percent | append: ','
+  endif
+  # split drops the trailing empty value, so the last comma goes away
+  assign tiers = tiers | split: ',' | join: ','
+
+  assign eyebrow = block.settings.eyebrow
+  assign heading = block.settings.heading
+  assign link_label = block.settings.link_label
+  assign link_url = block.settings.link_url | default: routes.all_products_collection_url
+  assign look_image = block.settings.image
+  assign note_title = block.settings.note_title
+  assign note_text = block.settings.note_text
+  assign note_icon = block.settings.note_icon
+  assign block_key = id | default: block.id
+  assign heading_id = block_key | append: '-heading'
+  assign cart_type = settings.cart_type | default: 'drawer'
+
+  assign label_count_one = 'blocks.shop_the_look.count_one' | t
+  assign label_count_other = 'blocks.shop_the_look.count_other' | t
+  assign label_discount = 'blocks.shop_the_look.discount' | t
+  assign label_status = 'blocks.shop_the_look.status' | t
+  assign label_error = 'blocks.shop_the_look.error' | t
+-%}
+
+{%- if rows != blank -%}
+  <bundle-form
+    class="shop-the-look"
+    {% if tiers != blank %}
+      data-tiers="{{ tiers }}"
+    {% endif %}
+    data-cart-add-url="{{ routes.cart_add_url }}"
+    data-cart-url="{{ routes.cart_url }}"
+    data-cart-type="{{ cart_type | escape }}"
+    data-currency="{{ cart.currency.iso_code }}"
+    data-locale="{{ request.locale.iso_code }}"
+    data-label-count-one="{{ label_count_one | escape }}"
+    data-label-count-other="{{ label_count_other | escape }}"
+    data-label-discount="{{ label_discount | escape }}"
+    data-label-status="{{ label_status | escape }}"
+    data-label-error="{{ label_error | escape }}"
+    data-lazy-module="{{ 'bundle-form.js' | asset_url }}"
+    data-testid="shop-the-look"
+    {{ block.shopify_attributes }}
+  >
+    {%- if eyebrow != blank or heading != blank or link_label != blank -%}
+      <div class="shop-the-look__header">
+        {%- if eyebrow != blank or heading != blank -%}
+          <div class="shop-the-look__titles">
+            {%- if eyebrow != blank -%}
+              <p class="shop-the-look__eyebrow" data-testid="shop-the-look-eyebrow">{{ eyebrow | escape }}</p>
+            {%- endif -%}
+            {%- if heading != blank -%}
+              <h2 class="shop-the-look__heading" id="{{ heading_id }}" data-testid="shop-the-look-heading">
+                {{- heading -}}
+              </h2>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+        {%- if link_label != blank -%}
+          <a class="shop-the-look__link" href="{{ link_url }}" data-testid="shop-the-look-link">
+            {{- link_label | escape -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    <div class="shop-the-look__body">
+      {%- if look_image != blank -%}
+        <div class="shop-the-look__media" data-testid="shop-the-look-image">
+          {% render 'image',
+            image: look_image,
+            class: 'shop-the-look__image',
+            width: 1872,
+            widths: '360, 720, 936, 1200, 1872',
+            sizes: '(min-width: 120rem) 936px, (min-width: 64rem) 62vw, 100vw',
+            loading: 'lazy'
+          %}
+          {%- for hotspot in (1..4) -%}
+            {%- liquid
+              assign hotspot_x_key = 'hotspot_' | append: hotspot | append: '_x'
+              assign hotspot_y_key = 'hotspot_' | append: hotspot | append: '_y'
+            -%}
+            <button
+              class="shop-the-look__hotspot"
+              type="button"
+              style="--hotspot-x: {{ block.settings[hotspot_x_key] }}; --hotspot-y: {{ block.settings[hotspot_y_key] }};"
+              aria-label="{{ 'blocks.shop_the_look.hotspot' | t: index: hotspot }}"
+              aria-pressed="{% if hotspot == 1 %}true{% else %}false{% endif %}"
+              data-hotspot="{{ hotspot }}"
+              data-testid="shop-the-look-hotspot"
+            ></button>
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+
+      <form
+        class="shop-the-look__form"
+        method="post"
+        action="{{ routes.cart_add_url }}"
+        {% if heading != blank %}
+          aria-labelledby="{{ heading_id }}"
+        {% endif %}
+      >
+        {%- if note_title != blank or note_text != blank -%}
+          <div class="shop-the-look__note" data-testid="shop-the-look-note">
+            {%- if note_icon == blank -%}
+              <div class="shop-the-look__note-icon"><svg aria-hidden="true" focusable="false" width="52" height="52" viewBox="0 0 52 52" fill="none"><circle cx="26" cy="26" r="26" fill="white"/><path d="M32.774 26.6156L33.494 25.8957C33.4937 25.8959 33.4942 25.8954 33.494 25.8957C33.4942 25.8954 33.4951 25.8945 33.4953 25.8943L36.0352 23.3544L38.5764 20.8133L39.972 19.4176C40.42 18.9697 40.6667 18.3741 40.6667 17.7406C40.6667 17.1071 40.42 16.5115 39.972 16.0637L35.9366 12.0282C35.4887 11.5803 34.8931 11.3335 34.2597 11.3335C33.6261 11.3335 33.0306 11.5802 32.5827 12.0282L25.3846 19.2262L20.4988 14.3404C19.6809 13.5225 18.6558 12.9403 17.5343 12.6568L12.4034 11.3597C12.1101 11.2855 11.7991 11.3712 11.5851 11.5853C11.3711 11.7993 11.2854 12.1101 11.3596 12.4035L12.6567 17.5345C12.9402 18.6559 13.5224 19.681 14.3403 20.4989L19.2261 25.3847L12.028 32.5827C11.5801 33.0307 11.3334 33.6262 11.3334 34.2597C11.3334 34.8933 11.5801 35.4887 12.028 35.9367L16.0635 39.9721C16.5115 40.4201 17.107 40.6668 17.7405 40.6668C18.374 40.6668 18.9696 40.4201 19.4175 39.9722L23.3521 36.0376C23.3527 36.037 23.3533 36.0364 23.3539 36.0358C23.3545 36.0352 23.3551 36.0346 23.3557 36.034L26.6155 32.7742L33.2327 39.3914C34.0817 40.2403 35.1968 40.6649 36.312 40.6649C37.4271 40.6649 38.5423 40.2404 39.3912 39.3914C41.0892 37.6935 41.0892 34.9308 39.3912 33.2329L32.774 26.6156ZM14.323 17.1132L13.379 13.3792L17.1131 14.3232C17.9341 14.5307 18.6846 14.957 19.2834 15.5558L19.9609 16.2333L16.2331 19.9612L15.5555 19.2836C14.9567 18.6848 14.5305 17.9343 14.323 17.1132ZM17.4484 21.1764L21.1763 17.4486L24.1692 20.4415L20.4414 24.1694L17.4484 21.1764ZM17.7405 38.9481C17.5661 38.9481 17.4022 38.8801 17.2789 38.7568L13.2434 34.7214C13.1201 34.5981 13.0522 34.4341 13.0522 34.2597C13.0522 34.0853 13.1201 33.9214 13.2434 33.798L33.798 13.2435C33.9212 13.1202 34.0853 13.0522 34.2597 13.0522C34.4341 13.0522 34.598 13.1202 34.7213 13.2435L38.7568 17.279C38.8801 17.4022 38.948 17.5662 38.948 17.7406C38.948 17.915 38.8801 18.079 38.7568 18.2023L37.969 18.9901L35.3475 16.3686C35.012 16.033 34.4678 16.033 34.1321 16.3686C33.7965 16.7041 33.7965 17.2483 34.1321 17.5839L36.7536 20.2054L35.428 21.5311L34.077 20.1801C33.7414 19.8444 33.1972 19.8445 32.8616 20.1801C32.526 20.5157 32.526 21.0598 32.8616 21.3954L34.2127 22.7464L32.8871 24.072L30.2656 21.4505C29.93 21.1148 29.3859 21.1148 29.0502 21.4505C28.7146 21.786 28.7146 22.3302 29.0502 22.6658L31.6717 25.2873L30.3461 26.6129L28.9951 25.2619C28.6595 24.9263 28.1154 24.9263 27.7797 25.2619C27.4441 25.5975 27.4441 26.1416 27.7797 26.4772L29.1307 27.8282L27.8281 29.1309L25.2066 26.5094C24.871 26.1738 24.3269 26.1738 23.9913 26.5094C23.6557 26.8449 23.6557 27.3891 23.9913 27.7247L26.6128 30.3462L25.2872 31.6718L23.9362 30.3208C23.6006 29.9853 23.0565 29.9853 22.7208 30.3208C22.3852 30.6564 22.3852 31.2005 22.7208 31.5361L24.0718 32.8871L22.7462 34.2127L20.1248 31.5913C19.7892 31.2558 19.2451 31.2558 18.9095 31.5913C18.5738 31.9269 18.5738 32.471 18.9095 32.8066L21.5309 35.4281L20.2053 36.7537L18.8543 35.4027C18.5187 35.0671 17.9746 35.0671 17.639 35.4027C17.3033 35.7383 17.3033 36.2824 17.639 36.618L18.9899 37.969L18.2021 38.7568C18.0788 38.8802 17.9149 38.9481 17.7405 38.9481ZM28.4323 30.9574C28.4335 30.9562 28.4346 30.9551 28.4359 30.9539C28.4371 30.9527 28.4382 30.9515 28.4393 30.9503L30.9528 28.4368C30.9532 28.4365 30.9535 28.4362 30.9538 28.4359C30.9541 28.4355 30.9545 28.4352 30.9548 28.4349L31.5587 27.831L35.2003 31.4725L31.4724 35.2004L27.8309 31.5588L28.4323 30.9574ZM38.1759 38.176C37.1481 39.2038 35.4758 39.2038 34.448 38.176L32.6878 36.4157L36.4156 32.6878L38.176 34.4481C39.2037 35.476 39.2037 37.1483 38.1759 38.176Z" fill="#1A1A1A"/></svg></div>
+            {%- else -%}
+              <div class="shop-the-look__note-icon">
+                {% render 'image',
+                  image: note_icon,
+                  width: 64,
+                  height: 64,
+                  crop: 'center',
+                  widths: '32, 64',
+                  sizes: '32px',
+                  loading: 'lazy',
+                  decorative: true
+                %}
+              </div>
+            {%- endif -%}
+            <div class="shop-the-look__note-text">
+              {%- if note_title != blank -%}
+                <p class="shop-the-look__note-title">{{ note_title | escape }}</p>
+              {%- endif -%}
+              {%- if note_text != blank -%}
+                <p class="shop-the-look__note-body">{{ note_text | escape }}</p>
+              {%- endif -%}
+            </div>
+          </div>
+        {%- endif -%}
+
+        <ul class="shop-the-look__rows" role="list" data-testid="shop-the-look-rows">
+          {{ content }}
+        </ul>
+
+        <div class="shop-the-look__panel" data-testid="shop-the-look-panel">
+          <div class="shop-the-look__summary">
+            <div class="shop-the-look__line" data-bundle-live>
+              <span data-bundle-count data-testid="shop-the-look-count"></span>
+              <span data-bundle-subtotal data-testid="shop-the-look-subtotal"></span>
+            </div>
+
+            {%- if tiers != blank -%}
+              <div
+                class="shop-the-look__line"
+                data-bundle-live
+                data-bundle-discount-row
+                data-testid="shop-the-look-discount-row"
+              >
+                <span data-bundle-discount-label></span>
+                <span
+                  class="shop-the-look__discount"
+                  data-bundle-discount
+                  data-testid="shop-the-look-discount"
+                ></span>
+              </div>
+            {%- endif -%}
+
+            <div class="shop-the-look__line shop-the-look__line--total" data-bundle-live>
+              <span>{{ 'blocks.bundle_builder.total' | t }}</span>
+              <span class="shop-the-look__total" data-bundle-total data-testid="shop-the-look-total"></span>
+            </div>
+          </div>
+
+          <div class="shop-the-look__actions">
+            <button
+              class="button shop-the-look__submit"
+              type="submit"
+              data-bundle-submit
+              data-testid="shop-the-look-submit"
+            >
+              {{- 'blocks.shop_the_look.submit' | t -}}
+              {%- render 'slideshow-icon', name: 'arrow' -%}
+            </button>
+            <div class="visually-hidden" role="status" data-bundle-status data-testid="shop-the-look-status"></div>
+            <div class="shop-the-look__error" role="alert" data-bundle-error data-testid="shop-the-look-error"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
+  </bundle-form>
+{%- elsif request.design_mode -%}
+  <div class="shop-the-look__placeholder" data-testid="shop-the-look-placeholder" {{ block.shopify_attributes }}>
+    {{ 'blocks.shop_the_look.placeholder' | t }}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.shop_the_look",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "default": "Shop this setup"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "default": "A Complete Corner Gym, Itemised"
+    },
+    {
+      "type": "text",
+      "id": "link_label",
+      "label": "t:labels.link_label",
+      "info": "t:info.bundle_builder_link",
+      "default": "Browse All Setups"
+    },
+    {
+      "type": "url",
+      "id": "link_url",
+      "label": "t:labels.link_url"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "t:labels.shop_the_look_image",
+      "info": "t:info.shop_the_look_image"
+    },
+    {
+      "type": "text",
+      "id": "note_title",
+      "label": "t:labels.shop_the_look_note_title",
+      "info": "t:info.shop_the_look_note",
+      "default": "Fits: 2.4×2.0 m"
+    },
+    {
+      "type": "text",
+      "id": "note_text",
+      "label": "t:labels.shop_the_look_note_text",
+      "default": "Folds flat when you're done."
+    },
+    {
+      "type": "image_picker",
+      "id": "note_icon",
+      "label": "t:labels.shop_the_look_note_icon",
+      "info": "t:info.shop_the_look_note_icon"
+    },
+    {
+      "type": "header",
+      "content": "t:general.bundle_builder_tiers",
+      "info": "t:info.bundle_builder_tiers"
+    },
+    {
+      "type": "range",
+      "id": "tier_1_quantity",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "t:labels.tier_1_quantity",
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "tier_1_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.tier_1_percent",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "tier_2_quantity",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "t:labels.tier_2_quantity",
+      "default": 5
+    },
+    {
+      "type": "range",
+      "id": "tier_2_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.tier_2_percent",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "tier_3_quantity",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "label": "t:labels.tier_3_quantity",
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "tier_3_percent",
+      "min": 0,
+      "max": 50,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.tier_3_percent",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:general.shop_the_look_hotspots",
+      "info": "t:info.shop_the_look_hotspots"
+    },
+    {
+      "type": "range",
+      "id": "hotspot_1_x",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.shop_the_look_hotspot_1_x",
+      "default": 85
+    },
+    {
+      "type": "range",
+      "id": "hotspot_1_y",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.shop_the_look_hotspot_1_y",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "hotspot_2_x",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.shop_the_look_hotspot_2_x",
+      "default": 27
+    },
+    {
+      "type": "range",
+      "id": "hotspot_2_y",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.shop_the_look_hotspot_2_y",
+      "default": 68
+    },
+    {
+      "type": "range",
+      "id": "hotspot_3_x",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.shop_the_look_hotspot_3_x",
+      "default": 78
+    },
+    {
+      "type": "range",
+      "id": "hotspot_3_y",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.shop_the_look_hotspot_3_y",
+      "default": 64
+    },
+    {
+      "type": "range",
+      "id": "hotspot_4_x",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.shop_the_look_hotspot_4_x",
+      "default": 46
+    },
+    {
+      "type": "range",
+      "id": "hotspot_4_y",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "t:labels.unit_percent",
+      "label": "t:labels.shop_the_look_hotspot_4_y",
+      "default": 58
+    }
+  ]
+}
+{% endschema %}

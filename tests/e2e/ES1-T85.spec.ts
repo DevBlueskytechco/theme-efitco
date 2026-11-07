@@ -6,6 +6,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CART } from './support/cart-api';
+import { watchShopPay403 } from './support/console-guard';
 
 const EVENT = 'shopify:cart:lines-update';
 const CDN = 'https://cdn.shopify.com/storefront/standard-events.js';
@@ -32,8 +33,10 @@ type Entry = {
 
 function watchConsole(page: Page, ignoreNetwork = false) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     const text = msg.text();
     if (IGNORE_CONSOLE.some((r) => r.test(text) || r.test(msg.location().url))) return;
     if (ignoreNetwork && NETWORK_LOG.test(text)) return;

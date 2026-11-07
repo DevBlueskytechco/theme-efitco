@@ -1,0 +1,29 @@
+--- a/tests/e2e/ES1-T182.spec.ts
++++ b/tests/e2e/ES1-T182.spec.ts
+@@ -1,7 +1,7 @@
+ // KHÔNG CHẮC: spec chưa chạy lần nào (không có preview, chưa type-check); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép sang tests/e2e/ES1-T182.spec.ts.
+ // Ticket ES1-T182 TE-17-FE1c: quiz, quiz-step, bundle-builder, featured-product theo Figma (plan ES1-T169 D1, CR-7; AC-H5, H6, H15, H18 phần markup).
+ // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T182.spec.ts
+-// Chờ ES1-T183: "Two questions" (1:515), "Tap the body map" (1:532), body map bấm được, token panel. Spec giữ copy hiện tại, ES1-T183 sửa 2 dòng có ghi chú.
++// Body map bấm được và token panel: tests/e2e/ES1-T183.spec.ts.
+ import { test, expect, type Page } from '@playwright/test';
+ import AxeBuilder from '@axe-core/playwright';
+ import { watchShopPay403 } from './support/console-guard';
+@@ -36,7 +36,7 @@
+ const STEPS = [
+   {
+     question: 'Where do you want to focus?',
+-    hint: 'Pick from the list.', // ES1-T183 đổi thành "Tap the body map or pick from the list."
++    hint: 'Tap the body map or pick from the list.',
+     options: [
+       ['Upper body', 'Shoulders, arms, chest', 'quiz-upper'],
+       ['Core', 'Abs, stability, balance', 'quiz-core'],
+@@ -69,7 +69,7 @@
+     await expect(tid(page, 'quiz')).toHaveCount(1);
+     await expect(tid(page, 'quiz-eyebrow')).toHaveText('Our most-loved feature');
+     await expect(tid(page, 'quiz-heading')).toHaveText('Find Your Perfect Gear');
+-    await expect(tid(page, 'quiz-subheading')).toHaveText('Three questions. One shortlist.'); // ES1-T183 đổi thành "Two questions. One shortlist."
++    await expect(tid(page, 'quiz-subheading')).toHaveText('Two questions. One shortlist.');
+     await expect(tid(page, 'quiz-note').nth(0)).toHaveText('20 seconds');
+     await expect(tid(page, 'quiz-note').nth(1)).toHaveText('No sign-up required');
+     await expect(tid(page, 'quiz-step')).toHaveCount(3);

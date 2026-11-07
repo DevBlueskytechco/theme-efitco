@@ -35,7 +35,9 @@
   and the storefront renders nothing.
 
   JavaScript hooks: custom element quiz-finder (root), data-enhanced,
-  data-design-mode, data-results-url, data-results-view, data-label-results
+  data-design-mode, data-lazy-module (URL of assets/quiz-finder.js, read by
+  assets/lazy-module.js; neither renders in the theme editor or with
+  results_view), data-results-url, data-results-view, data-label-results
   (%n stands for the count), data-quiz-submit, data-quiz-back, data-quiz-status,
   data-quiz-results-panel, data-quiz-title (results heading, tabindex -1),
   data-quiz-count (partial root, number of cards), data-quiz-empty; partial
@@ -128,6 +130,9 @@
       data-results-url="{{ results_url }}"
       data-results-view="quiz"
       data-label-results="{{ results_label | escape }}"
+    {% endunless %}
+    {% unless results_only or request.design_mode %}
+      data-lazy-module="{{ 'quiz-finder.js' | asset_url }}"
     {% endunless %}
     data-testid="quiz"
     {{ block.shopify_attributes }}
@@ -243,6 +248,9 @@
     </div>
 
     <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
+    {%- unless results_only or request.design_mode -%}
+      <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
+    {%- endunless -%}
   </{{ root_tag }}>
 {%- elsif request.design_mode -%}
   <p class="quiz-placeholder" data-testid="quiz-placeholder" {{ block.shopify_attributes }}>
@@ -257,7 +265,8 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "t:labels.eyebrow"
+      "label": "t:labels.eyebrow",
+      "default": "Our most-loved feature"
     },
     {
       "type": "text",
@@ -269,13 +278,14 @@
       "type": "text",
       "id": "subheading",
       "label": "t:labels.quiz_subheading",
-      "default": "Three questions. One shortlist."
+      "default": "Two questions. One shortlist."
     },
     {
       "type": "text",
       "id": "note_1",
       "label": "t:labels.quiz_note_1",
-      "info": "t:info.quiz_note"
+      "info": "t:info.quiz_note",
+      "default": "20 seconds"
     },
     {
       "type": "text",

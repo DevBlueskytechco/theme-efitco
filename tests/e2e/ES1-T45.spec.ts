@@ -4,6 +4,8 @@
 // Theme chưa có locale RTL: bật RTL bằng document.documentElement.dir = 'rtl' (D6), không sửa layout.
 import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
+import { fetchRetry429 } from './support/cart-api';
 
 const isDesktop = (ti: TestInfo) => ti.project.name === 'desktop';
 const SAND = 'rgb(235, 230, 224)'; // ADR 0005: background_sand #EBE6E0
@@ -51,7 +53,7 @@ async function hasDirRtlRule(page: Page) {
   const hrefs = await page.locator('link[rel="stylesheet"][href*="/assets/"], link[rel="stylesheet"][href*="/cdn/shop/t/"]')
     .evaluateAll(links => links.map(l => (l as HTMLLinkElement).href));
   for (const href of hrefs) {
-    const res = await page.request.get(href);
+    const res = await fetchRetry429(page, href);
     if (res.ok() && /:dir\(rtl\)/.test(await res.text())) return true;
   }
   return false;
@@ -123,7 +125,7 @@ test.describe('ES1-T45 rich-text (ES1-T44, ADR 0005)', () => {
     test.skip(!(await button.count()), 'button_label trống trên store dev');
     const href = await button.getAttribute('href');
     expect(href, 'button_url trống thì mặc định routes.all_products_collection_url').toBeTruthy();
-    const res = await page.request.get(new URL(href!, page.url()).toString());
+    const res = await fetchRetry429(page, new URL(href!, page.url()).toString());
     expect(res.status()).toBeLessThan(400);
   });
 
@@ -206,6 +208,7 @@ test.describe('ES1-T45 rich-text (ES1-T44, ADR 0005)', () => {
 
   test('TC-13 axe vùng home-intro: 0 color-contrast, 0 serious/critical', async ({ page }) => {
     await openHome(page);
+    await expectNotChallenged(page);
     const axe = await new AxeBuilder({ page }).include('[data-testid="container-home-intro"]').analyze();
     const bad = axe.violations.filter(v => v.id === 'color-contrast' || ['serious', 'critical'].includes(v.impact || ''));
     const report = bad.map(v => `${v.impact} ${v.id}: ` + v.nodes.slice(0, 5).map(n => n.target.join(' ')).join(', ')).join('\n');

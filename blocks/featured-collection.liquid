@@ -2,7 +2,8 @@
   Renders products from one collection in a grid (Figma 1:490): eyebrow, h2
   heading, optional View all link next to the heading or below the grid, and
   up to products_to_show product cards. 2 columns below 48rem, 3 columns from
-  48rem, columns_desktop columns from 80rem. No carousel.
+  48rem (4 when the grid has exactly 4 cards), columns_desktop columns from 80rem.
+  No carousel.
 
   Source: the collection setting; when it is empty, collections[default_collection]
   (the home page template passes 'all' so a fresh install and the CI preview
@@ -15,15 +16,40 @@
   preselected swatch follow that variant. Product items have no `product`
   property and render with the product's default variant.
 
+  Tabs (Figma 1:496, AC-H11, AC-H12): tab 1 is the source above, tabs 2 to 4 come
+  from tab_N_collection or collections[default_tab_N_collection]. A tab shows only
+  when it has a collection. With fewer than 2 tabs there is no tab bar and the
+  output matches a block without tabs. Labels are block settings, so a template
+  presets one with tab_N_label; empty label: collection title.
+
+  The first tab's grid is rendered. Other panels hold their grid in a template
+  element, so hidden tabs load no images and no JavaScript means no request at all.
+  Without JavaScript each tab is a link to its collection. An empty collection
+  shows a translated message in its panel.
+
+  JavaScript hooks (assets/collection-tabs.js, BE ES1-T189), only with 2 or more
+  tabs: data-collection-tabs (root), custom element collection-tabs (wraps the
+  block content), data-lazy-module (on it, URL of assets/collection-tabs.js, read
+  by assets/lazy-module.js), data-tab-list (tab row), data-tab="N" (link,
+  aria-current on the first one), data-tab-panel="N" (panel, has an id for
+  aria-controls, hidden except the first), data-tab-panel-template="N" (template
+  in that panel), data-tab-empty (empty message). The active style follows
+  aria-selected once set, otherwise aria-current.
+
   Loads assets/product-swatch.js (ES module, BE ES1-T52) when cards render.
   Self-contained: callers must leave the body empty.
 
   Test hooks: data-testid="featured-collection", "featured-collection-heading",
   "featured-collection-grid", "featured-collection-view-all",
-  "featured-collection-placeholder".
+  "featured-collection-placeholder", "featured-collection-tabs",
+  "featured-collection-tab", "featured-collection-panel",
+  "featured-collection-tab-empty".
 
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading id. Default: block.id
   @param {string} [default_collection] - Collection handle used when the collection setting is empty, such as 'all'. Empty: no fallback
+  @param {string} [default_tab_2_collection] - Collection handle for tab 2 when its setting is empty. Empty: no fallback
+  @param {string} [default_tab_3_collection] - Collection handle for tab 3 when its setting is empty. Empty: no fallback
+  @param {string} [default_tab_4_collection] - Collection handle for tab 4 when its setting is empty. Empty: no fallback
 
   @example
   {% block 'container', id: 'home-featured-collection', tag: 'div' %}
@@ -37,72 +63,66 @@
     assign source = collections[default_collection]
   endif
 
-  assign has_products = false
-  if source != blank and source.products_count > 0
-    assign has_products = true
-  endif
-
   assign limit = block.settings.products_to_show
   assign columns = block.settings.columns_desktop
   assign eyebrow = block.settings.eyebrow
   assign heading = block.settings.heading
   assign heading_id = id | default: block.id | append: '-heading'
-
-  assign show_view_all = false
-  if has_products and block.settings.show_view_all
-    assign show_view_all = true
-  endif
-  assign view_all_in_header = false
-  if show_view_all and block.settings.view_all_position == 'header'
-    assign view_all_in_header = true
-  endif
-
+  assign panel_id_prefix = id | default: block.id | append: '-panel-'
   assign image_sizes = '(min-width: 1280px) calc(1416px / ' | append: columns | append: '), (min-width: 768px) 33vw, 50vw'
+
+  assign tab_count = 0
+  assign any_products = false
+  assign first_source = nil
+  assign first_body = ''
+  assign tab_links = ''
+  assign hidden_panels = ''
 -%}
 
-{%- if show_view_all -%}
-  {%- assign collection_title = source.title | escape -%}
-  {%- capture view_all_link -%}
-    <a class="button button--secondary featured-collection__view-all" href="{{ source.url }}" data-testid="featured-collection-view-all">
-      {{- 'blocks.featured_collection.view_all' | t -}}
-      <span class="visually-hidden"> {{ 'blocks.featured_collection.view_all_suffix' | t: collection: collection_title }}</span>
-    </a>
-  {%- endcapture -%}
-{%- endif -%}
+{%- for tab_number in (1..4) -%}
+  {%- liquid
+    case tab_number
+      when 1
+        assign tab_source = source
+        assign tab_label = block.settings.tab_1_label
+      when 2
+        assign tab_source = block.settings.tab_2_collection
+        if tab_source == blank and default_tab_2_collection != blank
+          assign tab_source = collections[default_tab_2_collection]
+        endif
+        assign tab_label = block.settings.tab_2_label
+      when 3
+        assign tab_source = block.settings.tab_3_collection
+        if tab_source == blank and default_tab_3_collection != blank
+          assign tab_source = collections[default_tab_3_collection]
+        endif
+        assign tab_label = block.settings.tab_3_label
+      when 4
+        assign tab_source = block.settings.tab_4_collection
+        if tab_source == blank and default_tab_4_collection != blank
+          assign tab_source = collections[default_tab_4_collection]
+        endif
+        assign tab_label = block.settings.tab_4_label
+    endcase
 
-{%- if has_products or request.design_mode -%}
-  <section
-    class="featured-collection"
-    style="--columns: {{ columns }};"
-    {% if heading != blank %}
-      aria-labelledby="{{ heading_id }}"
-    {% endif %}
-    data-testid="featured-collection"
-    {{ block.shopify_attributes }}
-  >
-    {%- if eyebrow != blank or heading != blank or view_all_in_header -%}
-      <div class="featured-collection__header">
-        {%- if eyebrow != blank or heading != blank -%}
-          <div class="featured-collection__titles">
-            {%- if eyebrow != blank -%}
-              <p class="featured-collection__eyebrow">{{ eyebrow | escape }}</p>
-            {%- endif -%}
-            {%- if heading != blank -%}
-              <h2 class="featured-collection__heading" id="{{ heading_id }}" data-testid="featured-collection-heading">
-                {{- heading -}}
-              </h2>
-            {%- endif -%}
-          </div>
-        {%- endif -%}
-        {%- if view_all_in_header -%}
-          {{ view_all_link }}
-        {%- endif -%}
-      </div>
-    {%- endif -%}
+    if tab_source.handle == blank
+      continue
+    endif
 
-    {%- if has_products -%}
+    assign tab_count = tab_count | plus: 1
+
+    # The same product can sit in 2 tabs: input ids must stay unique after a clone
+    assign card_id_prefix = block.id
+    if tab_count > 1
+      assign card_id_prefix = block.id | append: '-tab-' | append: tab_count
+    endif
+  -%}
+
+  {%- capture tab_body -%}
+    {%- if tab_source.products_count > 0 -%}
+      {%- assign any_products = true -%}
       <ul class="featured-collection__grid" role="list" data-testid="featured-collection-grid">
-        {%- for item in source.products limit: limit -%}
+        {%- for item in tab_source.products limit: limit -%}
           {%- liquid
             assign card_product = item
             assign card_variant = nil
@@ -115,14 +135,128 @@
             {% render 'product-card',
               product: card_product,
               variant: card_variant,
-              id_prefix: block.id,
+              id_prefix: card_id_prefix,
               sizes: image_sizes,
               loading: 'lazy'
             %}
           </li>
         {%- endfor -%}
       </ul>
-      <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
+    {%- else -%}
+      <p class="featured-collection__empty" data-tab-empty data-testid="featured-collection-tab-empty">
+        {{- 'blocks.featured_collection.tab_empty' | t -}}
+      </p>
+    {%- endif -%}
+  {%- endcapture -%}
+
+  {%- capture tab_links -%}
+    {{- tab_links -}}
+    <a
+      class="featured-collection__tab"
+      href="{{ tab_source.url }}"
+      {% if tab_count == 1 %}
+        aria-current="true"
+      {% endif %}
+      data-tab="{{ tab_count }}"
+      data-testid="featured-collection-tab"
+    >
+      {{- tab_label | default: tab_source.title | escape -}}
+    </a>
+  {%- endcapture -%}
+
+  {%- if tab_count == 1 -%}
+    {%- assign first_source = tab_source -%}
+    {%- assign first_body = tab_body -%}
+  {%- else -%}
+    {%- capture hidden_panels -%}
+      {{- hidden_panels -}}
+      <div
+        class="featured-collection__panel"
+        id="{{ panel_id_prefix }}{{ tab_count }}"
+        hidden
+        data-tab-panel="{{ tab_count }}"
+        data-testid="featured-collection-panel"
+      >
+        <template data-tab-panel-template="{{ tab_count }}">
+          {{- tab_body -}}
+        </template>
+      </div>
+    {%- endcapture -%}
+  {%- endif -%}
+{%- endfor -%}
+
+{%- liquid
+  assign source = first_source
+
+  assign has_products = false
+  if source != blank and source.products_count > 0
+    assign has_products = true
+  endif
+
+  assign show_view_all = false
+  if has_products and block.settings.show_view_all
+    assign show_view_all = true
+  endif
+  assign view_all_in_header = false
+  if show_view_all and block.settings.view_all_position == 'header'
+    assign view_all_in_header = true
+  endif
+-%}
+
+{%- if show_view_all -%}
+  {%- assign collection_title = source.title | escape -%}
+  {%- capture view_all_link -%}
+    <a class="button button--secondary featured-collection__view-all" href="{{ source.url }}" data-testid="featured-collection-view-all">
+      {{- 'blocks.featured_collection.view_all' | t -}}
+      <span class="visually-hidden"> {{ 'blocks.featured_collection.view_all_suffix' | t: collection: collection_title }}</span>
+    </a>
+  {%- endcapture -%}
+{%- endif -%}
+
+{%- capture block_body -%}
+    {%- if tab_count > 1 or eyebrow != blank or heading != blank or view_all_in_header -%}
+      <div class="featured-collection__header{% if tab_count > 1 %} featured-collection__header--tabs{% endif %}">
+        {%- if eyebrow != blank or heading != blank -%}
+          <div class="featured-collection__titles">
+            {%- if eyebrow != blank -%}
+              <p class="featured-collection__eyebrow">{{ eyebrow | escape }}</p>
+            {%- endif -%}
+            {%- if heading != blank -%}
+              <h2 class="featured-collection__heading" id="{{ heading_id }}" data-testid="featured-collection-heading">
+                {{- heading -}}
+              </h2>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+        {%- if tab_count > 1 -%}
+          <div
+            class="featured-collection__tabs"
+            role="group"
+            aria-label="{{ 'blocks.featured_collection.tabs_label' | t }}"
+            data-tab-list
+            data-testid="featured-collection-tabs"
+          >
+            {{- tab_links -}}
+          </div>
+        {%- endif -%}
+        {%- if view_all_in_header -%}
+          {{ view_all_link }}
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+
+    {%- if tab_count > 1 -%}
+      <div
+        class="featured-collection__panel"
+        id="{{ panel_id_prefix }}1"
+        data-tab-panel="1"
+        data-testid="featured-collection-panel"
+      >
+        {{- first_body -}}
+      </div>
+      {{- hidden_panels -}}
+    {%- elsif has_products -%}
+      {{- first_body -}}
     {%- else -%}
       <div class="featured-collection__placeholder" data-testid="featured-collection-placeholder">
         <p class="featured-collection__hint">{{ 'blocks.featured_collection.placeholder' | t }}</p>
@@ -140,10 +274,37 @@
       </div>
     {%- endif -%}
 
+    {%- if any_products -%}
+      <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
+    {%- endif -%}
+
     {%- if show_view_all and view_all_in_header == false -%}
       <div class="featured-collection__footer">
         {{ view_all_link }}
       </div>
+    {%- endif -%}
+{%- endcapture -%}
+
+{%- if has_products or request.design_mode or tab_count > 1 -%}
+  <section
+    class="featured-collection"
+    style="--columns: {{ columns }};"
+    {% if heading != blank %}
+      aria-labelledby="{{ heading_id }}"
+    {% endif %}
+    {% if tab_count > 1 %}
+      data-collection-tabs
+    {% endif %}
+    data-testid="featured-collection"
+    {{ block.shopify_attributes }}
+  >
+    {%- if tab_count > 1 -%}
+      <collection-tabs data-lazy-module="{{ 'collection-tabs.js' | asset_url }}">
+        {{- block_body -}}
+        <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
+      </collection-tabs>
+    {%- else -%}
+      {{- block_body -}}
     {%- endif -%}
   </section>
 {%- endif -%}
@@ -165,7 +326,7 @@
       "max": 12,
       "step": 1,
       "label": "t:labels.products_to_show",
-      "default": 8
+      "default": 4
     },
     {
       "type": "range",
@@ -210,6 +371,52 @@
         }
       ],
       "default": "bottom"
+    },
+    {
+      "type": "text",
+      "id": "tab_1_label",
+      "label": "t:labels.featured_collection_tab_1_label",
+      "info": "t:info.featured_collection_tab_label",
+      "default": "All"
+    },
+    {
+      "type": "collection",
+      "id": "tab_2_collection",
+      "label": "t:labels.featured_collection_tab_2_collection",
+      "info": "t:info.featured_collection_tab_collection"
+    },
+    {
+      "type": "text",
+      "id": "tab_2_label",
+      "label": "t:labels.featured_collection_tab_2_label",
+      "info": "t:info.featured_collection_tab_label",
+      "default": "Weight"
+    },
+    {
+      "type": "collection",
+      "id": "tab_3_collection",
+      "label": "t:labels.featured_collection_tab_3_collection",
+      "info": "t:info.featured_collection_tab_collection"
+    },
+    {
+      "type": "text",
+      "id": "tab_3_label",
+      "label": "t:labels.featured_collection_tab_3_label",
+      "info": "t:info.featured_collection_tab_label",
+      "default": "Portable Fitness"
+    },
+    {
+      "type": "collection",
+      "id": "tab_4_collection",
+      "label": "t:labels.featured_collection_tab_4_collection",
+      "info": "t:info.featured_collection_tab_collection"
+    },
+    {
+      "type": "text",
+      "id": "tab_4_label",
+      "label": "t:labels.featured_collection_tab_4_label",
+      "info": "t:info.featured_collection_tab_label",
+      "default": "Accessories"
     }
   ]
 }

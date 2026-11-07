@@ -4,9 +4,12 @@
 // Trang tắt JS (nhóm nojs): không fetch trong trang được, dùng hàm *NoScript.
 // 429 sau khi thử lại: vẫn skip có lý do + 1 dòng log 'trả 429' để scripts/e2e-429-count.sh đếm trên CI.
 import { expect, test, type Page } from '@playwright/test';
+import { basename } from 'node:path';
 import { getJson } from './http';
+import { record429 } from './report-429';
+import { expectJsonAllowed, expectNotChallenged } from './store-guard';
 
-export type JsonResult<T> = { ok: boolean; status: number; body: T | null };
+export type JsonResult<T> = { ok: boolean; status: number; body: T | null; challenged?: boolean };
 export type ProductVariant = { id: number; available: boolean; price: number };
 export type ProductData = { id: number; handle: string; variants: ProductVariant[] };
 
@@ -42,9 +45,11 @@ export async function pageJson<T>(page: Page, path: string, attempts = 4): Promi
 
 // Lấy body; 429 sau khi thử lại → skip có lý do; lỗi khác → fail.
 export function requireJson<T>(r: JsonResult<T>, label: string): T {
+  expectJsonAllowed(r, label);
   if (r.status === 429) {
     const reason = `Shopify trả 429 cho ${label} sau khi thử lại (giới hạn store dev)`;
-    console.log(`[ES1-T100] ${reason}`);
+    console.log(`[ES1-T100] ${reason} (${basename(test.info().file)})`);
+    record429('skip', basename(test.info().file));
     test.skip(true, reason);
   }
   expect(r.ok && r.body !== null, `${label} trả ${r.status}`).toBeTruthy();
@@ -83,6 +88,7 @@ export async function readCartNoScript<T>(page: Page): Promise<T> {
   try {
     const helper = await sibling.newPage();
     await helper.goto(new URL('/cart', page.url()).toString(), { waitUntil: 'domcontentloaded' });
+    await expectNotChallenged(helper);
     return await readCartJson<T>(helper);
   } finally {
     await sibling.close();

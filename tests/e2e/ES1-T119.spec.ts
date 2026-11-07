@@ -4,6 +4,8 @@
 // Biến thể chạy trên /?view=te7 (templates/index.te7.liquid), mặc định schema chạy trên /.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
+import { watchShopPay403 } from './support/console-guard';
 
 const TE7 = '/?view=te7';
 const HOME = '/';
@@ -17,8 +19,10 @@ const question = (page: Page, id: string) => tid(item(page, id), 'faq-question')
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
@@ -27,6 +31,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
@@ -244,23 +249,22 @@ test.describe('ES1-T119 TE-7 FAQ', () => {
     });
   });
 
-  test('AC5 trang chủ: 5 câu mặc định gợi cách dùng, câu đầu mở, không số liệu Figma, không Lorem', async ({ page }) => {
+  test('AC5 trang chủ: 5 câu Figma, câu đầu mở, 2 ô stat có 360+, không chữ hướng dẫn, không Lorem', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
     const home = band(page, 'home-faq');
     await expect(home).toHaveClass(/block-container--cream/);
-    await expect(tid(home, 'faq-heading')).toHaveText('Add a heading for your questions');
+    await expect(tid(home, 'faq-heading')).toHaveText("We're Proud To Be The Best At Training");
     await expect(tid(home, 'faq-item')).toHaveCount(5);
     await expect(home.locator('details[open]')).toHaveCount(1);
     await expect(openItem(page, 'faq-1')).toHaveCount(1);
-    await expect(tid(home, 'faq-image')).toHaveCount(0);
-    await expect(tid(home, 'faq-stat-1')).toHaveCount(0);
-    await expect(tid(home, 'faq-stat-2')).toHaveCount(0);
+    await expect(tid(home, 'faq-image')).toHaveCount(1); // trang chủ đã nối ảnh (CTO 07/11)
+    await expect(tid(home, 'faq-stat-1')).toContainText('360+');
+    await expect(tid(home, 'faq-stat-2')).toBeVisible();
 
-    const text = (await home.innerText()).toLowerCase();
-    expect(text).toContain('add a question');
-    expect(text).not.toContain('lorem');
-    expect(text).not.toContain('360+');
+    const text = await home.innerText();
+    expect(text).not.toContain('Add a');
+    expect(text.toLowerCase()).not.toContain('lorem');
     await expectNoSeriousAxe(page);
     expect(errors).toEqual([]);
   });

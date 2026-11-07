@@ -136,7 +136,8 @@
         {% assign logo_render_width = block.settings.logo_width | times: 2 %}
         {% render 'image', image: logo, class: 'site-header__logo-image', width: logo_render_width %}
       {%- else -%}
-        {{- shop.name | escape -}}
+        <span class="visually-hidden">{{ shop.name | escape }}</span>
+        {%- render 'logo-efitco', class: 'site-header__logo-svg' -%}
       {%- endif -%}
     </a>
 
@@ -212,7 +213,7 @@
           menu="{{ block.settings.customer_account_menu }}"
           data-testid="header-account"
         >
-          {{ 'icon-account.svg' | inline_asset_content }}
+          <span slot="signed-out-avatar" class="site-header__account-icon">{{ 'icon-account.svg' | inline_asset_content }}</span>
         </shopify-account>
       {% endif %}
 

@@ -4,6 +4,8 @@
 // Biến thể chạy trên /?view=te7 (templates/index.te7.liquid), mặc định schema chạy trên /.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
+import { watchShopPay403 } from './support/console-guard';
 
 const TE7 = '/?view=te7';
 const HOME = '/';
@@ -14,8 +16,10 @@ const band = (page: Page, id: string) => page.getByTestId(`container-${id}`);
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
@@ -24,6 +28,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).analyze();
   const serious = violations.filter(
     (v) => v.impact === 'serious' || v.impact === 'critical' || v.id === 'color-contrast',
@@ -31,11 +36,13 @@ async function expectNoSeriousAxe(page: Page) {
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
 }
 
+// y tính theo tài liệu: mỗi lần gọi có thể cuộn trang, so y theo viewport giữa 2 lần gọi sẽ sai (ES1-T172).
 async function box(locator: Locator) {
   await locator.scrollIntoViewIfNeeded();
-  const value = await locator.boundingBox();
-  expect(value, 'phần tử phải có bounding box').not.toBeNull();
-  return value!;
+  return locator.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    return { x: rect.x, y: rect.y + window.scrollY, width: rect.width, height: rect.height };
+  });
 }
 
 async function expectNoPageOverflow(page: Page) {
@@ -237,7 +244,7 @@ test.describe('ES1-T120 TE-7 image with text', () => {
     expect(errors).toEqual([]);
   });
 
-  test('AC5 trang chủ: thứ tự Figma, 2 block có settings riêng, default gợi cách dùng', async ({ page }) => {
+  test('AC5 trang chủ: thứ tự Figma, 2 block có settings riêng, default theo Figma', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
     const inspiration = band(page, 'home-inspiration');
@@ -257,15 +264,18 @@ test.describe('ES1-T120 TE-7 image with text', () => {
 
     await expect(page.locator('[data-image-with-text-id="inspiration"]')).toHaveClass(/image-with-text--banner/);
     await expect(page.locator('[data-image-with-text-id="why-choose"]')).toHaveClass(/image-with-text--split/);
-    await expect(tid(whyChoose, 'image-with-text-image-placeholder')).toBeVisible();
+    // Trang chủ đã nối ảnh (CTO 07/11)
+    await expect(tid(whyChoose, 'image-with-text-image-placeholder')).toHaveCount(0);
     await expect(tid(inspiration, 'image-with-text-image-placeholder')).toHaveCount(0);
 
+    // ES1-T180: copy Figma thay chữ hướng dẫn (AC-H5). Hàng 13 có chữ efitco nên bỏ assert cũ; chi tiết copy ở ES1-T180.spec.ts.
+    await expect(tid(inspiration, 'image-with-text-heading')).toHaveText(/make fitness.*everyday life !/i);
+    await expect(tid(whyChoose, 'image-with-text-heading')).toHaveText(/why choose.*efitco\?/i);
     for (const scope of [inspiration, whyChoose]) {
-      await expect(tid(scope, 'image-with-text-heading')).toHaveText('Add a heading');
       await expect(tid(scope, 'image-with-text-button')).toHaveAttribute('href', /\/collections\/all$/);
       const text = (await scope.innerText()).toLowerCase();
       expect(text).not.toContain('lorem');
-      expect(text).not.toContain('efitco');
+      expect(text).not.toContain('add a');
     }
     await expectNoSeriousAxe(page);
     expect(errors).toEqual([]);

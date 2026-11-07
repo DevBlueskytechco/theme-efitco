@@ -4,6 +4,8 @@
 // Biến thể chạy trên /?view=te7 (templates/index.te7.liquid), mặc định schema chạy trên /.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
+import { watchShopPay403 } from './support/console-guard';
 
 const TE7 = '/?view=te7';
 const HOME = '/';
@@ -15,8 +17,10 @@ const column = (page: Page, id: string) => page.locator(`[data-multicolumn-colum
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     errors.push(msg.text());
   });
@@ -25,6 +29,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
@@ -198,17 +203,12 @@ test.describe('ES1-T121 TE-7 multicolumn, Custom Liquid', () => {
     await expect(tid(page, 'custom-liquid-placeholder')).toHaveCount(0);
   });
 
-  test('AC5 trang chủ: 3 cột mặc định gợi cách dùng, Custom Liquid rỗng không có band', async ({ page }) => {
+  test('AC5 trang chủ: không còn multicolumn, Custom Liquid (CR-5, ES1-T175)', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
-    const home = band(page, 'home-multicolumn');
-    await expect(tid(home, 'multicolumn-heading')).toHaveText('Add a heading for these columns');
-    await expect(tid(home, 'multicolumn-column')).toHaveCount(3);
-    await expect(tid(home, 'multicolumn-column-heading').first()).toHaveText('Add a short benefit');
-    await expect(tid(home, 'multicolumn-icon')).toHaveCount(0);
-    await expect(tid(home, 'multicolumn-image')).toHaveCount(0);
-    await expect(tid(home, 'multicolumn-link').first()).toHaveAttribute('href', /\/collections\/all\/?$/);
-    expect((await home.innerText()).toLowerCase()).not.toContain('lorem');
+    await expect(band(page, 'home-multicolumn')).toHaveCount(0);
+    await expect(tid(page, 'multicolumn-column')).toHaveCount(0);
+    await expect(tid(page, 'multicolumn-placeholder')).toHaveCount(0);
 
     await expect(band(page, 'home-custom-liquid')).toHaveCount(0);
     await expect(tid(page, 'custom-liquid')).toHaveCount(0);

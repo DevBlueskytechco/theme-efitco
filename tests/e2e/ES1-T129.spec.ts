@@ -4,6 +4,7 @@
 // JS chưa có (ES1-T130) nên test tự gọi showModal. Spec không click link khi có JS: sau BE1 click mở dialog, spec vẫn đúng.
 import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { expectNotChallenged } from './support/store-guard';
 
 const T = {
   link: 'header-search-link',
@@ -58,6 +59,7 @@ async function fillListbox(page: Page, count = 1) {
 
 // Phần còn lại của trang là inert khi dialog mở; axe trang đầy đủ đã có ở TE-1
 async function expectNoSeriousAxe(page: Page) {
+  await expectNotChallenged(page);
   const { violations } = await new AxeBuilder({ page }).include(`[data-testid="${T.dialog}"]`).analyze();
   const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
   expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);

@@ -27,6 +27,20 @@
   Rule: sold_out when the product or the variant is unavailable; sale when
   compare_at_price > price, label -N% (rounded) or Sale when N rounds to 0.
 
+  New badge (AC-H14, ES1-T174): product tag `new`, lowercase, exact match. It is
+  a separate element without data-card-badge, so assets/product-swatch.js leaves
+  it alone. Only 1 badge shows on the start corner, Sold out > -N% > New: CSS
+  hides New while `[data-card-badge]` is visible, also after a swatch change.
+
+  Rating badge (AC-H13): reviews.rating metafield, .value.rating over
+  .value.scale_max, brought to a scale of 5 as in blocks/featured-product. It sits
+  on the end corner. Without the metafield there is no badge and no default value.
+  Star and visible number are hidden from assistive tech; a translated
+  visually hidden sentence is read instead.
+
+  Test hooks for badges: product-card-badge-new, product-card-rating,
+  product-card-rating-value.
+
   Storefront event shopify:product:view (ES1-T76, TE-4 AC12): the card sits in
   <s-view-event view-event-trigger="intersect"> with product |
   standard_event_data, so the event fires when the card scrolls into view.
@@ -99,11 +113,30 @@
       assign badge_testid = 'product-card-badge'
   endcase
 
+  assign is_new = false
+  if product.tags contains 'new'
+    assign is_new = true
+  endif
+
+  assign rating_data = product.metafields.reviews.rating.value
+  assign rating_value = rating_data.rating
+  if rating_value != blank
+    assign rating_scale = rating_data.scale_max | plus: 0
+    if rating_scale <= 0
+      assign rating_scale = 5
+    endif
+    assign rating_on_five = rating_value | times: 5.0 | divided_by: rating_scale | round: 1
+  endif
+
+  # custom.swatch_colors: hex colors separated by commas, for a color option without native swatches
+  assign swatch_colors = product.metafields.custom.swatch_colors.value | split: ','
   assign swatch_option = nil
   for option in product.options_with_values
-    if option.values.size > 1 and option.values.first.swatch != blank
-      assign swatch_option = option
-      break
+    if option.values.size > 1
+      if option.values.first.swatch != blank or swatch_colors.size > 0
+        assign swatch_option = option
+        break
+      endif
     endif
   endfor
 
@@ -141,6 +174,19 @@
             data-card-image: 'card',
             data-testid: 'product-card-image'
         }}
+        {%- assign hover_media = product.media | where: 'media_type', 'image' -%}
+        {%- if variant == blank and hover_media.size > 1 and swatch_option == nil -%}
+          {{
+            hover_media[1]
+            | image_url: width: 720
+            | image_tag:
+              widths: '360, 720',
+              sizes: image_sizes,
+              loading: 'lazy',
+              alt: '',
+              class: 'product-card__image-hover'
+          }}
+        {%- endif -%}
       {%- else -%}
         <span class="product-card__placeholder" data-testid="product-card-placeholder-image">
           {{- 'product-1' | placeholder_svg_tag: 'product-card__placeholder-svg' -}}
@@ -159,6 +205,28 @@
     >
       {{- badge_label -}}
     </span>
+
+    {%- if is_new -%}
+      <span class="product-card__badge product-card__badge--new" data-testid="product-card-badge-new">
+        {{- 'products.card.new' | t -}}
+      </span>
+    {%- endif -%}
+
+    {%- if rating_value != blank -%}
+      <span class="product-card__rating" data-testid="product-card-rating">
+        <svg
+          class="product-card__rating-star"
+          viewBox="0 0 14 13"
+          fill="currentColor"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M13.9635 4.91254C13.8718 4.63786 13.6204 4.44277 13.3229 4.41679L9.28214 4.06127L7.68431 0.437487C7.56649 0.171911 7.29817 0 7.00006 0C6.70194 0 6.43362 0.171911 6.31581 0.438108L4.71797 4.06127L0.676558 4.41679C0.379615 4.44339 0.128816 4.63786 0.0366355 4.91254C-0.0555451 5.18723 0.0295857 5.48851 0.254216 5.67843L3.30856 8.27396L2.40791 12.1182C2.342 12.4008 2.45523 12.693 2.69727 12.8626C2.82737 12.9536 2.97958 13 3.13307 13C3.26541 13 3.39669 12.9654 3.5145 12.8971L7.00006 10.8786L10.4843 12.8971C10.7393 13.0457 11.0607 13.0322 11.3022 12.8626C11.5444 12.6925 11.6575 12.4002 11.5916 12.1182L10.6909 8.27396L13.7453 5.67895C13.9699 5.48851 14.0557 5.18775 13.9635 4.91254Z" />
+        </svg>
+        <span aria-hidden="true" data-testid="product-card-rating-value">{{ rating_on_five }}</span>
+        <span class="visually-hidden">{{ 'products.card.rating_label' | t: rating: rating_on_five }}</span>
+      </span>
+    {%- endif -%}
   </div>
 
   <{{ heading_tag }} class="product-card__title">
@@ -263,6 +331,8 @@
             style="--swatch-image: url({{ value.swatch.image | image_url: width: 64 }});"
           {% elsif value.swatch.color %}
             style="--swatch-color: {{ value.swatch.color }};"
+          {% elsif swatch_colors[forloop.index0] != blank %}
+            style="--swatch-color: {{ swatch_colors[forloop.index0] | strip }};"
           {% endif %}
         >
           <span class="visually-hidden">{{ value.name | escape }}</span>

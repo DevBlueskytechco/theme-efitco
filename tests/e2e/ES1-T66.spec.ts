@@ -8,6 +8,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
+import { watchShopPay403 } from './support/console-guard';
 
 const T = {
   form: 'product-form',
@@ -78,8 +79,10 @@ async function productJs(page: Page, handle: string): Promise<JsProduct> {
 
 function watchConsole(page: Page, ignoreNetwork = false) {
   const errors: string[] = [];
+  const isShopPay403 = watchShopPay403(page);
   page.on('console', (msg) => {
     if (msg.type() !== 'error') return;
+    if (isShopPay403(msg)) return;
     const text = msg.text();
     if (IGNORE_CONSOLE.some((r) => r.test(text) || r.test(msg.location().url))) return;
     if (ignoreNetwork && NETWORK_LOG.test(text)) return;
@@ -172,6 +175,8 @@ test.describe('ES1-T66 TE-4 variant picker', () => {
     // ES1-T81: không có import map → import thẳng URL CDN.
     expect(JS).toMatch(/import\(\s*"https:\/\/cdn\.shopify\.com\/storefront\/standard-events\.js"\s*\)/);
     expect(JS).not.toMatch(/["']@shopify\/standard-events["']/);
-    expect(JS).toMatch(/partials\.fetch\(\.\.\.REGIONS,/);
+    // ES1-T158: names = data-regions hoặc REGIONS.
+    expect(JS).toMatch(/regions \? regions\.split\(" "\) : REGIONS/);
+    expect(JS).toMatch(/partials\.fetch\(\.\.\.names,/);
   });
 });

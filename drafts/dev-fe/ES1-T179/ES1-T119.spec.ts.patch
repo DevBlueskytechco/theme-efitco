@@ -1,0 +1,35 @@
+diff --git a/tests/e2e/ES1-T119.spec.ts b/tests/e2e/ES1-T119.spec.ts
+index dfb1a29..33cf259 100644
+--- a/tests/e2e/ES1-T119.spec.ts
++++ b/tests/e2e/ES1-T119.spec.ts
+@@ -247,23 +247,22 @@ test.describe('ES1-T119 TE-7 FAQ', () => {
+     });
+   });
+ 
+-  test('AC5 trang chủ: 5 câu mặc định gợi cách dùng, câu đầu mở, không số liệu Figma, không Lorem', async ({ page }) => {
++  test('AC5 trang chủ: 5 câu Figma, câu đầu mở, 2 ô stat có 360+, không chữ hướng dẫn, không Lorem', async ({ page }) => {
+     const errors = watchConsole(page);
+     await page.goto(HOME);
+     const home = band(page, 'home-faq');
+     await expect(home).toHaveClass(/block-container--cream/);
+-    await expect(tid(home, 'faq-heading')).toHaveText('Add a heading for your questions');
++    await expect(tid(home, 'faq-heading')).toHaveText("We're Proud To Be The Best At Training");
+     await expect(tid(home, 'faq-item')).toHaveCount(5);
+     await expect(home.locator('details[open]')).toHaveCount(1);
+     await expect(openItem(page, 'faq-1')).toHaveCount(1);
+     await expect(tid(home, 'faq-image')).toHaveCount(0);
+-    await expect(tid(home, 'faq-stat-1')).toHaveCount(0);
+-    await expect(tid(home, 'faq-stat-2')).toHaveCount(0);
++    await expect(tid(home, 'faq-stat-1')).toContainText('360+');
++    await expect(tid(home, 'faq-stat-2')).toBeVisible();
+ 
+-    const text = (await home.innerText()).toLowerCase();
+-    expect(text).toContain('add a question');
+-    expect(text).not.toContain('lorem');
+-    expect(text).not.toContain('360+');
++    const text = await home.innerText();
++    expect(text).not.toContain('Add a');
++    expect(text.toLowerCase()).not.toContain('lorem');
+     await expectNoSeriousAxe(page);
+     expect(errors).toEqual([]);
+   });

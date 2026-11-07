@@ -1,12 +1,14 @@
 {% doc %}
-  Renders the theme's storefront footer: newsletter form, footer menu,
-  social links, Follow on Shop, localization, payment icons, trust bar,
-  wordmark, and copyright line. Works without JavaScript. Composed
-  directly in layout/theme.liquid so it appears on every page.
+  Renders the theme's storefront footer: newsletter band (optional image,
+  two-color heading, form, note), logo, description, footer menu, social
+  links, Follow on Shop, trust bar, wordmark, localization, payment icons,
+  and copyright line. Works without JavaScript. Composed directly in
+  layout/theme.liquid so it appears on every page.
 
   Social URLs are global settings (config/settings_schema.json, Social
-  group); everything else is a block setting. Self-contained: callers
-  must leave the body empty.
+  group); everything else is a block setting. An empty newsletter heading
+  uses the two-color sample from the locale, and an empty logo uses the shop
+  name. Self-contained: callers must leave the body empty.
 
   @example
   {% block 'footer' -%}{%- endblock %}
@@ -14,6 +16,9 @@
 
 {%- liquid
   assign menu_links = block.settings.menu.links
+  assign logo = block.settings.logo
+  assign newsletter_image = block.settings.newsletter_image
+  assign newsletter_heading = block.settings.newsletter_heading | strip
 
   assign social_networks = 'tiktok,instagram,youtube,facebook,x,pinterest' | split: ','
   assign has_social = false
@@ -50,61 +55,154 @@
 -%}
 
 <footer class="site-footer full-width" data-testid="footer" {{ block.shopify_attributes }}>
-  <div class="site-footer__inner">
-    <div class="site-footer__top">
-      <div class="site-footer__newsletter">
-        {%- if block.settings.newsletter_heading != blank -%}
-          <h2 class="site-footer__newsletter-heading">{{ block.settings.newsletter_heading | escape }}</h2>
+  <div class="site-footer__band{% if newsletter_image %} site-footer__band--media{% endif %}">
+    {%- if newsletter_image -%}
+      <div class="site-footer__newsletter-media">
+        {%- render 'image',
+          image: newsletter_image,
+          class: 'site-footer__newsletter-image',
+          width: 294,
+          height: 369,
+          crop: 'center',
+          widths: '98, 196, 294',
+          sizes: '98px',
+          testid: 'footer-newsletter-image'
+        -%}
+      </div>
+    {%- endif -%}
+
+    <div class="site-footer__newsletter">
+      <h2 class="site-footer__newsletter-heading" data-testid="footer-newsletter-heading">
+        {%- if newsletter_heading != blank -%}
+          {{- newsletter_heading | escape -}}
+        {%- else -%}
+          {{- 'blocks.footer.newsletter_heading_html' | t -}}
         {%- endif -%}
-        {%- if block.settings.newsletter_text != blank -%}
-          <p class="site-footer__newsletter-text">{{ block.settings.newsletter_text }}</p>
+      </h2>
+      {%- if block.settings.newsletter_text != blank -%}
+        <p class="site-footer__newsletter-text">{{ block.settings.newsletter_text }}</p>
+      {%- endif -%}
+    </div>
+
+    {%- form 'customer', id: 'footer-newsletter', class: 'site-footer__form', data-testid: 'footer-newsletter-form' -%}
+      <input type="hidden" name="contact[tags]" value="newsletter">
+      <div class="site-footer__field">
+        <label class="site-footer__hidden-label" for="footer-newsletter-email">
+          {{- 'blocks.footer.newsletter_email' | t -}}
+        </label>
+        <input
+          class="site-footer__input"
+          id="footer-newsletter-email"
+          type="email"
+          name="contact[email]"
+          autocomplete="email"
+          autocapitalize="off"
+          spellcheck="false"
+          required
+          placeholder="{{ 'blocks.footer.newsletter_email' | t }}"
+          data-testid="footer-newsletter-email"
+          {% if form.errors %}
+            value="{{ form.email | escape }}"
+            aria-invalid="true"
+            aria-describedby="footer-newsletter-error"
+          {% endif %}
+        >
+        <button class="site-footer__submit" type="submit" data-testid="footer-newsletter-submit">
+          {%- render 'slideshow-icon', name: 'send' -%}
+          <span>{{ 'blocks.footer.newsletter_submit' | t }}</span>
+        </button>
+      </div>
+
+      <p class="site-footer__invalid" data-testid="footer-newsletter-invalid">{{ 'blocks.footer.newsletter_invalid' | t }}</p>
+      <p class="site-footer__note" data-testid="footer-newsletter-note">
+        {{- 'blocks.footer.newsletter_note' | t -}}
+      </p>
+
+      {%- if form.errors -%}
+        <div
+          class="site-footer__message site-footer__message--error"
+          id="footer-newsletter-error"
+          role="alert"
+          data-testid="footer-newsletter-error"
+        >
+          {{ form.errors | default_errors }}
+        </div>
+      {%- endif -%}
+
+      {%- if form.posted_successfully? -%}
+        <p class="site-footer__message" role="status" data-testid="footer-newsletter-success">
+          {{- 'blocks.footer.newsletter_success' | t -}}
+        </p>
+      {%- endif -%}
+    {%- endform -%}
+  </div>
+
+  <div class="site-footer__main">
+    <div class="site-footer__main-top">
+      <div class="site-footer__brand">
+        <a
+          class="site-footer__logo"
+          href="{{ routes.root_url }}"
+          data-testid="footer-logo"
+          {% if logo %}
+            aria-label="{{ shop.name | escape }}"
+            style="--logo-width: {{ block.settings.logo_width }}px;"
+          {% endif %}
+        >
+          {%- if logo -%}
+            {%- assign logo_render_width = block.settings.logo_width | times: 2 -%}
+            {%- render 'image', image: logo, class: 'site-footer__logo-image', width: logo_render_width -%}
+          {%- else -%}
+            <span class="visually-hidden">{{ shop.name | escape }}</span>
+            {%- render 'logo-efitco', class: 'site-footer__logo-svg' -%}
+          {%- endif -%}
+        </a>
+
+        {%- if block.settings.description != blank -%}
+          <p class="site-footer__description" data-testid="footer-description">{{ block.settings.description }}</p>
         {%- endif -%}
 
-        {%- form 'customer', id: 'footer-newsletter', class: 'site-footer__form', data-testid: 'footer-newsletter-form' -%}
-          <input type="hidden" name="contact[tags]" value="newsletter">
-          <div class="site-footer__field">
-            <label class="site-footer__hidden-label" for="footer-newsletter-email">
-              {{- 'blocks.footer.newsletter_email' | t -}}
-            </label>
-            <input
-              class="site-footer__input"
-              id="footer-newsletter-email"
-              type="email"
-              name="contact[email]"
-              autocomplete="email"
-              autocapitalize="off"
-              spellcheck="false"
-              required
-              placeholder="{{ 'blocks.footer.newsletter_email' | t }}"
-              data-testid="footer-newsletter-email"
-              {% if form.errors %}
-                value="{{ form.email | escape }}"
-                aria-invalid="true"
-                aria-describedby="footer-newsletter-error"
-              {% endif %}
-            >
-            <button class="site-footer__submit" type="submit" data-testid="footer-newsletter-submit">
-              {{- 'blocks.footer.newsletter_submit' | t -}}
-            </button>
-          </div>
-
-          {%- if form.errors -%}
-            <div
-              class="site-footer__message site-footer__message--error"
-              id="footer-newsletter-error"
-              role="alert"
-              data-testid="footer-newsletter-error"
-            >
-              {{ form.errors | default_errors }}
-            </div>
+        <div class="site-footer__follow-group">
+          {%- if has_social -%}
+            <ul class="site-footer__social" aria-label="{{ 'blocks.footer.social_label' | t }}">
+              {%- for network in social_networks -%}
+                {%- assign social_key = 'social_' | append: network | append: '_link' -%}
+                {%- if settings[social_key] != blank -%}
+                  {%- case network -%}
+                    {%- when 'tiktok' -%}
+                      {%- assign social_name = 'blocks.footer.social.tiktok' | t -%}
+                    {%- when 'instagram' -%}
+                      {%- assign social_name = 'blocks.footer.social.instagram' | t -%}
+                    {%- when 'youtube' -%}
+                      {%- assign social_name = 'blocks.footer.social.youtube' | t -%}
+                    {%- when 'facebook' -%}
+                      {%- assign social_name = 'blocks.footer.social.facebook' | t -%}
+                    {%- when 'x' -%}
+                      {%- assign social_name = 'blocks.footer.social.x' | t -%}
+                    {%- when 'pinterest' -%}
+                      {%- assign social_name = 'blocks.footer.social.pinterest' | t -%}
+                  {%- endcase -%}
+                  <li>
+                    <a
+                      class="site-footer__social-link"
+                      href="{{ settings[social_key] }}"
+                      aria-label="{{ social_name }}"
+                      data-testid="footer-social-link"
+                    >
+                      {%- render 'icon-social', network: network -%}
+                    </a>
+                  </li>
+                {%- endif -%}
+              {%- endfor -%}
+            </ul>
+          {%- elsif request.design_mode -%}
+            <p class="site-footer__placeholder">{{ 'blocks.footer.social_placeholder' | t }}</p>
           {%- endif -%}
 
-          {%- if form.posted_successfully? -%}
-            <p class="site-footer__message" role="status" data-testid="footer-newsletter-success">
-              {{- 'blocks.footer.newsletter_success' | t -}}
-            </p>
+          {%- if shop.features.follow_on_shop? -%}
+            <div class="site-footer__shop-follow">{{ shop | login_button: action: 'follow' }}</div>
           {%- endif -%}
-        {%- endform -%}
+        </div>
       </div>
 
       {%- if menu_links.size > 0 -%}
@@ -148,126 +246,6 @@
       {%- endif -%}
     </div>
 
-    <div class="site-footer__meta">
-      <div class="site-footer__follow-group">
-        {%- if has_social -%}
-          <ul class="site-footer__social" aria-label="{{ 'blocks.footer.social_label' | t }}">
-            {%- for network in social_networks -%}
-              {%- assign social_key = 'social_' | append: network | append: '_link' -%}
-              {%- if settings[social_key] != blank -%}
-                {%- case network -%}
-                  {%- when 'tiktok' -%}
-                    {%- assign social_name = 'blocks.footer.social.tiktok' | t -%}
-                  {%- when 'instagram' -%}
-                    {%- assign social_name = 'blocks.footer.social.instagram' | t -%}
-                  {%- when 'youtube' -%}
-                    {%- assign social_name = 'blocks.footer.social.youtube' | t -%}
-                  {%- when 'facebook' -%}
-                    {%- assign social_name = 'blocks.footer.social.facebook' | t -%}
-                  {%- when 'x' -%}
-                    {%- assign social_name = 'blocks.footer.social.x' | t -%}
-                  {%- when 'pinterest' -%}
-                    {%- assign social_name = 'blocks.footer.social.pinterest' | t -%}
-                {%- endcase -%}
-                <li>
-                  <a
-                    class="site-footer__social-link"
-                    href="{{ settings[social_key] }}"
-                    aria-label="{{ social_name }}"
-                    data-testid="footer-social-link"
-                  >
-                    {%- render 'icon-social', network: network -%}
-                  </a>
-                </li>
-              {%- endif -%}
-            {%- endfor -%}
-          </ul>
-        {%- elsif request.design_mode -%}
-          <p class="site-footer__placeholder">{{ 'blocks.footer.social_placeholder' | t }}</p>
-        {%- endif -%}
-
-        {%- if shop.features.follow_on_shop? -%}
-          <div class="site-footer__shop-follow">{{ shop | login_button: action: 'follow' }}</div>
-        {%- endif -%}
-      </div>
-
-      <div class="site-footer__commerce-group">
-        {%- if show_countries or show_languages -%}
-          {%- form 'localization', id: 'footer-localization', class: 'site-footer__localization' -%}
-            <details class="site-footer__disclosure">
-              <summary class="site-footer__summary" data-testid="footer-localization-toggle">
-                <span class="site-footer__hidden-label">{{ 'blocks.footer.localization_label' | t }}</span>
-                {{ localization.country.currency.iso_code }} / {{ localization.language.iso_code | upcase }}
-              </summary>
-
-              <div class="site-footer__panel">
-                {%- if show_countries -%}
-                  <div class="site-footer__panel-group" data-testid="footer-country-selector">
-                    <p class="site-footer__panel-heading" id="footer-country-heading">
-                      {{- 'blocks.footer.country_label' | t -}}
-                    </p>
-                    <ul class="site-footer__options" aria-labelledby="footer-country-heading">
-                      {%- for country in localization.available_countries -%}
-                        <li>
-                          <button
-                            class="site-footer__option"
-                            type="submit"
-                            name="country_code"
-                            value="{{ country.iso_code }}"
-                            data-testid="footer-country-option"
-                            {% if country.iso_code == localization.country.iso_code %}
-                              aria-current="true"
-                            {% endif %}
-                          >
-                            {{- country.name | escape }} ({{ country.currency.iso_code }} {{ country.currency.symbol -}})
-                          </button>
-                        </li>
-                      {%- endfor -%}
-                    </ul>
-                  </div>
-                {%- endif -%}
-
-                {%- if show_languages -%}
-                  <div class="site-footer__panel-group" data-testid="footer-language-selector">
-                    <p class="site-footer__panel-heading" id="footer-language-heading">
-                      {{- 'blocks.footer.language_label' | t -}}
-                    </p>
-                    <ul class="site-footer__options" aria-labelledby="footer-language-heading">
-                      {%- for language in localization.available_languages -%}
-                        <li>
-                          <button
-                            class="site-footer__option"
-                            type="submit"
-                            name="language_code"
-                            value="{{ language.iso_code }}"
-                            lang="{{ language.iso_code }}"
-                            data-testid="footer-language-option"
-                            {% if language.iso_code == localization.language.iso_code %}
-                              aria-current="true"
-                            {% endif %}
-                          >
-                            {{- language.endonym_name | escape -}}
-                          </button>
-                        </li>
-                      {%- endfor -%}
-                    </ul>
-                  </div>
-                {%- endif -%}
-              </div>
-            </details>
-          {%- endform -%}
-        {%- endif -%}
-
-        {%- if show_payment_icons -%}
-          <ul class="site-footer__payment" aria-label="{{ 'blocks.footer.payment_label' | t }}">
-            {%- for type in shop.enabled_payment_types -%}
-              <li data-testid="footer-payment-icon">{{ type | payment_type_svg_tag }}</li>
-            {%- endfor -%}
-          </ul>
-        {%- endif -%}
-      </div>
-    </div>
-
     {%- if has_trust_items -%}
       <ul class="site-footer__trust" aria-label="{{ 'blocks.footer.trust_label' | t }}">
         {%- for index in (1..4) -%}
@@ -285,15 +263,103 @@
     {%- elsif request.design_mode -%}
       <p class="site-footer__placeholder">{{ 'blocks.footer.trust_placeholder' | t }}</p>
     {%- endif -%}
+  </div>
+
+  <div class="site-footer__bottom">
+    <div class="site-footer__copyright">
+      &copy;
+      {{ 'now' | date: '%Y' }}
+      {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
+    </div>
 
     {%- if block.settings.show_wordmark -%}
       <p class="site-footer__wordmark">{{ shop.name | escape }}</p>
     {%- endif -%}
 
-    <div class="site-footer__copyright">
-      &copy;
-      {{ 'now' | date: '%Y' }}
-      {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
+    <div class="site-footer__commerce-group">
+      {%- if show_countries or show_languages -%}
+        {%- form 'localization', id: 'footer-localization', class: 'site-footer__localization' -%}
+          <details class="site-footer__disclosure">
+            <summary class="site-footer__summary" data-testid="footer-localization-toggle">
+              <span class="site-footer__hidden-label">{{ 'blocks.footer.localization_label' | t }}</span>
+              {{ localization.country | image_url: width: 52 | image_tag: class: 'site-footer__flag', width: 26, height: 26, alt: '', loading: 'lazy' }}
+              <span>{{ localization.country.currency.iso_code }} / {{ localization.language.iso_code | upcase }}</span>
+              <svg aria-hidden="true" focusable="false" class="site-footer__chevron" width="9" height="5" viewBox="0 0 9 5" fill="none"><path d="M0.17192 0.168975C0.401146 -0.0563249 0.77273 -0.0563249 1.00196 0.168975L4.49999 3.60715L7.998 0.168975C8.22722 -0.056325 8.59887 -0.056325 8.82809 0.168975C9.0573 0.394275 9.0573 0.759568 8.82809 0.984845L4.91501 4.831C4.80497 4.93923 4.65565 5 4.49999 5C4.34433 5 4.19501 4.93923 4.08497 4.831L0.17192 0.984845C-0.0573072 0.759568 -0.0573072 0.394275 0.17192 0.168975Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>
+            </summary>
+
+            <div class="site-footer__panel">
+              {%- if show_countries -%}
+                <div class="site-footer__panel-group" data-testid="footer-country-selector">
+                  <p class="site-footer__panel-heading" id="footer-country-heading">
+                    {{- 'blocks.footer.country_label' | t -}}
+                  </p>
+                  <ul class="site-footer__options" aria-labelledby="footer-country-heading">
+                    {%- for country in localization.available_countries -%}
+                      <li>
+                        <button
+                          class="site-footer__option"
+                          type="submit"
+                          name="country_code"
+                          value="{{ country.iso_code }}"
+                          data-testid="footer-country-option"
+                          {% if country.iso_code == localization.country.iso_code %}
+                            aria-current="true"
+                          {% endif %}
+                        >
+                          {{- country.name | escape }} ({{ country.currency.iso_code }} {{ country.currency.symbol -}})
+                        </button>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </div>
+              {%- endif -%}
+
+              {%- if show_languages -%}
+                <div class="site-footer__panel-group" data-testid="footer-language-selector">
+                  <p class="site-footer__panel-heading" id="footer-language-heading">
+                    {{- 'blocks.footer.language_label' | t -}}
+                  </p>
+                  <ul class="site-footer__options" aria-labelledby="footer-language-heading">
+                    {%- for language in localization.available_languages -%}
+                      <li>
+                        <button
+                          class="site-footer__option"
+                          type="submit"
+                          name="language_code"
+                          value="{{ language.iso_code }}"
+                          lang="{{ language.iso_code }}"
+                          data-testid="footer-language-option"
+                          {% if language.iso_code == localization.language.iso_code %}
+                            aria-current="true"
+                          {% endif %}
+                        >
+                          {{- language.endonym_name | escape -}}
+                        </button>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </div>
+              {%- endif -%}
+            </div>
+          </details>
+        {%- endform -%}
+      {%- endif -%}
+
+      {%- assign figma_pay = images['efx-pay-1.png'] -%}
+      {%- if figma_pay != blank -%}
+        <ul class="site-footer__payment site-footer__payment--images" aria-label="{{ 'blocks.footer.payment_label' | t }}">
+          {%- for n in (1..5) -%}
+            {%- assign pay_name = 'efx-pay-' | append: n | append: '.png' -%}
+            <li data-testid="footer-payment-icon">{{ images[pay_name] | image_url: width: 64 | image_tag: width: 32, height: 22, alt: '', loading: 'lazy' }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- elsif show_payment_icons -%}
+        <ul class="site-footer__payment" aria-label="{{ 'blocks.footer.payment_label' | t }}">
+          {%- for type in shop.enabled_payment_types -%}
+            <li data-testid="footer-payment-icon">{{ type | payment_type_svg_tag }}</li>
+          {%- endfor -%}
+        </ul>
+      {%- endif -%}
     </div>
   </div>
 </footer>
@@ -322,14 +388,42 @@
       "default": true
     },
     {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "t:labels.logo",
+      "info": "t:info.logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "label": "t:labels.logo_width",
+      "min": 60,
+      "max": 240,
+      "step": 2,
+      "unit": "px",
+      "default": 86
+    },
+    {
+      "type": "inline_richtext",
+      "id": "description",
+      "label": "t:labels.footer_description",
+      "default": "Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence."
+    },
+    {
       "type": "header",
       "content": "t:general.newsletter"
+    },
+    {
+      "type": "image_picker",
+      "id": "newsletter_image",
+      "label": "t:labels.newsletter_image",
+      "info": "t:info.newsletter_image"
     },
     {
       "type": "text",
       "id": "newsletter_heading",
       "label": "t:labels.newsletter_heading",
-      "default": "Get 15% Off Your First Order"
+      "info": "t:info.sample_text"
     },
     {
       "type": "inline_richtext",

@@ -14,18 +14,24 @@ function trackErrors(page: Page): string[] {
   return errors;
 }
 
-// Setting autoplay mặc định tắt: sửa HTML trang chủ thay vì đổi cấu hình store.
+// Setting autoplay mặc định tắt: đổi thuộc tính ngay trước connectedCallback thay vì đổi cấu hình store.
+// Không dùng route.fetch: gọi lại store từ Node nhận trang bot protection "Your connection needs to be verified" (ES1-T171).
+// Chỉ đổi thuộc tính markup đã có: block mất hook data-autoplay thì autoplay không bật và test fail.
 async function enableAutoplay(page: Page) {
-  await page.route(url => url.pathname === '/', async route => {
-    const response = await route.fetch();
-    const body = (await response.text())
-      .replace(/data-autoplay="false"/, 'data-autoplay="true"')
-      .replace(/data-autoplay-speed="\d+"/, `data-autoplay-speed="${SPEED_SECONDS}"`);
-    const headers = { ...response.headers() };
-    delete headers['content-encoding']; // body đã giải nén, giữ header thì trình duyệt giải nén lần 2
-    delete headers['content-length'];
-    await route.fulfill({ response, body, headers });
-  });
+  await page.addInitScript(speed => {
+    const define = customElements.define;
+    customElements.define = function (name, element, options) {
+      if (name === 'slideshow-carousel') {
+        const connected = element.prototype.connectedCallback;
+        element.prototype.connectedCallback = function (this: HTMLElement) {
+          if (this.hasAttribute('data-autoplay')) this.setAttribute('data-autoplay', 'true');
+          if (this.hasAttribute('data-autoplay-speed')) this.setAttribute('data-autoplay-speed', String(speed));
+          connected.call(this);
+        };
+      }
+      define.call(customElements, name, element, options);
+    };
+  }, SPEED_SECONDS);
 }
 
 async function open(page: Page) {
@@ -45,7 +51,8 @@ async function moveMouseAway(page: Page) {
 }
 
 test.describe('ES1-T30 điều hướng', () => {
-  test('next, prev, chấm đổi slide, aria-current và inert đi cùng nhau', async ({ page }) => {
+  test('next, prev, chấm đổi slide, aria-current và inert đi cùng nhau', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'Mobile ẩn next, back theo CTO 07/11; dot kiểm ở ES1-T235');
     const errors = trackErrors(page);
     const count = await open(page);
     const dots = page.getByTestId('slideshow-dot');
@@ -61,12 +68,16 @@ test.describe('ES1-T30 điều hướng', () => {
     await page.getByTestId('slideshow-prev').click();
     await expect.poll(() => activeIndex(page)).toBe(0);
 
-    await dots.nth(count - 1).click();
-    await expect.poll(() => activeIndex(page)).toBe(count - 1);
+    // Trang chủ không autoplay ẩn chấm theo Figma (CTO 07/11); chấm chỉ hiện khi bật autoplay
+    if (await dots.nth(count - 1).isVisible()) {
+      await dots.nth(count - 1).click();
+      await expect.poll(() => activeIndex(page)).toBe(count - 1);
+    }
     expect(errors).toEqual([]);
   });
 
-  test('next ở slide cuối về đầu, prev ở đầu về cuối', async ({ page }) => {
+  test('next ở slide cuối về đầu, prev ở đầu về cuối', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'Mobile ẩn next, back theo CTO 07/11; dot kiểm ở ES1-T235');
     const count = await open(page);
     await page.getByTestId('slideshow-prev').click();
     await expect.poll(() => activeIndex(page)).toBe(count - 1);
@@ -93,7 +104,8 @@ test.describe('ES1-T30 điều hướng', () => {
     }
   });
 
-  test('a11y: nhãn slide, nhãn chấm, live region báo khi đổi slide', async ({ page }) => {
+  test('a11y: nhãn slide, nhãn chấm, live region báo khi đổi slide', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'Mobile ẩn next, back theo CTO 07/11; dot kiểm ở ES1-T235');
     const count = await open(page);
     const root = page.getByTestId('slideshow');
     const slides = page.getByTestId('slideshow-slide');
@@ -231,7 +243,8 @@ test.describe('ES1-T30 autoplay', () => {
     expect(await activeIndex(page)).toBe(0);
   });
 
-  test('reduced-motion: không tự chạy, nút ở trạng thái play, next nhảy ngay', async ({ page }) => {
+  test('reduced-motion: không tự chạy, nút ở trạng thái play, next nhảy ngay', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'Mobile ẩn next, back theo CTO 07/11; dot kiểm ở ES1-T235');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await enableAutoplay(page);
     await open(page);

@@ -3,6 +3,7 @@ on:
   push:
     branches: [develop]   # nhánh feature chạy qua pull_request, tránh chạy 2 lần
   pull_request:
+  workflow_dispatch:   # chạy đủ store-tests trên develop dù công tắc đang tắt: gh workflow run CI --ref develop
 jobs:
   theme-check:
     runs-on: ubuntu-latest
@@ -85,8 +86,10 @@ jobs:
   # Mỗi lần 1 PR dùng store: e2e + lhci song song của nhiều PR gây 429 và trang bot protection (ES1-T162).
   # theme-check, preview vẫn song song. Group giữ 1 chạy + 1 chờ: run thứ 3 vào hàng thì run đang chờ bị huỷ,
   # check lighthouse, e2e của run đó đỏ và phải chạy lại (docs/runbook.md mục 9).
+  # CTO 06/11: đợt trang chủ tắt e2e + lighthouse để tăng tốc: vars.RUN_STORE_TESTS = false. Bật lại: gh variable delete RUN_STORE_TESTS.
   store-tests:
     needs: preview
+    if: github.event_name == 'workflow_dispatch' || vars.RUN_STORE_TESTS != 'false'
     concurrency: { group: store-hoa-qua-e2e, cancel-in-progress: false }
     uses: ./.github/workflows/store-tests.yml
     with:
@@ -101,8 +104,12 @@ jobs:
     env:
       RESULT: ${{ needs.store-tests.outputs.lighthouse_result }}
       GROUP_RESULT: ${{ needs.store-tests.result }}
+      STORE_TESTS: ${{ vars.RUN_STORE_TESTS }}
+      EVENT: ${{ github.event_name }}
     steps:
-      - run: '[ "$RESULT" = "success" ] || { echo "::error::lighthouse: ${RESULT:-không chạy} (store-tests: $GROUP_RESULT)"; exit 1; }'
+      - run: |
+          if [ "$GROUP_RESULT" = "skipped" ] && [ "$STORE_TESTS" = "false" ] && [ "$EVENT" != "workflow_dispatch" ]; then echo "::warning::CHƯA CHẠY lighthouse: công tắc RUN_STORE_TESTS tắt (CTO 06/11). Check này pass KHÔNG có nghĩa đã kiểm."; exit 0; fi
+          [ "$RESULT" = "success" ] || { echo "::error::lighthouse: ${RESULT:-không chạy} (store-tests: $GROUP_RESULT)"; exit 1; }
   e2e:
     needs: store-tests
     if: always()
@@ -110,5 +117,9 @@ jobs:
     env:
       RESULT: ${{ needs.store-tests.outputs.e2e_result }}
       GROUP_RESULT: ${{ needs.store-tests.result }}
+      STORE_TESTS: ${{ vars.RUN_STORE_TESTS }}
+      EVENT: ${{ github.event_name }}
     steps:
-      - run: '[ "$RESULT" = "success" ] || { echo "::error::e2e desktop/mobile: ${RESULT:-không chạy} (store-tests: $GROUP_RESULT)"; exit 1; }'
+      - run: |
+          if [ "$GROUP_RESULT" = "skipped" ] && [ "$STORE_TESTS" = "false" ] && [ "$EVENT" != "workflow_dispatch" ]; then echo "::warning::CHƯA CHẠY e2e: công tắc RUN_STORE_TESTS tắt (CTO 06/11). Check này pass KHÔNG có nghĩa đã kiểm."; exit 0; fi
+          [ "$RESULT" = "success" ] || { echo "::error::e2e desktop/mobile: ${RESULT:-không chạy} (store-tests: $GROUP_RESULT)"; exit 1; }

@@ -1,0 +1,25 @@
+diff --git a/tests/e2e/ES1-T121.spec.ts b/tests/e2e/ES1-T121.spec.ts
+--- a/tests/e2e/ES1-T121.spec.ts
++++ b/tests/e2e/ES1-T121.spec.ts
+@@ -201,17 +201,12 @@ test.describe('ES1-T121 TE-7 multicolumn, Custom Liquid', () => {
+     await expect(tid(page, 'custom-liquid-placeholder')).toHaveCount(0);
+   });
+ 
+-  test('AC5 trang chủ: 3 cột mặc định gợi cách dùng, Custom Liquid rỗng không có band', async ({ page }) => {
++  test('AC5 trang chủ: không còn multicolumn, Custom Liquid (CR-5, ES1-T175)', async ({ page }) => {
+     const errors = watchConsole(page);
+     await page.goto(HOME);
+-    const home = band(page, 'home-multicolumn');
+-    await expect(tid(home, 'multicolumn-heading')).toHaveText('Add a heading for these columns');
+-    await expect(tid(home, 'multicolumn-column')).toHaveCount(3);
+-    await expect(tid(home, 'multicolumn-column-heading').first()).toHaveText('Add a short benefit');
+-    await expect(tid(home, 'multicolumn-icon')).toHaveCount(0);
+-    await expect(tid(home, 'multicolumn-image')).toHaveCount(0);
+-    await expect(tid(home, 'multicolumn-link').first()).toHaveAttribute('href', /\/collections\/all\/?$/);
+-    expect((await home.innerText()).toLowerCase()).not.toContain('lorem');
++    await expect(band(page, 'home-multicolumn')).toHaveCount(0);
++    await expect(tid(page, 'multicolumn-column')).toHaveCount(0);
++    await expect(tid(page, 'multicolumn-placeholder')).toHaveCount(0);
+ 
+     await expect(band(page, 'home-custom-liquid')).toHaveCount(0);
+     await expect(tid(page, 'custom-liquid')).toHaveCount(0);
