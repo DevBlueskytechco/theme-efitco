@@ -1,7 +1,16 @@
 {% doc %}
-  Collection filter form (TE-6 AC2, AC4, ES1-T103 D5, D6). Reads the global
-  `collection`. Works without JavaScript: the form submits with GET and the drawer
-  is a native popover.
+  Storefront filter form (TE-6 AC2, AC4, ES1-T103 D5, D6), shared by the
+  collection and search pages (TE-8 AC2, ES1-T123 D4). Works without JavaScript:
+  the form submits with GET and the drawer is a native popover.
+
+  Source of filters:
+  - No action_url (collection template): the global `collection`, its
+    filters, collection.url as form action and Clear all link.
+  - action_url set (templates/search.liquid): the `filters` param, action_url,
+    clear_url for Clear all. The body ({{ content }}) goes inside the form, so
+    the template passes hidden inputs (q, type, options[prefix]) that the GET
+    submit and FormData keep.
+  Neither: a hint in the theme editor, nothing on the storefront.
 
   Below 64rem the `dialog popover` is a drawer, opened by collection-filter-open
   in blocks/collection-products.liquid. From 64rem CSS turns it into the left
@@ -21,7 +30,9 @@
   JS hooks: form id collection-filter-form, dialog id collection-filter-drawer,
   on the form data-collection-id (empty on /collections/all; plain id, not a GID),
   data-collection-handle, data-products-count (all_products_count, before
-  filtering) for shopify:collection:update (ES1-T104 #6). The form is novalidate:
+  filtering) for shopify:collection:update (ES1-T104 #6). The 3 data-collection-*
+  hooks render only in collection mode, so JS skips that event on /search
+  (ES1-T110 comment of ES1-T123). The form is novalidate:
   a price from the URL above range_max would otherwise block a submit silently
   inside the closed drawer. BE checks min and max before fetching (ES1-T111).
 
@@ -29,7 +40,10 @@
   collection-filter-close, collection-filter-form, collection-filter-apply,
   collection-filter-clear, and the hooks of snippets/filter-group.liquid.
 
-  Self-contained: callers must leave the body empty.
+  @param {filter[]} [filters] - Filters when action_url is set, such as search.filters
+  @param {string} [action_url] - Form action, such as routes.search_url. Empty: collection mode
+  @param {string} [clear_url] - Clear all link when action_url is set. Default: action_url
+  @param {string} [content] - Hidden inputs to submit with the filters. Empty on the collection template
 
   @example
   {% block 'container', id: 'collection-main' %}
@@ -38,9 +52,34 @@
       {% block 'collection-products' %}{% endblock %}
     </collection-filters>
   {% endblock %}
+
+  @example Search page
+  {% block 'collection-filters', filters: search.filters, action_url: routes.search_url, clear_url: clear_url %}
+    <input type="hidden" name="q" value="{{ search.terms | escape }}">
+  {% endblock %}
 {% enddoc %}
 
-{%- if collection == blank -%}
+{%- liquid
+  assign collection_mode = false
+  assign has_source = false
+  if action_url != blank
+    assign has_source = true
+    assign source_filters = filters
+    assign form_action = action_url
+    assign form_clear_url = clear_url | default: action_url
+  elsif collection != blank
+    assign has_source = true
+    assign collection_mode = true
+    assign source_filters = collection.filters
+    assign form_action = collection.url
+    assign form_clear_url = collection.url
+  endif
+
+  # .size of nil is nil, and nil == 0 is false
+  assign filter_total = source_filters.size | default: 0
+-%}
+
+{%- if has_source == false -%}
   {%- if request.design_mode -%}
     <div class="collection-filters__hint" {{ block.shopify_attributes }}>
       {{ 'blocks.collection_filters.placeholder' | t }}
@@ -48,20 +87,15 @@
   {%- endif -%}
 {%- else -%}
   {%- liquid
-    # Same rule as the badge in blocks/collection-products.liquid
-    assign active_filter_count = 0
-    for filter in collection.filters
-      assign active_filter_count = active_filter_count | plus: filter.active_values.size
-      if filter.type == 'price_range'
-        if filter.min_value.value != nil or filter.max_value.value != nil
-          assign active_filter_count = active_filter_count | plus: 1
-        endif
-      endif
-    endfor
+    # Same rule as the badge in the toolbar (snippets/filter-count.liquid)
+    capture active_filter_count
+      render 'filter-count', filters: source_filters, count_only: true
+    endcapture
+    assign active_filter_count = active_filter_count | strip | plus: 0
   -%}
 
   <div class="collection-filters" data-testid="collection-filters" {{ block.shopify_attributes }}>
-    {%- if request.design_mode and collection.filters.size == 0 -%}
+    {%- if request.design_mode and filter_total == 0 -%}
       <div class="collection-filters__hint">{{ 'blocks.collection_filters.no_filters' | t }}</div>
     {%- endif -%}
 
@@ -72,7 +106,7 @@
       scroll-lock
       aria-labelledby="collection-filter-title"
       data-testid="collection-filter-drawer"
-      {% if collection.filters.size == 0 %}
+      {% if filter_total == 0 %}
         hidden
       {% endif %}
     >
@@ -95,21 +129,25 @@
       <form
         id="collection-filter-form"
         method="get"
-        action="{{ collection.url }}"
+        action="{{ form_action }}"
         novalidate
-        data-collection-id="{{ collection.id }}"
-        data-collection-handle="{{ collection.handle | escape }}"
-        data-products-count="{{ collection.all_products_count }}"
+        {% if collection_mode %}
+          data-collection-id="{{ collection.id }}"
+          data-collection-handle="{{ collection.handle | escape }}"
+          data-products-count="{{ collection.all_products_count }}"
+        {% endif %}
         data-testid="collection-filter-form"
       >
+        {{ content }}
+
         {% partial 'collection-filters' %}
           <div class="collection-filters__groups">
-            {%- for filter in collection.filters -%}
+            {%- for filter in source_filters -%}
               {% render 'filter-group', filter: filter %}
             {%- endfor -%}
 
             {%- if active_filter_count > 0 -%}
-              <a class="collection-filters__clear" href="{{ collection.url }}" data-testid="collection-filter-clear">
+              <a class="collection-filters__clear" href="{{ form_clear_url | escape }}" data-testid="collection-filter-clear">
                 {{- 'blocks.collection_filters.clear_all' | t -}}
               </a>
             {%- endif -%}

@@ -1,0 +1,252 @@
+{% doc %}
+  Search page results (TE-8 AC2, ES1-T123 D2, D3, D4). Reads the global
+  `search`; renders only when search.performed.
+
+  Toolbar, outside the results partial, same hooks as the collection toolbar
+  (assets/collection-filters.js works on both pages):
+  - collection-filter-open opens the dialog of blocks/collection-filters.liquid,
+    hidden when search.filters is empty. Partial collection-filter-count wraps
+    snippets/filter-count.liquid.
+  - snippets/sort-select.liquid with search.sort_options.
+  - collection-status: live region, empty until JavaScript fills it.
+
+  Partial search-results (name read by JS from data-results-partial on the
+  collection-filters element in templates/search.liquid) wraps the whole
+  paginate of 24: result count, groups, pagination and empty message.
+  `data-results-label` on the root inside the partial holds the translated
+  result count for the live region and the focus target after paging.
+
+  Groups: search.results is one mixed list, so items are grouped by
+  result.object_type within the current page, in the order product, article,
+  page (ES1-T126 #2). An empty group renders nothing, not even its heading.
+  Product: snippets/product-card.liquid with card_context search. Article:
+  image when set, title, excerpt. Page: title, excerpt.
+
+  Empty result: a message for shoppers, also outside the editor, because this is
+  the page result and not a block missing its configuration (ES1-T103 D3). With
+  filters applied: "nothing matches" and a link to clear_url (keeps q).
+  Otherwise: no results for the terms and a link to all products. search.terms
+  is escaped before it goes into a key ending in _html (ES1-T124 #5).
+
+  Loads assets/product-swatch.js outside the partial, always, because the
+  product group can appear when JavaScript applies the partial.
+
+  Test hooks: search-results (root), search-results-toolbar,
+  search-results-count, search-results-group (with data-object-type),
+  search-results-group-heading, search-results-product, search-results-article,
+  search-results-page, search-results-empty, search-results-empty-cta; shared
+  with TE-6: collection-filter-open, collection-filter-count, collection-sort,
+  collection-sort-apply, collection-status, collection-empty-clear and the hooks
+  of snippets/pagination.liquid. JS hook: data-results-label.
+
+  @param {string} [clear_url] - Link that removes the filters and keeps the search terms. Default: routes.search_url
+
+  @example
+  {% block 'search-results', clear_url: clear_url %}{% endblock %}
+{% enddoc %}
+
+{%- if search.performed != true -%}
+  {%- if request.design_mode -%}
+    <div class="collection-products__hint" {{ block.shopify_attributes }}>
+      {{ 'blocks.search_results.placeholder' | t }}
+    </div>
+  {%- endif -%}
+{%- else -%}
+  {%- liquid
+    assign search_terms = search.terms | escape
+    assign empty_clear_url = clear_url | default: routes.search_url
+    assign filter_total = search.filters.size | default: 0
+    assign pagination_label = 'collections.pagination.label' | t
+
+    capture active_filter_count
+      render 'filter-count', filters: search.filters, count_only: true
+    endcapture
+    assign active_filter_count = active_filter_count | strip | plus: 0
+
+    # 4 columns from 80rem, 3 from 48rem, 2 below (ES1-T127 #4)
+    assign image_sizes = '(min-width: 80rem) calc(' | append: settings.max_page_width | append: ' / 4), (min-width: 48rem) calc(100vw / 3), calc(100vw / 2)'
+    if filter_total > 0
+      assign image_sizes = '(min-width: 80rem) calc(' | append: settings.max_page_width | append: ' * 0.75 / 4), (min-width: 64rem) calc(75vw / 3), (min-width: 48rem) calc(100vw / 3), calc(100vw / 2)'
+    endif
+
+    assign object_types = 'product,article,page' | split: ','
+  -%}
+
+  <div
+    class="search-results"
+    style="--columns: 4; --columns-tablet: 3; --columns-mobile: 2;"
+    data-testid="search-results"
+    {{ block.shopify_attributes }}
+  >
+    <div class="collection-toolbar" data-testid="search-results-toolbar">
+      <button
+        class="button button--secondary collection-toolbar__filter"
+        type="button"
+        popovertarget="collection-filter-drawer"
+        data-testid="collection-filter-open"
+        {% if filter_total == 0 %}
+          hidden
+        {% endif %}
+      >
+        <span>{{ 'blocks.search_results.filter' | t }}</span>
+        {% partial 'collection-filter-count' %}
+          {% render 'filter-count', filters: search.filters %}
+        {% endpartial %}
+      </button>
+
+      {% render 'sort-select',
+        sort_options: search.sort_options,
+        sort_by: search.sort_by,
+        default_sort_by: search.default_sort_by
+      %}
+
+      <div class="visually-hidden" role="status" data-testid="collection-status"></div>
+    </div>
+
+    {% partial 'search-results' %}
+      {% paginate search.results by 24 %}
+        {%- assign results_label = 'blocks.search_results.results_count' | t: count: paginate.items -%}
+        <div
+          class="search-results__results"
+          data-results-label="{{ results_label | escape }}"
+        >
+          {%- if paginate.items == 0 -%}
+            <div class="collection-products__empty" data-testid="search-results-empty">
+              {%- if active_filter_count > 0 -%}
+                <p class="collection-products__empty-text">{{ 'blocks.search_results.empty_filtered' | t }}</p>
+                <a
+                  class="button button--secondary"
+                  href="{{ empty_clear_url | escape }}"
+                  data-testid="collection-empty-clear"
+                >
+                  {{- 'blocks.search_results.empty_clear' | t -}}
+                </a>
+              {%- else -%}
+                <p class="collection-products__empty-text">{{ 'search.no_results_html' | t: terms: search_terms }}</p>
+                <a
+                  class="button button--secondary"
+                  href="{{ routes.all_products_collection_url }}"
+                  data-testid="search-results-empty-cta"
+                >
+                  {{- 'blocks.search_results.empty_cta' | t -}}
+                </a>
+              {%- endif -%}
+            </div>
+          {%- else -%}
+            <p class="collection-products__count" data-testid="search-results-count">
+              {{- 'search.results_for_html' | t: count: paginate.items, terms: search_terms -}}
+            </p>
+
+            {%- for object_type in object_types -%}
+              {%- liquid
+                assign group_size = 0
+                for result in search.results
+                  if result.object_type == object_type
+                    assign group_size = group_size | plus: 1
+                  endif
+                endfor
+
+                case object_type
+                  when 'product'
+                    assign group_heading = 'blocks.search_results.group_product' | t
+                  when 'article'
+                    assign group_heading = 'blocks.search_results.group_article' | t
+                  else
+                    assign group_heading = 'blocks.search_results.group_page' | t
+                endcase
+              -%}
+              {%- if group_size > 0 -%}
+                <div
+                  class="search-results__group"
+                  data-object-type="{{ object_type }}"
+                  data-testid="search-results-group"
+                >
+                  <h2 class="search-results__group-heading" data-testid="search-results-group-heading">
+                    {{- group_heading -}}
+                  </h2>
+
+                  {%- if object_type == 'product' -%}
+                    <ul class="collection-products__grid" role="list">
+                      {%- assign product_index = 0 -%}
+                      {%- for result in search.results -%}
+                        {%- if result.object_type == 'product' -%}
+                          {%- liquid
+                            assign product_index = product_index | plus: 1
+                            assign card_loading = 'lazy'
+                            if paginate.current_page == 1 and product_index <= 4
+                              assign card_loading = 'eager'
+                            endif
+                          -%}
+                          <li class="collection-products__item" data-testid="search-results-product">
+                            {% render 'product-card',
+                              product: result,
+                              id_prefix: 'search',
+                              sizes: image_sizes,
+                              loading: card_loading,
+                              heading_level: 'h3',
+                              card_context: 'search'
+                            %}
+                          </li>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </ul>
+                  {%- else -%}
+                    <ul class="search-results__list" role="list">
+                      {%- for result in search.results -%}
+                        {%- if result.object_type == object_type -%}
+                          {%- liquid
+                            if object_type == 'article'
+                              assign entry_text = result.excerpt_or_content
+                            else
+                              assign entry_text = result.content
+                            endif
+                            assign entry_text = entry_text | strip_html | strip | truncatewords: 30
+                          -%}
+                          <li class="search-results__entry" data-testid="search-results-{{ object_type }}">
+                            {%- if object_type == 'article' and result.image -%}
+                              {% render 'image',
+                                image: result.image,
+                                class: 'search-results__entry-image',
+                                width: 192,
+                                height: 192,
+                                crop: 'center',
+                                widths: '96, 192',
+                                sizes: '6rem',
+                                decorative: true
+                              %}
+                            {%- endif -%}
+                            <div class="search-results__entry-body">
+                              <h3 class="search-results__entry-title">
+                                <a class="search-results__entry-link" href="{{ result.url }}">
+                                  {{- result.title | escape -}}
+                                </a>
+                              </h3>
+                              {%- if entry_text != blank -%}
+                                <p class="search-results__entry-text">{{ entry_text }}</p>
+                              {%- endif -%}
+                            </div>
+                          </li>
+                        {%- endif -%}
+                      {%- endfor -%}
+                    </ul>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            {%- endfor -%}
+
+            {% render 'pagination', paginate: paginate, label: pagination_label %}
+          {%- endif -%}
+        </div>
+      {% endpaginate %}
+    {% endpartial %}
+
+    <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.search_results",
+  "settings": []
+}
+{% endschema %}

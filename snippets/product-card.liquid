@@ -45,8 +45,9 @@
   <s-view-event view-event-trigger="intersect"> with product |
   standard_event_data, so the event fires when the card scrolls into view.
   The element is defined by assets/standard-events.js (BE ES1-T81, layout).
-  Context: collection (grids) or recommendation (product recommendations,
-  ES1-T65); any other value falls back to collection.
+  Context: collection (grids), recommendation (product recommendations,
+  ES1-T65) or search (search results, TE-8, ES1-T75); any other value falls
+  back to collection.
 
   @param {product} product - The product to render
   @param {variant} [variant] - Variant to show. Default: product.selected_or_first_available_variant
@@ -54,7 +55,7 @@
   @param {string} [sizes] - The image sizes attribute. Default: '(min-width: 80rem) 25vw, (min-width: 48rem) 33vw, 50vw'
   @param {string} [loading] - The image loading attribute. Default: 'lazy'
   @param {string} [heading_level] - Tag for the title: h2 to h6. Default: 'h3'
-  @param {string} [card_context] - View event context: 'collection' or 'recommendation'. Default: 'collection'
+  @param {string} [card_context] - View event context: 'collection', 'recommendation' or 'search'. Default: 'collection'
   @param {boolean} [show_swatches] - false: no swatch fieldset, for a card fixed to one variant (blocks/bundle-builder). Default: true
 
   @example
@@ -81,9 +82,10 @@
   endcase
 
   assign view_context = 'collection'
-  if card_context == 'recommendation'
-    assign view_context = 'recommendation'
-  endif
+  case card_context
+    when 'recommendation', 'search'
+      assign view_context = card_context
+  endcase
 
   assign card_image =card_variant.featured_image | default: product.featured_image
   assign card_alt = card_image.alt | default: product.title
