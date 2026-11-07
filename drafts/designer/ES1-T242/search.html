@@ -1,0 +1,938 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Efitco — Search + predictive search mockup (ES1-T242)</title>
+<!-- Google Fonts chỉ cho mockup. Theme dùng font_picker: Sofia Sans Condensed (heading), Inter (body) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sofia+Sans+Condensed:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* Token: giá trị mặc định của snippets/css-variables.liquid. Không có màu mới. */
+:root {
+  --font-heading: 'Sofia Sans Condensed', sans-serif;
+  --font-primary: 'Inter', sans-serif;
+  --font-size-xs: 0.8125rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-h3: clamp(1.375rem, 1.2rem + 0.6vw, 1.75rem);
+  --font-size-h2: clamp(1.75rem, 1.4rem + 1.2vw, 2.25rem);
+  --font-size-h1: clamp(2rem, 1.5rem + 2.5vw, 3rem);
+  --font-size-wordmark: clamp(4rem, 10.4vw, 12.5rem);
+  --page-width: 91rem;
+  --page-margin: 20px;
+  --header-height: 80px;
+  --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+  --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 120px;
+  --radius-input: 4px; --radius-button: 4px; --radius-card: 12px; --radius-pill: 999px;
+  --figma-radius-8: 8px; --figma-radius-16: 16px;
+  --color-background: #FFFFFF;
+  --color-foreground: #1A1A1A;
+  --color-muted: #4D4D4D;
+  --color-muted-light: #6B6B6B;
+  --color-border: #E5E5E5;
+  --color-background-alt: #F4F4F4;
+  --color-background-cream: #F5F5F1;
+  --color-background-dark: #1E1E1E;
+  --color-background-dark-foreground: #FFFFFF;
+  --color-background-panel: #393942;
+  --color-muted-on-dark: #999999;
+  --color-accent: #C8400E;
+  --color-accent-foreground: #FFFFFF;
+  --color-sale: #BD1616;
+  --color-sale-foreground: #FFFFFF;
+  --figma-1a1a1a: #1a1a1a;
+  --figma-white-12: rgb(255 255 255 / 0.12);
+  --figma-white-60: rgb(255 255 255 / 0.6);
+  --motion-fast: 150ms; --motion-base: 250ms; --motion-slow: 500ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-primary);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+img { display: block; max-inline-size: 100%; }
+a { color: inherit; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid currentcolor; outline-offset: 2px; }
+h1, h2, h3, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+.visually-hidden { position: absolute !important; inline-size: 1px; block-size: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.sprite { position: absolute; inline-size: 0; block-size: 0; overflow: hidden; }
+.icon { inline-size: 24px; block-size: 24px; flex: none; fill: none; stroke: currentcolor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.icon--20 { inline-size: 20px; block-size: 20px; }
+.icon--arrow { inline-size: 20px; block-size: 16px; }
+.page-width { max-inline-size: var(--page-width); margin-inline: auto; padding-inline: var(--page-margin); }
+
+/* ===== Nút (assets/base.css .button) ===== */
+.button {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+  min-block-size: 44px; padding: var(--space-3) var(--space-6);
+  border: 1px solid transparent; border-radius: var(--radius-button);
+  background: var(--color-accent); color: var(--color-accent-foreground);
+  font-size: var(--font-size-base); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25;
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: background-color var(--motion-fast) var(--ease-out), transform var(--motion-fast) var(--ease-out);
+}
+.button:hover { background: color-mix(in srgb, var(--color-accent) 88%, var(--color-foreground)); }
+.button--secondary { border-color: currentcolor; background: transparent; color: inherit; }
+.button--secondary:hover { background: var(--color-background-alt); }
+@media (min-width: 80rem) { .button { min-block-size: 52px; } }
+
+/* Link CTA (Figma 1:462): heading 700 28/34 + mũi tên 20 × 16 */
+.link-cta {
+  display: inline-flex; align-items: center; gap: var(--space-3); min-block-size: 44px;
+  font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-h3); line-height: 1.2;
+  letter-spacing: -0.02em; text-decoration: none;
+}
+.link-cta:hover span { text-decoration: underline; text-underline-offset: 0.15em; }
+
+/* Tab (Figma 1:496): 40 cao, padding ngang 28, bo 8, Inter 600 16/26. Vùng bấm 44 bằng ::before */
+.tab {
+  position: relative; display: inline-flex; align-items: center; flex: none;
+  min-block-size: 40px; padding-inline: 28px;
+  border: 1px solid var(--color-border); border-radius: var(--figma-radius-8);
+  background: var(--color-background-alt); color: var(--color-foreground);
+  font-size: var(--font-size-base); font-weight: 600; line-height: 26px; letter-spacing: -0.01em;
+  text-decoration: none; white-space: nowrap;
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+.tab::before { content: ''; position: absolute; inset: -2px 0; }
+.tab:hover { background: var(--color-border); }
+.tab[aria-current='page'] { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
+@media (max-width: 47.99rem) { .tab { padding-inline: var(--space-5); } }
+
+/* ===== Header (Figma 1:362), nền đặc như trang chủ sau khi cuộn ===== */
+.site-header { position: relative; z-index: 2; background: var(--figma-1a1a1a); color: var(--color-background-dark-foreground); }
+.site-header__inner { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); min-block-size: var(--header-height); }
+.site-header__start { display: flex; align-items: center; gap: var(--space-1); }
+.site-header__logo { display: inline-flex; align-items: center; min-block-size: 44px; color: inherit; }
+.site-header__logo svg { inline-size: 100px; block-size: 30px; }
+.icon-button {
+  position: relative; display: inline-grid; place-items: center; inline-size: 44px; block-size: 44px;
+  padding: 0; border: 0; border-radius: var(--radius-button); background: none; color: inherit; cursor: pointer;
+}
+.site-header__icons { display: flex; align-items: center; gap: var(--space-1); }
+.site-header__icons .icon-button[aria-expanded='true'] { background: var(--figma-white-12); }
+.site-header__nav { display: none; }
+.site-header__menu { display: flex; gap: 40px; }
+.site-header__link { display: inline-flex; align-items: center; gap: var(--space-1); min-block-size: 44px; color: var(--figma-white-60); font-weight: 500; text-decoration: none; letter-spacing: -0.01em; }
+.site-header__link:hover { color: var(--color-background-dark-foreground); }
+.site-header__link .icon { inline-size: 16px; block-size: 16px; }
+@media (min-width: 80rem) {
+  .site-header__menu-toggle { display: none; }
+  .site-header__nav { display: block; position: absolute; inset-block-start: 18px; inset-inline-start: calc(50% - 303px); }
+}
+
+/* ===== Breadcrumb (ĐỀ XUẤT) ===== */
+.breadcrumb { padding-block-start: var(--space-4); font-size: var(--font-size-sm); color: var(--color-muted); }
+.breadcrumb ol { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+.breadcrumb a { display: inline-flex; align-items: center; min-block-size: 44px; text-decoration: none; }
+.breadcrumb a:hover { color: var(--color-foreground); text-decoration: underline; }
+.breadcrumb li + li::before { content: '/'; margin-inline-end: var(--space-2); color: var(--color-muted-light); }
+.breadcrumb [aria-current] { color: var(--color-foreground); }
+
+/* ===== Đầu trang search ===== */
+.search-head { padding-block: var(--space-2) var(--space-7); }
+.eyebrow { margin-block-end: var(--space-2); font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-base); line-height: 1.25; text-transform: uppercase; color: var(--color-accent); }
+.h1 { font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-h1); line-height: 1.2; letter-spacing: -0.02em; }
+.h2 { font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-h2); line-height: 1.2; letter-spacing: -0.02em; }
+.search-form { display: flex; gap: var(--space-2); margin-block-start: var(--space-5); max-inline-size: 696px; }
+.field { position: relative; flex: 1 1 auto; min-inline-size: 0; }
+.field__icon { position: absolute; inset-block-start: 50%; inset-inline-start: var(--space-4); translate: 0 -50%; color: var(--color-muted); pointer-events: none; }
+.input {
+  inline-size: 100%; min-block-size: 52px; padding-inline: calc(var(--space-4) + 32px) var(--space-4);
+  border: 1px solid var(--color-border); border-radius: var(--radius-input);
+  background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-base);
+  transition: border-color var(--motion-fast) var(--ease-out);
+}
+.input::placeholder { color: var(--color-muted-light); opacity: 1; }
+.input:hover { border-color: var(--color-muted-light); }
+.input:focus-visible, .input.is-focus { border-color: var(--color-foreground); outline: 2px solid var(--color-foreground); outline-offset: 0; }
+.search-form .button { min-block-size: 52px; }
+.search-head__count { margin-block-start: var(--space-4); color: var(--color-muted); }
+.search-head__count strong { color: var(--color-foreground); font-weight: 600; }
+.search-tabs { display: flex; gap: var(--space-2); margin-block-start: var(--space-6); padding-block: 2px; overflow-x: auto; scrollbar-width: none; }
+@media (max-width: 47.99rem) {
+  .search-form .button { padding-inline: 0; inline-size: 52px; }
+  .search-form .button span { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .search-tabs { margin-inline: calc(var(--page-margin) * -1); padding-inline: var(--page-margin); }
+}
+@media (min-width: 48rem) { .search-form .button .icon { display: none; } }
+
+/* ===== Nhóm kết quả ===== */
+.results-group { padding-block-start: var(--space-7); border-block-start: 1px solid var(--color-border); }
+.results-group + .results-group { margin-block-start: var(--space-7); }
+.group-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); margin-block-end: var(--space-5); }
+.group-head__link { display: inline-flex; align-items: center; gap: var(--space-2); min-block-size: 44px; font-weight: 600; text-decoration: none; white-space: nowrap; }
+.group-head__link:hover span { text-decoration: underline; text-underline-offset: 0.2em; }
+@media (min-width: 64rem) {
+  .results-group { padding-block-start: 80px; }
+  .results-group + .results-group { margin-block-start: 80px; }
+  .group-head { margin-block-end: 40px; }
+}
+
+/* Sản phẩm: lưới 4 cột như Figma 1:490; cột 1 là filter từ 64rem */
+.products-layout { display: grid; gap: var(--space-5); }
+.filters { display: none; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2); margin-block-end: var(--space-5); }
+.toolbar__note { display: none; color: var(--color-muted); font-size: var(--font-size-sm); }
+.select-wrap { position: relative; display: inline-flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); }
+.select-wrap label { color: var(--color-muted); }
+.select {
+  min-block-size: 44px; padding-inline: var(--space-4) 40px;
+  border: 1px solid var(--color-border); border-radius: var(--radius-input);
+  background: var(--color-background); font-size: var(--font-size-sm); appearance: none; cursor: pointer;
+}
+.select-wrap .icon { position: absolute; inset-inline-end: var(--space-3); inline-size: 16px; block-size: 16px; pointer-events: none; }
+.filter-toggle { min-block-size: 44px; padding-inline: var(--space-4); font-size: var(--font-size-sm); }
+@media (min-width: 64rem) {
+  .products-layout { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .filters { display: block; }
+  .products-main { grid-column: 2 / -1; }
+  .filter-toggle { display: none; }
+  .toolbar__note { display: block; }
+}
+
+.filters__head { display: flex; align-items: center; justify-content: space-between; min-block-size: 44px; padding-block-end: var(--space-2); border-block-end: 1px solid var(--color-border); }
+.filters__title { font-size: var(--font-size-lg); font-weight: 600; }
+.filters__clear { display: inline-flex; align-items: center; min-block-size: 44px; color: var(--color-muted); font-size: var(--font-size-sm); }
+.filter-group { border-block-end: 1px solid var(--color-border); }
+.filter-group summary { display: flex; align-items: center; justify-content: space-between; min-block-size: 56px; font-weight: 600; cursor: pointer; list-style: none; }
+.filter-group summary::-webkit-details-marker { display: none; }
+.filter-group[open] summary .icon { rotate: 180deg; }
+.filter-group summary .icon { inline-size: 16px; block-size: 16px; transition: rotate var(--motion-base) var(--ease-out); }
+.filter-group__body { display: grid; gap: var(--space-1); padding-block-end: var(--space-4); }
+.check { display: flex; align-items: center; gap: var(--space-3); min-block-size: 44px; font-size: var(--font-size-sm); cursor: pointer; }
+.check input { inline-size: 20px; block-size: 20px; margin: 0; accent-color: var(--color-foreground); }
+.check--disabled { color: var(--color-muted-light); cursor: not-allowed; }
+.price-range { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+.price-range__hint { margin-block-end: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); }
+.price-range .input { min-block-size: 44px; padding-inline: var(--space-3); font-size: var(--font-size-sm); }
+
+.product-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--space-4); }
+@media (min-width: 48rem) { .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 40px var(--space-5); } }
+
+/* Product card (snippets/product-card.liquid, Figma 1:502) */
+.product-card { display: flex; flex-direction: column; gap: var(--space-2); min-inline-size: 0; }
+.product-card__media { position: relative; }
+.product-card__media-link { display: block; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); }
+.product-card__image { inline-size: 100%; block-size: 100%; object-fit: contain; mix-blend-mode: darken; transition: transform var(--motion-slow) var(--ease-out); }
+.product-card:hover .product-card__image { transform: scale(1.04); }
+.product-card__badge {
+  position: absolute; inset-block-start: var(--space-2); inset-inline-start: var(--space-2);
+  display: inline-flex; align-items: center; min-block-size: 28px; padding-inline: var(--space-3);
+  border-radius: var(--radius-pill); background: var(--color-sale); color: var(--color-sale-foreground);
+  font-size: var(--font-size-xs); font-weight: 600; letter-spacing: -0.02em;
+}
+@media (min-width: 64rem) { .product-card__badge { inset-block-start: var(--space-4); inset-inline-start: var(--space-4); } }
+.product-card__title { margin-block-start: var(--space-2); font-size: var(--font-size-base); font-weight: 500; line-height: 26px; letter-spacing: -0.01em; }
+.product-card__title a { text-decoration: none; }
+.product-card__title a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.price { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2); font-size: var(--font-size-base); font-weight: 500; line-height: 26px; }
+.price--sale .price__current { color: var(--color-sale); }
+.price__compare { color: var(--color-muted-light); font-size: var(--font-size-sm); text-decoration: line-through; }
+
+/* Bài viết: thẻ blog Figma 1:1022, tỉ lệ 300 / 448 */
+.article-grid { display: grid; grid-auto-flow: column; grid-auto-columns: 78%; gap: var(--space-4); overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
+@media (min-width: 48rem) { .article-grid { grid-auto-flow: row; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-5); overflow: visible; } }
+@media (min-width: 64rem) { .article-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+.article-card { position: relative; aspect-ratio: 300 / 448; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-dark); color: var(--color-background-dark-foreground); scroll-snap-align: start; }
+.article-card img { position: absolute; inset: 0; inline-size: 100%; block-size: 100%; object-fit: cover; transition: transform var(--motion-slow) var(--ease-out); }
+.article-card:hover img { transform: scale(1.04); }
+.article-card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, color-mix(in srgb, var(--color-background-dark) 90%, transparent) 0%, transparent 55%); }
+.article-card__body { position: absolute; inset-inline: var(--space-5); inset-block-end: var(--space-5); z-index: 1; display: grid; gap: var(--space-2); }
+.article-card__title { font-size: var(--font-size-lg); font-weight: 700; line-height: 28px; letter-spacing: -0.01em; }
+.article-card__title a { text-decoration: none; }
+.article-card__title a::after { content: ''; position: absolute; inset: 0; z-index: 2; }
+.article-card__meta { font-size: var(--font-size-sm); }
+
+/* Trang: hàng link CTA heading 28/34 + mũi tên */
+.page-list { border-block-start: 1px solid var(--color-border); }
+.page-list li { border-block-end: 1px solid var(--color-border); }
+.page-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding-block: var(--space-5); text-decoration: none; }
+.page-row__text { display: grid; gap: var(--space-1); }
+.page-row__title { font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-h3); line-height: 1.2; letter-spacing: -0.02em; }
+.page-row__url { color: var(--color-muted); font-size: var(--font-size-sm); }
+.page-row .icon--arrow { transition: transform var(--motion-fast) var(--ease-out); }
+.page-row:hover .page-row__title { text-decoration: underline; text-underline-offset: 0.15em; }
+.page-row:hover .icon--arrow { transform: translateX(var(--space-1)); }
+@media (min-width: 64rem) { .page-list { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--space-5); } }
+
+.main-end { padding-block-end: var(--space-7); }
+@media (min-width: 64rem) { .main-end { padding-block-end: var(--space-8); } }
+
+/* Phân trang (ĐỀ XUẤT) */
+.pagination { display: flex; justify-content: center; margin-block-start: var(--space-7); }
+.pagination ol { display: flex; gap: var(--space-2); }
+.pagination a, .pagination span { display: inline-grid; place-items: center; min-inline-size: 44px; block-size: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-button); font-weight: 600; text-decoration: none; }
+.pagination a:hover { border-color: var(--color-foreground); }
+.pagination [aria-current] { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
+.pagination .is-disabled { color: var(--color-muted-light); }
+
+/* ===== Footer (Figma 1:1104) ===== */
+.site-footer { background: var(--figma-1a1a1a); color: var(--color-background-dark-foreground); padding-block: var(--space-7) var(--space-5); }
+.newsletter { display: grid; gap: var(--space-5); padding-block-end: var(--space-7); }
+.newsletter__media { inline-size: 118px; aspect-ratio: 118 / 134; border-radius: var(--figma-radius-8); background: var(--color-background-panel); }
+.newsletter__title { font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-h2); line-height: 1.2; text-transform: uppercase; letter-spacing: -0.02em; }
+.newsletter__title em { font-style: normal; color: var(--color-accent); }
+.newsletter__text { margin-block-start: var(--space-3); color: var(--color-muted-on-dark); line-height: 27px; max-inline-size: 620px; }
+.newsletter__form { display: flex; }
+.newsletter__form .input { min-block-size: 56px; padding-inline: var(--space-5); border-color: var(--figma-white-12); border-start-end-radius: 0; border-end-end-radius: 0; background: transparent; color: inherit; }
+.newsletter__form .input::placeholder { color: var(--color-muted-on-dark); }
+.newsletter__form .button { min-block-size: 56px; border-start-start-radius: 0; border-end-start-radius: 0; }
+.newsletter__note { margin-block-start: var(--space-3); color: var(--color-muted-on-dark); font-size: var(--font-size-sm); }
+@media (min-width: 64rem) { .newsletter { grid-template-columns: 118px minmax(0, 1fr) minmax(0, 520px); column-gap: 80px; align-items: center; } }
+.footer-panel { padding: var(--space-7) var(--page-margin) 0; border-radius: var(--figma-radius-16); background: var(--color-background-dark); }
+.footer-panel__grid { display: grid; gap: var(--space-7); max-inline-size: 1416px; margin-inline: auto; padding-block-end: var(--space-7); }
+.footer-brand svg { inline-size: 100px; block-size: 30px; }
+.footer-brand p { margin-block-start: var(--space-6); max-inline-size: 460px; color: var(--color-muted-on-dark); line-height: 27px; }
+.socials { display: flex; gap: var(--space-2); margin-block-start: var(--space-5); }
+.socials a { display: inline-grid; place-items: center; inline-size: 44px; block-size: 44px; color: var(--color-background-dark-foreground); }
+.socials .icon { inline-size: 28px; block-size: 28px; }
+.footer-menus { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-5); }
+.footer-menus h2 { font-size: var(--font-size-lg); font-weight: 600; line-height: 28px; margin-block-end: var(--space-4); }
+.footer-menus a { display: inline-flex; align-items: center; min-block-size: 44px; color: var(--color-muted-on-dark); text-decoration: none; }
+.footer-menus a:hover { color: var(--color-background-dark-foreground); }
+@media (min-width: 64rem) {
+  .footer-panel { padding-block-start: 120px; }
+  .footer-panel__grid { grid-template-columns: 1fr auto; padding-block-end: 120px; }
+  .footer-menus { grid-template-columns: 250px 225px; gap: 0; }
+}
+.trust { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); max-inline-size: 1416px; margin-inline: auto; padding-block: var(--space-6); border-block-start: 1px solid var(--figma-white-12); color: var(--color-muted-on-dark); font-size: var(--font-size-sm); }
+.trust li { display: flex; align-items: center; gap: var(--space-3); }
+.trust .icon { inline-size: 32px; block-size: 32px; stroke-width: 1.25; }
+@media (min-width: 64rem) { .trust { grid-template-columns: repeat(4, 1fr); font-size: var(--font-size-base); } }
+.footer-bottom { display: grid; gap: var(--space-4); justify-items: center; padding-block-start: var(--space-7); color: var(--color-muted-on-dark); font-size: var(--font-size-sm); }
+.wordmark { color: var(--color-background-dark-foreground); font-family: var(--font-heading); font-weight: 800; font-size: var(--font-size-wordmark); line-height: 0.85; letter-spacing: -0.04em; }
+.footer-bottom__end { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-5); }
+.locale-btn { display: inline-flex; align-items: center; gap: var(--space-1); min-block-size: 44px; border: 0; background: none; color: inherit; font-size: var(--font-size-sm); }
+.payments { display: flex; gap: var(--space-1); }
+.payments span { inline-size: 34px; block-size: 24px; border-radius: var(--radius-input); background: var(--color-background-dark-foreground); }
+@media (min-width: 64rem) {
+  .footer-bottom { grid-template-columns: 1fr auto 1fr; align-items: end; }
+  .footer-bottom__start { justify-self: start; padding-block-end: var(--space-4); }
+  .footer-bottom__end { justify-self: end; padding-block-end: var(--space-3); }
+}
+
+/* ===== Predictive search (snippets/predictive-search.liquid) ===== */
+.demo { position: relative; overflow: hidden; block-size: 760px; border-block: 1px solid var(--color-border); }
+.demo__page { filter: none; }
+.demo__backdrop { position: absolute; inset: 0; z-index: 3; background: color-mix(in srgb, var(--color-background-dark) 50%, transparent); }
+.ps {
+  position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column;
+  background: var(--color-background); color: var(--color-foreground);
+}
+@media (min-width: 48rem) {
+  .ps { inset-block-end: auto; inset-inline: 0; margin-inline: auto; inline-size: min(var(--page-width), 100%); max-block-size: 80%; border-radius: 0 0 var(--radius-card) var(--radius-card); box-shadow: 0 16px 40px color-mix(in srgb, var(--color-background-dark) 20%, transparent); }
+}
+.ps__form { display: flex; align-items: center; gap: var(--space-2); padding: var(--space-4) var(--page-margin); border-block-end: 1px solid var(--color-border); }
+.ps__form .icon-button:hover { background: var(--color-background-alt); }
+.ps__status { padding: var(--space-3) var(--page-margin) 0; color: var(--color-muted); font-size: var(--font-size-sm); }
+.ps__body { display: grid; gap: var(--space-5); padding: var(--space-4) var(--page-margin) var(--space-5); overflow-y: auto; }
+.ps-group__title { padding-inline: var(--space-2); padding-block-end: var(--space-2); font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-base); line-height: 1.25; text-transform: uppercase; color: var(--color-muted); }
+.ps-options { display: grid; gap: var(--space-1); }
+.ps-option {
+  display: flex; align-items: center; gap: var(--space-3); min-block-size: 44px; padding: var(--space-1) var(--space-2);
+  border-radius: var(--figma-radius-8); font-size: var(--font-size-sm); text-decoration: none; cursor: pointer;
+  transition: background-color var(--motion-fast) var(--ease-out);
+}
+.ps-option:hover, .ps-option[aria-selected='true'] { background: var(--color-background-alt); }
+.ps-option[aria-selected='true'] { outline: 2px solid var(--color-foreground); outline-offset: -2px; }
+.ps-option__image { flex: none; inline-size: 64px; block-size: 64px; border-radius: var(--figma-radius-8); background: var(--color-background-cream); object-fit: contain; mix-blend-mode: darken; }
+.ps-option__image--cover { object-fit: cover; mix-blend-mode: normal; }
+.ps-option__text { display: grid; gap: 2px; min-inline-size: 0; }
+.ps-option__title { font-weight: 500; line-height: 20px; }
+.ps-option__meta { color: var(--color-muted); }
+.ps-option mark { background: none; color: inherit; font-weight: 700; }
+.ps-option .price { font-size: var(--font-size-sm); line-height: 20px; gap: var(--space-1) var(--space-2); }
+.ps-option .price__compare { font-size: var(--font-size-xs); }
+.ps__all { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-block-size: 56px; padding-inline: var(--page-margin); border-block-start: 1px solid var(--color-border); font-weight: 600; text-decoration: none; }
+.ps__all:hover { background: var(--color-background-alt); }
+@media (min-width: 64rem) {
+  .ps__body { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--space-5); padding-block: var(--space-5); }
+  .ps-group--products { grid-column: 1 / span 3; grid-row: 1 / span 3; }
+  .ps-group--products .ps-options { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-4); }
+  .ps-group--products .ps-option { flex-direction: column; align-items: stretch; gap: var(--space-2); padding: var(--space-2); }
+  .ps-group--products .ps-option__image { inline-size: 100%; block-size: auto; aspect-ratio: 1; border-radius: var(--radius-card); }
+  .ps-group--products .ps-option__title { font-size: var(--font-size-base); line-height: 24px; }
+  .ps-group--products .ps-option .price { font-size: var(--font-size-base); }
+}
+.ps-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); padding-inline: var(--space-2); }
+.ps-message { display: grid; gap: var(--space-2); padding: var(--space-2); }
+.ps-message__title { font-weight: 600; font-size: var(--font-size-lg); }
+.ps-message__title q { quotes: '“' '”'; }
+.ps-message p { color: var(--color-muted); }
+.ps-message--error { grid-template-columns: auto 1fr; column-gap: var(--space-3); align-items: start; }
+.ps-message--error .icon { color: var(--color-sale); }
+
+/* Skeleton: bố cục biết trước (ux-motion). Shimmer chỉ khi không giảm chuyển động */
+.skeleton { position: relative; overflow: hidden; border-radius: var(--figma-radius-8); background: var(--color-background-alt); }
+@media (prefers-reduced-motion: no-preference) {
+  .skeleton::after { content: ''; position: absolute; inset: 0; translate: -100% 0; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-background) 60%, transparent), transparent); animation: shimmer 1.2s var(--ease-out) infinite; }
+  @keyframes shimmer { to { translate: 100% 0; } }
+}
+.sk-row { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-1) var(--space-2); }
+.sk-thumb { inline-size: 64px; block-size: 64px; flex: none; }
+.sk-lines { display: grid; gap: var(--space-2); flex: 1; }
+.sk-line { block-size: 12px; border-radius: var(--radius-pill); }
+.sk-line--short { inline-size: 40%; }
+.sk-card { display: grid; gap: var(--space-2); }
+.sk-card .skeleton:first-child { aspect-ratio: 1; border-radius: var(--radius-card); }
+@media (min-width: 64rem) {
+  .ps-group--products .sk-row { flex-direction: column; align-items: stretch; padding: var(--space-2); }
+  .ps-group--products .sk-thumb { inline-size: 100%; block-size: auto; aspect-ratio: 1; border-radius: var(--radius-card); }
+}
+
+/* ===== Khung trạng thái (chú thích mockup, không phải UI) ===== */
+.states { padding-block: var(--space-7); background: var(--color-background-alt); }
+.states__title { font-family: var(--font-heading); font-weight: 800; font-size: var(--font-size-h1); line-height: 1.1; text-transform: uppercase; letter-spacing: -0.02em; }
+.states__intro { margin-block-start: var(--space-2); color: var(--color-muted); }
+.state { margin-block-start: var(--space-7); }
+.state__label { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: baseline; margin-block-end: var(--space-3); font-size: var(--font-size-sm); font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; }
+.state__label small { font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--color-muted); font-size: var(--font-size-sm); }
+.state__frame { position: relative; overflow: hidden; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background); }
+.state__frame .ps { position: relative; inset: auto; inline-size: 100%; max-block-size: none; box-shadow: none; border-radius: 0; }
+.state__frame--page { padding-block-end: var(--space-7); }
+.empty { display: grid; gap: var(--space-4); max-inline-size: 696px; }
+.empty__title { font-family: var(--font-heading); font-weight: 700; font-size: var(--font-size-h3); line-height: 1.2; letter-spacing: -0.02em; }
+.empty__list { display: grid; gap: var(--space-1); padding-inline-start: var(--space-5); list-style: disc; color: var(--color-muted); }
+.empty__chips { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+.empty__label { font-weight: 600; }
+.is-loading { opacity: 0.5; pointer-events: none; transition: opacity var(--motion-base) var(--ease-out); }
+.notice { display: flex; gap: var(--space-3); align-items: center; padding: var(--space-3) var(--space-4); margin-block-end: var(--space-5); border: 1px solid var(--color-sale); border-radius: var(--radius-input); color: var(--color-foreground); font-size: var(--font-size-sm); }
+.notice .icon { color: var(--color-sale); }
+.notice a { font-weight: 600; }
+</style>
+</head>
+<body>
+
+<!-- Sprite: absolute 0 × 0, không dùng <svg hidden> -->
+<svg class="sprite" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5.5 8h13l-1 13h-11z"/><path d="M9 8V6.5a3 3 0 0 1 6 0V8"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11 1l7 7-7 7"/></symbol>
+  <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7.5v5.5M12 16.5v.01"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 24 24"><path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.5 2.8 2.3 4.5 5 4.8"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><path d="M17 7v.01"/></symbol>
+  <symbol id="i-youtube" viewBox="0 0 24 24"><rect x="2.5" y="5.5" width="19" height="13" rx="3.5"/><path d="m10 9.5 4.5 2.5-4.5 2.5z"/></symbol>
+  <symbol id="i-facebook" viewBox="0 0 24 24"><path d="M14.5 21v-8h3l.5-3.5h-3.5V7.5c0-1 .4-1.8 1.9-1.8H18V2.6A22 22 0 0 0 15.4 2.5c-2.7 0-4.4 1.6-4.4 4.6v2.4H8V13h3v8"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 32 32"><path d="M16 3 6 7v8c0 7 4.5 11.5 10 14 5.5-2.5 10-7 10-14V7z"/><path d="m11.5 16 3 3 6-6"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 32 32"><path d="M3 8h16v14H3zM19 13h5l5 5v4h-10"/><circle cx="8.5" cy="23.5" r="2.5"/><circle cx="23.5" cy="23.5" r="2.5"/></symbol>
+  <symbol id="i-award" viewBox="0 0 32 32"><circle cx="16" cy="13" r="8"/><path d="m16 9 1.4 2.8 3 .4-2.2 2.1.5 3L16 15.9l-2.7 1.4.5-3-2.2-2.1 3-.4zM11 19.5 9 29l7-3.5 7 3.5-2-9.5"/></symbol>
+  <symbol id="i-return" viewBox="0 0 32 32"><path d="M6 13a9 9 0 0 1 16-4l3 3M26 19a9 9 0 0 1-16 4l-3-3"/><path d="M25 6v6h-6M7 26v-6h6"/></symbol>
+</svg>
+
+<!-- ========================================================= -->
+<!-- KHUNG 1: TRANG SEARCH, query "dumbbell", có kết quả         -->
+<!-- ========================================================= -->
+<header class="site-header" data-frame="header">
+  <div class="page-width site-header__inner">
+    <div class="site-header__start">
+      <button class="icon-button site-header__menu-toggle" type="button" aria-label="Open menu"><svg class="icon"><use href="#i-menu"/></svg></button>
+      <a class="site-header__logo" href="/" aria-label="Efitco">
+        <svg aria-hidden="true" focusable="false" width="100" height="30" viewBox="0 0 100 30" fill="none"><path d="M69.2121 25.06C65.8096 25.06 63.0507 22.2755 63.0507 18.8413C63.0507 15.4071 65.8096 12.6226 69.2121 12.6226C70.8674 12.6226 72.3756 13.2908 73.4791 14.3675L76.6058 11.2117C74.693 9.33683 72.0813 8.16734 69.2121 8.16734C63.3634 8.16734 58.6366 12.9381 58.6366 18.8413C58.6366 24.7445 63.3634 29.5153 69.2121 29.5153C72.0997 29.5153 74.693 28.3458 76.6058 26.4709L73.4791 23.3151C72.3756 24.3918 70.8674 25.06 69.2121 25.06Z" fill="currentColor"/><path d="M4.89235 17.8592H18.098V13.7381H4.89235V6.34985H19.0176V2.21021H0V29.4242H19.1096V25.3031H4.89235V17.8592Z" fill="currentColor"/><path d="M30.4549 0.928144C29.2962 0.928144 28.2294 1.1509 27.273 1.61499C26.3166 2.06051 25.5625 2.74736 24.9924 3.65696C24.4222 4.56657 24.1463 5.7175 24.1463 7.09119V9.02179H21.1484V12.7345H24.1463V29.423H28.9283V12.7345H34.2069V9.02179H28.9099V7.40677C28.9099 6.60855 29.0939 5.99595 29.4617 5.569C29.8295 5.14204 30.4549 4.91928 31.3377 4.91928C31.7239 4.91928 32.055 4.9564 32.3677 5.01209C32.6803 5.08635 32.9378 5.14204 33.1402 5.19773L34.0966 1.48505C33.7839 1.37367 33.3241 1.26229 32.6803 1.13234C32.0182 1.0024 31.2825 0.928144 30.4549 0.928144Z" fill="currentColor"/><path d="M41.7869 9.02139H37.0233V29.4411H41.7869V9.02139Z" fill="currentColor"/><path d="M54.863 25.5802C54.6056 25.6174 54.3297 25.6545 54.0354 25.6545C53.6492 25.6545 53.2813 25.5988 52.9503 25.4688C52.6192 25.3389 52.3617 25.1161 52.1594 24.7634C51.9571 24.4293 51.8651 23.9281 51.8651 23.2784V12.7344H56.9598V9.02167H51.8651V4.12093H47.1015V9.00311H44.2323V12.7158H47.1015V24.058C47.1015 25.3389 47.359 26.397 47.9292 27.2509C48.4809 28.1049 49.235 28.736 50.2098 29.1258C51.1662 29.5342 52.233 29.7199 53.4285 29.6827C54.109 29.6642 54.6791 29.6085 55.1389 29.4971C55.6171 29.3857 55.9666 29.2929 56.2241 29.2001L55.4148 25.4317C55.3045 25.506 55.1021 25.5431 54.863 25.5802Z" fill="currentColor"/><path d="M88.5225 8.25936C82.6738 8.25936 77.947 13.0302 77.947 18.9333C77.947 24.8365 82.6738 29.6073 88.5225 29.6073C94.3713 29.6073 99.0981 24.8365 99.0981 18.9333C99.0981 13.0302 94.3713 8.25936 88.5225 8.25936ZM88.5225 25.1521C85.1199 25.1521 82.3611 22.3676 82.3611 18.9333C82.3611 15.4991 85.1199 12.7146 88.5225 12.7146C91.9251 12.7146 94.6839 15.4991 94.6839 18.9333C94.6839 22.3676 91.9251 25.1521 88.5225 25.1521Z" fill="currentColor"/><path d="M97.7018 11.0638C97.0213 10.2656 96.2488 9.54159 95.3843 8.94756C96.1936 7.9637 97.2052 6.31156 96.7822 5.29057C96.5798 4.78936 95.3659 3.17434 88.524 3.17434C81.6821 3.17434 80.4682 4.80792 80.2659 5.30913C79.8429 6.33012 80.8728 8.00083 81.6637 8.96612C80.7993 9.56015 80.0268 10.2841 79.3463 11.0824C78.3163 9.85717 76.2196 6.90558 77.3783 4.08395C77.9485 2.72882 79.1256 1.70783 80.9648 1.03955C82.804 0.334141 85.3054 0 88.4688 0H88.5608C94.9061 0.0185634 98.5294 1.35513 99.6513 4.06538C100.828 6.88702 98.7317 9.8386 97.7018 11.0638Z" fill="currentColor"/><path d="M39.3213 6.40467C40.8449 6.40467 42.0801 5.158 42.0801 3.62016C42.0801 2.08231 40.8449 0.835646 39.3213 0.835646C37.7976 0.835646 36.5624 2.08231 36.5624 3.62016C36.5624 5.158 37.7976 6.40467 39.3213 6.40467Z" fill="currentColor"/></svg>
+      </a>
+    </div>
+    <nav class="site-header__nav" aria-label="Main">
+      <ul class="site-header__menu">
+        <li><a class="site-header__link" href="#">Shop <svg class="icon"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg class="icon"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Sale</a></li>
+        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Blog</a></li>
+        <li><a class="site-header__link" href="#">Contact</a></li>
+        <li><a class="site-header__link" href="#">Help</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__icons">
+      <a class="icon-button" href="/search" aria-label="Search"><svg class="icon"><use href="#i-search"/></svg></a>
+      <a class="icon-button" href="/account" aria-label="Account"><svg class="icon"><use href="#i-user"/></svg></a>
+      <a class="icon-button" href="/cart" aria-label="Cart"><svg class="icon"><use href="#i-bag"/></svg></a>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="page-width">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="/">Home</a></li>
+        <li><span aria-current="page">Search</span></li>
+      </ol>
+    </nav>
+
+    <div class="search-head">
+      <h1 class="h1">Search</h1>
+      <form class="search-form" action="/search" method="get" role="search">
+        <div class="field">
+          <svg class="icon field__icon"><use href="#i-search"/></svg>
+          <label class="visually-hidden" for="q-main">Search articles, pages, or products</label>
+          <input class="input" id="q-main" type="search" name="q" value="dumbbell" placeholder="Search articles, pages, or products">
+        </div>
+        <button class="button" type="submit"><svg class="icon icon--20"><use href="#i-search"/></svg><span>Search</span></button>
+      </form>
+      <p class="search-head__count" role="status">10 results found for <strong>dumbbell</strong></p>
+
+      <nav class="search-tabs" aria-label="Result type">
+        <a class="tab" href="/search?q=dumbbell" aria-current="page">All</a>
+        <a class="tab" href="/search?q=dumbbell&amp;type=product">Products</a>
+        <a class="tab" href="/search?q=dumbbell&amp;type=article">Articles</a>
+        <a class="tab" href="/search?q=dumbbell&amp;type=page">Pages</a>
+      </nav>
+    </div>
+
+    <!-- Nhóm Products -->
+    <section class="results-group" aria-labelledby="g-products">
+      <div class="group-head">
+        <h2 class="h2" id="g-products">Products</h2>
+        <a class="group-head__link" href="/search?q=dumbbell&amp;type=product"><span>View all</span><svg class="icon icon--arrow"><use href="#i-arrow"/></svg></a>
+      </div>
+
+      <div class="products-layout">
+        <aside class="filters" aria-label="Filters">
+          <div class="filters__head"><h3 class="filters__title">Filters</h3><a class="filters__clear" href="/search?q=dumbbell">Clear all</a></div>
+          <details class="filter-group" open>
+            <summary>Availability <svg class="icon"><use href="#i-chevron"/></svg></summary>
+            <div class="filter-group__body">
+              <label class="check"><input type="checkbox"> In stock (6)</label>
+              <label class="check check--disabled"><input type="checkbox" disabled> Out of stock (0)</label>
+            </div>
+          </details>
+          <details class="filter-group" open>
+            <summary>Price <svg class="icon"><use href="#i-chevron"/></svg></summary>
+            <div class="filter-group__body">
+              <p class="price-range__hint">The highest price is $549.00</p>
+              <div class="price-range">
+                <label><span class="visually-hidden">From</span><input class="input" type="number" placeholder="From $0"></label>
+                <label><span class="visually-hidden">To</span><input class="input" type="number" placeholder="To $549"></label>
+              </div>
+            </div>
+          </details>
+        </aside>
+
+        <div class="products-main">
+          <div class="toolbar">
+            <button class="button button--secondary filter-toggle" type="button"><svg class="icon icon--20"><use href="#i-filter"/></svg>Filter</button>
+            <p class="toolbar__note">Showing products on this page</p>
+            <div class="select-wrap">
+              <label for="sort">Sort by</label>
+              <select class="select" id="sort"><option>Relevance</option><option>Price, low to high</option><option>Price, high to low</option></select>
+              <svg class="icon"><use href="#i-chevron"/></svg>
+            </div>
+          </div>
+
+          <ul class="product-grid">
+            <li class="product-card">
+              <div class="product-card__media">
+                <a class="product-card__media-link" href="#" tabindex="-1" aria-hidden="true"><img class="product-card__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=720" alt="Ativafit Lava 66 lb Adjustable" width="720" height="720"></a>
+                <span class="product-card__badge">-24%</span>
+              </div>
+              <h3 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable</a></h3>
+              <div class="price price--sale"><span class="price__current">$379.99</span><s class="price__compare">$499.99</s></div>
+            </li>
+            <li class="product-card">
+              <div class="product-card__media">
+                <a class="product-card__media-link" href="#" tabindex="-1" aria-hidden="true"><img class="product-card__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=720" alt="Ativafit Lava 66 lb" width="720" height="720"></a>
+              </div>
+              <h3 class="product-card__title"><a href="#">Ativafit Lava 66 lb</a></h3>
+              <div class="price"><span class="price__current">$379.99</span></div>
+            </li>
+            <li class="product-card">
+              <div class="product-card__media">
+                <a class="product-card__media-link" href="#" tabindex="-1" aria-hidden="true"><img class="product-card__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png?width=720" alt="Home Starter Kit" width="720" height="720"></a>
+                <span class="product-card__badge">-22%</span>
+              </div>
+              <h3 class="product-card__title"><a href="#">Home Starter Kit</a></h3>
+              <div class="price price--sale"><span class="price__current">$399.00</span><s class="price__compare">$512.00</s></div>
+            </li>
+            <li class="product-card">
+              <div class="product-card__media">
+                <a class="product-card__media-link" href="#" tabindex="-1" aria-hidden="true"><img class="product-card__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=720" alt="Olympic Plate Set 100" width="720" height="720"></a>
+                <span class="product-card__badge">-15%</span>
+              </div>
+              <h3 class="product-card__title"><a href="#">Olympic Plate Set 100</a></h3>
+              <div class="price price--sale"><span class="price__current">$289.00</span><s class="price__compare">$339.00</s></div>
+            </li>
+            <li class="product-card">
+              <div class="product-card__media">
+                <a class="product-card__media-link" href="#" tabindex="-1" aria-hidden="true"><img class="product-card__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=720" alt="FlexFold Adjustable Bench" width="720" height="720"></a>
+                <span class="product-card__badge">-17%</span>
+              </div>
+              <h3 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h3>
+              <div class="price price--sale"><span class="price__current">$189.00</span><s class="price__compare">$229.00</s></div>
+            </li>
+            <li class="product-card">
+              <div class="product-card__media">
+                <a class="product-card__media-link" href="#" tabindex="-1" aria-hidden="true"><img class="product-card__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P07.jpg?width=720" alt="Compact Power Rack R3" width="720" height="720"></a>
+              </div>
+              <h3 class="product-card__title"><a href="#">Compact Power Rack R3</a></h3>
+              <div class="price"><span class="price__current">$549.00</span></div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nhóm Articles -->
+    <section class="results-group" aria-labelledby="g-articles">
+      <div class="group-head">
+        <h2 class="h2" id="g-articles">Articles</h2>
+        <a class="group-head__link" href="/search?q=dumbbell&amp;type=article"><span>View all</span><svg class="icon icon--arrow"><use href="#i-arrow"/></svg></a>
+      </div>
+      <ul class="article-grid">
+        <li class="article-card">
+          <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-3.jpg?width=720" alt="" width="720" height="1075">
+          <div class="article-card__body">
+            <h3 class="article-card__title"><a href="#">How to choose the right adjustable dumbbell</a></h3>
+            <p class="article-card__meta"><time datetime="2026-11-03">Nov 3, 2026</time></p>
+          </div>
+        </li>
+        <li class="article-card">
+          <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="1075">
+          <div class="article-card__body">
+            <h3 class="article-card__title"><a href="#">Set up a perfect home gym in just 15m²</a></h3>
+            <p class="article-card__meta"><time datetime="2026-11-04">Nov 4, 2026</time></p>
+          </div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- Nhóm Pages -->
+    <section class="results-group main-end" aria-labelledby="g-pages">
+      <div class="group-head">
+        <h2 class="h2" id="g-pages">Pages</h2>
+        <a class="group-head__link" href="/search?q=dumbbell&amp;type=page"><span>View all</span><svg class="icon icon--arrow"><use href="#i-arrow"/></svg></a>
+      </div>
+      <ul class="page-list">
+        <li><a class="page-row" href="#"><span class="page-row__text"><span class="page-row__title">FAQs</span><span class="page-row__url">/pages/faqs</span></span><svg class="icon icon--arrow"><use href="#i-arrow"/></svg></a></li>
+        <li><a class="page-row" href="#"><span class="page-row__text"><span class="page-row__title">Our Story</span><span class="page-row__url">/pages/our-story</span></span><svg class="icon icon--arrow"><use href="#i-arrow"/></svg></a></li>
+      </ul>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="page-width">
+    <div class="newsletter">
+      <div class="newsletter__media" role="img" aria-label="Newsletter image from footer settings"></div>
+      <div>
+        <h2 class="newsletter__title"><em>Get 15% off</em> your first order</h2>
+        <p class="newsletter__text">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+      </div>
+      <div>
+        <form class="newsletter__form"><label class="visually-hidden" for="nl">Email</label><input class="input" id="nl" type="email" placeholder="Email"><button class="button" type="submit">Get 15% Off</button></form>
+        <p class="newsletter__note">No spam. Unsubscribe anytime.</p>
+      </div>
+    </div>
+  </div>
+  <div class="footer-panel-wrap" style="padding-inline: clamp(0px, 3.125vw, 60px);">
+    <div class="footer-panel">
+      <div class="footer-panel__grid">
+        <div class="footer-brand">
+          <svg aria-hidden="true" focusable="false" width="100" height="30" viewBox="0 0 100 30" fill="none"><path d="M69.2121 25.06C65.8096 25.06 63.0507 22.2755 63.0507 18.8413C63.0507 15.4071 65.8096 12.6226 69.2121 12.6226C70.8674 12.6226 72.3756 13.2908 73.4791 14.3675L76.6058 11.2117C74.693 9.33683 72.0813 8.16734 69.2121 8.16734C63.3634 8.16734 58.6366 12.9381 58.6366 18.8413C58.6366 24.7445 63.3634 29.5153 69.2121 29.5153C72.0997 29.5153 74.693 28.3458 76.6058 26.4709L73.4791 23.3151C72.3756 24.3918 70.8674 25.06 69.2121 25.06Z" fill="currentColor"/><path d="M4.89235 17.8592H18.098V13.7381H4.89235V6.34985H19.0176V2.21021H0V29.4242H19.1096V25.3031H4.89235V17.8592Z" fill="currentColor"/><path d="M30.4549 0.928144C29.2962 0.928144 28.2294 1.1509 27.273 1.61499C26.3166 2.06051 25.5625 2.74736 24.9924 3.65696C24.4222 4.56657 24.1463 5.7175 24.1463 7.09119V9.02179H21.1484V12.7345H24.1463V29.423H28.9283V12.7345H34.2069V9.02179H28.9099V7.40677C28.9099 6.60855 29.0939 5.99595 29.4617 5.569C29.8295 5.14204 30.4549 4.91928 31.3377 4.91928C31.7239 4.91928 32.055 4.9564 32.3677 5.01209C32.6803 5.08635 32.9378 5.14204 33.1402 5.19773L34.0966 1.48505C33.7839 1.37367 33.3241 1.26229 32.6803 1.13234C32.0182 1.0024 31.2825 0.928144 30.4549 0.928144Z" fill="currentColor"/><path d="M41.7869 9.02139H37.0233V29.4411H41.7869V9.02139Z" fill="currentColor"/><path d="M54.863 25.5802C54.6056 25.6174 54.3297 25.6545 54.0354 25.6545C53.6492 25.6545 53.2813 25.5988 52.9503 25.4688C52.6192 25.3389 52.3617 25.1161 52.1594 24.7634C51.9571 24.4293 51.8651 23.9281 51.8651 23.2784V12.7344H56.9598V9.02167H51.8651V4.12093H47.1015V9.00311H44.2323V12.7158H47.1015V24.058C47.1015 25.3389 47.359 26.397 47.9292 27.2509C48.4809 28.1049 49.235 28.736 50.2098 29.1258C51.1662 29.5342 52.233 29.7199 53.4285 29.6827C54.109 29.6642 54.6791 29.6085 55.1389 29.4971C55.6171 29.3857 55.9666 29.2929 56.2241 29.2001L55.4148 25.4317C55.3045 25.506 55.1021 25.5431 54.863 25.5802Z" fill="currentColor"/><path d="M88.5225 8.25936C82.6738 8.25936 77.947 13.0302 77.947 18.9333C77.947 24.8365 82.6738 29.6073 88.5225 29.6073C94.3713 29.6073 99.0981 24.8365 99.0981 18.9333C99.0981 13.0302 94.3713 8.25936 88.5225 8.25936ZM88.5225 25.1521C85.1199 25.1521 82.3611 22.3676 82.3611 18.9333C82.3611 15.4991 85.1199 12.7146 88.5225 12.7146C91.9251 12.7146 94.6839 15.4991 94.6839 18.9333C94.6839 22.3676 91.9251 25.1521 88.5225 25.1521Z" fill="currentColor"/><path d="M97.7018 11.0638C97.0213 10.2656 96.2488 9.54159 95.3843 8.94756C96.1936 7.9637 97.2052 6.31156 96.7822 5.29057C96.5798 4.78936 95.3659 3.17434 88.524 3.17434C81.6821 3.17434 80.4682 4.80792 80.2659 5.30913C79.8429 6.33012 80.8728 8.00083 81.6637 8.96612C80.7993 9.56015 80.0268 10.2841 79.3463 11.0824C78.3163 9.85717 76.2196 6.90558 77.3783 4.08395C77.9485 2.72882 79.1256 1.70783 80.9648 1.03955C82.804 0.334141 85.3054 0 88.4688 0H88.5608C94.9061 0.0185634 98.5294 1.35513 99.6513 4.06538C100.828 6.88702 98.7317 9.8386 97.7018 11.0638Z" fill="currentColor"/><path d="M39.3213 6.40467C40.8449 6.40467 42.0801 5.158 42.0801 3.62016C42.0801 2.08231 40.8449 0.835646 39.3213 0.835646C37.7976 0.835646 36.5624 2.08231 36.5624 3.62016C36.5624 5.158 37.7976 6.40467 39.3213 6.40467Z" fill="currentColor"/></svg>          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+          <ul class="socials">
+            <li><a href="#" aria-label="TikTok"><svg class="icon"><use href="#i-tiktok"/></svg></a></li>
+            <li><a href="#" aria-label="Instagram"><svg class="icon"><use href="#i-instagram"/></svg></a></li>
+            <li><a href="#" aria-label="YouTube"><svg class="icon"><use href="#i-youtube"/></svg></a></li>
+            <li><a href="#" aria-label="Facebook"><svg class="icon"><use href="#i-facebook"/></svg></a></li>
+          </ul>
+        </div>
+        <div class="footer-menus">
+          <div><h2>Shop</h2><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></div>
+          <div><h2>Information</h2><ul><li><a href="#">Our Story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li></ul></div>
+        </div>
+      </div>
+      <ul class="trust">
+        <li><svg class="icon" viewBox="0 0 32 32"><use href="#i-shield"/></svg>1 Year Warranty</li>
+        <li><svg class="icon" viewBox="0 0 32 32"><use href="#i-truck"/></svg>Fast Shipping</li>
+        <li><svg class="icon" viewBox="0 0 32 32"><use href="#i-award"/></svg>Premium Quality</li>
+        <li><svg class="icon" viewBox="0 0 32 32"><use href="#i-return"/></svg>90 Day Money Back</li>
+      </ul>
+    </div>
+  </div>
+  <div class="page-width footer-bottom">
+    <p class="footer-bottom__start">© 2026 Efitco, Powered by Shopify</p>
+    <p class="wordmark" aria-hidden="true">EFITCO</p>
+    <div class="footer-bottom__end">
+      <button class="locale-btn" type="button">USD / EN <svg class="icon" style="inline-size:14px;block-size:14px"><use href="#i-chevron"/></svg></button>
+      <div class="payments" aria-label="Payment methods"><span></span><span></span><span></span><span></span><span></span></div>
+    </div>
+  </div>
+</footer>
+
+<!-- ========================================================= -->
+<!-- KHUNG 2: POPUP PREDICTIVE SEARCH Ở HEADER, query "dumbbell" -->
+<!-- Mobile: toàn màn. Từ 48rem: panel trên cùng, rộng page-width -->
+<!-- ========================================================= -->
+<section class="states" style="padding-block-end: 0;">
+  <div class="page-width">
+    <h2 class="states__title">Predictive search</h2>
+    <p class="states__intro">Popup mở từ icon search ở header, query "dumbbell", option thứ nhất đang chọn bằng phím ↓.</p>
+  </div>
+</section>
+<div class="demo">
+  <div class="demo__page" aria-hidden="true">
+    <div class="site-header"><div class="page-width site-header__inner"><div class="site-header__start"><span class="site-header__logo" style="font-family:var(--font-heading);font-weight:800;font-size:28px">Efitco</span></div><div class="site-header__icons"><span class="icon-button" aria-expanded="true"><svg class="icon"><use href="#i-search"/></svg></span><span class="icon-button"><svg class="icon"><use href="#i-user"/></svg></span><span class="icon-button"><svg class="icon"><use href="#i-bag"/></svg></span></div></div></div>
+    <div class="page-width" style="padding-block:48px"><p class="h1">Search</p></div>
+  </div>
+  <div class="demo__backdrop"></div>
+  <div class="ps" role="dialog" aria-label="Search">
+    <form class="ps__form" role="search">
+      <div class="field">
+        <svg class="icon field__icon"><use href="#i-search"/></svg>
+        <label class="visually-hidden" for="ps-q">Search products, collections, pages, or articles</label>
+        <input class="input is-focus" id="ps-q" type="search" value="dumbbell" role="combobox" aria-expanded="true" aria-controls="ps-list" aria-activedescendant="ps-o1" placeholder="Search products, collections, pages, or articles">
+      </div>
+      <button class="icon-button" type="button" aria-label="Close search"><svg class="icon"><use href="#i-close"/></svg></button>
+    </form>
+    <div class="ps__status" role="status">Suggestions found: 9</div>
+    <div class="ps__body" id="ps-list" role="listbox" aria-label="Search suggestions">
+      <div class="ps-group ps-group--products" role="group" aria-labelledby="psg-p">
+        <div class="ps-group__title" id="psg-p">Products</div>
+        <div class="ps-options">
+          <a class="ps-option" id="ps-o1" role="option" aria-selected="true" href="#">
+            <img class="ps-option__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=360" alt="" width="64" height="64">
+            <span class="ps-option__text"><span class="ps-option__title">Ativafit Lava 66 lb Adjustable</span><span class="price price--sale"><span class="price__current">$379.99</span><s class="price__compare">$499.99</s></span></span>
+          </a>
+          <a class="ps-option" role="option" aria-selected="false" href="#">
+            <img class="ps-option__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=360" alt="" width="64" height="64">
+            <span class="ps-option__text"><span class="ps-option__title">Ativafit Lava 66 lb</span><span class="price"><span class="price__current">$379.99</span></span></span>
+          </a>
+          <a class="ps-option" role="option" aria-selected="false" href="#">
+            <img class="ps-option__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png?width=360" alt="" width="64" height="64">
+            <span class="ps-option__text"><span class="ps-option__title">Home Starter Kit</span><span class="price price--sale"><span class="price__current">$399.00</span><s class="price__compare">$512.00</s></span></span>
+          </a>
+          <a class="ps-option" role="option" aria-selected="false" href="#">
+            <img class="ps-option__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=360" alt="" width="64" height="64">
+            <span class="ps-option__text"><span class="ps-option__title">Olympic Plate Set 100</span><span class="price price--sale"><span class="price__current">$289.00</span><s class="price__compare">$339.00</s></span></span>
+          </a>
+        </div>
+      </div>
+      <div class="ps-group" role="group" aria-labelledby="psg-c">
+        <div class="ps-group__title" id="psg-c">Collections</div>
+        <div class="ps-options">
+          <a class="ps-option" role="option" aria-selected="false" href="#"><span class="ps-option__title">Weight</span></a>
+          <a class="ps-option" role="option" aria-selected="false" href="#"><span class="ps-option__title">Setup</span></a>
+        </div>
+      </div>
+      <div class="ps-group" role="group" aria-labelledby="psg-pg">
+        <div class="ps-group__title" id="psg-pg">Pages</div>
+        <div class="ps-options">
+          <a class="ps-option" role="option" aria-selected="false" href="#"><span class="ps-option__title">FAQs</span></a>
+        </div>
+      </div>
+      <div class="ps-group" role="group" aria-labelledby="psg-a">
+        <div class="ps-group__title" id="psg-a">Articles</div>
+        <div class="ps-options">
+          <a class="ps-option" role="option" aria-selected="false" href="#">
+            <img class="ps-option__image ps-option__image--cover" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-3.jpg?width=180" alt="" width="64" height="64">
+            <span class="ps-option__text"><span class="ps-option__title">How to choose the right adjustable <mark>dumbbell</mark></span><span class="ps-option__meta">Nov 3, 2026</span></span>
+          </a>
+          <a class="ps-option" role="option" aria-selected="false" href="#">
+            <img class="ps-option__image ps-option__image--cover" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=180" alt="" width="64" height="64">
+            <span class="ps-option__text"><span class="ps-option__title">Set up a perfect home gym in just 15m²</span><span class="ps-option__meta">Nov 4, 2026</span></span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <a class="ps__all" role="option" aria-selected="false" href="/search?q=dumbbell">View all results for “dumbbell”<svg class="icon icon--arrow"><use href="#i-arrow"/></svg></a>
+  </div>
+</div>
+
+<!-- ========================================================= -->
+<!-- TRẠNG THÁI RỖNG / LỖI / LOADING (cuối file)                 -->
+<!-- ========================================================= -->
+<section class="states" aria-labelledby="states-title">
+  <div class="page-width">
+    <h2 class="states__title" id="states-title">Trạng thái</h2>
+    <p class="states__intro">Mọi khung dưới đây là ĐỀ XUẤT (Figma không có). Chuỗi mới ghi trong docs/ui-spec/search.md mục Locale.</p>
+
+    <!-- P1 -->
+    <div class="state">
+      <h3 class="state__label">P1 · Predictive · query rỗng (&lt; 2 ký tự) <small>Gợi ý collection từ menu merchant chọn; menu trống thì chỉ hiện ô nhập</small></h3>
+      <div class="state__frame">
+        <div class="ps">
+          <form class="ps__form" role="search"><div class="field"><svg class="icon field__icon"><use href="#i-search"/></svg><input class="input is-focus" type="search" aria-label="Search products, collections, pages, or articles" placeholder="Search products, collections, pages, or articles"></div><button class="icon-button" type="button" aria-label="Close search"><svg class="icon"><use href="#i-close"/></svg></button></form>
+          <div class="ps__body" style="display:block">
+            <div class="ps-group__title">Popular collections</div>
+            <div class="ps-chips"><a class="tab" href="#">Setup</a><a class="tab" href="#">Bundle</a><a class="tab" href="#">Accessories</a><a class="tab" href="#">Portable Fitness</a><a class="tab" href="#">Weight</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P2 -->
+    <div class="state">
+      <h3 class="state__label">P2 · Predictive · đang tải <small>Sau 300ms từ ký tự thứ 2; skeleton đúng bố cục kết quả; status "Searching…"</small></h3>
+      <div class="state__frame">
+        <div class="ps" aria-busy="true">
+          <form class="ps__form" role="search"><div class="field"><svg class="icon field__icon"><use href="#i-search"/></svg><input class="input is-focus" type="search" value="dumbbell" aria-label="Search products, collections, pages, or articles"></div><button class="icon-button" type="button" aria-label="Close search"><svg class="icon"><use href="#i-close"/></svg></button></form>
+          <div class="ps__status" role="status">Searching…</div>
+          <div class="ps__body">
+            <div class="ps-group ps-group--products">
+              <div class="ps-group__title">Products</div>
+              <div class="ps-options">
+                <div class="sk-row"><span class="skeleton sk-thumb"></span><span class="sk-lines"><span class="skeleton sk-line"></span><span class="skeleton sk-line sk-line--short"></span></span></div>
+                <div class="sk-row"><span class="skeleton sk-thumb"></span><span class="sk-lines"><span class="skeleton sk-line"></span><span class="skeleton sk-line sk-line--short"></span></span></div>
+                <div class="sk-row"><span class="skeleton sk-thumb"></span><span class="sk-lines"><span class="skeleton sk-line"></span><span class="skeleton sk-line sk-line--short"></span></span></div>
+                <div class="sk-row"><span class="skeleton sk-thumb"></span><span class="sk-lines"><span class="skeleton sk-line"></span><span class="skeleton sk-line sk-line--short"></span></span></div>
+              </div>
+            </div>
+            <div class="ps-group">
+              <div class="ps-group__title">Collections</div>
+              <div class="sk-row"><span class="sk-lines"><span class="skeleton sk-line"></span></span></div>
+              <div class="sk-row"><span class="sk-lines"><span class="skeleton sk-line sk-line--short"></span></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P3 -->
+    <div class="state">
+      <h3 class="state__label">P3 · Predictive · không có gợi ý <small>Chuỗi có sẵn blocks.predictive_search.empty; dòng phụ và chip là ĐỀ XUẤT</small></h3>
+      <div class="state__frame">
+        <div class="ps">
+          <form class="ps__form" role="search"><div class="field"><svg class="icon field__icon"><use href="#i-search"/></svg><input class="input is-focus" type="search" value="dumbbelx" aria-label="Search products, collections, pages, or articles"></div><button class="icon-button" type="button" aria-label="Close search"><svg class="icon"><use href="#i-close"/></svg></button></form>
+          <div class="ps__body" style="display:block">
+            <div class="ps-message" role="status">
+              <p class="ps-message__title">No suggestions for “dumbbelx”</p>
+              <p>Check the spelling or try a broader term.</p>
+            </div>
+            <div class="ps-group__title" style="margin-block-start:16px">Popular collections</div>
+            <div class="ps-chips"><a class="tab" href="#">Setup</a><a class="tab" href="#">Bundle</a><a class="tab" href="#">Accessories</a><a class="tab" href="#">Portable Fitness</a><a class="tab" href="#">Weight</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P4 -->
+    <div class="state">
+      <h3 class="state__label">P4 · Predictive · lỗi tải gợi ý <small>Fetch lỗi hoặc timeout; Enter vẫn gửi form GET tới trang search (AC3)</small></h3>
+      <div class="state__frame">
+        <div class="ps">
+          <form class="ps__form" role="search"><div class="field"><svg class="icon field__icon"><use href="#i-search"/></svg><input class="input is-focus" type="search" value="dumbbell" aria-label="Search products, collections, pages, or articles"></div><button class="icon-button" type="button" aria-label="Close search"><svg class="icon"><use href="#i-close"/></svg></button></form>
+          <div class="ps__body" style="display:block">
+            <div class="ps-message ps-message--error" role="status">
+              <svg class="icon"><use href="#i-alert"/></svg>
+              <div><p class="ps-message__title">Suggestions are unavailable right now</p><p>Press Enter to see all results.</p></div>
+            </div>
+          </div>
+          <a class="ps__all" href="/search?q=dumbbell">View all results for “dumbbell”<svg class="icon icon--arrow"><use href="#i-arrow"/></svg></a>
+        </div>
+      </div>
+    </div>
+
+    <!-- S1 -->
+    <div class="state">
+      <h3 class="state__label">S1 · Trang search · query rỗng <small>search.performed = false; chip lấy cùng menu với P1</small></h3>
+      <div class="state__frame state__frame--page">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><span aria-current="page">Search</span></li></ol></nav>
+          <div class="search-head" style="padding-block-end:32px">
+            <h1 class="h1">Search</h1>
+            <form class="search-form" role="search"><div class="field"><svg class="icon field__icon"><use href="#i-search"/></svg><input class="input" type="search" aria-label="Search articles, pages, or products" placeholder="Search articles, pages, or products"></div><button class="button" type="submit"><svg class="icon icon--20"><use href="#i-search"/></svg><span>Search</span></button></form>
+          </div>
+          <div class="empty">
+            <p class="empty__label">Popular collections</p>
+            <div class="empty__chips"><a class="tab" href="#">Setup</a><a class="tab" href="#">Bundle</a><a class="tab" href="#">Accessories</a><a class="tab" href="#">Portable Fitness</a><a class="tab" href="#">Weight</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S2 -->
+    <div class="state">
+      <h3 class="state__label">S2 · Trang search · không kết quả <small>Chuỗi có sẵn search.no_results_html; gợi ý và nút là ĐỀ XUẤT</small></h3>
+      <div class="state__frame state__frame--page">
+        <div class="page-width">
+          <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="/">Home</a></li><li><span aria-current="page">Search</span></li></ol></nav>
+          <div class="search-head" style="padding-block-end:32px">
+            <h1 class="h1">Search</h1>
+            <form class="search-form" role="search"><div class="field"><svg class="icon field__icon"><use href="#i-search"/></svg><input class="input" type="search" value="dumbbelx" aria-label="Search articles, pages, or products"></div><button class="button" type="submit"><svg class="icon icon--20"><use href="#i-search"/></svg><span>Search</span></button></form>
+          </div>
+          <div class="empty" role="status">
+            <p class="empty__title">No results found for “dumbbelx”</p>
+            <ul class="empty__list"><li>Check the spelling.</li><li>Use fewer or more general words.</li></ul>
+            <p class="empty__label">Popular collections</p>
+            <div class="empty__chips"><a class="tab" href="#">Setup</a><a class="tab" href="#">Bundle</a><a class="tab" href="#">Accessories</a><a class="tab" href="#">Portable Fitness</a><a class="tab" href="#">Weight</a></div>
+            <p><a class="button" href="/collections/all">Continue Shopping</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S3 -->
+    <div class="state">
+      <h3 class="state__label">S3 · Trang search · đang tải (lọc, sắp xếp, đổi trang) <small>BE refresh partial; lưới giữ chỗ bằng skeleton, aria-busy trên vùng kết quả</small></h3>
+      <div class="state__frame state__frame--page">
+        <div class="page-width" style="padding-block-start:24px">
+          <div class="products-layout">
+            <aside class="filters is-loading" aria-label="Filters">
+              <div class="filters__head"><span class="filters__title">Filters</span></div>
+              <details class="filter-group" open><summary>Availability <svg class="icon"><use href="#i-chevron"/></svg></summary><div class="filter-group__body"><label class="check"><input type="checkbox" checked> In stock (6)</label></div></details>
+            </aside>
+            <div class="products-main" aria-busy="true">
+              <div class="toolbar"><button class="button button--secondary filter-toggle" type="button"><svg class="icon icon--20"><use href="#i-filter"/></svg>Filter (1)</button><span></span><div class="select-wrap"><label for="sort2">Sort by</label><select class="select" id="sort2"><option>Price, low to high</option></select><svg class="icon"><use href="#i-chevron"/></svg></div></div>
+              <ul class="product-grid">
+                <li class="sk-card"><span class="skeleton"></span><span class="skeleton sk-line"></span><span class="skeleton sk-line sk-line--short"></span></li>
+                <li class="sk-card"><span class="skeleton"></span><span class="skeleton sk-line"></span><span class="skeleton sk-line sk-line--short"></span></li>
+                <li class="sk-card"><span class="skeleton"></span><span class="skeleton sk-line"></span><span class="skeleton sk-line sk-line--short"></span></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4 -->
+    <div class="state">
+      <h3 class="state__label">S4 · Trang search · lỗi cập nhật kết quả <small>Refresh partial lỗi: giữ kết quả cũ, báo lỗi, link tải lại trang (GET đầy đủ)</small></h3>
+      <div class="state__frame state__frame--page">
+        <div class="page-width" style="padding-block-start:24px">
+          <div class="notice" role="alert"><svg class="icon"><use href="#i-alert"/></svg><p>Couldn’t update the results. <a href="/search?q=dumbbell">Reload the page</a></p></div>
+          <ul class="product-grid">
+            <li class="product-card"><div class="product-card__media"><a class="product-card__media-link" href="#" tabindex="-1" aria-hidden="true"><img class="product-card__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=720" alt="Training Mat 12 mm" width="720" height="720"></a></div><h3 class="product-card__title"><a href="#">Training Mat 12 mm</a></h3><div class="price"><span class="price__current">$69.00</span></div></li>
+            <li class="product-card"><div class="product-card__media"><a class="product-card__media-link" href="#" tabindex="-1" aria-hidden="true"><img class="product-card__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P06.jpg?width=720" alt="FlexFold Bench" width="720" height="720"></a></div><h3 class="product-card__title"><a href="#">FlexFold Bench</a></h3><div class="price"><span class="price__current">$189.99</span></div></li>
+            <li class="product-card"><div class="product-card__media"><a class="product-card__media-link" href="#" tabindex="-1" aria-hidden="true"><img class="product-card__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=720" alt="Revllen Pro Speed Rope" width="720" height="720"></a><span class="product-card__badge">-22%</span></div><h3 class="product-card__title"><a href="#">Revllen Pro Speed Rope</a></h3><div class="price price--sale"><span class="price__current">$34.99</span><s class="price__compare">$44.99</s></div></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5 -->
+    <div class="state">
+      <h3 class="state__label">S5 · Trang search · phân trang <small>Hơn 20 kết quả; giữ q, type, filter, sort trong URL</small></h3>
+      <div class="state__frame" style="padding-block:8px 32px">
+        <nav class="pagination" aria-label="Pagination" style="margin-block-start:24px">
+          <ol>
+            <li><span class="is-disabled" aria-disabled="true"><span class="visually-hidden">Previous page</span><svg class="icon icon--arrow" style="scale:-1 1"><use href="#i-arrow"/></svg></span></li>
+            <li><span aria-current="page">1</span></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#" aria-label="Next page"><svg class="icon icon--arrow"><use href="#i-arrow"/></svg></a></li>
+          </ol>
+        </nav>
+      </div>
+    </div>
+  </div>
+</section>
+
+</body>
+</html>
