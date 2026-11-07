@@ -16,7 +16,11 @@
 
     {% unless settings.type_primary_font.system? %}
       {% comment %} Preload only the body font base variant (ADR 0003: preload 1 font) {% endcomment %}
-      {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+      {%- if settings.type_primary_font.family == 'Inter' -%}
+        {{ 'inter-500.woff2' | asset_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+      {%- else -%}
+        {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
+      {%- endif -%}
     {% endunless %}
 
     {% # Load and preload the critical CSS %}
