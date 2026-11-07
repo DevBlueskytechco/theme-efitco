@@ -16,11 +16,7 @@
 
     {% unless settings.type_primary_font.system? %}
       {% comment %} Preload only the body font base variant (ADR 0003: preload 1 font) {% endcomment %}
-      {%- if settings.type_primary_font.family == 'Inter' -%}
-        {{ 'inter-500.woff2' | asset_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
-      {%- else -%}
-        {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
-      {%- endif -%}
+      {{ settings.type_primary_font | font_url | preload_tag: as: 'font', crossorigin: 'anonymous' }}
     {% endunless %}
 
     {% # Load and preload the critical CSS %}
@@ -32,6 +28,7 @@
 
     {{ content_for_header }}
     <script src="{{ 'standard-events.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'motion.js' | asset_url }}" type="module"></script>
   </head>
 
   <body>

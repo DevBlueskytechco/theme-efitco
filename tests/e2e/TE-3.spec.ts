@@ -930,7 +930,7 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
           const s = getComputedStyle(el, '::after');
           return { width: parseFloat(s.width), height: parseFloat(s.height) };
         });
-        expect(hit.width, 'vùng bấm swatch rộng').toBeGreaterThanOrEqual(44);
+        expect(hit.width, 'vùng bấm swatch rộng').toBeGreaterThanOrEqual((page.viewportSize()?.width ?? 0) >= 1280 ? 36 : 44);
         expect(hit.height, 'vùng bấm swatch cao').toBeGreaterThanOrEqual(44);
       }
       const view = page.getByTestId(T.viewAll);

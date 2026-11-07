@@ -241,7 +241,7 @@ Phát hiện khác ES1-T168 và inventory:
 | 1:807 | store | Cast iron core, reinforced rubber | | custom.spec_3 |
 | 1:812 | copy | Assembly | blocks.featured_product.default_spec_4_label | |
 | 1:813 | store | None — ready out of the box | | custom.spec_4 |
-| I1:815;4912:3545 | copy | Add to cart | blocks.product_form.add_to_cart (có sẵn) | E11: Figma "Add To Cart" |
+| I1:815;4912:3545 | copy | Add To Cart | blocks.product_form.add_to_cart (có sẵn) | E11: Figma "Add To Cart" |
 | I1:816;377:1347 | copy | View Detail | blocks.featured_product.view_detail (có sẵn) | Có icon mũi tên |
 | 1:761 | ảnh | Dấu tròn: "Feature  Product   -   Efitco  -  " + biểu tượng | | SVG, ES1-T174. Chữ nằm trong SVG, không vào locale |
 | 1:760 | ảnh | Ảnh sản phẩm P15 | | Ảnh fill trên frame, theo `1-759.png` |

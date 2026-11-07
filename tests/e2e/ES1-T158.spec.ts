@@ -519,7 +519,7 @@ test.describe('ES1-T158 AC2 nhiều block: JSON (D4)', () => {
     await expect(add.locator('.product-form__add-label')).toHaveText('Sold out');
     await choose(scope, current);
     await expect(add).toBeEnabled();
-    await expect(add.locator('.product-form__add-label')).toHaveText('Add to cart');
+    await expect(add.locator('.product-form__add-label')).toHaveText('Add To Cart');
   });
 });
 

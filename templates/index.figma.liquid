@@ -118,20 +118,13 @@
   assign fi_pos_4 = images['efx-pos-4.jpg']
   assign fi_pos_5 = images['efx-pos-5.jpg']
   assign fi_pos_6 = images['efx-pos-6.jpg']
-  assign fi_vt_1 = images['efx-vthumb-1.jpg']
-  assign fi_vt_2 = images['efx-vthumb-2.jpg']
-  assign fi_vt_3 = images['efx-vthumb-3.jpg']
-  assign fi_vt_4 = images['efx-vthumb-4.jpg']
-  assign fi_vt_5 = images['efx-vthumb-5.jpg']
-  assign fi_vt_6 = images['efx-vthumb-6.jpg']
-  assign fi_rt_1 = images['efx-rthumb-1.jpg']
-  assign fi_rt_2 = images['efx-rthumb-2.jpg']
 
   # Store có bộ ảnh mẫu: nhãn Verified và đếm ngược như Figma. Store mới cài không có file nên tắt (CTO 06/11).
   assign home_demo = false
   if fi_slide_1 != blank
     assign home_demo = true
-    assign demo_countdown_end = 'now' | date: '%s' | plus: 81360 | date: '%Y-%m-%d %H:%M'
+    # Khuyến mãi trong ngày: hết lúc 23:59 giờ store, đếm ngược là thời gian thật
+    assign demo_countdown_end = 'now' | date: '%Y-%m-%d' | append: ' 23:59'
   endif
   assign fp_rev_1 = all_products['figma-ativafit-lava']
   assign fp_rev_2 = all_products['figma-compact-power-rack-r3']
@@ -365,7 +358,6 @@
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_1,
-      thumb: fi_vt_1,
       product: figma_video_product_1
     %}{% endblock %}
     {% block 'video-card',
@@ -374,7 +366,6 @@
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_2,
-      thumb: fi_vt_2,
       product: figma_video_product_2
     %}{% endblock %}
     {% block 'video-card',
@@ -383,7 +374,6 @@
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_3,
-      thumb: fi_vt_3,
       product: figma_video_product_3
     %}{% endblock %}
     {% block 'video-card',
@@ -392,7 +382,6 @@
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_4,
-      thumb: fi_vt_4,
       product: figma_video_product_4
     %}{% endblock %}
     {% block 'video-card',
@@ -401,7 +390,6 @@
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_5,
-      thumb: fi_vt_5,
       product: figma_video_product_5
     %}{% endblock %}
     {% block 'video-card',
@@ -410,7 +398,6 @@
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_6,
-      thumb: fi_vt_6,
       product: figma_video_product_6
     %}{% endblock %}
     {% block 'video-card', id: 'figma-video-card-7' %}{% endblock %}
@@ -423,7 +410,6 @@
     {% block 'testimonial-item',
       id: 'figma-testimonial-1',
       image: fi_rev_1,
-      thumb: fi_rt_1,
       default_verified: home_demo,
       product: fp_rev_1,
       default_author: r1_name,
@@ -434,7 +420,6 @@
     {% block 'testimonial-item',
       id: 'figma-testimonial-2',
       image: fi_rev_2,
-      thumb: fi_rt_2,
       default_verified: home_demo,
       product: fp_rev_2,
       default_author: r2_name,
@@ -445,7 +430,6 @@
     {% block 'testimonial-item',
       id: 'figma-testimonial-3',
       image: fi_rev_3,
-      thumb_blank: home_demo,
       default_verified: home_demo,
       product: fp_rev_3,
       default_author: r3_name,
@@ -456,7 +440,6 @@
     {% block 'testimonial-item',
       id: 'figma-testimonial-4',
       image: fi_rev_4,
-      thumb_blank: home_demo,
       default_verified: home_demo,
       product: fp_rev_4,
       default_author: r4_name,

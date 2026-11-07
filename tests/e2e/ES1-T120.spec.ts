@@ -264,7 +264,8 @@ test.describe('ES1-T120 TE-7 image with text', () => {
 
     await expect(page.locator('[data-image-with-text-id="inspiration"]')).toHaveClass(/image-with-text--banner/);
     await expect(page.locator('[data-image-with-text-id="why-choose"]')).toHaveClass(/image-with-text--split/);
-    await expect(tid(whyChoose, 'image-with-text-image-placeholder')).toBeVisible();
+    // Trang chủ đã nối ảnh (CTO 07/11)
+    await expect(tid(whyChoose, 'image-with-text-image-placeholder')).toHaveCount(0);
     await expect(tid(inspiration, 'image-with-text-image-placeholder')).toHaveCount(0);
 
     // ES1-T180: copy Figma thay chữ hướng dẫn (AC-H5). Hàng 13 có chữ efitco nên bỏ assert cũ; chi tiết copy ở ES1-T180.spec.ts.

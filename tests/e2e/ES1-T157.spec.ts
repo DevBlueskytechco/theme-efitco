@@ -218,10 +218,10 @@ test.describe('ES1-T157 TE-13 video carousel', () => {
     expect(errors).toEqual([]);
   });
 
-  test('AC3-markup trang chủ chưa cấu hình: không có video carousel, không có band rỗng', async ({ page }) => {
+  test('AC3-markup trang chủ đã nối dữ liệu (CTO 07/11): có video carousel', async ({ page }) => {
     await page.goto(HOME);
-    await expect(band(page, 'home-video-carousel')).toHaveCount(0);
-    await expect(page.getByTestId('video-carousel')).toHaveCount(0);
+    await expect(band(page, 'home-video-carousel')).toHaveCount(1);
+    await expect(page.getByTestId('video-carousel')).toHaveCount(1);
   });
 });
 

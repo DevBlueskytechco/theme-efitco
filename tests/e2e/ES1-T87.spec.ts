@@ -1,5 +1,5 @@
 // KHÔNG CHẮC: spec chưa chạy (sandbox agent không mở được trình duyệt) → chờ CI.
-// Ticket ES1-T87 Bug TE-4 (CI #70): partial fetch lỗi/abort thì nút Add to cart kẹt disabled.
+// Ticket ES1-T87 Bug TE-4 (CI #70): partial fetch lỗi/abort thì nút Add To Cart kẹt disabled.
 // Nguyên nhân: selectOptions đi qua tổ hợp không tồn tại → unavailable() đặt disabled + "Unavailable"; fetch của variant cuối lỗi → catch giữ nguyên.
 // Sửa: assets/product-variant-picker.js lưu nút add + tồn kho đã render (lúc load, sau mỗi apply); fetch/apply lỗi mà không do chính picker huỷ → khôi phục.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_OPTIONS_HANDLE=... npx playwright test tests/e2e/ES1-T87.spec.ts

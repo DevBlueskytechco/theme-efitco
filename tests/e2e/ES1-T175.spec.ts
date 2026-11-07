@@ -88,7 +88,6 @@ test.describe('ES1-T175 template cổng /?view=figma', () => {
     await page.goto(FIGMA);
     const meta = page.getByTestId('figma-meta');
     for (const [attribute, handle] of [
-      ['data-images', 'figma-level-beginner'],
       ['data-featured-collection', 'figma-tab-all'],
       ['data-bundle', 'figma-bundle'],
       ['data-featured-product', 'figma-ativafit-lava-featured'],

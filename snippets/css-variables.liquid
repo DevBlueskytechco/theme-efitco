@@ -23,13 +23,6 @@
 
 {% style %}
   {% # Loads font variants with display: swap. Variants the font family lacks return nil and are skipped. %}
-  {%- comment -%} Figma dùng Inter v4; thư viện font Shopify là v3, chữ hẹp hơn ~1%. Chỉ áp khi merchant giữ Inter. Inter: SIL OFL 1.1. {%- endcomment -%}
-  {%- if settings.type_primary_font.family == 'Inter' -%}
-    @font-face { font-family: 'Inter V4'; font-weight: 400; font-style: normal; font-display: swap; src: url('{{ 'inter-400.woff2' | asset_url }}') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-    @font-face { font-family: 'Inter V4'; font-weight: 500; font-style: normal; font-display: swap; src: url('{{ 'inter-500.woff2' | asset_url }}') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-    @font-face { font-family: 'Inter V4'; font-weight: 600; font-style: normal; font-display: swap; src: url('{{ 'inter-600.woff2' | asset_url }}') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-    @font-face { font-family: 'Inter V4'; font-weight: 700; font-style: normal; font-display: swap; src: url('{{ 'inter-700.woff2' | asset_url }}') format('woff2'); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-  {%- endif -%}
   {{ body_font | font_face: font_display: 'swap' }}
   {%- if body_font_medium %}{{ body_font_medium | font_face: font_display: 'swap' }}{% endif -%}
   {%- if body_font_semibold %}{{ body_font_semibold | font_face: font_display: 'swap' }}{% endif -%}
@@ -41,7 +34,7 @@
 
   :root {
     /* Fonts */
-    --font-primary--family: {% if settings.type_primary_font.family == 'Inter' %}'Inter V4', {% endif %}{{ body_font.family }}, {{ body_font.fallback_families }};
+    --font-primary--family: {{ body_font.family }}, {{ body_font.fallback_families }};
     --font-primary--style: {{ body_font.style }};
     --font-primary--weight: {{ body_font.weight }};
     --font-heading--family: {{ heading_font.family }}, {{ heading_font.fallback_families }};
@@ -113,5 +106,37 @@
     --color-badge-new: {{ settings.badge_new_color }};
     --color-badge-new-foreground: {{ settings.badge_new_foreground_color }};
     --color-rating: {{ settings.rating_color }};
+    --figma-radius-2: 2px;
+    --figma-radius-4: 4px;
+    --figma-radius-8: 8px;
+    --figma-radius-12: 12px;
+    --figma-radius-16: 16px;
+    --figma-radius-18: 18px;
+    --figma-radius-24: 24px;
+    --figma-radius-999: 999px;
+    --motion-fast: 150ms;
+    --motion-base: 250ms;
+    --motion-slow: 500ms;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --figma-000000: #000;
+    --figma-1a1a1a: #1a1a1a;
+    --figma-1c1c1c: #1c1c1c;
+    --figma-333333: #333;
+    --figma-393942: #393942;
+    --figma-4b824d: #4b824d;
+    --figma-4d4d4d: #4d4d4d;
+    --figma-666666: var(--color-muted-on-dark);
+    --figma-808080: var(--color-muted-light);
+    --figma-999999: #999;
+    --figma-b2b2b2: #b2b2b2;
+    --figma-d9d9d9: #d9d9d9;
+    --figma-e5e5e5: #e5e5e5;
+    --figma-ebe6e0: #ebe6e0;
+    --figma-f4f4f5: #f4f4f5;
+    --figma-f5f5f1: #f5f5f1;
+    --figma-ffffff: #fff;
+    --figma-white-12: rgb(255 255 255 / 0.12);
+    --figma-white-60: rgb(255 255 255 / 0.6);
   }
 {% endstyle %}

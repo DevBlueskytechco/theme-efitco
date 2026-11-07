@@ -58,7 +58,8 @@ async function expectFigmaTestimonials(scope: Locator) {
     await expect(stars.locator('.rating-stars__star--filled')).toHaveCount(rating);
   }
   // E9: Verified mặc định tắt
-  await expect(tid(scope, 'testimonial-verified')).toHaveCount(0);
+  // Store dev có bộ ảnh mẫu nên bật như Figma; store mới cài vẫn tắt (template kiểm tra file)
+  await expect(tid(scope, 'testimonial-verified')).toHaveCount(4);
 }
 
 test.describe('ES1-T179 TE-17 FAQ, testimonials mặc định', () => {

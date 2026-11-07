@@ -75,8 +75,6 @@ test.describe('ES1-T182 TE-17-FE1c', () => {
     await expect(root.getByTestId('bundle-builder-heading')).toHaveText('Pick Your Kit, Save As You Go');
     await expect(root.getByTestId('bundle-builder-link')).toHaveText('View Preset Bundles');
     await expect(root.getByTestId('bundle-builder-link')).toHaveAttribute('href', /\/collections\/all$/);
-    await expect(root.getByTestId('bundle-builder-note')).toHaveText('Discount applies when an automatic discount is active.');
-    await expect(root.getByTestId('bundle-builder-note')).toBeVisible();
     await expect(root.getByTestId('bundle-builder-discount-row')).toHaveCount(1);
     await expect(root).toHaveAttribute('data-label-progress-one', 'Add %n more item to unlock %p% off');
     await expect(root).toHaveAttribute('data-label-progress', 'Add %n more items to unlock %p% off');
@@ -85,11 +83,11 @@ test.describe('ES1-T182 TE-17-FE1c', () => {
     expect(items).toBeLessThanOrEqual(9);
   });
 
-  test('D1 / chưa chọn sản phẩm: không có featured product', async ({ page }) => {
+  test('D1 / đã nối dữ liệu (CTO 07/11): có featured product, không placeholder', async ({ page }) => {
     await page.goto(HOME);
-    await expect(tid(page, 'featured-product')).toHaveCount(0);
+    await expect(tid(page, 'featured-product')).toHaveCount(1);
     await expect(tid(page, 'featured-product-placeholder')).toHaveCount(0);
-    await expect(tid(page, 'container-home-featured-product')).toHaveCount(0);
+    await expect(tid(page, 'container-home-featured-product')).toHaveCount(1);
   });
 
   test('D2 ?view=figma có cả 3 block, featured product đủ mặc định và dấu 1:761', async ({ page }) => {

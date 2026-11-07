@@ -1105,7 +1105,7 @@ test.describe('ES1-T70 TE-4 AC5 sticky bar', () => {
     await selectOptions(page, target!.options);
     await settled(page);
     await expect.poll(async () => cents(await tid(page, T.stickyPrice).getByTestId(T.priceRegular).first().textContent())).toBe(target!.price);
-    await expect(tid(page, T.stickyAdd)).toHaveText(target!.available ? 'Add to cart' : 'Sold out');
+    await expect(tid(page, T.stickyAdd)).toHaveText(target!.available ? 'Add To Cart' : 'Sold out');
   });
 
   test('AC5 TC-504 biên 360px: sticky nằm trong màn, không tràn ngang', async ({ page }) => {
@@ -1468,7 +1468,7 @@ test.describe('ES1-T70 TE-4 AC8 thêm giỏ', () => {
     await page.waitForURL(isCart);
   });
 
-  test('AC8 TC-806 keyboard: Enter trên nút Add to cart gửi cart/add.js đúng 1 lần', async ({ page }) => {
+  test('AC8 TC-806 keyboard: Enter trên nút Add To Cart gửi cart/add.js đúng 1 lần', async ({ page }) => {
     await openBuyable(page);
     await skipIfDrawer(page);
     const requests = await mockAdd(page);

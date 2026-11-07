@@ -67,8 +67,11 @@ test.describe('ES1-T30 điều hướng', () => {
     await page.getByTestId('slideshow-prev').click();
     await expect.poll(() => activeIndex(page)).toBe(0);
 
-    await dots.nth(count - 1).click();
-    await expect.poll(() => activeIndex(page)).toBe(count - 1);
+    // Trang chủ không autoplay ẩn chấm theo Figma (CTO 07/11); chấm chỉ hiện khi bật autoplay
+    if (await dots.nth(count - 1).isVisible()) {
+      await dots.nth(count - 1).click();
+      await expect.poll(() => activeIndex(page)).toBe(count - 1);
+    }
     expect(errors).toEqual([]);
   });
 

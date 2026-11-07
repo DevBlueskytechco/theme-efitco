@@ -100,20 +100,13 @@
   assign fi_pos_4 = images['efx-pos-4.jpg']
   assign fi_pos_5 = images['efx-pos-5.jpg']
   assign fi_pos_6 = images['efx-pos-6.jpg']
-  assign fi_vt_1 = images['efx-vthumb-1.jpg']
-  assign fi_vt_2 = images['efx-vthumb-2.jpg']
-  assign fi_vt_3 = images['efx-vthumb-3.jpg']
-  assign fi_vt_4 = images['efx-vthumb-4.jpg']
-  assign fi_vt_5 = images['efx-vthumb-5.jpg']
-  assign fi_vt_6 = images['efx-vthumb-6.jpg']
-  assign fi_rt_1 = images['efx-rthumb-1.jpg']
-  assign fi_rt_2 = images['efx-rthumb-2.jpg']
 
   # Store có bộ ảnh mẫu: nhãn Verified và đếm ngược như Figma. Store mới cài không có file nên tắt (CTO 06/11).
   assign home_demo = false
   if fi_slide_1 != blank
     assign home_demo = true
-    assign demo_countdown_end = 'now' | date: '%s' | plus: 81360 | date: '%Y-%m-%d %H:%M'
+    # Khuyến mãi trong ngày: hết lúc 23:59 giờ store, đếm ngược là thời gian thật
+    assign demo_countdown_end = 'now' | date: '%Y-%m-%d' | append: ' 23:59'
   endif
   assign fp_rev_1 = all_products['figma-ativafit-lava']
   assign fp_rev_2 = all_products['figma-compact-power-rack-r3']
@@ -192,7 +185,7 @@
 {% block 'container', id: 'home-hero' %}
   {% block 'slideshow' %}
     {% block 'slideshow-slide',
-      id: 'home-slide-1',
+      id: 'slide-1',
       priority: true,
       image: fi_slide_2,
       overlay_opacity: 0,
@@ -202,7 +195,7 @@
       default_button_label: slide_button_label
     %}{% endblock %}
     {% block 'slideshow-slide',
-      id: 'home-slide-2',
+      id: 'slide-2',
       image: fi_slide_1,
       overlay_opacity: 0,
       default_eyebrow: slide_eyebrow,
@@ -215,26 +208,26 @@
 
 {% block 'container', id: 'home-collection-list', background: 'dark' %}
   {% block 'collection-list' %}
-    {% block 'collection-card', id: 'home-collection-card-1', handle: 'figma-cat-free-weights', image: fi_col_1 %}{% endblock %}
-    {% block 'collection-card', id: 'home-collection-card-2', handle: 'figma-cat-functional-training', image: fi_col_2 %}{% endblock %}
-    {% block 'collection-card', id: 'home-collection-card-3', handle: 'figma-cat-benches-racks', image: fi_col_3 %}{% endblock %}
-    {% block 'collection-card', id: 'home-collection-card-4', handle: 'figma-cat-recovery-mobility', image: fi_col_4 %}{% endblock %}
-    {% block 'collection-card', id: 'home-collection-card-5', handle: 'figma-cat-accessories', image: fi_col_5 %}{% endblock %}
+    {% block 'collection-card', id: 'collection-card-1', handle: 'figma-cat-free-weights', image: fi_col_1 %}{% endblock %}
+    {% block 'collection-card', id: 'collection-card-2', handle: 'figma-cat-functional-training', image: fi_col_2 %}{% endblock %}
+    {% block 'collection-card', id: 'collection-card-3', handle: 'figma-cat-benches-racks', image: fi_col_3 %}{% endblock %}
+    {% block 'collection-card', id: 'collection-card-4', handle: 'figma-cat-recovery-mobility', image: fi_col_4 %}{% endblock %}
+    {% block 'collection-card', id: 'collection-card-5', handle: 'figma-cat-accessories', image: fi_col_5 %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-intro', background: 'sand' %}
   {% block 'rich-text', inline_image: fi_inline %}{% endblock %}
   {% block 'shop-by-level' %}
-    {% block 'level-card', id: 'home-level-card-1', handle: 'figma-level-beginner', image: fi_lvl_1, default_label: level_label %}{% endblock %}
-    {% block 'level-card', id: 'home-level-card-2', handle: 'figma-level-intermediate', image: fi_lvl_2, default_label: level_label %}{% endblock %}
-    {% block 'level-card', id: 'home-level-card-3', handle: 'figma-level-advanced', image: fi_lvl_3, default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'level-card-1', handle: 'figma-level-beginner', image: fi_lvl_1, default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'level-card-2', handle: 'figma-level-intermediate', image: fi_lvl_2, default_label: level_label %}{% endblock %}
+    {% block 'level-card', id: 'level-card-3', handle: 'figma-level-advanced', image: fi_lvl_3, default_label: level_label %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-featured-collection', tag: 'div' %}
   {% block 'featured-collection',
-    id: 'home-featured-collection',
+    id: 'featured-collection',
     collection: figma_featured_collection,
     default_tab_2_collection: 'figma-tab-weight',
     default_tab_3_collection: 'figma-tab-portable-fitness',
@@ -243,9 +236,9 @@
 {% endblock %}
 
 {% block 'container', id: 'home-quiz', tag: 'div' %}
-  {% block 'quiz', id: 'home-quiz' %}
+  {% block 'quiz', id: 'quiz' %}
     {% block 'quiz-step',
-      id: 'home-quiz-step-1',
+      id: 'quiz-step-1',
       step: 1,
       default_checked: 1,
       total: 3,
@@ -266,7 +259,7 @@
       default_option_3_tag: 'quiz-lower'
     %}{% endblock %}
     {% block 'quiz-step',
-      id: 'home-quiz-step-2',
+      id: 'quiz-step-2',
       step: 2,
       total: 3,
       default_question: s2_question,
@@ -282,7 +275,7 @@
       default_option_3_tag: 'quiz-advanced'
     %}{% endblock %}
     {% block 'quiz-step',
-      id: 'home-quiz-step-3',
+      id: 'quiz-step-3',
       step: 3,
       total: 3,
       default_question: s3_question,
@@ -301,17 +294,17 @@
 {% endblock %}
 
 {% block 'container', id: 'home-shop-the-look', tag: 'div' %}
-  {% block 'shop-the-look', id: 'home-shop-the-look', image: fi_look, hotspot_1_x: 85.04, hotspot_1_y: 15.3, hotspot_2_x: 26.5, hotspot_2_y: 67.6, hotspot_3_x: 78.2, hotspot_3_y: 64, hotspot_4_x: 46.4, hotspot_4_y: 58.2 %}
-    {% block 'shop-the-look-row', id: 'home-look-row-1', look_row: 1, product: figma_setup_1 %}{% endblock %}
-    {% block 'shop-the-look-row', id: 'home-look-row-2', look_row: 2, product: figma_setup_2 %}{% endblock %}
-    {% block 'shop-the-look-row', id: 'home-look-row-3', look_row: 3, product: figma_setup_3 %}{% endblock %}
-    {% block 'shop-the-look-row', id: 'home-look-row-4', look_row: 4, product: figma_setup_4 %}{% endblock %}
+  {% block 'shop-the-look', id: 'shop-the-look', image: fi_look, hotspot_1_x: 85.04, hotspot_1_y: 15.3, hotspot_2_x: 26.5, hotspot_2_y: 67.6, hotspot_3_x: 78.2, hotspot_3_y: 64, hotspot_4_x: 46.4, hotspot_4_y: 58.2 %}
+    {% block 'shop-the-look-row', id: 'look-row-1', look_row: 1, product: figma_setup_1 %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'look-row-2', look_row: 2, product: figma_setup_2 %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'look-row-3', look_row: 3, product: figma_setup_3 %}{% endblock %}
+    {% block 'shop-the-look-row', id: 'look-row-4', look_row: 4, product: figma_setup_4 %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-inspiration', background: 'sand' %}
   {% block 'image-with-text',
-    id: 'home-inspiration',
+    id: 'inspiration',
     layout: 'banner',
     accent_image_1: fi_insp_1,
     accent_image_2: fi_insp_2,
@@ -323,80 +316,73 @@
 {% endblock %}
 
 {% block 'container', id: 'home-bundle-builder', tag: 'div', background: 'cream' %}
-  {% block 'bundle-builder', id: 'home-bundle-builder', collection: figma_bundle, preselect: ',1,2,3,5,6,' %}{% endblock %}
+  {% block 'bundle-builder', id: 'bundle-builder', collection: figma_bundle, preselect: ',1,2,3,5,6,' %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-featured-product', tag: 'div' %}
-  {% block 'featured-product', id: 'home-featured-product', product: figma_featured_product, hide_options: true, default_countdown_end: demo_countdown_end %}{% endblock %}
+  {% block 'featured-product', id: 'featured-product', product: figma_featured_product, hide_options: true, default_countdown_end: demo_countdown_end %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-video-carousel' %}
-  {% block 'video-carousel', id: 'home-video-carousel' %}
+  {% block 'video-carousel', id: 'video-carousel' %}
     {% block 'video-card',
-      id: 'home-video-card-1',
+      id: 'video-card-1',
       video: figma_video_1,
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_1,
-      thumb: fi_vt_1,
       product: figma_video_product_1
     %}{% endblock %}
     {% block 'video-card',
-      id: 'home-video-card-2',
+      id: 'video-card-2',
       video: figma_video_2,
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_2,
-      thumb: fi_vt_2,
       product: figma_video_product_2
     %}{% endblock %}
     {% block 'video-card',
-      id: 'home-video-card-3',
+      id: 'video-card-3',
       video: figma_video_3,
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_3,
-      thumb: fi_vt_3,
       product: figma_video_product_3
     %}{% endblock %}
     {% block 'video-card',
-      id: 'home-video-card-4',
+      id: 'video-card-4',
       video: figma_video_4,
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_4,
-      thumb: fi_vt_4,
       product: figma_video_product_4
     %}{% endblock %}
     {% block 'video-card',
-      id: 'home-video-card-5',
+      id: 'video-card-5',
       video: figma_video_5,
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_5,
-      thumb: fi_vt_5,
       product: figma_video_product_5
     %}{% endblock %}
     {% block 'video-card',
-      id: 'home-video-card-6',
+      id: 'video-card-6',
       video: figma_video_6,
       video_id: figma_video_id,
       video_host: figma_video_host,
       poster: fi_pos_6,
-      thumb: fi_vt_6,
       product: figma_video_product_6
     %}{% endblock %}
-    {% block 'video-card', id: 'home-video-card-7' %}{% endblock %}
-    {% block 'video-card', id: 'home-video-card-8' %}{% endblock %}
+    {% block 'video-card', id: 'video-card-7' %}{% endblock %}
+    {% block 'video-card', id: 'video-card-8' %}{% endblock %}
   {% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-testimonials', background: 'cream' %}
   {% block 'testimonials', default_eyebrow: testimonials_eyebrow, default_heading: testimonials_heading %}
     {% block 'testimonial-item',
-      id: 'home-testimonial-1',
+      id: 'testimonial-1',
       image: fi_rev_1,
-      thumb: fi_rt_1,
       default_verified: home_demo,
       product: fp_rev_1,
       default_author: r1_name,
@@ -405,9 +391,8 @@
       default_quote: r1_quote
     %}{% endblock %}
     {% block 'testimonial-item',
-      id: 'home-testimonial-2',
+      id: 'testimonial-2',
       image: fi_rev_2,
-      thumb: fi_rt_2,
       default_verified: home_demo,
       product: fp_rev_2,
       default_author: r2_name,
@@ -416,9 +401,8 @@
       default_quote: r2_quote
     %}{% endblock %}
     {% block 'testimonial-item',
-      id: 'home-testimonial-3',
+      id: 'testimonial-3',
       image: fi_rev_3,
-      thumb_blank: home_demo,
       default_verified: home_demo,
       product: fp_rev_3,
       default_author: r3_name,
@@ -427,9 +411,8 @@
       default_quote: r3_quote
     %}{% endblock %}
     {% block 'testimonial-item',
-      id: 'home-testimonial-4',
+      id: 'testimonial-4',
       image: fi_rev_4,
-      thumb_blank: home_demo,
       default_verified: home_demo,
       product: fp_rev_4,
       default_author: r4_name,
@@ -442,7 +425,7 @@
 
 {% block 'container', id: 'home-why-choose', background: 'dark' %}
   {% block 'image-with-text',
-    id: 'home-why-choose',
+    id: 'why-choose',
     image: fi_why,
     accent_image_1: fi_why_1,
     accent_image_2: fi_why_2,
@@ -454,7 +437,7 @@
 {% endblock %}
 
 {% block 'container', id: 'home-blog-posts' %}
-  {% block 'blog-posts', id: 'home-blog-posts', handle: 'figma-blog' %}{% endblock %}
+  {% block 'blog-posts', id: 'blog-posts', handle: 'figma-blog' %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-faq', background: 'cream' %}
@@ -469,10 +452,10 @@
     default_stat_2_value: faq_stat_2_value,
     default_stat_2_text: faq_stat_2_text
   %}
-    {% block 'faq-item', id: 'home-faq-1', open: true, default_question: faq_q1, default_answer: faq_answer %}{% endblock %}
-    {% block 'faq-item', id: 'home-faq-2', default_question: faq_q2, default_answer: faq_answer %}{% endblock %}
-    {% block 'faq-item', id: 'home-faq-3', default_question: faq_q3, default_answer: faq_answer %}{% endblock %}
-    {% block 'faq-item', id: 'home-faq-4', default_question: faq_q4, default_answer: faq_answer %}{% endblock %}
-    {% block 'faq-item', id: 'home-faq-5', default_question: faq_q5, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'faq-1', open: true, default_question: faq_q1, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'faq-2', default_question: faq_q2, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'faq-3', default_question: faq_q3, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'faq-4', default_question: faq_q4, default_answer: faq_answer %}{% endblock %}
+    {% block 'faq-item', id: 'faq-5', default_question: faq_q5, default_answer: faq_answer %}{% endblock %}
   {% endblock %}
 {% endblock %}
