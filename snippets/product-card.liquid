@@ -175,7 +175,7 @@
             data-testid: 'product-card-image'
         }}
         {%- assign hover_media = product.media | where: 'media_type', 'image' -%}
-        {%- if variant == blank and hover_media.size > 1 -%}
+        {%- if variant == blank and hover_media.size > 1 and swatch_option == nil -%}
           {{
             hover_media[1]
             | image_url: width: 720

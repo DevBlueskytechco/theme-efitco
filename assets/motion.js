@@ -37,3 +37,23 @@ if (icons && !calm) {
     document.querySelector('[data-testid="header-cart-link"]')?.setAttribute("data-bump", "");
   }).observe(icons, { childList: true, subtree: true });
 }
+
+// Bản tin: dùng 1 thông báo của theme, không bubble trình duyệt. Không JS thì trình duyệt vẫn kiểm tra.
+const news = document.querySelector("#footer-newsletter");
+if (news) {
+  news.noValidate = true;
+  const input = news.querySelector('input[type="email"]');
+  const mark = () => news.toggleAttribute("data-invalid", !input.validity.valid);
+  news.addEventListener("submit", (e) => {
+    if (input.validity.valid) return;
+    e.preventDefault();
+    mark();
+    input.setAttribute("aria-invalid", "true");
+    input.focus();
+  });
+  input.addEventListener("input", () => {
+    if (!news.hasAttribute("data-invalid")) return;
+    mark();
+    if (input.validity.valid) input.removeAttribute("aria-invalid");
+  });
+}

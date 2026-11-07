@@ -72,6 +72,9 @@ async function showSlide(page: Page, row: Row) {
   const { x } = nodeBox(nodes, row.node);
   const slide = page.getByTestId('slideshow-slide').nth(row.slide);
   for (let i = 0; i < row.slide; i++) await page.getByTestId('slideshow-next').click();
+  // Chuột còn trên Next thì nút ở trạng thái hover, không phải trạng thái Figma
+  await page.mouse.move(0, 0);
+  await page.waitForTimeout(400);
   await expect.poll(async () => Math.abs(((await boxOf(slide))?.x ?? 9999) - x), { message: `slide ${row.slide} chưa về khung` }).toBeLessThan(1);
 }
 

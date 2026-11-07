@@ -6,7 +6,8 @@ this.poster = this.querySelector("[data-video-poster]");
 this.tpl = this.querySelector("[data-video-template]");
 this.addEventListener("click", this);
 // play, error do not bubble; error fires on source.
-for (const t of ["play", "error"]) this.addEventListener(t, this, true);
+this.toggle = this.querySelector("[data-video-toggle]");
+for (const t of ["play", "pause", "ended", "error"]) this.addEventListener(t, this, true);
 this.io = new IntersectionObserver((e) => {
 if (!e.at(-1).isIntersecting) this.stop();
 else if (this.dataset.videoKind == "shopify") this.load();
@@ -21,7 +22,10 @@ if (active == this) active = null;
 handleEvent(e) {
 const t = e.target;
 if (e.type == "click") this.click(e);
-else if (e.type == "play") this.take();
+else if (e.type == "play") {
+this.take();
+this.sync();
+} else if (e.type == "pause" || e.type == "ended") this.sync();
 else if (t.localName == "video" ? t.error : t.localName == "source" && !t.nextElementSibling) this.fail();
 }
 load() {
@@ -35,6 +39,10 @@ active = this;
 }
 // No template or failed video: link runs. Modified click: new tab.
 click(e) {
+if (this.video && e.target.closest("video, [data-video-toggle]")) {
+this.video.paused ? this.video.play().catch(() => {}) : this.video.pause();
+return;
+}
 if (!e.target.closest("[data-video-poster]") || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
 if (this.dataset.videoKind == "shopify") {
 this.load();
@@ -42,7 +50,8 @@ if (!this.video) return;
 e.preventDefault();
 this.take();
 this.poster.hidden = true;
-this.video.focus();
+this.toggle?.removeAttribute("hidden");
+this.toggle?.focus({ preventScroll: true });
 this.video.play().catch(() => {});
 return;
 }
@@ -61,6 +70,12 @@ const f = document.activeElement == this.frame;
 this.frame.replaceWith(this.poster);
 if (f) this.poster.focus({ preventScroll: true });
 }
+// Only control: icon play, pause over the video.
+sync() {
+const on = !this.video?.paused;
+this.toggleAttribute("data-playing", on);
+if (this.toggle) this.toggle.ariaLabel = on ? this.toggle.dataset.labelPause : this.toggle.dataset.labelPlay;
+}
 // Poster stays, links to the product; frame size is set by CSS.
 fail() {
 const { video, poster, dataset: d } = this;
@@ -68,6 +83,7 @@ if (!video) return;
 const f = document.activeElement == video;
 video.remove();
 this.video = null;
+this.toggle?.setAttribute("hidden", "");
 d.videoError = "";
 poster.hidden = false;
 if (d.productUrl) poster.href = d.productUrl;

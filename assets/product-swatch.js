@@ -27,6 +27,8 @@ class ProductSwatch extends HTMLElement {
     // One delegated listener per card. Re-adding the same handler object is a
     // no-op, so moving the card in the DOM never doubles it.
     this.addEventListener('change', this);
+    this.addEventListener('pointerover', this);
+    this.addEventListener('pointerout', this);
 
     // Back/forward and reload restore form state without a change event, and
     // the browser may do it after this callback runs (ES1-T73). pageshow fires
@@ -47,10 +49,27 @@ class ProductSwatch extends HTMLElement {
       this.sync();
       return;
     }
+    if (event.type === 'pointerover' || event.type === 'pointerout') {
+      this.preview(event);
+      return;
+    }
     const input = event.target;
     if (input instanceof HTMLInputElement && input.checked && input.matches(SWATCH)) {
       this.select(input);
     }
+  }
+
+  /** Mouse over a swatch shows its image; leaving goes back to the checked swatch. */
+  preview(event) {
+    if (event.pointerType !== 'mouse') return;
+    const label = event.target.closest?.('.product-card__swatch');
+    if (!label) return;
+    const hovered = this.querySelector(`#${CSS.escape(label.htmlFor)}`);
+    const input = event.type === 'pointerover' ? hovered : this.querySelector(`${SWATCH}:checked`);
+    const image = this.querySelector('img[data-card-image]');
+    if (!image || !input?.dataset.imageSrc) return;
+    image.srcset = input.dataset.imageSrcset ?? '';
+    image.src = input.dataset.imageSrc;
   }
 
   /**

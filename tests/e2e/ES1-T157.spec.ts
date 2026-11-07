@@ -149,7 +149,7 @@ test.describe('ES1-T157 TE-13 video carousel', () => {
         expect(info.iframe.allow).toContain('autoplay');
       }
       if (info.video) {
-        expect(info.video).toMatchObject({ autoplay: false, muted: false, poster: false, controls: true, playsinline: true, preload: 'metadata' });
+        expect(info.video).toMatchObject({ autoplay: false, muted: false, poster: false, controls: false, playsinline: true, preload: 'metadata' });
       }
     }
   });

@@ -124,11 +124,25 @@
           <span class="video-card__badge" data-testid="video-card-badge">{{ block.settings.badge | escape }}</span>
         {%- endif -%}
 
+        {%- if card_kind == 'shopify' -%}
+          <button
+            class="video-card__toggle"
+            type="button"
+            hidden
+            aria-label="{{ 'blocks.video_card.play' | t: title: card_title | escape_once }}"
+            data-label-play="{{ 'blocks.video_card.play' | t: title: card_title | escape_once }}"
+            data-label-pause="{{ 'blocks.video_card.pause' | t: title: card_title | escape_once }}"
+            data-video-toggle
+            data-testid="video-card-toggle"
+          >
+            {%- render 'slideshow-icon', name: 'play' -%}
+            {%- render 'slideshow-icon', name: 'pause' -%}
+          </button>
+        {%- endif -%}
         <template data-video-template data-testid="video-card-template">
           {%- if card_kind == 'shopify' -%}
             <video
               class="video-card__media"
-              controls
               playsinline
               preload="metadata"
               aria-label="{{ media_label | escape_once }}"
