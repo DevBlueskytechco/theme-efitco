@@ -7850,6 +7850,16 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
 .video-card:not([data-playing]) .video-card__toggle .slideshow-icon--pause, .video-card[data-playing] .video-card__toggle .slideshow-icon--play { display: none; }
 [data-quiz-title]:focus { outline: 0; }
 .faq__stat-value { font-variant-numeric: tabular-nums; }
+/* Mobile (ảnh review 15): ảnh tràn màn, không bo góc, chỉ dot chuyển slide, vùng bấm 44 x 44 */
+@media (max-width: 47.99rem) {
+  .slideshow { padding-inline: 0; }
+  .slideshow__track { border-radius: 0; }
+  slideshow-carousel[data-enhanced][data-multiple] .slideshow__arrow { display: none; }
+  slideshow-carousel[data-enhanced] .slideshow__controls { justify-content: center; inset-block-end: var(--space-1); }
+  .slideshow__dots { gap: 0; }
+  .slideshow__dot { width: 44px; height: 44px; }
+  .slideshow__dot::before { inset: 16px; }
+}
 .site-footer__invalid { display: none; margin: 0; color: var(--color-sale); font-size: var(--font-size-sm); }
 .site-footer__form[data-invalid] .site-footer__invalid { display: block; }
 .site-footer__form[data-invalid] .site-footer__note { display: none; }

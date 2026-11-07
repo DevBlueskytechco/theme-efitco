@@ -51,7 +51,8 @@ async function moveMouseAway(page: Page) {
 }
 
 test.describe('ES1-T30 điều hướng', () => {
-  test('next, prev, chấm đổi slide, aria-current và inert đi cùng nhau', async ({ page }) => {
+  test('next, prev, chấm đổi slide, aria-current và inert đi cùng nhau', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'Mobile ẩn next, back theo CTO 07/11; dot kiểm ở ES1-T235');
     const errors = trackErrors(page);
     const count = await open(page);
     const dots = page.getByTestId('slideshow-dot');
@@ -75,7 +76,8 @@ test.describe('ES1-T30 điều hướng', () => {
     expect(errors).toEqual([]);
   });
 
-  test('next ở slide cuối về đầu, prev ở đầu về cuối', async ({ page }) => {
+  test('next ở slide cuối về đầu, prev ở đầu về cuối', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'Mobile ẩn next, back theo CTO 07/11; dot kiểm ở ES1-T235');
     const count = await open(page);
     await page.getByTestId('slideshow-prev').click();
     await expect.poll(() => activeIndex(page)).toBe(count - 1);
@@ -102,7 +104,8 @@ test.describe('ES1-T30 điều hướng', () => {
     }
   });
 
-  test('a11y: nhãn slide, nhãn chấm, live region báo khi đổi slide', async ({ page }) => {
+  test('a11y: nhãn slide, nhãn chấm, live region báo khi đổi slide', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'Mobile ẩn next, back theo CTO 07/11; dot kiểm ở ES1-T235');
     const count = await open(page);
     const root = page.getByTestId('slideshow');
     const slides = page.getByTestId('slideshow-slide');
@@ -240,7 +243,8 @@ test.describe('ES1-T30 autoplay', () => {
     expect(await activeIndex(page)).toBe(0);
   });
 
-  test('reduced-motion: không tự chạy, nút ở trạng thái play, next nhảy ngay', async ({ page }) => {
+  test('reduced-motion: không tự chạy, nút ở trạng thái play, next nhảy ngay', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'Mobile ẩn next, back theo CTO 07/11; dot kiểm ở ES1-T235');
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await enableAutoplay(page);
     await open(page);

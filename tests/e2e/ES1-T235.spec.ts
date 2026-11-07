@@ -65,6 +65,23 @@ test.describe('ES1-T235 trải nghiệm', () => {
     await expect.poll(open).toBe(false);
   });
 
+  test('hero mobile: tràn màn, không bo góc, không next back, dot 44 x 44 chuyển slide', async ({ page }, ti) => {
+    test.skip(ti.project.name !== 'mobile', 'Chỉ áp dưới 48rem');
+    await page.goto('/');
+    await expect(page.getByTestId('slideshow')).toHaveAttribute('data-enhanced', '');
+    const track = page.getByTestId('slideshow-track');
+    expect((await track.boundingBox())!.width).toBe(page.viewportSize()!.width);
+    await expect(track).toHaveCSS('border-radius', '0px');
+    await expect(page.getByTestId('slideshow-next')).toBeHidden();
+    await expect(page.getByTestId('slideshow-prev')).toBeHidden();
+    const dot = page.getByTestId('slideshow-dot').nth(1);
+    const box = (await dot.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
+    await dot.click();
+    await expect(dot).toHaveAttribute('aria-current', 'true');
+  });
+
   test('ghi chú giảm giá đã bỏ khỏi bundle và shop the look (CTO 07/11)', async ({ page }) => {
     await page.goto('/');
     await expect(page.getByTestId('bundle-builder-note')).toHaveCount(0);
