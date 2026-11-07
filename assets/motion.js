@@ -25,6 +25,37 @@ if (!calm && !auto) {
   }
 }
 
+// Số thống kê chạy từ 0 khi cuộn tới. Giữ chữ kèm theo ("360+"), giữ nguyên chữ không có số.
+if (!calm && !auto) {
+  const stats = new IntersectionObserver(
+    (seen) => {
+      for (const { isIntersecting, target } of seen) {
+        if (!isIntersecting) continue;
+        stats.unobserve(target);
+        const { before, end, after, text } = target.motionCount;
+        const start = performance.now();
+        const step = (now) => {
+          const t = Math.min((now - start) / 1400, 1);
+          target.firstChild.data = t < 1 ? before + Math.round(end * (1 - (1 - t) ** 3)) + after : text;
+          if (t < 1) requestAnimationFrame(step);
+          else target.removeAttribute("aria-label");
+        };
+        requestAnimationFrame(step);
+      }
+    },
+    { threshold: 0.6 },
+  );
+  for (const el of document.querySelectorAll(".faq__stat-value")) {
+    const text = el.textContent.trim();
+    const m = text.match(/^(\D*)(\d+)(\D*)$/);
+    if (!m || !el.firstChild) continue;
+    el.motionCount = { before: m[1], end: +m[2], after: m[3], text };
+    el.setAttribute("aria-label", text);
+    el.textContent = m[1] + 0 + m[3];
+    stats.observe(el);
+  }
+}
+
 // Số giỏ đổi: icon nhún. Partial thay cả link nên so số trước và sau.
 const count = () => document.querySelector('[data-testid="header-cart-count"]')?.textContent.trim() ?? "0";
 const icons = document.querySelector(".site-header__icons");
@@ -55,5 +86,18 @@ if (news) {
     if (!news.hasAttribute("data-invalid")) return;
     mark();
     if (input.validity.valid) input.removeAttribute("aria-invalid");
+  });
+}
+
+// Chọn tiền tệ, ngôn ngữ: bấm ra ngoài hoặc Esc thì đóng.
+const disclosure = document.querySelector(".site-footer__disclosure");
+if (disclosure) {
+  document.addEventListener("pointerdown", (e) => {
+    if (disclosure.open && !disclosure.contains(e.target)) disclosure.open = false;
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || !disclosure.open) return;
+    disclosure.open = false;
+    disclosure.querySelector("summary")?.focus();
   });
 }
