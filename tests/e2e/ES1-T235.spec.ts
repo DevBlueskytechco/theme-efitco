@@ -15,6 +15,15 @@ test.describe('ES1-T235 trải nghiệm', () => {
     await expect(block).not.toHaveAttribute('data-reveal', 'wait');
   });
 
+  test('số thống kê chạy từ 0 khi cuộn tới, dừng đúng giá trị', async ({ page }) => {
+    await page.addInitScript(asUser);
+    await page.goto('/');
+    const value = page.getByTestId('faq-stat-1').locator('.faq__stat-value');
+    await expect(value).toHaveText('0+');
+    await value.scrollIntoViewIfNeeded();
+    await expect(value).toHaveText('360+', { timeout: 5000 });
+  });
+
   test('prefers-reduced-motion: không bật chuyển động, nội dung hiện ngay', async ({ browser }) => {
     const context = await browser.newContext({ reducedMotion: 'reduce', storageState: 'tests/setup/state.json', baseURL: process.env.STORE_ORIGIN });
     const page = await context.newPage();
@@ -39,6 +48,21 @@ test.describe('ES1-T235 trải nghiệm', () => {
     await page.waitForTimeout(300);
     [color, background] = await colors();
     expect(color).not.toBe(background);
+  });
+
+  test('chọn tiền tệ: bấm ra ngoài và Esc đều đóng', async ({ page }) => {
+    await page.goto('/');
+    const disclosure = page.locator('.site-footer__disclosure');
+    test.skip((await disclosure.count()) === 0, 'Store chỉ có 1 nước, 1 ngôn ngữ');
+    const toggle = page.getByTestId('footer-localization-toggle');
+    const open = () => disclosure.evaluate((el: HTMLDetailsElement) => el.open);
+    await toggle.click();
+    expect(await open()).toBe(true);
+    await page.mouse.click(5, 300);
+    await expect.poll(open).toBe(false);
+    await toggle.click();
+    await page.keyboard.press('Escape');
+    await expect.poll(open).toBe(false);
   });
 
   test('ghi chú giảm giá đã bỏ khỏi bundle và shop the look (CTO 07/11)', async ({ page }) => {

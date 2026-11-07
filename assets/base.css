@@ -7843,9 +7843,13 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
 .video-card__media { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
 .video-card__toggle { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; translate: -50% -50%; display: flex; align-items: center; justify-content: center; inline-size: 52px; block-size: 52px; padding: 0; border: 0; border-radius: 50%; background-color: var(--color-background); color: var(--color-foreground); cursor: pointer; }
 .video-card__toggle[hidden] { display: none; }
+/* Giống lúc đầu: icon chỉ hiện khi rê chuột, video nào cũng vậy. Màn cảm ứng: chạm video để dừng, đang dừng thì hiện icon. */
+@media (hover: hover) { .video-card__toggle { opacity: 0; } .video-card:hover .video-card__toggle, .video-card__toggle:focus-visible { opacity: 1; } }
+@media (hover: none) { .video-card[data-playing] .video-card__toggle { opacity: 0; } }
 .video-card__toggle .slideshow-icon { inline-size: 20px; block-size: 20px; }
 .video-card:not([data-playing]) .video-card__toggle .slideshow-icon--pause, .video-card[data-playing] .video-card__toggle .slideshow-icon--play { display: none; }
 [data-quiz-title]:focus { outline: 0; }
+.faq__stat-value { font-variant-numeric: tabular-nums; }
 .site-footer__invalid { display: none; margin: 0; color: var(--color-sale); font-size: var(--font-size-sm); }
 .site-footer__form[data-invalid] .site-footer__invalid { display: block; }
 .site-footer__form[data-invalid] .site-footer__note { display: none; }
@@ -7875,6 +7879,7 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
   html[data-motion] .button:active:not(:disabled) { translate: 0 0; scale: 0.98; }
   html[data-motion] .slideshow__arrow:hover, html[data-motion] .collection-list__button:hover { scale: 1.06; }
   html[data-motion] .slideshow__arrow:active, html[data-motion] .collection-list__button:active { scale: 0.94; }
+  html[data-motion] .button--link:hover:not(:disabled), html[data-motion] .button--link:active:not(:disabled) { translate: none; scale: none; box-shadow: none; }
   .slideshow-icon--arrow { transition: translate var(--motion-base) var(--ease-out); }
   html[data-motion] a:hover > .slideshow-icon--arrow, html[data-motion] button:hover > .slideshow-icon--arrow { translate: 3px 0; }
   .button[aria-busy='true']::after { animation: motion-spin 700ms linear infinite; }
@@ -7883,6 +7888,7 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
   .site-header__link, .site-header__icon { transition: color var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out); }
   html[data-motion] .site-header__icon:hover { scale: 1.08; }
   .site-header__link svg { transition: rotate var(--motion-base) var(--ease-out); }
+  .site-footer__disclosure[open] > .site-footer__panel { animation: motion-fade var(--motion-base) var(--ease-out); }
   details[open] > .site-header__submenu { animation: motion-drop var(--motion-base) var(--ease-out); }
   .site-header__submenu .site-header__link { transition: color var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
   html[data-motion] .site-header__submenu .site-header__link:hover { color: var(--color-accent); translate: 4px 0; text-decoration: none; }
@@ -7917,17 +7923,16 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
   .image-with-text__accent img, .image-with-text__media img, .faq__image img, .shop-the-look__image img, .testimonial-item__image img, .site-footer__newsletter-image img, .rich-text__inline-image img { transition: scale var(--motion-slow) var(--ease-out); }
   html[data-motion] .image-with-text__accent:hover img, html[data-motion] .image-with-text__media:hover img, html[data-motion] .faq__media:hover .faq__image img, html[data-motion] .shop-the-look__media:hover img, html[data-motion] .testimonial-item:hover .testimonial-item__image img, html[data-motion] .site-footer__newsletter-image:hover img, html[data-motion] .rich-text__inline-image:hover img { scale: 1.05; }
   .video-card__toggle { transition: opacity var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out); }
-  .video-card[data-playing] .video-card__toggle { opacity: 0; }
-  .video-card[data-playing]:hover .video-card__toggle, .video-card__toggle:focus-visible { opacity: 1; }
   html[data-motion] .video-card__toggle:hover { scale: 1.08; }
   .site-footer__invalid { animation: motion-fade var(--motion-base) var(--ease-out); }
 
   /* Accordion: + quay thành -, nội dung trượt ra */
   .faq-item { interpolate-size: allow-keywords; }
-  .faq-item::details-content { block-size: 0; overflow: clip; opacity: 0; transition: block-size var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out), content-visibility var(--motion-base) allow-discrete; }
+  .faq__list { overflow-anchor: none; }
+  .faq-item::details-content { block-size: 0; overflow: clip; opacity: 0; transition: block-size var(--motion-accordion) var(--ease-in-out), opacity var(--motion-accordion) var(--ease-in-out), content-visibility var(--motion-accordion) allow-discrete; }
   .faq-item[open]::details-content { block-size: auto; opacity: 1; }
   .faq-item__summary { transition: color var(--motion-base) var(--ease-out); }
-  .faq-item__summary::after { transition: rotate var(--motion-base) var(--ease-out); }
+  .faq-item__summary::after { transition: rotate var(--motion-accordion) var(--ease-in-out); }
   .faq-item[open] > .faq-item__summary::after { display: block; rotate: 90deg; }
 
   /* Form */
