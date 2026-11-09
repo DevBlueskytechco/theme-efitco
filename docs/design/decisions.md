@@ -3,6 +3,9 @@
 Quyết định đã chốt, không hỏi lại. Mâu thuẫn với Figma hay bộ kiến thức thì sổ này thắng; mới nhất ở trên. Thêm dòng khi CTO chốt câu hỏi `[Q]`.
 
 ## Đã chốt
+- 09/11 Header trang con: nền trắng mặc định; trang có ảnh lớn đầu trang (banner collection, ảnh bìa bài viết) thì header đè ảnh như trang chủ (ES1-T251).
+- 09/11 Viền ô nhập: nền sáng dùng `--color-muted-light` (5.33:1), footer nền tối dùng `--color-muted-on-dark` (5.85:1); không dùng `--color-border` cho ô nhập (ES1-T251).
+- 09/11 Toast: cảnh báo dùng cam accent, thành công dùng `--color-badge-new`, không thêm token (ngoại lệ của quy tắc accent chỉ cho hành động, ES1-T251).
 - 09/11 CHỈ TIÊU NGHIỆM THU (ưu tiên số 1, đo Lighthouse trên demo): SEO 100, Accessibility 100, Best Practices 100 cả desktop và mobile; Performance desktop ≥98, mobile ≥90. Mọi thiết kế phải đạt được khi dựng. Hệ quả cho thiết kế:
   - A11y: chữ AA ở mọi nơi (kể cả trạng thái hover, placeholder, chữ trên ảnh), focus nhìn thấy, vùng chạm ≥24px (mobile ≥44px), mỗi link/nút có tên riêng, heading đúng thứ tự, form có label, popup là dialog có tiêu đề và nút đóng.
   - SEO: chữ link mô tả đích (không để "Read more", "Learn more", "Click here" đứng một mình), ảnh có alt, chữ ≥12px.
@@ -29,5 +32,4 @@ Quyết định đã chốt, không hỏi lại. Mâu thuẫn với Figma hay b�
 - 30/10 Font: heading Sofia Sans Condensed, body Inter, chỉ qua font_picker, không tự nhúng font (R15).
 
 ## Chưa chốt (ghi ĐỀ XUẤT, không tự quyết)
-- Header trang con: nền tối như trang chủ hay nền trắng (T241 và T244 đề xuất ngược nhau).
 - Ảnh một số sản phẩm trên store dev chưa khớp tên (ES1-T245).
