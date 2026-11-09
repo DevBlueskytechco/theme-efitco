@@ -66,10 +66,12 @@ test.describe('ES1-T191 tĩnh', () => {
     }
   });
 
-  test('0 JS; CSS: 0 màu literal, 0 thuộc tính vật lý trong mục blog', () => {
-    for (const file of ['blocks/blog-posts.liquid', 'snippets/article-card.liquid']) {
-      expect(readFileSync(file, 'utf8'), file).not.toMatch(/<script|data-lazy-module/);
-    }
+  // CTO 09/11 (tong_hop.docx #3, ES1-T250): blog chuyển bằng next, back. Block chỉ nạp scroll-buttons qua lazy-module; card vẫn 0 JS.
+  test('JS chỉ là scroll-buttons qua lazy-module; CSS: 0 màu literal, 0 thuộc tính vật lý trong mục blog', () => {
+    const block = readFileSync('blocks/blog-posts.liquid', 'utf8');
+    expect(block.match(/<script[^>]*>/g)).toEqual([`<script src="{{ 'lazy-module.js' | asset_url }}" type="module">`]);
+    expect(block.match(/data-lazy-module="[^"]*"/g)).toEqual([`data-lazy-module="{{ 'scroll-buttons.js' | asset_url }}"`]);
+    expect(readFileSync('snippets/article-card.liquid', 'utf8')).not.toMatch(/<script|data-lazy-module/);
     const css = readFileSync('assets/base.css', 'utf8');
     const start = css.indexOf('/** Blog posts (TE-16');
     const end = css.indexOf('/** Testimonials (TE-7');

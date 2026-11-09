@@ -34,16 +34,16 @@
 -%}
 
 {%- if article_count > 0 -%}
-  <div
+  <scroll-buttons
     class="blog-posts full-width"
     {% if id != blank %}
       data-blog-posts-id="{{ id }}"
     {% endif %}
+    data-lazy-module="{{ 'scroll-buttons.js' | asset_url }}"
     data-testid="blog-posts"
     {{ block.shopify_attributes }}
   >
-    {%- if block.settings.eyebrow != blank or block.settings.heading != blank -%}
-      <div class="blog-posts__header">
+    <div class="blog-posts__header">
         {%- if block.settings.eyebrow != blank -%}
           <p class="blog-posts__eyebrow" data-testid="blog-posts-eyebrow">
             {{- block.settings.eyebrow | escape -}}
@@ -54,8 +54,12 @@
             {{- block.settings.heading | escape -}}
           </h2>
         {%- endif -%}
-      </div>
-    {%- endif -%}
+      {%- liquid
+        assign nav_previous = 'blocks.blog_posts.previous' | t
+        assign nav_next = 'blocks.blog_posts.next' | t
+      -%}
+      {% render 'carousel-nav', prefix: 'blog-posts', label_previous: nav_previous, label_next: nav_next %}
+    </div>
     {%- comment -%}
       role="list": list-style none removes the list role in Safari, and tabindex lets
       keyboard users scroll the list (same as blocks/testimonials.liquid).
@@ -65,13 +69,16 @@
       role="list"
       tabindex="0"
       aria-label="{{ 'blocks.blog_posts.list_label' | t }}"
+      data-scroll-track
       data-testid="blog-posts-list"
     >
       {%- for post in source.articles limit: block.settings.articles_to_show -%}
         {% render 'article-card', article: post %}
       {%- endfor -%}
     </ul>
-  </div>
+    {% render 'carousel-progress' %}
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
+  </scroll-buttons>
 {%- elsif request.design_mode -%}
   <p
     class="blog-posts--placeholder"

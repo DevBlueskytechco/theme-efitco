@@ -40,16 +40,16 @@
 -%}
 
 {%- if items != blank -%}
-  <div
+  <scroll-buttons
     class="testimonials"
     {% if id != blank %}
       data-testimonials-id="{{ id }}"
     {% endif %}
+    data-lazy-module="{{ 'scroll-buttons.js' | asset_url }}"
     data-testid="testimonials"
     {{ block.shopify_attributes }}
   >
-    {%- if testimonials_eyebrow != blank or testimonials_heading != blank -%}
-      <div class="testimonials__header">
+    <div class="testimonials__header">
         {%- if testimonials_eyebrow != blank -%}
           <p class="testimonials__eyebrow">{{ testimonials_eyebrow | escape_once }}</p>
         {%- endif -%}
@@ -58,8 +58,12 @@
             {{- testimonials_heading | escape_once -}}
           </h2>
         {%- endif -%}
-      </div>
-    {%- endif -%}
+      {%- liquid
+        assign nav_previous = 'blocks.testimonials.previous' | t
+        assign nav_next = 'blocks.testimonials.next' | t
+      -%}
+      {% render 'carousel-nav', prefix: 'testimonials', label_previous: nav_previous, label_next: nav_next %}
+    </div>
     {%- comment -%}
       role="list": a ul with any other role makes each li fail the axe rule
       listitem (serious). It also keeps list semantics with list-style: none.
@@ -69,11 +73,14 @@
       role="list"
       tabindex="0"
       aria-label="{{ 'blocks.testimonials.list_label' | t }}"
+      data-scroll-track
       data-testid="testimonials-list"
     >
       {{ content }}
     </ul>
-  </div>
+    {% render 'carousel-progress' %}
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
+  </scroll-buttons>
 {%- elsif request.design_mode -%}
   <p
     class="testimonials testimonials--placeholder"

@@ -68,7 +68,8 @@ test.describe('ES1-T181 TE-17 hàng 16 footer', () => {
     await expect(logo).toHaveAttribute('href', /\/$/);
   });
 
-  test('heading 2 màu khác nhau, cả 2 từ 4.5:1 trên nền footer', async ({ page }) => {
+  // CTO 09/11 (tong_hop.docx #7, ES1-T250): "Get 15% Off" cam như Figma 1:1148. Đây là chữ lớn nên ngưỡng AA là 3:1.
+  test('heading 2 màu khác nhau; chữ thường từ 4.5:1, phần cam là chữ lớn từ 3:1 trên nền footer', async ({ page }) => {
     await page.goto('/');
     const heading = page.getByTestId('footer-newsletter-heading');
     const span = heading.locator('span');
@@ -77,10 +78,14 @@ test.describe('ES1-T181 TE-17 hàng 16 footer', () => {
       main: getComputedStyle(el).color,
       part: getComputedStyle(el.querySelector('span') as Element).color,
       bg: getComputedStyle(el.closest('.site-footer') as Element).backgroundColor,
+      size: parseFloat(getComputedStyle(el.querySelector('span') as Element).fontSize),
+      weight: parseInt(getComputedStyle(el.querySelector('span') as Element).fontWeight),
     }));
+    // WCAG chữ lớn: từ 24px, hoặc từ 18.66px và đậm
+    expect(colors.size >= 24 || (colors.size >= 18.66 && colors.weight >= 700), `cỡ ${colors.size}px`).toBe(true);
     expect(colors.part).not.toBe(colors.main);
     expect(contrast(parseRgb(colors.main), parseRgb(colors.bg))).toBeGreaterThanOrEqual(4.5);
-    expect(contrast(parseRgb(colors.part), parseRgb(colors.bg))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(parseRgb(colors.part), parseRgb(colors.bg))).toBeGreaterThanOrEqual(3);
   });
 
   test('nút submit, ô nhập từ 44px và không tràn ngang', async ({ page }) => {

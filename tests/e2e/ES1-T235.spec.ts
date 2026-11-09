@@ -8,8 +8,10 @@ test.describe('ES1-T235 trải nghiệm', () => {
     await page.addInitScript(asUser);
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-motion', 'on');
-    const block = page.locator('.shop-the-look');
+    // ES1-T250: hiện dần theo từng phần (chữ, card, ảnh) thay vì cả khối
+    const block = page.locator('.shop-the-look h2').first();
     await expect(block).toHaveAttribute('data-reveal', 'wait');
+    await expect(block).toHaveAttribute('data-reveal-kind', 'text');
     await block.scrollIntoViewIfNeeded();
     await expect(block).toHaveCSS('opacity', '1', { timeout: 5000 });
     await expect(block).not.toHaveAttribute('data-reveal', 'wait');

@@ -49,6 +49,7 @@
 
   @param {string} [content] - The quiz-step blocks of this quiz. Leave empty with results_view
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading id. Default: block.id
+  @param {boolean} [results_popup] - Show the results in a popup instead of under the steps. Same as the setting; default: false
   @param {boolean} [results_view] - Render only the results, with cards from the global collection. Default: false
   @param {number} [required_tags] - With results_view: tags the URL must apply, one per quiz step. Default: 3
 
@@ -90,6 +91,12 @@
   if results_only
     assign root_tag = 'div'
   endif
+
+  assign results_popup = false
+  if block.settings.results_popup and results_only == false and request.design_mode == false
+    assign results_popup = true
+  endif
+  assign results_title_id = id | default: block.id | append: '-results-title'
 
   assign results_url = block.settings.collection.url | default: collection.url | default: routes.all_products_collection_url
   assign results_label = 'blocks.quiz.results_count' | t: count: '%n'
@@ -192,6 +199,16 @@
       </form>
     {%- endunless -%}
 
+    {%- if results_popup -%}
+      {%- comment -%}
+        Popup (CTO 09/11): results open over the page instead of growing the block.
+        assets/quiz-finder.js opens it with showModal; without JavaScript the form goes to search.
+      {%- endcomment -%}
+      <dialog class="quiz__dialog" aria-labelledby="{{ results_title_id }}" data-quiz-dialog data-testid="quiz-dialog">
+      <button type="button" class="quiz__dialog-close" aria-label="{{ 'blocks.quiz.close' | t }}" data-quiz-close data-testid="quiz-close">
+        {%- render 'quiz-icon', name: 'close' -%}
+      </button>
+    {%- endif -%}
     <div
       class="quiz__results"
       {% unless results_only or request.design_mode %}
@@ -199,7 +216,7 @@
       {% endunless %}
       data-quiz-results-panel
     >
-      <h3 class="quiz__results-heading" tabindex="-1" data-quiz-title data-testid="quiz-results-heading">
+      <h3 class="quiz__results-heading" id="{{ results_title_id }}" tabindex="-1" data-quiz-title data-testid="quiz-results-heading">
         {{- 'blocks.quiz.results_heading' | t -}}
       </h3>
 
@@ -246,6 +263,19 @@
         </a>
       </div>
     </div>
+    {%- if results_popup -%}
+      <div class="quiz__dialog-actions">
+        <button type="button" class="button button--secondary" data-quiz-restart data-testid="quiz-restart">
+          {{- 'blocks.quiz.restart' | t -}}
+        </button>
+        <a class="button" href="{{ results_url }}" data-quiz-all data-testid="quiz-view-all">
+          {{- 'blocks.quiz.view_all' | t -}}
+          {% render 'slideshow-icon', name: 'arrow' %}
+        </a>
+      </div>
+      </dialog>
+      <script src="{{ 'quiz-dialog.js' | asset_url }}" type="module"></script>
+    {%- endif -%}
 
     <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
     {%- unless results_only or request.design_mode -%}
@@ -299,6 +329,13 @@
       "id": "collection",
       "label": "t:labels.collection",
       "info": "t:info.quiz_collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "results_popup",
+      "label": "t:labels.quiz_results_popup",
+      "info": "t:info.quiz_results_popup",
+      "default": false
     },
     {
       "type": "text",
