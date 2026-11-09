@@ -3,6 +3,13 @@
 Quyết định đã chốt, không hỏi lại. Mâu thuẫn với Figma hay bộ kiến thức thì sổ này thắng; mới nhất ở trên. Thêm dòng khi CTO chốt câu hỏi `[Q]`.
 
 ## Đã chốt
+- 09/11 CHỈ TIÊU NGHIỆM THU (ưu tiên số 1, đo Lighthouse trên demo): SEO 100, Accessibility 100, Best Practices 100 cả desktop và mobile; Performance desktop ≥98, mobile ≥90. Mọi thiết kế phải đạt được khi dựng. Hệ quả cho thiết kế:
+  - A11y: chữ AA ở mọi nơi (kể cả trạng thái hover, placeholder, chữ trên ảnh), focus nhìn thấy, vùng chạm ≥24px (mobile ≥44px), mỗi link/nút có tên riêng, heading đúng thứ tự, form có label, popup là dialog có tiêu đề và nút đóng.
+  - SEO: chữ link mô tả đích (không để "Read more", "Learn more", "Click here" đứng một mình), ảnh có alt, chữ ≥12px.
+  - Performance: màn đầu 1 ảnh lớn (LCP), không video tự chạy ở màn đầu mobile, tối đa 2 họ font, ảnh trong menu/popup tải khi mở; popup marketing không mở lúc tải trang (chờ thời gian, cuộn hoặc ý định rời trang), chừa chỗ để không xô lệch bố cục.
+  - Best Practices: ảnh đúng tỉ lệ và độ phân giải, không hiệu ứng gây lỗi console.
+- 09/11 Mọi trang và overlay thiết kế đủ 3 phiên bản: desktop (1280, 1920), tablet (768), mobile (360); kể cả trang chủ (Figma chỉ có desktop).
+- 09/11 Overlay cần có: popup newsletter, popup before you leave, mega menu, search popup (khi gõ, không có sản phẩm, tab canvas), search tab, popup mini cart, quickview, popup offer (hover big offer).
 - 09/11 Eyebrow (sub heading) màu cam accent như Figma; trên nền sand dùng `--color-accent-on-sand` (AA). Thay E3.
 - 09/11 Nút next/back tròn 52px: mặc định trắng viền #E5E5E5, rê chuột mới cam. Mọi carousel.
 - 09/11 Hàng ngang (video, testimonial, blog, danh mục): next/back ở đầu khối + thanh tiến trình mảnh; không dùng thanh cuộn trình duyệt; mobile ẩn nút, vuốt.
