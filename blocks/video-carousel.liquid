@@ -72,10 +72,10 @@
     {{ block.shopify_attributes }}
   >
     {%- comment -%}
-      display: contents keeps the header and list in the block's own layout. Such an element has
-      no box for lazy-module.js to observe, so scroll-buttons.js loads as a deferred module.
+      Header and list share one scroll-buttons box (next, back, progress). It repeats the block's
+      grid, so the layout stays the same; lazy-module.js imports scroll-buttons.js near the viewport.
     {%- endcomment -%}
-    <scroll-buttons class="video-carousel__scroller">
+    <scroll-buttons class="video-carousel__scroller" data-lazy-module="{{ 'scroll-buttons.js' | asset_url }}">
     <div class="video-carousel__header">
       <div class="video-carousel__row">
         <div class="video-carousel__title">
@@ -132,7 +132,6 @@
     </ul>
     {% render 'carousel-progress' %}
     </scroll-buttons>
-    <script src="{{ 'scroll-buttons.js' | asset_url }}" type="module"></script>
     <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
   </div>
 {%- elsif request.design_mode -%}
