@@ -5,6 +5,7 @@ description: Bộ kiến thức Designer của CTO (09/11/2026): DoD Theme Store
 Bộ kiến thức do CTO soạn (thư mục designer-knowledge, 09/11/2026), bản lưu có lịch sử ở `ai-team/knowledge/designer/`.
 Đây là tài liệu tra cứu: mở đúng file cần cho việc đang làm, không đọc hết 23 file.
 
+Đi kèm: quyết định đã chốt ở `docs/design/decisions.md`, dữ liệu thật cho mockup ở `docs/design/demo-data.json`.
 Thứ tự ưu tiên khi mâu thuẫn: quyết định CTO trong ticket > AGENTS.md > DESIGN.md > Figma > bộ kiến thức này.
 Trạng thái Đạt / Cần cải tiến / Chưa có trong các checklist là của theme Purity lúc audit; với Efitco phải chấm lại.
 
