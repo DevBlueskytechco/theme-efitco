@@ -214,11 +214,13 @@ test.describe('ES1-T120 TE-7 image with text', () => {
 
     const onDark = await token('--color-muted-on-dark');
     const muted = await token('--color-muted');
+    // CTO 09/11 (tong_hop.docx #4, ES1-T250): eyebrow cam như Figma; trên sand cam đậm hơn 10% để đạt AA
+    const accentOnSand = await token('--color-accent-on-sand');
     const left = band(page, 'te7-iwt-left');
     const sand = band(page, 'te7-iwt-banner-one');
     expect(await color(tid(left, 'image-with-text-eyebrow'))).toBe(onDark);
     expect(await color(tid(left, 'image-with-text-body'))).toBe(onDark);
-    expect(await color(tid(sand, 'image-with-text-eyebrow'))).toBe(muted);
+    expect(await color(tid(sand, 'image-with-text-eyebrow'))).toBe(accentOnSand);
     expect(await color(tid(sand, 'image-with-text-body'))).toBe(muted);
   });
 

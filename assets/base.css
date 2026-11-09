@@ -7964,3 +7964,209 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
   @keyframes motion-bump { 30% { translate: 0 -5px; } 60% { translate: 0 1px; } }
   @keyframes motion-breathe { 50% { opacity: 0.45; } }
 }
+
+/* ==== Review CTO 09/11 (tong_hop.docx, ES1-T250): sửa 7 lỗi + hàng cuộn có nút, thanh tiến trình, chuyển động. ==== */
+
+/* 1. Nội dung hero thẳng mép trái container (header, các khối dưới). % tính theo bề ngang slide. */
+@media (min-width: 80rem) {
+  .slideshow__content { padding-inline-start: max(min(191px, 10.6%), calc((100% - var(--page-width)) / 2 + var(--page-margin))); }
+}
+
+/* 2. Nút next, back: mặc định trắng, rê chuột mới cam */
+.slideshow__arrow--prev, .slideshow__arrow--next,
+.collection-list__button--prev, .collection-list__button--next,
+.carousel-nav__button {
+  background: var(--figma-ffffff);
+  color: var(--figma-1a1a1a);
+  border: 1px solid var(--figma-e5e5e5);
+}
+.slideshow__arrow--next .slideshow-icon, .collection-list__button--next .slideshow-icon { margin: -1px; }
+@media (hover: hover) {
+  .slideshow__arrow:hover, .collection-list__button:hover, .carousel-nav__button:hover {
+    background: var(--color-accent);
+    color: var(--color-accent-foreground, var(--figma-ffffff));
+    border-color: var(--color-accent);
+  }
+}
+.slideshow__arrow:focus-visible, .collection-list__button:focus-visible, .carousel-nav__button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* 3. Hàng cuộn ngang: next, back ở đầu khối, thanh tiến trình thay thanh cuộn trình duyệt */
+scroll-buttons { display: block; }
+scroll-buttons.video-carousel__scroller { display: contents; }
+.carousel-nav { display: none; gap: 8px; flex: none; }
+@media (min-width: 48rem) { .carousel-nav { display: flex; } }
+scroll-buttons:not([data-enhanced]) .carousel-nav,
+scroll-buttons:not([data-scrollable]) .carousel-nav { visibility: hidden; }
+.carousel-nav__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  min-width: 0;
+  padding: 0;
+  border-radius: 50%;
+  cursor: pointer;
+}
+.carousel-nav__button .slideshow-icon { flex: none; width: 52px; height: 52px; margin: -1px; }
+/* Ở đầu hoặc cuối hàng: nút mờ đi thay vì biến mất, cụm nút không nhảy chỗ */
+.carousel-nav__button[hidden], [data-testid$='-collection-list'] .collection-list__button[hidden] { display: inline-flex; opacity: 0.35; pointer-events: none; }
+.testimonials__header, .blog-posts__header { grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--space-4); align-items: end; }
+.testimonials__header > :not(.carousel-nav), .blog-posts__header > :not(.carousel-nav) { grid-column: 1; }
+.testimonials__header > .carousel-nav, .blog-posts__header > .carousel-nav { grid-column: 2; grid-row: 1 / span 2; align-self: end; }
+.video-carousel__row > .carousel-nav { margin-inline-start: auto; }
+.video-carousel__link + .carousel-nav { margin-inline-start: 0; }
+
+.carousel-progress {
+  position: relative;
+  height: 2px;
+  margin-block-start: 32px;
+  overflow: hidden;
+  border-radius: var(--figma-radius-2);
+  background: var(--figma-e5e5e5);
+  visibility: hidden;
+}
+scroll-buttons[data-scrollable] .carousel-progress { visibility: visible; }
+.testimonials > .carousel-progress { margin-inline: max(0px, (100% - var(--content-width)) / 2); }
+.blog-posts > .carousel-progress { margin-inline: var(--blog-posts-inset); margin-block-start: 0; }
+.video-carousel .carousel-progress { margin-inline: var(--video-carousel-inset); margin-block-start: 0; }
+.collection-list > .carousel-progress { margin-inline: calc((100% - var(--content-width)) / 2); background: var(--figma-white-12); }
+.carousel-progress__thumb {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  width: calc(var(--scroll-size, 1) * 100%);
+  border-radius: inherit;
+  background: var(--figma-1a1a1a);
+  translate: calc(var(--scroll-pos, 0) * (1 / var(--scroll-size, 1) - 1) * 100%) 0;
+}
+.collection-list > .carousel-progress .carousel-progress__thumb { background: var(--figma-ffffff); }
+scroll-buttons[data-enhanced] [data-scroll-track] { scrollbar-width: none; }
+scroll-buttons[data-enhanced] [data-scroll-track]::-webkit-scrollbar { display: none; }
+@media (pointer: fine) {
+  scroll-buttons[data-scrollable] [data-scroll-track] { cursor: grab; }
+}
+[data-scroll-track][data-dragging] { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; user-select: none; }
+[data-scroll-track][data-dragging] * { pointer-events: none; }
+
+/* 4. Eyebrow cam như Figma (CTO 09/11, thay E3). Nền sand dùng cam đậm hơn 10% để chữ nhỏ đạt AA. */
+.shop-by-level__eyebrow, .image-with-text__eyebrow, .multicolumn__eyebrow { color: var(--color-accent); }
+.block-container--sand :is(.shop-by-level__eyebrow, .image-with-text__eyebrow, .multicolumn__eyebrow) { color: var(--color-accent-on-sand); }
+
+/* 5. Popup kết quả quiz */
+.quiz__dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  width: min(1120px, calc(100% - var(--page-margin) * 2));
+  height: fit-content;
+  max-width: none;
+  max-height: min(860px, calc(100dvh - 48px));
+  padding: 48px;
+  border: 0;
+  border-radius: var(--figma-radius-24);
+  background: var(--figma-ffffff);
+  color: var(--figma-1a1a1a);
+  box-shadow: 0 32px 80px color-mix(in srgb, var(--figma-000000) 28%, transparent);
+  overscroll-behavior: contain;
+}
+.quiz__dialog::backdrop { background: color-mix(in srgb, var(--figma-1a1a1a) 62%, transparent); backdrop-filter: blur(6px); }
+.quiz__dialog .quiz__results { margin: 0; padding: 0; border: 0; background: none; }
+.quiz__dialog .quiz__results-heading { margin: 0 0 32px; padding-inline-end: 56px; font-family: var(--font-heading--family); font-size: clamp(28px, 3vw, 40px); line-height: 1.1; font-weight: var(--font-heading--weight-display); letter-spacing: -0.02em; }
+.quiz__dialog .quiz__results-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 0; list-style: none; }
+.quiz__dialog-close {
+  position: absolute;
+  inset-block-start: 24px;
+  inset-inline-end: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--figma-e5e5e5);
+  border-radius: 50%;
+  background: var(--figma-ffffff);
+  color: var(--figma-1a1a1a);
+  cursor: pointer;
+}
+@media (hover: hover) { .quiz__dialog-close:hover { background: var(--figma-1a1a1a); color: var(--figma-ffffff); border-color: var(--figma-1a1a1a); } }
+.quiz__dialog-close:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+.quiz__dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-block-start: 32px; padding-block-start: 24px; border-block-start: 1px solid var(--figma-e5e5e5); }
+.quiz__dialog .quiz__results[aria-busy='true'] .quiz__results-body:empty { min-height: 320px; border-radius: var(--figma-radius-16); background: linear-gradient(90deg, var(--figma-f4f4f5) 0 25%, var(--figma-ffffff) 50%, var(--figma-f4f4f5) 75%) 0 0 / 300% 100%; }
+@media (max-width: 63.99rem) { .quiz__dialog .quiz__results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } }
+@media (max-width: 47.99rem) {
+  .quiz__dialog { width: 100%; max-height: 88dvh; margin: auto 0 0; inset: auto 0 0; padding: 24px 16px; border-radius: var(--figma-radius-24) var(--figma-radius-24) 0 0; }
+  .quiz__dialog-close { inset-block-start: 12px; inset-inline-end: 12px; }
+  .quiz__dialog .quiz__results-heading { margin-block-end: 20px; }
+  .quiz__dialog-actions { justify-content: stretch; }
+  .quiz__dialog-actions > * { flex: 1 1 auto; }
+}
+
+/* 7. Get 15% Off: cam như Figma 1:1148 (chữ lớn, 3.48:1 trên nền tối đạt AA chữ lớn) */
+.site-footer__newsletter-heading span { color: var(--color-accent); }
+
+/* ==== Chuyển động v2 (ES1-T250): mở trang, hiện dần theo cuộn, cuộn gắn tiến trình. Chỉ transform, opacity, clip-path. ==== */
+@media (prefers-reduced-motion: no-preference) {
+  /* Hero: chữ trồi lên lần lượt, ảnh thu từ 1.12 về 1. Chạy lúc tải trang (CSS, không chờ JS) và mỗi lần đổi slide. */
+  slideshow-carousel:not([data-enhanced]) .slideshow__slide:first-child .slideshow__content > *,
+  slideshow-carousel[data-enhanced] .slideshow__slide:not([inert]) .slideshow__content > * {
+    animation: motion-rise var(--motion-reveal) var(--ease-expo) both;
+  }
+  .slideshow__content > :nth-child(2) { animation-delay: 90ms; }
+  .slideshow__content > :nth-child(3) { animation-delay: 180ms; }
+  .slideshow__content > :nth-child(4) { animation-delay: 270ms; }
+  .slideshow__content > :nth-child(5) { animation-delay: 360ms; }
+  slideshow-carousel:not([data-enhanced]) .slideshow__slide:first-child .slideshow__media :is(img, video),
+  slideshow-carousel[data-enhanced] .slideshow__slide:not([inert]) .slideshow__media :is(img, video) {
+    animation: motion-settle var(--motion-hero) var(--ease-expo) both;
+  }
+
+  /* Hiện dần theo cuộn: motion.js gắn data-reveal + data-reveal-kind, --reveal-i là thứ tự trong nhóm */
+  html[data-motion] [data-reveal] { transition-property: opacity, translate, scale, clip-path; transition-duration: var(--motion-reveal); transition-timing-function: var(--ease-expo); transition-delay: calc(var(--reveal-i, 0) * 80ms); }
+  html[data-motion] [data-reveal='wait'] { opacity: 0; translate: 0 32px; }
+  html[data-motion] [data-reveal='wait'][data-reveal-kind='card'] { translate: 0 56px; scale: 0.97; }
+  html[data-motion] [data-reveal='wait'][data-reveal-kind='media'] { opacity: 1; translate: none; clip-path: inset(14% 10% 14% 10% round var(--figma-radius-24)); }
+  html[data-motion] [data-reveal-kind='media'] img { transition: scale calc(var(--motion-reveal) * 1.6) var(--ease-expo); }
+  html[data-motion] [data-reveal='wait'][data-reveal-kind='media'] img { scale: 1.18; }
+  html[data-motion] [data-reveal='in'] { opacity: 1; translate: 0 0; scale: 1; clip-path: inset(0 0 0 0 round 0); }
+
+  /* 6. Make fitness: chữ đậm dần theo cuộn (motion.js đặt --w cho từng chữ), ảnh trôi lên (--lift) */
+  html[data-motion] .image-with-text__heading[data-scrub] .motion-word { color: color-mix(in srgb, var(--figma-1a1a1a) calc(var(--w, 0) * 100%), var(--figma-b2b2b2)); transition: color 120ms linear; }
+  html[data-motion] .image-with-text__heading[data-scrub] strong { color: inherit; }
+  html[data-motion] [data-lift] { translate: 0 var(--lift, 0); will-change: translate; }
+
+  /* Hàng cuộn: card nổi nhẹ khi rê chuột, nút bấm có độ nảy */
+  .carousel-nav__button, .quiz__dialog-close { transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out), opacity var(--motion-base) var(--ease-out); }
+  html[data-motion] .carousel-nav__button:hover { scale: 1.06; }
+  html[data-motion] .carousel-nav__button:active { scale: 0.94; }
+  .carousel-progress__thumb { transition: width var(--motion-base) var(--ease-out); }
+  .article-card, .video-card { transition: translate var(--motion-slow) var(--ease-expo), box-shadow var(--motion-slow) var(--ease-expo); }
+  html[data-motion] .article-card:hover { translate: 0 -6px; box-shadow: 0 18px 40px color-mix(in srgb, var(--figma-000000) 18%, transparent); }
+  html[data-motion] .product-card { transition: translate var(--motion-slow) var(--ease-expo); }
+  html[data-motion] .product-card:hover { translate: 0 -4px; }
+
+  /* Popup quiz: nền mờ dần, hộp nổi lên; mobile trượt từ dưới */
+  .quiz__dialog { transition: opacity var(--motion-base) var(--ease-out), translate var(--motion-slow) var(--ease-expo), scale var(--motion-slow) var(--ease-expo), overlay var(--motion-base) allow-discrete, display var(--motion-base) allow-discrete; opacity: 0; translate: 0 24px; scale: 0.97; }
+  .quiz__dialog[open] { opacity: 1; translate: 0 0; scale: 1; }
+  @starting-style { .quiz__dialog[open] { opacity: 0; translate: 0 24px; scale: 0.97; } }
+  .quiz__dialog::backdrop { transition: opacity var(--motion-base) var(--ease-out), overlay var(--motion-base) allow-discrete, display var(--motion-base) allow-discrete; opacity: 0; }
+  .quiz__dialog[open]::backdrop { opacity: 1; }
+  @starting-style { .quiz__dialog[open]::backdrop { opacity: 0; } }
+  .quiz__results-item { animation: motion-rise var(--motion-slow) var(--ease-expo) both; }
+  .quiz__results-item:nth-child(2) { animation-delay: 70ms; }
+  .quiz__results-item:nth-child(3) { animation-delay: 140ms; }
+  .quiz__results-item:nth-child(4) { animation-delay: 210ms; }
+  .quiz__dialog .quiz__results[aria-busy='true'] .quiz__results-body:empty { animation: motion-shimmer 1.4s linear infinite; }
+  @media (max-width: 47.99rem) {
+    .quiz__dialog { translate: 0 100%; scale: 1; }
+    @starting-style { .quiz__dialog[open] { translate: 0 100%; scale: 1; } }
+  }
+
+  @keyframes motion-rise { from { opacity: 0; translate: 0 40px; } }
+  @keyframes motion-settle { from { scale: 1.12; } }
+  @keyframes motion-shimmer { to { background-position: -300% 0; } }
+}
