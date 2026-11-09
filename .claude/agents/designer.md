@@ -7,6 +7,7 @@ skills:
   - ui-spec-template
   - design-token
   - ui-diff
+  - designer-knowledge
 maxTurns: 50
 memory: project
 ---
