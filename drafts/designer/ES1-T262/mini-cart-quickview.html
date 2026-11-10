@@ -179,27 +179,32 @@
   .qv-option legend { margin-block-end: var(--space-2); padding: 0; font-size: var(--font-size-sm); font-weight: 600; }
   .qv-option legend span { font-weight: 400; }
   .qv-option__values { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-  .opt { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 44px; min-height: 44px; padding-inline: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); font-size: var(--font-size-sm); font-weight: 500; cursor: pointer; }
+  /* ---------- Bộ chọn biến thể chung PDP / quickview (docs/ui-spec/variant-picker.md, ES1-T284) ----------
+     Cùng quy tắc với ES1-T253/product.html. Còn hàng · hết hàng (gạch chữ) · không tồn tại (gạch chữ + viền đứt) · đang chọn. */
+  .opt { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 56px; min-height: 44px; padding-inline: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; cursor: pointer; transition: border-color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out); }
   .opt:hover, .opt.is-hover { border-color: var(--color-foreground); }
   .opt.is-checked { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
-  /* Vòng 3b (2048 biến thể): 3 trạng thái mỗi giá trị theo lựa chọn hiện tại, từ value.available / value.exists.
-     Hết hàng = gạch chữ; không tồn tại = gạch chữ + viền nét đứt. Không chỉ dùng màu; tên ẩn ", sold out" / ", unavailable". */
-  .opt.is-sold-out:not(.is-checked), .opt.is-missing:not(.is-checked) { color: var(--color-muted); text-decoration: line-through; }
-  .opt.is-missing:not(.is-checked) { border-style: dashed; border-color: var(--color-muted-light); }
-  .opt.is-checked.is-sold-out, .opt.is-checked.is-missing { text-decoration: line-through; }
+  .opt.is-sold-out, .opt.is-missing { color: var(--color-muted); text-decoration: line-through; }
+  .opt.is-missing { border-style: dashed; border-color: var(--color-muted-light); }
+  .opt.is-missing:hover, .opt.is-missing.is-hover { border-color: var(--color-foreground); }
+  .opt.is-checked.is-sold-out, .opt.is-checked.is-missing { border-style: solid; border-color: var(--color-foreground); color: var(--color-background); }
   .opt.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-  .opt--swatch { padding: 0; border-radius: 50%; }
-  .opt--swatch::before { content: ''; position: absolute; inset: var(--space-1); border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent); border-radius: 50%; background: var(--swatch); }
+  .opt--swatch { width: 44px; min-width: 44px; padding: 0; border-radius: 50%; border-color: transparent; }
+  .opt--swatch::before { content: ''; position: absolute; inset: var(--space-1); border: 1px solid color-mix(in srgb, var(--color-foreground) 50%, transparent); border-radius: 50%; background: var(--swatch); }
+  .opt--swatch:hover, .opt--swatch.is-hover { border-color: var(--color-foreground); }
   .opt--swatch.is-checked { border: 2px solid var(--color-foreground); background: var(--color-background); }
-  .opt--swatch.is-sold-out::after, .opt--swatch.is-missing::after { content: ''; position: absolute; inset-block-start: 50%; inset-inline: var(--space-1); height: 1px; background: var(--color-foreground); rotate: -45deg; }
-  /* Option nhiều giá trị (> 10): lưới ô 72, thu 7 giá trị + nút "+N" (2 hàng ở mọi mốc: 4 cột 360/768, 5 cột 1280) */
+  .opt--swatch.is-missing:not(.is-checked) { border-style: dashed; border-color: var(--color-muted-light); }
+  .opt--swatch.is-sold-out::after, .opt--swatch.is-missing::after { content: ''; position: absolute; inset-block-start: calc(50% - 1px); inset-inline: var(--space-1); height: 2px; background: var(--color-foreground); box-shadow: 0 0 0 1px var(--color-background); rotate: -45deg; }
+  /* Option > 10 giá trị: lưới ô 72, 7 giá trị + "+N" ở ô 8 (≤ 2 hàng mọi mốc); mở hết tại chỗ, "Show Fewer" ô cuối 2 cột */
   .qv-option__values--grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); }
-  .qv-option__values--grid .opt { padding-inline: var(--space-2); }
-  .opt--more { border-color: var(--color-muted-light); background: var(--color-background-alt); color: var(--color-foreground); font-weight: 600; }
+  .qv-option__values--grid .opt { min-width: 0; padding-inline: var(--space-2); }
+  .opt--more { border-color: var(--color-muted-light); background: var(--color-background-alt); color: var(--color-foreground); font-weight: 600; text-decoration: none; }
   .opt--more:hover, .opt--more.is-hover { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
   .opt--more svg { width: 12px; height: 8px; margin-inline-start: var(--space-1); }
   .opt--more[aria-expanded='true'] svg { rotate: 180deg; }
   .qv-option__values--grid .opt--less { grid-column: span 2; }
+  /* Đang tải biến thể: nút giữ màu primary, aria-disabled, không spinner (spinner trên nút chỉ cho "đang thêm giỏ") */
+  .button.is-pending[aria-disabled='true'] { border-color: transparent; background: var(--color-accent); color: var(--color-accent-foreground); cursor: progress; }
   /* Đang tải biến thể (đổi option → fetch theo option value) */
   .qv__price-skel { width: 45%; height: 28px; }
   .stock--busy::before { width: 12px; height: 12px; border: 2px solid var(--color-border); border-block-start-color: var(--color-foreground); background: none; animation: kit-spin 700ms linear infinite; }
@@ -463,7 +468,7 @@
 
   <!-- ================= 2b. CA BIÊN 2048: 3 OPTION, WEIGHT 40 GIÁ TRỊ, THU GỌN ================= -->
   <section aria-labelledby="h-qv-many" style="margin-block-start: var(--space-7)">
-    <div class="container"><p class="demo-label" id="h-qv-many">2b · Ca biên 2048 biến thể: Adjustable dumbbell pair, 3 option (Weight 40 giá trị 5–200 lb, Color, Grip; option giả lập theo ticket). Weight thu gọn 7 + "+33"; 45, 60 lb hết hàng (gạch); White không tồn tại với 20 lb + Rubber (nét đứt). ≥ 768 dialog dài hơn màn → hàng mua dính đáy cột phải; 360 sheet đã cuộn tới bộ chọn, hàng mua dính đáy</p></div>
+    <div class="container"><p class="demo-label" id="h-qv-many">2b · Ca biên 2048 biến thể: Adjustable dumbbell pair, 3 option (Weight 40 giá trị 5–200 lb, Color, Grip; option giả lập theo ticket). Weight thu gọn 7 + "+33"; 45, 60 lb hết hàng (gạch); White không tồn tại với 20 lb + Rubber (gạch chéo + vòng đứt). ≥ 768 dialog dài hơn màn → hàng mua dính đáy cột phải; 360 sheet đã cuộn tới bộ chọn, hàng mua dính đáy</p></div>
     <div class="demo-stage stage" role="group" aria-label="Quick view, product with three options, collapsed">
       <div class="stage__page" aria-hidden="true">
         <header class="site-header">
@@ -526,7 +531,7 @@
 
   <!-- ================= 2c. CA BIÊN 2048: WEIGHT MỞ HẾT, ĐÃ CUỘN ================= -->
   <section aria-labelledby="h-qv-all" style="margin-block-start: var(--space-7)">
-    <div class="container"><p class="demo-label" id="h-qv-all">2c · Bấm "+33": mở hết 40 giá trị tại chỗ, focus về "40 lb"; 105–200 lb không tồn tại với Rubber (nét đứt). Sheet/dialog cuộn bên trong, nút đóng và hàng "Add To Cart" luôn thấy; "Show fewer" thu lại</p></div>
+    <div class="container"><p class="demo-label" id="h-qv-all">2c · Bấm "+33": mở hết 40 giá trị tại chỗ, focus vào "40 lb" (giá trị đầu tiên vừa hiện, variant-picker §5); 105–200 lb không tồn tại với Rubber (gạch + viền đứt). Sheet/dialog cuộn bên trong, nút đóng và hàng "Add To Cart" luôn thấy; "Show Fewer" ô cuối thu lại, focus về "+33"</p></div>
     <div class="demo-stage stage" role="group" aria-label="Quick view, all weight values expanded">
       <div class="stage__page" aria-hidden="true">
         <header class="site-header">
@@ -560,7 +565,7 @@
                 <label class="opt">55 lb</label><label class="opt is-sold-out">60 lb<span class="visually-hidden">, sold out</span></label><label class="opt">65 lb</label><label class="opt">70 lb</label><label class="opt">75 lb</label><label class="opt">80 lb</label><label class="opt">85 lb</label><label class="opt">90 lb</label><label class="opt">95 lb</label><label class="opt">100 lb</label>
                 <label class="opt is-missing">105 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">110 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">115 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">120 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">125 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">130 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">135 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">140 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">145 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">150 lb<span class="visually-hidden">, unavailable</span></label>
                 <label class="opt is-missing">155 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">160 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">165 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">170 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">175 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">180 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">185 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">190 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">195 lb<span class="visually-hidden">, unavailable</span></label><label class="opt is-missing">200 lb<span class="visually-hidden">, unavailable</span></label>
-                <button class="opt opt--more opt--less" type="button" aria-expanded="true" aria-controls="qv7-weight">Show fewer<span class="visually-hidden"> Weight options</span><svg aria-hidden="true"><use href="#i-caret"/></svg></button>
+                <button class="opt opt--more opt--less" type="button" aria-expanded="true" aria-controls="qv7-weight">Show Fewer<span class="visually-hidden"> Weight options</span><svg aria-hidden="true"><use href="#i-caret"/></svg></button>
               </div>
             </fieldset>
             <fieldset class="qv-option">
@@ -858,9 +863,9 @@
               </div>
             </fieldset>
             <p class="stock stock--busy">Checking availability…</p>
-            <div class="qv__buy"><button class="button" type="button" aria-busy="true" aria-disabled="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button><a class="button button--muted" href="#">View Detail<span class="visually-hidden"> of Adjustable dumbbell pair, 40 lb</span><svg class="button__arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+            <div class="qv__buy"><button class="button is-pending" type="button" aria-disabled="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button><a class="button button--muted" href="#">View Detail<span class="visually-hidden"> of Adjustable dumbbell pair</span><svg class="button__arrow" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
             <p class="visually-hidden" role="status">Loading 40 lb…</p>
-            <p class="demo-label" style="margin: 0">Giá trị chọn nằm ngoài 7 ô đầu: đưa vào ô thứ 7 (sau 6 ô đầu). "+33" đang hover: nền foreground chữ trắng. Lựa chọn nhảy ngay, giá + tồn + nút chờ server; bấm tiếp thì huỷ request cũ.</p>
+            <p class="demo-label" style="margin: 0">Cùng mẫu PDP J3 (variant-picker §6). Giá trị chọn nằm ngoài 7 ô đầu: 6 ô đầu + giá trị chọn ở ô 7. "+33" đang hover. Lựa chọn nhảy ngay; giá skeleton, dòng tồn có spinner duy nhất; Add To Cart giữ màu, aria-disabled, không spinner (spinner chỉ cho đang thêm giỏ); bấm tiếp thì huỷ request cũ.</p>
           </div>
         </div>
       </div>
