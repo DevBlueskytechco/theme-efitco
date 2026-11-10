@@ -31,16 +31,16 @@
   .lc-card__meta { margin: calc(var(--space-2) * -1) 0 0; color: var(--color-muted); font-size: var(--font-size-sm); }
   @media (min-width: 80rem) { .lc-card__meta { margin-block-start: calc(var(--space-3) * -1); } }
   .section-end { padding-block-end: var(--section-gap); }
-  .pagination { margin-block-start: var(--space-7); }
+  /* Phân trang dùng chung với collection.html: Previous/Next = nút tròn 52 chevron (Figma 1:398) */
   .pagination ul { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-  .page-link { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-width: 48px; min-height: 48px; padding-inline: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-button); color: var(--color-foreground); font-weight: 500; text-decoration: none; }
+  .pagination .round-button { text-decoration: none; }
+  .pagination .round-button--next { margin-inline-start: var(--space-2); }
+  .page-link { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; }
   .page-link[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
-  .page-link svg { width: 18px; height: 14px; }
-  .page-link--prev svg { scale: -1 1; }
   .page-status { color: var(--color-muted); font-size: var(--font-size-sm); }
   .page-num { display: none; }
-  @media (max-width: 47.99rem) { .pagination ul { justify-content: space-between; gap: var(--space-1); } }
-  @media (min-width: 48rem) { .page-num { display: block; } .page-status-item { display: none; } .page-link { min-width: 44px; min-height: 44px; font-size: var(--font-size-sm); } }
+  @media (max-width: 47.99rem) { .pagination ul { justify-content: space-between; } .pagination .round-button--next { margin: 0; } }
+  @media (min-width: 48rem) { .page-num { display: block; } .page-status-item { display: none; } }
   .state-box { padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
 </style>
 </head>
@@ -51,7 +51,18 @@
   <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
   <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
-  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
+  <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 28 28"><path d="M16 4v13.5a4.2 4.2 0 1 1-4.2-4.2M16 4c.4 3 2.4 5 5.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="20" height="20" rx="5"/><circle cx="14" cy="14" r="4.5"/><circle cx="19.6" cy="8.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="6.5" width="22" height="15" rx="4"/><path d="m12 11 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 28 28"><path d="M16.5 4.5h-2a4 4 0 0 0-4 4v3H8v3.5h2.5v8.5H14V15h3l.5-3.5H14V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
   <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
   <symbol id="i-empty" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5v-9Z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></g></symbol>
   <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
@@ -59,6 +70,7 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
+<!-- Header mọi trang: thanh tối riêng + noise, cao 80, không đè ảnh (sổ 10/11, Figma 1:362) -->
 <header class="site-header demo-static">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -75,7 +87,7 @@
       </ul>
     </nav>
     <div class="site-header__icons">
-      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
     </div>
@@ -110,21 +122,51 @@
   </ul>
 </main>
 
+<!-- Footer (foundation §4 vòng 3, Figma 1:1104) -->
 <footer class="site-footer">
-  <div class="container">
+  <div class="container site-footer__band">
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
     <div class="site-footer__newsletter">
-      <div>
-        <h2><span>Get 15% Off</span> Your First Order</h2>
-        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
-      </div>
-      <form class="site-footer__form" onsubmit="return false">
-        <label class="visually-hidden" for="nl-email">Email</label>
-        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit">Get 15% Off</button></div>
-        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
-      </form>
+      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
-    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
-    <div class="site-footer__bottom"><p>© 2026 Efitco, Powered by Shopify</p></div>
+    <form class="site-footer__form" onsubmit="return false">
+      <label class="visually-hidden" for="nl-email">Email</label>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+  <div class="site-footer__panel">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <svg class="site-footer__logo" viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+        <ul class="site-footer__social">
+          <li><a href="#" aria-label="Efitco on TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        </ul>
+      </div>
+      <div class="site-footer__menus">
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
+    </div>
+    <ul class="site-footer__trust">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© 2026 Efitco, Powered by Shopify</p>
+    <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
+    <div class="site-footer__end">
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
+    </div>
   </div>
 </footer>
 
@@ -138,7 +180,7 @@
         <li class="page-status-item"><span class="page-status">Page 1 of 2</span></li>
         <li class="page-num"><span class="page-link" aria-current="page">1</span></li>
         <li class="page-num"><a class="page-link" href="#" aria-label="Page 2">2</a></li>
-        <li><a class="page-link" href="#" style="padding-inline: var(--space-4)">Next<span class="visually-hidden"> page</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+        <li><a class="round-button round-button--next" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
       </ul>
     </nav>
   </section>
