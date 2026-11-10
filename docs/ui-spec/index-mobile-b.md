@@ -8,7 +8,7 @@ KHÔNG CHẮC: (1) Figma 1:359 chỉ có desktop 1920 và không có trạng th�
 | --- | --- | --- | --- | --- |
 | 1 | §1 thanh dính bundle 360 | "Mockup chưa vẽ, chờ CTO" | đã chốt (H4), vẽ đủ: hiện/ẩn, 0 món, đang thêm, lỗi; mục 1.1 | sổ 10/11 H4 |
 | 2 | §1 nút Big Offer ở trang chủ 360 | chưa xét va chạm với thanh dính | nút nhấc lên trên thanh, cách 16, theo chiều cao thật của thanh; không đè | sổ 10/11 audit (3); `marketing-popups.md` §4 |
-| 3 | Mockup | không có | `index.html` mục States: 2 khung 360 × 640 + 3 trạng thái thanh; PNG mới `index-360.png` 360 × 11847, `index-768.png` 768 × 10164 (thay số ở dòng Đầu ra) | ticket |
+| 3 | Mockup | không có | `index.html` mục States: 2 khung 360 × 640 + 3 trạng thái thanh; PNG mới `index-360.png` 360 × 11988, `index-768.png` 768 × 10274 (thay số ở dòng Đầu ra) | ticket |
 | 4 | §12 | câu 1 còn dạng hỏi | ghi đã chốt, thêm "Quyết định CTO cần chốt" | ticket |
 
 Không đổi: bố cục lưới, card, panel, trạng thái panel, mọi khối từ §2 trở đi.
@@ -307,7 +307,7 @@ CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions
 3. Dòng "Bundle discount" trong panel: đổi xanh Figma (2.50:1, trượt AA) sang `color-mix(badge-new 55%, trắng)` 5.41:1? Đề xuất: có, cùng cách `--color-accent-on-sand`.
 
 Đề xuất sửa file ngoài phạm vi ES1-T286 (không sửa ở ticket này):
-- §11 dòng "Thanh dính đáy 360 nếu CTO duyệt (câu 1)" → bỏ "nếu CTO duyệt", trỏ mục 1.1; dòng Đầu ra đầu spec đổi kích thước PNG (360 × 11847, 768 × 10164).
+- §11 dòng "Thanh dính đáy 360 nếu CTO duyệt (câu 1)" → bỏ "nếu CTO duyệt", trỏ mục 1.1; dòng Đầu ra đầu spec đổi kích thước PNG (360 × 11988, 768 × 10274).
 - `docs/ui-spec/marketing-popups.md` §4 "Không đè": thêm "thanh dính bundle trang chủ < 48rem → teaser nhấc theo `--bundle-bar-height`" và `kit.css` `.offer-teaser` thêm luật nhấc chung.
 - `kit.css` / foundation §17: `.toast-region` < 48rem cũng nhấc theo `--bundle-bar-height` khi thanh hiện (toast đang ở đáy cách 16 sẽ đè thanh).
 
