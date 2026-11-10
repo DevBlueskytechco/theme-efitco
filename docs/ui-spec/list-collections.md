@@ -8,6 +8,15 @@ Template `templates/list-collections.liquid` (markup trực tiếp, `paginate co
 
 Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:359 > bộ kiến thức; thành phần từ foundation vòng 3 (`docs/ui-spec/foundation.md`, `drafts/designer/_kit/kit.css`).
 
+## Thay đổi audit (ES1-T283, sửa ở ES1-T287)
+
+| # | Mã | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | A4, câu CTO 5 | trang 1 ẩn Previous, "Page 1 of 2" dồn trái | Previous giữ chỗ mờ 0.35 + `aria-disabled`; "Page X of Y" giữa 2 nút | Sổ 10/11 audit (5), `docs/ui-spec/pagination.md` |
+| 2 | A4 | §4 trỏ về collection.md §8 | §4 trỏ về `pagination.md` (snippet chung) | Sổ 10/11 S3/C3 |
+
+Mockup `drafts/designer/ES1-T254/list-collections.html` L1 vẽ lại.
+
 ## Thay đổi so với vòng 2
 
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
@@ -52,10 +61,10 @@ Cột 2 / 3 / 4 theo ES1-T107 #7 (CTO 06/11). Lưới → footer `--section-gap`
 - Hover: ảnh scale 1.04 (500ms), tiêu đề gạch chân 2px (như `.collection-card` trang chủ). Focus: outline 2px accent offset 4 bao cả card (trên `::after`). Active: theo link.
 - Không ảnh: nền `--color-background-cream`, icon ảnh 30% `--color-muted-light`, giữ tỉ lệ 336/220 (0 CLS). Code dùng `placeholder_svg_tag 'collection-1'`; ĐỀ XUẤT icon trung tính như card sản phẩm (foundation §9).
 - Rỗng (L2): empty-state foundation §18: h2 "No Collections Yet" · "No collections to show yet. Browse every product in the store instead." (câu đầu là `collections.empty` có sẵn) · primary "Shop All Products" (`routes.all_products_collection_url`).
-- Phân trang (L1): như `docs/ui-spec/collection.md` §8: Previous/Next tròn 52 chevron, `aria-label="Previous page"` / `"Next page"`; ≥ 768 số trang pill 44; < 768 "Page X of Y". Store dev 14 collection nên không hiện.
+- Phân trang (L1): snippet `pagination` chung theo `docs/ui-spec/pagination.md`: `{% paginate collections by 24, window_size: 1 %}` → `{% render 'pagination', paginate: paginate %}`. Previous/Next tròn 52 chevron (`aria-label="Previous page"` / `"Next page"`); ≥ 768 số trang pill 44, trang hiện tại accent; < 768 "Page X of Y" giữa 2 nút. Trang đầu/cuối: nút giữ chỗ mờ 0.35 + `aria-disabled` (sổ 10/11 audit 5). Store dev 14 collection nên không hiện.
 - Đang tải / lỗi: không có (trang render server, không JS).
 
-Chuỗi mới (ĐỀ XUẤT): `collections.count` ("{{ count }} collections"), `collections.products_count` ("{{ count }} products", số ít/nhiều), `collections.empty_heading`, `collections.empty_hint`, `collections.empty_cta`; dùng chung `collections.pagination.page_of`, `previous_page`, `next_page` với trang collection.
+Chuỗi mới (ĐỀ XUẤT): `collections.count` ("{{ count }} collections"), `collections.products_count` ("{{ count }} products", số ít/nhiều), `collections.empty_heading`, `collections.empty_hint`, `collections.empty_cta`; phân trang dùng chuỗi chung `collections.pagination.*` (pagination.md §5).
 
 ## 5. Accessibility
 
@@ -81,7 +90,7 @@ Chuỗi mới (ĐỀ XUẤT): `collections.count` ("{{ count }} collections"), `
 | header trắng trên trang không có `.slideshow` | nền tối mọi trang (foundation §21) |
 | ảnh 336 / 270 bo 12, tiêu đề 18 dưới, placeholder SVG Shopify | ảnh 336 / 220 bo 16, tiêu đề heading 28 (câu hỏi 1), meta số sản phẩm, placeholder icon, focus bao card |
 | không breadcrumb, h1 đứng một mình | breadcrumb + meta số collection (foundation §5) |
-| phân trang chữ | Previous/Next `.round-button` 52 + `slideshow-icon` |
+| phân trang chữ | snippet `pagination` sửa theo pagination.md §10 |
 
 ## 8. Quyết định CTO đã chốt (10/11)
 

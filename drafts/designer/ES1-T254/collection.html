@@ -101,31 +101,27 @@
   .results__grid { margin-block-start: var(--space-5); }
   @media (min-width: 64rem) { .results .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .product-card__title a { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-  .results[aria-busy='true'] .product-grid { opacity: 0.4; pointer-events: none; transition: opacity var(--motion-base) var(--ease-out); }
+  /* S7 (ES1-T287): không làm mờ card (foundation §18, Lighthouse color-contrast tính opacity); lưới thành skeleton như search S5 */
   .updating { display: inline-flex; align-items: center; gap: var(--space-2); }
   .updating .spinner { width: 20px; height: 20px; }
 
-  /* §8 Phân trang */
+  /* §8 Phân trang: khối chung docs/ui-spec/pagination.md (ES1-T287) */
   .pagination { margin-block-start: var(--space-7); }
   @media (min-width: 80rem) { .pagination { margin-block-start: calc(var(--space-1) * 16); } }
-  /* Previous / Next = nút tròn 52 chevron của kit (Figma 1:398, sổ 09/11): trắng viền border, hover cam */
-  .pagination ul { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-  .pagination .round-button { text-decoration: none; }
-  .pagination .round-button--prev { margin-inline-end: var(--space-2); }
-  .pagination .round-button--next { margin-inline-start: var(--space-2); }
-  .page-link { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
-  a.page-link:hover, .page-link.is-hover { border-color: var(--color-foreground); }
-  .page-link[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
-  .page-gap { display: inline-grid; place-items: center; min-width: 24px; color: var(--color-muted); }
-  .page-status { color: var(--color-muted); font-size: var(--font-size-sm); white-space: nowrap; }
-  .page-num { display: none; }
-  /* < 48rem: [‹ 52] Page X of Y [› 52] trải hết hàng */
-  @media (max-width: 47.99rem) {
-    .pagination ul { justify-content: space-between; }
-    .pagination .round-button--prev, .pagination .round-button--next { margin: 0; }
-    .page-status-item:first-child { margin-inline-end: auto; }
-  }
-  @media (min-width: 48rem) { .page-num { display: block; } .page-status-item { display: none; } }
+  .pagination__list { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+  .pagination__step { text-decoration: none; }
+  .pagination__step[aria-disabled='true'] { cursor: default; }
+  .pagination__item--prev { margin-inline-end: var(--space-2); }
+  .pagination__item--next { margin-inline-start: var(--space-2); }
+  .pagination__page { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
+  a.pagination__page:hover, .pagination__page.is-hover { border-color: var(--color-foreground); }
+  .pagination__page:focus-visible, .pagination__page.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .pagination__page[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
+  .pagination__gap { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 44px; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .pagination__status { font-size: var(--font-size-sm); font-weight: 500; white-space: nowrap; }
+  :dir(rtl) .pagination__step svg { scale: -1 1; }
+  @media (max-width: 47.99rem) { .pagination__num { display: none; } .pagination__list { justify-content: space-between; } .pagination__item--prev, .pagination__item--next { margin: 0; } }
+  @media (min-width: 48rem) { .pagination__status { display: none; } }
 
   /* Swatch trên card là chỉ báo (foundation §9 vòng 3): aria-hidden, không bấm, click đi qua link card */
   .swatches[aria-hidden='true'] { pointer-events: none; }
@@ -146,7 +142,6 @@
   .sort-options li { display: flex; align-items: center; min-height: 44px; padding-inline: var(--space-4); }
   .sort-options li[aria-selected='true'] { background: var(--color-background-alt); font-weight: 600; }
   .demo-row--wrap { display: flex; flex-wrap: wrap; gap: var(--space-4); align-items: center; }
-  .page-link.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
   .chip.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
   .field-error-demo { max-width: 360px; }
 </style>
@@ -303,12 +298,13 @@
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/1-1668682587206912817789.jpg" alt="Gift card" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Gift card</a></h2><p class="price"><span>From $10.00</span></p></div></li>
       </ul>
 
-      <nav class="pagination" aria-label="Pagination">
-        <ul>
-          <li class="page-status-item"><span class="page-status">Page 1 of 2</span></li>
-          <li class="page-num"><span class="page-link" aria-current="page">1</span></li>
-          <li class="page-num"><a class="page-link" href="#" aria-label="Page 2">2</a></li>
-          <li><a class="round-button round-button--next" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
+      <nav class="pagination" aria-label="Pagination" data-testid="pagination">
+        <ul class="pagination__list" role="list">
+          <li class="pagination__item--prev"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></span></li>
+          <li class="pagination__status">Page 1 of 2</li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>1</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 2">2</a></li>
+          <li class="pagination__item--next"><a class="round-button pagination__step" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
         </ul>
       </nav>
     </div>
@@ -480,7 +476,7 @@
   <!-- S4. Sort + phân trang -->
   <section class="demo-block" aria-labelledby="s4">
     <h2 id="s4">S4. Sắp xếp và phân trang</h2>
-    <p class="demo-note">Sort là `select` gốc (OS mở danh sách; trên mobile là picker của hệ điều hành). Nhãn "Sort by" nằm trong ô (12px), giá trị 16px. Tên tuỳ chọn do Shopify trả (`sort_options`). Phân trang: Previous/Next là nút tròn 52 chevron như Figma 1:398 (trắng viền #E5E5E5, rê chuột cam); ≥ 768 số trang tròn 44; dưới 768 [‹] Page X of Y [›].</p>
+    <p class="demo-note">Sort là `select` gốc (OS mở danh sách; trên mobile là picker của hệ điều hành). Nhãn "Sort by" nằm trong ô (12px), giá trị 16px. Tên tuỳ chọn do Shopify trả (`sort_options`). Phân trang: Previous/Next là nút tròn 52 chevron như Figma 1:398 (trắng viền #E5E5E5, rê chuột cam); ≥ 768 số trang tròn 44; dưới 768 [‹] Page X of Y [›]. Đầu/cuối giữ nút mờ 0.35 + aria-disabled (sổ 10/11, docs/ui-spec/pagination.md).</p>
     <div class="state-pair">
       <div class="state-box">
         <p class="demo-label">Sort: mặc định · hover · focus · danh sách mở (desktop)</p>
@@ -496,26 +492,27 @@
       <div class="state-box">
         <p class="demo-label">Trang 2 / 2</p>
         <nav class="pagination" aria-label="Pagination, page 2 sample" style="margin: 0 0 var(--space-6)">
-          <ul>
-            <li><a class="round-button round-button--prev" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
-            <li class="page-status-item"><span class="page-status">Page 2 of 2</span></li>
-            <li class="page-num"><a class="page-link" href="#" aria-label="Page 1">1</a></li>
-            <li class="page-num"><span class="page-link" aria-current="page">2</span></li>
+          <ul class="pagination__list" role="list">
+            <li class="pagination__item--prev"><a class="round-button pagination__step" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
+            <li class="pagination__status">Page 2 of 2</li>
+            <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 1">1</a></li>
+            <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>2</span></li>
+            <li class="pagination__item--next"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></span></li>
           </ul>
         </nav>
         <p class="demo-label">Trang 5 / 9, có dấu …; hover Previous (cam), hover trang 4, focus Next</p>
         <nav class="pagination" aria-label="Pagination, long sample" style="margin: 0">
-          <ul>
-            <li><a class="round-button round-button--prev is-hover" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
-            <li class="page-status-item"><span class="page-status">Page 5 of 9</span></li>
-            <li class="page-num"><a class="page-link" href="#" aria-label="Page 1">1</a></li>
-            <li class="page-num"><span class="page-gap">…</span></li>
-            <li class="page-num"><a class="page-link is-hover" href="#" aria-label="Page 4">4</a></li>
-            <li class="page-num"><span class="page-link" aria-current="page">5</span></li>
-            <li class="page-num"><a class="page-link" href="#" aria-label="Page 6">6</a></li>
-            <li class="page-num"><span class="page-gap">…</span></li>
-            <li class="page-num"><a class="page-link" href="#" aria-label="Page 9">9</a></li>
-            <li><a class="round-button round-button--next is-focus" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
+          <ul class="pagination__list" role="list">
+            <li class="pagination__item--prev"><a class="round-button pagination__step is-hover" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
+            <li class="pagination__status">Page 5 of 9</li>
+            <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 1">1</a></li>
+            <li class="pagination__num"><span class="pagination__gap">…</span></li>
+            <li class="pagination__num"><a class="pagination__page is-hover" href="#" aria-label="Page 4">4</a></li>
+            <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>5</span></li>
+            <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 6">6</a></li>
+            <li class="pagination__num"><span class="pagination__gap">…</span></li>
+            <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 9">9</a></li>
+            <li class="pagination__item--next"><a class="round-button pagination__step is-focus" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
           </ul>
         </nav>
       </div>
@@ -565,15 +562,17 @@
   <section class="demo-block" aria-labelledby="s7">
     <h2 id="s7">S7. Đang cập nhật · Lỗi tải</h2>
     <div class="state-pair">
-      <div class="state-box results" aria-busy="true">
+      <div class="state-box results">
         <div class="toolbar" style="position: static; margin: 0; padding-inline: 0">
           <p class="toolbar__count updating" role="status"><span class="spinner" aria-hidden="true"></span>Updating products…</p>
         </div>
-        <ul class="product-grid results__grid" role="list" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
-          <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg" alt="Revllen Pro Speed Rope" width="600" height="600"></div><div class="product-card__info"><h3 class="product-card__title"><a href="#" tabindex="-1">Revllen Pro Speed Rope</a></h3><p class="price"><span>$34.99</span></p></div></li>
-          <li class="skeleton-card" aria-hidden="true"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>
+        <ul class="product-grid results__grid" aria-busy="true" aria-label="Loading products" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
+          <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>
+          <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>
+          <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>
+          <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>
         </ul>
-        <p class="demo-note" style="margin-block-start: var(--space-3)">Card cũ mờ 40%, không bấm được; khi tải trang mới (Next) chưa có card thì dùng skeleton cùng kích thước.</p>
+        <p class="demo-note" style="margin-block-start: var(--space-3)">Không làm mờ card (foundation §18). Chờ ≤ 300 ms: giữ card cũ nguyên độ đậm, chỉ đổi dòng số kết quả thành spinner + "Updating products…". Chờ &gt; 300 ms hoặc sang trang (BE chặn link): lưới thành skeleton cùng số ô, cùng kích thước card (0 CLS), như search S5. Thanh công cụ, chip, cột lọc vẫn dùng được.</p>
       </div>
       <div class="state-box">
         <div class="alert" role="alert">
