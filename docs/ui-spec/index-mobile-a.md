@@ -141,6 +141,8 @@ A11y: `role="tablist"/"tab"/"tabpanel"`, ←/→ đổi tab, tab chưa chọn `t
 
 ## 6. Quiz (Figma 1:506)
 
+Kết quả quiz (popup sau bước 3, mọi mốc): `docs/ui-spec/quiz-result.md` (ES1-T285).
+
 Figma: panel #393942 1416 × 570 bo 24, padding 60; trái pill accent "● Our most-loved feature", h2 48 trắng "Find Your Perfect Gear", câu phụ, 2 ghi chú icon (20 seconds, No sign-up required); phải thẻ trắng 608 × 450 bo 16: thanh tiến độ accent 1/3 + "Step 1 of 3", h3 "Where do you want to focus?", gợi ý, body map 152 × 256 nền sand bo 12, 3 lựa chọn 80 cao (ảnh tròn 44, tên 18/600, mô tả 14, radio phải; chọn: nền sand + dấu check cam).
 
 | | 360 | 768 |

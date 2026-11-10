@@ -53,6 +53,7 @@ Template: `templates/product.liquid`. Block hiện có: `product-media`, `produc
 Đầu ra:
 - Spec này.
 - `drafts/designer/ES1-T253/product.html` (nhúng `../_kit/kit.css`) + `product-360|768|1280|1920.png`. Trạng thái A–I ở cuối file.
+- Bộ chọn biến thể chung: `docs/ui-spec/variant-picker.md` (ES1-T284). Tính năng Shopify trên buy box (pickup, unit price, selling plan, B2B, installments, gift card…): `docs/ui-spec/product-shopify-features.md` (ES1-T288). Đồng hồ: `docs/ui-spec/countdown.md`.
 
 Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma > kiến thức. Figma không có trang sản phẩm. Ngôn ngữ buy box lấy từ Featured product Figma 1:759 (trang chủ); thành phần chung theo `docs/ui-spec/foundation.md` (ES1-T251). Mọi phần không có trong Figma ghi `ĐỀ XUẤT:` kèm nguồn.
 
