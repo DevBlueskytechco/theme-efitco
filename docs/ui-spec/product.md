@@ -1,6 +1,33 @@
-KHÔNG CHẮC: (1) ảnh của handle `figma-ativafit-lava-adjustable` là áo tạ, không phải tạ tay (lệch tên, ES1-T245); mockup giữ đúng URL, alt trung tính. Ảnh một số sản phẩm gợi ý cũng lệch tên. (2) demo-data không có description, metafield rating, spec: mô tả, 4 dòng spec, 4.9 / 341 reviews lấy từ Figma 1:759; review mẫu lấy từ locale testimonial (Figma 1:885). (3) Nguồn dữ liệu review chưa chốt: hỏi ở ES1-T264.
+KHÔNG CHẮC: (1) ảnh của handle `figma-ativafit-lava-adjustable` là áo tạ, không phải tạ tay (lệch tên, ES1-T245); mockup giữ đúng URL, alt trung tính. Ảnh một số sản phẩm gợi ý cũng lệch tên. (2) demo-data không có description, metafield rating, spec: mô tả, 4 dòng spec, 4.9 / 341 reviews lấy từ Figma 1:759; review mẫu lấy từ chữ testimonial Figma 1:885. (3) Review: CTO chốt 10/11 (metafield rating + app block); app cụ thể vẫn chờ ES1-T264. (4) Figma nút CTA bo 8 (1:815, 1:816), mặc định `button_corner_radius` = 4: mockup giữ token, lệch báo cho foundation (ES1-T251), không đổi token ở trang này. (5) demo-data chưa có sản phẩm 3 option / 40 giá trị và metafield `custom.sale_ends_at`: trạng thái J và K dùng dữ liệu mẫu ghi rõ trên mockup; hỏi CTO ở ES1-T282. (6) Partial name mới (`product-options`, `product-countdown`, `product-buy-buttons`) là ĐỀ XUẤT; architecture.md hiện chỉ liệt kê `product-media`, `product-price`.
 
-# UI spec: Trang sản phẩm (ES1-T253)
+# UI spec: Trang sản phẩm (ES1-T253, vòng 3b)
+
+## Thay đổi vòng 3b
+
+| # | Thành phần | Vòng 3 | Vòng 3b | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Bộ chọn option | pill/swatch, gạch ngang chung cho hết hàng và không tồn tại | dựng từ `product.options_with_values` (≤ 3 option, mỗi option nhiều giá trị), không lặp `product.variants`, không nhúng JSON biến thể; 3 trạng thái mỗi giá trị: còn hàng / hết hàng (gạch ngang) / tổ hợp không tồn tại (viền đứt); đổi lựa chọn tải biến thể từ server theo option value, cập nhật URL, giá, ảnh, nút | CTO 10/11 mục 1; shopify.com/blog/2048-variants; §5.1, §17 |
+| 2 | Option nhiều giá trị | không có | > 12 giá trị: lưới ô 72, hiện 11 + nút "+N" mở hết tại chỗ, "Show Fewer" thu lại; setting chuyển sang dropdown; không vỡ ở 360 (4 ô/hàng) | CTO 10/11 mục 1; 10 §6 #850 |
+| 3 | Đang tải / lỗi khi đổi lựa chọn | không có | spinner 16 trong legend, skeleton phủ giá và tồn, nút Add To Cart `aria-busy`; lỗi đỏ + icon + "Try again", lựa chọn quay về biến thể cuối đã tải | CTO 10/11 mục 1; 05 §5 |
+| 4 | Sticky bar | mọi mốc, "Show on desktop" mặc định tắt, ≥1024 có select biến thể | mọi mốc, mặc định BẬT; bỏ select biến thể (trái quy tắc 2048), ≥1024 thêm ô số lượng; lựa chọn không mua được thì nút "Choose Options"; mockup có thanh dính thật ở đáy cả 4 mốc | CTO 10/11 mục 2 (P2); 09 §1 #784 |
+| 5 | Countdown "Sale ends in" | không đưa lên trang | có, giữa tên và giá như Figma 1:773; ngày từ metafield `custom.sale_ends_at` (date_time); ẩn khi không ngày, quá hạn lúc render, không giảm giá, hết hàng; trạng thái ≥ 24 giờ, < 1 giờ (ô cam), hết giờ khi đang xem, không countdown | CTO 10/11 mục 3 (P3); Figma 1:773; TE-13 AC1 |
+| 6 | Review | đề xuất, chờ CTO | chốt: tóm tắt từ metafield rating + vùng app block, ẩn khi không dữ liệu | CTO 10/11 mục 4 (P1) |
+| 7 | JSON-LD Product | offers theo variant (AC11) | ĐỀ XUẤT offers chỉ biến thể đang chọn + `AggregateOffer` (`price_min`/`price_max`), không lặp mọi biến thể | 2048 variants; §17 |
+| 8 | Mục cuối spec | "Quyết định CTO cần chốt" | "Quyết định CTO đã chốt (10/11)" + 2 câu mới | ticket vòng 3b |
+
+## Thay đổi so với vòng 2
+
+| # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Header | A nền trắng viền dưới, sticky | thanh tối `--color-background-dark` + noise, cao 80, logo 100 × 30, menu trắng 60%, search 20 / account, cart 24; sticky, không đè ảnh | Sổ 10/11; Figma 1:362; foundation §3 |
+| 2 | Nút trước/sau 52 (gallery, lightbox, You May Also Like) | icon mũi tên 20 × 16 | chevron 11 × 16 trong khung 52 (`slideshow-icon` previous/next); trắng viền border, hover cam | Sổ 09/11; Figma 1:398; foundation §6 |
+| 3 | Gallery dính | top = header trắng 80 + 24 | giữ 80 + 24, header tối sticky cùng cao (không đổi số) | foundation §3.1 |
+| 4 | Hàng rating | "4.9" foreground + "341 reviews" gạch chân | "(4.9)" + vạch + "341 reviews" chữ muted 14 như Figma; gạch chân + foreground khi hover | Figma 1:786 |
+| 5 | Card review | sao trên, tiêu đề 600, tên cuối card, bo 12 | hàng đầu tên (trái) + sao (phải), tiêu đề Inter 18/700, quote 16/27 muted, bo 16; bỏ ảnh và sản phẩm đính kèm của testimonial | Figma 1:885 |
+| 6 | Footer | newsletter 2 cột, 3 social, wordmark tách hàng | theo foundation vòng 3: ảnh 98 × 123 + chữ + form, panel dải rộng bo 16, 4 social, wordmark giữa hàng cuối với copyright và localization | Figma 1:1104; foundation §4 |
+| 7 | Lệch Figma ghi nhận, không sửa ở trang | — | Nút bo 8 (Figma) vs 4 (token); "View Detail" nền xám #E5E5E5 (1:816) không dùng cho Buy It Now vì trùng nút disabled foundation §6; quote #808080 (3.95:1) đổi `--color-muted`; dấu tròn "Feature Product" (1:762) là trang trí khối trang chủ, không đưa lên gallery | Figma 1:759, 1:885 |
+
+Giữ nguyên nội dung, bố cục 2 cột, accordion, trạng thái A–I và settings của vòng 2. Vòng 3b giữ toàn bộ vòng 3, chỉ sửa các mục trong bảng "Thay đổi vòng 3b"; thêm trạng thái J (2048 biến thể) và K (countdown).
 
 Mục đích: người mua xem ảnh/video/3D, chọn biến thể và thấy giá, tồn, nút cập nhật ngay, thêm giỏ hoặc mua nhanh, đọc mô tả, thông số, review, rồi tìm sản phẩm mua kèm hoặc thay thế. Story TE-4 (AC1–AC12), `docs/srs.md#TE-4`.
 
@@ -18,11 +45,11 @@ Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma > kiến thứ
 
 | # | Khối | Block | Ghi chú |
 | --- | --- | --- | --- |
-| 1 | Header A (nền trắng, sticky) | `header` | Sổ quyết định 09/11; foundation §3 |
+| 1 | Header tối (#1A1A1A + noise, cao 80, sticky, không đè ảnh) | `header` | Sổ quyết định 10/11; Figma 1:362; foundation §3 |
 | 2 | Breadcrumb | — (foundation §5) | Home / {collection} / {product} |
-| 3 | Gallery + buy box | `product-media`, `product-info`, `product-form` | §3–§6 |
+| 3 | Gallery + buy box (có countdown khi có sale có hạn) | `product-media`, `product-info`, `product-form` | §3–§6 |
 | 4 | Pairs Well With | `product-recommendations` intent complementary | §7 |
-| 5 | Customer Reviews | ĐỀ XUẤT block mới `product-reviews` | §8, ES1-T264 |
+| 5 | Customer Reviews | block mới `product-reviews` (CTO chốt 10/11) | §8, ES1-T264 |
 | 6 | You May Also Like | `product-recommendations` intent related | §9 |
 | 7 | Footer | `footer` | foundation §4 |
 | — | Sticky bar | `product-sticky-bar` | §10 |
@@ -56,7 +83,7 @@ Không dùng tab ngang cho mô tả / thông số / review (09 §1 #753). Không
 Anatomy: track ảnh (scroll-snap) · nút phóng to (ảnh là link tới bản 2048, icon kính lúp 44 trắng góc phải trên, chỉ trang trí) · bộ đếm "1 / 3" (pill trắng, `aria-hidden`) · nút trước/sau tròn 52 góc phải dưới (≥768) · hàng thumbnail.
 
 - Thứ tự media: featured media của variant đang chọn trước (code đã có). Đổi variant thì track trượt tới ảnh variant (AC1).
-- Nút 52: trắng viền `--color-border`, hover cam (sổ quyết định 09/11). Ở đầu/cuối: mờ 0.35 + `aria-disabled`. 360: ẩn nút, vuốt.
+- Nút 52: chevron 11 × 16 (`snippets/slideshow-icon`), trắng viền `--color-border`, hover nền cam icon trắng + scale 1.06 (sổ quyết định 09/11, Figma 1:398). Hai nút cách 8. Ở đầu/cuối: mờ 0.35 + `aria-disabled`. 360: ẩn nút, vuốt.
 - Thumbnail: nền cream, viền 1px `--color-border`, bo 4 (8 từ 80rem); đang xem viền 2px foreground (ĐỀ XUẤT, code 1px: 1px foreground khó thấy khác hover); hover viền foreground. Thumbnail hiện cả trên mobile (09 §3 #774M). Video: nhãn ▶ đen góc phải dưới; 3D: nhãn "3D". Chỉ hiện khi ≥ 2 media.
 - Không lặp badge giảm giá trên ảnh: -24% đặt cạnh giá (Figma 1:783; 10 §8 không lặp khuyến mãi).
 - Hover ảnh desktop: con trỏ zoom-in. Không làm hover zoom ở bản này (06 §6 gợi ý; ĐỀ XUẤT để sau vì phải tải ảnh 2048 khi rê chuột, chạm Performance).
@@ -70,7 +97,7 @@ Lightbox (`product-media__dialog`), trạng thái F:
 
 ## 4. Buy box: phần đầu (`product-info`)
 
-Thứ tự (Figma 1:769 + 09 §1 thứ tự Baymard): eyebrow vendor → h1 → giá → rating → ghi chú thuế/ship.
+Thứ tự (Figma 1:769 + 09 §1 thứ tự Baymard): eyebrow vendor → h1 → countdown (khi có, §4.2) → giá → rating → ghi chú thuế/ship.
 
 | Phần tử | Kiểu | Màu | Nguồn |
 | --- | --- | --- | --- |
@@ -79,7 +106,7 @@ Thứ tự (Figma 1:769 + 09 §1 thứ tự Baymard): eyebrow vendor → h1 → 
 | Giá bán | Inter 600 `--font-size-h3` | `--color-sale` khi giảm (6.38), foreground khi không | ĐỀ XUẤT cỡ ≈ tên (10 §8 #792); Figma 1:784 chỉ 16px vì là khối trang chủ |
 | Giá gạch | 16/500 line-through | `--color-muted` (8.45) | Figma 1:784 (14) tăng 1 bậc theo giá |
 | Badge -N% | pill 28, 13/600 | sale / sale-foreground | Figma 1:785; N tính từ compare_at_price |
-| Rating | 5 sao 16 + "4.9" + vạch 1px + "341 reviews" gạch chân | sao `--color-rating`, chữ foreground | Figma 1:786; metafield `reviews.rating`, `reviews.rating_count` (như featured-product) |
+| Rating | 5 sao 16 + "(4.9)" + vạch 1px + "341 reviews", 14/400 | sao `--color-rating`, chữ `--color-muted` (8.45); hover "341 reviews" foreground + gạch chân | Figma 1:786; metafield `reviews.rating`, `reviews.rating_count` (như featured-product) |
 | Thuế, ship | 14/400 | muted | code (`taxes_included`, `shipping_at_checkout_html`) |
 
 - Giá, gạch, badge cùng một hàng, cách 8–12 (10 §8 gộp nhóm giá, nhãn giảm sát giá).
@@ -88,17 +115,69 @@ Thứ tự (Figma 1:769 + 09 §1 thứ tự Baymard): eyebrow vendor → h1 → 
 - Unit price (edge_cases "Unit price"): dòng 14 muted ngay dưới giá, "$X / 100 g" theo snippet `price` (10 §8 #817).
 - Giá theo variant đổi tại chỗ qua partial `product-price` (AC2).
 
+### 4.2 Countdown "Sale ends in" (vòng 3b, CTO chốt 10/11)
+
+Hình theo Figma 1:773, cùng kiểu khối featured product trang chủ (ES1-T252, `docs/ui-spec/index.md`): khung nền `--color-background-dark` bo 8, cao 60, chữ "Sale ends in" Inter 16/500 trắng, ô số bo 8 viền `color-mix(--color-background-dark-foreground 12%, --color-background-dark)` (≈ #333 của Figma), số Inter 700 `tabular-nums`. Không thêm nhãn đơn vị (Figma không có; giữ như trang chủ).
+
+| Giá trị | 360 | 768 | 1280 / 1920 |
+| --- | --- | --- | --- |
+| Padding ngang khung | 16 | 24 | 24 (Figma) |
+| Ô số | 40 × 40, số 16 | 44 × 44, số 18 | 44 × 44, số 18 (Figma) |
+| Khoảng giữa ô | 4 | 12 | 12 (Figma) |
+| Rộng tối đa (4 ô) | 311 ≤ 320 | 368 | 368 |
+
+Dữ liệu (không đếm ngược giả, 15 §1 fake urgency, R8):
+- ĐỀ XUẤT metafield sản phẩm `custom.sale_ends_at`, kiểu `date_time` (cùng namespace `custom` với `custom.spec_1..4`). Merchant nhập ngày giờ kết thúc sale thật của sản phẩm. Countdown chỉ hiển thị, không đổi giá: merchant phải tự kết thúc giá gạch đúng giờ (ghi trong info của setting).
+- Hiện khi đủ 4 điều kiện: có metafield; ngày còn trong tương lai lúc render; variant đang chọn có `compare_at_price > price`; variant còn hàng. Thiếu một điều kiện: Liquid không in khối, không chừa chỗ (K4). Đổi variant: partial `product-countdown` trả lại khối hoặc rỗng (cùng lúc với giá).
+- Ô ngày chỉ hiện khi còn ≥ 24 giờ (4 ô: ngày, giờ, phút, giây, K1); dưới 24 giờ 3 ô giờ, phút, giây (như Figma 22 · 36 · 28, như TE-13 AC1).
+- Sắp hết (< 1 giờ, K2): ô nền `--color-accent`, số trắng (5.01:1). Không nhấp nháy, không đổi kích thước. ĐỀ XUẤT, nguồn 05 §3 (trạng thái rõ), sổ 09/11 (cam cho phần nhấn).
+- Hết giờ khi đang xem (K3): giữ khung 60, thay ô số bằng chữ "This sale has ended" (trắng 60%, 6.93:1). Không ẩn khối để không xô bố cục (CLS). Tải lại trang thì Liquid không in khối. ĐỀ XUẤT, nguồn 06 (CLS), foundation §18.
+- Số in từ Liquid lúc render, JS chỉ đếm tiếp (như trang chủ, ES1-T276). JS kiểm lại khi tải: nếu trang được cache và đã quá hạn thì chuyển ngay sang K3.
+
+Accessibility:
+- `<p role="timer">`: ô số `aria-hidden="true"`; chữ ẩn "Sale ends on November 11, 2026 at 11:59 PM EST" (ngày giờ đầy đủ theo giờ store, qua `| date` + locale). Không `aria-live`, không đọc từng giây.
+- Tương phản: trắng / #1A1A1A 17.4; trắng / accent 5.01; viền ô chỉ trang trí.
+- Không chạy chuyển động; chỉ đổi số. Giảm chuyển động: vẫn đổi số (đây là thông tin, không phải hiệu ứng). Rủi ro WCAG 2.2.2 (nội dung tự cập nhật): câu CTO 1 §19.
+
 ## 5. Buy box: form (`product-form`)
 
 Ngăn với phần đầu bằng gạch 1px `--color-border`, padding-top 24.
 
 Anatomy: bộ chọn option (fieldset/option) · dòng tồn kho · số lượng + Add To Cart · Buy It Now + "More payment options" · pickup (khi có) · hàng cam kết · accordion.
 
-Bộ chọn option:
+### 5.1 Bộ chọn option (vòng 3b: 2048 biến thể)
+
+Nguồn dữ liệu: chỉ `product.options_with_values` (tối đa 3 option, mỗi option nhiều giá trị) và thuộc tính của từng option value. Không dựng từ `product.variants`, không in JSON toàn bộ biến thể, không `<select name="id">` liệt kê biến thể (CTO 10/11; shopify.com/blog/2048-variants). Bàn giao Dev ở §17.
+
+Trạng thái mỗi giá trị, tính theo các option đang chọn khác (Shopify trả sẵn trên option value):
+
+| Trạng thái | Điều kiện | Pill chữ | Swatch | Chữ ẩn |
+| --- | --- | --- | --- | --- |
+| Còn hàng | `value.available` | viền `--color-border` | lõi màu, viền 50% | — |
+| Hết hàng | `value.exists` và không `available` | chữ muted 8.45 gạch ngang, viền thường | gạch chéo 2px foreground có viền trắng 1px | ", sold out" |
+| Tổ hợp không tồn tại | không `value.exists` | viền đứt `--color-muted-light` (5.33), chữ muted 8.45, không gạch | lõi mờ 45% + viền đứt | ", unavailable" |
+| Đang chọn | `value.selected` | nền foreground chữ trắng (viền liền kể cả khi không tồn tại) | vòng 2px foreground | — |
+
+Hai trạng thái không mua được khác nhau bằng hình (gạch / viền đứt) và chữ ẩn, không chỉ bằng màu (01). Mọi giá trị vẫn bấm được để thấy kết quả (nút "Sold out" / "Unavailable").
+
+Option nhiều giá trị (> 12 giá trị, vd Weight 5–200 lb, 40 giá trị; trạng thái J):
+- ĐỀ XUẤT mặc định "nút thu gọn": lưới `repeat(auto-fill, minmax(72px, 1fr))`, gap 8, ô cao 44. Liquid in 11 giá trị đầu + nút "+N" (N = tổng − 11, Liquid tính, không cần JS đếm, không CLS). Giá trị đang chọn nằm sau vị trí 11 thì thay vào ô thứ 11. Nguồn 10 §6 #850 (nút, không dropdown), 05 (mỗi nhóm hiện 3–5 lựa chọn chính, phần còn lại mở thêm).
+- Số ô mỗi hàng theo bề rộng buy box: 360 (320) 4 ô, 3 hàng; 768 (728) 9 ô, 2 hàng; 1280 (580) 7 ô, 2 hàng; 1920 (668) 8 ô, 2 hàng. Không cuộn ngang, không vỡ ở 360.
+- "+N": pill viền foreground 14/600, hover đảo đen; tên đọc "+29 more weights, show all 40"; `aria-expanded`, `aria-controls`. Mở hết tại chỗ (J2), focus giữ trên nút đã đổi thành "Show Fewer" (nút secondary nhỏ 40, cuối danh sách). Không JS: `<details>` bọc phần còn lại vẫn mở được.
+- Setting "Options with many values": `Buttons, collapsed` (mặc định) / `Dropdown`. Dropdown (J3): `<select>` kiểu field foundation §12, label thật, chữ trạng thái trong option ("25 lb - Sold out", "5 lb - Unavailable").
+- Option ≤ 12 giá trị: như vòng 3 (flex wrap, pill hoặc swatch).
+
+Đổi lựa chọn (AC2):
+1. Giá trị vừa bấm chọn ngay (phản hồi < 100ms). Legend cập nhật giá trị + spinner 16 bên phải.
+2. Giá và dòng tồn bị phủ skeleton cùng kích thước (không làm nhạt chữ: chữ nhạt trượt AA và giá cũ dễ đọc nhầm); nút Add To Cart `aria-busy` (spinner, giữ bề rộng); `role=status` ẩn "Loading 120 lb". Mọi option vẫn bấm được; lần bấm sau huỷ lần trước.
+3. Server trả biến thể theo option value (§17): cập nhật bộ chọn (trạng thái các giá trị khác), giá, countdown, ảnh (featured media của biến thể), tồn, nút, sticky bar; URL `?variant=` bằng `history.replaceState`.
+4. Lỗi tải (J3): chữ 14/500 `--color-sale` (6.38) + icon ngay dưới option, `role=alert`: "Couldn't load 120 lb. Check your connection." + nút "Try again". Lựa chọn quay về biến thể cuối đã tải được, giá và nút giữ đúng biến thể đó. ĐỀ XUẤT chuỗi locale mới, nguồn 05 §4.
+
+Chi tiết từng phần tử:
 - `<fieldset>` + `<legend>` "Color: Black" (tên option 14/600 + giá trị đang chọn 14/400 muted). ĐỀ XUẤT thêm giá trị đang chọn vào legend (10 §6 #849; swatch không có chữ).
 - Swatch khi `value.swatch` có màu/ảnh: tròn 44 (vùng chạm), lõi 36. Chưa chọn: viền lõi `color-mix(foreground 50%)` (ĐỀ XUẤT; code 20% chỉ ~1.5:1, swatch White trên nền trắng không thấy mép; 50% ≈ 3.4:1 đạt 1.4.11). Chọn: vòng 2px foreground ngoài lõi. Hover: viền foreground.
 - Pill chữ khi không có swatch (Size, Denominations, Operating system): cao 44, min 56, padding 16, bo pill, 14/500; chưa chọn viền `--color-border`, hover viền foreground; chọn nền foreground chữ trắng (17.4). Không dùng dropdown cho size (10 §6 #850). Code có sẵn `.product-option__value`.
-- Giá trị không có variant bán được: vẫn bấm được (để thấy Sold out / Unavailable); pill chữ gạch ngang + muted (8.45); swatch gạch chéo 2px foreground có viền trắng 1px. Chữ ẩn ", sold out" / ", unavailable" trong label (không chỉ dựa vào hình, 01).
+- Giá trị không mua được: theo bảng trạng thái ở trên (hết hàng gạch ngang, không tồn tại viền đứt).
 - Giữ lựa chọn option khác khi đổi một option nếu còn tổ hợp (10 §6 #2712, BE).
 - 1 variant hoặc chỉ default variant: không hiện bộ chọn (AC9, code có).
 
@@ -113,7 +192,7 @@ Số lượng + nút:
 
 Hàng cam kết (ĐỀ XUẤT, 10 §9 #803, #836: thông tin ship/đổi trả gần nút): khung viền `--color-border` bo 12 padding 16; 3 mục icon 24 cam + chữ 14: "Fast Shipping" (link shipping policy), "1 Year Warranty", "90 Day Money Back" (link refund policy). Nội dung lấy từ trust bar footer Figma 1:1107, không thêm hứa hẹn mới. 360 xếp dọc, 768 và ≥1280 3 cột, 1024–1279 xếp dọc (cột hẹp).
 
-Không có countdown "Sale ends in" (Figma 1:773) trên trang sản phẩm: xem câu hỏi CTO 3.
+Countdown "Sale ends in" ở phần đầu buy box, xem §4.2.
 
 ## 6. Accordion chi tiết (ĐỀ XUẤT block `product-details`)
 
@@ -136,11 +215,11 @@ Theo foundation §13 (dấu + cam bên trái như Figma 1:1057, hàng ≥ 56, `<
 - ĐỀ XUẤT nút thêm giỏ từng sản phẩm (09 §2 #821): cần BE (JSON recommendations + cart add). Không có nút thì thẻ chỉ là link.
 - Rỗng (0 kết quả, chưa cài Search and Discovery) hoặc lỗi: ẩn cả khối (code có). Đang tải: skeleton 1 hàng đúng kích thước (trạng thái H).
 
-## 8. Customer Reviews (ĐỀ XUẤT block `product-reviews`, ES1-T264)
+## 8. Customer Reviews (block `product-reviews`, CTO chốt 10/11; app cụ thể ES1-T264)
 
 Nền cream (section `--color-background-cream`), `id="reviews"` (đích của link rating).
 - Trái (4/12 từ 64rem): h2 "Customer Reviews" · điểm "4.9" heading 800 `--font-size-display` · 5 sao 20 + "Based on 341 reviews" 14 muted · nút secondary "Write A Review".
-- Phải (8/12): danh sách review của app; mockup dùng card trắng bo 12 padding 24: sao 16, tiêu đề Inter 18/600 (h3), nội dung muted, tên 14/600. 2 cột từ 48rem. Nút secondary "Show More Reviews" dưới danh sách.
+- Phải (8/12): danh sách review của app; mockup dùng thân card testimonial Figma 1:885: card trắng bo 16 padding 24 · hàng đầu tên 16/400 trái + sao 16 phải · tiêu đề Inter 18/700 (h3) · quote 16/27 `--color-muted` (Figma #808080 chỉ 3.95:1). Bỏ ảnh và sản phẩm đính kèm (đang ở chính trang sản phẩm). Badge Verified mặc định tắt (sổ 06/11, E9). 2 cột từ 48rem. Nút secondary "Show More Reviews" dưới danh sách.
 - 360: xếp dọc, tóm tắt trên.
 - Theme chỉ hiện tóm tắt từ metafield + vùng nhận app block; danh sách, lọc, ảnh khách, phân bố sao (10 §10 #749, #750, #2557) do app. Không metafield và không app: ẩn khối.
 - Tương phản: số "4.9" foreground trên cream 15.9; muted trên trắng 8.45.
@@ -154,15 +233,16 @@ Nền cream (section `--color-background-cream`), `id="reviews"` (đích của l
 
 ## 10. Sticky bar (`product-sticky-bar`)
 
-Hiện khi nút Add To Cart chính ra khỏi màn, ẩn khi quay lại (AC5, code BE có). Fixed đáy, nền trắng, viền trên border, bóng `0 -4 16 foreground 10%`, padding đáy `env(safe-area-inset-bottom)`.
+Thanh mua dính đáy ở MỌI mốc; setting "Show on desktop" mặc định BẬT (CTO 10/11, P2). Mockup: thanh thật fixed ở đáy cả 4 PNG (360, 768, 1280, 1920) + khung trạng thái G. Hiện khi nút Add To Cart chính ra khỏi màn, ẩn khi quay lại (AC5, code BE có). Desktop đặt đáy (09 §1 #784: bottom bar dễ thấy nhất, không che header). Fixed đáy, nền trắng, viền trên border, bóng `0 -4 16 foreground 10%`, padding đáy `env(safe-area-inset-bottom)`.
 
 | Mốc | Nội dung | Cao |
 | --- | --- | --- |
 | 360 | ảnh 48 · tên 14/600 1 dòng "…" + giá sale (ẩn giá gạch) · nút "Add To Cart" (không icon, padding 16) | 72 |
-| 768 | ảnh 56 · tên 16/600 + biến thể đang chọn 14 muted + giá + giá gạch · nút có icon | 80 |
-| ≥1024 | như 768 + select biến thể (ĐỀ XUẤT, câu hỏi CTO 2) | 80 |
+| 768 | ảnh 56 · tên 16/600 + biến thể đang chọn 14 muted (`variant.title`, vd "Black / Pair / 45 lb") + giá + giá gạch · nút có icon | 80 |
+| ≥1024 | như 768 + ô số lượng 48 (đồng bộ với ô trong form) | 80 |
 
-- Hết hàng / tổ hợp không có: nút disabled "Sold out" / "Unavailable" (code có).
+- Vòng 3b bỏ select biến thể ở ≥1024: select cần danh sách biến thể, trái quy tắc 2048. Thay bằng ô số lượng (09 §1 #784 ghi chú audit: "đi cùng số lượng, không phải lựa chọn màu").
+- Hết hàng: nút disabled "Sold out". Lựa chọn hiện tại là tổ hợp không tồn tại hoặc chưa đủ option: nút secondary "Choose Options", bấm cuộn mượt về bộ chọn và focus option đầu tiên chưa hợp lệ (ĐỀ XUẤT, 05 §3: không để nút chết mà không chỉ cách sửa). Dòng biến thể ghi "Gold / L · Unavailable".
 - Đang thêm: nút loading như §11 C. Lỗi khi bấm từ thanh: toast error (foundation §17) vì vùng lỗi trong form đang khuất. Toast nằm trên thanh (cách đáy 72 + 16).
 - Motion: trượt lên 250ms `--ease-out`, ẩn 200ms; chỉ transform/opacity. Không đẩy layout; body có padding đáy khi thanh hiện (code `data-sticky-bar-visible`).
 - ĐỀ XUẤT ẩn thanh khi drawer giỏ, lightbox hay dialog mở (một lớp overlay một lúc, 15).
@@ -172,15 +252,17 @@ Hiện khi nút Add To Cart chính ra khỏi màn, ẩn khi quay lại (AC5, cod
 | # | Trạng thái | Thiết kế | Nguồn |
 | --- | --- | --- | --- |
 | A | Hết hàng toàn bộ | badge Sold out cạnh giá; swatch gạch chéo; ô số lượng khoá (nền alt, viền border); nút disabled "Sold out" (nền `--color-border`, chữ muted 6.70); dòng tồn "Sold out"; ảnh opacity 0.6; không Buy It Now | edge_cases "Hết hàng toàn bộ"; foundation §6; 05 §3 |
-| B | Tổ hợp không tồn | pill L gạch ngang; nút disabled "Unavailable"; câu "This combination is unavailable. Choose another size or color." 14 muted dưới hàng nút, nối `aria-describedby` | edge_cases "2 option có tổ hợp không tồn"; 10 §6 #2709. ĐỀ XUẤT chuỗi locale mới |
+| B | Tổ hợp không tồn | pill L viền đứt, chữ muted (vòng 3b, không gạch); nút disabled "Unavailable"; câu "This combination is unavailable. Choose another size or color." 14 muted dưới hàng nút, nối `aria-describedby` | edge_cases "2 option có tổ hợp không tồn"; 10 §6 #2709. ĐỀ XUẤT chuỗi locale mới |
 | C | Đang thêm giỏ | nút giữ bề rộng, chữ trong suốt + spinner 20 trắng, `aria-busy`, không bấm lại; ô số lượng khoá; `role=status` "Adding to cart" | foundation §6; 05 §5 |
 | D | Lỗi thêm giỏ | hộp `form-message--error` ngay dưới hàng nút trong `product-form-error` (role alert): "Couldn't add to cart" + câu lỗi 422 của Shopify + cách sửa; không tự ẩn; nút mở lại; số lượng giữ giá trị server | 05 §4; TE-5 AC2 |
 | — | Thêm thành công | drawer giỏ mở (TE-5 AC8) hoặc sang trang giỏ theo setting; số giỏ nhảy; không toast | 05 §6; 12 §1 |
 | E | Video, 3D | §3 | AC1; 09 §4 #770 |
 | F | Lightbox | §3 | 09 §3 |
-| G | Sticky bar + toast lỗi | §10 | AC5 |
+| G | Sticky bar + toast lỗi; "Choose Options" | §10 | AC5; CTO 10/11 P2 |
 | H | Đang tải gợi ý | skeleton card (media 1:1 + 2 dòng), shimmer 1.4s, tĩnh khi giảm chuyển động | foundation §18 |
 | I | Không media | §3 | edge_cases |
+| J | 3 option, Weight 40 giá trị (dữ liệu mẫu, ES1-T282) | J1 thu gọn 11 + "+29", có giá trị hết hàng và không tồn tại; J2 mở hết + đang tải sau khi chọn 120 lb; J3 kiểu dropdown + lỗi tải | §5.1; CTO 10/11 mục 1 |
+| K | Countdown | K1 ≥ 24 giờ (4 ô); K2 < 1 giờ (ô cam); K3 hết giờ khi đang xem; K4 không countdown, không chừa chỗ. Trang chính: 3 ô 22 · 36 · 28 như Figma | §4.2; Figma 1:773 |
 
 Nhiều biến thể khác trong edge_cases: "Apparel More Variants" (7 màu) swatch xuống dòng, không cuộn ngang; "Sản phẩm số" (Operating system, không cần ship) ẩn dòng ship và pickup (AC9); gift card hiện form người nhận (AC6, foundation §12: label trên, viền muted-light).
 
@@ -203,6 +285,8 @@ Hover / focus / active (mọi phần tử): theo foundation §6–§7. Focus: ou
 | Block | Tên | Kiểu | Default | Giới hạn / nguồn |
 | --- | --- | --- | --- | --- |
 | product-info | Show rating | checkbox | true | ẩn khi không metafield; 10 §10 #786 |
+| product-info | Show sale countdown | checkbox | true | info: "Uses the product metafield custom.sale_ends_at. Hidden when the date has passed, the variant has no compare-at price, or is sold out. The countdown does not end the sale." §4.2 |
+| product-form | Options with many values | select: Buttons, collapsed / Dropdown | Buttons, collapsed | áp cho option > 12 giá trị; §5.1 |
 | product-form | Show quantity selector | checkbox | true | 10 §8 #793 |
 | product-form | Show assurance list | checkbox | true | 10 §9 |
 | product-form | Assurance 1–3 text | text | Fast Shipping / 1 Year Warranty / 90 Day Money Back | Figma 1:1107 |
@@ -211,7 +295,7 @@ Hover / focus / active (mọi phần tử): theo foundation §6–§7. Focus: ou
 | product-details | Open description by default | checkbox | true | 15 §6 |
 | product-details | Show shipping and returns | checkbox | true | 10 §9 #803 |
 | product-reviews | Heading | text | Customer Reviews | ES1-T264 |
-| product-sticky-bar | Show on desktop | checkbox | false | câu hỏi CTO 2 |
+| product-sticky-bar | Show on desktop | checkbox | true | CTO chốt 10/11 (P2) |
 
 Tên sentence case, không ký tự `&`. Không thêm setting màu (dùng token).
 
@@ -231,25 +315,35 @@ Tương phản (tính tay WCAG; L foreground 0.0103, sand 0.796, cream 0.910, ac
 | background / foreground | 17.4 | pill đang chọn, nhãn ▶/3D thumbnail |
 | viền swatch 50% (#8C8C8C) / background | 3.36 | mép swatch (1.4.11) |
 | sao `--color-rating` / background | ~1.6 | chỉ trang trí, nghĩa nằm ở chữ "4.9", "Rated 5 out of 5 stars" |
+| trắng / `--color-background-dark` | 17.4 | chữ và số countdown |
+| trắng / accent | 5.01 | số countdown < 1 giờ |
+| trắng 60% / `--color-background-dark` | 6.93 | "This sale has ended" |
+| viền đứt `--color-muted-light` / background | 5.33 | pill tổ hợp không tồn tại (1.4.11) |
 
 - Vùng chạm: swatch, pill, nút stepper 44; rating link 44; thumbnail 56–80; nút ảnh 52; đóng lightbox 48; mọi nút ≥ 40 desktop, ≥ 44 mobile (nút nhỏ 40 chỉ ở card complementary ≥768; 360 cùng 40 nhưng cách nhau ≥ 16, đạt target-size 24).
 - Bàn phím: thứ tự gallery → thumbnail → option → số lượng → nút → accordion. Radio trong fieldset dùng phím mũi tên. Lightbox bẫy focus (`showModal`), Escape đóng.
 - Tên: link ảnh "Open image 1 of 3 in full size"; thumbnail "Load media 2 of 4, video"; stepper "Decrease quantity for {product}"; nút gallery "Previous image"/"Next image"; nút complementary "Add To Cart: {product}"; video "Play video: {title}"; iframe có `title`.
-- Live region: `product-form-status` (role status: "Adding to cart", "Added to cart") và `product-form-error` (role alert), có sẵn.
+- Live region: `product-form-status` (role status: "Adding to cart", "Added to cart", vòng 3b thêm "Loading {value}") và `product-form-error` (role alert), có sẵn. Lỗi tải biến thể: role alert ngay dưới option.
+- Countdown: `role="timer"` không aria-live, số aria-hidden, câu ngày giờ đầy đủ (§4.2). Nút "+N" có tên đầy đủ và `aria-expanded`; sau khi mở, focus ở lại nút (đổi thành "Show Fewer").
 - Alt ảnh: `media.alt`, thiếu thì "{product}, image n of N" (không bịa mô tả ảnh). Thumbnail, ảnh sticky bar, ảnh card gợi ý `alt=""` (tên ở link).
 - Một h1 (tên sản phẩm); h2 cho Pairs Well With, Customer Reviews, You May Also Like; h3 cho tên sản phẩm trong card và tiêu đề review.
 - Zoom 200%: buy box 1 cột dưới 64rem; hàng ngang có `overflow-x` riêng.
 
 ## 14. Lighthouse
 
-Chỉ tiêu: SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90 (sổ 09/11).
+Chỉ tiêu: SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90 (sổ 09/11). Trang sản phẩm nằm trong phạm vi SEO 100 (sổ 10/11).
+
+- Header tối: noise là `background-image` 1 file nhỏ có sẵn (`assets/noise-dark.png`) trong critical.css, không phải ứng viên LCP; menu trắng 60% 6.93:1, focus trắng (foundation §3.4). Ảnh footer 98 × 123 lazy.
 
 - LCP: ảnh đầu gallery (featured media của variant), `loading="eager"` + `fetchpriority="high"`, srcset 360–1800 (code). ĐỀ XUẤT sửa `sizes` theo bố cục mới: `(min-width: 80rem) min(668px, 50vw), (min-width: 64rem) 50vw, 100vw` (code đang `58vw`, tải thừa ~16% ở desktop). Không hiệu ứng reveal cho gallery, h1, giá, nút (màn đầu, chặn LCP); reveal chỉ cho tiêu đề và card từ §7 trở xuống (sổ 09/11).
 - Lazy: ảnh gallery 2+, mọi thumbnail, poster video không phải media đầu, ảnh sticky bar, ảnh lightbox (gắn khi mở), ảnh swatch, ảnh complementary/related/review. Video `preload="none"`, iframe YouTube/Vimeo và model-viewer chỉ tải khi bấm.
 - Font: 2 họ qua `font_picker`: Sofia Sans Condensed 700/800 (h1, h2, eyebrow, số 4.9), Inter 400/500/600 (còn lại). Không thêm weight.
+- 2048 biến thể: HTML không chứa JSON hay `<option>` của mọi biến thể (trang 150–2048 biến thể không phình HTML, TBT không tăng); mỗi lần đổi lựa chọn chỉ tải partial của biến thể đó.
+- Countdown: số in từ Liquid nên khung có kích thước thật ngay lần vẽ đầu (không CLS khi JS chạy); ô `tabular-nums`, min-width cố định; hết giờ khi đang xem giữ khung (K3). Không phải ứng viên LCP (chữ nhỏ, ảnh gallery lớn hơn).
+- Sticky bar mọi mốc: `position: fixed`, ảnh 56 lazy, không đẩy layout (0 CLS); body chừa padding đáy khi thanh hiện để không che footer.
 - CLS: ảnh có width/height + `aspect-ratio` khung; sticky bar, toast, lightbox `position: fixed`; tồn kho/giá đổi trong cùng khung (partial thay nội dung cùng chiều cao); khối gợi ý giữ chỗ skeleton khi đang tải và nằm dưới màn đầu ở 360/768. Rủi ro: ở 1920 khối complementary có thể chạm đáy màn đầu (main ~900px) → skeleton đúng 1 hàng, ẩn khi 0 kết quả chỉ sau khi fetch xong.
 - A11y rủi ro đã tránh: sao màu vàng không mang nghĩa một mình; swatch có tên ẩn và mép 3.36:1; nút disabled vẫn 6.70:1; link trong câu ("Shipping") gạch chân (link-in-text-block); bảng thông số có `th scope`; dialog có tên; không `div` bấm được.
-- SEO: một h1; breadcrumb `nav` + JSON-LD BreadcrumbList; JSON-LD Product có sẵn (AC11), ĐỀ XUẤT thêm `aggregateRating` khi có metafield rating; link chữ mô tả đích ("Read the shipping policy", không "Learn more"); chữ nhỏ nhất 13 (badge).
+- SEO: một h1; breadcrumb `nav` + JSON-LD BreadcrumbList; JSON-LD Product có sẵn (AC11), ĐỀ XUẤT thêm `aggregateRating` khi có metafield rating; offers không lặp mọi biến thể (§17); link chữ mô tả đích ("Read the shipping policy", không "Learn more"); chữ nhỏ nhất 13 (badge).
 - Best Practices: không lỗi console (mockup 0 lỗi ở 4 mốc); ảnh `object-fit: contain` không méo; không xin quyền; payment button do Shopify chèn ngoài partial.
 
 ## 15. Token dùng
@@ -260,21 +354,54 @@ Chỉ token foundation §2. Dẫn xuất: `--control-height`, `--grid-gap`, `--s
 
 | Phần | Code hiện có | Việc cho Dev FE (FE) / BE |
 | --- | --- | --- |
+| Header | `.site-header`, nền tối chỉ khi `body:has(.slideshow)` | FE: theo foundation §21 (mọi trang tối); trang sản phẩm không thêm gì |
 | Bố cục 2 cột | `.product` 7fr/5fr, `.product__details` sticky | FE: 1fr/1fr, gap 48 → 80 từ 80rem, sticky chuyển sang media |
-| Gallery | `.product-media__*` xếp dọc từ 64rem | FE: 1 ảnh + thumbnail mọi mốc, tỉ lệ 4:3 ở 48–64rem, tràn mép <48rem, đếm ảnh, nút 52 (`round-button`); BE: nút trước/sau, đồng bộ `aria-current` |
+| Gallery | `.product-media__*` xếp dọc từ 64rem | FE: 1 ảnh + thumbnail mọi mốc, tỉ lệ 4:3 ở 48–64rem, tràn mép <48rem, đếm ảnh, nút 52 dùng lại `.carousel-nav__button` + `snippets/slideshow-icon`; BE: nút trước/sau, đồng bộ `aria-current` |
 | Lightbox | `.product-media__dialog` | FE: nền cream, đếm, nút 52, thumbnail; BE: chuyển ảnh trong dialog |
 | Giá, rating | `snippets/price`, `snippets/rating-stars` | FE: cỡ giá h3, badge -N%, hàng rating link `#reviews` |
 | Mô tả | trong `product-info` | FE: chuyển sang accordion `product-details` |
-| Option | `.product-option__value(--swatch)` | FE: legend có giá trị chọn, viền swatch 50%, vòng chọn 2px |
+| Option | `.product-option__value(--swatch)` | FE: legend có giá trị chọn, viền swatch 50%, vòng chọn 2px; 3 trạng thái giá trị; lưới + "+N" cho option > 12 giá trị; spinner legend, skeleton giá/tồn; BE: tải biến thể theo option value (§17) |
+| Countdown | — (featured-product có countdown setting, trang chủ) | FE: khối `product-countdown` trong `product-info`, dùng lại markup/CSS countdown của featured product; BE: đếm tiếp, chuyển K3 khi hết giờ, nằm trong partial đổi variant |
 | Số lượng | `.product-form__quantity` | FE: markup stepper; BE: nút −/+ |
 | Tồn kho | `.product-form__inventory` | FE: chấm badge-new, đặt trên hàng nút |
 | Nút, Buy It Now | `.product-form__add`, `__payment-button` | FE: cùng hàng số lượng, icon túi; unbranded = secondary |
 | Gợi ý | `product-recommendations` | FE: dạng gọn cho complementary, hàng ngang cho related <80rem; BE: nút thêm giỏ complementary, skeleton |
-| Review | — | chờ ES1-T264 |
-| Sticky bar | `product-sticky-bar` | FE: bố cục 3 mốc; BE: toast lỗi, ẩn khi overlay mở |
+| Review | — | FE: block `product-reviews` (CTO chốt); app cụ thể chờ ES1-T264 |
+| Sticky bar | `product-sticky-bar` | FE: bố cục 3 mốc, bỏ select biến thể, ô số lượng ≥1024, "Choose Options"; `show_on_desktop` default true; BE: toast lỗi, ẩn khi overlay mở, đồng bộ số lượng, cuộn về bộ chọn |
 
-## 17. Quyết định CTO cần chốt
+## 17. Bàn giao Dev: biến thể (2048 variants)
 
-1. Khối Customer Reviews: theme làm block `product-reviews` hiện tóm tắt từ metafield `reviews.rating` + chừa chỗ app block (danh sách review do app), ẩn khi không có dữ liệu? Đề xuất: có (chi tiết ES1-T264).
-2. Sticky bar có hiện trên tablet và desktop (thêm biến thể đang chọn, select biến thể từ 1024) hay chỉ mobile như AC5? Đề xuất: hiện mọi mốc, setting "Show on desktop" mặc định tắt để giữ AC5, merchant bật khi trang dài (09 §1 #784).
-3. Countdown "Sale ends in" (Figma 1:773) chỉ ở khối Featured product trang chủ, không đưa lên trang sản phẩm? Đề xuất: không đưa, vì không có ngày hết sale thật cho từng sản phẩm (đếm giả là dark pattern) và nó chen giữa giá và nút (10 §8 #789).
+Nguồn: CTO 10/11 mục 1; shopify.com/blog/2048-variants. KHÔNG CHẮC phần tên partial và tham số: Tech Lead đối chiếu shopify.dev trước khi tách ticket FE/BE.
+
+Dữ liệu (Liquid, FE):
+- Bộ chọn lặp `product.options_with_values` → `option.values`. Mỗi value dùng: `value.name`, `value.id`, `value.selected`, `value.available`, `value.exists`, `value.swatch` (màu/ảnh), `value.variant` (biến thể của tổ hợp khi chọn value này, có thể rỗng), `value.product_url` (combined listing: value thuộc sản phẩm khác thì đổi trang).
+- KHÔNG `{% for variant in product.variants %}` ở bất kỳ đâu trên trang sản phẩm (bộ chọn, sticky bar, JSON-LD, `<select name="id">`); KHÔNG `{{ product | json }}` hay JSON danh sách biến thể. `product.variants` chỉ trả tối đa 250 nên vòng lặp này vừa nặng vừa sai khi > 250 biến thể.
+- Biến thể đang mua: `product.selected_or_first_available_variant`. Form chỉ gửi `<input type="hidden" name="id">` của biến thể này.
+- Mỗi giá trị in `data-option-value-id="{{ value.id }}"`; nếu có `value.variant` thì thêm `data-variant-id`; nếu `value.product_url` khác URL hiện tại thì thêm `data-product-url`.
+- Option > 12 giá trị: in 11 + nút "+N" (N = `option.values.size | minus: 11`), phần còn lại trong vùng ẩn có `id` cho `aria-controls`.
+- JSON-LD: offers chỉ cho biến thể đang chọn, kèm `AggregateOffer` (`lowPrice` = `product.price_min`, `highPrice` = `product.price_max`, `offerCount` = `product.variants_count`). ĐỀ XUẤT; Tech Lead xác nhận với AC11.
+
+Luồng đổi lựa chọn (BE):
+1. Gom `option_value` id đang chọn của mọi option (≤ 3), gọi trang sản phẩm với `?option_values=<id1>,<id2>,<id3>` qua partial rendering của theme (architecture.md: thay Section Rendering API vì theme không có sections). Huỷ request trước khi có lần bấm mới (AbortController).
+2. Partial trả về (ĐỀ XUẤT tên): `product-options` (bộ chọn với trạng thái mới), `product-price`, `product-countdown`, `product-media` (đã có), `product-buy-buttons` (tồn + nút + id biến thể), `product-sticky-bar`.
+3. Áp partial, `history.replaceState` với `?variant=<id>` (AC2), dispatch event variant chuẩn (AC12).
+4. Giá trị có `data-product-url` (combined listing): điều hướng sang URL đó thay vì fetch.
+5. Lỗi mạng hoặc 5xx: giữ biến thể cuối đã áp, khôi phục radio, hiện lỗi J3.
+- Không JS: trang vẫn mua được biến thể mặc định; đổi option cần JS (ĐỀ XUẤT chấp nhận, như luồng partial hiện có của theme).
+
+## 18. Ghi chú countdown cho Dev
+
+- Liquid: `product.metafields.custom.sale_ends_at.value` so với `'now' | date: '%s'`; in số ngày/giờ/phút/giây còn lại; thêm `datetime` ISO vào `<time>` ẩn hoặc data attribute cho JS.
+- Điều kiện theo variant (giá gạch, còn hàng) nên khối nằm trong partial đổi variant.
+- Cùng component với countdown featured product trang chủ (TE-13), khác nguồn ngày (metafield thay setting).
+
+## 19. Quyết định CTO đã chốt (10/11)
+
+- Bộ chọn biến thể theo option value, hỗ trợ 2048 biến thể, không vòng lặp biến thể, không JSON biến thể; có trạng thái còn/hết/không tồn tại, đang tải, option nhiều giá trị (§5.1, §17).
+- Sticky bar ở mọi mốc, "Show on desktop" mặc định bật (§10).
+- Có countdown "Sale ends in" như Figma 1:773, ngày từ dữ liệu thật từng sản phẩm, ẩn khi không có ngày / hết giờ / không giảm giá (§4.2).
+- Review: tóm tắt từ metafield rating + app block, ẩn khi không dữ liệu (§8).
+
+Câu mới (CTO chốt 10/11 theo đề xuất, docs/design/decisions.md):
+1. Countdown đếm giây là nội dung tự cập nhật (WCAG 2.2.2)? Đề xuất: giữ giây như Figma, coi là thông tin thiết yếu; số aria-hidden, không chuyển động, không aria-live.
+2. Ngày hết sale đặt ở metafield sản phẩm hay từng biến thể? Đề xuất: sản phẩm `custom.sale_ends_at` (date_time), ẩn ở biến thể không có giá gạch.

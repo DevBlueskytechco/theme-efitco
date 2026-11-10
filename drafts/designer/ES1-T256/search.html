@@ -7,13 +7,14 @@
 <meta name="description" content="Search Efitco for benches, dumbbells, racks and recovery gear, plus training articles and store pages.">
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
-  /* CSS riêng trang search (ES1-T256). Thành phần chung lấy từ ../_kit/kit.css (ES1-T251). */
-  .site-header.demo-static { position: relative; }
+  /* CSS riêng trang search (ES1-T256, vòng 3). Thành phần chung lấy từ ../_kit/kit.css (foundation ES1-T251 vòng 3). */
 
-  /* Đầu trang: h1 → form → dòng trạng thái */
-  .search-head { display: grid; gap: var(--space-4); padding-block: var(--space-2) var(--space-5); }
+  /* Đầu trang: [h1 → form → status] trái, link loại kết quả phải từ 80rem (như tiêu đề + tab Figma 1:490) */
+  .search-top { display: grid; gap: var(--space-4); padding-block: var(--space-2) var(--space-2); }
+  .search-head { display: grid; gap: var(--space-4); min-width: 0; }
   .search-head > h1, .search-head > .h1 { margin: 0; }
-  @media (min-width: 64rem) { .search-head { gap: var(--space-5); padding-block: var(--space-3) var(--space-6); } }
+  @media (min-width: 64rem) { .search-top { padding-block-start: var(--space-3); } .search-head { gap: var(--space-5); } }
+  @media (min-width: 80rem) { .search-top { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--space-6); } }
 
   .search-form { display: flex; gap: var(--space-2); width: 100%; max-width: 45rem; margin: 0; }
   .search-form__field { position: relative; flex: 1; min-width: 0; }
@@ -36,53 +37,56 @@
   .search-status { min-height: 24px; font-size: var(--font-size-base); }
   .search-status strong { font-weight: 600; }
 
-  /* Link loại kết quả: dùng style tab (foundation §7) nhưng là link điều hướng */
-  .type-nav { margin-block-end: var(--space-2); }
-  .type-nav .tab { padding-inline: var(--space-3); color: var(--color-foreground); text-decoration: none; }
+  /* Link loại kết quả: style tab Figma 1:490 (kit .tab), là link điều hướng nên đang chọn = aria-current */
+  .type-nav .tab { padding-inline: var(--space-3); text-decoration: none; }
   .type-nav .tab[aria-current='page'] { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
   @media (min-width: 48rem) { .type-nav .tab { padding-inline: calc(var(--space-1) * 7); } }
 
-  /* Nhóm kết quả */
+  /* Nhóm kết quả: tiêu đề trái, công cụ phải (Figma 1:490 Title space-between), tiêu đề → nội dung --heading-gap */
   .result-group { padding-block-start: var(--space-6); }
   @media (min-width: 64rem) { .result-group { padding-block-start: calc(var(--space-1) * 10); } }
-  .group-head { margin-block-end: var(--space-4); }
+  .group-head { display: grid; gap: var(--space-4); margin-block-end: var(--space-5); }
   .group-head h2 { display: flex; align-items: baseline; gap: var(--space-2); }
   .group-head__count { color: var(--color-muted); font-family: var(--font-primary--family); font-size: var(--font-size-base); font-weight: 500; letter-spacing: 0; }
-  @media (min-width: 80rem) { .group-head { margin-block-end: var(--space-5); } }
+  @media (min-width: 48rem) { .group-head--split { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--space-5); } }
+  @media (min-width: 80rem) { .group-head { margin-block-end: var(--heading-gap); } }
 
-  /* Thanh công cụ: Filter + chip + Sort */
-  .toolbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); margin-block-end: var(--space-4); }
+  /* Công cụ: Filter + Sort (cùng snippet với collection ES1-T254 §6) */
+  .toolbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-3); }
   .filter-toggle { width: 100%; padding-inline: var(--space-4); }
-  .filter-toggle__count { display: inline-grid; place-items: center; min-width: 20px; height: 20px; padding-inline: var(--space-1); border-radius: var(--radius-pill); background: var(--color-foreground); color: var(--color-background); font-size: var(--font-size-xs); font-weight: 600; }
+  .filter-toggle__count { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding-inline: var(--space-1); border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-accent-foreground); font-size: var(--font-size-xs); font-weight: 700; }
   .filter-toggle:hover .filter-toggle__count { background: var(--color-background); color: var(--color-foreground); }
-  .sort { display: flex; align-items: center; gap: var(--space-2); min-width: 0; }
-  .sort .field__input { min-width: 0; padding-inline: var(--space-3) var(--space-6); text-overflow: ellipsis; }
-  @media (min-width: 48rem) { .sort .field__input { padding-inline-start: var(--space-4); } }
-  .sort__label { font-size: var(--font-size-sm); font-weight: 600; white-space: nowrap; }
-  @media (max-width: 47.99rem) { .sort__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; } }
+  .sort-field { position: relative; min-width: 0; }
+  .sort-field label { position: absolute; inset-block-start: 5px; inset-inline-start: var(--space-4); color: var(--color-muted); font-size: 12px; font-weight: 500; line-height: 16px; pointer-events: none; }
+  .sort-field .field__input { padding: 14px var(--space-6) 0 var(--space-4); font-weight: 500; text-overflow: ellipsis; }
   @media (min-width: 48rem) {
-    .toolbar { display: flex; align-items: center; gap: var(--space-4); }
+    .toolbar { display: flex; align-items: center; gap: var(--space-3); }
     .filter-toggle { width: auto; padding-inline: var(--space-5); }
-    .sort { margin-inline-start: auto; }
-    .sort .field__input { width: 13.5rem; }
+    .sort-field { width: 15rem; }
   }
 
-  .chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: 0 0 var(--space-5); padding: 0; list-style: none; }
-  .chip { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding-inline: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background-alt); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
+  /* Chip lọc đang áp (collection ES1-T254 §7) */
+  .chips { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); margin: calc(var(--space-1) * -2) 0 var(--space-5); padding: 0; list-style: none; }
+  .chip { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding-inline: var(--space-4); border: 1px solid var(--color-foreground); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
   .chip--remove { padding-inline-end: var(--space-3); }
-  .chip:hover, .chip.is-hover { border-color: var(--color-foreground); }
+  .chip__key { color: var(--color-muted); }
+  .chip:hover, .chip.is-hover { background: var(--color-foreground); color: var(--color-background); }
+  .chip:hover .chip__key, .chip.is-hover .chip__key { color: inherit; }
   .chip svg { width: 14px; height: 14px; }
   .chip-clear { display: inline-flex; align-items: center; min-height: 44px; padding-inline: var(--space-2); }
   @media (min-width: 80rem) { .chip, .chip-clear { min-height: 40px; } }
+  .chips--suggest { margin: 0; }
+  .chips--suggest .chip { border-color: var(--color-border); background: var(--color-background-alt); }
+  .chips--suggest .chip:hover, .chips--suggest .chip.is-hover { border-color: var(--color-foreground); background: var(--color-foreground); }
   .filter-note { display: flex; gap: var(--space-2); align-items: flex-start; margin-block: calc(var(--space-2) * -1) var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
   .filter-note svg { flex: none; width: 16px; height: 16px; margin-block-start: 2px; }
 
   /* Article, page: danh sách (CTO ES1-T127 #4) */
-  .other-results { display: grid; gap: 0 var(--space-6); margin-block-start: var(--space-5); }
-  @media (min-width: 64rem) { .other-results { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); margin-block-start: var(--space-6); } }
+  .other-results { display: grid; gap: 0 var(--space-6); }
+  @media (min-width: 64rem) { .other-results { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); } }
   .result-list { display: grid; margin: 0; padding: 0; border-block-start: 1px solid var(--color-border); list-style: none; }
   .result-row { position: relative; display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: center; gap: var(--space-4); min-height: 104px; padding-block: var(--space-4); border-block-end: 1px solid var(--color-border); }
-  .result-row__media { display: grid; place-items: center; width: 72px; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-alt); color: var(--color-muted); }
+  .result-row__media { display: grid; place-items: center; width: 72px; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); color: var(--color-muted); }
   .result-row__media img { width: 100%; height: 100%; object-fit: cover; transition: scale var(--motion-slow) var(--ease-out); }
   .result-row__media svg { width: 28px; height: 28px; }
   .result-row__body { display: grid; gap: var(--space-1); min-width: 0; }
@@ -96,36 +100,33 @@
   .result-row:focus-within { outline: 2px solid var(--color-accent); outline-offset: 2px; }
   .result-row a:focus-visible { outline: none; }
   @media (min-width: 48rem) {
-    .result-row { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-5); min-height: 128px; padding-block: var(--space-4); }
+    .result-row { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-5); min-height: 128px; }
     .result-row__media { width: 96px; }
     .result-row__title { font-size: var(--font-size-lg); }
   }
 
-  /* Phân trang */
+  /* Phân trang: Previous/Next = nút tròn 52 chevron (kit .round-button, Figma 1:398); trang hiện tại nền accent (ES1-T107 #6) */
   .pagination { display: grid; justify-items: center; gap: var(--space-3); margin-block-start: var(--space-7); }
   .pagination ul { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-  .pagination__page { display: inline-grid; place-items: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border-radius: var(--radius-pill); color: var(--color-foreground); font-weight: 500; text-decoration: none; transition: background-color var(--motion-fast) var(--ease-out); }
-  .pagination__page:hover, .pagination__page.is-hover { background: var(--color-background-alt); }
-  .pagination__page[aria-current='page'] { background: var(--color-foreground); color: var(--color-background); }
-  .pagination__step { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding-inline: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); color: var(--color-foreground); font-weight: 500; text-decoration: none; }
-  .pagination__step:hover { border-color: var(--color-foreground); }
-  .pagination__step svg { width: 16px; height: 13px; }
-  .pagination__step--prev svg { scale: -1 1; }
-  .pagination__step[aria-disabled='true'] { color: var(--color-muted-light); border-color: var(--color-border); pointer-events: none; }
+  .pagination__page { display: inline-grid; place-items: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
+  .pagination__page:hover, .pagination__page.is-hover { border-color: var(--color-foreground); }
+  .pagination__page[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
+  .pagination__of { padding-inline: var(--space-3); font-size: var(--font-size-sm); font-weight: 500; }
   .pagination__summary { color: var(--color-muted); font-size: var(--font-size-sm); }
-  @media (max-width: 47.99rem) { .pagination__step span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } .pagination__step { padding-inline: 0; width: 44px; justify-content: center; } }
-  @media (min-width: 64rem) { .pagination { margin-block-start: calc(var(--space-1) * 16); } }
+  @media (max-width: 47.99rem) { .pagination__num { display: none; } .pagination ul { width: 100%; justify-content: space-between; } }
+  @media (min-width: 48rem) { .pagination__of { display: none; } }
+  @media (min-width: 80rem) { .pagination { margin-block-start: calc(var(--space-1) * 16); } }
 
   /* Gợi ý (chưa có từ khoá, không kết quả) */
   .suggest { display: grid; gap: var(--space-6); }
   .suggest__title { margin: 0 0 var(--space-3); font-family: var(--font-primary--family); font-size: var(--font-size-base); font-weight: 600; letter-spacing: 0; }
-  .suggest .chips { margin: 0; }
   .category-links { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
   .category-links a { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 56px; padding-inline: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
   .category-links a:hover, .category-links a.is-hover { border-color: var(--color-foreground); }
+  .category-links a:hover svg, .category-links a.is-hover svg { color: var(--color-accent); translate: var(--space-1) 0; }
   .category-links b { font-weight: 600; }
   .category-links small { color: var(--color-muted); font-size: var(--font-size-sm); }
-  .category-links svg { flex: none; width: 16px; height: 13px; color: var(--color-muted); }
+  .category-links svg { flex: none; width: 16px; height: 14px; color: var(--color-foreground); transition: translate var(--motion-base) var(--ease-out); }
   .category-links span { display: grid; }
   @media (min-width: 48rem) { .category-links { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 80rem) { .category-links { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -135,9 +136,9 @@
   .no-results__message .empty-state__icon { background: var(--color-background); }
   .no-results__message p { color: var(--color-muted); max-width: 46ch; }
   .no-results__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-5); margin-block-start: var(--space-2); }
-  .no-results .category-links a, .no-results .chip { background: var(--color-background); }
-  @media (min-width: 48rem) { .no-results .category-links { grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); } }
-  @media (min-width: 48rem) { .no-results { padding: var(--space-6); } }
+  .no-results .chips--suggest .chip { background: var(--color-background); }
+  .no-results .chips--suggest .chip:hover { background: var(--color-foreground); }
+  @media (min-width: 48rem) { .no-results { padding: var(--space-6); } .no-results .category-links { grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); } }
   @media (min-width: 80rem) { .no-results { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: var(--space-7); padding: var(--space-7); } }
   .popular { padding-block-start: var(--space-7); }
   @media (min-width: 48rem) and (max-width: 79.99rem) { .popular .product-grid > li:nth-child(4) { display: none; } }
@@ -150,16 +151,25 @@
   .status-busy .spinner { width: 16px; height: 16px; }
   .skeleton-grid .skeleton-card .skeleton--line:nth-child(3) { width: 40%; }
 
-  /* Drawer bộ lọc (foundation §15: trái 90% / 420) */
-  .filter-drawer .overlay__body { padding-block: 0; }
-  .filter-drawer .accordion { border-block-start: 0; }
-  .filter-drawer .accordion details > div { display: grid; gap: 0; padding-inline-start: 0; }
-  .choice__count { color: var(--color-muted); }
-  .choice.is-disabled { color: var(--color-muted-light); cursor: not-allowed; }
-  .choice.is-disabled .choice__count { color: var(--color-muted-light); }
-  .color-dot { flex: none; width: 20px; height: 20px; border: 1px solid color-mix(in srgb, var(--color-foreground) 24%, transparent); border-radius: 50%; background: var(--swatch); }
-  .price-range { display: grid; gap: var(--space-3); }
-  @media (min-width: 48rem) { .price-range { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  /* Drawer bộ lọc: trái 90% / 420 (foundation §15); nhóm lọc = snippet filter-group của collection (ES1-T254 §5.2) */
+  .filter-drawer .overlay__body { padding-block: var(--space-3) 0; }
+  .filter-drawer__status { padding-block-end: var(--space-3); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .filter-group { border-block-start: 1px solid var(--color-border); }
+  .filter-group summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 52px; font-weight: 600; list-style: none; cursor: pointer; }
+  .filter-group summary::-webkit-details-marker { display: none; }
+  .filter-group summary small { margin-inline-start: auto; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+  .filter-group summary svg { flex: none; width: 12px; height: 7px; transition: rotate var(--motion-base) var(--ease-out); }
+  .filter-group[open] summary svg { rotate: 180deg; }
+  .filter-group__body { display: grid; padding-block-end: var(--space-4); }
+  .filter-group .choice { justify-content: flex-start; }
+  .filter-group .choice:hover .choice__label { text-decoration: underline; text-underline-offset: 0.2em; }
+  .filter-group .choice input:checked ~ .choice__label { font-weight: 600; }
+  .choice__count { margin-inline-start: auto; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .choice.is-disabled { color: var(--color-muted); cursor: not-allowed; }
+  .choice.is-disabled .choice__label { text-decoration: line-through; }
+  .color-dot { flex: none; width: 24px; height: 24px; border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent); border-radius: 50%; background: var(--swatch); }
+  .price-range { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); }
+  .price-range .field__label { font-weight: 500; }
   .input-prefix { position: relative; }
   .input-prefix > span { position: absolute; inset-inline-start: var(--space-4); inset-block-start: 50%; translate: 0 -50%; color: var(--color-muted); pointer-events: none; }
   .input-prefix .field__input { padding-inline-start: var(--space-6); }
@@ -171,8 +181,8 @@
   .state-frame { padding: var(--space-4); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
   @media (min-width: 48rem) { .state-frame { padding: var(--space-5); } }
   @media (min-width: 80rem) { .state-frame { padding: var(--space-6); } }
-  .state-frame + .demo-label, .state-frame + .state-frame { margin-block-start: var(--space-5); }
-  .stage-tall { min-height: 820px; }
+  .state-frame + .state-frame { margin-block-start: var(--space-5); }
+  .stage-tall { min-height: 860px; }
 </style>
 </head>
 <body>
@@ -183,34 +193,38 @@
   <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
   <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
-  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <!-- Chevron 52: snippets/slideshow-icon previous/next (Figma 1:398), như foundation -->
+  <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 16 14"><path d="M8.29289 0.292893C8.68342 -0.0976311 9.31658 -0.0976311 9.70711 0.292893L15.7071 6.29289C15.8946 6.48043 16 6.73478 16 7C16 7.26522 15.8946 7.51957 15.7071 7.70711L9.70711 13.7071C9.31658 14.0976 8.68342 14.0976 8.29289 13.7071C7.90237 13.3166 7.90237 12.6834 8.29289 12.2929L12.5858 8L1 8C0.447715 8 0 7.55229 0 7C0 6.44772 0.447715 6 1 6L12.5858 6L8.29289 1.70711C7.90237 1.31658 7.90237 0.683417 8.29289 0.292893Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
   <symbol id="i-info" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 9v5M10 5.8v.1"/></g></symbol>
   <symbol id="i-filter" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 5.5h8.5M15 5.5h2.5M2.5 14.5h2.5M9 14.5h8.5"/><circle cx="13" cy="5.5" r="2"/><circle cx="7" cy="14.5" r="2"/></g></symbol>
   <symbol id="i-page" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8l-5-5Z"/><path d="M14 3v5h5M8.5 12.5h7M8.5 16h5"/></g></symbol>
-  <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
   <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
   <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
   <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
   <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
   <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
-  <symbol id="i-instagram" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="20" height="20" rx="5"/><circle cx="13" cy="13" r="4.5"/><circle cx="18.6" cy="7.4" r=".6" fill="currentColor"/></g></symbol>
-  <symbol id="i-youtube" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="5.5" width="22" height="15" rx="4"/><path d="m11 10 5 3-5 3v-6Z"/></g></symbol>
-  <symbol id="i-facebook" viewBox="0 0 26 26"><path d="M15.5 4.5h-2a4 4 0 0 0-4 4v3h-2.5v3.5h2.5v8.5h3.5V15h3l.5-3.5h-3.5V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 28 28"><path d="M16 4v13.5a4.2 4.2 0 1 1-4.2-4.2M16 4c.4 3 2.4 5 5.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="20" height="20" rx="5"/><circle cx="14" cy="14" r="4.5"/><circle cx="19.6" cy="8.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="6.5" width="22" height="15" rx="4"/><path d="m12 11 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 28 28"><path d="M16.5 4.5h-2a4 4 0 0 0-4 4v3H8v3.5h2.5v8.5H14V15h3l.5-3.5H14V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
   <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
 </svg>
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- ===== Header trang con, biến thể A nền trắng (foundation §3) ===== -->
-<header class="site-header demo-static">
+<!-- ===== Header mọi trang: thanh tối riêng #1A1A1A + noise, cao 80, không đè ảnh (CTO 10/11, Figma 1:362, foundation §3) ===== -->
+<header class="site-header">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
     <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
     <nav class="site-header__nav" aria-label="Main">
       <ul class="site-header__menu">
-        <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
-        <li><a class="site-header__link" href="#">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#">Sale</a></li>
         <li><a class="site-header__link" href="#">Our Story</a></li>
         <li><a class="site-header__link" href="#">Blog</a></li>
@@ -219,7 +233,7 @@
       </ul>
     </nav>
     <div class="site-header__icons">
-      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
     </div>
@@ -236,41 +250,44 @@
       </ol>
     </nav>
 
-    <div class="search-head" data-testid="search-head">
-      <h1>Search Results</h1>
-      <form class="search-form" action="#" method="get" role="search" data-testid="search-form" onsubmit="return false">
-        <label class="visually-hidden" for="q-main">Search products, articles, and pages</label>
-        <div class="search-form__field">
-          <svg aria-hidden="true"><use href="#i-search"/></svg>
-          <input class="field__input search-form__input" id="q-main" type="search" name="q" value="adjustable" placeholder="Search benches, dumbbells…" autocomplete="off" autocapitalize="off" spellcheck="false">
-          <button class="search-form__clear" type="button" aria-label="Clear search term"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
-        </div>
-        <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="search-form__submit-label">Search</span></button>
-      </form>
-      <p class="search-status" role="status" data-testid="search-status">7 results for <strong>“adjustable”</strong></p>
+    <div class="search-top">
+      <div class="search-head" data-testid="search-head">
+        <h1>Search Results</h1>
+        <form class="search-form" action="#" method="get" role="search" data-testid="search-form" onsubmit="return false">
+          <label class="visually-hidden" for="q-main">Search products, articles, and pages</label>
+          <div class="search-form__field">
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <input class="field__input search-form__input" id="q-main" type="search" name="q" value="adjustable" placeholder="Search benches, dumbbells…" autocomplete="off" autocapitalize="off" spellcheck="false">
+            <button class="search-form__clear" type="button" aria-label="Clear search term"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          </div>
+          <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="search-form__submit-label">Search</span></button>
+        </form>
+        <p class="search-status" role="status" data-testid="search-status">7 results for <strong>“adjustable”</strong></p>
+      </div>
+      <nav class="type-nav" aria-label="Result type" data-testid="search-type-nav">
+        <ul class="tabs">
+          <li><a class="tab" href="#" aria-current="page">All</a></li>
+          <li><a class="tab" href="#">Products</a></li>
+          <li><a class="tab" href="#">Articles</a></li>
+          <li><a class="tab" href="#">Pages</a></li>
+        </ul>
+      </nav>
     </div>
 
-    <nav class="type-nav" aria-label="Result type" data-testid="search-type-nav">
-      <ul class="tabs">
-        <li><a class="tab" href="#" aria-current="page">All</a></li>
-        <li><a class="tab" href="#">Products</a></li>
-        <li><a class="tab" href="#">Articles</a></li>
-        <li><a class="tab" href="#">Pages</a></li>
-      </ul>
-    </nav>
-
-    <!-- Nhóm Products: lưới card như collection (CTO ES1-T127 #4) -->
+    <!-- Nhóm Products: lưới card như collection (CTO ES1-T127 #4), card Figma 1:502 -->
     <section class="result-group" aria-labelledby="g-products" data-testid="search-products">
-      <div class="group-head"><h2 id="g-products">Products <span class="group-head__count">5</span></h2></div>
-      <div class="toolbar">
-        <button class="button button--secondary filter-toggle" type="button" aria-haspopup="dialog" aria-controls="filter-drawer" data-testid="search-filter-toggle"><svg aria-hidden="true"><use href="#i-filter"/></svg>Filter</button>
-        <div class="sort" data-testid="search-sort">
-          <label class="sort__label" for="sort-main">Sort by</label>
-          <select class="field__input" id="sort-main" name="sort_by">
-            <option selected>Relevance</option>
-            <option>Price, low to high</option>
-            <option>Price, high to low</option>
-          </select>
+      <div class="group-head group-head--split">
+        <h2 id="g-products">Products <span class="group-head__count">5</span></h2>
+        <div class="toolbar">
+          <button class="button button--secondary filter-toggle" type="button" aria-haspopup="dialog" aria-controls="filter-drawer" data-testid="search-filter-toggle"><svg aria-hidden="true"><use href="#i-filter"/></svg>Filter</button>
+          <div class="sort-field" data-testid="search-sort">
+            <label for="sort-main">Sort by</label>
+            <select class="field__input" id="sort-main" name="sort_by">
+              <option selected>Relevance</option>
+              <option>Price, low to high</option>
+              <option>Price, high to low</option>
+            </select>
+          </div>
         </div>
       </div>
       <ul class="product-grid" data-testid="search-product-grid">
@@ -282,34 +299,34 @@
           </div>
         </li>
         <li class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div>
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div>
           <div class="product-card__info">
-            <h3 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable</a></h3>
+            <h3 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable<span class="visually-hidden">, 2 colors</span></a></h3>
             <p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p>
-            <ul class="swatches" role="radiogroup" aria-label="Color, Ativafit Lava 66 lb Adjustable"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li></ul>
+            <div class="swatches" aria-hidden="true"><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-muted-light)"></span></div>
           </div>
         </li>
         <li class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg" alt="Adjustable dumbbell pair" width="600" height="600"></div>
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg" alt="Adjustable dumbbell pair" width="600" height="600" loading="lazy"></div>
           <div class="product-card__info">
             <h3 class="product-card__title"><a href="#">Adjustable dumbbell pair</a></h3>
             <p class="price"><span>$259.00</span></p>
           </div>
         </li>
         <li class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg" alt="FlexFold Adjustable Bench" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div>
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg" alt="FlexFold Adjustable Bench" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div>
           <div class="product-card__info">
-            <h3 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h3>
+            <h3 class="product-card__title"><a href="#">FlexFold Adjustable Bench<span class="visually-hidden">, 3 colors</span></a></h3>
             <p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$229.00</s></p>
-            <ul class="swatches" role="radiogroup" aria-label="Color, FlexFold Adjustable Bench"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul>
+            <div class="swatches" aria-hidden="true"><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-muted-light)"></span><span class="swatch" style="--swatch: var(--color-background)"></span></div>
           </div>
         </li>
         <li class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div>
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div>
           <div class="product-card__info">
-            <h3 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable</a></h3>
+            <h3 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable<span class="visually-hidden">, 3 colors</span></a></h3>
             <p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p>
-            <ul class="swatches" role="radiogroup" aria-label="Color, Ativafit Lava 66 lb Adjustable"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul>
+            <div class="swatches" aria-hidden="true"><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-muted-light)"></span><span class="swatch" style="--swatch: var(--color-background)"></span></div>
           </div>
         </li>
       </ul>
@@ -321,7 +338,7 @@
         <div class="group-head"><h2 id="g-articles">Articles <span class="group-head__count">1</span></h2></div>
         <ul class="result-list">
           <li class="result-row">
-            <div class="result-row__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg" alt="" width="192" height="192"></div>
+            <div class="result-row__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg" alt="" width="192" height="192" loading="lazy"></div>
             <div class="result-row__body">
               <p class="result-row__meta">Article · <time datetime="2026-11-04">Nov 4, 2026</time></p>
               <h3 class="result-row__title"><a href="#">Set up a perfect home gym in just 15m²</a></h3>
@@ -347,44 +364,50 @@
   <div style="height: var(--section-gap)"></div>
 </main>
 
-<!-- ===== Footer (Figma 1:1104, foundation §4) ===== -->
+<!-- ===== Footer (Figma 1:1104, foundation §4 vòng 3) ===== -->
 <footer class="site-footer">
-  <div class="container">
+  <div class="container site-footer__band">
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
     <div class="site-footer__newsletter">
-      <div>
-        <h2><span>Get 15% Off</span> Your First Order</h2>
-        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
-      </div>
-      <form class="site-footer__form" onsubmit="return false">
-        <label class="visually-hidden" for="nl-email">Email</label>
-        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
-        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
-      </form>
+      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
-    <div class="site-footer__panel">
-      <div class="site-footer__top">
-        <div class="site-footer__brand">
-          <svg class="logo" viewBox="0 0 100 30" aria-label="Efitco" role="img"><use href="#i-logo"/></svg>
-          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
-          <div class="site-footer__social"><a href="#" aria-label="Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a><a href="#" aria-label="YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a><a href="#" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></div>
-        </div>
-        <div class="site-footer__menus">
-          <div class="site-footer__menu"><details open><summary>Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-          <div class="site-footer__menu"><details open><summary>Information <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
-        </div>
+    <form class="site-footer__form" onsubmit="return false" novalidate>
+      <label class="visually-hidden" for="nl-email">Email</label>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+  <div class="site-footer__panel">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <svg class="site-footer__logo" viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+        <ul class="site-footer__social">
+          <li><a href="#" aria-label="Efitco on TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        </ul>
       </div>
-      <ul class="site-footer__trust">
-        <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
-        <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
-        <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
-        <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
-      </ul>
+      <div class="site-footer__menus">
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
     </div>
-    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
-    <div class="site-footer__bottom">
-      <p>© 2026 Efitco, Powered by Shopify</p>
-      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English">USD / EN <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button>
-      <ul class="payment-icons" aria-label="Payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul>
+    <ul class="site-footer__trust">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© 2026 Efitco, Powered by Shopify</p>
+    <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
+    <div class="site-footer__end">
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
     </div>
   </div>
 </footer>
@@ -398,7 +421,7 @@
     <!-- S1 -->
     <section class="demo-block" aria-labelledby="s1">
       <h2 id="s1">S1. No Search Term Yet</h2>
-      <p class="demo-note">/search không có q (vào từ link "Search" hoặc submit ô rỗng). h1 "Search", ô tìm trống có placeholder, gợi ý từ khoá phổ biến (setting) và danh mục (setting). Không lưới sản phẩm, không bộ lọc.</p>
+      <p class="demo-note">/search không có q (link "Search" hoặc submit ô rỗng). h1 "Search", ô trống có placeholder, gợi ý từ khoá phổ biến (setting) và danh mục (setting). Không lưới sản phẩm, không bộ lọc. Không link loại kết quả.</p>
       <div class="state-frame">
         <div class="search-head">
           <p class="h1" style="font-family: var(--font-heading--family); font-weight: var(--font-heading--weight); line-height: 1.2">Search</p>
@@ -408,10 +431,10 @@
             <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="search-form__submit-label">Search</span></button>
           </form>
         </div>
-        <div class="suggest">
+        <div class="suggest" style="margin-block-start: var(--space-6)">
           <div>
             <h3 class="suggest__title">Popular searches</h3>
-            <ul class="chips">
+            <ul class="chips chips--suggest">
               <li><a class="chip" href="#">Dumbbell</a></li>
               <li><a class="chip" href="#">Bench</a></li>
               <li><a class="chip" href="#">Kettlebell</a></li>
@@ -436,7 +459,7 @@
     <!-- S2 -->
     <section class="demo-block" aria-labelledby="s2">
       <h2 id="s2">S2. No Results</h2>
-      <p class="demo-note">q=treadmill (không có trong 36 sản phẩm demo). Giữ từ khoá trong ô để sửa (11 §4 #346). Panel nền alt: câu không đổ lỗi + mẹo + CTA "Shop All Products" (CTO ES1-T127 #5), bên cạnh là từ khoá phổ biến và danh mục (11 §5). Dưới: 4 sản phẩm từ collection setting (lazy). Không hiện bộ lọc, sắp xếp.</p>
+      <p class="demo-note">q=treadmill (không có trong 36 sản phẩm demo). Giữ từ khoá trong ô (11 §4 #346). Panel nền alt: câu không đổ lỗi + mẹo + CTA "Shop All Products" (CTO ES1-T127 #5); cạnh bên từ khoá phổ biến và danh mục (11 §5). Dưới: tiêu đề kiểu Figma 1:490 (eyebrow cam + heading) và 4 sản phẩm từ collection setting (lazy). Không bộ lọc, sắp xếp.</p>
       <div class="state-frame" data-testid="search-empty">
         <div class="search-head">
           <p class="h1" style="font-family: var(--font-heading--family); font-weight: var(--font-heading--weight); line-height: 1.2">Search Results</p>
@@ -447,7 +470,7 @@
           </form>
           <p class="search-status" role="status">No results for <strong>“treadmill”</strong></p>
         </div>
-        <div class="no-results">
+        <div class="no-results" style="margin-block-start: var(--space-5)">
           <div class="no-results__message">
             <span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-search"/></svg></span>
             <h3 class="h2">Nothing Matches “treadmill” Yet</h3>
@@ -457,7 +480,7 @@
           <div class="suggest">
             <div>
               <h4 class="suggest__title">Popular searches</h4>
-              <ul class="chips">
+              <ul class="chips chips--suggest">
                 <li><a class="chip" href="#">Dumbbell</a></li>
                 <li><a class="chip" href="#">Bench</a></li>
                 <li><a class="chip" href="#">Kettlebell</a></li>
@@ -479,21 +502,21 @@
           <div class="section-header"><p class="eyebrow">Need inspiration</p><h3 class="h1">Popular Products</h3></div>
           <ul class="product-grid">
             <li class="product-card">
-              <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="600" height="600"><div class="product-card__badges"><span class="badge badge--new">New</span></div></div>
-              <div class="product-card__info"><h4 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg</a></h4><p class="price"><span>$119.00</span></p>
-                <ul class="swatches" role="radiogroup" aria-label="Color, Iron Core Kettlebell 16 kg"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul></div>
+              <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--new">New</span></div></div>
+              <div class="product-card__info"><h4 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg<span class="visually-hidden">, 3 colors</span></a></h4><p class="price"><span>$119.00</span></p>
+                <div class="swatches" aria-hidden="true"><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-sale)"></span><span class="swatch" style="--swatch: var(--color-background)"></span></div></div>
             </li>
             <li class="product-card">
-              <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg" alt="Revllen Pro Speed Rope" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-22%</span></div></div>
-              <div class="product-card__info"><h4 class="product-card__title"><a href="#">Revllen Pro Speed Rope</a></h4><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$34.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$44.99</s></p>
-                <ul class="swatches" role="radiogroup" aria-label="Color, Revllen Pro Speed Rope"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul></div>
+              <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg" alt="Revllen Pro Speed Rope" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-22%</span></div></div>
+              <div class="product-card__info"><h4 class="product-card__title"><a href="#">Revllen Pro Speed Rope<span class="visually-hidden">, 3 colors</span></a></h4><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$34.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$44.99</s></p>
+                <div class="swatches" aria-hidden="true"><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-background)"></span><span class="swatch" style="--swatch: var(--color-background)"></span></div></div>
             </li>
             <li class="product-card">
-              <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg" alt="Olympic Plate Set 100" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-15%</span></div></div>
+              <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg" alt="Olympic Plate Set 100" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-15%</span></div></div>
               <div class="product-card__info"><h4 class="product-card__title"><a href="#">Olympic Plate Set 100</a></h4><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$289.00</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$339.00</s></p></div>
             </li>
             <li class="product-card">
-              <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P17.jpg" alt="Compact Power Rack" width="600" height="600"></div>
+              <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P17.jpg" alt="Compact Power Rack" width="600" height="600" loading="lazy"></div>
               <div class="product-card__info"><h4 class="product-card__title"><a href="#">Compact Power Rack</a></h4><p class="price"><span>$549.00</span></p></div>
             </li>
           </ul>
@@ -504,33 +527,35 @@
     <!-- S3 -->
     <section class="demo-block" aria-labelledby="s3">
       <h2 id="s3">S3. Filter Applied (Color: Black)</h2>
-      <p class="demo-note">Nút Filter có số bộ lọc đang áp; chip bỏ từng bộ lọc + "Clear all" (08 §6 #488D). Bộ lọc chỉ áp cho sản phẩm: nhóm Articles, Pages ẩn và có dòng giải thích. Ảnh card theo màu đã lọc (08 #482D). Swatch Black đang chọn. Card 1 ở trạng thái hover.</p>
+      <p class="demo-note">Badge số trên nút Filter (tròn 24 nền accent); chip bỏ từng bộ lọc + "Clear all" (08 §6 #488D, cùng chip collection ES1-T254 §7). Bộ lọc chỉ áp cho sản phẩm: Articles, Pages ẩn, có dòng giải thích. Ảnh card theo màu đã lọc (08 #482D). Card 1 ở trạng thái hover, chip 1 hover.</p>
       <div class="state-frame">
-        <div class="group-head"><h3 class="h2" style="display:flex; align-items:baseline; gap: var(--space-2)">Products <span class="group-head__count">3</span></h3></div>
-        <div class="toolbar">
-          <button class="button button--secondary filter-toggle" type="button" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-filter"/></svg>Filter <span class="filter-toggle__count">1<span class="visually-hidden"> filter applied</span></span></button>
-          <div class="sort"><label class="sort__label" for="sort-s3">Sort by</label><select class="field__input" id="sort-s3"><option>Relevance</option><option>Price, low to high</option><option>Price, high to low</option></select></div>
+        <div class="group-head group-head--split">
+          <h3 class="h2" style="display:flex; align-items:baseline; gap: var(--space-2)">Products <span class="group-head__count">3</span></h3>
+          <div class="toolbar">
+            <button class="button button--secondary filter-toggle" type="button" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-filter"/></svg>Filter <span class="filter-toggle__count">1<span class="visually-hidden"> filter applied</span></span></button>
+            <div class="sort-field"><label for="sort-s3">Sort by</label><select class="field__input" id="sort-s3"><option>Relevance</option><option>Price, low to high</option><option>Price, high to low</option></select></div>
+          </div>
         </div>
         <ul class="chips" aria-label="Active filters" data-testid="search-active-filters">
-          <li><a class="chip chip--remove" href="#" aria-label="Remove filter: Color Black">Color: Black <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
+          <li><a class="chip chip--remove is-hover" href="#" aria-label="Remove filter Color: Black"><span class="chip__key">Color:</span> Black <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
           <li><a class="text-link chip-clear" href="#">Clear all</a></li>
         </ul>
         <p class="filter-note"><svg aria-hidden="true"><use href="#i-info"/></svg>Filters apply to products only. Clear them to see articles and pages.</p>
         <ul class="product-grid">
           <li class="product-card is-hover">
-            <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div>
-            <div class="product-card__info"><h4 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable</a></h4><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p>
-              <ul class="swatches" role="radiogroup" aria-label="Color"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li></ul></div>
+            <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div>
+            <div class="product-card__info"><h4 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable<span class="visually-hidden">, 2 colors</span></a></h4><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p>
+              <div class="swatches" aria-hidden="true"><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-muted-light)"></span></div></div>
           </li>
           <li class="product-card">
-            <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg" alt="FlexFold Adjustable Bench" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div>
-            <div class="product-card__info"><h4 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h4><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$229.00</s></p>
-              <ul class="swatches" role="radiogroup" aria-label="Color"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul></div>
+            <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg" alt="FlexFold Adjustable Bench" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div>
+            <div class="product-card__info"><h4 class="product-card__title"><a href="#">FlexFold Adjustable Bench<span class="visually-hidden">, 3 colors</span></a></h4><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$229.00</s></p>
+              <div class="swatches" aria-hidden="true"><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-muted-light)"></span><span class="swatch" style="--swatch: var(--color-background)"></span></div></div>
           </li>
           <li class="product-card">
-            <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div>
-            <div class="product-card__info"><h4 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable</a></h4><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p>
-              <ul class="swatches" role="radiogroup" aria-label="Color"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul></div>
+            <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div>
+            <div class="product-card__info"><h4 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable<span class="visually-hidden">, 3 colors</span></a></h4><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p>
+              <div class="swatches" aria-hidden="true"><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-muted-light)"></span><span class="swatch" style="--swatch: var(--color-background)"></span></div></div>
           </li>
         </ul>
       </div>
@@ -539,43 +564,42 @@
     <!-- S4 -->
     <section class="demo-block" aria-labelledby="s4">
       <h2 id="s4">S4. Filter Drawer Open</h2>
-      <p class="demo-note">Mọi mốc: drawer trái, 90% ở 360, 420 từ 768 (foundation §15). Nhóm là accordion Figma 1:1057, mở sẵn 2 nhóm đầu. Checkbox thật, có số lượng; giá trị 0 sản phẩm bị tắt. Chân drawer dính đáy: Clear All + Show N Results (08 §7). Có JS: lưới phía sau cập nhật ngay, nút chỉ đóng drawer; không JS: nút submit form.</p>
+      <p class="demo-note">Mọi mốc: drawer trái, 90% ở 360, 420 từ 768 (foundation §15). Nhóm lọc dùng chung snippet filter-group với collection (ES1-T254 §5.2): summary 52, chevron phải, "N selected", giá trị 0 tắt + gạch ngang. Chân dính đáy: Clear all + Show N products (08 §7). Có JS: lưới phía sau cập nhật ngay, nút chỉ đóng drawer; không JS: nút submit form.</p>
       <div class="demo-stage stage-tall" role="group" aria-label="Filter drawer sample">
         <div class="scrim"></div>
         <div class="drawer drawer--start filter-drawer" id="filter-drawer" role="dialog" aria-modal="true" aria-labelledby="fd-title" data-testid="filter-drawer">
-          <div class="overlay__header"><h3 class="overlay__title" id="fd-title">Filter</h3><button class="close-button" type="button" aria-label="Close filter"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+          <div class="overlay__header"><h3 class="overlay__title" id="fd-title">Filters</h3><button class="close-button" type="button" aria-label="Close filters"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
           <div class="overlay__body">
-            <div class="accordion">
-              <details open>
-                <summary>Availability</summary>
-                <div>
-                  <label class="choice"><input type="checkbox" name="filter.v.availability" value="1"> In stock <span class="choice__count">(5)</span></label>
-                  <label class="choice is-disabled"><input type="checkbox" disabled> Out of stock <span class="choice__count">(0)</span></label>
+            <p class="filter-drawer__status" role="status">1 filter applied · 3 products</p>
+            <details class="filter-group" open>
+              <summary>Availability <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+              <div class="filter-group__body">
+                <label class="choice"><input type="checkbox" name="filter.v.availability" value="1"><span class="choice__label">In stock</span><span class="choice__count">5</span></label>
+                <label class="choice is-disabled"><input type="checkbox" disabled><span class="choice__label">Out of stock</span><span class="choice__count">0</span></label>
+              </div>
+            </details>
+            <details class="filter-group" open>
+              <summary>Price <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+              <div class="filter-group__body">
+                <div class="price-range">
+                  <div class="field"><label class="field__label" for="pr-min">Min price</label><div class="input-prefix"><span aria-hidden="true">$</span><input class="field__input" id="pr-min" inputmode="decimal" placeholder="0"></div></div>
+                  <div class="field"><label class="field__label" for="pr-max">Max price</label><div class="input-prefix"><span aria-hidden="true">$</span><input class="field__input" id="pr-max" inputmode="decimal" placeholder="379.99"></div></div>
                 </div>
-              </details>
-              <details open>
-                <summary>Price</summary>
-                <div>
-                  <div class="price-range">
-                    <div class="field"><label class="field__label" for="pr-min">From</label><div class="input-prefix"><span aria-hidden="true">$</span><input class="field__input" id="pr-min" inputmode="decimal" placeholder="0"></div></div>
-                    <div class="field"><label class="field__label" for="pr-max">To</label><div class="input-prefix"><span aria-hidden="true">$</span><input class="field__input" id="pr-max" inputmode="decimal" placeholder="379.99"></div></div>
-                  </div>
-                  <p class="field__hint" style="margin-block-start: var(--space-2)">The highest price is $379.99</p>
-                </div>
-              </details>
-              <details open>
-                <summary>Color</summary>
-                <div>
-                  <label class="choice"><input type="checkbox" checked><span class="color-dot" style="--swatch: var(--color-foreground)"></span>Black <span class="choice__count">(3)</span></label>
-                  <label class="choice"><input type="checkbox"><span class="color-dot" style="--swatch: var(--color-muted-light)"></span>Gray <span class="choice__count">(3)</span></label>
-                  <label class="choice"><input type="checkbox"><span class="color-dot" style="--swatch: var(--color-background)"></span>White <span class="choice__count">(2)</span></label>
-                </div>
-              </details>
-            </div>
+                <p class="field__hint" style="margin-block-start: var(--space-2)">Highest price is $379.99</p>
+              </div>
+            </details>
+            <details class="filter-group" open>
+              <summary>Color <small>1 selected</small> <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+              <div class="filter-group__body">
+                <label class="choice"><input type="checkbox" checked><span class="color-dot" style="--swatch: var(--color-foreground)"></span><span class="choice__label">Black</span><span class="choice__count">3</span></label>
+                <label class="choice"><input type="checkbox"><span class="color-dot" style="--swatch: var(--color-muted-light)"></span><span class="choice__label">Gray</span><span class="choice__count">3</span></label>
+                <label class="choice"><input type="checkbox"><span class="color-dot" style="--swatch: var(--color-background)"></span><span class="choice__label">White</span><span class="choice__count">2</span></label>
+              </div>
+            </details>
           </div>
           <div class="overlay__footer overlay__footer--split">
-            <a class="button button--secondary" href="#">Clear All</a>
-            <button class="button" type="button">Show 3 Results</button>
+            <a class="button button--secondary" href="#">Clear all</a>
+            <button class="button" type="button">Show 3 products</button>
           </div>
         </div>
       </div>
@@ -584,13 +608,15 @@
     <!-- S5 -->
     <section class="demo-block" aria-labelledby="s5">
       <h2 id="s5">S5. Loading (Filter Or Sort Changing)</h2>
-      <p class="demo-note">Có JS: BE refresh partial search-products. Lưới aria-busy + skeleton đúng ô card (0 CLS), dòng trạng thái có spinner cạnh nút Filter, sort vẫn dùng được. Không JS: tải lại trang, không cần trạng thái này.</p>
+      <p class="demo-note">Có JS: BE refresh partial search-products. Lưới aria-busy + skeleton đúng ô card (0 CLS), dòng trạng thái có spinner, toolbar vẫn dùng được. Không JS: tải lại trang.</p>
       <div class="state-frame">
-        <div class="toolbar">
-          <button class="button button--secondary filter-toggle" type="button" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-filter"/></svg>Filter <span class="filter-toggle__count">1<span class="visually-hidden"> filter applied</span></span></button>
-          <div class="sort"><label class="sort__label" for="sort-s5">Sort by</label><select class="field__input" id="sort-s5"><option>Price, low to high</option></select></div>
+        <div class="group-head group-head--split">
+          <p class="status-busy" role="status"><span class="spinner" aria-hidden="true"></span>Updating results…</p>
+          <div class="toolbar">
+            <button class="button button--secondary filter-toggle" type="button" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-filter"/></svg>Filter <span class="filter-toggle__count">1<span class="visually-hidden"> filter applied</span></span></button>
+            <div class="sort-field"><label for="sort-s5">Sort by</label><select class="field__input" id="sort-s5"><option>Price, low to high</option></select></div>
+          </div>
         </div>
-        <p class="status-busy" role="status" style="margin-block-end: var(--space-4)"><span class="spinner" aria-hidden="true"></span>Updating results…</p>
         <ul class="product-grid skeleton-grid" aria-busy="true" aria-label="Loading products">
           <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line"></span></li>
           <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line"></span></li>
@@ -603,11 +629,11 @@
     <!-- S6 -->
     <section class="demo-block" aria-labelledby="s6">
       <h2 id="s6">S6. Filters Return Nothing, And Update Error</h2>
-      <p class="demo-note">Khung trên: Color White + Price $0–$100 cho q=adjustable ra 0 sản phẩm (2 sản phẩm White đều &gt; $100). Giữ toolbar, chip; khối rỗng nói rõ cách sửa. Khung dưới: refresh partial lỗi mạng: alert + Try Again, lưới cũ giữ nguyên phía dưới.</p>
+      <p class="demo-note">Khung trên: Color White + Price $0–$100 cho q=adjustable ra 0 sản phẩm (2 sản phẩm White đều &gt; $100). Giữ chip; khối rỗng nói rõ cách sửa. Khung dưới: refresh partial lỗi mạng: alert + Try Again, lưới cũ giữ nguyên.</p>
       <div class="state-frame">
-        <ul class="chips" aria-label="Active filters">
-          <li><a class="chip chip--remove" href="#" aria-label="Remove filter: Color White">Color: White <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
-          <li><a class="chip chip--remove" href="#" aria-label="Remove filter: Price $0 to $100">$0–$100 <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
+        <ul class="chips" aria-label="Active filters" style="margin-block-start: 0">
+          <li><a class="chip chip--remove" href="#" aria-label="Remove filter Color: White"><span class="chip__key">Color:</span> White <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
+          <li><a class="chip chip--remove" href="#" aria-label="Remove filter Price: $0 to $100"><span class="chip__key">Price:</span> $0–$100 <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
           <li><a class="text-link chip-clear" href="#">Clear all</a></li>
         </ul>
         <div class="filtered-empty">
@@ -624,14 +650,15 @@
     <!-- S7 -->
     <section class="demo-block" aria-labelledby="s7">
       <h2 id="s7">S7. Pagination</h2>
-      <p class="demo-note">24 kết quả mỗi trang (setting). Link thật, crawl được, chạy không JS. Trang hiện tại aria-current; nút Previous/Next ở đầu/cuối tắt nhưng vẫn hiện. Mobile: chỉ mũi tên + số trang. Minh hoạ q=efitco, trang 2/2 (KHÔNG CHẮC số kết quả, xem spec §9).</p>
+      <p class="demo-note">24 kết quả mỗi trang (setting). Link thật, chạy không JS. Previous/Next là nút tròn 52 chevron (Figma 1:398, kit .round-button): trắng viền #E5E5E5, rê chuột cam; đầu/cuối aria-disabled mờ 0.35. Trang hiện tại nền accent (ES1-T107 #6). &lt; 768: "Page 2 of 2" thay số trang. Minh hoạ q=efitco trang 2/2 (KHÔNG CHẮC số kết quả, spec §11). Mũi tên Previous ở trạng thái hover.</p>
       <div class="state-frame">
         <nav class="pagination" aria-label="Pagination" data-testid="search-pagination" style="margin-block-start: 0">
           <ul>
-            <li><a class="pagination__step pagination__step--prev" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Previous</span></a></li>
-            <li><a class="pagination__page is-hover" href="#" aria-label="Page 1">1</a></li>
-            <li><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>2</span></li>
-            <li><span class="pagination__step" aria-disabled="true"><span>Next</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></span></li>
+            <li><a class="round-button is-hover" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
+            <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 1">1</a></li>
+            <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>2</span></li>
+            <li class="pagination__of" aria-hidden="true">Page 2 of 2</li>
+            <li><span class="round-button" aria-disabled="true" role="link" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></span></li>
           </ul>
           <p class="pagination__summary">Showing 25–37 of 37 results</p>
         </nav>
@@ -641,16 +668,21 @@
     <!-- S8 -->
     <section class="demo-block" aria-labelledby="s8">
       <h2 id="s8">S8. Hover And Focus</h2>
-      <p class="demo-note">Hover &lt; 200ms. Focus: outline 2px accent offset 2 trên mọi phần tử (dòng kết quả: outline cả dòng qua :focus-within). Link loại kết quả: hover viền đen, đang chọn nền đen.</p>
+      <p class="demo-note">Hover &lt; 200ms. Focus: outline 2px accent offset 2 (nút tròn offset 3); trên header, footer tối outline trắng. Link loại kết quả: hover viền đen, đang chọn nền đen (tab Figma 1:490). Chip lọc hover đảo đen; chip gợi ý hover đảo đen; thẻ danh mục hover viền đen + mũi tên cam; dòng kết quả outline cả dòng.</p>
       <div class="state-frame">
         <div class="demo-row">
           <a class="tab is-hover" href="#" style="text-decoration:none">Articles</a>
-          <a class="chip is-hover" href="#">Bench</a>
-          <a class="chip chip--remove" href="#" style="outline: 2px solid var(--color-accent); outline-offset: 2px" aria-label="Remove filter: Color Black (focus sample)">Color: Black <svg aria-hidden="true"><use href="#i-close"/></svg></a>
+          <ul class="chips chips--suggest" style="display:contents"><li><a class="chip is-hover" href="#">Bench</a></li></ul>
+          <a class="chip chip--remove" href="#" style="outline: 2px solid var(--color-accent); outline-offset: 2px" aria-label="Remove filter Color: Black, focus sample"><span class="chip__key">Color:</span> Black <svg aria-hidden="true"><use href="#i-close"/></svg></a>
+          <a class="pagination__page is-hover" href="#" aria-label="Page 3, hover sample">3</a>
+          <a class="round-button is-focus" href="#" aria-label="Next page, focus sample"><svg aria-hidden="true"><use href="#i-next"/></svg></a>
         </div>
+        <ul class="category-links" style="margin-block-start: var(--space-5)">
+          <li><a class="is-hover" href="#"><span><b>Free Weights</b><small>7 products</small></span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+        </ul>
         <ul class="result-list" style="margin-block-start: var(--space-5)">
           <li class="result-row is-hover">
-            <div class="result-row__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg" alt="" width="192" height="192"></div>
+            <div class="result-row__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg" alt="" width="192" height="192" loading="lazy"></div>
             <div class="result-row__body"><p class="result-row__meta">Article · <time datetime="2026-11-05">Nov 5, 2026</time></p><h3 class="result-row__title"><a href="#">How to stretch properly after training</a></h3></div>
           </li>
         </ul>

@@ -62,15 +62,56 @@
   .pdp-price__current--sale { color: var(--color-sale); }
   .pdp-price__compare { color: var(--color-muted); font-size: var(--font-size-base); font-weight: 500; text-decoration: line-through; }
   .rating { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); }
-  .rating__link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; color: var(--color-foreground); text-decoration: none; }
-  .rating__link:hover .rating__count { color: var(--color-accent); }
-  .rating__count { text-decoration: underline; text-underline-offset: 0.2em; }
+  /* Figma 1:786: sao 16 · "(4.9)" · vạch · "341 reviews", chữ muted 14 (8.45). Link đứng riêng, không trong đoạn văn: gạch chân khi hover */
+  .rating__link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; color: var(--color-muted); text-decoration: none; }
+  .rating__link:hover .rating__count { color: var(--color-foreground); text-decoration: underline; text-underline-offset: 0.2em; }
   .rating__sep { width: 1px; height: 16px; background: var(--color-muted-light); }
   .stars { display: inline-flex; gap: 2px; color: var(--color-rating); }
   .stars svg { width: 16px; height: 15px; }
   .buy__note { color: var(--color-muted); font-size: var(--font-size-sm); }
   .buy__note a { color: inherit; text-decoration: underline; text-underline-offset: 0.2em; }
   .buy__form { display: grid; align-content: start; gap: var(--space-5); padding-block-start: var(--space-5); border-block-start: 1px solid var(--color-border); }
+
+  /* ---------- Countdown "Sale ends in" (vòng 3b; Figma 1:773: nền #1A1A1A bo 8, cao 60, padding 24, ô 44 bo 8 viền #333, số Inter 18/700; cùng kiểu trang chủ ES1-T252) ---------- */
+  .countdown { display: flex; align-items: center; gap: var(--space-3); width: fit-content; max-width: 100%; min-height: 60px; margin: 0; padding: var(--space-2) var(--space-4); border-radius: var(--space-2); background: var(--color-background-dark); color: var(--color-background-dark-foreground); font-weight: 500; letter-spacing: -0.01em; line-height: 26px; white-space: nowrap; }
+  .countdown__units { display: flex; gap: var(--space-1); }
+  .countdown__unit { display: grid; place-items: center; min-width: 40px; height: 40px; padding-inline: var(--space-1); border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, var(--color-background-dark)); border-radius: var(--space-2); font-size: var(--font-size-base); font-weight: 700; font-variant-numeric: tabular-nums; line-height: 28px; }
+  @media (min-width: 48rem) {
+    .countdown { gap: var(--space-4); padding-inline: var(--space-5); }
+    .countdown__units { gap: var(--space-3); }
+    .countdown__unit { min-width: 44px; height: 44px; font-size: var(--font-size-lg); }
+  }
+  /* Sắp hết (< 1 giờ): ô nền cam, chữ trắng 5.01:1; không nhấp nháy, không đổi kích thước */
+  .countdown--soon .countdown__unit { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); }
+  /* Hết giờ khi đang xem: giữ khung 60 (không CLS), đổi chữ */
+  .countdown--ended { color: color-mix(in srgb, var(--color-background-dark-foreground) 60%, var(--color-background-dark)); }
+
+  /* ---------- Bộ chọn option theo option value (vòng 3b, 2048 biến thể) ---------- */
+  /* 3 trạng thái giá trị theo lựa chọn hiện tại: còn hàng (mặc định) · hết hàng .opt--na (gạch ngang) · tổ hợp không tồn tại .opt--none (viền đứt, chữ muted) */
+  .opt--none { border-style: dashed; border-color: var(--color-muted-light); color: var(--color-muted); }
+  .opt--none:has(:checked) { border-style: solid; color: var(--color-background); }
+  .opt--swatch.opt--none { border-color: transparent; }
+  .opt--swatch.opt--none::before { border-style: dashed; border-color: var(--color-muted-light); opacity: 0.45; }
+  .option legend .option__loading { display: inline-block; width: 16px; height: 16px; margin-inline-start: var(--space-2); vertical-align: -3px; }
+  /* Option nhiều giá trị (> 12): lưới ô đều, hiện 11 giá trị + nút "+N" (Liquid tính N, không cần JS đếm) */
+  .option__values--many { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: var(--space-2); }
+  .option__values--many .opt { min-width: 0; padding-inline: var(--space-2); }
+  .opt-more { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-foreground); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
+  .opt-more:hover { background: var(--color-foreground); color: var(--color-background); }
+  .option__less { justify-self: start; margin-block-start: var(--space-2); }
+  .option-legend-key { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin: 0; padding: 0; color: var(--color-muted); font-size: var(--font-size-xs); list-style: none; }
+  .option-legend-key li { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .option-legend-key i { display: inline-block; width: 28px; height: 16px; border: 1px solid var(--color-border); border-radius: var(--radius-pill); }
+  .option-legend-key i.is-none { border-style: dashed; border-color: var(--color-muted-light); }
+  .option-legend-key i.is-na { background: linear-gradient(transparent 7px, var(--color-muted) 7px 9px, transparent 9px); }
+  /* Đang tải biến thể: chỉ làm nhạt vùng sẽ đổi, giữ kích thước (0 CLS) */
+  /* Giá và tồn cũ bị phủ skeleton (không làm nhạt chữ: chữ nhạt trượt AA, giá cũ dễ đọc nhầm) */
+  .buy.is-loading .pdp-price, .buy.is-loading .stock { position: relative; }
+  .buy.is-loading .pdp-price::after, .buy.is-loading .stock::after { content: ''; position: absolute; inset: 0 auto 0 0; width: min(100%, 240px); border-radius: var(--space-1); background: linear-gradient(90deg, var(--color-background-alt) 0 25%, var(--color-background) 50%, var(--color-background-alt) 75%) 0 0 / 300% 100%; animation: kit-shimmer 1.4s linear infinite; }
+  @media (prefers-reduced-motion: reduce) { .buy.is-loading .pdp-price::after, .buy.is-loading .stock::after { animation: none; } }
+  .load-error { display: flex; align-items: flex-start; gap: var(--space-2); margin: var(--space-2) 0 0; color: var(--color-sale); font-size: var(--font-size-sm); font-weight: 500; }
+  .load-error svg { flex: none; width: 18px; height: 18px; margin-block-start: 1px; }
+  .load-error button { padding: 0; border: 0; background: none; color: var(--color-foreground); font-weight: 600; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; min-height: 24px; }
 
   /* Option */
   .option { min-width: 0; margin: 0; padding: 0; border: 0; }
@@ -152,10 +193,12 @@
   .reviews__based { color: var(--color-muted); font-size: var(--font-size-sm); }
   .reviews__list { display: grid; gap: var(--grid-gap); margin: 0; padding: 0; list-style: none; }
   @media (min-width: 48rem) { .reviews__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .review { display: grid; gap: var(--space-3); align-content: start; height: 100%; padding: var(--space-5); border-radius: var(--radius-card); background: var(--color-background); }
-  .review__title { margin: 0; font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 600; letter-spacing: -0.01em; line-height: 1.4; }
-  .review__quote { margin: 0; color: var(--color-muted); }
-  .review__author { font-size: var(--font-size-sm); font-weight: 600; }
+  /* Thân card theo testimonial Figma 1:885: hàng tên (trái) + sao (phải) · tiêu đề Inter 18/700 · quote 16/27. Bỏ ảnh và sản phẩm đính kèm (đang ở chính trang sản phẩm) */
+  .review { display: grid; gap: var(--space-3); align-content: start; height: 100%; padding: var(--space-5); border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background); }
+  .review__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-4); }
+  .review__author { font-size: var(--font-size-base); font-weight: 400; }
+  .review__title { margin: 0; font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: -0.01em; line-height: 1.5; }
+  .review__quote { margin: 0; color: var(--color-muted); line-height: calc(27 / 16); } /* Figma #808080 = 3.95:1, trượt AA → --color-muted 8.45 */
   .reviews__more { margin-block-start: var(--space-5); }
 
   /* ---------- You may also like ---------- */
@@ -180,15 +223,24 @@
   .sticky-bar .button svg { display: none; }
   .sticky-bar__compare { display: none; }
   @media (min-width: 48rem) { .sticky-bar .button { padding-inline: var(--space-6); } .sticky-bar .button svg { display: block; } .sticky-bar__compare { display: inline; } }
-  .sticky-bar__select { display: none; }
+  /* Vòng 3b: bỏ select biến thể (cần danh sách biến thể, trái quy tắc 2048). ≥1024: thêm ô số lượng gọn (09 §1 #784 ghi chú audit: đi cùng số lượng, không phải lựa chọn màu) */
+  .sticky-bar__qty { display: none; }
   @media (min-width: 48rem) {
-    .sticky-bar__inner { grid-template-columns: 56px minmax(0, 1fr) auto auto; gap: var(--space-4); min-height: 80px; }
+    .sticky-bar__inner { grid-template-columns: 56px minmax(0, 1fr) auto; gap: var(--space-4); min-height: 80px; }
     .sticky-bar__img { width: 56px; height: 56px; }
     .sticky-bar__title { font-size: var(--font-size-base); }
     .sticky-bar__variant { display: block; }
     .sticky-bar .price { font-size: var(--font-size-base); }
   }
-  @media (min-width: 64rem) { .sticky-bar__select { display: block; min-width: 10rem; } .sticky-bar__inner { grid-template-columns: 56px minmax(0, 1fr) auto auto auto; } }
+  @media (min-width: 64rem) {
+    .sticky-bar__inner { grid-template-columns: 56px minmax(0, 1fr) auto auto; }
+    .sticky-bar__qty { display: inline-grid; min-height: 48px; }
+    .sticky-bar .button { min-height: 48px; }
+  }
+  /* Thanh dính thật của trang: fixed đáy ở mọi mốc; body chừa chỗ khi thanh hiện (code data-sticky-bar-visible) */
+  body.has-sticky-bar { padding-block-end: 72px; }
+  @media (min-width: 48rem) { body.has-sticky-bar { padding-block-end: 80px; } }
+  .sticky-bar.is-page { z-index: 15; }
 
   /* ---------- Lightbox ---------- */
   .lightbox { position: absolute; inset: 0; z-index: 21; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--color-background-cream); color: var(--color-background-cream-foreground); }
@@ -227,9 +279,18 @@
   .placeholder-tile svg { width: 40%; height: auto; }
   .demo-pair { display: grid; gap: var(--space-5); }
   @media (min-width: 64rem) { .demo-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .demo-card { display: grid; gap: var(--space-4); align-content: start; padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+  .demo-card > .demo-label { margin: 0; }
+  .demo-cols { display: grid; gap: var(--space-5); }
+  @media (min-width: 48rem) { .demo-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .demo-cols--k { display: grid; gap: var(--space-5); }
+  @media (min-width: 80rem) { .demo-cols--k { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 47.99rem) { .demo-card, .state-pdp { padding-inline: 0; border-inline: 0; border-radius: 0; } }
+  .mini-frame--page { display: grid; align-content: start; min-height: 320px; padding: var(--space-5); background: var(--color-background); }
+  .mini-frame--page + .mini-frame { margin-block-start: var(--space-4); }
 </style>
 </head>
-<body>
+<body class="has-sticky-bar">
 <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
   <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
@@ -237,7 +298,9 @@
   <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
   <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
-  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <!-- Chevron 11 × 16 trong khung 52 (snippets/slideshow-icon, Figma 1:398) — foundation vòng 3 §6 -->
+  <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-star" viewBox="0 0 14 13"><path fill="currentColor" d="m7 0 2.1 4.2 4.6.7-3.3 3.2.8 4.6L7 10.5l-4.2 2.2.8-4.6L.3 4.9l4.6-.7L7 0Z"/></symbol>
   <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
   <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
@@ -247,9 +310,11 @@
   <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
   <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
   <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
-  <symbol id="i-instagram" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="20" height="20" rx="5"/><circle cx="13" cy="13" r="4.5"/><circle cx="18.6" cy="7.4" r=".6" fill="currentColor"/></g></symbol>
-  <symbol id="i-youtube" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="5.5" width="22" height="15" rx="4"/><path d="m11 10 5 3-5 3v-6Z"/></g></symbol>
-  <symbol id="i-facebook" viewBox="0 0 26 26"><path d="M15.5 4.5h-2a4 4 0 0 0-4 4v3h-2.5v3.5h2.5v8.5h3.5V15h3l.5-3.5h-3.5V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 28 28"><path d="M16 4v13.5a4.2 4.2 0 1 1-4.2-4.2M16 4c.4 3 2.4 5 5.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="20" height="20" rx="5"/><circle cx="14" cy="14" r="4.5"/><circle cx="19.6" cy="8.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="6.5" width="22" height="15" rx="4"/><path d="m12 11 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 28 28"><path d="M16.5 4.5h-2a4 4 0 0 0-4 4v3H8v3.5h2.5v8.5H14V15h3l.5-3.5H14V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
   <symbol id="i-zoom" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="6"/><path d="m13 13 5 5M8.5 6v5M6 8.5h5"/></g></symbol>
   <symbol id="i-play" viewBox="0 0 14 14"><path fill="currentColor" d="M3 1.5v11a.6.6 0 0 0 .9.5l8.6-5.5a.6.6 0 0 0 0-1L3.9 1A.6.6 0 0 0 3 1.5Z"/></symbol>
   <symbol id="i-cube" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="m10 2 7 4v8l-7 4-7-4V6l7-4Z"/><path d="m3 6 7 4 7-4M10 10v8"/></g></symbol>
@@ -260,8 +325,8 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- ===== Header trang con, biến thể A (sổ quyết định 09/11) ===== -->
-<header class="site-header">
+<!-- ===== Header mọi trang: thanh tối riêng #1A1A1A + noise, cao 80, không đè ảnh (sổ 10/11, Figma 1:362; foundation vòng 3 §3) ===== -->
+<header class="site-header" data-testid="header">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
     <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
@@ -277,7 +342,7 @@
       </ul>
     </nav>
     <div class="site-header__icons">
-      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
     </div>
@@ -306,8 +371,8 @@
             </ul>
             <span class="gallery__count" aria-hidden="true">1 / 3</span>
             <div class="carousel-nav gallery__nav">
-              <button class="round-button round-button--prev" type="button" aria-label="Previous image" aria-disabled="true"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-              <button class="round-button" type="button" aria-label="Next image"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <button class="round-button round-button--prev" type="button" aria-label="Previous image" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
+              <button class="round-button" type="button" aria-label="Next image"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
             </div>
           </div>
           <ul class="gallery__thumbs" aria-label="Product media thumbnails">
@@ -322,6 +387,12 @@
         <div class="buy__head" data-testid="product-info">
           <p class="eyebrow">Efitco</p>
           <h1 class="buy__title">Ativafit Lava 66 lb Adjustable</h1>
+          <!-- Countdown: chỉ khi metafield custom.sale_ends_at còn hạn + variant đang chọn có giá gạch + còn hàng. Số in từ Liquid, JS đếm tiếp; không aria-live -->
+          <p class="countdown" role="timer" data-testid="product-countdown">
+            <span aria-hidden="true">Sale ends in</span>
+            <span class="visually-hidden">Sale ends on November 11, 2026 at 11:59 PM EST</span>
+            <span class="countdown__units" aria-hidden="true"><span class="countdown__unit">22</span><span class="countdown__unit">36</span><span class="countdown__unit">28</span></span>
+          </p>
           <div class="buy__meta">
             <div class="pdp-price">
               <span class="visually-hidden">Sale price</span><span class="pdp-price__current pdp-price__current--sale">$379.99</span>
@@ -331,7 +402,7 @@
             <div class="rating">
               <a class="rating__link" href="#reviews">
                 <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
-                <span><span class="visually-hidden">Rated </span>4.9<span class="visually-hidden"> out of 5 stars,</span></span>
+                <span><span class="visually-hidden">Rated </span><span aria-hidden="true">(</span>4.9<span aria-hidden="true">)</span><span class="visually-hidden"> out of 5 stars,</span></span>
                 <span class="rating__sep" aria-hidden="true"></span>
                 <span class="rating__count">341 reviews</span>
               </a>
@@ -434,7 +505,7 @@
     </div>
   </section>
 
-  <!-- ===== product-reviews (ĐỀ XUẤT, câu hỏi CTO 1) ===== -->
+  <!-- ===== product-reviews (CTO chốt 10/11: metafield rating + app block, ẩn khi không dữ liệu) ===== -->
   <section class="section section--cream" id="reviews" aria-labelledby="h-reviews">
     <div class="container reviews">
       <div class="reviews__summary">
@@ -451,18 +522,22 @@
       <div>
         <ul class="reviews__list">
           <li class="review">
-            <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
-            <p class="visually-hidden">Rated 5 out of 5 stars</p>
+            <div class="review__head">
+              <p class="review__author">E. Johnson</p>
+              <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
+              <p class="visually-hidden">Rated 5 out of 5 stars</p>
+            </div>
             <h3 class="review__title">Versatile Gear For All Exercises</h3>
             <p class="review__quote">High quality equipment that doesn't break the bank. I am very impressed with the overall durability.</p>
-            <p class="review__author">E. Johnson</p>
           </li>
           <li class="review">
-            <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
-            <p class="visually-hidden">Rated 5 out of 5 stars</p>
+            <div class="review__head">
+              <p class="review__author">M. Anderson</p>
+              <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
+              <p class="visually-hidden">Rated 5 out of 5 stars</p>
+            </div>
             <h3 class="review__title">Smooth Every Single Rep</h3>
             <p class="review__quote">The dial switches weight fast, no jamming at all. Saves an entire corner of my room.</p>
-            <p class="review__author">M. Anderson</p>
           </li>
         </ul>
         <button class="button button--secondary reviews__more" type="button">Show More Reviews</button>
@@ -476,8 +551,8 @@
       <div class="section-header section-header--split">
         <h2 id="h-related">You May Also Like</h2>
         <div class="carousel-nav">
-          <button class="round-button round-button--prev" type="button" aria-label="Previous products" aria-disabled="true"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-          <button class="round-button" type="button" aria-label="Next products"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <button class="round-button round-button--prev" type="button" aria-label="Previous products" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
+          <button class="round-button" type="button" aria-label="Next products"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
         </div>
       </div>
       <ul class="related-row" aria-labelledby="h-related">
@@ -540,7 +615,7 @@
     <section class="demo-block" aria-labelledby="st-b">
       <p class="demo-label">Trạng thái B · edge_cases "2 option có tổ hợp không tồn"</p>
       <h2 id="st-b">Many variants, unavailable combination</h2>
-      <p class="demo-note">Gold + L không có variant: pill L gạch ngang, nút "Unavailable" khoá, gợi ý chọn cỡ khác ngay dưới nút. Size dùng pill (không dropdown, 10 §6 #850); Color là swatch khi có value.swatch, không có thì pill chữ.</p>
+      <p class="demo-note">Gold + L không có variant (value.exists = false): pill L viền đứt, chữ muted, không gạch ngang (gạch ngang dành cho hết hàng); nút "Unavailable" khoá, gợi ý chọn cỡ khác ngay dưới nút. Size dùng pill (không dropdown, 10 §6 #850); Color là swatch khi có value.swatch, không có thì pill chữ.</p>
       <div class="state-pdp">
         <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, variant sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=900" width="900" height="900" alt="2 option có tổ hợp không tồn"></li></ul></div>
         <div class="buy">
@@ -561,7 +636,7 @@
               <div class="option__values">
                 <label class="opt"><input type="radio" name="sb2"><span class="opt__text">S</span></label>
                 <label class="opt"><input type="radio" name="sb2"><span class="opt__text">M</span></label>
-                <label class="opt opt--na"><input type="radio" name="sb2" checked><span class="opt__text">L</span><span class="visually-hidden">, unavailable</span></label>
+                <label class="opt opt--none"><input type="radio" name="sb2" checked><span class="opt__text">L</span><span class="visually-hidden">, unavailable</span></label>
               </div>
             </fieldset>
             <div class="buy__purchase">
@@ -640,8 +715,8 @@
           <div class="lightbox__bar"><span>1 / 3</span><button class="close-button" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
           <div class="lightbox__img"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=1440" width="1440" height="1440" alt="Ativafit Lava 66 lb Adjustable, black, image 1 of 3"></div>
           <div class="lightbox__nav">
-            <button class="round-button round-button--prev" type="button" aria-label="Previous image" aria-disabled="true"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-            <button class="round-button" type="button" aria-label="Next image"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            <button class="round-button round-button--prev" type="button" aria-label="Previous image" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
+            <button class="round-button" type="button" aria-label="Next image"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
           </div>
           <div class="lightbox__thumbs">
             <a class="gallery__thumb" href="#" aria-current="true"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=160" width="64" height="64" alt=""><span class="visually-hidden">Image 1 of 3</span></a>
@@ -655,7 +730,22 @@
     <section class="demo-block" aria-labelledby="st-g">
       <p class="demo-label">Trạng thái G · product-sticky-bar + toast lỗi khi nút chính đã khuất</p>
       <h2 id="st-g">Sticky add to cart bar</h2>
-      <p class="demo-note">Hiện khi nút Add To Cart chính ra khỏi màn, ẩn khi quay lại; fixed đáy (0 CLS). 360: ảnh 48, tên 1 dòng + giá, nút. ≥768: thêm biến thể đang chọn. ≥1024: thêm select biến thể (ĐỀ XUẤT, câu hỏi CTO 2). Lỗi thêm giỏ từ thanh này hiện toast error vì vùng lỗi trong form đang khuất.</p>
+      <p class="demo-note">Mọi mốc (CTO 10/11, "Show on desktop" mặc định bật). Hiện khi nút Add To Cart chính ra khỏi màn, ẩn khi quay lại; fixed đáy (0 CLS). 360: ảnh 48, tên 1 dòng + giá, nút. ≥768: thêm biến thể đang chọn + giá gạch. ≥1024: thêm ô số lượng 48. Không có select biến thể (2048 biến thể). Lựa chọn hiện tại không mua được: nút "Choose Options" cuộn về bộ chọn và đặt focus vào option đầu tiên. Lỗi thêm giỏ từ thanh: toast error vì vùng lỗi trong form đang khuất. Thanh thật của trang nằm ở đáy mockup.</p>
+      <div class="mini-frame mini-frame--page">
+        <p class="demo-label">Màn sau khi cuộn qua nút chính · lựa chọn không mua được</p>
+        <h2 style="margin: 0">Customer Reviews</h2>
+        <div class="sticky-bar">
+          <div class="sticky-bar__inner">
+            <img class="sticky-bar__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=112" width="56" height="56" alt="" loading="lazy">
+            <div class="sticky-bar__text">
+              <p class="sticky-bar__title">2 option có tổ hợp không tồn</p>
+              <p class="sticky-bar__variant">Gold / L · Unavailable</p>
+              <div class="price"><span>$30.00</span></div>
+            </div>
+            <button class="button button--secondary" type="button">Choose Options</button>
+          </div>
+        </div>
+      </div>
       <div class="mini-frame">
         <div class="toast-region">
           <div class="toast toast--error" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="toast__body"><strong>Couldn't add to cart</strong>You can't add more Ativafit Lava 66 lb Adjustable - Black to the cart.</div><button class="toast__close" type="button" aria-label="Dismiss message"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
@@ -668,7 +758,7 @@
               <p class="sticky-bar__variant">Black</p>
               <div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="sticky-bar__compare"><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s></span></div>
             </div>
-            <div class="sticky-bar__select"><label class="visually-hidden" for="sb-variant">Color</label><select class="field__input" id="sb-variant"><option>Black</option><option>Gray</option><option>White</option></select></div>
+            <div class="qty sticky-bar__qty"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input type="number" min="1" value="1" aria-label="Quantity"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
             <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
           </div>
         </div>
@@ -693,48 +783,249 @@
         </div>
       </div>
     </section>
+
+    <!-- ===== Vòng 3b: 2048 biến thể ===== -->
+    <section class="demo-block" aria-labelledby="st-j">
+      <p class="demo-label">Trạng thái J · 2048 biến thể: 3 option, Weight 40 giá trị · DỮ LIỆU MẪU (demo-data chưa có, hỏi ES1-T282)</p>
+      <h2 id="st-j">Three options, one with 40 values</h2>
+      <p class="demo-note">Bộ chọn dựng từ product.options_with_values (option + option value), không lặp product.variants, không nhúng JSON biến thể. Trạng thái mỗi giá trị theo lựa chọn hiện tại (Black + Pair): còn hàng = viền thường; hết hàng (value.available = false) = gạch ngang; tổ hợp không tồn tại (value.exists = false) = viền đứt, chữ muted. Option &gt; 12 giá trị: lưới ô đều, hiện 11 giá trị + nút "+29" (Liquid tính N; giá trị đang chọn luôn nằm trong phần hiện). Ô tối thiểu 72: 360 (buy box 320) 4 ô/hàng, 3 hàng; 768 9 ô/hàng; 1280 (buy box 580) 7 ô/hàng, 2 hàng. Bấm "+29" mở hết tại chỗ (J2), "Show Fewer" thu lại.</p>
+      <ul class="option-legend-key" aria-hidden="true">
+        <li><i></i>In stock</li>
+        <li><i class="is-na"></i>Sold out (line-through)</li>
+        <li><i class="is-none"></i>Not available with current choice (dashed)</li>
+      </ul>
+      <div class="state-pdp" style="margin-block-start: var(--space-4)">
+        <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, three option sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=900" width="900" height="900" alt="Sample product with three options" loading="lazy"></li></ul></div>
+        <div class="buy">
+          <div class="buy__head">
+            <h3 class="buy__title buy__title--h3">Sample: 3 options, 40 weights</h3>
+            <div class="pdp-price"><span class="pdp-price__current">$189.00</span></div>
+          </div>
+          <div class="buy__form">
+            <fieldset class="option">
+              <legend>Color: <span>Black</span></legend>
+              <div class="option__values">
+                <label class="opt opt--swatch" style="--swatch-color:#1a1a1a"><input type="radio" name="j1c" checked><span class="visually-hidden">Black</span></label>
+                <label class="opt opt--swatch" style="--swatch-color:#8c8c8c"><input type="radio" name="j1c"><span class="visually-hidden">Gray</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="option">
+              <legend>Pack: <span>Pair</span></legend>
+              <div class="option__values">
+                <label class="opt"><input type="radio" name="j1p"><span class="opt__text">Single</span></label>
+                <label class="opt"><input type="radio" name="j1p" checked><span class="opt__text">Pair</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="option">
+              <legend>Weight: <span>45 lb</span></legend>
+              <div class="option__values option__values--many" id="j1-weight">
+                <label class="opt opt--none"><input type="radio" name="j1w"><span class="opt__text">5 lb</span><span class="visually-hidden">, unavailable</span></label>
+                <label class="opt opt--none"><input type="radio" name="j1w"><span class="opt__text">10 lb</span><span class="visually-hidden">, unavailable</span></label>
+                <label class="opt"><input type="radio" name="j1w"><span class="opt__text">15 lb</span></label>
+                <label class="opt"><input type="radio" name="j1w"><span class="opt__text">20 lb</span></label>
+                <label class="opt opt--na"><input type="radio" name="j1w"><span class="opt__text">25 lb</span><span class="visually-hidden">, sold out</span></label>
+                <label class="opt"><input type="radio" name="j1w"><span class="opt__text">30 lb</span></label>
+                <label class="opt"><input type="radio" name="j1w"><span class="opt__text">35 lb</span></label>
+                <label class="opt"><input type="radio" name="j1w"><span class="opt__text">40 lb</span></label>
+                <label class="opt"><input type="radio" name="j1w" checked><span class="opt__text">45 lb</span></label>
+                <label class="opt opt--na"><input type="radio" name="j1w"><span class="opt__text">50 lb</span><span class="visually-hidden">, sold out</span></label>
+                <label class="opt"><input type="radio" name="j1w"><span class="opt__text">55 lb</span></label>
+                <button class="opt-more" type="button" aria-expanded="false" aria-controls="j1-weight">+29<span class="visually-hidden"> more weights, show all 40</span></button>
+              </div>
+            </fieldset>
+            <p class="stock">In stock</p>
+            <div class="buy__purchase">
+              <label for="qty-j1">Quantity</label>
+              <div class="qty"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-j1" type="number" min="1" value="1"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+              <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo-pair" style="margin-block-start: var(--space-5)">
+        <div class="demo-card">
+          <p class="demo-label">J2 · đã mở hết 40 giá trị · đang tải biến thể sau khi chọn 120 lb</p>
+          <div class="buy is-loading">
+            <div class="buy__head"><div class="pdp-price"><span class="pdp-price__current">$189.00</span></div></div>
+            <div class="buy__form" style="border: 0; padding: 0">
+              <fieldset class="option">
+                <legend>Weight: <span>120 lb</span><i class="spinner option__loading" aria-hidden="true"></i></legend>
+                <div class="option__values option__values--many" id="j2-weight">
+                  <label class="opt opt--none"><input type="radio" name="j2w"><span class="opt__text">5 lb</span><span class="visually-hidden">, unavailable</span></label>
+                  <label class="opt opt--none"><input type="radio" name="j2w"><span class="opt__text">10 lb</span><span class="visually-hidden">, unavailable</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">15 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">20 lb</span></label>
+                  <label class="opt opt--na"><input type="radio" name="j2w"><span class="opt__text">25 lb</span><span class="visually-hidden">, sold out</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">30 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">35 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">40 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">45 lb</span></label>
+                  <label class="opt opt--na"><input type="radio" name="j2w"><span class="opt__text">50 lb</span><span class="visually-hidden">, sold out</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">55 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">60 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">65 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">70 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">75 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">80 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">85 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">90 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">95 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">100 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">105 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">110 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">115 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w" checked><span class="opt__text">120 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">125 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">130 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">135 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">140 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">145 lb</span></label>
+                  <label class="opt opt--na"><input type="radio" name="j2w"><span class="opt__text">150 lb</span><span class="visually-hidden">, sold out</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">155 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">160 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">165 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">170 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">175 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">180 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">185 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">190 lb</span></label>
+                  <label class="opt opt--none"><input type="radio" name="j2w"><span class="opt__text">195 lb</span><span class="visually-hidden">, unavailable</span></label>
+                  <label class="opt opt--none"><input type="radio" name="j2w"><span class="opt__text">200 lb</span><span class="visually-hidden">, unavailable</span></label>
+                </div>
+                <button class="button button--secondary button--small option__less" type="button" aria-expanded="true" aria-controls="j2-weight">Show Fewer<span class="visually-hidden"> weights</span></button>
+              </fieldset>
+              <p class="stock">In stock</p>
+              <div class="buy__purchase">
+                <label for="qty-j2">Quantity</label>
+                <div class="qty"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-j2" type="number" min="1" value="1"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+                <button class="button buy__add" type="submit" aria-busy="true" aria-disabled="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+              </div>
+              <p class="visually-hidden" role="status">Loading 120 lb</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo-card">
+          <p class="demo-label">J3 · setting "Options with many values" = Dropdown · lỗi tải biến thể</p>
+          <div class="buy">
+            <div class="buy__head"><div class="pdp-price"><span class="pdp-price__current">$189.00</span></div></div>
+            <div class="buy__form" style="border: 0; padding: 0">
+              <div class="field">
+                <label class="field__label" for="j3-weight">Weight</label>
+                <select class="field__input" id="j3-weight" aria-describedby="j3-error">
+                  <option>5 lb - Unavailable</option><option>10 lb - Unavailable</option><option>15 lb</option><option>20 lb</option><option>25 lb - Sold out</option><option>30 lb</option><option>35 lb</option><option>40 lb</option><option selected>45 lb</option><option>50 lb - Sold out</option>
+                </select>
+                <p class="load-error" id="j3-error" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><span>Couldn't load 120 lb. Check your connection. <button type="button">Try again</button></span></p>
+              </div>
+              <p class="stock">In stock</p>
+              <div class="buy__purchase">
+                <label for="qty-j3">Quantity</label>
+                <div class="qty"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-j3" type="number" min="1" value="1"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+                <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+              </div>
+            </div>
+          </div>
+          <p class="demo-note" style="margin: 0">Lỗi: lựa chọn quay về 45 lb (biến thể cuối đã tải được), giá, nút giữ đúng 45 lb; chữ lỗi đỏ 6.38 + icon, nút "Try again". Dropdown chỉ hiện chữ trạng thái (không gạch được trong select).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Vòng 3b: countdown ===== -->
+    <section class="demo-block" aria-labelledby="st-k">
+      <p class="demo-label">Trạng thái K · countdown "Sale ends in" (Figma 1:773) · metafield custom.sale_ends_at (date_time)</p>
+      <h2 id="st-k">Sale countdown states</h2>
+      <p class="demo-note">Đặt giữa tên và giá (thứ tự Figma 1:769). Hiện khi: có ngày, chưa hết giờ, variant đang chọn có giá gạch, còn hàng. Ô ngày chỉ hiện khi còn ≥ 24 giờ (như TE-13 AC1). Số in từ Liquid, JS đếm tiếp mỗi giây; số aria-hidden, trình đọc màn hình đọc câu ngày giờ đầy đủ; không aria-live. Khung cao 60 cố định, ô tabular-nums: số đổi không xô bố cục.</p>
+      <div class="demo-cols--k">
+        <div class="demo-card">
+          <p class="demo-label">K1 · còn ≥ 24 giờ: 4 ô ngày, giờ, phút, giây</p>
+          <p class="countdown" role="timer"><span aria-hidden="true">Sale ends in</span><span class="visually-hidden">Sale ends on November 13, 2026 at 4:00 AM EST</span><span class="countdown__units" aria-hidden="true"><span class="countdown__unit">02</span><span class="countdown__unit">14</span><span class="countdown__unit">36</span><span class="countdown__unit">28</span></span></p>
+          <div class="pdp-price"><span class="visually-hidden">Sale price</span><span class="pdp-price__current pdp-price__current--sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="pdp-price__compare">$499.99</s><span class="badge badge--sale">-24%</span></div>
+        </div>
+        <div class="demo-card">
+          <p class="demo-label">K2 · sắp hết (&lt; 1 giờ): ô nền cam</p>
+          <p class="countdown countdown--soon" role="timer"><span aria-hidden="true">Sale ends in</span><span class="visually-hidden">Sale ends today at 11:59 PM EST, in less than one hour</span><span class="countdown__units" aria-hidden="true"><span class="countdown__unit">00</span><span class="countdown__unit">42</span><span class="countdown__unit">17</span></span></p>
+          <div class="pdp-price"><span class="visually-hidden">Sale price</span><span class="pdp-price__current pdp-price__current--sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="pdp-price__compare">$499.99</s><span class="badge badge--sale">-24%</span></div>
+        </div>
+        <div class="demo-card">
+          <p class="demo-label">K3 · hết giờ khi đang xem: giữ khung, đổi chữ</p>
+          <p class="countdown countdown--ended">This sale has ended</p>
+          <div class="pdp-price"><span class="visually-hidden">Sale price</span><span class="pdp-price__current pdp-price__current--sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="pdp-price__compare">$499.99</s><span class="badge badge--sale">-24%</span></div>
+        </div>
+        <div class="demo-card">
+          <p class="demo-label">K4 · không countdown: không ngày, quá hạn lúc render, không giảm giá, hoặc hết hàng · không chừa chỗ</p>
+          <div class="pdp-price"><span class="pdp-price__current">$499.99</span></div>
+          <p class="buy__note" style="margin: 0">Taxes included. <a href="#">Shipping</a> calculated at checkout.</p>
+        </div>
+      </div>
+    </section>
   </div>
 </main>
 
+<!-- ===== Footer (Figma 1:1104; foundation vòng 3 §4) ===== -->
 <footer class="site-footer">
-  <div class="container">
+  <div class="container site-footer__band">
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
     <div class="site-footer__newsletter">
-      <div>
-        <h2><span>Get 15% Off</span> Your First Order</h2>
-        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
-      </div>
-      <form class="site-footer__form" onsubmit="return false">
-        <label class="visually-hidden" for="nl-email">Email</label>
-        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
-        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
-      </form>
+      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
-    <div class="site-footer__panel">
-      <div class="site-footer__top">
-        <div class="site-footer__brand">
-          <svg class="logo" viewBox="0 0 100 30" aria-label="Efitco" role="img"><use href="#i-logo"/></svg>
-          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
-          <div class="site-footer__social"><a href="#" aria-label="Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a><a href="#" aria-label="YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a><a href="#" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></div>
-        </div>
-        <div class="site-footer__menus">
-          <div class="site-footer__menu"><details open><summary>Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-          <div class="site-footer__menu"><details open><summary>Information <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
-        </div>
+    <form class="site-footer__form" onsubmit="return false" novalidate>
+      <label class="visually-hidden" for="nl-email">Email</label>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+  <div class="site-footer__panel">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <svg class="site-footer__logo" viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+        <ul class="site-footer__social">
+          <li><a href="#" aria-label="Efitco on TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        </ul>
       </div>
-      <ul class="site-footer__trust">
-        <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
-        <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
-        <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
-        <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
-      </ul>
+      <div class="site-footer__menus">
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
     </div>
-    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
-    <div class="site-footer__bottom">
-      <p>© 2026 Efitco, Powered by Shopify</p>
-      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English">USD / EN <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button>
-      <ul class="payment-icons" aria-label="Payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul>
+    <ul class="site-footer__trust">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© 2026 Efitco, Powered by Shopify</p>
+    <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
+    <div class="site-footer__end">
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
     </div>
   </div>
 </footer>
+
+<!-- ===== product-sticky-bar thật: fixed đáy ở mọi mốc (vòng 3b: "Show on desktop" mặc định bật). Mockup luôn hiện; live chỉ hiện khi nút Add To Cart chính ra khỏi màn ===== -->
+<div class="sticky-bar is-page" data-testid="product-sticky-bar-live">
+  <div class="sticky-bar__inner">
+    <img class="sticky-bar__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=112" width="56" height="56" alt="" loading="lazy">
+    <div class="sticky-bar__text">
+      <p class="sticky-bar__title">Ativafit Lava 66 lb Adjustable</p>
+      <p class="sticky-bar__variant">Black</p>
+      <div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="sticky-bar__compare"><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s></span></div>
+    </div>
+    <div class="qty sticky-bar__qty">
+      <button type="button" aria-label="Decrease quantity for Ativafit Lava 66 lb Adjustable" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button>
+      <input type="number" min="1" value="1" inputmode="numeric" aria-label="Quantity for Ativafit Lava 66 lb Adjustable">
+      <button type="button" aria-label="Increase quantity for Ativafit Lava 66 lb Adjustable"><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+    </div>
+    <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+  </div>
+</div>
 </body>
 </html>

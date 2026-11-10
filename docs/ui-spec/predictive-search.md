@@ -1,10 +1,27 @@
-KHÔNG CHẮC: (1) demo-data không có từ khoá gợi ý (`queries` của predictive search), từ khoá phổ biến, pages, excerpt bài viết; gợi ý từ khoá trong mockup suy từ tên sản phẩm/collection thật, pages bỏ trống (đã hỏi BA ở ES1-T266, bổ sung comment). (2) Ảnh sản phẩm store dev lệch tên (ES1-T245): "FlexFold Adjustable Bench" ra dây thừng, "Training mat" ra dây nhảy; mockup giữ đúng URL. (3) Search page spec ES1-T256 nằm trên nhánh khác, không đọc được; phần nối sang trang /search chỉ theo SRS TE-8 AC2.
+KHÔNG CHẮC: (1) demo-data không có từ khoá gợi ý (`queries` của predictive search), từ khoá phổ biến, pages, excerpt bài viết; gợi ý từ khoá trong mockup suy từ tên sản phẩm/collection thật, pages bỏ trống (đã hỏi BA ở ES1-T266, bổ sung comment). (2) Ảnh sản phẩm store dev lệch tên (ES1-T245): "FlexFold Adjustable Bench" ra dây thừng, "Training mat" ra dây nhảy; mockup giữ đúng URL. (3) Search page spec ES1-T256 (`docs/ui-spec/search.md`) đã có trên develop: link "View all products" dùng `type=product` khớp type-nav §3.3 của trang đó; default "Popular searches" hai spec đang khác chữ (search.md §5 dùng tên sản phẩm đầy đủ, spec này dùng từ chung): Dev dùng một setting chung, chữ chốt ở ES1-T266.
 
-# UI spec: Search overlay (ES1-T261)
+# UI spec: Search overlay (ES1-T261, vòng 3)
+
+## Thay đổi so với vòng 2
+
+| # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Header nền trong mockup | trắng, logo 140, chỉ icon | thanh tối `--color-background-dark` + noise cao 80, logo 100 × 30, menu 7 mục trắng 60%, search 20, số giỏ | Sổ 10/11, Figma 1:362, foundation §3 |
+| 2 | Hàng ô tìm (popup) | nền trắng, viền dưới border | thanh tối 80 + noise mọi mốc, nằm đúng chỗ header; panel kết quả trắng ngay dưới | Figma 1:362, sổ 10/11 (header luôn tối) |
+| 3 | Ô tìm (popup) | viền muted-light trên trắng | kiểu input nền tối của footer: viền 100% `--color-muted-on-dark` (6.11), chữ trắng, placeholder muted-on-dark, focus outline trắng | Figma 1:1104, sổ 09/11, foundation §12 |
+| 4 | Nút đóng (popup) | tròn 48 trắng viền border | tròn 48 trong suốt, viền trắng 24%, icon trắng; hover nền trắng icon tối | foundation §6 (trên nền tối) |
+| 5 | Spinner trong ô (popup) | xám trên trắng | vòng trắng 24% + cung trắng | foundation §18 |
+| 6 | Tab | biến thể nhỏ 14/600, padding 16 | tab Figma: 16/500, padding 28 (drawer 24), cao 40 desktop / 44, cách 8; bỏ `.tab--sm` | Figma 1:490, foundation §7 |
+| 7 | Card sản phẩm (dạng card) | không badge, media → tên 12, lh 24 | badge -N% góc trái trên (cách 8; 16 từ 64rem), media → tên 8, tên → giá 4, tên 16/26 | Figma 1:502, foundation §8–9 |
+| 8 | Hàng tab trong popup | padding dưới 12 | padding 16 (24 từ 80rem) vì hàng trên đã là thanh tối | bố cục |
+| 9 | Drawer (tab canvas) | — | giữ nền trắng, header drawer 72 (header trang tối không lặp vào drawer) | foundation §15 |
+| 10 | Chevron 52 | — | không dùng: overlay không có hàng carousel (Trending là lưới 2/4 cột) | foundation §6, §11 |
+
+Giữ nguyên nội dung, nhóm, trạng thái, `data-testid`, locale, settings, hành vi của vòng 2.
 
 Mục đích: người mua gõ 2 ký tự là thấy gợi ý từ khoá, sản phẩm (ảnh, tên, giá), collection, bài viết, trang; chuyển nhóm bằng tab; 0 kết quả vẫn có đường đi tiếp; Enter hoặc nút chân mở trang kết quả. Story TE-8 AC1, AC3 (docs/srs.md#TE-8). Quyết định CTO 09/11: search popup (khi gõ, không có sản phẩm, tab canvas) + search tab, đủ 360 / 768 / 1280 / 1920.
 
-Figma: không có. Header 1:362 chỉ có icon search (figma-inventory hàng 1, "search mở" là trạng thái chưa vẽ). Mọi thứ dưới đây là `ĐỀ XUẤT:` theo ngôn ngữ trang chủ 1:359 + foundation (docs/ui-spec/foundation.md), trừ chỗ ghi "code hiện có".
+Figma: không có overlay. Header 1:362 chỉ có icon search (figma-inventory hàng 1, "search mở" là trạng thái chưa vẽ). Mọi thứ dưới đây là `ĐỀ XUẤT:` phát triển từ Figma trang chủ 1:359 (gốc duy nhất, sổ 10/11): thanh tối 1:362, input nền tối 1:1104, tab 1:490, card 1:502; cùng foundation vòng 3 (docs/ui-spec/foundation.md, kit.css), trừ chỗ ghi "code hiện có".
 
 Đầu ra:
 - Spec này.
@@ -18,22 +35,23 @@ Code hiện có: `snippets/predictive-search.liquid` (dialog sau link `header-se
 
 | Kiểu | 360 | 768 | 1280 / 1920 | Nguồn |
 | --- | --- | --- | --- | --- |
-| Popup (mặc định) | toàn màn, trượt từ trên | dải từ trên, rộng 100%, cao ≤ 80% viewport, bo 2 góc dưới `--radius-card` | như 768; hàng đầu cao 80 thay chỗ header (logo · ô tìm · nút đóng) | code hiện có; SRS TE-8 AC1 "mobile full màn"; ticket "trượt từ trên" |
+| Popup (mặc định) | toàn màn, trượt từ trên; hàng đầu là thanh tối 80 | dải từ trên, rộng 100%, cao ≤ 80% viewport, bo 2 góc dưới `--radius-card`; hàng đầu thanh tối 80 | như 768; thanh tối 80 thay chỗ header (logo · ô tìm · nút đóng) | code hiện có; SRS TE-8 AC1 "mobile full màn"; ticket "trượt từ trên"; Figma 1:362 |
 | Drawer ("tab canvas") | cạnh phải, rộng 90% | 420 | 480 | ĐỀ XUẤT: 15 §2 #4 (search drawer phải 90%), foundation §15 |
 
-- Popup trên desktop thay chỗ header: logo, ô tìm, nút đóng cùng hàng cao `--header-height` (80) để mắt không phải tìm lại vị trí (06 §4). Ô tìm bắt đầu ở cột 4 của lưới 12, thẳng với cột nội dung chính bên dưới.
+- Popup thay chỗ header: hàng đầu là thanh tối `--color-background-dark` + noise cao `--header-height` (80) mọi mốc, đúng vị trí và màu header Figma 1:362, nên khi mở chỉ nội dung thanh đổi (menu → ô tìm), nền không nháy (06 §4, sổ 10/11 header luôn tối). Desktop: logo, ô tìm, nút đóng cùng hàng; ô tìm bắt đầu ở cột 4 của lưới 12, thẳng với cột nội dung chính bên dưới. Dưới 80rem: ô tìm + nút đóng (logo ẩn để ô đủ rộng).
+- Ô tìm trên thanh tối dùng kiểu input nền tối của footer (Figma 1:1104, foundation §12): viền 100% `--color-muted-on-dark`, nền trong suốt, chữ trắng; panel kết quả bên dưới nền trắng (như mega menu, foundation §14).
 - Drawer có tiêu đề nhìn thấy "Search" (h2 heading 28, như `.overlay__title`) + nút đóng 48; popup có h2 "Search" ẩn (tên dialog) vì ô tìm đã là tiêu điểm. Cả hai là `<dialog>` có tên (sổ quyết định 09/11: popup là dialog có tiêu đề và nút đóng).
 - Một nội dung, hai khung: cùng nhóm, thứ tự, tab, trạng thái; chỉ khác bố cục (§3). Chức năng giống nhau mở/đóng như nhau (06 §1, 15 §7).
 
 ## 2. Anatomy
 
 1. Scrim: `--overlay-scrim` (dark 50%), chạm để đóng.
-2. Hàng đầu (popup): logo (≥ 80rem, link về trang chủ) · form tìm · nút đóng. Drawer: hàng tiêu đề (h2 "Search" + nút đóng) rồi hàng form.
+2. Hàng đầu (popup, thanh tối 80 + noise): logo 100 × 30 (≥ 80rem, link về trang chủ) · form tìm (kiểu nền tối) · nút đóng 48 (viền trắng 24%, icon trắng). Drawer (nền trắng): hàng tiêu đề 72 (h2 "Search" + nút đóng 48 trắng viền border) rồi hàng form (kiểu nền sáng, viền `--color-muted-light`).
 3. Form tìm (`role="search"`, GET `routes.search_url`): nút submit kính lúp 44 ở đầu ô · `<label>` ẩn "Search products, collections, pages, or articles" (code) · input `type=search`, combobox · nút xoá × 44 (chỉ khi có chữ) / spinner 20 (đang tải).
 4. Hàng tab (≥ 2 ký tự và có kết quả): All · Products n · Collections n · Articles n · Pages n. Chỉ hiện tab có kết quả.
 5. Thân (cuộn riêng): listbox gồm các nhóm theo thứ tự DOM Suggestions → Products → Collections → Articles → Pages.
    - Suggestions: tối đa 4 từ khoá, icon kính lúp 16, phần người mua đã gõ chữ thường 400, phần gợi ý thêm 600.
-   - Products: tối đa 4 ở tab All; ảnh, tên (tối đa 2 dòng), giá (sale đỏ + giá gạch), "Sold out" bằng chữ.
+   - Products: tối đa 4 ở tab All; ảnh, tên (tối đa 2 dòng), giá (sale đỏ + giá gạch), "Sold out" bằng chữ. Dạng card (lưới, desktop tab All): như card Figma 1:502 rút gọn: media 1:1 cream bo 12, badge -N% (`.badge--sale`) góc trái trên, tên 16/500 lh 26, giá; không rating, swatch (giữ gọn, chọn biến thể ở trang sản phẩm). Dạng hàng (ảnh 64): không badge, sale đọc từ giá đỏ + giá gạch.
    - Collections: icon lưới 16, tên, "N products" (14 muted) ở cuối hàng.
    - Articles: ảnh 64 × 48 bo 4, tiêu đề 2 dòng, ngày đăng 14 muted.
    - Pages: icon trang 16, tên.
@@ -47,9 +65,9 @@ Token theo foundation §1. Khoảng cách viết bằng `--space-*`.
 | | 360 | 768 | 1280 | 1920 |
 | --- | --- | --- | --- | --- |
 | Khung | toàn màn | dải trên, ≤ 80% cao | dải trên, ≤ 80% cao | như 1280, nội dung 1416 |
-| Hàng đầu | ô tìm + đóng 48, padding 12 | như 360 | lưới 12: logo cột 1–3, ô cột 4–11, đóng cột 12; cao 80 | như 1280 |
+| Hàng đầu | thanh tối 80: ô tìm + đóng 48, gap 12 | như 360 | thanh tối 80, lưới 12: logo cột 1–3, ô cột 4–11, đóng cột 12 | như 1280, logo x 252 |
 | Ô tìm | cao 48, chữ 16 | cao 48, chữ 16 | cao 52, chữ 18 | như 1280 |
-| Tab | cao 44, cuộn ngang, tab kế lộ ra | cao 44 | cao 40, bắt đầu cột 4 | như 1280 |
+| Tab | cao 44, padding 28, 16/500, cuộn ngang, tab kế lộ ra; hàng padding 16 | như 360 | cao 40 (Figma 1:490), bắt đầu cột 4; hàng padding 24 | như 1280 |
 | Tab All | 1 cột: gợi ý → sản phẩm dạng hàng (ảnh 64) → collection → bài viết | lưới 8: trái 3 cột (gợi ý, collection, bài viết, trang), phải 5 cột sản phẩm dạng hàng | lưới 12: trái 3 cột, phải 9 cột 4 card (213 rộng) | 4 card 246 rộng |
 | Tab Products | lưới 2 card | lưới 4 card | lưới 5 card | lưới 5 card |
 | Tab Collections / Articles / Pages | danh sách 1 cột | danh sách 1 cột, rộng 100% | như 768 | như 768 |
@@ -57,7 +75,7 @@ Token theo foundation §1. Khoảng cách viết bằng `--space-*`.
 | Chân | nút full width, cao 48 | trạng thái trái, nút phải | như 768, nút cao 52 | như 1280 |
 | Drawer | 90%, 1 cột như 360, nút chân full width | 420 | 480 | 480 |
 
-Khoảng cách: thân padding `--space-5` (24) / `--space-6` (32) từ 80rem; giữa các nhóm `--space-6`; tiêu đề nhóm → nội dung `--space-2`; hàng option cao 44; hàng sản phẩm cao 80; card gap `--space-5`; chân padding `--space-3`.
+Khoảng cách: thân padding `--space-5` (24) / `--space-6` (32) từ 80rem; giữa các nhóm `--space-6`; tiêu đề nhóm → nội dung `--space-2`; hàng option cao 44; hàng sản phẩm cao 80; card gap `--space-5`; card media → tên `--space-2`, tên → giá `--space-1` (Figma 1:502); badge cách mép media `--space-2` (`--space-4` từ 64rem, như `.product-card__badges`); chân padding `--space-3`.
 
 Thứ tự tab bàn phím và phím mũi tên theo DOM (gợi ý → sản phẩm → collection → bài viết); desktop nhìn theo hình chữ Z (trái trên → phải → trái dưới). Mobile thứ tự nhìn trùng DOM (06 §2).
 
@@ -101,7 +119,9 @@ Default "Popular searches" lấy từ tên sản phẩm thật trong demo-data. 
 | Lỗi | mạng lỗi, 5xx, quá 5s | hộp `.alert` (viền sale, icon ! sale): "Suggestions are unavailable right now" + "Check your connection and try again, or press Enter to see all results for “q”." + nút secondary "Try Again"; `role="alert"`; nút chân vẫn mở trang kết quả | 7 |
 | Hover option | chuột | nền `--color-background-alt`, < 150ms | 1 (card 1) |
 | Option đang chọn (phím) | `aria-selected="true"` | nền alt + viền trong 2px `--color-foreground`; card desktop: viền ngoài 2px offset 4 + gạch chân tên | 1 ("adjustable bench") |
-| Focus ô tìm | `:focus-within` | viền + outline 2px `--color-accent` (foundation §12) | 5, 6 |
+| Focus ô tìm | `:focus-within` | popup (nền tối): viền + outline 2px trắng offset −1; drawer (nền sáng): viền + outline 2px `--color-accent` (foundation §12) | 5, 6 |
+| Hover ô tìm / nút đóng (popup) | chuột | ô: viền trắng; nút đóng: nền trắng, icon tối | — |
+| Focus trên thanh tối | `:focus-visible` | outline 2px trắng (accent trên dark 3.48, foundation §3.2) | — |
 | Tab hover / chọn | | foundation §7 (viền foreground / nền foreground chữ trắng) | 2 |
 | Chip hover | | viền foreground | 5 ("bench") |
 
@@ -139,8 +159,12 @@ Thêm: `placeholder` "Search benches, kettlebells, mats…" (04 §3.7, 11 §1: p
 | --- | --- |
 | chữ option / tên sản phẩm `--color-foreground` trên trắng; trên alt (hover) | 17.4; 15.8 |
 | tiêu đề nhóm, meta "6 products", ngày, status `--color-muted` trên trắng; trên alt | 8.45; 7.69 |
-| placeholder `--color-muted-light` / trắng | 5.33 |
-| viền ô tìm `--color-muted-light` (sổ quyết định 09/11) | 5.33 (≥ 3) |
+| placeholder drawer `--color-muted-light` / trắng | 5.33 |
+| viền ô tìm drawer `--color-muted-light` (sổ quyết định 09/11) | 5.33 (≥ 3) |
+| thanh tối popup: chữ ô tìm, icon submit, nút đóng, logo trắng / dark | 17.4 |
+| thanh tối popup: placeholder, nút xoá, viền ô `--color-muted-on-dark` / dark | 6.11 (sổ 09/11) |
+| thanh tối popup: outline focus trắng / dark | 17.4 |
+| badge -N% `--color-sale-foreground` / `--color-sale` | 6.38 |
 | giá sale `--color-sale` trên trắng; trên alt | 6.38; 5.80 |
 | tab chọn: background / foreground | 17.4 |
 | chip: foreground / alt | 15.8 |
@@ -170,6 +194,7 @@ Không animate chiều cao khung khi số kết quả đổi (tránh xô lệch)
 - LCP: overlay không bao giờ là LCP. Dialog đóng lúc tải trang (`display: none`), không ảnh nào trong dialog tải; LCP vẫn là ảnh đầu trang của template (hero / banner). Không mở search tự động.
 - Ảnh lazy: mọi ảnh trong overlay. Ảnh kết quả do JS tạo từ `<template>` sau khi gõ (code). Ảnh "Trending now" render bằng `snippets/image.liquid` với `loading="lazy"` bên trong dialog đóng, hoặc trong `<template>` chèn khi mở (sổ quyết định 09/11: ảnh trong popup tải khi mở); `sizes` 64px (hàng) / `(min-width: 80rem) 250px, 50vw` (card); srcset tới 480. Có `width`/`height` → 0 CLS.
 - Font: Inter (body, ô tìm, option) + Sofia Sans Condensed (h2 drawer). Không font mới.
+- Thanh tối popup dùng lại `noise-dark.png` của header (đã tải, cache), không thêm request. Badge -N% tính từ `compare_at_price` trả về (dữ liệu động, sổ 07/11), không ảnh.
 - JS: `predictive-search.js` ≤ 8 KB gồm tab + recent searches; tải module khi trang tải nhưng chỉ fetch khi gõ; trang ≤ 40 KB. Nếu vượt 8 KB: tách recent searches thành module nạp khi mở.
 - CLS: overlay `position: fixed` trên trang, không đẩy layout; skeleton đúng kích thước nội dung; chân và hàng đầu cố định.
 - A11y (Lighthouse chỉ đo trạng thái tải, dialog đóng; QA axe khi mở): rủi ro `aria-required-children` (heading/link không option trong listbox) → khám phá, hộp 0 kết quả, nút "View all" để ngoài listbox; `nested-interactive` → option là `<a>`, không bọc; `aria-dialog-name` → h2; `button-name` → mọi nút icon có `aria-label`; `color-contrast` → bảng §8; `label` → `<label for>` thật; `target-size` → §8.
@@ -180,9 +205,10 @@ Không animate chiều cao khung khi số kết quả đổi (tránh xô lệch)
 
 | Phần | Hiện có | Thay đổi đề xuất | Phía |
 | --- | --- | --- | --- |
-| Khung | `.predictive-search-dialog` full màn / dải trên ≥ 48rem | thêm hàng logo + lưới 12 ≥ 80rem; biến thể drawer `[data-style="drawer"]`; h2 ẩn + `aria-labelledby` thay `aria-label` | FE |
-| Form | input 44, viền `--color-border`, submit icon ở cuối | ô cao `--control-height`, viền `--color-muted-light` (sổ 09/11), submit kính lúp đầu ô, nút xoá `data-testid="predictive-search-clear"`, placeholder mới | FE |
-| Tab | — | tablist `data-testid="predictive-search-tabs"`, tab `data-predictive-tab="all|products|collections|articles|pages"`, tabpanel bọc listbox; dùng `.tab` + biến thể nhỏ | FE markup, BE logic |
+| Khung | `.predictive-search-dialog` full màn / dải trên ≥ 48rem | hàng đầu nền `--color-background-dark` + noise (cùng nền `.site-header`), cao `--header-height`; thêm logo + lưới 12 ≥ 80rem; biến thể drawer `[data-style="drawer"]` nền trắng; h2 ẩn + `aria-labelledby` thay `aria-label` | FE |
+| Form | input 44, viền `--color-border`, submit icon ở cuối | ô cao `--control-height`, submit kính lúp đầu ô, nút xoá `data-testid="predictive-search-clear"`, placeholder mới; popup: viền `--color-muted-on-dark`, chữ `--color-background-dark-foreground`, focus trắng (như input footer); drawer: viền `--color-muted-light` (sổ 09/11) | FE |
+| Tab | — | tablist `data-testid="predictive-search-tabs"`, tab `data-predictive-tab="all|products|collections|articles|pages"`, tabpanel bọc listbox; dùng đúng style `.featured-collection__tab` (Figma 1:490), không biến thể nhỏ | FE markup, BE logic |
+| Badge card | — | dạng card dùng lại `.product-card__badge` sale (-N%) từ `snippets/price`/product-card; dạng hàng không badge | FE |
 | Nhóm từ khoá | — | group `data-predictive-group="queries"`, template `data-predictive-template="query"` (`<mark>` phần khớp) | FE + BE |
 | Sản phẩm | hàng ảnh 64 | ≥ 80rem trong popup tab All thành card 1:1 (4 cột), tab Products lưới 2/4/5 | FE |
 | "View all" | option cuối trong listbox | chuyển ra chân, `.button`, giữ `data-testid="predictive-search-all"`; nhãn đổi theo tab | FE + BE |
@@ -194,10 +220,11 @@ Ticket con theo `.claude/rules/fe-be-boundary.md`: FE1 markup + CSS (test id ở
 
 ## 12. Token dùng
 
-Màu: `--color-background`, `--color-foreground`, `--color-muted`, `--color-muted-light`, `--color-border`, `--color-background-alt`, `--color-background-cream`, `--color-accent(-foreground)`, `--color-sale`, `--overlay-scrim`. Chữ: `--font-primary--family`, `--font-heading--family/weight`, `--font-size-sm/base/lg/h3`. Khoảng cách: `--space-1..6`, `--control-height`, `--header-height`, `--grid-gap`, `--page-width`, `--page-margin`. Bo: `--radius-input`, `--radius-card`, `--radius-pill`. Motion: `--motion-fast/base/slow`, `--ease-out`. Bóng: `--shadow-overlay`. Không token mới.
+Màu: `--color-background`, `--color-foreground`, `--color-muted`, `--color-muted-light`, `--color-border`, `--color-background-alt`, `--color-background-cream`, `--color-background-dark(-foreground)`, `--color-muted-on-dark`, `--color-accent(-foreground)`, `--color-sale(-foreground)`, `--overlay-scrim`; nền tối kèm `assets/noise-dark.png` (đã dùng ở header, footer). Chữ: `--font-primary--family`, `--font-heading--family/weight`, `--font-size-sm/base/lg/h3`. Khoảng cách: `--space-1..6`, `--control-height`, `--header-height`, `--grid-gap`, `--page-width`, `--page-margin`. Bo: `--radius-input`, `--radius-card`, `--radius-pill`. Motion: `--motion-fast/base/slow`, `--ease-out`. Bóng: `--shadow-overlay`. Không token mới.
 
-## 13. Quyết định CTO cần chốt
+## 13. Quyết định CTO đã chốt (10/11)
 
-1. Mobile 360 kiểu mặc định là popup toàn màn (SRS TE-8 AC1, code hiện có) hay drawer phải 90% (15 §2, foundation §15)? Đề xuất: giữ toàn màn cho kiểu Popup (mặc định), drawer 90% là kiểu thứ hai qua setting "Search style"; foundation §15 ghi rõ drawer search chỉ áp khi chọn Drawer.
-2. Số trên tab: predictive search không trả tổng, chỉ trả tối đa `limit` gợi ý mỗi loại. Hiện số gợi ý (đủ 8 ghi "8+") hay bỏ số? Đề xuất: hiện số, "8+" khi chạm giới hạn; tổng thật nằm ở trang /search.
-3. Thêm 3 setting header (Popular searches, Popular collections, Trending products) cho trạng thái rỗng và 0 kết quả? Đề xuất: có; rỗng thì ẩn khối, demo điền dữ liệu thật; không có khối này thì trạng thái 0 kết quả không đạt 11 §5.
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
+1. Mobile 360 kiểu Popup (mặc định) là toàn màn với thanh tối 80 ở đầu (SRS TE-8 AC1), drawer phải 90% chỉ khi chọn "Search style: Drawer"? Đề xuất: có (§1, foundation §15).
+2. Số trên tab là số gợi ý trả về (predictive search không trả tổng), chạm giới hạn 8 thì ghi "8+"? Đề xuất: có, tổng thật ở trang /search (§4).
+3. Thêm 3 setting header (Popular searches, Popular collections, Trending products) cho trạng thái rỗng và 0 kết quả, rỗng thì ẩn khối? Đề xuất: có, thiếu thì 0 kết quả không đạt 11 §5 (§5).

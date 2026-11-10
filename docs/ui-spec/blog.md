@@ -8,16 +8,28 @@ Figma: không có trang blog. Dùng ngôn ngữ trang chủ: block Blog posts 1:
 Mockup: `drafts/designer/ES1-T257/blog.html` + `blog-360|768|1280|1920.png`. Trạng thái ở cuối file.
 Spec trang bài viết: `docs/ui-spec/article.md`.
 
+## Thay đổi so với vòng 2
+
+| # | Phần | Vòng 2 | Vòng 3 | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Header | biến thể A nền trắng, viền dưới | thanh tối `--color-background-dark` + noise, cao 80, logo 100 × 30, menu trắng 60%, "Blog" trắng 100% + gạch chân 2px (`aria-current`); search 20, account/cart 24 | Sổ 10/11, Figma 1:362, F§3 |
+| 2 | Footer | newsletter 2 cột, panel trong container, 3 social, wordmark tách hàng | markup kit vòng 3: ảnh 98 × 123 + chữ + form · panel dải rộng bo 16 · 4 social (TikTok, Instagram, YouTube, Facebook) · wordmark giữa hàng copyright và localization (cờ + USD / EN) | Figma 1:1104, F§4 |
+| 3 | Card bài viết: padding nội dung | 16 mọi mốc (kit) | 16 dưới 48rem, 24 từ 48rem | Figma 1:1030 (padding 24), `assets/base.css` `.article-card__content` |
+| 4 | Card bài viết: meta "ngày · thời gian đọc" | `--color-muted-on-dark` (#999) | chữ trắng `--color-background-dark-foreground`, như code | Code ES1-T174 mục 4; sổ 09/11 A11y 100 (xem §6) |
+| 5 | Nền tối, tương phản | #1E1E1E, 16.7:1 | #1A1A1A, 17.4:1 (card không ảnh) | F§2 bảng tương phản |
+
+Giữ nguyên: anatomy, lọc tag, bài nổi bật, lưới 1/2/3/4 cột, phân trang, mọi trạng thái, 3 câu CTO. Lệch còn lại với Figma (P4): gradient card bắt đầu 50% thay 63.72% theo F§10 (ĐỀ XUẤT chung của foundation, chưa chốt).
+
 ## 1. Anatomy
 
 Thứ tự giữ nguyên ở mọi mốc (06 §2).
 
-1. Header biến thể A, nền trắng (F§3; sổ quyết định 09/11: trang không có ảnh lớn đầu trang). Mục menu "Blog" có `aria-current="page"`.
+1. Header tối dùng chung (F§3; sổ 10/11: mọi trang một biến thể, không đè ảnh). Mục menu "Blog" có `aria-current="page"` (trắng 100% + gạch chân 2px).
 2. Breadcrumb (F§5): `Home / {blog.title}`; trang lọc tag: `Home / {blog.title} / {tag}`.
 3. Tiêu đề trang (F§5): eyebrow "From the Efitco blog" (Figma 1:1024, accent) · h1 `{blog.title}` · meta số bài ("4 articles"; trang tag: "2 articles tagged Diet plans").
 4. Lọc chủ đề: `<nav aria-label="Blog topics">` + `<ul>` link thật tới `{blog.url}/tagged/{tag | handle}`; mục đầu "All" về `blog.url`. Dáng tab F§7, mục đang xem `aria-current="page"` (nền foreground, chữ background). Nguồn `blog.all_tags`, thứ tự chữ cái như Shopify trả.
 5. Bài nổi bật (trang 1, không lọc tag, setting bật): bài mới nhất. Ảnh 4/3 bo 16 · tag pill (tag đầu) · h2 tiêu đề (link duy nhất, `::after` phủ cả khối) · excerpt (`article.excerpt_or_content | strip_html | truncatewords: 30`) · meta: ngày · thời gian đọc.
-6. Lưới card: các bài còn lại, card Figma 1:1022 (snippet `article-card`): ảnh 3/4 phủ kín + gradient, tag pill accent phải trên, tiêu đề Inter 700 18/28 trắng tối đa 3 dòng, meta 14/500 `--color-muted-on-dark` "Nov 4, 2026 · 5 min read".
+6. Lưới card: các bài còn lại, card Figma 1:1022 (snippet `article-card`): ảnh 3/4 phủ kín + gradient, tag pill accent phải trên cách 12, nội dung padding 16 (24 từ 48rem, Figma 1:1030), tiêu đề Inter 700 18/28 trắng tối đa 3 dòng, meta 14/500 chữ trắng "Nov 4, 2026 · 5 min read".
 7. Phân trang (khi số bài > Articles per page).
 8. Footer (F§4).
 
@@ -68,7 +80,7 @@ Figma không có trạng thái nào; tất cả dưới đây là ĐỀ XUẤT t
 | Lọc tag | URL `/tagged/{tag}` | breadcrumb thêm tag, meta "N articles tagged {tag}", tab tag `aria-current`, không có bài nổi bật, lưới bắt đầu ngay | 04 §4 (active rõ) |
 | Blog rỗng | `blog.articles_count == 0` | ẩn lọc và meta; empty state F§18: icon bài viết, h2 "No Articles Yet", câu "New training tips are on the way. Until then, find the right gear for your next session.", primary "Explore Equipment" (Figma CTA) → `routes.all_products_collection_url`, text link "Back to homepage" | AGENTS empty state (trang rỗng là nội dung), 05 §7 |
 | Tag không có bài | tag trong URL không còn bài | giữ lọc; h2 "No Articles On This Topic", "Try another topic above or browse every article.", primary "View All Articles" → `blog.url` | 05 §7 |
-| Không ảnh | `article.image` rỗng | card nền `--color-background-dark` (chữ 16.7:1); bài nổi bật khung 4/3 cùng màu | F§10, DESIGN Images |
+| Không ảnh | `article.image` rỗng | card nền `--color-background-dark` (chữ 17.4:1); bài nổi bật khung 4/3 cùng màu | F§10, DESIGN Images |
 | Không tag | `article.tags` rỗng | không pill | snippet hiện có |
 | Không thời gian đọc | `article.content` rỗng | chỉ còn ngày | AC-H27 |
 | Đang tải | chỉ khi BE làm lọc tag không tải lại trang (partial) | lưới `aria-busy`, 4 skeleton 3/4, "Loading articles" trong `role="status"` | F§18; không JS thì link tải lại trang, không có trạng thái này |
@@ -100,9 +112,11 @@ Lọc tag mặc định là link thật, tải lại trang (AGENTS "Works withou
 | accent / background | 5.01 | eyebrow |
 | accent-foreground / accent | 5.01 | tag pill |
 | muted-light / background | 5.33 | dấu "/" breadcrumb, nút phân trang disabled |
-| background-dark-foreground / background-dark | 16.7 | card không ảnh |
+| background-dark-foreground / background-dark | 17.4 | card không ảnh |
+| background-dark-foreground / header tối | 17.4 | logo, icon, menu đang xem |
+| menu trắng 60% / header tối | 6.93 | menu header |
 
-Chữ trên ảnh card: tiêu đề trắng và meta `--color-muted-on-dark` nằm trên gradient tối (kit `.article-card::before`, 50% → `--color-background-dark` ở đáy, F§10). Meta ở ~93% chiều cao card, độ phủ tối ~86%: trắng đạt ≥ 4.5 kể cả ảnh trắng (L nền ≤ 0.151 → 5.2:1); `#999` chỉ đạt khi đáy ảnh tối (4 ảnh demo đều tối ở đáy). Giữ màu Figma 1:1032 theo sổ quyết định 07/11 (card label như Figma). Hướng dẫn merchant: ảnh bìa có phần dưới tối hoặc trơn.
+Chữ trên ảnh card: tiêu đề và meta trắng nằm trên gradient tối (kit `.article-card::before`, 50% → `--color-background-dark` ở đáy, F§10). Meta ở ~93% chiều cao card, độ phủ tối ~86%: trắng đạt ≥ 4.5 kể cả ảnh trắng (L nền ≤ 0.151 → 5.2:1). `#999` của Figma 1:1032 chỉ đạt khi đáy ảnh tối, nên vòng 3 theo code (ES1-T174) dùng trắng: sổ 09/11 đặt A11y 100 là ưu tiên số 1 (lệch Figma P3, có lý do). Hướng dẫn merchant: ảnh bìa có phần dưới tối hoặc trơn.
 - Heading: h1 (tên blog) → h2 (bài nổi bật, từng card) → h2 footer. Card truyền `heading_tag: 'h2'`.
 - Mỗi card/bài nổi bật đúng 1 link, tên link = tiêu đề bài (18 §link mô tả đích); ảnh trang trí `alt=""` vì tiêu đề đã gọi tên link (snippet hiện có). Tag pill trong card không phải link (tránh link lồng link).
 - Tab lọc: `<a>` có `aria-current="page"`, không dùng `role="tab"` (đây là điều hướng, không phải tabpanel).
@@ -113,7 +127,8 @@ Chữ trên ảnh card: tiêu đề trắng và meta `--color-muted-on-dark` n�
 ## 7. Lighthouse
 
 - LCP: ảnh bài nổi bật (`loading="eager"`, `fetchpriority="high"`, 1 ảnh duy nhất, AGENTS Images). Trang lọc tag (không có bài nổi bật) và khi tắt "Feature the newest article": ảnh card đầu tiên eager + high, như hàng card đầu của collection không banner (ES1-T113). Trang 2+: như trang tag.
-- Lazy: mọi ảnh card còn lại, ảnh footer.
+- Lazy: mọi ảnh card còn lại, ảnh footer (ảnh newsletter 98 × 123).
+- Header tối: noise là `background-image` 1 file nhỏ đã có (`assets/noise-dark.png`), nằm trong critical.css, không tranh LCP (F§3.4).
 - Ảnh: `snippets/image.liquid`, srcset 360/720/1080/1440; bài nổi bật `sizes="(min-width: 48rem) 58vw, 100vw"`, card `sizes="(min-width: 80rem) 336px, (min-width: 64rem) 33vw, (min-width: 48rem) 50vw, 100vw"`; width/height đủ, `object-fit: cover` (BP: đúng tỉ lệ).
 - Font: Sofia Sans Condensed (eyebrow, h1, tiêu đề nổi bật) + Inter (còn lại), 2 họ, preload 1 (ADR 0003).
 - JS: 0 file riêng cho trang (lọc, phân trang là link). Không có carousel trên trang blog.
@@ -135,15 +150,17 @@ Motion: `--motion-slow`, `--ease-out`, `--ease-expo`. Không thêm token.
 
 | Phần | Có sẵn | Cần làm (Dev FE) |
 | --- | --- | --- |
-| Card | `snippets/article-card.liquid`, `.article-card*` | tham số `heading_tag`, `show_date`; meta 2 phần ngăn "·" |
+| Header, footer | `.site-header*`, `.site-footer*` (F§21) | bỏ điều kiện `body:has(.slideshow)` để trang blog có header tối (việc chung F§21) |
+| Card | `snippets/article-card.liquid`, `.article-card*` (padding 24 từ 48rem, meta trắng: đã đúng) | tham số `heading_tag`, `show_date`; meta 2 phần ngăn "·" |
 | Tiêu đề trang, breadcrumb | — (F§21) | dùng chung theo F§5 |
 | Lọc chủ đề | `.featured-collection__tab` (dáng) | `<nav>` link + `aria-current` |
 | Bài nổi bật, phân trang, empty state | — | mới, class theo block |
 | Template | `templates/blog.liquid` thô | thay bằng `container` + block `blog-articles` |
 | Chuỗi | `blog.*` có sẵn 7 khoá | thêm: `blog.topics_label`, `blog.all_topics`, `blog.articles_count` (one/other), `blog.tagged_count`, `blog.empty_*`, `blog.empty_tag_*`, `blog.pagination.*`, `blog.loading`; dùng `blocks.blog_posts.read_time` có sẵn |
 
-## 10. Quyết định CTO cần chốt
+## 10. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Trang blog có bài nổi bật (bài mới nhất, ảnh 4/3 + excerpt) ở trang 1, phần còn lại là card Figma 1:1022 không có excerpt; AC3 "excerpt_or_content" đáp ứng ở bài nổi bật và trang bài viết? Đề xuất: có. Card Figma giữ nhịp với trang chủ (06 §1); thêm excerpt vào card phủ ảnh làm vùng tối phải cao hơn và vỡ dáng Figma.
 2. Card trên trang blog hiện "ngày · thời gian đọc" (trang chủ giữ chỉ thời gian đọc như Figma) qua tham số `show_date`? Đề xuất: có (AC3 published_at; mặc định false nên trang chủ không đổi).
 3. Lưới card 1 cột ở 360 (card 320 × 427, trang dài hơn) thay vì 2 cột 152 × 203? Đề xuất: 1 cột; 2 cột làm tiêu đề 18px 3 dòng tràn vùng gradient và tag che nửa ảnh.

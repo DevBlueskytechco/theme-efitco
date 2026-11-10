@@ -15,23 +15,10 @@
   .collection-head__desc { max-width: 65ch; color: var(--color-muted); }
   @media (min-width: 64rem) { .collection-head .page-title { padding-block: var(--space-3) var(--space-6); } }
 
-  /* §3 Banner có ảnh (biến thể B, header đè ảnh) */
-  .banner-wrap { position: relative; }
-  .banner { position: relative; display: grid; align-items: end; min-height: 360px; overflow: hidden; background: var(--color-background-dark); color: var(--color-background-dark-foreground); }
-  .banner > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-  .banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom,
-      color-mix(in srgb, var(--color-background-dark) 55%, transparent) 0%,
-      color-mix(in srgb, var(--color-background-dark) 30%, transparent) 30%,
-      color-mix(in srgb, var(--color-background-dark) 70%, transparent) 55%,
-      color-mix(in srgb, var(--color-background-dark) 80%, transparent) 100%); }
-  .banner__content { position: relative; z-index: 1; display: grid; gap: var(--space-2); width: var(--content-width); margin-inline: auto; padding-block-end: var(--space-6); }
-  .banner .breadcrumb { padding: 0; }
-  .banner .breadcrumb a, .banner .breadcrumb [aria-current], .banner .breadcrumb li + li::before { color: var(--color-background-dark-foreground); }
-  .banner__desc { max-width: 56ch; }
-  /* Chữ thẳng mép logo: banner lùi 12 nên nội dung chỉ lùi thêm (lề trang − 12) */
-  @media (min-width: 48rem) { .banner-wrap { padding-inline: var(--space-3); } .banner { min-height: 400px; border-radius: var(--radius-dialog); } .banner__content { width: min(calc(var(--page-width) - var(--page-margin) * 2), calc(100% - (var(--page-margin) - var(--space-3)) * 2)); } }
-  @media (min-width: 80rem) { .banner { min-height: 480px; } .banner__content { padding-block-end: var(--space-7); } }
-  @media (min-width: 120rem) { .banner { min-height: 560px; } }
+  /* §4B Banner có ảnh: .page-banner của kit (foundation §3.3) — thẻ bo 16 NẰM DƯỚI header tối, không đè (sổ 10/11) */
+  .page-banner .h1 { font-family: var(--font-heading--family); font-weight: var(--font-heading--weight); letter-spacing: -0.02em; }
+  .page-banner + .collection-layout { margin-block-start: var(--space-5); }
+  @media (min-width: 64rem) { .page-banner + .collection-layout { margin-block-start: var(--space-6); } }
 
   /* §4 Bố cục: cột lọc 3/12 + kết quả 9/12 từ 64rem */
   .collection-layout { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: var(--grid-gap); padding-block-end: var(--section-gap); }
@@ -121,22 +108,27 @@
   /* §8 Phân trang */
   .pagination { margin-block-start: var(--space-7); }
   @media (min-width: 80rem) { .pagination { margin-block-start: calc(var(--space-1) * 16); } }
+  /* Previous / Next = nút tròn 52 chevron của kit (Figma 1:398, sổ 09/11): trắng viền border, hover cam */
   .pagination ul { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-  .page-link { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-width: 48px; min-height: 48px; padding-inline: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-button); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-base); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
+  .pagination .round-button { text-decoration: none; }
+  .pagination .round-button--prev { margin-inline-end: var(--space-2); }
+  .pagination .round-button--next { margin-inline-start: var(--space-2); }
+  .page-link { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
   a.page-link:hover, .page-link.is-hover { border-color: var(--color-foreground); }
   .page-link[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
-  .page-link--step { padding-inline: var(--space-4); }
-  .page-link--step svg { width: 18px; height: 14px; }
-  .page-link--prev svg { scale: -1 1; }
   .page-gap { display: inline-grid; place-items: center; min-width: 24px; color: var(--color-muted); }
   .page-status { color: var(--color-muted); font-size: var(--font-size-sm); white-space: nowrap; }
   .page-num { display: none; }
-  /* < 48rem: Previous · Page X of Y · Next trải hết hàng, không tràn khi số trang 2 chữ số */
+  /* < 48rem: [‹ 52] Page X of Y [› 52] trải hết hàng */
   @media (max-width: 47.99rem) {
-    .pagination ul { justify-content: space-between; gap: var(--space-1); }
-    .page-link--step { gap: var(--space-1); padding-inline: var(--space-3); }
+    .pagination ul { justify-content: space-between; }
+    .pagination .round-button--prev, .pagination .round-button--next { margin: 0; }
+    .page-status-item:first-child { margin-inline-end: auto; }
   }
-  @media (min-width: 48rem) { .page-num { display: block; } .page-status-item { display: none; } .page-link { min-width: 44px; min-height: 44px; font-size: var(--font-size-sm); } }
+  @media (min-width: 48rem) { .page-num { display: block; } .page-status-item { display: none; } }
+
+  /* Swatch trên card là chỉ báo (foundation §9 vòng 3): aria-hidden, không bấm, click đi qua link card */
+  .swatches[aria-hidden='true'] { pointer-events: none; }
 
   /* Drawer lọc (dưới 64rem) */
   .demo-stage--drawer { min-height: 780px; }
@@ -172,12 +164,24 @@
   <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
   <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
   <symbol id="i-empty" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5v-9Z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></g></symbol>
+  <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
+  <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 28 28"><path d="M16 4v13.5a4.2 4.2 0 1 1-4.2-4.2M16 4c.4 3 2.4 5 5.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="20" height="20" rx="5"/><circle cx="14" cy="14" r="4.5"/><circle cx="19.6" cy="8.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="6.5" width="22" height="15" rx="4"/><path d="m12 11 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 28 28"><path d="M16.5 4.5h-2a4 4 0 0 0-4 4v3H8v3.5h2.5v8.5H14V15h3l.5-3.5H14V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
   <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
 </svg>
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- ===== Header A (nền trắng; collection không có ảnh) ===== -->
+<!-- ===== Header mọi trang: thanh tối riêng + noise, cao 80, không đè ảnh (sổ 10/11, Figma 1:362) ===== -->
 <header class="site-header demo-static">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -194,7 +198,7 @@
       </ul>
     </nav>
     <div class="site-header__icons">
-      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
     </div>
@@ -202,7 +206,7 @@
 </header>
 
 <main id="main">
-  <!-- Đầu trang A: breadcrumb + h1 (collections/all không có ảnh, không mô tả) -->
+  <!-- Đầu trang không ảnh: breadcrumb + h1 trên nền trắng dưới header tối (collections/all không có ảnh, không mô tả) -->
   <div class="container collection-head">
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <ol><li><a href="#">Home</a></li><li><a href="#">Collections</a></li><li><span aria-current="page">Products</span></li></ol>
@@ -280,7 +284,7 @@
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg" alt="Olympic Plate Set 100" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-15%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Olympic Plate Set 100</a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$289.00</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$339.00</s></p></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P17.jpg" alt="Compact Power Rack" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Compact Power Rack</a></h2><p class="price"><span>$549.00</span></p></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P16_b6c798cf-e03c-4995-b522-1737773992d2.png" alt="Ativafit Lava 66 lb" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Ativafit Lava 66 lb</a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p></div></li>
-        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable</a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p><ul class="swatches" role="radiogroup" aria-label="Color, Ativafit Lava 66 lb Adjustable"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li></ul></div></li>
+        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable<span class="visually-hidden">, 2 colors</span></a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p><ul class="swatches" aria-hidden="true"><li><span class="swatch is-selected"style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch"style="--swatch: var(--color-muted-light)"></span></li></ul></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P14.jpg" alt="Training mat" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Training mat</a></h2><p class="price"><span>$69.00</span></p></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P13.jpg" alt="Recovery roller" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Recovery roller</a></h2><p class="price"><span>$52.00</span></p></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P12.jpg" alt="Speed rope" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Speed rope</a></h2><p class="price"><span>$34.00</span></p></div></li>
@@ -291,10 +295,10 @@
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P07.jpg" alt="Compact Power Rack R3" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Compact Power Rack R3</a></h2><p class="price"><span>$549.00</span></p></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P06.jpg" alt="FlexFold Bench" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">FlexFold Bench</a></h2><p class="price"><span>$189.99</span></p></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg" alt="Ativafit Lava 66 lb" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Ativafit Lava 66 lb</a></h2><p class="price"><span>$379.99</span></p></div></li>
-        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg" alt="Revllen Pro Speed Rope" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-22%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Revllen Pro Speed Rope</a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$34.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$44.99</s></p><ul class="swatches" role="radiogroup" aria-label="Color, Revllen Pro Speed Rope"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul></div></li>
-        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg" alt="FlexFold Adjustable Bench" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$229.00</s></p><ul class="swatches" role="radiogroup" aria-label="Color, FlexFold Adjustable Bench"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul></div></li>
-        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="600" height="600"><div class="product-card__badges"><span class="badge badge--new">New</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg</a></h2><p class="price"><span>$119.00</span></p><ul class="swatches" role="radiogroup" aria-label="Color, Iron Core Kettlebell 16 kg"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul></div></li>
-        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable</a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p><ul class="swatches" role="radiogroup" aria-label="Color, Ativafit Lava 66 lb Adjustable 2"><li><span class="swatch" role="radio" aria-checked="true" aria-label="Black" tabindex="0" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="Gray" tabindex="-1" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" role="radio" aria-checked="false" aria-label="White" tabindex="-1" style="--swatch: var(--color-background)"></span></li></ul></div></li>
+        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg" alt="Revllen Pro Speed Rope" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-22%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Revllen Pro Speed Rope<span class="visually-hidden">, 3 colors</span></a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$34.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$44.99</s></p><ul class="swatches" aria-hidden="true"><li><span class="swatch is-selected"style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch"style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch"style="--swatch: var(--color-background)"></span></li></ul></div></li>
+        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg" alt="FlexFold Adjustable Bench" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">FlexFold Adjustable Bench<span class="visually-hidden">, 3 colors</span></a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$229.00</s></p><ul class="swatches" aria-hidden="true"><li><span class="swatch is-selected"style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch"style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch"style="--swatch: var(--color-background)"></span></li></ul></div></li>
+        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="600" height="600"><div class="product-card__badges"><span class="badge badge--new">New</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg<span class="visually-hidden">, 3 colors</span></a></h2><p class="price"><span>$119.00</span></p><ul class="swatches" aria-hidden="true"><li><span class="swatch is-selected"style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch"style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch"style="--swatch: var(--color-background)"></span></li></ul></div></li>
+        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable<span class="visually-hidden">, 3 colors</span></a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p><ul class="swatches" aria-hidden="true"><li><span class="swatch is-selected"style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch"style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch"style="--swatch: var(--color-background)"></span></li></ul></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/2-16686825872651420933582.jpg" alt="Sản phẩm số" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Sản phẩm số</a></h2><p class="price"><span>$343.00</span></p></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/1-1668682587206912817789.jpg" alt="Gift card" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Gift card</a></h2><p class="price"><span>From $10.00</span></p></div></li>
       </ul>
@@ -304,61 +308,97 @@
           <li class="page-status-item"><span class="page-status">Page 1 of 2</span></li>
           <li class="page-num"><span class="page-link" aria-current="page">1</span></li>
           <li class="page-num"><a class="page-link" href="#" aria-label="Page 2">2</a></li>
-          <li><a class="page-link page-link--step" href="#">Next<span class="visually-hidden"> page</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+          <li><a class="round-button round-button--next" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
         </ul>
       </nav>
     </div>
   </div>
 </main>
 
-<!-- ===== Footer (foundation §4, Figma 1:1104) ===== -->
+<!-- ===== Footer (foundation §4 vòng 3, Figma 1:1104) ===== -->
 <footer class="site-footer">
-  <div class="container">
+  <div class="container site-footer__band">
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
     <div class="site-footer__newsletter">
-      <div>
-        <h2><span>Get 15% Off</span> Your First Order</h2>
-        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
-      </div>
-      <form class="site-footer__form" onsubmit="return false">
-        <label class="visually-hidden" for="nl-email">Email</label>
-        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit">Get 15% Off</button></div>
-        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
-      </form>
+      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
-    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
-    <div class="site-footer__bottom"><p>© 2026 Efitco, Powered by Shopify</p></div>
+    <form class="site-footer__form" onsubmit="return false">
+      <label class="visually-hidden" for="nl-email">Email</label>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+  <div class="site-footer__panel">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <svg class="site-footer__logo" viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+        <ul class="site-footer__social">
+          <li><a href="#" aria-label="Efitco on TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        </ul>
+      </div>
+      <div class="site-footer__menus">
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
+    </div>
+    <ul class="site-footer__trust">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© 2026 Efitco, Powered by Shopify</p>
+    <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
+    <div class="site-footer__end">
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
+    </div>
   </div>
 </footer>
 
 <!-- ===================== TRẠNG THÁI (spec §9–§13) ===================== -->
 <div class="container demo-states">
 
-  <!-- S1. Biến thể B: collection có ảnh, header đè ảnh -->
+  <!-- S1. Collection có ảnh: header tối + banner thẻ bo góc bên dưới (không đè) -->
   <section class="demo-block" aria-labelledby="s1">
-    <h2 id="s1">S1. Collection có ảnh: banner + header đè ảnh</h2>
-    <p class="demo-note">Sổ quyết định 09/11. Ảnh minh hoạ: efx-col-1.jpg (card Free Weights trang chủ, Figma 1:395); collection Free Weights trên store dev chưa có ảnh (KHÔNG CHẮC). Overlay 55% đỉnh (vùng header) → 30% → 70–80% đáy (vùng chữ). Mobile tràn màn không bo; từ 768 cách mép 12, bo 24. Cao 360 / 400 / 480 / 560.</p>
+    <h2 id="s1">S1. Collection có ảnh: header tối, banner thẻ bo 16 nằm dưới header</h2>
+    <p class="demo-note">Sổ 10/11: header trang con luôn là thanh tối riêng, không đè ảnh. Banner = .page-banner foundation §3.3 (ngôn ngữ hero Figma 1:361): trong container, cách header 16 / 24, bo 16, cao tối thiểu 280 / 360, lớp tối 75% đáy → 60% từ giữa lên. Ảnh minh hoạ efx-col-1.jpg (card Free Weights, Figma 1:395); collection trên store dev chưa có ảnh, chưa có mô tả (KHÔNG CHẮC).</p>
   </section>
 </div>
-<div class="banner-wrap">
-  <header class="site-header site-header--overlay" style="z-index: 3">
+<div>
+  <header class="site-header demo-static">
     <div class="site-header__inner">
       <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
-      <a class="site-header__logo" href="#" aria-label="Efitco home, overlay sample"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
-      <nav class="site-header__nav" aria-label="Main, overlay sample">
+      <a class="site-header__logo" href="#" aria-label="Efitco home, banner sample"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+      <nav class="site-header__nav" aria-label="Main, banner sample">
         <ul class="site-header__menu"><li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li><li><a class="site-header__link" href="#" aria-current="page">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li><li><a class="site-header__link" href="#">Sale</a></li><li><a class="site-header__link" href="#">Our Story</a></li><li><a class="site-header__link" href="#">Blog</a></li><li><a class="site-header__link" href="#">Contact</a></li><li><a class="site-header__link" href="#">Help</a></li></ul>
       </nav>
       <div class="site-header__icons">
-        <a class="site-header__icon" href="#" aria-label="Search, overlay sample"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
-        <a class="site-header__icon" href="#" aria-label="Account, overlay sample"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
-        <a class="site-header__icon" href="#" aria-label="Cart, 2 items, overlay sample"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+        <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search, banner sample"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+        <a class="site-header__icon" href="#" aria-label="Account, banner sample"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+        <a class="site-header__icon" href="#" aria-label="Cart, 2 items, banner sample"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
       </div>
     </div>
   </header>
-  <div class="banner">
+  <div class="page-banner">
     <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-1.jpg" alt="" width="1920" height="1080" fetchpriority="high">
-    <div class="banner__content">
+    <div class="page-banner__content">
       <nav class="breadcrumb" aria-label="Breadcrumb, banner sample"><ol><li><a href="#">Home</a></li><li><a href="#">Collections</a></li><li><span aria-current="page">Free Weights</span></li></ol></nav>
-      <p class="h1" style="font-family: var(--font-heading--family); font-weight: var(--font-heading--weight); letter-spacing: -0.02em;">Free Weights</p>
+      <p class="h1">Free Weights</p>
+    </div>
+  </div>
+  <div class="container" style="margin-block-start: var(--space-5)">
+    <div class="toolbar" style="position: static">
+      <button class="button button--secondary toolbar__filter" type="button" aria-haspopup="dialog"><svg aria-hidden="true"><use href="#i-filter"/></svg>Filter</button>
+      <p class="toolbar__count"><strong>7</strong> products</p>
+      <div class="sort"><label for="sort-s1">Sort by</label><select class="field__input" id="sort-s1"><option>Featured</option></select></div>
     </div>
   </div>
 </div>
@@ -417,7 +457,10 @@
               <li><label class="fopt"><span class="fopt__swatch"><input type="checkbox" checked><span style="--sw: var(--color-foreground)"></span></span><span class="fopt__label">Black</span><span class="fopt__count">11</span></label></li>
               <li><label class="fopt"><span class="fopt__swatch"><input type="checkbox"><span style="--sw: var(--color-badge-new)"></span></span><span class="fopt__label">Green</span><span class="fopt__count">7</span></label></li>
               <li><label class="fopt"><span class="fopt__swatch"><input type="checkbox"><span style="--sw: var(--color-muted-light)"></span></span><span class="fopt__label">Gray</span><span class="fopt__count">5</span></label></li>
-            </ul><button class="show-more" type="button" aria-expanded="false">Show 7 more<span class="visually-hidden"> Color options</span></button></div>
+              <li><label class="fopt"><span class="fopt__swatch"><input type="checkbox"><span style="--sw: var(--color-background-sand)"></span></span><span class="fopt__label">Beige</span><span class="fopt__count">5</span></label></li>
+              <li><label class="fopt"><span class="fopt__swatch"><input type="checkbox"><span style="--sw: var(--color-background)"></span></span><span class="fopt__label">White</span><span class="fopt__count">4</span></label></li>
+              <li><label class="fopt"><span class="fopt__swatch"><input type="checkbox"><span style="--sw: var(--color-rating)"></span></span><span class="fopt__label">Gold</span><span class="fopt__count">4</span></label></li>
+            </ul><button class="show-more" type="button" aria-expanded="false">Show 4 more<span class="visually-hidden"> Color options</span></button></div>
           </details>
           <details class="fgroup">
             <summary>Size <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
@@ -437,7 +480,7 @@
   <!-- S4. Sort + phân trang -->
   <section class="demo-block" aria-labelledby="s4">
     <h2 id="s4">S4. Sắp xếp và phân trang</h2>
-    <p class="demo-note">Sort là `select` gốc (OS mở danh sách; trên mobile là picker của hệ điều hành). Nhãn "Sort by" nằm trong ô (12px), giá trị 16px. Tên tuỳ chọn do Shopify trả (`sort_options`). Phân trang: ≥ 768 số trang; dưới 768 Previous · Page X of Y · Next.</p>
+    <p class="demo-note">Sort là `select` gốc (OS mở danh sách; trên mobile là picker của hệ điều hành). Nhãn "Sort by" nằm trong ô (12px), giá trị 16px. Tên tuỳ chọn do Shopify trả (`sort_options`). Phân trang: Previous/Next là nút tròn 52 chevron như Figma 1:398 (trắng viền #E5E5E5, rê chuột cam); ≥ 768 số trang tròn 44; dưới 768 [‹] Page X of Y [›].</p>
     <div class="state-pair">
       <div class="state-box">
         <p class="demo-label">Sort: mặc định · hover · focus · danh sách mở (desktop)</p>
@@ -454,16 +497,16 @@
         <p class="demo-label">Trang 2 / 2</p>
         <nav class="pagination" aria-label="Pagination, page 2 sample" style="margin: 0 0 var(--space-6)">
           <ul>
-            <li><a class="page-link page-link--step page-link--prev" href="#"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Previous<span class="visually-hidden"> page</span></a></li>
+            <li><a class="round-button round-button--prev" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
             <li class="page-status-item"><span class="page-status">Page 2 of 2</span></li>
             <li class="page-num"><a class="page-link" href="#" aria-label="Page 1">1</a></li>
             <li class="page-num"><span class="page-link" aria-current="page">2</span></li>
           </ul>
         </nav>
-        <p class="demo-label">Trang 5 / 9, có dấu …; hover trang 4, focus Next</p>
+        <p class="demo-label">Trang 5 / 9, có dấu …; hover Previous (cam), hover trang 4, focus Next</p>
         <nav class="pagination" aria-label="Pagination, long sample" style="margin: 0">
           <ul>
-            <li><a class="page-link page-link--step page-link--prev" href="#"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Previous<span class="visually-hidden"> page</span></a></li>
+            <li><a class="round-button round-button--prev is-hover" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
             <li class="page-status-item"><span class="page-status">Page 5 of 9</span></li>
             <li class="page-num"><a class="page-link" href="#" aria-label="Page 1">1</a></li>
             <li class="page-num"><span class="page-gap">…</span></li>
@@ -472,7 +515,7 @@
             <li class="page-num"><a class="page-link" href="#" aria-label="Page 6">6</a></li>
             <li class="page-num"><span class="page-gap">…</span></li>
             <li class="page-num"><a class="page-link" href="#" aria-label="Page 9">9</a></li>
-            <li><a class="page-link page-link--step is-focus" href="#">Next<span class="visually-hidden"> page</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+            <li><a class="round-button round-button--next is-focus" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
           </ul>
         </nav>
       </div>
