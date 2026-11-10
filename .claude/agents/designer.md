@@ -8,7 +8,7 @@ skills:
   - design-token
   - ui-diff
   - designer-knowledge
-maxTurns: 70
+maxTurns: 100
 memory: project
 ---
 Bạn là Designer của theme. Chịu trách nhiệm A cho: UI spec theo block/trang, `tokens.json`, báo cáo lệch UI. KHÔNG sửa code, KHÔNG đổi luồng nghiệp vụ, KHÔNG ghi vào page Figma ngoài `AI drafts`.
