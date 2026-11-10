@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contact Us – Efitco</title>
+<meta name="description" content="Contact Efitco about an order, a product or your home gym setup. Send a message or find a quick answer about shipping, assembly and warranty.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* ES1-T258 · page + page.contact. Chỉ CSS riêng trang; phần chung ở ../_kit/kit.css */
+  .site-header.demo-static { position: relative; }
+
+  /* Rich text (page.content) — docs/ui-spec/page.md §RTE */
+  .rte { font-size: var(--font-size-base); line-height: 1.7; }
+  .rte > * { margin-block: 0; }
+  .rte > * + * { margin-block-start: var(--space-4); }
+  .rte > h2, .rte > h3, .rte > h4 { margin-block-start: var(--space-7); }
+  .rte > h2 + *, .rte > h3 + *, .rte > h4 + * { margin-block-start: var(--space-3); }
+  .rte > :first-child { margin-block-start: 0; }
+  .rte p, .rte li { max-width: 65ch; }
+  .rte h4 { font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 600; letter-spacing: 0; }
+  .rte a { font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+  .rte a:hover { color: var(--color-accent); }
+  .rte ul, .rte ol { display: grid; gap: var(--space-2); padding-inline-start: var(--space-5); }
+  .rte li::marker { color: var(--color-muted); }
+  .rte blockquote { margin-inline: 0; padding: var(--space-5) var(--space-6); border-inline-start: 4px solid var(--color-foreground); border-start-end-radius: var(--radius-card); border-end-end-radius: var(--radius-card); background: var(--color-background-sand); color: var(--color-background-sand-foreground); font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: -0.01em; line-height: 1.2; }
+  .rte blockquote footer { margin-block-start: var(--space-3); color: var(--color-muted); font-family: var(--font-primary--family); font-size: var(--font-size-sm); font-weight: 500; letter-spacing: 0; }
+  .rte > figure { margin-block: var(--space-6); }
+  .rte img { width: 100%; height: auto; border-radius: var(--radius-card); }
+  .rte figcaption { margin-block-start: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .rte .table-wrap { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+  .rte table { width: 100%; min-width: 30rem; border-collapse: collapse; font-size: var(--font-size-sm); line-height: 1.5; }
+  .rte th, .rte td { padding: var(--space-3) var(--space-4); border-block-end: 1px solid var(--color-border); text-align: start; vertical-align: top; }
+  .rte th { background: var(--color-background-alt); font-weight: 600; }
+  .rte tr:last-child td { border-block-end: 0; }
+  .rte hr { margin-block: var(--space-7); border: 0; border-block-start: 1px solid var(--color-border); }
+
+  /* Page mặc định: cột đọc căn giữa */
+  .page-narrow { width: min(100%, calc(var(--space-1) * 180)); margin-inline: auto; }
+  .page-narrow .page-title { padding-block-end: var(--space-6); }
+  @media (min-width: 64rem) { .page-narrow .page-title { padding-block-end: var(--space-7); } }
+
+  /* Contact */
+  .contact { display: grid; gap: var(--space-7); padding-block-end: var(--section-gap); }
+  .contact__intro { margin-block-end: var(--space-6); }
+  .contact-form { display: grid; gap: var(--space-5); }
+  .contact-form__head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-4); }
+  .contact-form__head h2 { font-size: var(--font-size-h3); }
+  .contact-form__req { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .contact-form__legal { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .contact-form__legal a { color: var(--color-foreground); }
+  .contact-form .button { width: 100%; }
+  @media (min-width: 48rem) { .contact-form .button { width: auto; min-width: calc(var(--space-1) * 50); justify-self: start; } }
+  .contact__aside { display: grid; align-content: start; gap: var(--space-5); padding: var(--space-6) var(--space-5); border-radius: var(--radius-dialog); background: var(--color-background-alt); color: var(--color-background-alt-foreground); }
+  .contact__aside .eyebrow { color: var(--color-accent); }
+  .contact__aside h2 { font-size: var(--font-size-h3); }
+  .contact__aside .accordion details > div { color: var(--color-muted); font-size: var(--font-size-sm); line-height: 1.6; }
+  .contact__aside .accordion summary { font-size: var(--font-size-base); }
+  .aside-links { display: grid; margin: 0; padding: 0; list-style: none; }
+  .aside-links a { display: flex; align-items: center; justify-content: space-between; min-height: 44px; font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+  .aside-links a:hover { color: var(--color-accent); }
+  .aside-links svg { width: 20px; height: 16px; flex: none; }
+  @media (min-width: 48rem) { .contact__aside { padding: var(--space-6); } }
+  @media (min-width: 80rem) {
+    .contact { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); }
+    .contact__main { grid-column: 1 / span 7; }
+    .contact__aside { grid-column: 9 / span 4; position: sticky; inset-block-start: calc(var(--header-height) + var(--space-5)); padding: calc(var(--space-1) * 10); }
+    .contact__aside .accordion summary { font-size: var(--font-size-base); }
+  }
+
+  /* Khu trạng thái cuối file */
+  .demo-states { padding-block: var(--space-7); }
+  .stage-white { padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background); }
+  @media (min-width: 48rem) { .stage-white { padding: var(--space-6); } }
+  .editor-hint { padding: var(--space-4) var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .state-grid { display: grid; gap: var(--space-6); }
+  @media (min-width: 80rem) { .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
+  <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
+  <symbol id="i-instagram" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="20" height="20" rx="5"/><circle cx="13" cy="13" r="4.5"/><circle cx="18.6" cy="7.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="5.5" width="22" height="15" rx="4"/><path d="m11 10 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 26 26"><path d="M15.5 4.5h-2a4 4 0 0 0-4 4v3h-2.5v3.5h2.5v8.5h3.5V15h3l.5-3.5h-3.5V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<a class="visually-hidden" href="#main">Skip to content</a>
+
+<!-- Header A (nền trắng, foundation §3) -->
+<header class="site-header demo-static">
+  <div class="site-header__inner">
+    <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+    <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+    <nav class="site-header__nav" aria-label="Main">
+      <ul class="site-header__menu">
+        <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Sale</a></li>
+        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Blog</a></li>
+        <li><a class="site-header__link" href="#" aria-current="page">Contact</a></li>
+        <li><a class="site-header__link" href="#">Help</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__icons">
+      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="#">Home</a></li>
+        <li><span aria-current="page">Contact Us</span></li>
+      </ol>
+    </nav>
+    <div class="page-title">
+      <h1>Contact Us</h1>
+    </div>
+
+    <div class="contact" data-testid="contact-page">
+      <div class="contact__main">
+        <!-- page.content (merchant soạn trong Pages) -->
+        <div class="rte contact__intro">
+          <p>Questions about an order, a product or your home gym setup? Send us a message with your order number and we'll help from there.</p>
+        </div>
+
+        <!-- {% form 'contact' %} -->
+        <form class="contact-form" id="ContactForm" action="#" method="post" novalidate data-testid="contact-form">
+          <div class="contact-form__head">
+            <h2>Send Us A Message</h2>
+            <p class="contact-form__req"><span aria-hidden="true">*</span> Required fields</p>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="field">
+              <label class="field__label" for="ContactForm-name">Name <span class="req" aria-hidden="true">*</span></label>
+              <input class="field__input" id="ContactForm-name" name="contact[name]" type="text" autocomplete="name" required aria-required="true">
+            </div>
+            <div class="field">
+              <label class="field__label" for="ContactForm-email">Email <span class="req" aria-hidden="true">*</span></label>
+              <input class="field__input" id="ContactForm-email" name="contact[email]" type="email" autocomplete="email" spellcheck="false" required aria-required="true">
+            </div>
+            <div class="field span-all">
+              <label class="field__label" for="ContactForm-body">Message <span class="req" aria-hidden="true">*</span></label>
+              <textarea class="field__input" id="ContactForm-body" name="contact[body]" rows="6" required aria-required="true" aria-describedby="ContactForm-body-hint"></textarea>
+              <p class="field__hint" id="ContactForm-body-hint">Add your order number if your message is about an order.</p>
+            </div>
+          </div>
+          <p class="contact-form__legal">We use your details only to reply to you. Read our <a class="text-link" href="#">Privacy policy</a>.</p>
+          <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Send Message</button>
+        </form>
+      </div>
+
+      <aside class="contact__aside" aria-labelledby="contact-faq-title">
+        <p class="eyebrow">Questions and Answers</p>
+        <h2 id="contact-faq-title">Quick Answers Before You Write</h2>
+        <div class="accordion">
+          <details open><summary>How long does shipping take?</summary><div><p>Orders ship within one business day. Standard delivery is 2-4 business days across the continental US, and shipping is free on orders over $99.</p></div></details>
+          <details><summary>Are adjustable dumbbells easy for beginners?</summary><div><p>Yes. The dial changes the weight in seconds, from 11 to 66 lb per hand, so you can start light and add load as you get stronger. There are no plates to swap.</p></div></details>
+          <details><summary>How much floor space do I actually need?</summary><div><p>A pair of adjustable dumbbells takes just 0.18 m² and fits under a desk. A complete corner setup fits in 2.4 x 2.0 m and folds flat when you're done.</p></div></details>
+          <details><summary>Does equipment arrive assembled?</summary><div><p>Adjustable dumbbells arrive ready to use, with no assembly needed. Other equipment varies, so check the product page before you order.</p></div></details>
+          <details><summary>What's covered by the warranty?</summary><div><p>Every item comes with a 12-month warranty, and you can return it within 90 days for your money back. Contact us with your order number and we'll help from there.</p></div></details>
+        </div>
+        <ul class="aside-links">
+          <li><a href="#">Shipping policy <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+          <li><a href="#">Refund policy <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+        </ul>
+      </aside>
+    </div>
+  </div>
+</main>
+
+<!-- Footer (Figma 1:1104, foundation §4) -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__newsletter">
+      <div>
+        <h2><span>Get 15% Off</span> Your First Order</h2>
+        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+      </div>
+      <form class="site-footer__form" action="#" method="post">
+        <label class="visually-hidden" for="nl-email">Email</label>
+        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+      </form>
+    </div>
+    <div class="site-footer__panel">
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <svg class="logo" viewBox="0 0 100 30" aria-label="Efitco" role="img"><use href="#i-logo"/></svg>
+          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+          <div class="site-footer__social"><a href="#" aria-label="Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a><a href="#" aria-label="YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a><a href="#" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></div>
+        </div>
+        <div class="site-footer__menus">
+          <div class="site-footer__menu"><details open><summary>Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+          <div class="site-footer__menu"><details open><summary>Information <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#" aria-current="page">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        </div>
+      </div>
+      <ul class="site-footer__trust">
+        <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+        <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+        <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+        <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+      </ul>
+    </div>
+    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
+    <div class="site-footer__bottom">
+      <p>© 2026 Efitco, Powered by Shopify</p>
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English">USD / EN <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== TRẠNG THÁI (không phải phần của trang) ===================== -->
+<section class="demo-states container" aria-label="States">
+  <p class="demo-label">ES1-T258 · page + page.contact · trạng thái</p>
+
+  <!-- S1: page mặc định -->
+  <div class="demo-block">
+    <h2>S1 · Page mặc định (templates/page.liquid): Our Story</h2>
+    <p class="demo-note">Cột đọc 720 căn giữa, đoạn văn tối đa 65ch. Đủ các phần tử RTE merchant hay dùng: h2, h3, đoạn, link, danh sách, trích dẫn, ảnh có chú thích, bảng, đường kẻ. Tiêu đề trong khung này là h1 khi dựng (ở đây dùng p.h1 để mockup chỉ có 1 h1).</p>
+    <div class="stage-white">
+      <div class="page-narrow">
+        <nav class="breadcrumb" aria-label="Breadcrumb, sample">
+          <ol><li><a href="#">Home</a></li><li><span aria-current="page">Our Story</span></li></ol>
+        </nav>
+        <div class="page-title"><p class="h1" style="margin:0;font-family:var(--font-heading--family);font-weight:var(--font-heading--weight);letter-spacing:-0.02em">Our Story</p></div>
+        <div class="rte">
+          <p>Affordable, high-quality fitness gear that supports beginners to elite athletes. We design for the home first — equipment that folds, stacks or disappears when you're done, so your living room stays a living room between sessions.</p>
+          <figure>
+            <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-why-b.jpg?width=1440" alt="Athlete training with adjustable dumbbells in a home gym">
+            <figcaption>Every product is tested in real homes before it ships.</figcaption>
+          </figure>
+          <h3>Why Choose Efitco?</h3>
+          <ul>
+            <li><strong>Uncompromising Quality:</strong> cast iron core, reinforced rubber.</li>
+            <li><strong>Rigorous Testing:</strong> a 12-month warranty on every item.</li>
+            <li><strong>Designed For Athletes:</strong> gear for every level, from Beginner to Advanced.</li>
+          </ul>
+          <blockquote>
+            <p>The rack folds flat against the wall. My garage is a garage again between sessions.</p>
+            <footer>Customer review, Compact Power Rack R3</footer>
+          </blockquote>
+          <h3>Shipping And Returns At A Glance</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">Topic</th><th scope="col">What to expect</th></tr></thead>
+              <tbody>
+                <tr><td>Dispatch</td><td>Within one business day</td></tr>
+                <tr><td>Delivery</td><td>2-4 business days across the continental US</td></tr>
+                <tr><td>Free shipping</td><td>Orders over $99</td></tr>
+                <tr><td>Returns</td><td>90 days for your money back</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>Read the full <a href="#">Shipping policy</a> or <a href="#">contact our team</a> with your order number.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S2–S4: form -->
+  <div class="demo-block">
+    <h2>S2–S4 · Form liên hệ: lỗi, đang gửi, gửi thành công</h2>
+    <p class="demo-note">Lỗi hiện khi rời trường và khi submit; submit lỗi thì hộp tóm tắt role="alert" đầu form và focus về trường lỗi đầu tiên. Shopify trả form.errors sau khi tải lại trang, form.posted_successfully? khi gửi được.</p>
+    <div class="state-grid">
+      <div class="stage-white">
+        <p class="demo-label">S2 · Lỗi (submit với 2 trường sai)</p>
+        <form class="contact-form" action="#" method="post" novalidate>
+          <div class="form-message form-message--error" role="alert" tabindex="-1">
+            <svg aria-hidden="true"><use href="#i-alert"/></svg>
+            <div><strong>Check 2 fields</strong><a class="text-link" href="#s2-name">Enter your name</a> · <a class="text-link" href="#s2-email">Enter a valid email</a></div>
+          </div>
+          <div class="form-grid form-grid--2">
+            <div class="field">
+              <label class="field__label" for="s2-name">Name <span class="req" aria-hidden="true">*</span></label>
+              <input class="field__input" id="s2-name" type="text" autocomplete="name" aria-invalid="true" aria-describedby="s2-name-err">
+              <p class="field__error" id="s2-name-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Enter your name.</p>
+            </div>
+            <div class="field">
+              <label class="field__label" for="s2-email">Email <span class="req" aria-hidden="true">*</span></label>
+              <input class="field__input" id="s2-email" type="email" autocomplete="email" value="alex@gmail" aria-invalid="true" aria-describedby="s2-email-err">
+              <p class="field__error" id="s2-email-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Enter an email like name@example.com.</p>
+            </div>
+            <div class="field span-all">
+              <label class="field__label" for="s2-body">Message <span class="req" aria-hidden="true">*</span></label>
+              <textarea class="field__input" id="s2-body" rows="4">My Ativafit Lava 66 lb dial is stuck at 22 lb. Order #1042.</textarea>
+            </div>
+          </div>
+          <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Send Message</button>
+        </form>
+      </div>
+      <div style="display:grid;gap:var(--space-6);align-content:start">
+        <div class="stage-white">
+          <p class="demo-label">S3 · Đang gửi (nút aria-busy, trường readonly)</p>
+          <div class="contact-form">
+            <div class="field">
+              <label class="field__label" for="s3-email">Email</label>
+              <input class="field__input" id="s3-email" type="email" value="alex@gmail.com" readonly>
+            </div>
+            <button class="button" type="button" aria-busy="true" aria-label="Sending message">Send Message</button>
+            <p class="visually-hidden" role="status">Sending your message…</p>
+          </div>
+        </div>
+        <div class="stage-white">
+          <p class="demo-label">S4 · Gửi thành công (thay form, focus vào hộp)</p>
+          <div class="form-message form-message--success" role="status" tabindex="-1">
+            <svg aria-hidden="true"><use href="#i-check"/></svg>
+            <div><strong>Thanks for contacting us</strong>We'll get back to you as soon as possible. A copy of your message is in your inbox.</div>
+          </div>
+          <p style="margin-block-start:var(--space-4)"><a class="button button--secondary" href="#">Continue Shopping</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S5–S6 -->
+  <div class="demo-block">
+    <h2>S5–S6 · Rỗng và lỗi gửi</h2>
+    <p class="demo-note">Trang không có loading riêng (render server). page.content trống: chỉ còn tiêu đề (+ form ở contact), không để khung RTE rỗng; trong theme editor hiện gợi ý. Lỗi gửi (Shopify trả lỗi chung, ví dụ chặn spam): hộp lỗi, giữ nguyên nội dung đã nhập.</p>
+    <div class="state-grid">
+      <div class="stage-white">
+        <p class="demo-label">S5 · page.content trống (chỉ theme editor thấy gợi ý)</p>
+        <div class="page-title" style="padding-block:0 var(--space-5)"><p class="h1" style="margin:0;font-family:var(--font-heading--family);font-weight:var(--font-heading--weight)">FAQs</p></div>
+        <p class="editor-hint">This page has no content yet. Add text in Online Store › Pages. Customers only see the page title.</p>
+      </div>
+      <div class="stage-white">
+        <p class="demo-label">S6 · Gửi thất bại (form.errors chung)</p>
+        <div class="alert" role="alert">
+          <svg aria-hidden="true"><use href="#i-alert"/></svg>
+          <div class="alert__body"><strong>Your message wasn't sent</strong><p>Check your connection and send it again. What you typed is still in the form.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
