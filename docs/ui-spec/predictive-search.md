@@ -2,6 +2,14 @@ KHÔNG CHẮC: (1) demo-data không có từ khoá gợi ý (`queries` của pre
 
 # UI spec: Search overlay (ES1-T261, vòng 3)
 
+## Thay đổi audit (ES1-T291, audit ES1-T283 A23)
+
+| # | Mục | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | §5 Popular searches | setting riêng của header block, 5 cụm "Adjustable bench, Kettlebell, Resistance band, Training mat, Power rack"; trang search có setting khác (tối đa 6, chữ khác) | 1 theme setting chung `settings.popular_searches` (foundation §24.1), default "Adjustable bench, Dumbbell, Kettlebell, Resistance band, Training mat", tối đa 5 cụm; header block bỏ setting này | foundation §24.1; 05 §4 |
+
+Chỉ §5 đổi. Mockup T261 (khung 3, 5) giữ chip cũ tới khi render lại; chip "Power rack" thành "Dumbbell". Câu KHÔNG CHẮC (3) ở đầu file về default khác nhau đã xử lý bằng setting chung.
+
 ## Thay đổi so với vòng 2
 
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
@@ -94,16 +102,23 @@ Chiều cao khung popup ≤ 80% viewport (code): hàng đầu và chân cố đ�
 - Recent searches: lưu 5 từ khoá gần nhất khi submit hoặc chọn gợi ý, trong `localStorage`; "Clear" xoá hết. Không JS thì không có khối này. ĐỀ XUẤT: 06 §5.3 (gợi ý lịch sử tìm kiếm).
 - Khoá cuộn trang nền khi mở (`scroll-lock` đã có).
 
-## 5. Settings merchant (ĐỀ XUẤT, header block)
+## 5. Settings merchant (ĐỀ XUẤT, header block + 1 theme setting chung)
+
+Header block:
 
 | Tên | Kiểu | Default | Giới hạn | Nguồn |
 | --- | --- | --- | --- | --- |
 | Search style | select: Popup, Drawer | Popup | — | ticket (popup + tab canvas), 15 §2 |
-| Popular searches | text | Adjustable bench, Kettlebell, Resistance band, Training mat, Power rack | tối đa 5 từ, phân cách dấu phẩy; rỗng thì ẩn khối | 11 §5 (gợi ý từ khoá phổ biến), 05 §4 (3–5 lựa chọn) |
 | Popular collections | collection_list | rỗng (demo: Free Weights, Benches & Racks, Functional Training, Recovery & Mobility) | tối đa 4; rỗng thì ẩn khối | 11 §5 (link danh mục phổ biến) |
 | Trending products | collection | rỗng (demo: All, `figma-tab-all`) | 4 sản phẩm đầu; rỗng thì ẩn khối | 11 §5, 07 (người dùng khám phá) |
 
-Default "Popular searches" lấy từ tên sản phẩm thật trong demo-data. Không thêm setting màu, cỡ: đọc token có sẵn. Label sentence case, `t:` key trong `locales/en.default.schema.json`.
+Theme settings (dùng chung với trang search, foundation §24.1; không đặt trong header block):
+
+| Tên | id | Kiểu | Default | Giới hạn | Nguồn |
+| --- | --- | --- | --- | --- | --- |
+| Popular searches | `popular_searches` | text | Adjustable bench, Dumbbell, Kettlebell, Resistance band, Training mat | tối đa 5 cụm, phân cách dấu phẩy, cụm thứ 6 trở đi bỏ qua; rỗng thì ẩn khối "Popular searches" ở overlay và trang search | 11 §5 (gợi ý từ khoá phổ biến), 05 §4 (3–5 lựa chọn), foundation §24.1 |
+
+Overlay đọc `settings.popular_searches` (khám phá §2.7: trạng thái rỗng, < 2 ký tự, 0 kết quả); bấm chip điền ô và chạy gợi ý tại chỗ (§4). Default là từ chung, mỗi cụm khớp sản phẩm thật trong demo-data. Không thêm setting màu, cỡ: đọc token có sẵn. Label sentence case, `t:` key trong `locales/en.default.schema.json`. §13 câu 3 ("3 setting header") nay là 2 setting header + 1 theme setting; khối và hành vi không đổi.
 
 ## 6. Trạng thái
 
