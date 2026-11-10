@@ -1,4 +1,4 @@
-KHÔNG CHẮC: Figma chỉ có desktop 1920 và không có trạng thái, nên 360/768 và mọi trạng thái là ĐỀ XUẤT. Snapshot không có vector: chevron 52 lấy từ `snippets/slideshow-icon.liquid`, noise lấy từ `assets/noise-dark.png` (cả hai đã dựng theo Figma). PNG dài 12–16k px, chi tiết dưới 4px soát qua code.
+KHÔNG CHẮC: Figma chỉ có desktop 1920 và không có trạng thái, nên 360/768 và mọi trạng thái là ĐỀ XUẤT. Snapshot không có vector: chevron 52 lấy từ `snippets/slideshow-icon.liquid`, noise lấy từ `assets/noise-dark.png` (cả hai đã dựng theo Figma). PNG dài 12–16k px, chi tiết dưới 4px soát qua code. ES1-T291: 5 spec trỏ ở §23 (trừ countdown.md) do ticket khác tạo, chưa có trên nhánh này; mục trỏ theo tên file cố định trong ticket.
 
 # UI spec: Foundation trang con (ES1-T251, vòng 3)
 
@@ -12,6 +12,23 @@ Mục đích: bộ thành phần chung cho mọi trang con và overlay (ES1-T252
 Thứ tự nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:359 > bộ kiến thức (file `NN`). Không dùng trang live hay ảnh chụp store làm gốc (ticket vòng 3).
 
 Quy ước cho Dev FE: kit.css là mockup, không chép vào `assets/`. Theme vẫn theo AGENTS.md: logical properties, 0 màu literal, `var(--*)`, breakpoint `48rem / 64rem / 80rem`. Cột "Code hiện có" chỉ class đã có trong `assets/`.
+
+## Thay đổi audit (ES1-T291, audit ES1-T283 A11, A13, A14, A23, A24, A28)
+
+| # | Mục | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | §2 Panel tối | mỗi spec tự chọn màu chữ phụ / giảm giá trên `--color-background-panel`: cart, mini cart trắng 70% + badge-new 50%; bundle #B2B2B2 + badge-new 55%; shop the look trắng 60% + chữ trắng | 1 cặp dẫn xuất chung `--panel-muted` (trắng 70%, 6.56) và `--panel-saving` (badge-new 50% + trắng, 5.64), áp mọi panel tối | A13; sổ 10/11 G3 (cart.md §3) |
+| 2 | §4 Footer | ghi chú "icon social #B2B2B2 → muted-on-dark (P4)"; mockup Information thiếu "Our Efitco" | icon social `--color-muted-on-dark` là quy định (kit đã đúng); Information: Our Story, Our Efitco, FAQs, Contact Us (+ 2 link chính sách) | A28; Figma 1:1104, index-mobile-b §8 |
+| 3 | §6 Nút | Title Case chỉ nêu "Add To Cart" | mọi nút và link dạng nút Title Case, liệt kê nhãn lệch đang có ("Keep shopping", "Show fewer", "Try again") | A24; sổ 07/11 |
+| 4 | §13 Accordion | "+ cam 24" | icon +/− cùng màu chữ câu hỏi (đóng `--color-muted`, mở `--color-foreground`), không cam | A11; Figma 1:1057, index-mobile-b §7 |
+| 5 | §16 Dialog | "1 lần/phiên" | hàng đợi: mỗi lúc 1 popup, đóng popup đang hiện mới tới popup kế, nghỉ 3 s; mỗi popup tự mở tối đa 1 lần/phiên | A11; sổ 10/11 MK3, MK4 |
+| 6 | §20 Lighthouse | "SEO 100 bắt buộc ở trang index" | SEO 100 đo ở 6 loại trang (chủ, collection, sản phẩm, blog, bài viết, page); BP 100 do DevOps/QA đo | A11; sổ 10/11 (BGĐ) |
+| 7 | §22 | "Quyết định CTO cần chốt" 3 câu | "đã chốt (10/11)" theo đề xuất | sổ 10/11 "các câu khác vòng 3 chốt theo đề xuất" |
+| 8 | §23 mới | — | mục lục thành phần dùng chung ở spec riêng: variant-picker, pagination, layers, countdown, announcement-bar, localization | ticket ES1-T291 |
+| 9 | §24 mới | 2 setting "Popular searches" (header 5 cụm; search-results tối đa 6, chữ khác) | 1 theme setting chung, 1 bộ chữ mặc định, tối đa 5 cụm | A23; 05 §4 |
+| 10 | Mockup | — | foundation.html: accordion theo Figma, "Our Efitco", mục 16 Sale Countdown, mục 17 Dark Panel; render lại 4 PNG | ticket ES1-T291 |
+
+Giữ nguyên mọi mục khác của vòng 3.
 
 ## Thay đổi so với vòng 2
 
@@ -85,6 +102,10 @@ Giá trị dẫn xuất (không phải token, viết `calc()` hoặc custom prop
 | `--shadow-raised` | `0 8 24 color-mix(--color-foreground 12%)` | dropdown, toast |
 | `--shadow-overlay` | `0 32 80 color-mix(--color-foreground 28%)` | drawer, dialog |
 | `--radius-dialog` | `--radius-card × 2` = 24 | dialog, sheet |
+| `--panel-muted` | `color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel))` ≈ #C4C4C6 | chữ phụ trên panel tối: dòng hàng, Subtotal, ghi chú thuế, đếm món, ghi chú quiz |
+| `--panel-saving` | `color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground))` ≈ #A3BDA4 | dòng giảm giá trên panel tối, luôn kèm icon tag 16 + dấu "−" |
+
+Panel tối (G3, sổ 10/11): mọi khối nền `--color-background-panel` (tóm tắt cart, chân mini cart, "Your Bundle", panel shop the look, quiz) dùng đúng cặp trên. Chữ chính và tổng: `--color-background-dark-foreground` (11.4). Không dùng #999 / `--color-muted-on-dark` (4.01), #B2B2B2, trắng 60%, xanh Figma #4B824D (2.50) hay chữ trắng cho dòng giảm giá. Focus trên panel: outline trắng. Thay đổi chữ phụ trắng 60% → 70% và #B2B2B2 → 70% là lệch Figma có chủ đích (nhất quán, AA); spec bundle, shop the look, quiz trỏ về đây.
 
 Bảng tương phản (WCAG, L tính tay; dark = #1A1A1A, L 0.0103):
 
@@ -106,7 +127,9 @@ Bảng tương phản (WCAG, L tính tay; dark = #1A1A1A, L 0.0103):
 | menu trắng 60% (#A3A3A3) / dark | 6.93 | menu header (Figma) |
 | muted-on-dark / dark | 6.11 | eyebrow tối, link footer, placeholder, viền input tối |
 | muted-on-dark / panel footer (#1F1F1F) | 5.78 | link, trust trong panel |
-| background-dark-foreground / panel | 11.4 | panel quiz |
+| background-dark-foreground / panel | 11.4 | chữ chính, tổng trên mọi panel tối |
+| `--panel-muted` (L 0.553) / panel (#393942, L 0.042) | 6.56 | chữ phụ panel tối |
+| `--panel-saving` (L 0.469) / panel | 5.64 | giảm giá panel tối (badge-new mặc định #467A48; spec cũ ghi 5.81–5.84 vì tính với xanh Figma #4B824D) |
 | muted / border (nút disabled) | 6.70 | chữ nút disabled |
 | accent / dark | 3.48 | chỉ chữ lớn ("Get 15% Off"), focus không dùng |
 | sale / dark | 2.73 | KHÔNG dùng cho chữ; lỗi trên nền tối dùng chữ trắng + icon đỏ |
@@ -172,8 +195,8 @@ Trạng thái và form:
 - Input: viền 100% `--color-muted-on-dark` (6.11, sổ 09/11), hover viền trắng, focus outline trắng 2px.
 - Lỗi: viền đỏ 2px, câu lỗi CHỮ TRẮNG + icon đỏ (sale trên dark 2.73:1 trượt AA). Code `.site-footer__invalid` đang tô chữ `--color-sale`: cần sửa.
 - Thành công: hộp `form-message--success` trên nền tối (chữ trắng, thanh badge-new).
-- ĐỀ XUẤT: thêm "Shipping policy", "Refund policy" vào Information, URL `shop.policies` (14 #252D; TE-9 AC5). Figma không có.
-- Ghi chú lệch nhỏ: icon social Figma #B2B2B2 (không có token) → dùng `--color-muted-on-dark` (P4).
+- Menu Information theo Figma 1:1104: Our Story, Our Efitco, FAQs, Contact Us. ĐỀ XUẤT: thêm "Shipping policy", "Refund policy" cuối danh sách, URL `shop.policies` (14 #252D; TE-9 AC5). Figma không có. Là dữ liệu menu, không đổi giao diện.
+- Icon social: `--color-muted-on-dark` (6.11), hover trắng. Figma #B2B2B2 không có token, không dùng (kit.css `.site-footer__social a` đã đúng).
 
 A11y: menu tiêu đề không dùng `<h*>` ở desktop nếu làm lệch heading-order (dùng `<p>`/`summary`); wordmark `aria-hidden` (trang trí, không lặp tên); social có tên "Efitco on Instagram"; thanh toán `aria-label="Payment methods"`; input có label ẩn + `autocomplete="email"`.
 
@@ -208,7 +231,7 @@ Trạng thái (Figma không có; code + ĐỀ XUẤT 05 §3):
 - Loading: `aria-busy="true"`, chữ trong suốt, spinner 20, giữ bề rộng, chữ ẩn "Adding".
 - Sold out: primary disabled, chữ "Sold out".
 
-Quy tắc: 1 primary mỗi section, ≤ 5 mỗi trang (04 §1); nhãn 2–4 từ Title Case mở bằng động từ ("Add To Cart", sổ 07/11); hai nút cách 16, mobile xếp dọc cách 12–20. `<button>` cho hành động, `<a href>` cho điều hướng; nút icon có `aria-label`.
+Quy tắc: 1 primary mỗi section, ≤ 5 mỗi trang (04 §1); nhãn 2–4 từ Title Case mở bằng động từ ("Add To Cart", sổ 07/11), áp cho mọi `<button>` và link dạng nút (kể cả nút đóng có chữ, nút "+N"/thu gọn, nút thử lại): "Keep Shopping", "Show Fewer", "Try Again", "Continue Shopping". Text link trong câu, link menu, link chính sách giữ chữ theo dữ liệu ("Shipping policy"). Nhãn đang lệch: "Keep shopping" (marketing-popups §3), "Show fewer" (mini-cart-quickview §3.1), "Try again" (product §5.1 J3): sửa theo §24 đề xuất trỏ; hai nút cách 16, mobile xếp dọc cách 12–20. `<button>` cho hành động, `<a href>` cho điều hướng; nút icon có `aria-label`.
 
 ## 7. Tab
 
@@ -271,7 +294,7 @@ Lighthouse: `<label for>` thật, `autocomplete`, không chặn dán, không pla
 
 ## 13. Accordion
 
-Figma 1:1057: + cam 24 bên trái, gạch 1px border, câu hỏi 18/600 (16 dưới 80rem). Figma thắng 15 §6 (icon phải). `<details>/<summary>`, mở sẵn mục đầu, cho mở nhiều mục; hàng ≥ 56; nội dung thụt 40, chữ muted; `--motion-accordion`. Không giấu phí ship, điều kiện KM. Code `.faq-item`, `.site-footer__disclosure`.
+Figma 1:1057: icon +/− 24 bên trái, cùng màu chữ câu hỏi (mục đóng `--color-muted` 8.45 trên trắng, 7.73 trên cream; mục mở `--color-foreground`), KHÔNG cam; gạch 1px border; câu hỏi 18/600 (16 dưới 80rem). Figma thắng 15 §6 (icon phải). Icon đổi + → − khi mở, không xoay. ĐỀ XUẤT (05 §3, Figma không có hover): hover câu đóng thì chữ và icon foreground; focus outline accent quanh summary. `<details>/<summary>`, mở sẵn mục đầu, cho mở nhiều mục; hàng ≥ 56; nội dung thụt 40, chữ muted; `--motion-accordion`. Không giấu phí ship, điều kiện KM. Code `.faq-item`, `.site-footer__disclosure`.
 
 ## 14. Dropdown và mega menu
 
@@ -310,9 +333,9 @@ Figma chỉ có chevron Shop, Collection (1:362). ĐỀ XUẤT theo 14 §1, 05 �
 
 - ≥ 768: giữa màn, bo 24, padding 32 (48 từ 1280), cao ≤ `min(860, 100dvh − 48)`, × 48 cách góc 24.
 - < 768: dính đáy, rộng 100%, cao ≤ 88dvh, bo 2 góc trên, thanh kéo 40 × 4, × cách góc 12, vuốt xuống đóng; nút xếp dọc, chính dưới cùng.
-- Tiêu đề h2 heading 800 (28–40), chừa chỗ ×. Popup marketing < 50 từ. Hàng nút phải, cách 32, gạch trên.
+- Tiêu đề h2 heading 800 (28–40), chừa chỗ ×; popup marketing dùng Sofia 700 theo Figma 1:1148 (marketing-popups). Popup marketing < 50 từ. Hàng nút phải, cách 32, gạch trên.
 - Motion: mở 300ms fade + nhấc 24 + scale 0.97; đóng 200ms; mobile trượt từ đáy.
-- Quy tắc: một lớp một lúc; không mở lúc tải trang (chờ thời gian/cuộn/ý định rời); không ở 404; không confirmshaming; 1 lần/phiên (15 §1, sổ 09/11).
+- Quy tắc: một lớp một lúc, hàng đợi: popup đang hiện đóng thì popup kế mới hiện, nghỉ 3 s giữa hai popup tự mở (sổ 10/11 MK3, MK4); thẻ big offer đang mở thì popup tự mở chờ (MK5); mỗi popup tự mở tối đa 1 lần/phiên, cộng số ngày theo setting (không phải "1 popup/phiên" cho cả theme); không mở lúc tải trang (chờ thời gian/cuộn/ý định rời, sổ 09/11); không ở 404; không confirmshaming (15 §1). Chi tiết hàng đợi: marketing-popups.md §1.2; thứ tự lớp và vùng đáy: layers.md (§23).
 - A11y: `<dialog>` + `showModal()`, `aria-labelledby`, Escape, focus phần tử đầu, trả focus.
 
 ## 17. Toast
@@ -355,7 +378,7 @@ Chỉ transform / opacity / clip-path (sổ 09/11); reveal 1 lần, chỉ tiêu 
 
 ## 20. Ràng buộc Lighthouse
 
-Chỉ tiêu (sổ 09/11): A11y 100, BP 100 desktop và mobile; Performance desktop ≥ 98, mobile ≥ 90; SEO 100 bắt buộc ở trang index (ticket vòng 3), trang con vẫn thiết kế để đạt.
+Chỉ tiêu (sổ 09/11, phạm vi theo sổ 10/11 BGĐ): A11y 100 desktop và mobile ở mọi trang; Performance desktop ≥ 98, mobile ≥ 90 ở mọi trang; SEO 100 đo ở trang chủ, collection, sản phẩm, blog, bài viết, page (cart, search, account, 404, password, gift card không tính SEO vì Shopify chặn index hoặc trả 404/401, nhưng vẫn giữ quy tắc SEO dưới đây); Best Practices 100 do DevOps/QA đo, tách phần theme và phần nền tảng, ngoài phạm vi Designer (thiết kế vẫn giữ các quy tắc BP dưới đây).
 - A11y: tương phản theo §2 (không dùng border, accent trên dark, sale trên dark cho chữ nhỏ); mọi nút/link icon có tên riêng; mọi trường có label; một `<main>`, một h1, heading không nhảy bậc (tiêu đề cột menu/footer không dùng `<h*>` nếu lệch bậc); danh sách `<ul>/<ol>`; tablist đủ; dialog có tên; link trong đoạn văn gạch chân; vùng chạm ≥ 24, control mobile ≥ 44; swatch card `aria-hidden` (không có control 16px); skip link; không thuộc tính ARIA trên phần tử không role.
 - SEO: `<title>` + meta description; link `<a href>` thật; chữ link mô tả đích; ảnh có alt; breadcrumb JSON-LD; canonical (`meta-tags`); chữ ≥ 12px.
 - Best Practices: 0 lỗi console; ảnh đúng tỉ lệ và độ phân giải (`image` snippet srcset); không chặn dán; không xin quyền khi tải.
@@ -378,11 +401,58 @@ Chỉ tiêu (sổ 09/11): A11y 100, BP 100 desktop và mobile; Performance deskt
 | Drawer | `.site-header__drawer*`, `.cart-drawer__dialog` | khung drawer chung, filter, search |
 | Dialog | `.quiz__dialog`, `.quiz__dialog-close` | class chung cho mọi popup |
 | Breadcrumb, toast, empty, alert, skeleton | — | tạo mới §5, §17, §18 |
+| Panel tối | `.cart-summary`; `.bundle-builder__panel` có `--bundle-panel-muted` trắng 60% (base.css 747) | 1 cặp `--panel-muted` 70%, `--panel-saving` cho cart, mini cart, bundle, shop the look, quiz (§2); đổi `--bundle-panel-muted` 60% → 70% |
+| Accordion | `.faq-item` | icon +/− `currentColor`, câu đóng `--color-muted` (§13) |
 
-Settings merchant: foundation không thêm setting; dùng `background_dark_color` có sẵn cho header và footer.
+Settings merchant: foundation dùng `background_dark_color` có sẵn cho header và footer; thêm 1 theme setting "Popular searches" (§24.1).
 
-## 22. Quyết định CTO cần chốt
+## 22. Quyết định CTO đã chốt (10/11)
 
-1. Banner trang con (collection, ảnh bìa bài viết): thẻ bo 16 trong container dưới header, lớp tối ≥ 60% (khác hero 30%) để chữ trắng AA với mọi ảnh merchant chọn? Đề xuất: có (§3.3).
-2. Swatch trên card sản phẩm là chỉ báo không bấm (`aria-hidden`, số màu đọc trong tên link), chọn màu ở trang sản phẩm/quickview, vì 32 × 16 cách 4 của Figma không đạt vùng chạm 44 trên mobile? Đề xuất: có (§9).
-3. Khi mở mega menu/dropdown header giữ tối (bỏ "chuyển trắng khi mở" trong `navigation.md` ES1-T260), mục đang mở trắng 100% + chevron xoay? Đề xuất: có (§14, sổ 10/11).
+CTO chốt cả 3 câu theo đề xuất (sổ 10/11: các câu khác vòng 3 chốt theo đề xuất trong spec).
+1. Banner trang con (collection, ảnh bìa bài viết): thẻ bo 16 trong container dưới header, lớp tối ≥ 60% (khác hero 30%) để chữ trắng AA với mọi ảnh merchant chọn: có (§3.3).
+2. Swatch trên card sản phẩm là chỉ báo không bấm (`aria-hidden`, số màu đọc trong tên link), chọn màu ở trang sản phẩm/quickview: có (§9).
+3. Mở mega menu/dropdown header giữ tối, mục đang mở trắng 100% + chevron xoay: có (§14, navigation.md đã theo).
+
+## 23. Thành phần dùng chung ở spec riêng
+
+Tên file cố định; spec chưa có là do ticket khác đang tạo (audit ES1-T283 §3). Trang con và overlay trỏ về các file này, không mô tả lại.
+
+| Thành phần | Spec | Nội dung chính | Ticket audit |
+| --- | --- | --- | --- |
+| Bộ chọn biến thể | `docs/ui-spec/variant-picker.md` | dựng từ option value (2048 biến thể), 3 trạng thái giá trị, > 10 giá trị hiện 7 + "+N" (hằng chung, sổ 10/11 M5), "Show Fewer", đang tải, lỗi "Try Again"; PDP, quickview, card | T1 (A1, A2) |
+| Phân trang | `docs/ui-spec/pagination.md` | snippet `pagination` chung, nút tròn 52 (§6), trang hiện tại accent, đầu/cuối giữ nút mờ 0.35 + `aria-disabled` (sổ 10/11 câu 5) | T2 (A3, A4) |
+| Lớp và vùng đáy | `docs/ui-spec/layers.md` | thứ tự z và vùng đáy (sticky ATC, cart bar, bundle bar, teaser Big Offer, toast, Inbox, banner consent), `scroll-padding` cho header 80 và thanh đáy, danh sách lớp cho hàng đợi popup (§16) | T7 (A15–A17, A22) |
+| Countdown "Sale ends in" | `docs/ui-spec/countdown.md` | 1 component cho featured product, PDP, big offer; Compact/Regular theo khung chứa; 3/4 ô; nguồn ngày metafield `custom.sale_ends_at` trước, setting sau (sổ 10/11 câu 2); A11y theo P4 | T8 (A14), ticket này |
+| Announcement bar | `docs/ui-spec/announcement-bar.md` | thanh trên header tối 80, link, đóng, rỗng thì ẩn (SRS TE-1 AC4) | T6 (A18) |
+| Chọn quốc gia / ngôn ngữ | `docs/ui-spec/localization.md` | 1 nút gộp "USD / EN" ở footer (§4) và drawer menu (§15), popover desktop, sheet mobile, ô tìm khi nhiều nước, ẩn khi 1 nước/ngôn ngữ (SRS TE-1 AC5, AC9) | T6 (A19) |
+
+## 24. Settings dùng chung toàn theme
+
+### 24.1 Popular searches (A23)
+
+Một setting trong theme settings (`config/settings_schema.json`, nhóm "Search"), đọc ở cả search overlay (predictive-search.md §5, trạng thái rỗng và 0 kết quả) và trang search (search.md S1, S2). Bỏ setting cùng tên trong header block và block `search-results`.
+
+| Tên | id | Kiểu | Default | Giới hạn | Info (sentence case) |
+| --- | --- | --- | --- | --- | --- |
+| Popular searches | `popular_searches` | text | Adjustable bench, Dumbbell, Kettlebell, Resistance band, Training mat | tối đa 5 cụm (05 §4: 3–5 lựa chọn), phân cách dấu phẩy, mỗi cụm ≤ 3 từ; cụm thứ 6 trở đi bỏ qua; rỗng thì ẩn khối "Popular searches" ở cả 2 chỗ | "Up to 5 terms, separated by commas. Shown in the search popup and on the search page before a search and when nothing is found. Leave empty to hide." |
+
+Default: từ chung, mỗi cụm khớp sản phẩm thật trong demo-data (FlexFold Adjustable Bench, Adjustable dumbbell pair, Iron Core Kettlebell 16 kg, Resistance Band Set, Training Mat 12 mm), nên chip nào cũng ra kết quả. Chip là link `routes.search_url?q=`; overlay bấm chip thì chạy gợi ý tại chỗ (predictive-search §4).
+
+## 25. Đề xuất trỏ cho spec ngoài phạm vi ES1-T291 (không sửa ở ticket này)
+
+| File | Mục | Sửa |
+| --- | --- | --- |
+| `search.md` | §4 | bỏ dòng "Popular searches" khỏi settings block `search-results`, ghi "theo foundation §24.1"; §4 dòng chữ mặc định "Iron Core Kettlebell…" bỏ; mockup T256 S1, S2 đổi chip theo default mới khi render lại |
+| `marketing-popups.md` | §3, §4 | nhãn "Keep shopping" → "Keep Shopping" (§6); thanh đếm ngược big offer trỏ countdown.md (cỡ Compact, 3/4 ô, nguồn ngày metafield trước); setting "Sale end date" chỉ dùng khi không có metafield; dữ liệu mockup "`default_countdown_end`" → "`custom.sale_ends_at`" |
+| `product.md` | §4.2, §18, §5.1 | bảng cỡ countdown trỏ countdown.md §2 (giá trị giữ nguyên = Compact/Regular); §18 "khác nguồn ngày" → "cùng nguồn ngày, countdown.md §4"; "Try again" → "Try Again" (gộp ticket T1 bộ chọn biến thể) |
+| `mini-cart-quickview.md` | §1, §3.1, bảng tương phản | "Show fewer" → "Show Fewer"; số 6.54 / 5.84 → 6.56 / 5.64 theo §2 (cùng công thức, token badge-new mặc định) |
+| `cart.md` | §3 dòng 124–125, bảng tương phản | giữ công thức (đã là gốc); số `--panel-saving` 5.81 (#A5C1A6) → 5.64 (#A3BDA4) vì token mặc định #467A48 |
+| `index-mobile-b.md` | §1 Bundle, §9 bảng tương phản, §12 câu 3 | dòng hàng panel #B2B2B2 (5.39) → `--panel-muted` (6.56); dòng giảm giá badge-new 55% (5.41) → `--panel-saving` (5.64) + icon tag; mockup T279 render lại khi chạm khối bundle |
+| `index-mobile-a.md` | §6 Quiz, §9.1 dòng "Ghi chú quiz, dòng phụ panel" | trắng 60% (5.27) → `--panel-muted` (6.56); §7 đã sửa trong ticket này |
+| `page.md` | aside FAQ | icon accordion theo §13 mới (không cam); PNG T258 render lại khi chạm trang |
+| `collection.md` | §9 S7 | (A12, ngoài ticket này) "card cũ mờ 40%" trái §18 "không làm mờ chữ" |
+
+## 26. Quyết định CTO cần chốt
+
+1. Chữ phụ trên mọi panel tối đổi về trắng 70% (6.56) kể cả chỗ Figma vẽ #B2B2B2 (bundle) và trắng 60% (shop the look, quiz) để một cặp màu toàn theme? Đề xuất: có (§2).
+2. "Popular searches" chuyển thành theme setting duy nhất, tối đa 5 cụm, bỏ setting ở header block và block search-results? Đề xuất: có (§24.1).

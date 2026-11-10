@@ -49,6 +49,44 @@
   .skeleton-grid .skeleton-card .skeleton--line:nth-child(3) { width: 40%; }
   .state-grid { display: grid; gap: var(--space-6); }
   @media (min-width: 80rem) { .state-grid { grid-template-columns: 1.4fr 1fr; } }
+
+  /* ES1-T291 · §13 accordion theo Figma 1:1057: icon cùng màu chữ, đóng muted, mở foreground (kit.css vẽ + cam) */
+  .accordion summary { color: var(--color-muted); }
+  .accordion details[open] > summary, .accordion summary:hover { color: var(--color-foreground); }
+  .accordion summary::before { color: currentColor; }
+
+  /* ES1-T291 · countdown.md: 1 component, Compact < 368 khung chứa, Regular ≥ 368 (Figma 1:773) */
+  .cd-grid { display: grid; gap: var(--space-6); }
+  @media (min-width: 64rem) { .cd-grid { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); } }
+  .cd-host { display: grid; gap: var(--space-4); container-type: inline-size; }
+  .cd-host--offer { max-inline-size: 352px; }
+  .cd-item { display: grid; gap: var(--space-2); justify-items: start; }
+  .cd-item small { color: var(--color-muted); font-size: var(--font-size-xs); }
+  .sale-countdown { --cd-cell: 40px; --cd-gap: var(--space-1); --cd-pad: var(--space-4); --cd-num: var(--font-size-base); --cd-num-lh: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); box-sizing: border-box; inline-size: fit-content; max-inline-size: 100%; min-block-size: 60px; margin: 0; padding: var(--space-2) var(--cd-pad); border-radius: calc(var(--radius-card) - var(--space-1)); background: var(--color-background-dark); color: var(--color-background-dark-foreground); }
+  @container (min-width: 23rem) { .sale-countdown { --cd-cell: 44px; --cd-gap: var(--space-3); --cd-pad: var(--space-5); --cd-num: var(--font-size-lg); --cd-num-lh: 28px; } }
+  .sale-countdown__label { font-size: var(--font-size-base); font-weight: 500; line-height: 26px; letter-spacing: -0.01em; white-space: nowrap; }
+  .sale-countdown__units { display: flex; gap: var(--cd-gap); }
+  .sale-countdown__unit { display: grid; place-items: center; box-sizing: border-box; min-inline-size: var(--cd-cell); block-size: var(--cd-cell); padding-inline: var(--space-1); border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, var(--color-background-dark)); border-radius: calc(var(--radius-card) - var(--space-1)); font-size: var(--cd-num); font-weight: 700; line-height: var(--cd-num-lh); letter-spacing: -0.01em; font-variant-numeric: tabular-nums; }
+  .sale-countdown[data-state="ending"] .sale-countdown__unit { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); }
+  .sale-countdown__ended { color: color-mix(in srgb, var(--color-background-dark-foreground) 60%, var(--color-background-dark)); font-size: var(--font-size-base); font-weight: 500; line-height: 26px; }
+  .sale-countdown--ended { min-inline-size: 267px; }
+  @container (min-width: 23rem) { .sale-countdown--ended { min-inline-size: 311px; } }
+
+  /* ES1-T291 · foundation §2: panel tối G3, 1 cặp màu dẫn xuất */
+  .dpanel { --panel-muted: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel)); --panel-saving: color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground)); display: grid; gap: var(--space-3); max-inline-size: 456px; padding: var(--space-5); border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-panel); color: var(--color-background-dark-foreground); }
+  .dpanel__title { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: 700; letter-spacing: -0.02em; }
+  .dpanel__muted { margin: 0; color: var(--panel-muted); font-size: var(--font-size-sm); font-weight: 500; }
+  .dpanel__lines { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; color: var(--panel-muted); font-size: var(--font-size-sm); font-weight: 500; }
+  .dpanel__row { display: flex; justify-content: space-between; gap: var(--space-4); margin: 0; font-size: var(--font-size-sm); font-weight: 500; }
+  .dpanel__row--muted { color: var(--panel-muted); }
+  .dpanel__row--saving { color: var(--panel-saving); }
+  .dpanel__row--saving span:first-child { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .dpanel__row--saving svg { width: 16px; height: 16px; }
+  .dpanel__row--total { padding-block-start: var(--space-3); border-block-start: 1px solid var(--color-muted); font-size: var(--font-size-lg); font-weight: 700; }
+  .dpanel .button { margin-block-start: var(--space-2); }
+  .dpanel-pairs { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; font-size: var(--font-size-sm); }
+  .dpanel-pairs li { display: flex; align-items: center; gap: var(--space-3); }
+  .dpanel-pairs i { flex: none; width: 24px; height: 24px; border-radius: var(--space-1); border: 1px solid var(--color-border); }
 </style>
 </head>
 <body>
@@ -118,7 +156,7 @@
       </ol>
     </nav>
     <div class="sheet-intro">
-      <p class="eyebrow">ES1-T251 · Foundation · Round 3</p>
+      <p class="eyebrow">ES1-T251 · Foundation · Round 3 · Audit fix ES1-T291</p>
       <h1>Components For Inner Pages</h1>
       <p>Bảng thành phần dùng chung, gốc duy nhất là Figma trang chủ 1:359. Header mọi trang là thanh tối #1A1A1A có noise, không đè ảnh. Giá trị đọc từ token trong snippets/css-variables.liquid; spec ở docs/ui-spec/foundation.md; dữ liệu từ docs/design/demo-data.json.</p>
     </div>
@@ -415,7 +453,7 @@
     <!-- 11. Accordion -->
     <section class="demo-block" aria-labelledby="h-acc">
       <h2 id="h-acc">11. Accordion</h2>
-      <p class="demo-note">Figma 1:1057: dấu + cam bên trái, gạch phân cách. Mở sẵn mục đầu, cho mở nhiều mục, chạy được không JS (details).</p>
+      <p class="demo-note">Figma 1:1057: dấu +/− bên trái cùng màu chữ câu hỏi (đóng xám muted, mở đen), không cam; gạch phân cách. Mở sẵn mục đầu, cho mở nhiều mục, chạy được không JS (details).</p>
       <div class="accordion">
         <details open><summary>How long does shipping take?</summary><div>Orders ship within 1–2 business days. Standard delivery is 3–5 business days.</div></details>
         <details><summary>Are adjustable dumbbells easy for beginners?</summary><div>Yes. Start light and add plates as you progress.</div></details>
@@ -513,6 +551,89 @@
         </div>
       </div>
     </section>
+
+    <!-- 16. Countdown chung (ES1-T291, docs/ui-spec/countdown.md) -->
+    <section class="demo-block" aria-labelledby="h-countdown">
+      <h2 id="h-countdown">16. Sale Countdown</h2>
+      <p class="demo-note">Một component cho featured product, trang sản phẩm, thẻ big offer (Figma 1:773). Cỡ theo khung chứa: Compact (ô 40, số 16) khi khung &lt; 368, Regular (ô 44, số 18) khi ≥ 368. 4 ô khi còn ≥ 24 giờ, 3 ô khi &lt; 24 giờ. Ngày lấy từ metafield sản phẩm custom.sale_ends_at, setting ngày chỉ khi không có metafield. Số aria-hidden, đọc 1 câu ngày giờ, không aria-live.</p>
+      <div class="cd-grid">
+        <div class="cd-host" role="group" aria-label="Countdown in featured product and product page">
+          <p class="demo-label">Featured product · product page (Compact ở 360, Regular từ 768)</p>
+          <div class="cd-item">
+            <small>&lt; 24 hours · 3 cells</small>
+            <div class="sale-countdown" role="timer" data-testid="sale-countdown">
+              <span class="sale-countdown__label" aria-hidden="true">Sale ends in</span>
+              <span class="sale-countdown__units" aria-hidden="true"><span class="sale-countdown__unit">22</span><span class="sale-countdown__unit">36</span><span class="sale-countdown__unit">28</span></span>
+              <span class="visually-hidden">Sale ends on <time datetime="2026-11-11T23:59:00-05:00">November 11, 2026 at 11:59 PM EST</time></span>
+            </div>
+          </div>
+          <div class="cd-item">
+            <small>K1 · ≥ 24 hours · 4 cells (day, hour, minute, second)</small>
+            <div class="sale-countdown" role="timer">
+              <span class="sale-countdown__label" aria-hidden="true">Sale ends in</span>
+              <span class="sale-countdown__units" aria-hidden="true"><span class="sale-countdown__unit">02</span><span class="sale-countdown__unit">22</span><span class="sale-countdown__unit">36</span><span class="sale-countdown__unit">28</span></span>
+              <span class="visually-hidden">Sale ends on <time datetime="2026-11-13T23:59:00-05:00">November 13, 2026 at 11:59 PM EST</time></span>
+            </div>
+          </div>
+          <div class="cd-item">
+            <small>K2 · &lt; 1 hour · accent cells, no blinking</small>
+            <div class="sale-countdown" role="timer" data-state="ending">
+              <span class="sale-countdown__label" aria-hidden="true">Sale ends in</span>
+              <span class="sale-countdown__units" aria-hidden="true"><span class="sale-countdown__unit">00</span><span class="sale-countdown__unit">42</span><span class="sale-countdown__unit">05</span></span>
+              <span class="visually-hidden">Sale ends on <time datetime="2026-11-10T23:59:00-05:00">November 10, 2026 at 11:59 PM EST</time></span>
+            </div>
+          </div>
+          <div class="cd-item">
+            <small>K3 · ended while viewing · same frame size</small>
+            <div class="sale-countdown sale-countdown--ended" role="timer" data-state="ended"><span class="sale-countdown__ended">This sale has ended</span></div>
+          </div>
+        </div>
+        <div class="cd-host cd-host--offer" role="group" aria-label="Countdown in big offer card">
+          <p class="demo-label">Big offer card · popover 352 · always Compact</p>
+          <div class="cd-item">
+            <small>Ativafit Lava 66 lb Adjustable · $379.99 · was $499.99 · −24%</small>
+            <div class="sale-countdown" role="timer">
+              <span class="sale-countdown__label" aria-hidden="true">Sale ends in</span>
+              <span class="sale-countdown__units" aria-hidden="true"><span class="sale-countdown__unit">22</span><span class="sale-countdown__unit">36</span><span class="sale-countdown__unit">28</span></span>
+              <span class="visually-hidden">Sale ends on <time datetime="2026-11-11T23:59:00-05:00">November 11, 2026 at 11:59 PM EST</time></span>
+            </div>
+          </div>
+          <div class="cd-item">
+            <small>K1 · 4 cells fit 352 in Compact (311)</small>
+            <div class="sale-countdown" role="timer">
+              <span class="sale-countdown__label" aria-hidden="true">Sale ends in</span>
+              <span class="sale-countdown__units" aria-hidden="true"><span class="sale-countdown__unit">02</span><span class="sale-countdown__unit">22</span><span class="sale-countdown__unit">36</span><span class="sale-countdown__unit">28</span></span>
+              <span class="visually-hidden">Sale ends on <time datetime="2026-11-13T23:59:00-05:00">November 13, 2026 at 11:59 PM EST</time></span>
+            </div>
+          </div>
+          <p class="demo-note" style="margin: 0">Không ngày, quá hạn lúc tải, không giá gạch hoặc hết hàng (K4): không in khối, không chừa chỗ. Không JS: ẩn.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 17. Panel tối G3 (ES1-T291, foundation §2) -->
+    <section class="demo-block" aria-labelledby="h-panel">
+      <h2 id="h-panel">17. Dark Panel</h2>
+      <p class="demo-note">Một cặp màu cho mọi panel nền #393942 (tóm tắt giỏ, chân mini cart, Your Bundle, shop the look, quiz): chữ phụ trắng 70% (6.56:1), giảm giá xanh badge-new 50% + trắng (5.64:1) luôn kèm icon tag và dấu −. Không dùng #999, #B2B2B2, trắng 60% hay xanh Figma #4B824D (2.50:1).</p>
+      <div class="two-col">
+        <div class="dpanel" role="group" aria-labelledby="dp-title">
+          <h3 class="dpanel__title" id="dp-title">Your Bundle</h3>
+          <p class="dpanel__muted">5 items selected · You reached 15% off</p>
+          <p class="dpanel__row dpanel__row--muted"><span>Subtotal</span><span>$514.00</span></p>
+          <p class="dpanel__row dpanel__row--saving"><span><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10.6 2.5H17.5v6.9L9.4 17.5 2.5 10.6l8.1-8.1Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><circle cx="13.6" cy="6.4" r="1.3" fill="currentColor"/></svg>Bundle discount (15%)</span><span>−$77.10</span></p>
+          <p class="dpanel__row dpanel__row--total"><span>Total</span><span>$436.90</span></p>
+          <p class="dpanel__muted">Taxes and shipping calculated at checkout.</p>
+          <button class="button button--full" type="button">Add Bundle To Cart</button>
+        </div>
+        <ul class="dpanel-pairs" aria-label="Dark panel color pairs">
+          <li><i style="background: var(--color-background-dark-foreground)"></i>Chữ chính, tổng · trắng / panel 11.4</li>
+          <li><i style="background: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel))"></i>--panel-muted · trắng 70% / panel 6.56</li>
+          <li><i style="background: color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground))"></i>--panel-saving · badge-new 50% / panel 5.64</li>
+          <li><i style="background: var(--color-muted)"></i>Vạch chia tổng · muted (trang trí)</li>
+          <li><i style="background: var(--color-accent)"></i>Nút primary · trắng / accent 5.01; focus outline trắng</li>
+        </ul>
+      </div>
+    </section>
   </div>
 </main>
 
@@ -545,7 +666,7 @@
       </div>
       <div class="site-footer__menus">
         <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a class="is-hover" href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
       </div>
     </div>
     <ul class="site-footer__trust">

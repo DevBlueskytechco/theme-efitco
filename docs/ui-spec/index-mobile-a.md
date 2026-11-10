@@ -2,6 +2,14 @@ KHÔNG CHẮC: (1) Figma chỉ có desktop 1920 và không có trạng thái: m�
 
 # UI spec: Trang chủ 768 và 360, phần A (ES1-T278)
 
+## Thay đổi audit (ES1-T291, audit ES1-T283 A13)
+
+| # | Mục | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | §7 Shop the look, panel | chữ phụ trắng 60% (5.27); dòng giảm giá chữ trắng | `--panel-muted` (6.56), `--panel-saving` (5.64) + icon tag, cặp chung foundation §2 | foundation §2; sổ 10/11 G3 |
+
+Chỉ §7 đổi (trỏ màu). Mockup T278 render lại khi chạm khối shop the look; §6 Quiz, §9.1 ghi ở foundation §25.
+
 Mục đích: người mua trên tablet và điện thoại hiểu Efitco bán gì ngay màn đầu, tới được danh mục, cấp độ, bestseller, quiz, combo mà không mở menu. Story TE-17 (khối thuộc TE-1, TE-2, TE-3, TE-11, TE-12, TE-7). Template `templates/index.liquid`.
 
 Gốc duy nhất: Figma desktop 1:359 (sổ 10/11). Desktop 1280/1920 là chính Figma, không vẽ lại. Không dùng trang live hay ảnh store làm gốc; `docs/ui-spec/index.md` (ES1-T252) chỉ được nhắc ở mục 12 để Dev biết phải đổi gì.
@@ -149,10 +157,10 @@ Figma: eyebrow "SHOP THIS SETUP", h2 48, link "Browse All Setups" phải; ảnh 
 | Ảnh | 320 × 279 (giữ 936/816 để điểm nóng đúng vị trí), bo 16 | 728 × 635 |
 | Dưới ảnh | 1 cột, cách 24: ô Fits → 4 hàng (cách 12) → panel | ĐỀ XUẤT: lưới `1fr 280`, gap 16: trái ô Fits + 4 hàng, phải panel `position: sticky` (top 80 + 16) |
 | Hàng | 64 + tên/giá, padding 12, bo 8; đang chọn viền 2px accent | như 360 |
-| Panel | padding 24; dòng 14/500 trắng 60%; tổng 18/700 trắng; nút full cao 48, cách 16 | như 360 |
+| Panel | padding 24; dòng 14/500 `--panel-muted` (foundation §2, 6.56); tổng 18/700 trắng; nút full cao 48, cách 16 | như 360 |
 
 Lý do 768: nút "Add Setup To Cart" đưa lên ngang danh sách, gần ảnh (05 nhóm 4 §1.3 "CTA rất gần khi cuộn nhẹ"; 19 §D1 tablet tận dụng bề ngang). Panel dính trong khối, không ra ngoài khối.
-Không có dòng ghi chú giảm giá dưới panel (sổ 07/11). Dòng giảm giá chữ trắng + dấu "−" (xanh Figma chỉ 2.50:1 trên panel, code ES1-T145 #4 đã làm vậy).
+Không có dòng ghi chú giảm giá dưới panel (sổ 07/11). Màu panel theo cặp chung của foundation §2 (panel tối G3, sổ 10/11): chữ phụ `--panel-muted`, dòng giảm giá `--panel-saving` (5.64) + icon tag 16 + dấu "−" (xanh Figma chỉ 2.50:1 trên panel; thay chữ trắng của vòng 3 / code ES1-T145 #4 để cùng cart, mini cart, bundle). Bảng §9.1 dòng "dòng phụ panel trắng 60%" không còn áp cho shop the look.
 Trạng thái (ĐỀ XUẤT): bấm điểm nóng → hàng tương ứng viền cam + cuộn tới hàng (360); hàng hết hàng: badge Sold out, ảnh 0.6, không tính vào tổng, số món giảm; tất cả hết hàng: ẩn panel (code đã có); đang thêm: nút `aria-busy` + spinner, giữ bề rộng; lỗi thêm giỏ: hộp lỗi `role="alert"` "Setup Not Added" + "Try Again"; thành công: mở mini cart (TE-5). Tổng nên in sẵn từ Liquid để không có ô trống trước khi JS chạy (như ĐỀ XUẤT ES1-T252 §1 khối 7).
 A11y: điểm nóng 44 × 44 (chấm 20), tên "Show {product} in the list", `aria-pressed`; hàng: 1 link (tên sản phẩm), ảnh `alt=""`; panel `aria-live="polite"` cho tổng; link "Browse All Setups" mô tả đích.
 

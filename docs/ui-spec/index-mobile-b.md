@@ -2,6 +2,14 @@ KHÔNG CHẮC: (1) Figma 1:359 chỉ có desktop 1920 và không có trạng th�
 
 # UI spec: Trang chủ 768 và 360, phần B (ES1-T279)
 
+## Thay đổi audit (ES1-T291, audit ES1-T283 A14)
+
+| # | Mục | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | §2 Featured product, đồng hồ | ô 44, số 20/600 riêng của trang chủ; ngày từ setting `countdown_end` | theo `docs/ui-spec/countdown.md`: 360 Compact (ô 40, số 16), 768 Regular (ô 44, số 18, Figma 1:773); 3/4 ô; ngày từ metafield `custom.sale_ends_at`, `countdown_end` chỉ khi sản phẩm không có metafield | sổ 10/11 câu 2; countdown.md |
+
+Chỉ §2 đổi. Mockup T279 vẽ ô 44 / số 20 ở 360: lệch P3, sửa khi render lại khối featured. §1 bundle (màu panel) ghi ở foundation §25.
+
 Khối: bundle builder (1:636) · featured product (1:759) · video demo (1:817) · testimonial (1:885) · why choose (1:992) · blog (1:1022) · FAQ (1:1057) · footer (1:1104).
 Phần A (hero → inspiration) thuộc ES1-T278. Spec `docs/ui-spec/index.md` (ES1-T252, gốc live) không sửa; với 8 khối này, spec này thay thế phần tương ứng vì gốc là Figma (sổ 10/11 BGĐ).
 
@@ -70,14 +78,14 @@ Figma desktop: 2 cột; trái thẻ ảnh 668 × ~652 nền cream viền nhạt 
 | Ảnh | 320 × 320 (1:1), sản phẩm `contain` padding 8% | ĐỀ XUẤT 728 × 546 (4:3): nút "Add To Cart" lên sớm ~180 px so với 1:1 (05 nhóm 4 §1.3); ảnh `contain` nên không cắt sản phẩm |
 | Dấu tròn | 72, cách góc 16 | 88, cách góc 24 |
 | Tiêu đề | `--font-size-h1` 33 | 43 |
-| Đồng hồ | inline-flex rộng theo nội dung (~286), ô 44, số 20/600 tabular | như 360 |
+| Đồng hồ | countdown.md cỡ Compact (khung chứa 320 < 368): ô 40, số 16, 3 ô rộng 267 / 4 ô 311 | countdown.md cỡ Regular (Figma 1:773): ô 44, số 18, 3 ô 311 / 4 ô 367 |
 | Bảng thông số | mỗi hàng xếp dọc: nhãn 14 muted trên, giá trị 16/500 dưới (giá trị dài "Cast iron core, reinforced rubber" không vừa 2 cột ở 320) | 2 cột như Figma: nhãn trái, giá trị phải, padding 12 / 24 |
 | Nút | xếp dọc full, primary trên, cách 12 | 1 hàng theo nội dung, cách 12 |
 
-- Đồng hồ: hiện số Liquid ngay khi render, JS chỉ đếm tiếp; Tech Lead trả lời ở ES1-T276 (lý do code đang ẩn tới khi module chạy). `role="timer"`, nhãn đầy đủ, không đọc mỗi giây. Hết giờ lúc render: không in khối.
+- Đồng hồ: component chung `docs/ui-spec/countdown.md` (kích thước §2, số ô §3, nguồn ngày và điều kiện hiện §4, trạng thái K0–K4 §5, A11y §7). Nguồn ngày: metafield `custom.sale_ends_at` của sản phẩm; setting `countdown_end` chỉ dùng khi sản phẩm không có metafield (sổ 10/11 câu 2). Vị trí giữ như Figma: giữa h2 và hàng giá. Không mô tả lại ở đây.
 - "View Detail" có phần ẩn " of {product}" (SEO, link mô tả đích).
 - Trạng thái: hết hàng → giá thường + badge Sold out, nút primary disabled chữ "Sold out", "View Detail" vẫn bấm được; không có rating → ẩn hàng sao; không có giá gạch → ẩn badge.
-- Settings giữ như schema (`product`, `eyebrow`, `countdown_label`, `countdown_end`, `spec_1..4_label`).
+- Settings giữ như schema (`product`, `eyebrow`, `countdown_label`, `countdown_end` dự phòng, `spec_1..4_label`); info `countdown_end` đổi theo countdown.md §6.
 
 ## 3. Video demo (Figma 1:817)
 
