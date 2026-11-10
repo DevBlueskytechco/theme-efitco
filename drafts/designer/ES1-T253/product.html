@@ -1,0 +1,740 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ativafit Lava 66 lb Adjustable – Efitco</title>
+<meta name="description" content="Ativafit Lava 66 lb Adjustable dumbbells: 11 to 66 lb in seconds, one dial, less floor space than a shoebox. Mockup ES1-T253.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* CSS riêng trang sản phẩm (ES1-T253). Spec: docs/ui-spec/product.md. Chỉ var(--*); hex duy nhất là dữ liệu swatch của Shopify (value.swatch.color) */
+
+  /* ---------- Khung 2 cột (Figma 1:759: media 668 · gap 80 · info 670) ---------- */
+  .pdp { display: grid; gap: var(--space-5); padding-block: var(--space-2) var(--space-7); }
+  .pdp > * { min-width: 0; }
+  @media (min-width: 64rem) {
+    .pdp { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; column-gap: var(--space-7); padding-block: var(--space-5) var(--space-8); }
+    .pdp__media { position: sticky; inset-block-start: calc(var(--header-height) + var(--space-5)); }
+  }
+  @media (min-width: 80rem) { .pdp { column-gap: calc(var(--space-1) * 20); } }
+
+  /* ---------- Gallery ---------- */
+  .gallery { display: grid; gap: var(--space-3); }
+  .gallery__stage { position: relative; margin-inline: calc(var(--page-margin) * -1); }
+  .gallery__track { display: flex; margin: 0; padding: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; list-style: none; background: var(--color-background-cream); }
+  .gallery__slide { position: relative; display: grid; flex: 0 0 100%; place-items: center; aspect-ratio: 1; scroll-snap-align: start; }
+  .gallery__zoom { display: block; width: 100%; height: 100%; cursor: zoom-in; }
+  .gallery__slide img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
+  .gallery__zoom:focus-visible { outline-offset: -4px; }
+  .gallery__zoom-hint { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); pointer-events: none; }
+  .gallery__zoom-hint svg { width: 20px; height: 20px; }
+  .gallery__count { position: absolute; inset-block-end: var(--space-3); inset-inline-start: var(--space-3); padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-xs); font-weight: 600; line-height: 20px; }
+  .gallery__nav { position: absolute; inset-block-end: var(--space-4); inset-inline-end: var(--space-4); }
+  .gallery__thumbs { display: flex; gap: var(--space-3); margin: 0; padding: 0; overflow-x: auto; scrollbar-width: none; list-style: none; }
+  .gallery__thumb { position: relative; display: block; width: 56px; height: 56px; flex: none; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-background-cream); }
+  .gallery__thumb img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: darken; }
+  .gallery__thumb:hover { border-color: var(--color-foreground); }
+  .gallery__thumb[aria-current='true'] { border: 2px solid var(--color-foreground); }
+  .gallery__thumb-badge { position: absolute; inset-block-end: var(--space-1); inset-inline-end: var(--space-1); display: grid; place-items: center; min-width: 22px; height: 22px; padding-inline: var(--space-1); border-radius: var(--radius-pill); background: var(--color-foreground); color: var(--color-background); font-size: 11px; font-weight: 700; }
+  .gallery__thumb-badge svg { width: 10px; height: 10px; }
+  @media (min-width: 48rem) {
+    .gallery__stage { margin-inline: 0; }
+    .gallery__track { border-radius: calc(var(--radius-card) + var(--space-1)); }
+    .gallery__slide { aspect-ratio: 4 / 3; }
+    .gallery__thumb { width: 64px; height: 64px; }
+  }
+  @media (min-width: 64rem) { .gallery__slide { aspect-ratio: 1; } }
+  @media (min-width: 80rem) { .gallery__thumb { width: 80px; height: 80px; border-radius: var(--space-2); } .gallery__count { inset-block-end: var(--space-4); inset-inline-start: var(--space-4); } }
+  /* video, 3D (trạng thái E) */
+  .media-play { position: absolute; inset: 0; margin: auto; display: inline-flex; align-items: center; gap: var(--space-2); width: fit-content; height: 56px; padding: 0 var(--space-5) 0 var(--space-2); border: 0; border-radius: var(--radius-pill); background: var(--color-foreground); color: var(--color-background); font-weight: 600; cursor: pointer; }
+  .media-play__icon { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--color-background); color: var(--color-foreground); }
+  .media-play__icon svg { width: 14px; height: 14px; }
+  .media-play:hover { background: var(--color-accent); color: var(--color-accent-foreground); }
+
+  /* ---------- Buy box ---------- */
+  .buy { display: grid; gap: var(--space-5); align-content: start; }
+  .buy__head { display: grid; gap: var(--space-3); }
+  .buy__title { font-size: var(--font-size-h1); line-height: calc(58 / 48); }
+  .buy__title--h3 { font-size: var(--font-size-h2); line-height: 1.15; }
+  .buy__meta { display: grid; gap: var(--space-1); }
+  .pdp-price { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+  .pdp-price__current { font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
+  .pdp-price__current--sale { color: var(--color-sale); }
+  .pdp-price__compare { color: var(--color-muted); font-size: var(--font-size-base); font-weight: 500; text-decoration: line-through; }
+  .rating { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); }
+  .rating__link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; color: var(--color-foreground); text-decoration: none; }
+  .rating__link:hover .rating__count { color: var(--color-accent); }
+  .rating__count { text-decoration: underline; text-underline-offset: 0.2em; }
+  .rating__sep { width: 1px; height: 16px; background: var(--color-muted-light); }
+  .stars { display: inline-flex; gap: 2px; color: var(--color-rating); }
+  .stars svg { width: 16px; height: 15px; }
+  .buy__note { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .buy__note a { color: inherit; text-decoration: underline; text-underline-offset: 0.2em; }
+  .buy__form { display: grid; align-content: start; gap: var(--space-5); padding-block-start: var(--space-5); border-block-start: 1px solid var(--color-border); }
+
+  /* Option */
+  .option { min-width: 0; margin: 0; padding: 0; border: 0; }
+  .option legend { margin-block-end: var(--space-3); padding: 0; font-size: var(--font-size-sm); font-weight: 600; line-height: 20px; }
+  .option legend span { color: var(--color-muted); font-weight: 400; }
+  .option__values { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .opt { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 56px; min-height: 44px; padding-inline: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; cursor: pointer; transition: border-color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out); }
+  .opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .opt:hover { border-color: var(--color-foreground); }
+  .opt:has(:checked) { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
+  .opt:has(:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .opt--na { color: var(--color-muted); }
+  .opt--na .opt__text { text-decoration: line-through; }
+  .opt--na:has(:checked) { color: var(--color-background); }
+  .opt--swatch { width: 44px; min-width: 44px; padding: 0; border-radius: 50%; border-color: transparent; }
+  .opt--swatch::before { content: ''; position: absolute; inset: var(--space-1); border: 1px solid color-mix(in srgb, var(--color-foreground) 50%, transparent); border-radius: 50%; background: var(--swatch-color, var(--color-background-cream)); }
+  .opt--swatch:has(:checked) { border: 2px solid var(--color-foreground); background: var(--color-background); }
+  .opt--swatch.opt--na::after { content: ''; position: absolute; inset-block-start: 50%; inset-inline: var(--space-1); height: 2px; background: var(--color-foreground); box-shadow: 0 0 0 1px var(--color-background); rotate: -45deg; }
+
+  /* Số lượng + Add To Cart */
+  .buy__purchase { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-2) var(--space-3); align-items: end; }
+  .buy__purchase > label { grid-column: 1 / -1; font-size: var(--font-size-sm); font-weight: 600; line-height: 20px; }
+  .qty { display: inline-grid; grid-template-columns: 44px 40px 44px; align-items: stretch; min-height: var(--control-height); border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); }
+  .qty button { display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--color-foreground); cursor: pointer; }
+  .qty button svg { width: 14px; height: 14px; }
+  .qty button:hover { color: var(--color-accent); }
+  .qty button:disabled { color: var(--color-muted-light); cursor: not-allowed; }
+  .qty input { width: 100%; min-width: 0; padding: 0; border: 0; background: none; font-weight: 600; text-align: center; -moz-appearance: textfield; appearance: textfield; }
+  .qty:focus-within { border-color: var(--color-accent); outline: 2px solid var(--color-accent); outline-offset: -1px; }
+  .qty.is-disabled { border-color: var(--color-border); background: var(--color-background-alt); }
+  .buy__add { width: 100%; }
+  .buy__more { justify-self: center; display: inline-flex; align-items: center; min-height: 44px; color: var(--color-foreground); font-size: var(--font-size-sm); text-decoration: underline; text-underline-offset: 0.2em; }
+  .buy__buttons { display: grid; gap: var(--space-3); }
+  .stock { display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); font-weight: 500; }
+  .stock::before { content: ''; flex: none; width: var(--space-2); height: var(--space-2); border-radius: 50%; background: var(--color-badge-new); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-badge-new) 20%, transparent); }
+  .stock--out { color: var(--color-muted); }
+  .stock--out::before { background: var(--color-muted); box-shadow: none; }
+
+  /* Cam kết (Figma 1:1107 trust bar) */
+  .assure { display: grid; gap: var(--space-3); margin: 0; padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-card); list-style: none; font-size: var(--font-size-sm); }
+  .assure li { display: flex; align-items: center; gap: var(--space-3); }
+  .assure svg { flex: none; width: 24px; height: 24px; color: var(--color-accent); }
+  .assure a { color: inherit; font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
+  .assure a:hover { color: var(--color-accent); }
+  @media (min-width: 48rem) and (max-width: 63.99rem), (min-width: 80rem) { .assure { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+  /* Accordion trong buy box */
+  .buy .accordion details > div { display: grid; gap: var(--space-4); }
+  .buy .accordion ul { margin: 0; padding-inline-start: var(--space-5); }
+  .spec { width: 100%; border: 1px solid var(--color-background-sand); border-radius: var(--space-2); border-collapse: separate; border-spacing: 0; overflow: hidden; color: var(--color-foreground); }
+  .spec th, .spec td { padding: var(--space-2) var(--space-4); font-size: var(--font-size-sm); line-height: 22px; text-align: start; vertical-align: top; }
+  .spec th { width: 40%; color: var(--color-muted); font-weight: 400; }
+  .spec td { font-weight: 500; }
+  .spec tr:nth-child(odd) { background: var(--color-background-sand); }
+  .spec tr:nth-child(odd) th { color: var(--color-background-sand-foreground); }
+  @media (min-width: 48rem) { .spec th, .spec td { padding: var(--space-2) var(--space-5); } .spec td { font-size: var(--font-size-base); text-align: end; } }
+
+  /* ---------- Pairs well with (complementary) ---------- */
+  .pairs { display: grid; gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+  @media (min-width: 48rem) { .pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--grid-gap); } }
+  @media (min-width: 80rem) { .pairs { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .pair { position: relative; display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-4); align-items: center; padding: var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+  .pair__media { aspect-ratio: 1; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); }
+  .pair__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
+  .pair__info { display: grid; gap: var(--space-1); justify-items: start; }
+  .pair__title { margin: 0; font-family: var(--font-primary--family); font-size: var(--font-size-base); font-weight: 500; letter-spacing: -0.01em; line-height: 1.5; }
+  .pair__title a { text-decoration: none; }
+  .pair__title a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+  .button--small { min-height: 40px; padding-inline: var(--space-4); font-size: var(--font-size-sm); }
+  .pair .button--small { margin-block-start: var(--space-1); }
+
+  /* ---------- Reviews ---------- */
+  .reviews { display: grid; gap: var(--space-6); }
+  @media (min-width: 64rem) { .reviews { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); align-items: start; gap: var(--space-7); } }
+  .reviews__summary { display: grid; gap: var(--space-4); justify-items: start; }
+  .reviews__score { display: flex; align-items: center; gap: var(--space-4); }
+  .reviews__number { font-family: var(--font-heading--family); font-size: var(--font-size-display); font-weight: var(--font-heading--weight-display); line-height: 0.9; letter-spacing: -0.03em; }
+  .reviews__score .stars svg { width: 20px; height: 19px; }
+  .reviews__based { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .reviews__list { display: grid; gap: var(--grid-gap); margin: 0; padding: 0; list-style: none; }
+  @media (min-width: 48rem) { .reviews__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .review { display: grid; gap: var(--space-3); align-content: start; height: 100%; padding: var(--space-5); border-radius: var(--radius-card); background: var(--color-background); }
+  .review__title { margin: 0; font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 600; letter-spacing: -0.01em; line-height: 1.4; }
+  .review__quote { margin: 0; color: var(--color-muted); }
+  .review__author { font-size: var(--font-size-sm); font-weight: 600; }
+  .reviews__more { margin-block-start: var(--space-5); }
+
+  /* ---------- You may also like ---------- */
+  .related-row { display: flex; gap: var(--grid-gap); margin: 0; padding: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; list-style: none; }
+  .related-row > li { flex: 0 0 min(70vw, 280px); scroll-snap-align: start; }
+  @media (min-width: 48rem) { .related-row > li { flex-basis: calc((100% - var(--grid-gap) * 2) / 2.5); } }
+  @media (min-width: 80rem) {
+    .related-row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
+    .related .carousel-progress, .related .carousel-nav { display: none; }
+  }
+
+  /* ---------- Sticky bar ---------- */
+  .sticky-bar { position: fixed; inset-inline: 0; inset-block-end: 0; z-index: 15; border-block-start: 1px solid var(--color-border); background: var(--color-background); box-shadow: 0 -4px 16px color-mix(in srgb, var(--color-foreground) 10%, transparent); padding-block-end: env(safe-area-inset-bottom); }
+  .sticky-bar__inner { display: grid; grid-template-columns: 48px minmax(0, 1fr) auto; gap: var(--space-3); align-items: center; width: var(--content-width); min-height: 72px; margin-inline: auto; padding-block: var(--space-3); }
+  .sticky-bar__img { width: 48px; height: 48px; border-radius: var(--space-2); background: var(--color-background-cream); object-fit: contain; mix-blend-mode: darken; }
+  .sticky-bar__text { display: grid; min-width: 0; }
+  .sticky-bar__title { overflow: hidden; font-size: var(--font-size-sm); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+  .sticky-bar__variant { display: none; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .sticky-bar .price { font-size: var(--font-size-sm); line-height: 20px; }
+  .sticky-bar .price__compare { font-size: var(--font-size-xs); }
+  .sticky-bar .button { padding-inline: var(--space-4); }
+  .sticky-bar .button svg { display: none; }
+  .sticky-bar__compare { display: none; }
+  @media (min-width: 48rem) { .sticky-bar .button { padding-inline: var(--space-6); } .sticky-bar .button svg { display: block; } .sticky-bar__compare { display: inline; } }
+  .sticky-bar__select { display: none; }
+  @media (min-width: 48rem) {
+    .sticky-bar__inner { grid-template-columns: 56px minmax(0, 1fr) auto auto; gap: var(--space-4); min-height: 80px; }
+    .sticky-bar__img { width: 56px; height: 56px; }
+    .sticky-bar__title { font-size: var(--font-size-base); }
+    .sticky-bar__variant { display: block; }
+    .sticky-bar .price { font-size: var(--font-size-base); }
+  }
+  @media (min-width: 64rem) { .sticky-bar__select { display: block; min-width: 10rem; } .sticky-bar__inner { grid-template-columns: 56px minmax(0, 1fr) auto auto auto; } }
+
+  /* ---------- Lightbox ---------- */
+  .lightbox { position: absolute; inset: 0; z-index: 21; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; background: var(--color-background-cream); color: var(--color-background-cream-foreground); }
+  .lightbox__bar { display: flex; align-items: center; justify-content: space-between; padding: var(--space-3) var(--space-3) 0 var(--space-5); font-size: var(--font-size-sm); font-weight: 600; }
+  .lightbox__img { position: relative; min-height: 0; }
+  .lightbox__img img { position: absolute; inset: var(--space-4); width: calc(100% - var(--space-6)); height: calc(100% - var(--space-6)); object-fit: contain; mix-blend-mode: darken; }
+  .lightbox__nav { position: absolute; inset-inline: var(--space-5); inset-block-start: 50%; display: none; justify-content: space-between; translate: 0 -50%; pointer-events: none; }
+  .lightbox__nav .round-button { pointer-events: auto; }
+  .lightbox__thumbs { display: flex; justify-content: center; gap: var(--space-2); padding: var(--space-3) var(--space-3) var(--space-5); }
+  @media (min-width: 48rem) { .lightbox__nav { display: flex; } }
+
+  /* Breadcrumb mobile: 1 dòng, mục cuối cắt "…" (foundation §5) */
+  @media (max-width: 47.99rem) {
+    .breadcrumb ol { flex-wrap: nowrap; }
+    .breadcrumb li:last-child { flex: 1 1 auto; overflow: hidden; }
+    .breadcrumb [aria-current='page'] { max-width: 100%; }
+  }
+
+  /* ---------- Bảng trạng thái ---------- */
+  .site-header.demo-static { position: relative; }
+  .state-pdp { display: grid; gap: var(--space-5); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+  @media (min-width: 64rem) { .state-pdp { grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); align-items: start; gap: var(--space-6); } }
+  .state-pdp .gallery__stage { margin-inline: 0; }
+  .state-pdp .gallery__track { border-radius: var(--radius-card); }
+  .state-pdp .gallery__slide { aspect-ratio: 1; }
+  .state-grid { display: grid; gap: var(--space-6); }
+  .is-sold-out .gallery__slide img { opacity: 0.6; }
+  .mini-frame { position: relative; min-height: 280px; overflow: hidden; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background-alt); }
+  .mini-frame > .sticky-bar, .mini-frame > .toast-region { position: absolute; }
+  .mini-frame > .toast-region { inset-block-end: 96px; }
+  .lightbox-frame { position: relative; height: 560px; overflow: hidden; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
+  .skeleton-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--grid-gap); }
+  @media (min-width: 80rem) { .skeleton-row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .skeleton-row .skeleton-card .skeleton--line:nth-child(3) { width: 40%; }
+  .placeholder-tile { display: grid; place-items: center; aspect-ratio: 1; border-radius: var(--radius-card); background: var(--color-background-cream); color: var(--color-muted-light); }
+  .placeholder-tile svg { width: 40%; height: auto; }
+  .demo-pair { display: grid; gap: var(--space-5); }
+  @media (min-width: 64rem) { .demo-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-star" viewBox="0 0 14 13"><path fill="currentColor" d="m7 0 2.1 4.2 4.6.7-3.3 3.2.8 4.6L7 10.5l-4.2 2.2.8-4.6L.3 4.9l4.6-.7L7 0Z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
+  <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
+  <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
+  <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="20" height="20" rx="5"/><circle cx="13" cy="13" r="4.5"/><circle cx="18.6" cy="7.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="5.5" width="22" height="15" rx="4"/><path d="m11 10 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 26 26"><path d="M15.5 4.5h-2a4 4 0 0 0-4 4v3h-2.5v3.5h2.5v8.5h3.5V15h3l.5-3.5h-3.5V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-zoom" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="8.5" cy="8.5" r="6"/><path d="m13 13 5 5M8.5 6v5M6 8.5h5"/></g></symbol>
+  <symbol id="i-play" viewBox="0 0 14 14"><path fill="currentColor" d="M3 1.5v11a.6.6 0 0 0 .9.5l8.6-5.5a.6.6 0 0 0 0-1L3.9 1A.6.6 0 0 0 3 1.5Z"/></symbol>
+  <symbol id="i-cube" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="m10 2 7 4v8l-7 4-7-4V6l7-4Z"/><path d="m3 6 7 4 7-4M10 10v8"/></g></symbol>
+  <symbol id="i-minus" viewBox="0 0 14 14"><path d="M2 7h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 14 14"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<a class="visually-hidden" href="#main">Skip to content</a>
+
+<!-- ===== Header trang con, biến thể A (sổ quyết định 09/11) ===== -->
+<header class="site-header">
+  <div class="site-header__inner">
+    <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+    <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+    <nav class="site-header__nav" aria-label="Main">
+      <ul class="site-header__menu">
+        <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Sale</a></li>
+        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Blog</a></li>
+        <li><a class="site-header__link" href="#">Contact</a></li>
+        <li><a class="site-header__link" href="#">Help</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__icons">
+      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol>
+        <li><a href="#">Home</a></li>
+        <li><a href="#">Free Weights</a></li>
+        <li><span aria-current="page">Ativafit Lava 66 lb Adjustable</span></li>
+      </ol>
+    </nav>
+
+    <!-- ===== product-main: product-media + product-info + product-form ===== -->
+    <div class="pdp">
+      <div class="pdp__media">
+        <div class="gallery" data-testid="product-media">
+          <div class="gallery__stage">
+            <ul class="gallery__track" aria-label="Product media">
+              <li class="gallery__slide"><a class="gallery__zoom" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=1440" width="1440" height="1440" alt="Ativafit Lava 66 lb Adjustable, black, image 1 of 3" fetchpriority="high"><span class="visually-hidden">Open image 1 of 3 in full size</span></a><span class="gallery__zoom-hint" aria-hidden="true"><svg><use href="#i-zoom"/></svg></span></li>
+              <li class="gallery__slide"><a class="gallery__zoom" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P01-1.jpg?width=1440" width="1440" height="1440" alt="Ativafit Lava 66 lb Adjustable, image 2 of 3"><span class="visually-hidden">Open image 2 of 3 in full size</span></a></li>
+              <li class="gallery__slide"><a class="gallery__zoom" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P01-2.jpg?width=1440" width="1440" height="1440" alt="Ativafit Lava 66 lb Adjustable, image 3 of 3"><span class="visually-hidden">Open image 3 of 3 in full size</span></a></li>
+            </ul>
+            <span class="gallery__count" aria-hidden="true">1 / 3</span>
+            <div class="carousel-nav gallery__nav">
+              <button class="round-button round-button--prev" type="button" aria-label="Previous image" aria-disabled="true"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+              <button class="round-button" type="button" aria-label="Next image"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            </div>
+          </div>
+          <ul class="gallery__thumbs" aria-label="Product media thumbnails">
+            <li><a class="gallery__thumb" href="#" aria-current="true"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=160" width="80" height="80" alt=""><span class="visually-hidden">Load media 1 of 3</span></a></li>
+            <li><a class="gallery__thumb" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P01-1.jpg?width=160" width="80" height="80" alt=""><span class="visually-hidden">Load media 2 of 3</span></a></li>
+            <li><a class="gallery__thumb" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P01-2.jpg?width=160" width="80" height="80" alt=""><span class="visually-hidden">Load media 3 of 3</span></a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="buy">
+        <div class="buy__head" data-testid="product-info">
+          <p class="eyebrow">Efitco</p>
+          <h1 class="buy__title">Ativafit Lava 66 lb Adjustable</h1>
+          <div class="buy__meta">
+            <div class="pdp-price">
+              <span class="visually-hidden">Sale price</span><span class="pdp-price__current pdp-price__current--sale">$379.99</span>
+              <span class="visually-hidden">Regular price</span><s class="pdp-price__compare">$499.99</s>
+              <span class="badge badge--sale">-24%</span>
+            </div>
+            <div class="rating">
+              <a class="rating__link" href="#reviews">
+                <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
+                <span><span class="visually-hidden">Rated </span>4.9<span class="visually-hidden"> out of 5 stars,</span></span>
+                <span class="rating__sep" aria-hidden="true"></span>
+                <span class="rating__count">341 reviews</span>
+              </a>
+            </div>
+            <p class="buy__note">Taxes included. <a href="#">Shipping</a> calculated at checkout.</p>
+          </div>
+        </div>
+
+        <div class="buy__form" data-testid="product-form">
+          <fieldset class="option">
+            <legend>Color: <span>Black</span></legend>
+            <div class="option__values">
+              <label class="opt opt--swatch" style="--swatch-color:#1a1a1a"><input type="radio" name="o1" checked><span class="visually-hidden">Black</span></label>
+              <label class="opt opt--swatch" style="--swatch-color:#8c8c8c"><input type="radio" name="o1"><span class="visually-hidden">Gray</span></label>
+              <label class="opt opt--swatch" style="--swatch-color:#ffffff"><input type="radio" name="o1"><span class="visually-hidden">White</span></label>
+            </div>
+          </fieldset>
+
+          <p class="stock">In stock</p>
+
+          <div class="buy__purchase">
+            <label for="qty-main">Quantity</label>
+            <div class="qty">
+              <button type="button" aria-label="Decrease quantity for Ativafit Lava 66 lb Adjustable" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button>
+              <input id="qty-main" type="number" min="1" value="1" inputmode="numeric">
+              <button type="button" aria-label="Increase quantity for Ativafit Lava 66 lb Adjustable"><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
+            </div>
+            <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+          </div>
+
+          <div class="buy__buttons">
+            <button class="button button--secondary button--full" type="button">Buy It Now</button>
+            <a class="buy__more" href="#">More payment options</a>
+          </div>
+
+          <ul class="assure">
+            <li><svg aria-hidden="true"><use href="#i-truck"/></svg><a href="#">Fast Shipping</a></li>
+            <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+            <li><svg aria-hidden="true"><use href="#i-refresh"/></svg><a href="#">90 Day Money Back</a></li>
+          </ul>
+
+          <div class="accordion">
+            <details open>
+              <summary>Features and description</summary>
+              <div>
+                <p>11 to 66 lb in seconds. One pair replaces a whole rack of fixed dumbbells - and takes up less floor space than a shoebox. No plates to swap, no waiting between sets, just one dial and go. Fifteen pairs of dumbbells living quietly in the corner - and your room stays a room.</p>
+              </div>
+            </details>
+            <details open>
+              <summary>Specifications</summary>
+              <div>
+                <table class="spec">
+                  <caption class="visually-hidden">Ativafit Lava 66 lb Adjustable specifications</caption>
+                  <tbody>
+                    <tr><th scope="row">Weight range</th><td>11 – 66 lb per hand</td></tr>
+                    <tr><th scope="row">Footprint</th><td>0.18 m² — fits under a desk</td></tr>
+                    <tr><th scope="row">Materials</th><td>Cast iron core, reinforced rubber</td></tr>
+                    <tr><th scope="row">Assembly</th><td>None — ready out of the box</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </details>
+            <details>
+              <summary>Shipping and returns</summary>
+              <div>
+                <p>Shipping is calculated at checkout from your address.</p>
+                <p><a class="text-link" href="#">Read the shipping policy</a> · <a class="text-link" href="#">Read the refund policy</a></p>
+              </div>
+            </details>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== product-complementary ===== -->
+  <section class="section" style="padding-block-start: 0" aria-labelledby="h-pairs" data-testid="product-recommendations">
+    <div class="container">
+      <div class="section-header">
+        <h2 id="h-pairs">Pairs Well With</h2>
+      </div>
+      <ul class="pairs" aria-labelledby="h-pairs">
+        <li class="pair">
+          <div class="pair__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=192" width="96" height="96" alt=""></div>
+          <div class="pair__info"><h3 class="pair__title"><a href="#">Training Mat 12 mm</a></h3><div class="price"><span>$69.00</span></div><button class="button button--secondary button--small" type="button">Add To Cart<span class="visually-hidden">: Training Mat 12 mm</span></button></div>
+        </li>
+        <li class="pair">
+          <div class="pair__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P10.jpg?width=192" width="96" height="96" alt=""></div>
+          <div class="pair__info"><h3 class="pair__title"><a href="#">Foldable bench</a></h3><div class="price"><span>$89.00</span></div><button class="button button--secondary button--small" type="button">Add To Cart<span class="visually-hidden">: Foldable bench</span></button></div>
+        </li>
+        <li class="pair">
+          <div class="pair__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png?width=192" width="96" height="96" alt=""></div>
+          <div class="pair__info"><h3 class="pair__title"><a href="#">Resistance Band Set</a></h3><div class="price"><span>$45.00</span></div><button class="button button--secondary button--small" type="button">Add To Cart<span class="visually-hidden">: Resistance Band Set</span></button></div>
+        </li>
+        <li class="pair">
+          <div class="pair__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P20.jpg?width=192" width="96" height="96" alt=""></div>
+          <div class="pair__info"><h3 class="pair__title"><a href="#">Recovery Roller Pro</a></h3><div class="price"><span>$52.00</span></div><button class="button button--secondary button--small" type="button">Add To Cart<span class="visually-hidden">: Recovery Roller Pro</span></button></div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== product-reviews (ĐỀ XUẤT, câu hỏi CTO 1) ===== -->
+  <section class="section section--cream" id="reviews" aria-labelledby="h-reviews">
+    <div class="container reviews">
+      <div class="reviews__summary">
+        <h2 id="h-reviews">Customer Reviews</h2>
+        <div class="reviews__score">
+          <span class="reviews__number" aria-hidden="true">4.9</span>
+          <div>
+            <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
+            <p class="reviews__based"><span class="visually-hidden">Rated 4.9 out of 5 stars. </span>Based on 341 reviews</p>
+          </div>
+        </div>
+        <a class="button button--secondary" href="#">Write A Review</a>
+      </div>
+      <div>
+        <ul class="reviews__list">
+          <li class="review">
+            <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
+            <p class="visually-hidden">Rated 5 out of 5 stars</p>
+            <h3 class="review__title">Versatile Gear For All Exercises</h3>
+            <p class="review__quote">High quality equipment that doesn't break the bank. I am very impressed with the overall durability.</p>
+            <p class="review__author">E. Johnson</p>
+          </li>
+          <li class="review">
+            <span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
+            <p class="visually-hidden">Rated 5 out of 5 stars</p>
+            <h3 class="review__title">Smooth Every Single Rep</h3>
+            <p class="review__quote">The dial switches weight fast, no jamming at all. Saves an entire corner of my room.</p>
+            <p class="review__author">M. Anderson</p>
+          </li>
+        </ul>
+        <button class="button button--secondary reviews__more" type="button">Show More Reviews</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== product-related ===== -->
+  <section class="section related" aria-labelledby="h-related">
+    <div class="container">
+      <div class="section-header section-header--split">
+        <h2 id="h-related">You May Also Like</h2>
+        <div class="carousel-nav">
+          <button class="round-button round-button--prev" type="button" aria-label="Previous products" aria-disabled="true"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <button class="round-button" type="button" aria-label="Next products"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        </div>
+      </div>
+      <ul class="related-row" aria-labelledby="h-related">
+        <li><article class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg?width=720" width="720" height="720" alt=""></div>
+          <div class="product-card__info"><h3 class="product-card__title"><a href="#">Adjustable dumbbell pair</a></h3><div class="price"><span>$259.00</span></div></div>
+        </article></li>
+        <li><article class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=720" width="720" height="720" alt=""><div class="product-card__badges"><span class="badge badge--sale">-15%</span></div></div>
+          <div class="product-card__info"><h3 class="product-card__title"><a href="#">Olympic Plate Set 100</a></h3><div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$289.00</span><span class="visually-hidden">Regular price</span><s class="price__compare">$339.00</s></div></div>
+        </article></li>
+        <li><article class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg?width=720" width="720" height="720" alt=""><div class="product-card__badges"><span class="badge badge--new">New</span></div></div>
+          <div class="product-card__info"><h3 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg</a></h3><div class="price"><span>$119.00</span></div><span class="swatch-more">3 colors</span></div>
+        </article></li>
+        <li><article class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=720" width="720" height="720" alt=""><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div>
+          <div class="product-card__info"><h3 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h3><div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$189.00</span><span class="visually-hidden">Regular price</span><s class="price__compare">$229.00</s></div></div>
+        </article></li>
+      </ul>
+      <div class="carousel-progress" aria-hidden="true"><span class="carousel-progress__thumb" style="--size: 45%"></span></div>
+    </div>
+  </section>
+
+  <!-- ================= TRẠNG THÁI (cuối file theo ticket) ================= -->
+  <div class="container">
+    <section class="demo-block" aria-labelledby="st-a">
+      <p class="demo-label">Trạng thái A · edge_cases "Hết hàng toàn bộ"</p>
+      <h2 id="st-a">Sold out</h2>
+      <p class="demo-note">Mọi variant hết: badge Sold out cạnh giá, swatch gạch chéo nhưng vẫn chọn được, số lượng và nút khoá, ảnh mờ 0.6. Không hiện Buy It Now (Shopify ẩn khi variant không bán được).</p>
+      <div class="state-pdp is-sold-out">
+        <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, sold out sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=900" width="900" height="900" alt="Hết hàng toàn bộ"></li></ul></div>
+        <div class="buy">
+          <div class="buy__head">
+            <h3 class="buy__title buy__title--h3">Hết hàng toàn bộ</h3>
+            <div class="pdp-price"><span class="pdp-price__current">$1,000.00</span><span class="badge badge--sold-out">Sold out</span></div>
+          </div>
+          <div class="buy__form">
+            <fieldset class="option">
+              <legend>Color: <span>Green</span></legend>
+              <div class="option__values">
+                <label class="opt opt--swatch opt--na" style="--swatch-color:#4b7f52"><input type="radio" name="sa" checked><span class="visually-hidden">Green, sold out</span></label>
+                <label class="opt opt--swatch opt--na" style="--swatch-color:#a0703c"><input type="radio" name="sa"><span class="visually-hidden">Bronze, sold out</span></label>
+                <label class="opt opt--swatch opt--na" style="--swatch-color:#2f5fa8"><input type="radio" name="sa"><span class="visually-hidden">Blue, sold out</span></label>
+                <label class="opt opt--swatch opt--na" style="--swatch-color:#1a1a1a"><input type="radio" name="sa"><span class="visually-hidden">Black, sold out</span></label>
+                <label class="opt opt--swatch opt--na" style="--swatch-color:#e6d9c3"><input type="radio" name="sa"><span class="visually-hidden">Beige, sold out</span></label>
+              </div>
+            </fieldset>
+            <div class="buy__purchase">
+              <label for="qty-a">Quantity</label>
+              <div class="qty is-disabled"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-a" type="number" value="1" disabled><button type="button" aria-label="Increase quantity" disabled><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+              <button class="button buy__add" type="submit" disabled>Sold out</button>
+            </div>
+            <p class="stock stock--out">Sold out</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="st-b">
+      <p class="demo-label">Trạng thái B · edge_cases "2 option có tổ hợp không tồn"</p>
+      <h2 id="st-b">Many variants, unavailable combination</h2>
+      <p class="demo-note">Gold + L không có variant: pill L gạch ngang, nút "Unavailable" khoá, gợi ý chọn cỡ khác ngay dưới nút. Size dùng pill (không dropdown, 10 §6 #850); Color là swatch khi có value.swatch, không có thì pill chữ.</p>
+      <div class="state-pdp">
+        <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, variant sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=900" width="900" height="900" alt="2 option có tổ hợp không tồn"></li></ul></div>
+        <div class="buy">
+          <div class="buy__head">
+            <h3 class="buy__title buy__title--h3">2 option có tổ hợp không tồn</h3>
+            <div class="pdp-price"><span class="pdp-price__current">$30.00</span></div>
+          </div>
+          <div class="buy__form">
+            <fieldset class="option">
+              <legend>Color: <span>Gold</span></legend>
+              <div class="option__values">
+                <label class="opt"><input type="radio" name="sb1"><span class="opt__text">Black</span></label>
+                <label class="opt"><input type="radio" name="sb1" checked><span class="opt__text">Gold</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="option">
+              <legend>Size: <span>L</span></legend>
+              <div class="option__values">
+                <label class="opt"><input type="radio" name="sb2"><span class="opt__text">S</span></label>
+                <label class="opt"><input type="radio" name="sb2"><span class="opt__text">M</span></label>
+                <label class="opt opt--na"><input type="radio" name="sb2" checked><span class="opt__text">L</span><span class="visually-hidden">, unavailable</span></label>
+              </div>
+            </fieldset>
+            <div class="buy__purchase">
+              <label for="qty-b">Quantity</label>
+              <div class="qty"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-b" type="number" value="1"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+              <button class="button buy__add" type="submit" disabled aria-describedby="hint-b">Unavailable</button>
+            </div>
+            <p class="stock stock--out" id="hint-b">This combination is unavailable. Choose another size or color.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="st-c">
+      <p class="demo-label">Trạng thái C, D · đang thêm giỏ, lỗi thêm giỏ</p>
+      <h2 id="st-c">Adding to cart and add to cart error</h2>
+      <p class="demo-note">C: nút giữ bề rộng, spinner, aria-busy, số lượng khoá, chữ ẩn "Adding to cart" trong role=status. D: lỗi 422 của Shopify hiện ngay dưới nút trong product-form-error (role=alert), không tự ẩn; nút mở lại. Thành công: drawer giỏ mở (TE-5 AC8), không cần toast.</p>
+      <div class="demo-pair">
+        <div class="buy__form" style="border: 0; padding: 0">
+          <div class="buy__purchase">
+            <label for="qty-c">Quantity</label>
+            <div class="qty is-disabled"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-c" type="number" value="1" disabled><button type="button" aria-label="Increase quantity" disabled><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+            <button class="button buy__add" type="submit" aria-busy="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+          </div>
+          <p class="visually-hidden" role="status">Adding to cart</p>
+        </div>
+        <div class="buy__form" style="border: 0; padding: 0">
+          <div class="buy__purchase">
+            <label for="qty-d">Quantity</label>
+            <div class="qty"><button type="button" aria-label="Decrease quantity"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-d" type="number" value="6"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+            <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+          </div>
+          <div class="form-message form-message--error" role="alert">
+            <svg aria-hidden="true"><use href="#i-alert"/></svg>
+            <div><strong>Couldn't add to cart</strong>You can't add more Ativafit Lava 66 lb Adjustable - Black to the cart. Lower the quantity and try again.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="st-e">
+      <p class="demo-label">Trạng thái E · edge_cases "Media đủ loại": video và 3D trong gallery</p>
+      <h2 id="st-e">Video and 3D model in the gallery</h2>
+      <p class="demo-note">Video: poster + nút "Play video" giữa ảnh, không tự chạy, preload none; YouTube/Vimeo chỉ tải iframe khi bấm. 3D: poster + nút "View in 3D", model-viewer tải khi bấm. Thumbnail có nhãn ▶ hoặc 3D. Poster ở đây là ảnh của sản phẩm mẫu (store không xuất được preview video).</p>
+      <div class="demo-pair">
+        <div class="gallery">
+          <div class="gallery__stage" style="margin-inline: 0">
+            <ul class="gallery__track" style="border-radius: var(--radius-card)" aria-label="Product media, video sample">
+              <li class="gallery__slide" style="aspect-ratio: 1"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj.jpg?width=900" width="900" height="900" alt=""><button class="media-play" type="button"><span class="media-play__icon" aria-hidden="true"><svg><use href="#i-play"/></svg></span>Play video<span class="visually-hidden">: Media đủ loại</span></button></li>
+            </ul>
+            <span class="gallery__count" aria-hidden="true">2 / 4</span>
+          </div>
+          <ul class="gallery__thumbs" aria-label="Product media thumbnails, video sample">
+            <li><a class="gallery__thumb" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=160" width="80" height="80" alt=""><span class="visually-hidden">Load media 1 of 4</span></a></li>
+            <li><a class="gallery__thumb" href="#" aria-current="true"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj.jpg?width=160" width="80" height="80" alt=""><span class="gallery__thumb-badge" aria-hidden="true"><svg><use href="#i-play"/></svg></span><span class="visually-hidden">Load media 2 of 4, video</span></a></li>
+            <li><a class="gallery__thumb" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=160" width="80" height="80" alt=""><span class="gallery__thumb-badge" aria-hidden="true">3D</span><span class="visually-hidden">Load media 3 of 4, 3D model</span></a></li>
+          </ul>
+        </div>
+        <div class="gallery">
+          <div class="gallery__stage" style="margin-inline: 0">
+            <ul class="gallery__track" style="border-radius: var(--radius-card)" aria-label="Product media, 3D sample">
+              <li class="gallery__slide" style="aspect-ratio: 1"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=900" width="900" height="900" alt=""><button class="media-play" type="button"><span class="media-play__icon" aria-hidden="true"><svg><use href="#i-cube"/></svg></span>View in 3D<span class="visually-hidden">: Media đủ loại</span></button></li>
+            </ul>
+            <span class="gallery__count" aria-hidden="true">3 / 4</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="st-f">
+      <p class="demo-label">Trạng thái F · lightbox phóng to (product-media__dialog)</p>
+      <h2 id="st-f">Zoomed image</h2>
+      <p class="demo-note">Toàn màn hình mọi mốc (ngoại lệ "không popup full-screen" vì đây là trình xem ảnh, 09 §3 ảnh phóng 80–100%). Nền trắng, đếm ảnh trái trên, nút đóng 48 phải trên; ≥768 có nút 52 hai bên; mobile vuốt + thumbnail dưới. Escape đóng, trả focus về ảnh.</p>
+      <div class="lightbox-frame">
+        <div class="lightbox" role="dialog" aria-label="Zoomed image" aria-modal="false">
+          <div class="lightbox__bar"><span>1 / 3</span><button class="close-button" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+          <div class="lightbox__img"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=1440" width="1440" height="1440" alt="Ativafit Lava 66 lb Adjustable, black, image 1 of 3"></div>
+          <div class="lightbox__nav">
+            <button class="round-button round-button--prev" type="button" aria-label="Previous image" aria-disabled="true"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            <button class="round-button" type="button" aria-label="Next image"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+          <div class="lightbox__thumbs">
+            <a class="gallery__thumb" href="#" aria-current="true"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=160" width="64" height="64" alt=""><span class="visually-hidden">Image 1 of 3</span></a>
+            <a class="gallery__thumb" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P01-1.jpg?width=160" width="64" height="64" alt=""><span class="visually-hidden">Image 2 of 3</span></a>
+            <a class="gallery__thumb" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P01-2.jpg?width=160" width="64" height="64" alt=""><span class="visually-hidden">Image 3 of 3</span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="st-g">
+      <p class="demo-label">Trạng thái G · product-sticky-bar + toast lỗi khi nút chính đã khuất</p>
+      <h2 id="st-g">Sticky add to cart bar</h2>
+      <p class="demo-note">Hiện khi nút Add To Cart chính ra khỏi màn, ẩn khi quay lại; fixed đáy (0 CLS). 360: ảnh 48, tên 1 dòng + giá, nút. ≥768: thêm biến thể đang chọn. ≥1024: thêm select biến thể (ĐỀ XUẤT, câu hỏi CTO 2). Lỗi thêm giỏ từ thanh này hiện toast error vì vùng lỗi trong form đang khuất.</p>
+      <div class="mini-frame">
+        <div class="toast-region">
+          <div class="toast toast--error" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="toast__body"><strong>Couldn't add to cart</strong>You can't add more Ativafit Lava 66 lb Adjustable - Black to the cart.</div><button class="toast__close" type="button" aria-label="Dismiss message"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+        </div>
+        <div class="sticky-bar" data-testid="product-sticky-bar">
+          <div class="sticky-bar__inner">
+            <img class="sticky-bar__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=112" width="56" height="56" alt="">
+            <div class="sticky-bar__text">
+              <p class="sticky-bar__title">Ativafit Lava 66 lb Adjustable</p>
+              <p class="sticky-bar__variant">Black</p>
+              <div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="sticky-bar__compare"><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s></span></div>
+            </div>
+            <div class="sticky-bar__select"><label class="visually-hidden" for="sb-variant">Color</label><select class="field__input" id="sb-variant"><option>Black</option><option>Gray</option><option>White</option></select></div>
+            <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="st-h">
+      <p class="demo-label">Trạng thái H, I · đang tải gợi ý, sản phẩm không có media</p>
+      <h2 id="st-h">Loading recommendations and product without media</h2>
+      <p class="demo-note">H: khối gợi ý có kết quả thì hiện skeleton 1 hàng đúng kích thước trong lúc fetch; 0 kết quả hoặc lỗi thì ẩn cả khối (không hiện trạng thái rỗng). I: edge_cases "Sản phẩm không có media": 1 ô placeholder cream, không thumbnail, không nút phóng to.</p>
+      <div class="demo-pair">
+        <div>
+          <p class="demo-label">Pairs Well With · loading</p>
+          <div class="skeleton-row" aria-busy="true">
+            <div class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line"></span></div>
+            <div class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line"></span></div>
+          </div>
+        </div>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-4); align-items: start">
+          <div class="placeholder-tile" role="img" aria-label="Sản phẩm không có media, no image"><svg aria-hidden="true"><use href="#i-image"/></svg></div>
+          <div class="buy__head"><h3 class="buy__title buy__title--h3">Sản phẩm không có media</h3><div class="pdp-price"><span class="pdp-price__current">$34.00</span></div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__newsletter">
+      <div>
+        <h2><span>Get 15% Off</span> Your First Order</h2>
+        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+      </div>
+      <form class="site-footer__form" onsubmit="return false">
+        <label class="visually-hidden" for="nl-email">Email</label>
+        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+      </form>
+    </div>
+    <div class="site-footer__panel">
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <svg class="logo" viewBox="0 0 100 30" aria-label="Efitco" role="img"><use href="#i-logo"/></svg>
+          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+          <div class="site-footer__social"><a href="#" aria-label="Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a><a href="#" aria-label="YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a><a href="#" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></div>
+        </div>
+        <div class="site-footer__menus">
+          <div class="site-footer__menu"><details open><summary>Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+          <div class="site-footer__menu"><details open><summary>Information <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        </div>
+      </div>
+      <ul class="site-footer__trust">
+        <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+        <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+        <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+        <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+      </ul>
+    </div>
+    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
+    <div class="site-footer__bottom">
+      <p>© 2026 Efitco, Powered by Shopify</p>
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English">USD / EN <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
