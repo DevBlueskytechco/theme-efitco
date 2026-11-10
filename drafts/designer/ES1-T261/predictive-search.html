@@ -11,7 +11,6 @@
   .sheet-intro { padding-block: var(--space-5) var(--space-6); }
   .sheet-intro p { max-width: 75ch; margin-block-start: var(--space-3); color: var(--color-muted); }
   .demo-block { padding-block: var(--space-7) 0; }
-  .site-header__logo svg { width: calc(var(--space-1) * 25); } /* Figma/base.css 100 × 30 (kit đang 140) */
   .stage { --stage-h: 760px; position: relative; height: var(--stage-h); overflow: hidden; border-block: 1px dashed var(--color-muted-light); background: var(--color-background); }
   @media (min-width: 48rem) { .stage { --stage-h: 1024px; } }
   @media (min-width: 80rem) { .stage { --stage-h: 800px; } }
@@ -45,12 +44,19 @@
   .ps__top .ps__inner { display: flex; align-items: center; gap: var(--space-3); padding-block: var(--space-3); }
   .ps--drawer .ps__top .ps__inner { padding-block: var(--space-4) var(--space-3); }
   .ps__logo { display: none; }
+  /* Vòng 3: hàng ô tìm của popup = thanh tối header (Figma 1:362, sổ 10/11), cao 80 mọi mốc, nằm đúng chỗ header */
+  .ps--popup .ps__top { background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); }
+  .ps--popup .ps__top .ps__inner { min-height: var(--header-height); padding-block: var(--space-4); }
+  .ps--popup .ps__top :focus-visible { outline-color: var(--color-background-dark-foreground); }
   @media (min-width: 80rem) {
-    .ps--popup .ps__top .ps__inner { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); min-height: var(--header-height); padding-block: var(--space-4); }
+    .ps--popup .ps__top .ps__inner { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); }
     .ps--popup .ps__logo { display: inline-flex; grid-column: 1 / span 3; }
     .ps--popup .ps-field { grid-column: 4 / span 8; }
     .ps--popup .ps__close { grid-column: 12; justify-self: end; }
   }
+  /* Nút đóng 48 trên nền tối: viền trắng 24%, icon trắng 17.4:1; hover nền trắng icon tối */
+  .ps--popup .ps__close { border-color: color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); background: transparent; color: var(--color-background-dark-foreground); }
+  .ps--popup .ps__close:hover, .ps--popup .ps__close.is-hover { border-color: var(--color-background-dark-foreground); background: var(--color-background-dark-foreground); color: var(--color-background-dark); }
 
   .ps-field { position: relative; display: flex; flex: 1; align-items: center; min-width: 0; min-height: var(--control-height); border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); background: var(--color-background); transition: border-color var(--motion-fast) var(--ease-out); }
   .ps-field:hover { border-color: var(--color-foreground); }
@@ -65,14 +71,26 @@
   .ps-field__clear:hover { color: var(--color-foreground); }
   .ps-field__clear svg { width: 18px; height: 18px; }
   .ps-field .spinner { flex: none; width: 20px; height: 20px; margin-inline: var(--space-3); }
+  /* Ô tìm trên thanh tối: như input footer Figma 1:1104 (sổ 09/11: viền 100% muted-on-dark 6.11:1) */
+  .ps--popup .ps-field { border-color: var(--color-muted-on-dark); background: transparent; }
+  .ps--popup .ps-field:hover { border-color: var(--color-background-dark-foreground); }
+  .ps--popup .ps-field:focus-within, .ps--popup .ps-field.is-focus { border-color: var(--color-background-dark-foreground); outline-color: var(--color-background-dark-foreground); }
+  .ps--popup .ps-field input { color: var(--color-background-dark-foreground); }
+  .ps--popup .ps-field input::placeholder { color: var(--color-muted-on-dark); }
+  .ps--popup .ps-field__submit { color: var(--color-background-dark-foreground); }
+  .ps--popup .ps-field__clear { color: var(--color-muted-on-dark); }
+  .ps--popup .ps-field__clear:hover { color: var(--color-background-dark-foreground); }
+  .ps--popup .ps-field .spinner { border-color: color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); border-block-start-color: var(--color-background-dark-foreground); }
 
   .ps__tabs .ps__inner { padding-block: 0 var(--space-3); }
+  .ps--popup .ps__tabs .ps__inner { padding-block: var(--space-4); }
   @media (min-width: 80rem) {
-    .ps--popup .ps__tabs .ps__inner { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); padding-block-end: var(--space-4); }
+    .ps--popup .ps__tabs .ps__inner { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); padding-block: var(--space-5); }
     .ps--popup .ps__tabs .tabs { grid-column: 4 / -1; }
   }
-  .tab--sm { padding-inline: var(--space-4); font-size: var(--font-size-sm); }
+  /* Vòng 3: tab theo Figma 1:490 (cao 40 desktop / 44, padding 28, 16/500, cách 8), không còn biến thể nhỏ */
   .tab__count { margin-inline-start: var(--space-2); font-weight: 400; }
+  .ps--drawer .tab { padding-inline: var(--space-5); }
 
   .ps__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; border-block-start: 1px solid var(--color-border); }
   .ps__body > .ps__inner { padding-block: var(--space-5); }
@@ -113,11 +131,15 @@
   .ps-card { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-3); min-height: 80px; margin-inline: calc(var(--space-3) * -1); padding: var(--space-2) var(--space-3); border-radius: var(--radius-input); color: inherit; text-decoration: none; transition: background-color var(--motion-fast) var(--ease-out); }
   .ps-card:hover, .ps-card.is-hover { background: var(--color-background-alt); }
   .ps-card[aria-selected='true'] { background: var(--color-background-alt); outline: 2px solid var(--color-foreground); outline-offset: -2px; }
-  .ps-card__media { display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); }
+  .ps-card__media { position: relative; display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); }
+  /* Badge -N% góc trái trên như card Figma 1:502 (chỉ ở dạng card, không ở hàng ảnh 64) */
+  .ps-card__badge { position: absolute; z-index: 1; inset-block-start: var(--space-2); inset-inline-start: var(--space-2); display: none; }
+  .ps-products--grid .ps-card__badge { display: inline-flex; }
+  @media (min-width: 64rem) { .ps-products--grid .ps-card__badge { inset-block-start: var(--space-4); inset-inline-start: var(--space-4); } }
   .ps-card__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; transition: scale var(--motion-slow) var(--ease-out); }
   .ps-card__media svg { width: 45%; height: auto; color: var(--color-muted-light); }
   .ps-card__info { display: grid; gap: 2px; min-width: 0; }
-  .ps-card__title { display: -webkit-box; overflow: hidden; font-weight: 500; letter-spacing: -0.01em; line-height: 1.5; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .ps-card__title { display: -webkit-box; overflow: hidden; font-weight: 500; letter-spacing: -0.01em; line-height: 1.625; -webkit-box-orient: vertical; -webkit-line-clamp: 2; } /* 16/26 Figma 1:502 */
   .ps-card .price { font-size: var(--font-size-sm); line-height: 1.5; }
   .ps-card__stock { color: var(--color-muted); font-size: var(--font-size-sm); }
 
@@ -133,7 +155,9 @@
   }
   @media (min-width: 80rem) {
     .ps--popup .ps-products--all { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); }
-    .ps--popup .ps-products--all .ps-card { grid-template-columns: 1fr; align-items: start; gap: var(--space-3); min-height: 0; margin: 0; padding: 0; background: none; }
+    .ps--popup .ps-products--all .ps-card { grid-template-columns: 1fr; align-items: start; gap: var(--space-2); min-height: 0; margin: 0; padding: 0; background: none; }
+    .ps--popup .ps-products--all .ps-card__badge { display: inline-flex; inset-block-start: var(--space-4); inset-inline-start: var(--space-4); }
+    .ps--popup .ps-products--all .ps-card__info { gap: var(--space-1); }
     .ps--popup .ps-products--all .ps-card__media { border-radius: var(--radius-card); }
     .ps--popup .ps-products--all .ps-card .price { font-size: var(--font-size-base); }
     .ps--popup .ps-products--all .ps-card:hover .ps-card__media img, .ps--popup .ps-products--all .ps-card.is-hover .ps-card__media img { scale: 1.04; }
@@ -229,21 +253,22 @@
 <main id="main">
   <div class="container sheet-intro">
     <h1>Search overlay</h1>
-    <p lang="vi">ES1-T261 · TE-8. Mỗi khung là một màn hình thiết bị ở mốc đang xem (360 / 768 / 1280 / 1920). Spec: docs/ui-spec/predictive-search.md. Dữ liệu sản phẩm, collection, bài viết lấy từ docs/design/demo-data.json; ảnh sản phẩm giữ đúng URL store dev dù một số chưa khớp tên (ES1-T245).</p>
+    <p lang="vi">ES1-T261 · TE-8 · vòng 3 (header tối Figma 1:362, tab Figma 1:490, card + badge Figma 1:502). Mỗi khung là một màn hình thiết bị ở mốc đang xem (360 / 768 / 1280 / 1920). Spec: docs/ui-spec/predictive-search.md. Dữ liệu sản phẩm, collection, bài viết lấy từ docs/design/demo-data.json; ảnh sản phẩm giữ đúng URL store dev dù một số chưa khớp tên (ES1-T245).</p>
   </div>
 
   <!-- ===================== 1. Popup khi gõ, tab All ===================== -->
   <section class="demo-block" aria-labelledby="s1">
     <div class="container">
       <h2 id="s1">1. Search popup while typing (All tab)</h2>
-      <p class="demo-note" lang="vi">Kiểu mặc định "Popup": trượt từ trên, phủ header. Desktop: logo, ô tìm, nút đóng cùng hàng header 80; cột trái gợi ý từ khoá + collection, cột phải 4 sản phẩm. Tablet: 3/5 cột, sản phẩm dạng hàng. Mobile: toàn màn (SRS TE-8 AC1). Trạng thái minh hoạ: "adjustable bench" đang chọn bằng phím ↓ (viền 2px), card sản phẩm 1 đang rê chuột.</p>
+      <p class="demo-note" lang="vi">Kiểu mặc định "Popup": trượt từ trên. Hàng ô tìm là thanh tối 80 có noise nằm đúng chỗ header (Figma 1:362, sổ 10/11), ô tìm kiểu input nền tối của footer (Figma 1:1104); panel kết quả trắng ngay dưới. Desktop: logo, ô tìm, nút đóng cùng hàng; cột trái gợi ý từ khoá + collection, cột phải 4 sản phẩm. Tablet: 3/5 cột, sản phẩm dạng hàng. Mobile: toàn màn (SRS TE-8 AC1). Trạng thái minh hoạ: "adjustable bench" đang chọn bằng phím ↓ (viền 2px), card sản phẩm 1 đang rê chuột.</p>
     </div>
     <div class="stage">
       <div class="ghost" aria-hidden="true">
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30"><use href="#i-logo"/></svg></span>
-          <div class="site-header__icons"><span class="site-header__icon"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg></span></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="container ghost-page"><span class="ghost-line"></span><div class="ghost-grid"><span></span><span></span><span></span><span></span></div></div>
       </div>
@@ -262,9 +287,9 @@
         </div></div>
         <div class="ps__tabs"><div class="ps__inner">
           <div class="tabs" role="tablist" aria-label="Result types" data-testid="predictive-search-tabs">
-            <button class="tab tab--sm" type="button" role="tab" id="tab1-all" aria-selected="true" aria-controls="panel1">All</button>
-            <button class="tab tab--sm" type="button" role="tab" id="tab1-products" aria-selected="false" aria-controls="panel1" tabindex="-1">Products<span class="tab__count">4</span></button>
-            <button class="tab tab--sm" type="button" role="tab" id="tab1-collections" aria-selected="false" aria-controls="panel1" tabindex="-1">Collections<span class="tab__count">1</span></button>
+            <button class="tab" type="button" role="tab" id="tab1-all" aria-selected="true" aria-controls="panel1">All</button>
+            <button class="tab" type="button" role="tab" id="tab1-products" aria-selected="false" aria-controls="panel1" tabindex="-1">Products<span class="tab__count">4</span></button>
+            <button class="tab" type="button" role="tab" id="tab1-collections" aria-selected="false" aria-controls="panel1" tabindex="-1">Collections<span class="tab__count">1</span></button>
           </div>
         </div></div>
         <div class="ps__body" id="panel1" role="tabpanel" aria-labelledby="tab1-all"><div class="ps__inner">
@@ -279,10 +304,10 @@
             <div class="ps-group ps-main" role="group" aria-labelledby="g1-p">
               <div class="ps-group__title" id="g1-p">Products</div>
               <div class="ps-products ps-products--all">
-                <a class="ps-card is-hover" id="o1-5" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Adjustable Bench</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$229.00</s></span></span></a>
+                <a class="ps-card is-hover" id="o1-5" role="option" aria-selected="false" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-17%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Adjustable Bench</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$229.00</s></span></span></a>
                 <a class="ps-card" id="o1-6" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P06.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Bench</span><span class="price"><span>$189.99</span></span></span></a>
                 <a class="ps-card" id="o1-7" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P10.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Foldable bench</span><span class="price"><span>$89.00</span></span></span></a>
-                <a class="ps-card" id="o1-8" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Adjustable Bench</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$189.00</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$229.00</s></span></span></a>
+                <a class="ps-card" id="o1-8" role="option" aria-selected="false" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-17%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Adjustable Bench</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$189.00</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$229.00</s></span></span></a>
               </div>
             </div>
             <div class="ps-group" role="group" aria-labelledby="g1-c">
@@ -310,7 +335,8 @@
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30"><use href="#i-logo"/></svg></span>
-          <div class="site-header__icons"><span class="site-header__icon"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg></span></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="container ghost-page"><span class="ghost-line"></span><div class="ghost-grid"><span></span><span></span><span></span><span></span></div></div>
       </div>
@@ -329,10 +355,10 @@
         </div></div>
         <div class="ps__tabs"><div class="ps__inner">
           <div class="tabs" role="tablist" aria-label="Result types">
-            <button class="tab tab--sm" type="button" role="tab" id="tab2-all" aria-selected="false" aria-controls="panel2" tabindex="-1">All</button>
-            <button class="tab tab--sm" type="button" role="tab" id="tab2-products" aria-selected="true" aria-controls="panel2">Products<span class="tab__count">3</span></button>
-            <button class="tab tab--sm is-hover" type="button" role="tab" id="tab2-collections" aria-selected="false" aria-controls="panel2" tabindex="-1">Collections<span class="tab__count">1</span></button>
-            <button class="tab tab--sm" type="button" role="tab" id="tab2-articles" aria-selected="false" aria-controls="panel2" tabindex="-1">Articles<span class="tab__count">1</span></button>
+            <button class="tab" type="button" role="tab" id="tab2-all" aria-selected="false" aria-controls="panel2" tabindex="-1">All</button>
+            <button class="tab" type="button" role="tab" id="tab2-products" aria-selected="true" aria-controls="panel2">Products<span class="tab__count">3</span></button>
+            <button class="tab is-hover" type="button" role="tab" id="tab2-collections" aria-selected="false" aria-controls="panel2" tabindex="-1">Collections<span class="tab__count">1</span></button>
+            <button class="tab" type="button" role="tab" id="tab2-articles" aria-selected="false" aria-controls="panel2" tabindex="-1">Articles<span class="tab__count">1</span></button>
           </div>
         </div></div>
         <div class="ps__body" id="panel2" role="tabpanel" aria-labelledby="tab2-products"><div class="ps__inner">
@@ -341,7 +367,7 @@
               <div class="ps-group__title visually-hidden" id="g2-p">Products</div>
               <div class="ps-products ps-products--grid ps-products--tab">
                 <a class="ps-card" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Resistance Band Set</span><span class="price"><span>$45.00</span></span></span></a>
-                <a class="ps-card" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Olympic Plate Set 100</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$289.00</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$339.00</s></span></span></a>
+                <a class="ps-card" role="option" aria-selected="false" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-15%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Olympic Plate Set 100</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$289.00</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$339.00</s></span></span></a>
                 <a class="ps-card" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P11.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Resistance band set</span><span class="price"><span>$45.00</span></span></span></a>
               </div>
             </div>
@@ -366,7 +392,8 @@
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30"><use href="#i-logo"/></svg></span>
-          <div class="site-header__icons"><span class="site-header__icon"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg></span></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="container ghost-page"><span class="ghost-line"></span><div class="ghost-grid"><span></span><span></span><span></span><span></span></div></div>
       </div>
@@ -416,10 +443,10 @@
             <section class="ps-section ps-main" aria-labelledby="h3-tr">
               <h4 id="h3-tr">Trending now</h4>
               <ul class="ps-products ps-products--grid">
-                <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Ativafit Lava 66 lb Adjustable</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$499.99</s></span></span></a></li>
+                <li><a class="ps-card" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-24%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Ativafit Lava 66 lb Adjustable</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$499.99</s></span></span></a></li>
                 <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Iron Core Kettlebell 16 kg</span><span class="price"><span>$119.00</span></span></span></a></li>
-                <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Adjustable Bench</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$229.00</s></span></span></a></li>
-                <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Revllen Pro Speed Rope</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$34.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$44.99</s></span></span></a></li>
+                <li><a class="ps-card" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-17%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Adjustable Bench</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$229.00</s></span></span></a></li>
+                <li><a class="ps-card" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-22%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Revllen Pro Speed Rope</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$34.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$44.99</s></span></span></a></li>
               </ul>
             </section>
           </div>
@@ -443,7 +470,8 @@
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30"><use href="#i-logo"/></svg></span>
-          <div class="site-header__icons"><span class="site-header__icon"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg></span></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="container ghost-page"><span class="ghost-line"></span><div class="ghost-grid"><span></span><span></span><span></span><span></span></div></div>
       </div>
@@ -463,10 +491,10 @@
         </div></div>
         <div class="ps__tabs"><div class="ps__inner">
           <div class="tabs" role="tablist" aria-label="Result types">
-            <button class="tab tab--sm" type="button" role="tab" id="tab4-all" aria-selected="true" aria-controls="panel4">All</button>
-            <button class="tab tab--sm" type="button" role="tab" aria-selected="false" aria-controls="panel4" tabindex="-1">Products<span class="tab__count">2</span></button>
-            <button class="tab tab--sm" type="button" role="tab" aria-selected="false" aria-controls="panel4" tabindex="-1">Collections<span class="tab__count">1</span></button>
-            <button class="tab tab--sm" type="button" role="tab" aria-selected="false" aria-controls="panel4" tabindex="-1">Articles<span class="tab__count">1</span></button>
+            <button class="tab" type="button" role="tab" id="tab4-all" aria-selected="true" aria-controls="panel4">All</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel4" tabindex="-1">Products<span class="tab__count">2</span></button>
+            <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel4" tabindex="-1">Collections<span class="tab__count">1</span></button>
+            <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="panel4" tabindex="-1">Articles<span class="tab__count">1</span></button>
           </div>
         </div></div>
         <div class="ps__body" id="panel4" role="tabpanel" aria-labelledby="tab4-all"><div class="ps__inner">
@@ -513,7 +541,8 @@
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30"><use href="#i-logo"/></svg></span>
-          <div class="site-header__icons"><span class="site-header__icon"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg></span></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="container ghost-page"><span class="ghost-line"></span><div class="ghost-grid"><span></span><span></span><span></span><span></span></div></div>
       </div>
@@ -563,10 +592,10 @@
             <section class="ps-section ps-main" aria-labelledby="h5-tr">
               <h4 id="h5-tr">Trending now</h4>
               <ul class="ps-products ps-products--grid">
-                <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Ativafit Lava 66 lb Adjustable</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$499.99</s></span></span></a></li>
+                <li><a class="ps-card" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-24%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Ativafit Lava 66 lb Adjustable</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$499.99</s></span></span></a></li>
                 <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Iron Core Kettlebell 16 kg</span><span class="price"><span>$119.00</span></span></span></a></li>
-                <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Adjustable Bench</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$229.00</s></span></span></a></li>
-                <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Revllen Pro Speed Rope</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$34.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$44.99</s></span></span></a></li>
+                <li><a class="ps-card" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-17%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Adjustable Bench</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$229.00</s></span></span></a></li>
+                <li><a class="ps-card" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-22%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Revllen Pro Speed Rope</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$34.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$44.99</s></span></span></a></li>
               </ul>
             </section>
           </div>
@@ -586,7 +615,8 @@
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30"><use href="#i-logo"/></svg></span>
-          <div class="site-header__icons"><span class="site-header__icon"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg></span></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="container ghost-page"><span class="ghost-line"></span><div class="ghost-grid"><span></span><span></span><span></span><span></span></div></div>
       </div>
@@ -642,7 +672,8 @@
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30"><use href="#i-logo"/></svg></span>
-          <div class="site-header__icons"><span class="site-header__icon"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg></span></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg><use href="#i-search"/></svg></span><span class="site-header__icon"><svg><use href="#i-user"/></svg></span><span class="site-header__icon"><svg><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="container ghost-page"><span class="ghost-line"></span><div class="ghost-grid"><span></span><span></span><span></span><span></span></div></div>
       </div>
