@@ -3,6 +3,11 @@
 Quyết định đã chốt, không hỏi lại. Mâu thuẫn với Figma hay bộ kiến thức thì sổ này thắng; mới nhất ở trên. Thêm dòng khi CTO chốt câu hỏi `[Q]`.
 
 ## Đã chốt
+- 10/11 (BGĐ) Gốc thiết kế duy nhất là Figma trang chủ desktop (frame 1:359, docs/figma/img, snapshot). Không dùng trang live hay ảnh chụp store dev làm gốc thiết kế. Tablet, mobile của trang chủ và mọi trang con phát triển từ ngôn ngữ Figma này.
+- 10/11 (BGĐ) Hoàn thiện toàn bộ thiết kế, BGĐ duyệt xong mới sang giai đoạn Dev.
+- 10/11 (BGĐ) Phạm vi SEO 100: đo trên trang chủ, collection, sản phẩm, blog, bài viết, page. /cart, /search, /account, 404, password, gift card không tính SEO (Shopify chặn index hoặc trả 404/401); mọi trang vẫn đo Accessibility, Best Practices, Performance.
+- 10/11 (BGĐ) Best Practices 100: DevOps/QA đo, tách phần do theme và phần do nền tảng Shopify; không thuộc phạm vi Designer.
+- 10/11 Tài khoản khách: theme dùng tài khoản mới của Shopify (đăng ký, đăng nhập do Shopify host), không thiết kế trang customers/* (bỏ ES1-T259).
 - 10/11 Hero 768 và 360: lớp tối 30% (overlay_opacity 30, chỉ dưới 1280; desktop giữ như Figma). Cần đạt hết AA thì chọn ảnh có vùng nền trơn sau chữ, không tăng lớp tối (ES1-T252).
 - 10/11 Hero 360: chữ căn trái, cùng mép 20 với các khối dưới (thay căn giữa của bản 07/11) (ES1-T252).
 - 10/11 Eyebrow trên nền tối (vd Why choose): giữ xám như live (#999, 5.85:1). Cam chỉ dùng trên nền sáng và sand; ngoại lệ của dòng eyebrow 09/11 (ES1-T252).
