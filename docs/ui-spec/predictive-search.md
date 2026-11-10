@@ -222,8 +222,9 @@ Ticket con theo `.claude/rules/fe-be-boundary.md`: FE1 markup + CSS (test id ở
 
 Màu: `--color-background`, `--color-foreground`, `--color-muted`, `--color-muted-light`, `--color-border`, `--color-background-alt`, `--color-background-cream`, `--color-background-dark(-foreground)`, `--color-muted-on-dark`, `--color-accent(-foreground)`, `--color-sale(-foreground)`, `--overlay-scrim`; nền tối kèm `assets/noise-dark.png` (đã dùng ở header, footer). Chữ: `--font-primary--family`, `--font-heading--family/weight`, `--font-size-sm/base/lg/h3`. Khoảng cách: `--space-1..6`, `--control-height`, `--header-height`, `--grid-gap`, `--page-width`, `--page-margin`. Bo: `--radius-input`, `--radius-card`, `--radius-pill`. Motion: `--motion-fast/base/slow`, `--ease-out`. Bóng: `--shadow-overlay`. Không token mới.
 
-## 13. Quyết định CTO cần chốt
+## 13. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Mobile 360 kiểu Popup (mặc định) là toàn màn với thanh tối 80 ở đầu (SRS TE-8 AC1), drawer phải 90% chỉ khi chọn "Search style: Drawer"? Đề xuất: có (§1, foundation §15).
 2. Số trên tab là số gợi ý trả về (predictive search không trả tổng), chạm giới hạn 8 thì ghi "8+"? Đề xuất: có, tổng thật ở trang /search (§4).
 3. Thêm 3 setting header (Popular searches, Popular collections, Trending products) cho trạng thái rỗng và 0 kết quả, rỗng thì ẩn khối? Đề xuất: có, thiếu thì 0 kết quả không đạt 11 §5 (§5).

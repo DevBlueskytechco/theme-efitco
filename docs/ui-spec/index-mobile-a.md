@@ -240,8 +240,9 @@ Không thêm setting. Dùng có sẵn; chỉ đổi mặc định trong template
 | Make fitness | Ảnh rải (360: 2 ảnh hàng trên, 768: 3 ảnh) thay hàng 3 ảnh đều | FE | P3 |
 | Trạng thái | Skeleton tab, tab rỗng, sheet quiz không khớp, lỗi thêm setup | FE markup + BE JS | P3 |
 
-## 13. Quyết định CTO cần chốt
+## 13. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Hero 768 tràn màn 4/3 không bo, chữ mép 20, 2 nút 52 góc dưới phải, không dot (thay thẻ bo trong container chữ lùi vào)? Đề xuất: có (§2).
 2. 360 ẩn ảnh trang trí để khối ngắn: body map quiz và ảnh thứ 3 Make fitness, panel quiz tràn mép? Đề xuất: có (§6, §8; 07 §C, 19 §D6).
 3. Bestseller 768 lưới 4 cột 170 (1 hàng như Figma) thay 3 cột của foundation khi số sản phẩm chia hết cho 4? Đề xuất: có (§5).

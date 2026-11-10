@@ -220,8 +220,9 @@ Không thêm setting. Dùng setting có sẵn: bundle (`eyebrow`, `heading`, `li
 | FAQ | 768 giữ bố cục Figma (ảnh 76% phải, ô số đè trái); 360 ô số đè đáy ảnh; icon +/− theo màu chữ | FE | P3 / P4 |
 | Footer | Theo foundation §4; menu demo thêm 2 link chính sách | FE + dữ liệu store | P3 |
 
-## 12. Quyết định CTO cần chốt
+## 12. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Bundle 360: thêm thanh dính đáy ("{n} Items · {total}" + "Add Bundle To Cart") khi panel chưa vào màn hình, vì nút cách đầu khối ~1.350 px? Đề xuất: có.
 2. Video card: thêm nút play 52 giữa poster (code đã có, Figma không vẽ) để người dùng biết bấm được, phát tại chỗ, không tự chạy? Đề xuất: có.
 3. Dòng "Bundle discount" trong panel: đổi xanh Figma (2.50:1, trượt AA) sang `color-mix(badge-new 55%, trắng)` 5.41:1? Đề xuất: có, cùng cách `--color-accent-on-sand`.

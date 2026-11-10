@@ -127,7 +127,8 @@ Spam: Shopify có thể chuyển sang trang hCaptcha `/challenge` sau submit; kh
 - Best Practices: 0 lỗi console; hCaptcha chỉ tải ở bước challenge sau submit, không tải lúc vào trang.
 - Performance: không JS bắt buộc; CSS `.rte`, `.contact` vào base.css (critical chỉ header, breadcrumb, page-title).
 
-## 10. Quyết định CTO cần chốt
+## 10. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Contact dùng template Liquid `templates/page.contact.liquid` (form 3 trường + aside 5 câu FAQ dùng lại `faq-item`)? Đề xuất: có; giảm câu hỏi lặp (02 §4 mục 11), 0 JS bắt buộc.
 2. Page mặc định đặt cột đọc 720 căn giữa (khác quy tắc "thẳng mép trái container" của hero 09/11)? Đề xuất: có; quy tắc mép trái áp cho hero và khối trang chủ, trang đọc dài cần dòng 50–75 ký tự (03 §4).

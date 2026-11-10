@@ -166,8 +166,9 @@ Motion: `--motion-base`, `--motion-slow`, `--ease-out`. Không thêm token.
 | Bình luận | markup thô trong template | block `article-comments`, lỗi theo trường, hộp thành công |
 | Chuỗi | `blog.article_comments`, `comment_form_*`, `article_metadata_html` | sửa `comment_form_submit` "Post" → "Post Comment" (câu CTO 3); thêm `blog.comments_count` (one/other), `blog.no_comments`, `blog.comment_moderated_note`, `blog.comment_pending_*`, `blog.comment_posted`, `blog.comment_errors_summary`, `blog.comment_error_author/email/body`, `blog.email_hint`, `blog.required_note`, `blog.topics`, `blog.back_to_blog` ("Back to {{ blog }}"), `blog.related_*`; nhãn breadcrumb dùng chung F§5 |
 
-## 10. Quyết định CTO cần chốt
+## 10. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Ảnh bìa bài viết dùng khung banner F§3.3 nhưng KHÔNG đặt breadcrumb/h1 lên ảnh và không lớp tối 60% (khác F§3.3), tiêu đề nằm dưới ảnh? Đề xuất: có; ảnh bài giữ màu thật, AA không phụ thuộc ảnh merchant (06 text over images), cột đọc cùng thứ tự ở mọi mốc.
 2. Card bài viết (blog, bài liên quan) dùng meta chữ trắng như code ES1-T174 thay #999 của Figma 1:1032? Đề xuất: có; #999 trượt AA trên ảnh sáng đáy, sổ 09/11 đặt A11y 100 ưu tiên số 1.
 3. Đổi chữ nút gửi bình luận từ "Post" (locale hiện tại) thành "Post Comment", và ô Email ghi "Not published."? Đề xuất: có; nhãn nói rõ hành động (04 §2, DESIGN CTA Title Case), câu gợi ý giảm lo ngại lộ email.

@@ -238,8 +238,9 @@ Chỉ tiêu: SEO 100 (collection nằm trong phạm vi SEO, sổ 10/11), A11y 10
 | Card | swatch radio | swatch `aria-hidden` + ", N colors" trong tên link (foundation §21) |
 | Rỗng / lỗi / tải | câu + nút secondary | empty-state đầy đủ, alert, aria-busy (BE) |
 
-## 14. Quyết định CTO cần chốt
+## 14. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Có cột lọc thì đổi "Columns on desktop" mặc định 4 → 3 để card 292 / 336 đúng cỡ Figma 1:502? Đề xuất: có (§3; 08 #2272D).
 2. Drawer lọc mobile rộng 90% (chạm nền để đóng) thay toàn màn của ES1-T107 #3? Đề xuất: có (foundation §15; 15 §1; 08 §7).
 3. Previous/Next phân trang dùng nút tròn 52 chevron như carousel Figma 1:398 (tên "Previous page"/"Next page" qua aria-label), bỏ chữ hiện trên nút? Đề xuất: có (§8; sổ 09/11 nút tròn 52 mọi điều hướng prev/next).

@@ -244,8 +244,9 @@ Màu: `--color-background`, `--color-foreground`, `--color-muted`, `--color-mute
 
 Chuyển động: số tiền không animate; dòng bị xoá mờ dần 200ms rồi partial thay (chỉ opacity); thanh freeship đổi `value` không animate width (không phải transform); toast 250 / 150 (foundation §19).
 
-## 10. Quyết định CTO cần chốt
+## 10. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Đổi ô số native (mặc định ES1-T93 #3) sang bộ − ô + 44px cho cart page và drawer? Đề xuất: có (12 #2151D; không đổi luồng, vẫn `updates[]`, cần 1 ticket BE nhỏ).
 2. Upsell trong cart page (ES1-T247 chưa trả lời): làm theo §3.8, intent complementary, tối đa 4, dưới khu giỏ, cùng đợt BE với thanh dính đáy §3.7? Đề xuất: có.
 3. Tóm tắt dùng panel tối như "Your Bundle" 1:718, chữ phụ trắng 70% (6.56) và xanh giảm giá nhạt (5.81) thay #999 (4.01) và #4B824D (2.50) của Figma để đạt AA? Đề xuất: có, áp cả cho bundle builder trang chủ và mini cart ES1-T262.

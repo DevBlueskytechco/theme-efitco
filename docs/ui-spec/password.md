@@ -108,7 +108,8 @@ Màn đầu 360 thấy logo, eyebrow, h1, message, ô email, nút Notify Me.
 - Best Practices: 0 lỗi console; layout password không tải JS theme ngoài nút mắt (≤ 1 KB, BE).
 - Performance: critical.css + base.css như hiện có; không header/footer nên trang nhẹ.
 
-## 9. Quyết định CTO cần chốt
+## 9. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Trang password có form newsletter làm hành động chính và form mật khẩu thu trong `<details>` "Enter Using Password" (mở sẵn khi sai mật khẩu; setting tắt newsletter)? Đề xuất: có; khách ghé lúc store khoá chỉ làm được việc để lại email, `<details>` chạy không JS, không popup.
 2. Trang password dùng nền tối + noise toàn trang (như dải đầu trang chủ 1:360), ảnh là thẻ bo 16 dưới thanh 80? Đề xuất: có; trang không có header theme, nền tối giữ nhận diện như trang chủ.

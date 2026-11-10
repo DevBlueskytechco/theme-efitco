@@ -248,8 +248,9 @@ Chuỗi mới (`locales/en.default.json`, nhóm `search`): `results_title` "Sear
 - S3: 3 sản phẩm có màu Black. S4 số đếm Color tính từ options (Black 3, Gray 3, White 2); Availability 5/0 giả định (không có tồn kho). S6a: White + $0–$100 ra 0 thật (2 sản phẩm White đều > $100). S7: q=`efitco` theo vendor (22 + 14 + page Our Efitco = 37), KHÔNG CHẮC cách Shopify tách từ "efitco-ai-dev".
 - Tên trang Our Story, Our Efitco, FAQs, Contact Us: Figma 1:1104 menu Information.
 
-## 12. Quyết định CTO cần chốt
+## 12. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Thêm link All / Products / Articles / Pages (tham số `type`, link thật, kiểu tab Figma 1:490, nằm phải tiêu đề từ 1280)? Đề xuất: có, người tìm trang chính sách không phải cuộn qua 24 sản phẩm (11 §4 #393).
 2. Search dùng drawer lọc ở mọi mốc (giữ 4 cột ES1-T127) dù collection có cột lọc trái từ 1024? Đề xuất: có, chung snippet `filter-group`, chỉ khác vỏ.
 3. Previous/Next phân trang là nút tròn 52 chevron (như carousel Figma 1:398) cho cả search và collection (snippet `pagination` chung)? Đề xuất: có, một kiểu nút prev/next toàn theme.

@@ -158,8 +158,9 @@ Motion: `--motion-slow`, `--ease-out`, `--ease-expo`. Không thêm token.
 | Template | `templates/blog.liquid` thô | thay bằng `container` + block `blog-articles` |
 | Chuỗi | `blog.*` có sẵn 7 khoá | thêm: `blog.topics_label`, `blog.all_topics`, `blog.articles_count` (one/other), `blog.tagged_count`, `blog.empty_*`, `blog.empty_tag_*`, `blog.pagination.*`, `blog.loading`; dùng `blocks.blog_posts.read_time` có sẵn |
 
-## 10. Quyết định CTO cần chốt
+## 10. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Trang blog có bài nổi bật (bài mới nhất, ảnh 4/3 + excerpt) ở trang 1, phần còn lại là card Figma 1:1022 không có excerpt; AC3 "excerpt_or_content" đáp ứng ở bài nổi bật và trang bài viết? Đề xuất: có. Card Figma giữ nhịp với trang chủ (06 §1); thêm excerpt vào card phủ ảnh làm vùng tối phải cao hơn và vỡ dáng Figma.
 2. Card trên trang blog hiện "ngày · thời gian đọc" (trang chủ giữ chỉ thời gian đọc như Figma) qua tham số `show_date`? Đề xuất: có (AC3 published_at; mặc định false nên trang chủ không đổi).
 3. Lưới card 1 cột ở 360 (card 320 × 427, trang dài hơn) thay vì 2 cột 152 × 203? Đề xuất: 1 cột; 2 cột làm tiêu đề 18px 3 dòng tràn vùng gradient và tag che nửa ảnh.

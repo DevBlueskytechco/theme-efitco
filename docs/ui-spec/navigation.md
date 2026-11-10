@@ -251,8 +251,9 @@ Ngữ nghĩa:
 
 Token dùng: `--color-background`, `--color-foreground`, `--color-muted`, `--color-muted-light`, `--color-border`, `--color-background-alt`, `--color-background-cream`, `--color-accent`, `--color-sale(-foreground)`, `--color-background-dark-foreground`, `--font-heading--*`, `--font-primary--family`, `--font-size-sm/base/lg/h3/h2`, `--space-1..8`, `--radius-card`, `--radius-input`, `--header-height`, `--motion-fast/base/slow`, `--ease-out`; dẫn xuất foundation `--overlay-scrim`, `--shadow-raised`, `--shadow-overlay`, `--content-width`. Không token mới.
 
-## 11. Quyết định CTO cần chốt
+## 11. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Drawer mobile dùng trượt cấp 2 + Back khi có JS, accordion chỉ là bản không JS (TE-1 AC2 đang ghi accordion)? Đề xuất: có, BA sửa AC2 (14 §1, foundation §15).
 2. Thêm 2 setting header "Show collection images in menu" (bật) và "Featured product in menu" (product, trống)? Đề xuất: có, card lấy giá và badge thật nên không cần setting chữ.
 3. Kiểu panel chọn theo dữ liệu menu (có cấp 3 → cột, toàn collection → ô ảnh, còn lại → dropdown) thay vì setting từng mục? Đề xuất: có, giữ settings phẳng (AGENTS); cần menu 3 cấp trên store dev (ES1-T271).

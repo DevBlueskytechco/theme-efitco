@@ -91,6 +91,7 @@ Không setting mới (template `layout none`, không block). Dùng `settings.log
 - Best Practices: 0 lỗi console khi `vendor/qrcode.js` lỗi mạng (bọc kiểm tra `window.QRCode`); ảnh Wallet đúng tỉ lệ.
 - Performance: JS chỉ QR (Shopify CDN, defer) + copy/print (≤ 1 KB); 0 ảnh lớn.
 
-## 9. Quyết định CTO cần chốt
+## 9. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Thẻ gift card dựng bằng CSS (nền dark, logo, số dư) thay ảnh `gift-card/card.svg` của Shopify khi chưa có logo, và thêm nút Copy Code + Print Gift Card (2 ticket con BE nhỏ)? Đề xuất: có; 0 ảnh lớn, in được, đúng ngôn ngữ nền tối Figma 1:360 và footer 1:1104.

@@ -83,7 +83,8 @@ Chuỗi mới (ĐỀ XUẤT): `collections.count` ("{{ count }} collections"), `
 | không breadcrumb, h1 đứng một mình | breadcrumb + meta số collection (foundation §5) |
 | phân trang chữ | Previous/Next `.round-button` 52 + `slideshow-icon` |
 
-## 8. Quyết định CTO cần chốt
+## 8. Quyết định CTO đã chốt (10/11)
 
+CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Card danh sách collection dùng ảnh 336 / 220 + tiêu đề heading 28 bên dưới như Figma 1:404 (cả card 336 × 270), thay ảnh 336 / 270 trong ES1-T107 #7? Đề xuất: có, một danh mục trông giống nhau ở trang chủ và trang danh sách (06 §1).
 2. Thêm dòng "N products" dưới tên collection? Đề xuất: có (TE-15 card trình độ đã có số sản phẩm).
