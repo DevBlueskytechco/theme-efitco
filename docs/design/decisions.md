@@ -3,6 +3,9 @@
 Quyết định đã chốt, không hỏi lại. Mâu thuẫn với Figma hay bộ kiến thức thì sổ này thắng; mới nhất ở trên. Thêm dòng khi CTO chốt câu hỏi `[Q]`.
 
 ## Đã chốt
+- 10/11 Hero 768 và 360: lớp tối 30% (overlay_opacity 30, chỉ dưới 1280; desktop giữ như Figma). Cần đạt hết AA thì chọn ảnh có vùng nền trơn sau chữ, không tăng lớp tối (ES1-T252).
+- 10/11 Hero 360: chữ căn trái, cùng mép 20 với các khối dưới (thay căn giữa của bản 07/11) (ES1-T252).
+- 10/11 Eyebrow trên nền tối (vd Why choose): giữ xám như live (#999, 5.85:1). Cam chỉ dùng trên nền sáng và sand; ngoại lệ của dòng eyebrow 09/11 (ES1-T252).
 - 10/11 Header trang chủ: thanh tối riêng cao 80px trên dải nền #1A1A1A có noise (Figma 1:362), hero là thẻ bo góc nằm dưới header, KHÔNG đè ảnh. Sửa nhận định sai của ES1-T251.
 - 10/11 Header trang con giống trang chủ: luôn là thanh tối riêng (#1A1A1A có noise, như Figma 1:362), không đè ảnh, kể cả trang có banner hay ảnh bìa lớn. Thay quyết định 09/11 (nền trắng, đè ảnh khi có ảnh lớn).
 - 09/11 Viền ô nhập: nền sáng dùng `--color-muted-light` (5.33:1), footer nền tối dùng `--color-muted-on-dark` (5.85:1); không dùng `--color-border` cho ô nhập (ES1-T251).
