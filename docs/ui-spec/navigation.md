@@ -1,6 +1,24 @@
 KHÔNG CHẮC: demo-data không có menu (linklists) và mọi collection có `image` rỗng. Cấu trúc menu cấp 2, 3 và ảnh danh mục (efx-col-1..5.jpg của block Browse Categories 1:395) trong mockup là đề xuất, đã hỏi BA ở ES1-T271. Ảnh sản phẩm Home Starter Kit (P19) trên store dev là dây nhảy, lệch tên (ES1-T245).
 
-# UI spec: Mega menu desktop và menu drawer mobile (ES1-T260)
+# UI spec: Mega menu desktop và menu drawer mobile (ES1-T260, vòng 3)
+
+## Thay đổi so với vòng 2
+
+| # | Phần | Vòng 2 | Vòng 3 | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Header khi đóng | trang chủ trong suốt đè hero, trang con trắng | mọi trang thanh tối `--color-background-dark` + noise, cao 80, không đè ảnh; hero / banner nằm dưới | Sổ 10/11, Figma 1:362, 1:361; foundation §3 |
+| 2 | Header khi mega mở | chuyển nền trắng, chữ foreground | giữ tối; panel trắng ngay dưới đáy header, viền trên 1px border | foundation §3.2, §14; sổ 10/11 |
+| 3 | Mục menu | trắng 60% chỉ trên hero; trên trắng chữ foreground; hover gạch 1px; đang mở gạch 2px | luôn trắng 60% (#A3A3A3, 6.93:1); hover và đang mở trắng 100%, đang mở thêm chevron lật; chỉ trang hiện tại gạch chân 2px offset 0.45em | Figma 1:365; kit `.site-header__link` |
+| 4 | Focus mục menu, icon header | outline cam (trên hero trắng) | outline trắng 2px offset 2 (cam trên tối 3.48:1) | foundation §3.2 |
+| 5 | Icon header | 3 icon 24 | search 20, account / cart 24, ô 44 cách 4 | Figma 1:373; foundation §3.1 |
+| 6 | Logo | 100 (mockup override kit 140) | 100 × 30 mọi mốc, lấy từ kit | Figma 1:377 |
+| 7 | Drawer | khung riêng `.nav-drawer` | dùng kit `.drawer--start` + `.overlay__header/__body/__footer`; nền trắng, phủ cả thanh tối | foundation §15 |
+| 8 | Hàng cấp 1 drawer | 56 | 52 (kit `.drawer-menu`) | foundation, kit §11 |
+| 9 | Trang phía sau trong mockup | hero tràn từ y 0 dưới header trong suốt | trang chủ: hero bắt đầu y 80, ≥ 80rem bo 16 lùi `--band-inset` (Figma 1:361 x 61, 1798 × 827); < 80rem tràn mép không bo (sổ 07/11). Trang con: breadcrumb + tiêu đề | Sổ 10/11 |
+| 10 | Trạng thái header trong mockup | 2 dải (trên hero, trên trắng) | 1 dải tối: open, hover, focus, current, default | foundation §3.2 |
+| 11 | Chevron tròn 52 | — | không dùng trong overlay điều hướng (không có hàng cuộn ngang; panel B xuống hàng khi > 5 ô) | foundation §6 |
+
+Giữ nguyên: cấu trúc 3 biến thể panel, card sản phẩm nổi bật, drawer 2 cấp + Back, 2 setting đề xuất, mọi trạng thái, bàn phím, Lighthouse. Đối chiếu foundation §14: foundation lấy Collection làm ví dụ dropdown; spec này giữ quy tắc chọn theo dữ liệu (§3), Collection ra dropdown C khi tắt "Show collection images in menu".
 
 Mục đích: người mua thấy toàn bộ danh mục trong 1 lần mở, đi thẳng tới collection hoặc sản phẩm nổi bật; trên mobile đi được 2 cấp mà không mất chỗ đang đứng. Story TE-17 (cha), TE-1 AC2 (menu 2 cấp, hover + bàn phím, drawer mobile).
 
@@ -8,7 +26,7 @@ Mục đích: người mua thấy toàn bộ danh mục trong 1 lần mở, đi 
 - Spec này.
 - `drafts/designer/ES1-T260/navigation.html` (nhúng `../_kit/kit.css`) + `navigation-360|768|1280|1920.png`. Mỗi PNG là thiết kế của mốc đó: ≥ 1280 là mega menu, < 1280 là drawer. Trạng thái ở cuối file.
 
-Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:362 (header, chỉ trạng thái đóng, desktop 1920) > `docs/ui-spec/foundation.md` §3, §14, §15 > kiến thức 14, 15, 18, 22, 04, 05, 06, 03. Figma không có panel mở, drawer, trạng thái: mọi thứ ngoài header đóng là `ĐỀ XUẤT:` kèm nguồn.
+Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:362 (header, chỉ trạng thái đóng, desktop 1920), 1:361 (hero dưới header) > `docs/ui-spec/foundation.md` vòng 3 §3, §6, §14, §15 > kiến thức 14, 15, 18, 22, 04, 05, 06, 03. Không dùng trang live hay ảnh chụp store làm gốc. Figma không có panel mở, drawer, trạng thái: mọi thứ ngoài header đóng là `ĐỀ XUẤT:` kèm nguồn.
 
 Hành vi hiện tại (`blocks/header.liquid`, `assets/header-menu.js`, `assets/critical.css`): menu 2 cấp; ≥ 80rem mỗi mục cha mở dropdown nhỏ `.site-header__submenu` (hover 150ms, Esc, focusout đóng); < 80rem drawer `<details>` trái rộng `min(22rem, 100vw − 3.5rem)`, cấp 2 là accordion, nút đóng 44 không tiêu đề, focus trap bằng JS. Không đọc cấp 3. Mục §10 liệt kê phần đổi.
 
@@ -21,14 +39,14 @@ Hành vi hiện tại (`blocks/header.liquid`, `assets/header-menu.js`, `assets/
 | 1280, 1920 (≥ 80rem) | Menu ngang 7 mục giữa header, mục có cấp con mở mega menu hoặc dropdown | Figma 1:365; code `.site-header__nav` hiện từ 80rem |
 | 1024, 768, 360 (< 80rem) | Nút menu trái mở drawer 2 cấp | code `.site-header__drawer` ẩn từ 80rem |
 
-Figma 1:365: 7 mục Shop ▾, Collection ▾, Sale, Our Story, Blog, Contact, Help; Inter 16/500, cao 24–26, khoảng cách 40, cả hàng opacity 0.6 trên hero; chevron 9 × 5, cách chữ 4; logo 1:377 100 × 30 tại x = 252; 3 icon 24, cách 24.
-Ghi chú: foundation §14 ghi mega "từ 64rem", nhưng menu ngang chỉ hiện từ 80rem (code), nên mega bắt đầu từ 80rem; 1024 dùng drawer. Logo desktop: Figma và `base.css` 100 × 30, kit.css (foundation) đang 140; mockup này theo Figma 100.
+Figma 1:362 trên nền 1:360: thanh #1A1A1A có noise cao 80; 1:365: 7 mục Shop ▾, Collection ▾, Sale, Our Story, Blog, Contact, Help; Inter 16/500, cao chữ 24–26, khoảng cách 40, cả hàng opacity 0.6; chevron 9 × 5, cách chữ 4; logo 1:377 100 × 30 tại x = 252; icon 1:373: search 20, account 24, cart 24, cách 24. Hero 1:361 bắt đầu y 80, ngay dưới thanh tối.
+Mega bắt đầu từ 80rem (menu ngang chỉ có từ 80rem, foundation §14 vòng 3); 1024 dùng drawer.
 
 ## 2. Anatomy
 
 Mega menu (≥ 80rem):
-1. Trigger: `<summary>` của mục cha (chữ + chevron), `aria-expanded`.
-2. Scrim: phủ trang từ đáy header xuống, `--overlay-scrim` (50%).
+1. Trigger: `<summary>` của mục cha (chữ + chevron), `aria-expanded`. Thanh header tối giữ nguyên khi mở.
+2. Scrim: phủ trang từ đáy header xuống, `--overlay-scrim` (50%); header không bị phủ.
 3. Panel: full bề ngang viewport, ngay dưới header (top 80), nền `--color-background`, viền trên 1px `--color-border`, bóng `--shadow-raised`; nội dung thẳng lưới container (1240 / 1416).
 4. Biến thể A "Cột link": cột = link cấp 2 có cấp 3. Mỗi cột: tiêu đề cột (link tới URL cấp 2) + danh sách link cấp 3. Link "View all …" đứng đầu cột 1 (URL mục cha).
 5. Card sản phẩm nổi bật (biến thể A, tuỳ chọn): ảnh, badge giảm giá, eyebrow "Featured", tên, giá.
@@ -36,9 +54,9 @@ Mega menu (≥ 80rem):
 7. Biến thể C "Dropdown nhỏ": giữ `.site-header__submenu` hiện có.
 
 Menu drawer (< 80rem):
-1. Nút menu trong header (`header-drawer-toggle`), `aria-expanded`.
-2. Scrim toàn màn.
-3. Drawer trái: header drawer (tiêu đề "Menu" + nút đóng 48) · thân cuộn riêng · chân (Sign In, Currency, Language).
+1. Nút menu trong thanh tối (`header-drawer-toggle`, ô 44, lùi −12), `aria-expanded`.
+2. Scrim toàn màn (phủ cả thanh tối ở phần 10% bên phải).
+3. Drawer trái nền trắng (kit `.drawer--start`; thanh tối không lặp vào drawer, foundation §15): `.overlay__header` (tiêu đề "Menu" + nút đóng 48) · `.overlay__body` cuộn riêng · `.overlay__footer` (Sign In, Currency, Language).
 4. Cấp 1: hàng link; mục có con là nút có chevron ›.
 5. Cấp 2 (trượt vào trong cùng drawer): nút Back + nút đóng · tiêu đề cấp 2 · "View all …" · nhóm (tiêu đề nhóm = link cấp 2 có cấp 3, dưới là link cấp 3) hoặc hàng collection có ảnh 56 · card sản phẩm nổi bật cuối danh sách (nếu có).
 
@@ -77,8 +95,8 @@ Chữ cố định qua locale `blocks.header.*` (không setting): `menu_title` "
 
 | Giá trị | 1280 | 1920 | Token / cách tính |
 | --- | --- | --- | --- |
-| Header | 80, nền trong suốt (trang chủ) hoặc trắng | như 1280 | `--header-height` |
-| Menu ngang | chữ 16/500, gap 40 | như 1280 | Figma 1:365 itemSpacing 40 |
+| Header | 80, nền `--color-background-dark` + noise mọi trang, kể cả khi panel mở | như 1280 | `--header-height`, `--dark-texture` |
+| Menu ngang | chữ 16/500 ls −0.04em, gap 40, ô bấm cao 44 | như 1280 | Figma 1:365 itemSpacing 40; kit `.site-header__link` |
 | Panel top | 80 | 80 | ngay đáy header |
 | Panel padding-block | 40 / 48 | 40 / 48 | `--space-1 × 10` / `--space-7` |
 | Bề rộng nội dung | 1240 | 1416 | `--content-width` |
@@ -92,13 +110,13 @@ Chữ cố định qua locale `blocks.header.*` (không setting): `menu_title` "
 | B: chữ dưới ảnh | cách ảnh 12; tên 16/600; số 14 muted | | |
 | Scrim | từ y = 80 tới đáy viewport | | `--overlay-scrim` |
 
-Khi panel mở trên trang có header đè hero: header chuyển nền trắng, chữ foreground, bỏ opacity 60% (trạng thái như `[data-scrolled]`), để header và panel liền một khối (ĐỀ XUẤT, 14 #290D chữ trên ảnh; 06 nhất quán). Mục đang mở: gạch chân 2px offset 0.35em, chevron xoay 180°.
+Khi panel mở: header giữ tối (sổ 10/11; foundation §3.2, §14), không đổi chiều cao. Mục đang mở trắng 100% + chevron xoay 180°; mục khác vẫn trắng 60%; trang hiện tại vẫn gạch chân. Panel trắng tách khỏi thanh tối bằng viền trên 1px `--color-border` và bóng `--shadow-raised` phía dưới.
 
 ### 5.2 Tablet 768 (và 1024)
 
-- Drawer trái rộng 420, cao toàn màn; nền trang phía phải lộ dưới scrim (chạm để đóng).
+- Drawer trái rộng 420, cao toàn màn, phủ cả thanh tối; phần trang bên phải (thanh tối + hero / nội dung) lộ dưới scrim (chạm để đóng).
 - Nội dung drawer giống 360; không tăng cỡ chữ (drawer cùng bề rộng 420 ở 768 và 1024).
-- Header drawer 72: padding 12 / 12 / 12 / 24; tiêu đề "Menu" heading 700 `--font-size-h3` (24 ở 768); nút đóng 48 cách mép phải 12.
+- `.overlay__header` 72: padding 12 / 12 / 12 / 24; tiêu đề "Menu" heading 700 `--font-size-h3` (24 ở 768); nút đóng 48 cách mép phải 12.
 - Thân: padding 8 / 24 / 24. Tiêu đề cấp 2 heading 800 uppercase `--font-size-h2` (32 ở 768).
 
 ### 5.3 Mobile 360
@@ -107,10 +125,10 @@ Khi panel mở trên trang có header đè hero: header chuyển nền trắng, 
 | --- | --- | --- |
 | Drawer | rộng 90% (324), cao 100dvh | 15 §2 #3, foundation §15 |
 | Header drawer | cao 72; "Menu" 22; × 48 cách mép 12 | 14 §3 (× cách mép ≥ 12), 15 §1 (× ≥ 48) |
-| Hàng cấp 1 | cao 56, Inter 18/500, gạch dưới 1px border, chevron › 12 muted | 14 #1083M điều hướng ≥ 44 |
+| Hàng cấp 1 | cao 52, Inter 18/500, gạch dưới 1px border, chevron › 12 muted | kit `.drawer-menu`; 14 #1083M điều hướng ≥ 44 |
 | Header cấp 2 | Back (chevron ‹ 12 + "Back" 14 muted, cao 44) trái; × 48 phải | 14 §3: back nhỏ và nhạt hơn × |
 | Tiêu đề cấp 2 | heading 800 uppercase 28, cách trên 16 | foundation §1 h2 |
-| "View all …" | hàng 56, 16/600 gạch chân, mũi tên phải | 14 §1, 18 C2 |
+| "View all …" | hàng 52, 16/600 gạch chân, mũi tên phải | 14 §1, 18 C2 |
 | Nhóm cấp 3 | tiêu đề nhóm 14/600 uppercase muted (link, cao 44), cách nhóm trên 24; link 16/400 cao 48 | 14 #1094M khoảng cách chạm |
 | Hàng collection có ảnh | cao 72; ảnh 56 × 56 bo 8 `cover`; gap 16; tên 16/500; số 14 muted | |
 | Card sản phẩm | ngang: ảnh 96 nền trắng + chữ; nền cream bo 12 padding 12; cách nhóm trên 32 | |
@@ -139,7 +157,7 @@ Chuyển động (foundation §19; 15 §4; ux-motion; chỉ transform/opacity; t
 | Panel mega | 250 `--ease-out`, opacity 0 → 1, translate −8 → 0 (`motion-drop` có sẵn) | 150 opacity |
 | Đổi panel khi rê sang mục khác | không hiệu ứng | không |
 | Scrim | 250 opacity | 150 |
-| Header trong suốt → trắng khi mở | 150 màu nền, màu chữ | 150 |
+| Mục menu 60% → 100%, chevron xoay | 150 màu, 250 rotate | 150 |
 | Link trong panel hover | 150, chữ accent + dịch 4px (code `.site-header__submenu` đã có) | 150 |
 | Ô ảnh hover | ảnh scale 1.04, 500 | 500 |
 | Drawer | 250 translate −100% → 0 | 200 |
@@ -151,11 +169,13 @@ Figma không có trạng thái nào; tất cả ĐỀ XUẤT (05 §3, 05 §6–7
 
 | Trạng thái | Desktop | Drawer |
 | --- | --- | --- |
-| Mục menu default | trên hero trắng 60% (Figma 1:365); trên nền trắng foreground | hàng 18/500 foreground |
-| Hover | trắng 100% / gạch chân 1px | — |
+| Mục menu default | trắng 60% trên thanh tối, mọi trang (Figma 1:365) | hàng 18/500 foreground |
+| Hover | trắng 100% | — |
+| Đang mở (`aria-expanded="true"`) | trắng 100% + chevron xoay 180° | cấp 2 trượt vào (không có trạng thái hàng) |
 | Pressed | — | nền `--color-background-alt` |
-| Focus | outline 2px accent offset 4 (trên hero: outline trắng) | outline 2px accent inset |
-| Trang hiện tại (`aria-current="page"`) | gạch chân 2px, trên hero trắng 100% | 600 + gạch chân 2px |
+| Focus | outline trắng 2px offset 2 (foundation §3.2) | outline 2px accent inset |
+| Trang hiện tại (`aria-current="page"`) | trắng 100% + gạch chân 2px offset 0.45em | 600 + gạch chân 2px |
+| Header đã cuộn | giữ nền tối, thêm bóng (foundation §3.2); panel mở vẫn top 80 | — |
 | Link trong panel: hover / focus / current | accent + dịch 4 / outline accent / 600 + gạch chân 2px | — |
 | Đang tải ảnh danh mục | khung đúng tỉ lệ, shimmer `--color-background-alt` → background 1.4s; chữ có sẵn | như desktop, ảnh 56 |
 | Collection không ảnh, ảnh lỗi | nền cream + icon ảnh `--color-muted-light`; không ẩn mục | như desktop |
@@ -165,7 +185,7 @@ Figma không có trạng thái nào; tất cả ĐỀ XUẤT (05 §3, 05 §6–7
 | compare_at_price ≤ price ("Sản phẩm có màu sale và màu không sale") | không badge, không giá gạch | như desktop |
 | Tên dài | tối đa 2 dòng, cắt "…" (card); link menu xuống dòng tự nhiên | như desktop |
 | Chưa chọn sản phẩm nổi bật | không card, cột giãn | không card |
-| Menu trống, theme editor | chữ `blocks.header.menu_placeholder` giữa header | chữ xuống dòng dưới logo |
+| Menu trống, theme editor | chữ `blocks.header.menu_placeholder` giữa thanh tối, `--color-muted-on-dark` 14 | chữ xuống dòng dưới logo |
 | Menu trống, storefront | không menu, không nút menu; logo trái, icon phải | như desktop |
 | Không JS | bấm để mở, không hover | accordion tại chỗ |
 | Lỗi | Menu render từ server nên không có lỗi tải chữ; ảnh lỗi = "không ảnh" | như desktop |
@@ -185,9 +205,12 @@ Tương phản (tính tay theo WCAG, L độ sáng tương đối; số chung l�
 | accent / cream (L 0.1596 / 0.913) | 4.59 | eyebrow "Featured" 14/800 |
 | sale-foreground / sale | 6.38 | badge −22% |
 | muted-light / background | 5.33 | viền nút Currency, Language (sổ quyết định 09/11) |
-| trắng 60% trên hero | không tính được (ảnh) | Figma 1:365, đang có trên trang chủ; rủi ro ở §9 |
+| trắng 60% (#A3A3A3) / dark #1A1A1A | 6.93 | mục menu mặc định (foundation §2) |
+| dark-foreground / dark | 17.4 | mục hover, đang mở, trang hiện tại; logo, icon; outline focus |
+| muted-on-dark / dark | 6.11 | chữ menu trống trong theme editor |
+| accent / dark | 3.48 | không dùng (focus trên thanh tối dùng trắng) |
 
-Vùng chạm: mục menu desktop cao 24–26 theo Figma (đạt target-size 24); ĐỀ XUẤT nới vùng bấm lên 44 bằng padding-block 10 không đổi bố cục (04 §3.9, 06). Link trong panel 40 (desktop ≥ 40, 06). Drawer: hàng 56 / 48 / 72, Back 44, × 48, Sign In 44, Currency / Language 44 (14 #1083M). Khoảng cách giữa các link chạm ≥ 0 nhưng vùng chạm không chồng nhau.
+Vùng chạm: mục menu desktop chữ cao 24–26 theo Figma, ô bấm 44 (kit `min-height: 44px`, không đổi bố cục thanh 80). Icon header ô 44. Link trong panel 40 (desktop ≥ 40, 06). Drawer: hàng 52 / 48 / 72, Back 44, × 48, Sign In 44, Currency / Language 44 (14 #1083M). Khoảng cách giữa các link chạm ≥ 0 nhưng vùng chạm không chồng nhau.
 
 Ngữ nghĩa:
 - `<nav aria-label="Main menu">` (desktop) và `<nav aria-label="Mobile menu">` (drawer): tên khác nhau (code có).
@@ -201,12 +224,12 @@ Ngữ nghĩa:
 
 ## 9. Lighthouse (SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90)
 
-- Phần tử LCP: không thuộc menu. Menu đóng khi tải trang nên LCP giữ nguyên của từng trang (trang chủ: ảnh slide 1 hero; collection: banner hoặc hàng card đầu).
+- Phần tử LCP: không thuộc menu. Menu đóng khi tải trang nên LCP giữ nguyên của từng trang (trang chủ: ảnh slide 1 hero dưới thanh tối; collection: banner hoặc hàng card đầu). Noise của thanh tối là `background-image` nhỏ đã có (`assets/noise-dark.png`), không phải LCP.
 - Ảnh lazy: mọi ảnh trong menu (ô danh mục, ảnh 56 trong drawer, ảnh card sản phẩm) `loading="lazy"`, có width/height, qua `snippets/image` (srcset). Ảnh nằm trong `<details>` đóng nên không tải tới khi mở (sổ quyết định 09/11 "ảnh trong menu tải khi mở"). Không ảnh nào eager, không `fetchpriority`. `sizes`: ô B `(min-width: 80rem) 20vw`; ảnh drawer 56px (yêu cầu bản 112 cho màn 2x); card 400px desktop, 96px drawer.
 - Font: chỉ Inter (400, 500, 600) và Sofia Sans Condensed (700, 800) đã có; không thêm họ, không thêm weight mới.
 - CSS: thanh header ở `critical.css` như hiện tại; panel, drawer mở, cấp 2, ô ảnh ở `base.css` (đóng khi tải nên không cần critical). Panel, scrim, drawer `position: absolute / fixed` nên 0 CLS; header không đổi chiều cao khi mở.
 - JS: chỉ tăng cường trong `assets/header-menu.js` (giữ ≤ 8 KB, trang ≤ 40 KB); markup chạy khi chưa có JS. Chuyển động chỉ transform/opacity.
-- Rủi ro A11y và cách tránh: tiêu đề cột dùng `<h*>` gây heading-order → dùng `<p>`/link; nút icon thiếu tên → mọi nút có `aria-label` locale; drawer không tên → `aria-labelledby`; link trùng tên "View all" → nhãn theo đích; trạng thái chỉ bằng màu → gạch chân; chữ trắng 60% trên hero (Figma) Lighthouse không đo được trên ảnh (incomplete, không trừ điểm) nhưng QA thủ công có thể bắt → khi mở menu header chuyển nền trắng (17.4); hero giữ overlay ≥ 30% (DESIGN).
+- Rủi ro A11y và cách tránh: tiêu đề cột dùng `<h*>` gây heading-order → dùng `<p>`/link; nút icon thiếu tên → mọi nút có `aria-label` locale; drawer không tên → `aria-labelledby`; link trùng tên "View all" → nhãn theo đích; trạng thái chỉ bằng màu → trang hiện tại gạch chân, mục đang mở có chevron lật + `aria-expanded`; chữ menu trắng 60% nay nằm trên nền tối đặc (6.93:1, Lighthouse đo được, đạt) thay vì trên ảnh; focus cam trên tối 3.48 → outline trắng.
 - Rủi ro SEO: mọi link là `<a href>` render server, có trong HTML kể cả khi đóng (crawl được); chữ link mô tả đích; không "Read more"/"Shop now" trần; chữ ≥ 13 (nhỏ nhất: số sản phẩm 14, badge 13).
 - Best Practices: ảnh `object-fit: cover` (ô, ảnh 56) và `contain` (card) không kéo méo; độ phân giải theo srcset; 0 lỗi console (mockup render 0 lỗi ở 4 mốc).
 
@@ -216,9 +239,9 @@ Ngữ nghĩa:
 | --- | --- | --- | --- |
 | Đọc cấp 3 | `link.links` 2 cấp | lặp thêm `child.links` | FE |
 | Panel A, B | `.site-header__submenu` absolute dưới từng mục | panel full bề ngang dưới header, giữ C cho dữ liệu đơn giản | FE |
-| Header khi mở | không đổi | `data-menu-open` trên header: nền trắng, bỏ 60% | FE (CSS) + BE (đặt attribute) |
+| Header | nền tối chỉ khi `body:has(.slideshow)`, `[data-header-overlay]` | nền tối mọi trang, bỏ overlay (ticket foundation §21); khi mở mega không đổi màu, chỉ `aria-expanded` | FE |
 | Scrim desktop | không có | scrim từ dưới header; bấm đóng | FE + BE |
-| Drawer | `min(22rem, 100vw − 3.5rem)`, × 44 không tiêu đề | `min(90%, 420px)`, header 72 có "Menu" + × 48, chân Sign In + localization | FE |
+| Drawer | `min(22rem, 100vw − 3.5rem)`, × 44 không tiêu đề | `min(90%, 420px)` nền trắng, header 72 có "Menu" + × 48, hàng 52, chân Sign In + localization (khung chung foundation §15) | FE |
 | Cấp 2 drawer | accordion | trượt + Back khi có JS; accordion khi không JS | FE markup, BE JS |
 | Card sản phẩm | không | setting `menu_featured_product`, dùng `snippets/price` | FE |
 | Ảnh danh mục | không | setting `menu_collection_images`, `snippets/image` lazy | FE |
@@ -230,6 +253,6 @@ Token dùng: `--color-background`, `--color-foreground`, `--color-muted`, `--col
 
 ## 11. Quyết định CTO cần chốt
 
-1. TE-1 AC2 ghi "mobile drawer có accordion", ticket ES1-T260 ghi "2 cấp, nút quay lại": dùng trượt cấp 2 + Back khi có JS và giữ accordion làm bản không JS? Đề xuất: có, BA sửa AC2 theo (14 §1 hiệu ứng tiết kiệm, foundation §15).
-2. Thêm 2 setting cho block header: "Show collection images in menu" (mặc định bật) và "Featured product in menu" (product, mặc định trống)? Đề xuất: có; card khuyến mãi lấy giá, badge thật từ sản phẩm nên không cần setting chữ, đúng R8 không giảm giá giả.
-3. Kiểu panel chọn tự động theo dữ liệu menu (con có cấp 3 → cột; toàn collection → ô ảnh; còn lại → dropdown nhỏ) thay vì setting từng mục? Đề xuất: có; giữ settings phẳng (AGENTS), merchant chỉ sửa menu trong Navigation; cần store dev có menu 3 cấp (ES1-T271).
+1. Drawer mobile dùng trượt cấp 2 + Back khi có JS, accordion chỉ là bản không JS (TE-1 AC2 đang ghi accordion)? Đề xuất: có, BA sửa AC2 (14 §1, foundation §15).
+2. Thêm 2 setting header "Show collection images in menu" (bật) và "Featured product in menu" (product, trống)? Đề xuất: có, card lấy giá và badge thật nên không cần setting chữ.
+3. Kiểu panel chọn theo dữ liệu menu (có cấp 3 → cột, toàn collection → ô ảnh, còn lại → dropdown) thay vì setting từng mục? Đề xuất: có, giữ settings phẳng (AGENTS); cần menu 3 cấp trên store dev (ES1-T271).
