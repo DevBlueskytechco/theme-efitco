@@ -1,0 +1,609 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Efitco navigation overlays: mega menu and menu drawer — ES1-T260</title>
+<meta name="description" content="Efitco mega menu for desktop and two-level menu drawer for tablet and mobile, with loading, missing image, sold out, empty menu and no JavaScript states.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* Chỉ cho mockup ES1-T260. Spec: docs/ui-spec/navigation.md */
+  .sheet-intro { padding-block: var(--space-5) var(--space-6); }
+  .sheet-intro p { max-width: 75ch; margin-block-start: var(--space-3); color: var(--color-muted); }
+  .only-desktop { display: none; }
+  @media (min-width: 80rem) { .only-desktop { display: block; } .only-mobile { display: none; } }
+  .stage-head { padding-block: var(--space-7) var(--space-4); }
+  .stage-head h2 { margin-block-end: var(--space-2); }
+  .stage-head p { max-width: 80ch; color: var(--color-muted); font-size: var(--font-size-sm); }
+
+  /* Khung mô phỏng viewport: tràn hết bề ngang như thiết bị thật */
+  .nav-stage { position: relative; overflow: hidden; height: 740px; border-block: 1px dashed var(--color-muted-light); background: var(--color-background); }
+  @media (min-width: 48rem) { .nav-stage { height: 980px; } }
+  .nav-stage--scroll { height: 1290px; }
+  @media (min-width: 80rem) { .nav-stage { height: 640px; } .nav-stage--tall { height: 700px; } }
+  .nav-stage > .site-header { position: absolute; inset-inline: 0; inset-block-start: 0; z-index: 2; }
+  .nav-stage > .site-header.is-open { z-index: 23; border-block-end-color: transparent; }
+  .nav-stage > .scrim { position: absolute; inset: 0; }
+  @media (min-width: 80rem) { .nav-stage > .scrim { inset-block-start: var(--header-height); } }
+  .page-behind { position: absolute; inset: var(--header-height) 0 0; }
+  .page-behind--hero { inset-block-start: 0; }
+  .page-behind--hero img { width: 100%; height: 100%; object-fit: cover; }
+  .page-behind--hero::after { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--color-background-dark) 30%, transparent); }
+  .page-behind .product-grid { margin-block-start: var(--space-5); }
+
+  /* Header: Figma 1:365 gap 40, chữ 16/500 */
+  @media (min-width: 80rem) { .site-header__menu { gap: calc(var(--space-1) * 10); } .site-header__logo svg { width: calc(var(--space-1) * 25); } }
+  button.site-header__link { padding: 0; border: 0; background: none; cursor: pointer; }
+  .site-header__link svg { transition: rotate var(--motion-base) var(--ease-out); }
+  .site-header__link[aria-expanded='true'] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.35em; }
+  .site-header__link[aria-expanded='true'] svg { rotate: 180deg; }
+  .site-header--overlay .site-header__menu > li > .site-header__link { color: color-mix(in srgb, var(--color-background-dark-foreground) 60%, transparent); }
+  .site-header--overlay .site-header__menu > li > .site-header__link.is-hover,
+  .site-header--overlay .site-header__menu > li > .site-header__link[aria-current='page'],
+  .site-header--overlay .site-header__menu > li > .site-header__link.is-focus { color: var(--color-background-dark-foreground); }
+  .site-header__link.is-hover { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.35em; }
+  .site-header__link.is-focus { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: 2px; }
+  .site-header--overlay .site-header__link.is-focus { outline-color: var(--color-background-dark-foreground); }
+  .site-header__placeholder { margin: 0 auto; color: var(--color-muted); font-size: var(--font-size-sm); }
+
+  /* ===== Mega menu (≥ 80rem) ===== */
+  .mega-panel { position: absolute; inset-inline: 0; inset-block-start: var(--header-height); z-index: 22; padding-block: calc(var(--space-1) * 10) var(--space-7); border-block-start: 1px solid var(--color-border); background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); }
+  .mega-panel__inner { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.3fr); gap: var(--space-6); width: var(--content-width); margin-inline: auto; }
+  .mega-panel__inner--tiles { display: block; }
+  .mega-col { display: grid; align-content: start; }
+  .mega-col__title { display: inline-flex; align-items: center; justify-self: start; min-height: 40px; margin-block-end: var(--space-1); color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: 0.04em; text-decoration: none; text-transform: uppercase; }
+  .mega-col__title:hover, .mega-col__title.is-hover { color: var(--color-foreground); text-decoration: underline; text-underline-offset: 0.25em; }
+  .mega-col ul { display: grid; margin: 0; padding: 0; list-style: none; }
+  .mega-link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px; color: var(--color-foreground); text-decoration: none; transition: color var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
+  .mega-link:hover, .mega-link.is-hover { color: var(--color-accent); translate: var(--space-1) 0; }
+  .mega-link.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 2px; }
+  .mega-link[aria-current='page'] { font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.3em; }
+  .mega-link--all { font-weight: 600; text-decoration: underline; text-underline-offset: 0.25em; }
+  .mega-link svg { width: 16px; height: 13px; }
+  .mega-tiles-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); margin-block-end: var(--space-5); }
+  .mega-tiles-head p { font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: -0.02em; line-height: 1.1; }
+
+  /* ===== Danh mục có ảnh: hàng (< 80rem) / ô (≥ 80rem) ===== */
+  .cat-list { display: grid; margin: 0; padding: 0; list-style: none; }
+  .cat-list a { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: var(--space-4); min-height: 72px; padding-block: var(--space-2); border-block-end: 1px solid var(--color-border); color: var(--color-foreground); text-decoration: none; }
+  .cat-list__media { display: grid; place-items: center; width: 56px; aspect-ratio: 1; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); color: var(--color-muted-light); }
+  .cat-list__media img { width: 100%; height: 100%; object-fit: cover; transition: scale var(--motion-slow) var(--ease-out); }
+  .cat-list__media svg { width: 50%; height: auto; }
+  .cat-list__media .skeleton { width: 100%; height: 100%; border-radius: 0; }
+  .cat-list__text { display: grid; min-width: 0; }
+  .cat-list__name { font-weight: 500; line-height: 1.5; }
+  .cat-list__count { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .cat-list a:hover .cat-list__name, .cat-list a.is-hover .cat-list__name { text-decoration: underline; text-underline-offset: 0.2em; }
+  @media (min-width: 80rem) {
+    .cat-list { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-5); }
+    .cat-list a { grid-template-columns: minmax(0, 1fr); align-items: start; gap: var(--space-3); min-height: 0; padding: 0; border: 0; }
+    .cat-list__media { width: auto; aspect-ratio: 336 / 220; border-radius: calc(var(--radius-card) + var(--space-1)); }
+    .cat-list__media svg { width: 20%; }
+    .cat-list a:hover img, .cat-list a.is-hover img { scale: 1.04; }
+    .cat-list__name { font-weight: 600; }
+  }
+
+  /* ===== Card sản phẩm nổi bật trong menu ===== */
+  .menu-promo { position: relative; display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: var(--space-4); padding: var(--space-3); border-radius: var(--radius-card); background: var(--color-background-cream); color: var(--color-foreground); text-decoration: none; }
+  .menu-promo__media { position: relative; display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; border-radius: var(--space-2); background: var(--color-background); color: var(--color-muted-light); }
+  .menu-promo__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; transition: scale var(--motion-slow) var(--ease-out); }
+  .menu-promo__media svg { width: 40%; height: auto; }
+  .menu-promo__media .badge { position: absolute; inset-block-start: var(--space-1); inset-inline-start: var(--space-1); min-height: 22px; padding-inline: var(--space-2); }
+  .menu-promo__body { display: grid; gap: var(--space-1); min-width: 0; }
+  .menu-promo__eyebrow { color: var(--color-accent); font-family: var(--font-heading--family); font-size: var(--font-size-sm); font-weight: var(--font-heading--weight-display); letter-spacing: 0.04em; text-transform: uppercase; }
+  .menu-promo__title { display: -webkit-box; overflow: hidden; font-weight: 600; line-height: 1.375; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .menu-promo:hover .menu-promo__title, .menu-promo.is-hover .menu-promo__title { text-decoration: underline; text-underline-offset: 0.2em; }
+  .menu-promo:hover img, .menu-promo.is-hover img { scale: 1.04; }
+  .menu-promo .price { font-size: var(--font-size-sm); }
+  .menu-promo.is-sold-out img { opacity: 0.6; }
+  @media (min-width: 80rem) {
+    .menu-promo { grid-template-columns: minmax(0, 1fr); align-items: start; align-self: start; gap: var(--space-4); padding: var(--space-4); }
+    .menu-promo__media { aspect-ratio: 3 / 2; border-radius: var(--space-2); }
+    .menu-promo__media .badge { inset-block-start: var(--space-3); inset-inline-start: var(--space-3); min-height: 28px; padding-inline: var(--space-3); }
+    .menu-promo__title { font-size: var(--font-size-lg); }
+    .menu-promo .price { font-size: var(--font-size-base); }
+  }
+
+  /* ===== Menu drawer (< 80rem): trái, 90% / 420 ===== */
+  .nav-drawer { position: absolute; inset-block: 0; inset-inline-start: 0; z-index: 21; display: flex; flex-direction: column; width: min(90%, 420px); background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); }
+  .nav-drawer__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: calc(var(--space-1) * 18); padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5); border-block-end: 1px solid var(--color-border); }
+  .nav-drawer__head--sub { padding-inline-start: var(--space-3); }
+  .nav-drawer__title { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); }
+  .nav-drawer__body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-2) var(--space-5) var(--space-5); }
+  .nav-drawer__level-title { margin: var(--space-4) 0 var(--space-2); font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight-display); text-transform: uppercase; letter-spacing: -0.02em; }
+  .nav-rows { margin: 0; padding: 0; list-style: none; }
+  .nav-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; min-height: 56px; padding: 0; border: 0; border-block-end: 1px solid var(--color-border); background: none; color: var(--color-foreground); font-size: var(--font-size-lg); font-weight: 500; text-align: start; text-decoration: none; cursor: pointer; }
+  .nav-row svg { flex: none; width: 12px; height: 7px; rotate: -90deg; color: var(--color-muted); }
+  .nav-row.is-active { background: var(--color-background-alt); }
+  .nav-row.is-focus { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+  .nav-row[aria-current='page'] { font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.3em; }
+  .nav-row--all { font-size: var(--font-size-base); font-weight: 600; text-decoration: underline; text-underline-offset: 0.25em; }
+  .nav-row--all svg { width: 16px; height: 13px; rotate: none; color: currentColor; }
+  .nav-group { padding-block-start: var(--space-5); }
+  .nav-group__title { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: 0.04em; text-decoration: none; text-transform: uppercase; }
+  .nav-sub { margin: 0; padding: 0; list-style: none; }
+  .nav-sub a { display: flex; align-items: center; min-height: 48px; color: var(--color-foreground); text-decoration: none; }
+  .nav-drawer .menu-promo { margin-block-start: var(--space-6); }
+  .nav-drawer__foot { display: grid; gap: var(--space-2); padding: var(--space-3) var(--space-5) var(--space-5); border-block-start: 1px solid var(--color-border); }
+  .nav-drawer__account { display: inline-flex; align-items: center; gap: var(--space-3); min-height: 44px; color: var(--color-foreground); font-weight: 500; text-decoration: none; }
+  .nav-drawer__account svg { width: 24px; height: 24px; }
+  .locale-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .locale-btn { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-3); border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); cursor: pointer; }
+  .locale-btn span { color: var(--color-muted); }
+  .locale-btn svg { width: 9px; height: 5px; }
+  .back-button { gap: var(--space-2); padding-inline: var(--space-2); }
+  .back-button svg { width: 12px; height: 7px; rotate: 90deg; scale: 1; }
+  .close-button.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+
+  /* ===== Trạng thái ===== */
+  .state-grid { display: grid; gap: var(--space-5); }
+  @media (min-width: 48rem) { .state-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 80rem) { .state-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .state-card { display: grid; align-content: start; gap: var(--space-3); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+  .state-card > h3 { font-size: var(--font-size-h3); }
+  .state-card > .demo-note { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .strip { position: relative; overflow: hidden; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
+  .strip > .site-header { position: relative; }
+  .strip--hero { background: var(--color-background-dark); }
+  .strip--hero img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .strip--hero::after { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--color-background-dark) 30%, transparent); }
+  .strip--hero > .site-header { z-index: 1; }
+  .noscript-list details { border-block-end: 1px solid var(--color-border); }
+  .noscript-list summary { display: flex; align-items: center; justify-content: space-between; min-height: 56px; font-size: var(--font-size-lg); font-weight: 500; list-style: none; cursor: pointer; }
+  .noscript-list summary::-webkit-details-marker { display: none; }
+  .noscript-list summary svg { width: 12px; height: 7px; color: var(--color-muted); }
+  .noscript-list details[open] summary svg { rotate: 180deg; }
+  .noscript-list ul { margin: 0; padding: 0 0 var(--space-3) var(--space-4); list-style: none; }
+  .noscript-list ul a { display: flex; align-items: center; min-height: 44px; text-decoration: none; }
+  .states-links { display: grid; gap: var(--space-2); }
+  .states-links .demo-label { margin: var(--space-2) 0 0; }
+  .states-links .mega-link { justify-self: start; }
+  .mobile-only-inline { display: block; }
+  .desktop-only-inline { display: none; }
+  @media (min-width: 80rem) { .mobile-only-inline { display: none; } .desktop-only-inline { display: grid; } }
+  /* Không có menu: icon vẫn dạt phải */
+  .site-header__logo + .site-header__icons, .site-header__placeholder + .site-header__icons { margin-inline-start: auto; }
+  .site-header__logo + .site-header__placeholder { margin-inline: var(--space-4) auto; }
+  .state-card .strip .site-header__inner { width: calc(100% - var(--space-3) * 2); }
+  @media (max-width: 79.99rem) {
+    .site-header__inner:has(.site-header__placeholder) { flex-wrap: wrap; }
+    .site-header__logo + .site-header__placeholder { flex-basis: 100%; order: 3; margin: 0 0 var(--space-3); }
+  }
+</style></head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<a class="visually-hidden" href="#main">Skip to content</a>
+
+<main id="main">
+  <div class="container sheet-intro">
+    <p class="eyebrow">ES1-T260 · Navigation overlays</p>
+    <h1>Mega Menu And Menu Drawer</h1>
+    <p>Từ 1280 (80rem): menu ngang Figma 1:362, mục có cấp con mở mega menu khi rê chuột 150ms hoặc bấm/Enter/Space. Dưới 1280 (360, 768, 1024): nút menu mở drawer trái 2 cấp, nút Back. Dữ liệu: collection, sản phẩm, giá lấy từ docs/design/demo-data.json; cấu trúc menu cấp 2, 3 là đề xuất chờ BA (ES1-T271). Trạng thái ở cuối trang.</p>
+  </div>
+
+  <!-- ================= DESKTOP ≥ 80rem ================= -->
+  <section class="only-desktop" aria-labelledby="d1">
+    <div class="container stage-head">
+      <h2 id="d1">1. Shop: Link Columns And Featured Product</h2>
+      <p>Trang chủ (header đè hero). Mở mega: header chuyển nền trắng, mục Shop gạch chân 2px, chevron lật, aria-expanded true. Panel full bề ngang, nội dung thẳng lưới 1240 / 1416. Scrim 50% phủ trang từ dưới header. Cột = link cấp 2 có cấp 3; link "View all products" đầu cột 1. Card sản phẩm từ setting "Featured product in menu".</p>
+    </div>
+    <div class="nav-stage" role="group" aria-label="Desktop mega menu, Shop open on the home page">
+      <div class="page-behind page-behind--hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="900"></div>
+      <div class="scrim"></div>
+      <header class="site-header is-open">
+        <div class="site-header__inner">
+          <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+          <nav class="site-header__nav" aria-label="Main menu">
+            <ul class="site-header__menu">
+              <li><button class="site-header__link" type="button" aria-expanded="true" aria-controls="mega-shop">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+              <li><button class="site-header__link" type="button" aria-expanded="false">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+              <li><a class="site-header__link" href="#">Sale</a></li>
+              <li><a class="site-header__link" href="#">Our Story</a></li>
+              <li><a class="site-header__link" href="#">Blog</a></li>
+              <li><a class="site-header__link" href="#">Contact</a></li>
+              <li><a class="site-header__link" href="#">Help</a></li>
+            </ul>
+          </nav>
+          <div class="site-header__icons">
+            <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+            <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+            <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+          </div>
+        </div>
+      </header>
+      <div class="mega-panel" id="mega-shop">
+        <div class="mega-panel__inner">
+          <div class="mega-col">
+            <a class="mega-col__title" href="#" id="mc-cat">Categories</a>
+            <ul aria-labelledby="mc-cat">
+              <li><a class="mega-link mega-link--all" href="#">View all products <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+              <li><a class="mega-link" href="#">Free Weights</a></li>
+              <li><a class="mega-link is-hover" href="#">Functional Training</a></li>
+              <li><a class="mega-link" href="#">Benches &amp; Racks</a></li>
+              <li><a class="mega-link" href="#">Recovery &amp; Mobility</a></li>
+              <li><a class="mega-link" href="#">Accessories</a></li>
+            </ul>
+          </div>
+          <div class="mega-col">
+            <a class="mega-col__title" href="#" id="mc-lvl">Training Level</a>
+            <ul aria-labelledby="mc-lvl">
+              <li><a class="mega-link" href="#">Beginner</a></li>
+              <li><a class="mega-link" href="#">Intermediate</a></li>
+              <li><a class="mega-link" href="#">Advanced</a></li>
+            </ul>
+          </div>
+          <div class="mega-col">
+            <a class="mega-col__title" href="#" id="mc-feat">Featured</a>
+            <ul aria-labelledby="mc-feat">
+              <li><a class="mega-link" href="#">Bundle</a></li>
+              <li><a class="mega-link" href="#">Setup</a></li>
+              <li><a class="mega-link" href="#">Portable Fitness</a></li>
+              <li><a class="mega-link" href="#">Weight</a></li>
+            </ul>
+          </div>
+          <a class="menu-promo" href="#">
+            <span class="menu-promo__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png" alt="" width="600" height="400"><span class="badge badge--sale">-22%</span></span>
+            <span class="menu-promo__body">
+              <span class="menu-promo__eyebrow">Featured</span>
+              <span class="menu-promo__title">Home Starter Kit</span>
+              <span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$399.00</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$512.00</s></span>
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="only-desktop" aria-labelledby="d2">
+    <div class="container stage-head">
+      <h2 id="d2">2. Collection: Category Images</h2>
+      <p>Trang con (header trắng). Cấp 2 toàn là collection, không có cấp 3: panel hiện ô ảnh danh mục như Figma 1:395 (ảnh 336/220, bo 16), tên + số sản phẩm dưới ảnh. Tiêu đề panel = tên mục cha; "View all collections" đứng đầu, cạnh tiêu đề. Ảnh lazy, chỉ tải khi panel mở.</p>
+    </div>
+    <div class="nav-stage nav-stage--tall" role="group" aria-label="Desktop mega menu, Collection open on an inner page">
+      <div class="page-behind">
+        <div class="container">
+          <nav class="breadcrumb" aria-label="Breadcrumb, sample"><ol><li><a href="#">Home</a></li><li><span aria-current="page">All products</span></li></ol></nav>
+          <div class="page-title"><h2 class="h1">All Products</h2><p class="page-title__meta">36 products</p></div>
+          <ul class="product-grid">
+            <li class="product-card"><span class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png" alt="" width="600" height="600"></span></li>
+            <li class="product-card"><span class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png" alt="" width="600" height="600"></span></li>
+            <li class="product-card"><span class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P20.jpg" alt="" width="600" height="600"></span></li>
+            <li class="product-card"><span class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png" alt="" width="600" height="600"></span></li>
+          </ul>
+        </div>
+      </div>
+      <div class="scrim"></div>
+      <header class="site-header is-open">
+        <div class="site-header__inner">
+          <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+          <nav class="site-header__nav" aria-label="Main menu, inner page">
+            <ul class="site-header__menu">
+              <li><button class="site-header__link" type="button" aria-expanded="false">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+              <li><button class="site-header__link" type="button" aria-expanded="true" aria-controls="mega-col">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+              <li><a class="site-header__link" href="#">Sale</a></li>
+              <li><a class="site-header__link" href="#">Our Story</a></li>
+              <li><a class="site-header__link" href="#">Blog</a></li>
+              <li><a class="site-header__link" href="#">Contact</a></li>
+              <li><a class="site-header__link" href="#">Help</a></li>
+            </ul>
+          </nav>
+          <div class="site-header__icons">
+            <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+            <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+            <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+          </div>
+        </div>
+      </header>
+      <div class="mega-panel" id="mega-col">
+        <div class="mega-panel__inner mega-panel__inner--tiles">
+          <div class="mega-tiles-head">
+            <p>Collection</p>
+            <a class="text-link" href="#">View all collections</a>
+          </div>
+          <ul class="cat-list">
+            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-1.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Free Weights</span><span class="cat-list__count">7 Products</span></span></a></li>
+            <li><a href="#" class="is-hover"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-2.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Functional Training</span><span class="cat-list__count">5 Products</span></span></a></li>
+            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-3.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Benches &amp; Racks</span><span class="cat-list__count">6 Products</span></span></a></li>
+            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Recovery &amp; Mobility</span><span class="cat-list__count">2 Products</span></span></a></li>
+            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-5.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Accessories</span><span class="cat-list__count">2 Products</span></span></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="only-desktop" aria-labelledby="d3">
+    <div class="container stage-head">
+      <h2 id="d3">3. Menu Item States</h2>
+      <p>Trên hero: mục thường trắng 60% (Figma 1:365 opacity 0.6), rê chuột / focus / trang hiện tại trắng 100%. Trên nền trắng: chữ foreground 17.4:1. Hover gạch chân 1px, trang hiện tại 2px, focus outline 2px offset 4.</p>
+    </div>
+    <div class="container state-grid">
+      <div class="strip strip--hero">
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="900">
+        <header class="site-header site-header--overlay">
+          <div class="site-header__inner">
+            <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+            <nav class="site-header__nav" aria-label="States over hero">
+              <ul class="site-header__menu">
+                <li><button class="site-header__link" type="button" aria-expanded="false">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+                <li><button class="site-header__link is-hover" type="button" aria-expanded="false">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+                <li><a class="site-header__link is-focus" href="#">Sale</a></li>
+                <li><a class="site-header__link" href="#">Our Story</a></li>
+                <li><a class="site-header__link" href="#" aria-current="page">Blog</a></li>
+                <li><a class="site-header__link" href="#">Contact</a></li>
+                <li><a class="site-header__link" href="#">Help</a></li>
+              </ul>
+            </nav>
+            <div class="site-header__icons">
+              <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+              <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+              <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+            </div>
+          </div>
+        </header>
+      </div>
+      <p class="demo-label">Default · Collection: hover · Sale: keyboard focus · Blog: current page</p>
+      <div class="strip">
+        <header class="site-header">
+          <div class="site-header__inner">
+            <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+            <nav class="site-header__nav" aria-label="States on white">
+              <ul class="site-header__menu">
+                <li><button class="site-header__link" type="button" aria-expanded="false">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+                <li><button class="site-header__link is-hover" type="button" aria-expanded="false">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+                <li><a class="site-header__link is-focus" href="#">Sale</a></li>
+                <li><a class="site-header__link" href="#">Our Story</a></li>
+                <li><a class="site-header__link" href="#" aria-current="page">Blog</a></li>
+                <li><a class="site-header__link" href="#">Contact</a></li>
+                <li><a class="site-header__link" href="#">Help</a></li>
+              </ul>
+            </nav>
+            <div class="site-header__icons">
+              <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+              <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+              <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+            </div>
+          </div>
+        </header>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TABLET / MOBILE < 80rem ================= -->
+  <section class="only-mobile" aria-labelledby="m1">
+    <div class="container stage-head">
+      <h2 id="m1">1. Menu Drawer: Level 1</h2>
+      <p>Drawer trái, rộng 90% (360) / 420 (768, 1024), cao toàn màn, scrim 50%. Mở thì focus vào nút đóng (vòng cam). Mục có cấp con là nút có chevron ›, mục không có là link. Chân drawer: Sign In, tiền tệ, ngôn ngữ.</p>
+    </div>
+    <div class="nav-stage" role="group" aria-label="Menu drawer, level 1">
+      <div class="page-behind page-behind--hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1080" height="1350"></div>
+      <header class="site-header site-header--overlay">
+        <div class="site-header__inner">
+          <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="true"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+          <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+          <div class="site-header__icons">
+            <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+            <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+            <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+          </div>
+        </div>
+      </header>
+      <div class="scrim"></div>
+      <div class="nav-drawer" role="dialog" aria-modal="true" aria-labelledby="dr1-title">
+        <div class="nav-drawer__head">
+          <h3 class="nav-drawer__title" id="dr1-title">Menu</h3>
+          <button class="close-button is-focus" type="button" aria-label="Close menu"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+        </div>
+        <nav class="nav-drawer__body" aria-label="Mobile menu">
+          <ul class="nav-rows">
+            <li><button class="nav-row" type="button" aria-expanded="false">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+            <li><button class="nav-row" type="button" aria-expanded="false">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></button></li>
+            <li><a class="nav-row" href="#">Sale</a></li>
+            <li><a class="nav-row" href="#">Our Story</a></li>
+            <li><a class="nav-row" href="#">Blog</a></li>
+            <li><a class="nav-row" href="#">Contact</a></li>
+            <li><a class="nav-row" href="#">Help</a></li>
+          </ul>
+        </nav>
+        <div class="nav-drawer__foot">
+          <a class="nav-drawer__account" href="#"><svg aria-hidden="true"><use href="#i-user"/></svg>Sign In</a>
+          <div class="locale-row">
+            <button class="locale-btn" type="button"><span>Currency</span> USD $ <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+            <button class="locale-btn" type="button"><span>Language</span> English <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="only-mobile" aria-labelledby="m2">
+    <div class="container stage-head">
+      <h2 id="m2">2. Level 2: Shop</h2>
+      <p>Cấp 2 trượt vào trong cùng drawer (250ms), focus về nút Back. Back nhỏ, chữ xám, bên trái; × giữ bên phải. Cấp 3 không mở thêm tầng: hiện thành nhóm có tiêu đề (link) ngay trong cấp 2. "View all products" đầu danh sách. Card sản phẩm nổi bật ở cuối. Khung kéo dài để thấy hết phần thân cuộn được; trên máy thật header drawer đứng yên, thân cuộn riêng.</p>
+    </div>
+    <div class="nav-stage nav-stage--scroll" role="group" aria-label="Menu drawer, level 2 Shop">
+      <div class="page-behind page-behind--hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1080" height="1350"></div>
+      <div class="scrim"></div>
+      <div class="nav-drawer" role="dialog" aria-modal="true" aria-labelledby="dr2-title">
+        <div class="nav-drawer__head nav-drawer__head--sub">
+          <button class="back-button is-focus" type="button" aria-label="Back to menu" style="outline: 2px solid var(--color-accent); outline-offset: 2px"><svg aria-hidden="true"><use href="#i-chevron"/></svg>Back</button>
+          <button class="close-button" type="button" aria-label="Close menu"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+        </div>
+        <nav class="nav-drawer__body" aria-labelledby="dr2-title">
+          <h3 class="nav-drawer__level-title" id="dr2-title">Shop</h3>
+          <a class="nav-row nav-row--all" href="#">View all products <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <div class="nav-group">
+            <a class="nav-group__title" href="#" id="g-cat">Categories</a>
+            <ul class="nav-sub" aria-labelledby="g-cat">
+              <li><a href="#">Free Weights</a></li><li><a href="#">Functional Training</a></li><li><a href="#">Benches &amp; Racks</a></li><li><a href="#">Recovery &amp; Mobility</a></li><li><a href="#">Accessories</a></li>
+            </ul>
+          </div>
+          <div class="nav-group">
+            <a class="nav-group__title" href="#" id="g-lvl">Training Level</a>
+            <ul class="nav-sub" aria-labelledby="g-lvl"><li><a href="#">Beginner</a></li><li><a href="#">Intermediate</a></li><li><a href="#">Advanced</a></li></ul>
+          </div>
+          <div class="nav-group">
+            <a class="nav-group__title" href="#" id="g-feat">Featured</a>
+            <ul class="nav-sub" aria-labelledby="g-feat"><li><a href="#">Bundle</a></li><li><a href="#">Setup</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Weight</a></li></ul>
+          </div>
+          <a class="menu-promo" href="#">
+            <span class="menu-promo__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png" alt="" width="192" height="192"><span class="badge badge--sale">-22%</span></span>
+            <span class="menu-promo__body"><span class="menu-promo__eyebrow">Featured</span><span class="menu-promo__title">Home Starter Kit</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$399.00</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$512.00</s></span></span>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <section class="only-mobile" aria-labelledby="m3">
+    <div class="container stage-head">
+      <h2 id="m3">3. Level 2: Collection</h2>
+      <p>Cấp 2 toàn collection: mỗi hàng có ảnh danh mục 56 × 56 (bo 8), tên 16/500, số sản phẩm 14. Hàng cao 72. Ảnh lazy, chỉ tải khi mở cấp này. Hàng đang chạm: nền alt.</p>
+    </div>
+    <div class="nav-stage" role="group" aria-label="Menu drawer, level 2 Collection">
+      <div class="page-behind page-behind--hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1080" height="1350"></div>
+      <div class="scrim"></div>
+      <div class="nav-drawer" role="dialog" aria-modal="true" aria-labelledby="dr3-title">
+        <div class="nav-drawer__head nav-drawer__head--sub">
+          <button class="back-button" type="button" aria-label="Back to menu"><svg aria-hidden="true"><use href="#i-chevron"/></svg>Back</button>
+          <button class="close-button" type="button" aria-label="Close menu"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+        </div>
+        <nav class="nav-drawer__body" aria-labelledby="dr3-title">
+          <h3 class="nav-drawer__level-title" id="dr3-title">Collection</h3>
+          <a class="nav-row nav-row--all" href="#">View all collections <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <ul class="cat-list">
+            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-1.jpg" alt="" width="112" height="112"></span><span class="cat-list__text"><span class="cat-list__name">Free Weights</span><span class="cat-list__count">7 Products</span></span></a></li>
+            <li><a href="#" style="background: var(--color-background-alt)"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-2.jpg" alt="" width="112" height="112"></span><span class="cat-list__text"><span class="cat-list__name">Functional Training</span><span class="cat-list__count">5 Products</span></span></a></li>
+            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-3.jpg" alt="" width="112" height="112"></span><span class="cat-list__text"><span class="cat-list__name">Benches &amp; Racks</span><span class="cat-list__count">6 Products</span></span></a></li>
+            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="112" height="112"></span><span class="cat-list__text"><span class="cat-list__name">Recovery &amp; Mobility</span><span class="cat-list__count">2 Products</span></span></a></li>
+            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-5.jpg" alt="" width="112" height="112"></span><span class="cat-list__text"><span class="cat-list__name">Accessories</span><span class="cat-list__count">2 Products</span></span></a></li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TRẠNG THÁI (mọi mốc) ================= -->
+  <section aria-labelledby="s0">
+    <div class="container stage-head">
+      <h2 id="s0">States: Loading, Missing Image, Product Edge Cases, Empty Menu, No JavaScript</h2>
+      <p>Cùng markup cho mega (≥ 1280: ô ảnh, card dọc) và drawer (&lt; 1280: hàng, card ngang). Chữ menu render từ server nên luôn có ngay; chỉ ảnh tải sau.</p>
+    </div>
+    <div class="container state-grid">
+
+      <div class="state-card">
+        <h3>Loading</h3>
+        <p class="demo-note">Ảnh danh mục đang tải khi vừa mở: khung giữ đúng tỉ lệ (0 CLS), shimmer nền alt → trắng 1.4s; giảm chuyển động thì tĩnh. Tên và số sản phẩm hiện ngay.</p>
+        <ul class="cat-list" aria-label="Loading sample">
+          <li><a href="#"><span class="cat-list__media"><span class="skeleton"></span></span><span class="cat-list__text"><span class="cat-list__name">Free Weights</span><span class="cat-list__count">7 Products</span></span></a></li>
+          <li><a href="#"><span class="cat-list__media"><span class="skeleton"></span></span><span class="cat-list__text"><span class="cat-list__name">Functional Training</span><span class="cat-list__count">5 Products</span></span></a></li>
+          <li><a href="#"><span class="cat-list__media"><span class="skeleton"></span></span><span class="cat-list__text"><span class="cat-list__name">Benches &amp; Racks</span><span class="cat-list__count">6 Products</span></span></a></li>
+          <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Recovery &amp; Mobility</span><span class="cat-list__count">2 Products</span></span></a></li>
+          <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-5.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Accessories</span><span class="cat-list__count">2 Products</span></span></a></li>
+        </ul>
+      </div>
+
+      <div class="state-card">
+        <h3>Missing Image Or Image Error</h3>
+        <p class="demo-note">Collection chưa có ảnh (cả 14 collection trong demo-data đang rỗng) hoặc ảnh lỗi: nền cream + icon ảnh muted-light, không ảnh vỡ, không ẩn mục. Collection rỗng (0 sản phẩm) vẫn hiện, ghi "0 Products".</p>
+        <ul class="cat-list" aria-label="Missing image sample">
+          <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Bundle</span><span class="cat-list__count">6 Products</span></span></a></li>
+          <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Setup</span><span class="cat-list__count">4 Products</span></span></a></li>
+          <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Portable Fitness</span><span class="cat-list__count">4 Products</span></span></a></li>
+          <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Weight</span><span class="cat-list__count">4 Products</span></span></a></li>
+          <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Accessories</span><span class="cat-list__count">4 Products</span></span></a></li>
+        </ul>
+      </div>
+
+      <div class="state-card">
+        <h3>Featured Product Edge Cases</h3>
+        <p class="demo-note">Dữ liệu edge_cases. Không media: placeholder. Hết hàng: badge Sold out, ảnh mờ 60%, giá giữ. compare_at_price thấp hơn giá: không badge, không giá gạch. Tên dài: tối đa 2 dòng. Không chọn sản phẩm: không có card, cột link giãn đủ chỗ.</p>
+        <div class="state-grid state-grid--2 state-grid--3">
+          <a class="menu-promo" href="#">
+            <span class="menu-promo__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span>
+            <span class="menu-promo__body"><span class="menu-promo__eyebrow">Featured</span><span class="menu-promo__title">Sản phẩm không có media</span><span class="price"><span>$34.00</span></span></span>
+          </a>
+          <a class="menu-promo is-sold-out" href="#">
+            <span class="menu-promo__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg" alt="" width="600" height="400"><span class="badge badge--sold-out">Sold out</span></span>
+            <span class="menu-promo__body"><span class="menu-promo__eyebrow">Featured</span><span class="menu-promo__title">Hết hàng toàn bộ</span><span class="price"><span>$1,000.00</span></span></span>
+          </a>
+          <a class="menu-promo" href="#">
+            <span class="menu-promo__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg" alt="" width="600" height="400"></span>
+            <span class="menu-promo__body"><span class="menu-promo__eyebrow">Featured</span><span class="menu-promo__title">Sản phẩm có màu sale và màu không sale</span><span class="price"><span>$200.00</span></span></span>
+          </a>
+        </div>
+      </div>
+
+      <div class="state-grid state-grid--2">
+        <div class="state-card">
+          <h3>Empty Menu</h3>
+          <p class="demo-note">Trong theme editor: chữ hướng dẫn (locale có sẵn blocks.header.menu_placeholder). Trên storefront: không menu ngang, không nút menu; logo và 3 icon giữ nguyên chỗ.</p>
+          <p class="demo-label">Theme editor</p>
+          <div class="strip">
+            <header class="site-header">
+              <div class="site-header__inner">
+                <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+                <p class="site-header__placeholder">No menu to show. Select a menu in this block's settings.</p>
+                <div class="site-header__icons">
+                  <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+                  <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+                </div>
+              </div>
+            </header>
+          </div>
+          <p class="demo-label">Storefront</p>
+          <div class="strip">
+            <header class="site-header">
+              <div class="site-header__inner">
+                <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+                <div class="site-header__icons">
+                  <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+                  <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+                  <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+                </div>
+              </div>
+            </header>
+          </div>
+        </div>
+
+        <div class="state-card">
+          <h3>No JavaScript</h3>
+          <p class="demo-note">Markup là &lt;details&gt; nên vẫn dùng được. Drawer: cấp 2 mở dạng accordion tại chỗ (không trượt, không Back). Desktop: bấm mục để mở panel (không mở khi rê chuột), bấm lại để đóng; scrim bấm được để đóng.</p>
+          <div class="noscript-list">
+            <details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+              <ul><li><a href="#"><strong>View all products</strong></a></li><li><a href="#">Categories</a></li><li><a href="#">Training Level</a></li><li><a href="#">Featured</a></li></ul>
+            </details>
+            <details><summary>Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Free Weights</a></li></ul></details>
+          </div>
+          <p class="demo-label">Link states</p>
+          <div class="states-links desktop-only-inline">
+            <a class="mega-link" href="#">Free Weights (default)</a>
+            <a class="mega-link is-hover" href="#">Functional Training (hover)</a>
+            <a class="mega-link is-focus" href="#">Benches &amp; Racks (focus)</a>
+            <a class="mega-link" href="#" aria-current="page">Accessories (current page)</a>
+          </div>
+          <ul class="nav-rows mobile-only-inline">
+            <li><a class="nav-row" href="#">Sale (default)</a></li>
+            <li><a class="nav-row is-active" href="#">Our Story (pressed)</a></li>
+            <li><a class="nav-row is-focus" href="#">Blog (focus)</a></li>
+            <li><a class="nav-row" href="#" aria-current="page">Contact (current page)</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div style="height: var(--space-8)"></div>
+  </section>
+</main>
+</body>
+</html>
