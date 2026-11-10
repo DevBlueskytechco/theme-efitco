@@ -1,6 +1,21 @@
-KHÔNG CHẮC: (1) quickview chưa có story/AC trong SRS, ghi chú đơn trong drawer vượt TE-5 AC1 → hỏi BA ES1-T272; upsell drawer chờ CTO ES1-T247. (2) Ảnh store dev lệch tên (ES1-T245): efx-prod-P03 (FlexFold Adjustable Bench) là dây thừng, efx-prod-P14 (Training mat) là dây nhảy; mockup giữ URL, alt trung tính. (3) Ngưỡng freeship $500 là minh hoạ (setting `free_shipping_threshold` mặc định 0, như ES1-T255). (4) demo-data không có description, rating, tồn kho theo variant: quickview không có mô tả, tồn kho mockup tự đặt (White = quá tồn ở 5d). (5) Spec cart page ES1-T255 nằm trên nhánh khác, không đọc được; chỉ bám comment ticket.
+KHÔNG CHẮC: (1) quickview chưa có story/AC trong SRS, ghi chú đơn trong drawer vượt TE-5 AC1 → hỏi BA ES1-T272; upsell drawer chờ CTO ES1-T247. (2) Ảnh store dev lệch tên (ES1-T245): efx-prod-P03 (FlexFold Adjustable Bench) là dây thừng, efx-prod-P14 (Training mat) là dây nhảy; mockup giữ URL, alt trung tính. (3) Ngưỡng freeship $500 là minh hoạ (setting `free_shipping_threshold` mặc định 0, như ES1-T255). (4) demo-data không có description, rating, tồn kho theo variant: quickview không có mô tả, tồn kho mockup tự đặt (White = quá tồn ở 5d). (5) Spec cart page ES1-T255 nằm trên nhánh khác, không đọc được; chỉ bám comment ticket. (6) Figma CTA bo 8 (1:815, 1:816), setting `button_corner_radius` mặc định 4 (DESIGN.md): mockup theo token, lệch ghi §10.
 
-# UI spec: Mini cart (cart drawer) và quick view (ES1-T262)
+# UI spec: Mini cart (cart drawer) và quick view (ES1-T262, vòng 3)
+
+## Thay đổi so với vòng 2
+
+| # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Header sau scrim | override logo, search 24, menu không chevron | nguyên kit vòng 3: thanh tối `--color-background-dark` + noise, cao 80, logo 100 × 30, menu trắng 60% có chevron Shop/Collection, search 20 | Sổ 10/11, Figma 1:362, foundation §3 |
+| 2 | Badge -N% quick view | góc trái trên ảnh | cùng hàng giá: sale · gạch · badge, cách 8 | Figma 1:783 |
+| 3 | Tiêu đề quick view | Sofia 800 | Sofia 700, ls −0.02em, lh 58/48 | Figma 1:772 |
+| 4 | Ảnh quick view | bo 12 | bo 16 (`--radius-card + --space-1`) | Figma 1:759 |
+| 5 | Hàng mua quick view | stepper + Add To Cart; link chữ "View Full Details →" bên dưới | hàng "Quantity" riêng; hàng mua = "Add To Cart" (accent, icon túi 24) + "View Detail" (nút xám `--color-border`, mũi tên 16 × 14), cách 12; mobile cả hàng dính đáy sheet | Figma 1:814–1:816 |
+| 6 | Điều hướng ảnh quick view | chỉ thumbnail | thêm cặp chevron tròn 52 góc phải dưới ảnh (≥ 48rem), đầu dãy `aria-disabled` | Sổ 09/11 (mọi carousel), foundation §6 |
+| 7 | Card sản phẩm (nền khung 2, khung 3) | không swatch | swatch 32 × 16 `aria-hidden`, số màu trong tên link | Figma 1:502, foundation §9 |
+| 8 | Khoảng cách khối info quick view | 16 mọi mốc | 16 < 80rem, 24 từ 80rem; hàng mua cách 40 | Figma 1:768, 1:769 |
+
+Giữ nguyên: drawer, mọi trạng thái, settings, câu hỏi BA/CTO đang mở.
 
 Mục đích: người mua thêm hàng mà không rời trang. Mini cart: thấy ngay hàng vừa thêm, sửa số lượng, xoá, ghi chú, biết còn bao nhiêu tới freeship, thấy tổng và đi checkout. Quick view: chọn biến thể và thêm giỏ từ card sản phẩm, có đường sang trang sản phẩm.
 
@@ -67,15 +82,15 @@ Theo mốc:
 Dialog cỡ M (foundation §16), `<dialog>` + `showModal()`, `aria-labelledby` tiêu đề.
 
 1. Nút đóng tròn 48, góc phải trên cách 24 (12 mobile).
-2. Đầu: eyebrow vendor (accent, 16/800 uppercase như Figma 1:759 "FEATURED PRODUCT · FREE WEIGHTS") · h2 tên sản phẩm (heading 800, `--font-size-h2`), chừa 56 bên phải cho nút đóng.
-3. Media: ảnh chính 1:1 nền cream bo 12 `contain` + badge -N% góc trái trên · thumbnail 64 (72 từ 80rem) bo 8, đang chọn viền 2px foreground, tối đa 5. Mobile: dải ảnh vuốt (mỗi ảnh 78% bề ngang, lộ ảnh sau, 15 §5) + thanh tiến trình mảnh (sổ quyết định 09/11), không thumbnail.
-4. Giá: sale 18/600 đỏ + compare-at 16 gạch muted; badge -N% ở ảnh (không lặp ở giá). Không giá sale: giá foreground. `price_varies`: giá theo biến thể đang chọn.
-5. Rating (chỉ khi có metafield `reviews.rating`, như card AC-H13): sao 14 + "(4.9)" + gạch đứng + "341 reviews" 14 muted (Figma 1:759).
-6. Mô tả (chỉ khi có): 3 dòng cắt "…", muted (Figma 1:759 có đoạn mô tả; demo-data không có).
+2. Đầu: eyebrow vendor (accent, Sofia 16/800 uppercase ls 0.04em, Figma 1:771) · cách 12 · h2 tên sản phẩm Sofia 700 (`--font-heading--weight`), `--font-size-h2`, ls −0.02em (Figma 1:772 là 48/58; dialog dùng h2 36 vì cột chỉ 408), chừa 56 bên phải cho nút đóng.
+3. Media: ảnh chính 1:1 nền cream bo 16 `contain` (Figma 1:759) · cặp chevron tròn 52 (`.round-button`, kit) góc phải dưới cách 16, cách nhau 8: trắng viền border, rê chuột cam; ở ảnh đầu/cuối `aria-disabled` opacity 0.35 (code `.carousel-nav__button`) · thumbnail 64 (72 từ 80rem) bo 8, đang chọn viền 2px foreground, tối đa 5. Mobile: dải ảnh vuốt (mỗi ảnh 78% bề ngang, lộ ảnh sau, 15 §5) + thanh tiến trình mảnh, không chevron, không thumbnail (sổ 09/11).
+4. Giá (Figma 1:783, hàng cao 28, cách 8): sale 18/600 đỏ · compare-at 16 gạch muted · badge -N% (pill 28, kit `.badge--sale`). Không lặp badge trên ảnh. Không giá sale: giá foreground, không badge. `price_varies`: giá theo biến thể đang chọn.
+5. Rating (chỉ khi có metafield `reviews.rating`, như card AC-H13): sao 14 + "(4.9)" + gạch đứng + "341 reviews" 14 muted (Figma 1:786, cách giá 8).
+6. Mô tả (chỉ khi có): Inter 16/500 lh 26 muted (Figma 1:797), cắt 3 dòng "…". Demo-data không có.
 7. Option: mỗi option một `<fieldset>` + legend "Color: Black" (giá trị đang chọn ghi trong legend). Màu có `swatch` → tròn 44; còn lại pill 44 (code `.product-option__value`). Không bán được: gạch ngang chữ / gạch chéo swatch, vẫn chọn được (code).
 8. Tình trạng: chấm 8 + "In stock" / "Sold out" / "Unavailable" 14.
-9. Hàng mua: stepper (44; 52 từ 80rem cho bằng nút) + "Add To Cart" primary có icon túi (Figma 1:759, sổ quyết định 07/11).
-10. Link "View Full Details →" (Figma 1:759 "View Detail"), tên ẩn "of {product}".
+9. Số lượng: label thật "Quantity" 14/600 + stepper 44 (hàng riêng; Figma 1:814 không có ô số, giữ chức năng vòng 2).
+10. Hàng mua (Figma 1:814, cách khối trên 40 từ 80rem): "Add To Cart" primary, icon túi 24, padding 32 · cách 12 · "View Detail" nút xám: nền `--color-border`, chữ foreground 16/600 (13.8:1), mũi tên 16 × 14; là `<a href>` tới PDP, tên ẩn "of {product}". Hover View Detail: nền foreground chữ trắng, mũi tên dịch 4 (ĐỀ XUẤT, foundation §6 secondary hover). < 80rem padding 16 để 2 nút vừa 1 hàng ở cột 316 (155 + 12 + 142).
 
 Theo mốc:
 
@@ -83,12 +98,14 @@ Theo mốc:
 | --- | --- | --- | --- | --- |
 | Kiểu | bottom sheet, cao tối đa 88% | dialog giữa | dialog giữa | dialog giữa |
 | Rộng | 100% | 720 | 960 | 960 |
-| Bố cục | 1 cột: tên → ảnh vuốt → giá → option → tồn → link → thanh mua dính đáy | 2 cột 1:1, gap 24; ảnh 316 | 2 cột, gap 48; ảnh 408 | như 1280 |
+| Bố cục | 1 cột: tên → ảnh vuốt → giá → option → tồn → số lượng → hàng mua (Add To Cart + View Detail) dính đáy | 2 cột 1:1, gap 24; ảnh 316, chevron 52 | 2 cột, gap 48; ảnh 408, chevron 52 | như 1280 |
 | Padding | 32 / 16 / 20 | 32 | 48 | 48 |
 
 ĐỀ XUẤT:
 - 960 từ 80rem thay 720 của foundation §16 (M): ở 720 ảnh chỉ 316 trên màn 1280+, nhỏ hơn card 336 trong lưới phía sau; 960 cho ảnh 408, vẫn nhỏ hơn L 1120 và không cần cuộn với 1 option (cao ~590 < 820).
-- Mobile: tên lên đầu sheet (chung hàng nút đóng, vùng vuốt xuống gồm cả header, 15 §2), thanh "stepper + Add To Cart" dính đáy sheet (vùng ngón cái, 05 §1.5), link chi tiết đứng trước thanh mua.
+- Mobile: tên lên đầu sheet (chung hàng nút đóng, vùng vuốt xuống gồm cả header, 15 §2); hàng "Add To Cart + View Detail" giữ đúng cặp Figma 1:814, dính đáy sheet (vùng ngón cái, 05 §1.5), cao 48, padding 16; stepper nằm trong nội dung ngay trên.
+- Chevron 52 trên ảnh quick view (≥ 48rem): sổ 09/11 "nút next/back tròn 52 mọi carousel"; thumbnail vẫn giữ để nhảy thẳng tới ảnh. Mobile chỉ vuốt + thanh tiến trình (sổ 09/11).
+- "View Detail" dùng nút xám như Figma 1:816 chứ không phải `.button--secondary` viền của foundation §6: khối featured product là chỗ duy nhất Figma có nút phụ đặt cạnh CTA chính. Rủi ro: nút disabled (nền border, chữ muted 6.70) cùng nền với nút xám; phân biệt bằng chữ ("Sold Out"/"Unavailable"), chữ muted và `cursor: not-allowed` (khung 5b, 5c).
 - Không có nút dynamic checkout (Buy it now) trong quickview: 1 CTA chính mỗi lớp (04 §1); thanh toán nhanh có ở drawer ngay sau khi thêm.
 - Gift card: quickview chỉ chọn mệnh giá; form người nhận (TE-4 AC6) chỉ ở PDP, có câu "Add a recipient on the product page." + link.
 
@@ -144,8 +161,8 @@ Quick view:
 | --- | --- | --- |
 | Đang tải (5a) | dialog mở ngay khi bấm, skeleton: tên, ảnh vuông, giá, 3 swatch, nút; "Loading product…" status | foundation §18; sổ 09/11 ảnh popup tải khi mở |
 | Mặc định | khung 2 | |
-| Biến thể hết hàng (5b) | giá + badge Sold out; mọi option gạch; chấm muted "Sold out"; stepper + nút disabled "Sold Out"; link PDP vẫn dùng được | code product-form; 05 §3, §5 |
-| Tổ hợp không tồn tại (5c) | option đang chọn gạch; "Unavailable"; nút disabled "Unavailable" | code `data-label-unavailable` |
+| Biến thể hết hàng (5b) | giá + badge Sold out; mọi option gạch; chấm muted "Sold out"; stepper + nút disabled "Sold Out"; "View Detail" vẫn dùng được | code product-form; 05 §3, §5 |
+| Tổ hợp không tồn tại (5c) | option đang chọn gạch; "Unavailable"; nút disabled "Unavailable"; khung 5c vẽ thêm hover "View Detail" | code `data-label-unavailable` |
 | Đang thêm (5d) | nút `aria-busy`, spinner, cùng bề rộng; không bấm lại | foundation §6; 05 §5 |
 | Lỗi 422 (5d) | câu Shopify trả về dưới hàng mua, sale 14/500 + icon, `role="alert"`; stepper viền sale `aria-invalid` | 05 §4 |
 | Thêm thành công | quickview đóng (200ms) → drawer mở với thông báo (khung 1); `cart_type = page` → sang `/cart` | TE-4 AC8, TE-5 AC6; 15 §1 một lớp popup |
@@ -165,6 +182,8 @@ Tương phản (tính tay WCAG, số từ foundation §2; L muted-light 0.147, a
 | sale / background | 6.38 | giá sale, câu lỗi |
 | accent-foreground / accent | 5.01 | Checkout, Add To Cart |
 | muted / border | 6.70 | nút disabled (Checkout khi cập nhật, Sold Out) |
+| foreground / border | 13.8 | nút xám "View Detail" (Figma 1:816) |
+| foreground / background (chevron 52), accent-foreground / accent (hover) | 17.4 / 5.01 | chevron ảnh quick view |
 | muted-light / background | 5.33 | viền stepper, −/+ disabled (sổ 09/11 viền ô nhập) |
 | muted-light / alt | (0.954 / 0.197) = 4.84 | icon −/+ trong stepper disabled |
 | accent / alt (thanh freeship) | 4.55 | phi chữ ≥ 3 |
@@ -172,7 +191,7 @@ Tương phản (tính tay WCAG, số từ foundation §2; L muted-light 0.147, a
 | foreground / background (badge Sold out) | 17.4 | |
 
 - Vùng chạm: nút đóng 48; thùng rác, −, +, ô số, View cart, Quick View, swatch, pill, thumbnail 64–72, Add / Choose 44; Checkout, Add To Cart 48–52. Hai nút cạnh nhau cách ≥ 8 trong cụm, cụm cách 12–16.
-- Tên: mọi nút icon có tên riêng kèm tên sản phẩm: "Remove {title}" (`cart.remove_label` có sẵn), "Decrease quantity for {title}", "Increase quantity for {title}", ô số `cart.quantity_label`; "Add" / "Choose" có phần ẩn "{title} to cart" / "options for {title}"; "Quick View" + tên; thumbnail "Show image 2 of 3"; "View Full Details" + "of {title}". Không có 2 link/nút cùng tên khác đích.
+- Tên: mọi nút icon có tên riêng kèm tên sản phẩm: "Remove {title}" (`cart.remove_label` có sẵn), "Decrease quantity for {title}", "Increase quantity for {title}", ô số `cart.quantity_label`; "Add" / "Choose" có phần ẩn "{title} to cart" / "options for {title}"; "Quick View" + tên; thumbnail "Show image 2 of 3"; chevron "Previous image" / "Next image"; "View Detail" + "of {title}"; ô số có `<label>` "Quantity" thật. Không có 2 link/nút cùng tên khác đích.
 - Bàn phím: drawer, dialog dùng `showModal()` (bẫy focus, Escape đóng, nền inert); mở thì focus vào nút đóng (drawer) / tiêu đề (quickview, `tabindex="-1"`); đóng thì trả focus về nút mở. Thumbnail, option là radio/nút đi bằng Tab, ←/→ trong nhóm radio.
 - Live region: `cart-items-status` (status) và `cart-items-error` (alert) có sẵn; quickview thêm 1 status + 1 alert.
 - Heading: drawer h2 → "Pairs Well With" h3; quickview h2. Không nhảy bậc.
@@ -193,14 +212,14 @@ Tương phản (tính tay WCAG, số từ foundation §2; L muted-light 0.147, a
   - Chữ mờ khi cập nhật: không dùng opacity cho chữ (color-contrast tính cả opacity).
   - `label` cho ô số và textarea ghi chú: label thật (ẩn với ô số).
   - `target-size`: mọi control ≥ 44.
-- SEO: overlay không có link "Read more"/"Click here"; link là `<a href>` thật (tiêu đề dòng hàng, View cart, View Full Details); nút Quick View là `<button>`, không cản crawler đi qua link card. Chữ ≥ 12 (nhỏ nhất 13 ở pill).
+- SEO: overlay không có link "Read more"/"Click here"; link là `<a href>` thật (tiêu đề dòng hàng, View cart, View Detail + tên ẩn sản phẩm); nút Quick View là `<button>`, không cản crawler đi qua link card. Chữ ≥ 12 (nhỏ nhất 13 ở pill).
 - Best Practices: không lỗi console (render 4 mốc 0 lỗi); ảnh `object-fit: contain`, không kéo méo; ô số và textarea không chặn dán.
 
 ## 9. Token và chuỗi
 
 Token: chỉ token có sẵn (`--color-*`, `--space-*`, `--radius-*`, `--motion-*`, `--font-*`) + giá trị dẫn xuất foundation §2 (`--overlay-scrim`, `--shadow-overlay`, `--shadow-raised`, `--radius-dialog`, `--control-height`). Không thêm token. Màu swatch lấy từ `value.swatch.color` của Shopify (mockup giả lập bằng token).
 
-Chuỗi mới (đề xuất key, Dev FE thêm vào `locales/en.default.json`): `cart.view_cart` "View cart", `cart.item_count` "{{ count }} item(s)" (one/other), `cart.added` "Added to cart", `cart.shipping_at_checkout` "Taxes and shipping calculated at checkout.", `cart.note_toggle` "Add order note", `cart.note_hint` "Saved with your order.", `cart.line_sold_out` "This item is sold out. Remove it to check out.", `cart.sold_out_summary` "{{ count }} item is sold out", `cart.update_error_title` "We couldn't update your cart", `cart.decrease_label` / `cart.increase_label` "Decrease/Increase quantity for {{ title }}", `cart.empty_heading` "Your Cart Is Empty", `cart.empty_text`, `cart.empty_cta` "Shop Bestsellers", `cart.recommendations_add` "Add", `cart.recommendations_choose` "Choose", `products.quick_view.open` "Quick View", `.close` "Close quick view", `.view_details` "View Full Details", `.image_label` "Show image {{ index }} of {{ count }}", `.loading` "Loading product…", `.load_error_title` "We couldn't load this product", `general.try_again` "Try Again". Giữ có sẵn: `cart.title`, `cart.checkout`, `cart.free_shipping_*`, `cart.quantity_*`, `cart.remove_label`, `cart.removed`, `cart.error`.
+Chuỗi mới (đề xuất key, Dev FE thêm vào `locales/en.default.json`): `cart.view_cart` "View cart", `cart.item_count` "{{ count }} item(s)" (one/other), `cart.added` "Added to cart", `cart.shipping_at_checkout` "Taxes and shipping calculated at checkout.", `cart.note_toggle` "Add order note", `cart.note_hint` "Saved with your order.", `cart.line_sold_out` "This item is sold out. Remove it to check out.", `cart.sold_out_summary` "{{ count }} item is sold out", `cart.update_error_title` "We couldn't update your cart", `cart.decrease_label` / `cart.increase_label` "Decrease/Increase quantity for {{ title }}", `cart.empty_heading` "Your Cart Is Empty", `cart.empty_text`, `cart.empty_cta` "Shop Bestsellers", `cart.recommendations_add` "Add", `cart.recommendations_choose` "Choose", `products.quick_view.open` "Quick View", `.close` "Close quick view", `.view_detail` "View Detail" (Figma 1:816), `.previous_image` "Previous image", `.next_image` "Next image", `.quantity` "Quantity", `.image_label` "Show image {{ index }} of {{ count }}", `.loading` "Loading product…", `.load_error_title` "We couldn't load this product", `general.try_again` "Try Again". Giữ có sẵn: `cart.title`, `cart.checkout`, `cart.free_shipping_*`, `cart.quantity_*`, `cart.remove_label`, `cart.removed`, `cart.error`.
 
 ## 10. Lệch giữa code hiện tại và spec (cho Dev FE)
 
@@ -217,6 +236,8 @@ Chuỗi mới (đề xuất key, Dev FE thêm vào `locales/en.default.json`): `
 | Thanh freeship cao 8, không icon | cao 6 bo pill, icon xe; đạt → xanh | §1 |
 | Empty: câu + "Continue shopping" | empty state foundation §18 + Bestsellers | 12 §1 Must |
 | Không có ghi chú, gợi ý, thông báo "Added to cart", quickview | thêm | ES1-T272, ES1-T247 |
+| `--radius-button` 4 (setting `button_corner_radius`) | Figma CTA bo 8 (1:815, 1:816) | P3; mockup theo token, không đổi token; chỉnh default setting là việc của ticket foundation |
+| Nền header tối chỉ khi có `.slideshow` | header tối mọi trang, kể cả trang đang mở drawer/quick view | foundation §3, §21 |
 
 Ticket tách theo `.claude/rules/fe-be-boundary.md`: FE (markup drawer + stepper, quickview dialog + nút card, locale, settings) trước, có `data-testid`; BE (stepper debounce, gợi ý fetch/add, quickview fetch + module, ghi chú lưu, focus).
 
