@@ -402,6 +402,6 @@ Luồng đổi lựa chọn (BE):
 - Có countdown "Sale ends in" như Figma 1:773, ngày từ dữ liệu thật từng sản phẩm, ẩn khi không có ngày / hết giờ / không giảm giá (§4.2).
 - Review: tóm tắt từ metafield rating + app block, ẩn khi không dữ liệu (§8).
 
-Câu mới:
+Câu mới (CTO chốt 10/11 theo đề xuất, docs/design/decisions.md):
 1. Countdown đếm giây là nội dung tự cập nhật (WCAG 2.2.2)? Đề xuất: giữ giây như Figma, coi là thông tin thiết yếu; số aria-hidden, không chuyển động, không aria-live.
 2. Ngày hết sale đặt ở metafield sản phẩm hay từng biến thể? Đề xuất: sản phẩm `custom.sale_ends_at` (date_time), ẩn ở biến thể không có giá gạch.

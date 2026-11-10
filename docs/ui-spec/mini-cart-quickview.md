@@ -307,6 +307,6 @@ Ticket tách theo `.claude/rules/fe-be-boundary.md`: FE (markup drawer + stepper
 - G3: footer mini cart là panel tối như cart (chữ phụ trắng 70%, xanh giảm giá nhạt) (§1).
 - 2048 biến thể: bộ chọn từ option value, 3 trạng thái giá trị, tải biến thể từ server, thu gọn "+N", có trạng thái đang tải (§3.1).
 
-Câu mới:
+Câu mới (CTO chốt 10/11 theo đề xuất, docs/design/decisions.md):
 1. Quickview đổi biến thể không đổi URL trang nền, chỉ đổi link "View Detail" sang `?variant=`? Đề xuất: có (Back vẫn về collection; PDP mới `replaceState`).
 2. Ngưỡng thu gọn: option > 10 giá trị thì hiện 7 + "+N", hằng chung PDP/quickview, không thành setting? Đề xuất: có (đúng 2 hàng ở mọi mốc, 10 §6 #850).

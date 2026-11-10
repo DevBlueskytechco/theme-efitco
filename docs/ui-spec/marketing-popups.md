@@ -360,7 +360,7 @@ Không token mới. Giá trị lẻ (264, 288, 400, 720, 480, 96, 120) là kích
 - MK2: nút nổi "Big Offer" góc dưới trái mở thẻ deal sản phẩm giảm giá; teaser chỉ hiện khi còn hàng, có giá gạch, chưa hết giờ (mục 4).
 - MK3: newsletter, before you leave, big offer mặc định BẬT; mỗi lúc 1 popup, đóng popup đang hiện thì popup kế mới hiện (hàng đợi, mục 1.2).
 
-Câu mới:
+Câu mới (CTO chốt 10/11 theo đề xuất, docs/design/decisions.md):
 1. Khoảng nghỉ giữa hai popup tự mở: đề xuất 3 s, newsletter chờ được, before you leave cần tín hiệu rời trang mới (mục 1.2 điều 2–3).
 2. Thẻ big offer người mua mở có chặn popup tự mở: đề xuất có (chiếm lớp, popup tự mở chờ); nút Big Offer không phải popup (điều 1, 8).
 3. Đã đăng ký newsletter trong phiên thì bỏ before you leave biến thể B (mã 15% trùng): đề xuất có (điều 7).
