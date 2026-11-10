@@ -3,7 +3,16 @@
 Quyết định đã chốt, không hỏi lại. Mâu thuẫn với Figma hay bộ kiến thức thì sổ này thắng; mới nhất ở trên. Thêm dòng khi CTO chốt câu hỏi `[Q]`.
 
 ## Đã chốt
-- 09/11 Header trang con: nền trắng mặc định; trang có ảnh lớn đầu trang (banner collection, ảnh bìa bài viết) thì header đè ảnh như trang chủ (ES1-T251).
+- 10/11 (BGĐ) Gốc thiết kế duy nhất là Figma trang chủ desktop (frame 1:359, docs/figma/img, snapshot). Không dùng trang live hay ảnh chụp store dev làm gốc thiết kế. Tablet, mobile của trang chủ và mọi trang con phát triển từ ngôn ngữ Figma này.
+- 10/11 (BGĐ) Hoàn thiện toàn bộ thiết kế, BGĐ duyệt xong mới sang giai đoạn Dev.
+- 10/11 (BGĐ) Phạm vi SEO 100: đo trên trang chủ, collection, sản phẩm, blog, bài viết, page. /cart, /search, /account, 404, password, gift card không tính SEO (Shopify chặn index hoặc trả 404/401); mọi trang vẫn đo Accessibility, Best Practices, Performance.
+- 10/11 (BGĐ) Best Practices 100: DevOps/QA đo, tách phần do theme và phần do nền tảng Shopify; không thuộc phạm vi Designer.
+- 10/11 Tài khoản khách: theme dùng tài khoản mới của Shopify (đăng ký, đăng nhập do Shopify host), không thiết kế trang customers/* (bỏ ES1-T259).
+- 10/11 Hero 768 và 360: lớp tối 30% (overlay_opacity 30, chỉ dưới 1280; desktop giữ như Figma). Cần đạt hết AA thì chọn ảnh có vùng nền trơn sau chữ, không tăng lớp tối (ES1-T252).
+- 10/11 Hero 360: chữ căn trái, cùng mép 20 với các khối dưới (thay căn giữa của bản 07/11) (ES1-T252).
+- 10/11 Eyebrow trên nền tối (vd Why choose): giữ xám như live (#999, 5.85:1). Cam chỉ dùng trên nền sáng và sand; ngoại lệ của dòng eyebrow 09/11 (ES1-T252).
+- 10/11 Header trang chủ: thanh tối riêng cao 80px trên dải nền #1A1A1A có noise (Figma 1:362), hero là thẻ bo góc nằm dưới header, KHÔNG đè ảnh. Sửa nhận định sai của ES1-T251.
+- 10/11 Header trang con giống trang chủ: luôn là thanh tối riêng (#1A1A1A có noise, như Figma 1:362), không đè ảnh, kể cả trang có banner hay ảnh bìa lớn. Thay quyết định 09/11 (nền trắng, đè ảnh khi có ảnh lớn).
 - 09/11 Viền ô nhập: nền sáng dùng `--color-muted-light` (5.33:1), footer nền tối dùng `--color-muted-on-dark` (5.85:1); không dùng `--color-border` cho ô nhập (ES1-T251).
 - 09/11 Toast: cảnh báo dùng cam accent, thành công dùng `--color-badge-new`, không thêm token (ngoại lệ của quy tắc accent chỉ cho hành động, ES1-T251).
 - 09/11 CHỈ TIÊU NGHIỆM THU (ưu tiên số 1, đo Lighthouse trên demo): SEO 100, Accessibility 100, Best Practices 100 cả desktop và mobile; Performance desktop ≥98, mobile ≥90. Mọi thiết kế phải đạt được khi dựng. Hệ quả cho thiết kế:
