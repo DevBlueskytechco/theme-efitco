@@ -1,61 +1,77 @@
-KHÔNG CHẮC: không đọc được đầu ra T239–T244 trên nhánh feature/ai-ES1-T239..T244 (agent không có git), nên chỉ tổng hợp từ comment ticket T241, T244. PNG dài bị thu nhỏ khi soát, chi tiết dưới 4px chưa kiểm bằng mắt.
+KHÔNG CHẮC: Figma chỉ có desktop 1920 và không có trạng thái, nên 360/768 và mọi trạng thái là ĐỀ XUẤT. Snapshot không có vector: chevron 52 lấy từ `snippets/slideshow-icon.liquid`, noise lấy từ `assets/noise-dark.png` (cả hai đã dựng theo Figma). PNG dài 12–16k px, chi tiết dưới 4px soát qua code.
 
-# UI spec: Foundation trang con (ES1-T251)
+# UI spec: Foundation trang con (ES1-T251, vòng 3)
 
-Mục đích: bộ thành phần chung để các trang con (product, collection, cart, search, blog, trang phụ, overlay; ES1-T252–T263) ghép lại, nhất quán với trang chủ Figma 1:359. Story TE-9, TE-17.
+Mục đích: bộ thành phần chung cho mọi trang con và overlay (ES1-T252–T263), nhất quán với gốc duy nhất là Figma trang chủ 1:359. Story TE-9, TE-17.
 
 Đầu ra:
 - Spec này.
-- `drafts/designer/_kit/kit.css`: CSS cho mockup. Mockup trang con nhúng `<link rel="stylesheet" href="../_kit/kit.css">`, chỉ viết thêm CSS riêng của trang.
-- `drafts/designer/ES1-T251/foundation.html` + `foundation-360|768|1280|1920.png`: bảng thành phần.
+- `drafts/designer/_kit/kit.css`: CSS mockup. Mockup trang con nhúng `<link rel="stylesheet" href="../_kit/kit.css">`, chỉ viết thêm CSS riêng trang.
+- `drafts/designer/ES1-T251/foundation.html` + `foundation-360|768|1280|1920.png`.
 
-Thứ tự nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:359 > bộ kiến thức (file `NN`). Figma chỉ có desktop 1920 và không có trạng thái nào (figma-inventory). Mọi thứ không có trong Figma ghi `ĐỀ XUẤT:` kèm nguồn.
+Thứ tự nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:359 > bộ kiến thức (file `NN`). Không dùng trang live hay ảnh chụp store làm gốc (ticket vòng 3).
 
-Quy ước cho Dev FE: kit.css là mockup, không chép vào `assets/`. Theme vẫn theo AGENTS.md: logical properties, 0 màu literal, `var(--*)`, breakpoint `48rem / 64rem / 80rem`. Cột "Code hiện có" chỉ class đã có trong `assets/`, dùng lại, không viết lần hai.
+Quy ước cho Dev FE: kit.css là mockup, không chép vào `assets/`. Theme vẫn theo AGENTS.md: logical properties, 0 màu literal, `var(--*)`, breakpoint `48rem / 64rem / 80rem`. Cột "Code hiện có" chỉ class đã có trong `assets/`.
+
+## Thay đổi so với vòng 2
+
+| # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Header | 3 biến thể: A nền trắng viền dưới, B trong suốt đè ảnh, C đã cuộn | 1 biến thể mọi trang: thanh tối `--color-background-dark` + noise, cao 80, không đè ảnh; cuộn chỉ thêm bóng | Sổ 10/11, Figma 1:360, 1:362 |
+| 2 | Logo header | 100 mobile, 140 desktop | 100 × 30 mọi mốc | Figma 1:377 |
+| 3 | Menu header | chữ foreground, gap 56, gạch chân khi hover | trắng 60% (6.93:1), gap 40, hover/đang mở trắng 100%, trang hiện tại thêm gạch chân 2px | Figma 1:365 (opacity 0.6, itemSpacing 40) |
+| 4 | Icon header | 3 icon 24 | search 20, account/cart 24, ô bấm 44 cách 4 (nhìn cách 24 như Figma); số giỏ trắng chữ tối | Figma 1:373 |
+| 5 | Trang có ảnh lớn đầu trang | header đè ảnh | banner bo góc nằm dưới header, trong container, lớp tối ≥ 60% | Sổ 10/11; ĐỀ XUẤT §3.3 |
+| 6 | Nút tròn 52 | icon mũi tên 20 × 16 | chevron 11 × 16 trong khung 52 (đúng icon slideshow) | Figma 1:398, `snippets/slideshow-icon` |
+| 7 | Eyebrow nền tối | cam | xám `--color-muted-on-dark` (6.11:1); cam chỉ trên nền sáng, sand | Sổ 10/11 |
+| 8 | `--color-background-dark` trong kit | #1E1E1E | #1A1A1A (mặc định `settings_schema`, = Figma 1:360, 1:1105); mọi tỉ lệ trên nền tối tính lại | `config/settings_schema.json` |
+| 9 | Footer | panel trong container, bo 24, nền +4% trắng; 3 social; wordmark tách hàng | panel dải rộng (lùi tối đa 60, 1798 ở 1920), bo 16, nền +2% trắng; nền footer có noise; 4 social (TikTok, Instagram, YouTube, Facebook); tiêu đề menu Inter 700/18; link cách 16; wordmark nằm giữa hàng cuối cùng copyright và localization | Figma 1:1104–1:1192 |
+| 10 | Viền input | ĐỀ XUẤT | đã chốt: nền sáng `--color-muted-light`, nền tối 100% `--color-muted-on-dark` | Sổ 09/11 |
+| 11 | Toast | ĐỀ XUẤT màu | đã chốt: warning accent, success badge-new | Sổ 09/11 |
+| 12 | Card sản phẩm | swatch cách 12, radio bấm được | swatch 32 × 16 cách 4, cách giá 8; là chỉ báo (`aria-hidden`), số màu đọc trong tên link | Figma 1:502; ĐỀ XUẤT §9 |
+| 13 | Dropdown, mega menu | mở từ 64rem, header chuyển trắng khi mở | chỉ từ 80rem (menu ngang chỉ có từ 80rem); header vẫn tối, panel trắng ngay dưới | Sổ 10/11, `critical.css` |
+| 14 | Mốc 1920 | có số | thêm cột dải rộng, footer, header theo Figma | Ticket vòng 3 |
 
 ---
 
 ## 1. Lưới, khoảng cách, chữ theo mốc
 
-Mobile-first. Mốc thiết kế 360 / 768 / 1280 / 1920 ứng với breakpoint code `< 48rem`, `48rem`, `80rem`, `80rem` (+ page-width chặn ở 1456). `64rem` (1024) chỉ đổi khoảng cách section.
+Mobile-first. Mốc 360 / 768 / 1280 / 1920 ứng với code `< 48rem`, `48rem`, `80rem`, `80rem` (+ page-width chặn 1456). `64rem` (1024) đổi khoảng cách section và bố cục footer.
 
 | Giá trị | 360 | 768 | 1280 | 1920 | Token / cách tính | Nguồn |
 | --- | --- | --- | --- | --- | --- | --- |
-| Lề trang | 20 | 20 | 20 | 252 (do page-width) | `--page-margin` | DESIGN Page rhythm |
-| Bề rộng nội dung | 320 | 728 | 1240 | 1416 | `min(--page-width − 2×margin, 100% − 2×margin)` | Figma 1:490 x=252..1668 |
-| Cột / gutter | 4 / 16 | 8 / 16 | 12 / 24 | 12 / 24 | gutter `--space-4` → `--space-5` từ 80rem | 03 §1 (mobile 4 cột, gutter 12–16; desktop 12 / 24) |
-| Lưới sản phẩm | 2 × 152 | 3 × 232 | 4 × 292 | 4 × 336 | cột 2 / 3 / 4; gap ngang = gutter, gap dọc 24 → 40 từ 80rem | Figma 1:490 card 336, gap 24 |
-| Card bài viết (hàng ngang) | 252 × 336 | 307 × 410 | 336 × 448 | 336 × 448 | `min(70vw, 336px)` / `min(40vw, 336px)`, tỉ lệ 3/4 | base.css `.article-card`, Figma 1:1022 |
-| Khoảng giữa section | 48 | 48 | 120 | 120 | `--space-7` < 64rem, `--space-8` ≥ 64rem | DESIGN (thắng 03 §8 100/60) |
-| Tiêu đề section → nội dung | 24 | 24 | 40 | 40 | `--space-5`; `--space-1 × 10` từ 80rem | Figma 1:490 (2873 → 2913) |
-| Eyebrow → tiêu đề | 12 | 12 | 12 | 12 | `--space-3` | Figma 1:490 itemSpacing 12 |
-| Chiều cao header | 80 | 80 | 80 | 80 | `--header-height` | DESIGN |
-| Chiều cao control (nút, input) | 48 | 48 | 52 | 52 | `--space-1 × 12` / `× 13` | ĐỀ XUẤT 48 mobile: 14 §2 #1083M (CTA chính ≥ 48); 52: Figma 1:1104 |
-| Vùng chạm tối thiểu | 44 | 44 | 40–44 | 40–44 | icon header 44, swatch 44, link menu 44 | AGENTS a11y, 14 §2 |
-| display | 48 | 70 | 100 | 100 | `--font-size-display` | clamp tính tại mốc |
-| h1 (tiêu đề trang) | 33 | 43 | 48 | 48 | `--font-size-h1`, lh 58/48 | Figma 1:495 |
+| Lề trang | 20 | 20 | 20 | 252 (do page-width) | `--page-margin` | DESIGN |
+| Bề rộng nội dung | 320 | 728 | 1240 | 1416 | `min(--page-width − 2×margin, 100% − 2×margin)` | Figma x 252–1668 |
+| Dải rộng (panel footer) | 360 (tràn) | 768 (tràn) | 1280 (tràn) | 1798 (lùi 60) | `--band-inset = clamp(0, side − 64, 60)` | Figma 1:1106, 1:361; base.css `.site-footer__main` |
+| Cột / gutter | 4 / 16 | 8 / 16 | 12 / 24 | 12 / 24 | `--space-4` → `--space-5` từ 80rem | 03 §1 |
+| Lưới sản phẩm | 2 × 152 | 3 × 232 | 4 × 292 | 4 × 336 | gap ngang = gutter, gap dọc 24 → 40 | Figma 1:490 |
+| Card bài viết (hàng ngang) | 252 × 336 | 307 × 410 | 336 × 448 | 336 × 448 | `min(70vw, 336px)` / `min(40vw, 336px)`, 3/4 | Figma 1:1022 |
+| Khoảng giữa section | 48 | 48 | 120 | 120 | `--space-7` < 64rem, `--space-8` | DESIGN |
+| Tiêu đề section → nội dung | 24 | 24 | 40 | 40 | `--space-5`; `--space-1 × 10` từ 80rem | Figma 1:490 |
+| Eyebrow → tiêu đề | 12 | 12 | 12 | 12 | `--space-3` | Figma 1:490 |
+| Header | 80 | 80 | 80 | 80 | `--header-height` | Figma 1:362 |
+| Control (nút, input) | 48 | 48 | 52 | 52 | `--space-1 × 12` / `× 13` | 14 §2; Figma 1:1104 |
+| Vùng chạm tối thiểu | 44 | 44 | ≥ 24 (icon, nav 44) | ≥ 24 (icon, nav 44) | Sổ 09/11: ≥ 24, mobile ≥ 44 | AGENTS, 14 §2 |
+| display | 48 | 70 | 100 | 100 | `--font-size-display` | clamp tại mốc |
+| h1 | 33 | 43 | 48 | 48 | `--font-size-h1`, lh 58/48 | Figma 1:495 |
 | h2 | 28 | 32 | 36 | 36 | `--font-size-h2` | |
 | h3 | 22 | 24 | 27 | 28 | `--font-size-h3` | |
-| Body / nhỏ / badge | 16 / 14 / 13 | 16 / 14 / 13 | 16 / 14 / 13 | 16 / 14 / 13 | `--font-size-base / sm / xs` | 03 §4 body ≥ 16 |
+| Body / nhỏ / badge | 16 / 14 / 13 | như 360 | như 360 | như 360 | `--font-size-base / sm / xs` | 03 §4 |
 
-Quy tắc:
-- Thứ tự nội dung giữ nguyên giữa các mốc, chỉ đổi số cột (06 §2).
-- Đoạn văn dài (mô tả, bài viết) tối đa 65–75 ký tự: `max-inline-size: 65ch` (06 §7.3).
-- Zoom 200% không tràn ngang: mọi hàng cuộn ngang có `overflow-x: auto` riêng, không cuộn cả trang (03, 14 #1096M).
+Quy tắc: thứ tự nội dung giữ nguyên giữa mốc (06 §2); đoạn dài `max-inline-size: 65ch` (06 §7.3); zoom 200% không tràn ngang, hàng cuộn ngang có `overflow-x` riêng (14 #1096M).
 
 ## 2. Token dùng
 
-Chỉ token trong `snippets/css-variables.liquid`. Không thêm token.
+Chỉ token trong `snippets/css-variables.liquid`, không thêm token.
 
 Màu: `--color-background`, `--color-foreground`, `--color-muted`, `--color-muted-light`, `--color-border`, `--color-background-alt(-foreground)`, `--color-background-cream(-foreground)`, `--color-background-sand(-foreground)`, `--color-background-dark(-foreground)`, `--color-background-panel`, `--color-muted-on-dark`, `--color-accent(-foreground)`, `--color-accent-on-sand`, `--color-sale(-foreground)`, `--color-badge-new(-foreground)`, `--color-rating`.
 Chữ: `--font-heading--family/weight/weight-display`, `--font-primary--family`, `--font-size-xs..wordmark`, `--line-height-body/heading`.
-Khoảng cách: `--space-1..8`, `--touch-target-min`, `--page-width`, `--page-margin`, `--header-height`.
-Bo góc: `--radius-input`, `--radius-button`, `--radius-card`, `--radius-hero`, `--radius-pill`.
-Motion: `--motion-fast/base/slow/accordion/reveal`, `--ease-out`, `--ease-in-out`, `--ease-expo`.
+Khoảng cách: `--space-1..8`, `--touch-target-min`, `--page-width`, `--page-margin`, `--header-height`. Bo góc: `--radius-input/button/card/hero/pill`. Motion: `--motion-fast/base/slow/accordion/reveal`, `--ease-out/in-out/expo`.
+Asset: `assets/noise-dark.png` (đang dùng ở base.css cho header trang chủ và footer) là lớp noise của mọi nền tối.
 
-Không dùng `--figma-*` cho thành phần mới: đó là alias trang chủ. Tương đương: `--figma-e5e5e5` = `--color-border`, `--figma-1a1a1a` = `--color-foreground`, `--figma-ffffff` = `--color-background`, `--figma-radius-24` = `calc(var(--radius-card) * 2)`.
+Không dùng `--figma-*` cho thành phần mới. Tương đương: `--figma-1a1a1a` = `--color-background-dark` (mặc định #1A1A1A), `--figma-e5e5e5` = `--color-border`, `--figma-white-60` = `color-mix(--color-background-dark-foreground 60%, --color-background-dark)`.
 
-Giá trị dẫn xuất (không phải token mới; viết thẳng `calc()` hoặc custom property cục bộ trong class block, như `--swatch-hit` đang có):
+Giá trị dẫn xuất (không phải token, viết `calc()` hoặc custom property cục bộ):
 
 | Tên trong kit | Giá trị | Dùng cho |
 | --- | --- | --- |
@@ -63,328 +79,310 @@ Giá trị dẫn xuất (không phải token mới; viết thẳng `calc()` ho�
 | `--heading-gap` | `--space-5` → `--space-1 × 10` từ 80rem | header section → nội dung |
 | `--grid-gap` | `--space-4` → `--space-5` từ 80rem | gutter |
 | `--control-height` | `--space-1 × 12` → `× 13` từ 80rem | nút, input, select |
-| `--overlay-scrim` | `color-mix(--color-background-dark 50%, transparent)` | nền mờ drawer, dialog, mega menu (critical.css `.site-header__drawer[open] > summary`) |
+| `--band-side`, `--band-inset` | `(100% − content) / 2`; `max(0, min(60, side − 64))` | panel footer, dải rộng |
+| `--dark-texture` | `url(noise-dark.png)` | header, footer, section tối |
+| `--overlay-scrim` | `color-mix(--color-background-dark 50%, transparent)` | drawer, dialog, mega |
 | `--shadow-raised` | `0 8 24 color-mix(--color-foreground 12%)` | dropdown, toast |
-| `--shadow-overlay` | `0 32 80 color-mix(--color-foreground 28%)` | drawer, dialog (base.css `.quiz__dialog`) |
-| `--radius-dialog` | `calc(var(--radius-card) * 2)` = 24 | dialog, sheet, panel footer |
+| `--shadow-overlay` | `0 32 80 color-mix(--color-foreground 28%)` | drawer, dialog |
+| `--radius-dialog` | `--radius-card × 2` = 24 | dialog, sheet |
 
-Bảng tương phản (tính tay theo WCAG, L = độ sáng tương đối):
+Bảng tương phản (WCAG, L tính tay; dark = #1A1A1A, L 0.0103):
 
-| Cặp | Tỉ lệ | Dùng được cho |
+| Cặp | Tỉ lệ | Dùng cho |
 | --- | --- | --- |
 | foreground / background | 17.4 | mọi chữ |
-| foreground / background-alt | 15.8 | chữ, tab chưa chọn |
+| foreground / background-alt | 15.8 | tab chưa chọn |
 | foreground / cream | 15.9 | card sản phẩm |
 | muted / background | 8.45 | chữ phụ, breadcrumb, giá gạch |
 | muted / sand | 6.81 | chữ phụ trên sand |
-| muted-light / background | 5.33 | placeholder, dấu phân cách, viền input (ĐỀ XUẤT) |
+| muted-light / background | 5.33 | placeholder, viền input |
 | accent-foreground / accent | 5.01 | nút primary, tag |
 | accent / background | 5.01 | eyebrow, focus ring |
 | accent / background-alt | 4.55 | eyebrow trên alt |
-| accent-on-sand / sand | ~4.8 | eyebrow trên sand (CTO 09/11) |
-| sale-foreground / sale | 6.38 | badge sale; sale / background 6.38 cho giá, lỗi |
-| badge-new-foreground / badge-new | 4.57 | badge New; thanh toast success |
-| background-dark-foreground / background-dark | 16.7 | footer |
-| muted-on-dark / background-dark | 5.85 | chữ phụ footer |
-| background-dark-foreground / panel | 11.4 | panel |
-| muted / border (nút disabled) | 6.70 | chữ nút disabled vẫn đọc được |
-| accent / background-dark | 3.48 | chỉ chữ lớn (Get 15% Off) |
-| border / background | 1.26 | chỉ trang trí, không làm viền nhận diện control |
+| accent-on-sand / sand | ~4.8 | eyebrow trên sand |
+| sale-foreground / sale | 6.38 | badge sale; giá sale, lỗi trên nền sáng |
+| badge-new-foreground / badge-new | 4.57 | badge New, toast success |
+| background-dark-foreground / dark | 17.4 | chữ header, footer |
+| menu trắng 60% (#A3A3A3) / dark | 6.93 | menu header (Figma) |
+| muted-on-dark / dark | 6.11 | eyebrow tối, link footer, placeholder, viền input tối |
+| muted-on-dark / panel footer (#1F1F1F) | 5.78 | link, trust trong panel |
+| background-dark-foreground / panel | 11.4 | panel quiz |
+| muted / border (nút disabled) | 6.70 | chữ nút disabled |
+| accent / dark | 3.48 | chỉ chữ lớn ("Get 15% Off"), focus không dùng |
+| sale / dark | 2.73 | KHÔNG dùng cho chữ; lỗi trên nền tối dùng chữ trắng + icon đỏ |
+| border / background | 1.26 | chỉ trang trí |
 
-## 3. Header trang con
+## 3. Header mọi trang
 
-Figma 1:362 (desktop, trong suốt đè hero). Code: `blocks/header.liquid`, `.site-header*` trong `assets/critical.css`.
+Nguồn: sổ 10/11 (header trang chủ và trang con là thanh tối riêng, không đè ảnh), Figma 1:362 trên nền 1:360. Code: `blocks/header.liquid`, `.site-header*` (`critical.css`), nền tối hiện chỉ áp cho trang có `.slideshow` (base.css dòng 7452–7458): ticket trang bỏ điều kiện đó.
 
-Anatomy: nút menu (mobile) · logo (link về trang chủ) · menu chính 7 mục (Shop ▾, Collection ▾, Sale, Our Story, Blog, Contact, Help) · icon search · icon account · icon cart + số lượng.
+### 3.1 Anatomy và kích thước
 
-Biến thể:
+Nút menu (< 80rem) · logo (link về trang chủ) · menu chính 7 mục (Shop ▾, Collection ▾, Sale, Our Story, Blog, Contact, Help) · search · account · cart + số lượng.
 
-| Biến thể | Khi nào | Nền / chữ | Ghi chú |
-| --- | --- | --- | --- |
-| A. Mặc định | trang con không có ảnh lớn đầu trang (product, cart, search, page, 404, account) | `--color-background` / `--color-foreground`, viền dưới 1px `--color-border` | sticky; code đã có (critical.css `.site-header`) |
-| B. Đè ảnh | template có ảnh lớn ngay đầu `<main>` (collection có banner, article có ảnh bìa) | trong suốt, chữ `--color-background-dark-foreground` | dùng lại `[data-header-overlay]`; ảnh phải có overlay ≥ 30% như hero |
-| C. Đã cuộn | A hoặc B sau 80px | như A, bỏ viền, bóng `0 1 8 color-mix(foreground 12%)` | `[data-scrolled]` đã có |
+| | 360 | 768 | 1280 | 1920 |
+| --- | --- | --- | --- | --- |
+| Nền | `--color-background-dark` + noise, cao 80, không viền | như 360 | như 360 | như 360 |
+| Trái | menu 44 (lùi −12) + logo 100 × 30 | như 360 | logo 100 × 30 | logo tại x 252 |
+| Giữa | — | — | 7 mục, gap 40, Inter 16/500, ls −0.04em, chevron 9 × 5 cách 4 | như 1280 |
+| Phải | search 20, account 24, cart 24, ô 44 liền nhau | như 360 | ô 44 cách 4 (nhìn icon cách 24) | như 1280 |
+| Số giỏ | pill 18, nền trắng, chữ dark 13/700, góc trên phải icon | | | |
 
-Theo mốc:
-- 360, 768: [menu 44] [logo 100 × 30] … [search 44][account 44][cart 44]. Account giữ trên mobile (07 §E). Menu mở drawer trái (§15).
-- 1280, 1920: logo 140 trái, menu giữa (gap 56, chữ 16/500), 3 icon phải. Mục có ▾ mở dropdown/mega (§14).
+### 3.2 Trạng thái
 
-Trạng thái: link hover gạch chân 1px offset 0.35em; trang hiện tại `aria-current="page"` gạch chân 2px (ĐỀ XUẤT, 04 §3.9: mục đang chọn phải rõ). Icon hover scale 1.08 (base.css). Focus: outline 2px accent offset 2. Cart count nhảy khi thêm hàng (base.css `[data-bump]`).
+- Link menu: mặc định trắng 60% (6.93:1); hover, `aria-expanded="true"` trắng 100%, chevron xoay 180°; trang hiện tại (`aria-current="page"`) trắng 100% + gạch chân 2px offset 0.45em (ĐỀ XUẤT, 04 §3.9: mục đang chọn phải rõ, không chỉ bằng màu).
+- Icon: hover scale 1.08 (base.css). Số giỏ nhảy khi thêm hàng (`[data-bump]`).
+- Focus: outline 2px `--color-background-dark-foreground` offset 2 (accent trên dark 3.48, kém rõ).
+- Đã cuộn (`[data-scrolled]`): giữ nguyên nền, thêm bóng `0 1 8 color-mix(foreground 24%)`. Không đổi chiều cao (0 CLS).
+- Dropdown / mega mở: header giữ tối; panel trắng ngay dưới đáy header (§14).
 
-A11y + Lighthouse: `<header>` + `<nav aria-label>`; icon chỉ có tên qua `aria-label` ("Cart, 2 items" — số trong tên, không chỉ trong badge `aria-hidden`); vùng chạm 44; skip link "Skip to content" trước header; logo là `<a>` có tên. Header nằm trong critical.css (≤ 10 KB). Sticky bằng CSS, không đổi chiều cao khi cuộn (0 CLS).
+### 3.3 Trang có ảnh lớn đầu trang (collection có banner, article có ảnh bìa)
 
-ĐỀ XUẤT trả lời câu mở trong sổ quyết định (header trang con nền tối hay trắng): dùng A (nền trắng) làm mặc định, B cho trang có ảnh đầu trang. Lý do:
-1. Figma 1:362 không có header nền tối: header trong suốt đè ảnh hero 1:363, phần tối là ảnh + overlay (figma-inventory hàng 1). Trang con không có hero thì "nền tối" là một dải màu mới, cần setting nền header mới; ticket cấm đổi token.
-2. Trang chủ sau 80px cuộn đã chuyển sang nền trắng (critical.css `.site-header[data-scrolled]`). A là đúng trạng thái người mua đã thấy ở trang chủ, 0 CSS mới; logo, menu, giỏ cùng chỗ trên mọi trang (06 §4).
-3. Chữ menu 17.4:1, breadcrumb và h1 nằm ngay dưới trên cùng nền trắng; không có dải tối đè lên nội dung chính (03 §6, 14 #290D).
-4. Trang có ảnh lớn (B) vẫn giữ cảm giác trang chủ mà không thêm biến thể.
-Bản T241 chọn một hướng, T244 hướng ngược lại (sổ quyết định); không đọc được lý do chi tiết trên nhánh.
+ĐỀ XUẤT (sổ 10/11 cấm đè ảnh; hình thức theo hero 1:361 là thẻ bo góc dưới header):
+- `.page-banner`: thẻ trong container, cách header 16 (24 từ 64rem), bo 16 (`--radius-card + --space-1`), cao tối thiểu 280 / 360 từ 64rem, ảnh `cover`.
+- Lớp tối gradient 75% đáy → 60% từ giữa lên: điểm sáng nhất vẫn ≥ 60%, chữ trắng trên ảnh trắng = 4.56:1 (L nền 0.180). Khác hero (30% theo sổ 10/11) vì banner trang con là ảnh merchant tự chọn, không duyệt từng ảnh; xem câu CTO 1.
+- Nội dung đáy trái, padding 32 / 24 (48 từ 64rem): breadcrumb trắng, eyebrow trắng (xám #999 trên ảnh chỉ ~2.3:1), h1 trắng.
+- Ảnh banner là LCP: eager + `fetchpriority="high"`, width/height, srcset.
+
+### 3.4 A11y, Lighthouse
+
+`<header>` + `<nav aria-label="Main">`; icon có `aria-label` ("Cart, 2 items": số nằm trong tên, badge `aria-hidden`); vùng chạm 44; skip link trước header; logo `<a>` có tên. Header ở critical.css (≤ 10 KB): noise là `background-image` 1 file nhỏ đã có, không chặn LCP. Sticky bằng CSS, 0 CLS.
+
+Câu hỏi mở vòng 2 (header trang con tối hay trắng): đã chốt 10/11, tối. Đề xuất nền trắng của vòng 2 bị huỷ.
 
 ## 4. Footer
 
-Figma 1:1104, giống hệt trên mọi trang có `layout/theme.liquid` (password và gift card không có). Code: `blocks/footer.liquid`, `.site-footer*`.
+Figma 1:1104, giống hệt trên mọi trang có `layout/theme.liquid` (password, gift card không có). Code: `blocks/footer.liquid`, `.site-footer*`.
 
-Anatomy: newsletter (ảnh nhỏ, tiêu đề "Get 15% Off Your First Order" phần nhấn cam, mô tả, input email + nút "Get 15% Off", ghi chú) · panel bo 24 (logo, mô tả, social; 2 cột menu Shop, Information) · trust bar 4 icon · wordmark EFITCO · copyright, localization USD / EN, icon thanh toán.
+Anatomy (3 tầng trên nền `--color-background-dark` + noise, 1:1105):
+1. Newsletter (container): ảnh 98 × 123 bo 8 có 2 thẻ 78 × 99 phía sau (1:1188) · tiêu đề h2 Sofia 800 uppercase, "Get 15% Off" cam (chữ lớn 3.48 ≥ 3, sổ 09/11) · mô tả muted-on-dark · form: input + nút "Get 15% Off" có icon gửi · ghi chú "No spam. Unsubscribe anytime."
+2. Panel dải rộng (1:1106): nền `color-mix(white 2%)` (Figma #333 20% trên #1A1A1A = #1F1F1F), bo 16, padding trên 48 → 120 từ 80rem, dưới 24. Trong panel: logo 86 × 26 · mô tả (16/27, max 456) · 4 social 28 (ô 44) · 2 cột menu Shop, Information (tiêu đề Inter 700 18/27, tiêu đề → link 32, link cách 16) · trust bar 4 mục (icon 32 + chữ 14/500), gạch trên 1px trắng 12%.
+3. Hàng cuối: copyright 14/500 trái · wordmark "EFITCO" Sofia 800 `--font-size-wordmark` (200 ở 1920) lh 0.9 ls −0.04em giữa · localization (cờ tròn 26 + "USD / EN" + chevron) và 5 icon thanh toán phải; copyright và phải căn đáy theo wordmark.
 
-Theo mốc:
-- 360: newsletter xếp dọc, input + nút xuống dòng (nút full width); 2 menu thành `<details>` (accordion, tap 52); trust 2 × 2; wordmark 64.
-- 768: như 360, trust 4 cột, panel padding 48 / 32.
-- 1280, 1920: newsletter 2 cột; input liền nút; 2 menu mở sẵn; panel padding 120 / 200 (Figma).
+| | 360 | 768 | 1280 | 1920 |
+| --- | --- | --- | --- | --- |
+| Newsletter | xếp dọc: ảnh, chữ, form; nút full width | ảnh + chữ 2 cột, form dưới full | 3 cột ảnh · chữ · form (≤ 496), input liền nút | như 1280, x form 1170 |
+| Panel | tràn mép, padding ngang 20 | tràn mép, padding 20 | tràn mép, nội dung thẳng container | lùi 60, bo 16, nội dung thẳng x 252 |
+| Menu | `<details>` accordion, hàng 52, link 44 | 2 cột mở sẵn, link 26 cách 16 | brand trái, 2 cột 216 phải gap 24 | như 1280 |
+| Trust | 2 × 2 | 4 cột | 4 cột | 4 cột |
+| Hàng cuối | wordmark 64 trên, rồi locale + thanh toán, rồi copyright (giữa) | wordmark 80 | 3 cột, wordmark 133 | wordmark 200 |
 
-ĐỀ XUẤT:
-- Thêm link "Shipping policy", "Refund policy" vào menu Information, URL từ `shop.policies` (14 #252D Must; SRS TE-9 AC5). Figma không có.
-- Viền input footer: Figma `muted-on-dark` 50% chỉ đạt 2.49:1 trên nền tối (< 3:1 của WCAG 1.4.11). Đề xuất 100% `--color-muted-on-dark` (5.85). Xem câu hỏi CTO 2.
-- Focus trên nền tối: outline màu `--color-background-dark-foreground` (accent trên dark 3.48, vẫn ≥ 3 nhưng kém rõ).
+Trạng thái và form:
+- Link menu, social: muted-on-dark → hover trắng (Figma: "Portable Fitness" trắng là hover). Focus outline trắng.
+- Input: viền 100% `--color-muted-on-dark` (6.11, sổ 09/11), hover viền trắng, focus outline trắng 2px.
+- Lỗi: viền đỏ 2px, câu lỗi CHỮ TRẮNG + icon đỏ (sale trên dark 2.73:1 trượt AA). Code `.site-footer__invalid` đang tô chữ `--color-sale`: cần sửa.
+- Thành công: hộp `form-message--success` trên nền tối (chữ trắng, thanh badge-new).
+- ĐỀ XUẤT: thêm "Shipping policy", "Refund policy" vào Information, URL `shop.policies` (14 #252D; TE-9 AC5). Figma không có.
+- Ghi chú lệch nhỏ: icon social Figma #B2B2B2 (không có token) → dùng `--color-muted-on-dark` (P4).
 
-Lỗi / thành công form newsletter: theo §12 nhưng trên nền tối chữ lỗi dùng `--color-background-dark-foreground` + icon ! (chỉ icon và viền ô màu sale), vì chữ sale trên dark chỉ ~2.6:1 (L sale 0.1145, L dark 0.0130). Code hiện tại `.site-footer__invalid` đang tô chữ `--color-sale`: lỗi AA khi trạng thái lỗi hiện. ĐỀ XUẤT, nguồn 05 §4, 06.
+A11y: menu tiêu đề không dùng `<h*>` ở desktop nếu làm lệch heading-order (dùng `<p>`/`summary`); wordmark `aria-hidden` (trang trí, không lặp tên); social có tên "Efitco on Instagram"; thanh toán `aria-label="Payment methods"`; input có label ẩn + `autocomplete="email"`.
 
 ## 5. Breadcrumb và tiêu đề trang
 
-ĐỀ XUẤT (Figma không có; 04 §4 Breadcrumbs).
+ĐỀ XUẤT (Figma không có; 04 §4).
+- `<nav aria-label="Breadcrumb"><ol>`, mục cuối `<span aria-current="page">`, dấu "/" bằng `::before`.
+- Chữ 14/20, link `--color-muted` (8.45), mục cuối foreground 500, dấu `--color-muted-light`. Link cao 44. Padding trên 16 → 24 từ 64rem (header tối phía trên, breadcrumb trên nền trắng). Mục cuối cắt "…" ở 22ch / 48ch.
+- Hover: foreground + gạch chân. Focus: outline accent.
+- Không có trên: trang chủ, cart, 404, password. Collection: Home / Collections / {collection}. Product: Home / {collection} / {product}. Article: Home / {blog} / {article}. Trong banner (§3.3): chữ trắng.
+- SEO: JSON-LD `BreadcrumbList`, URL qua `routes.*`.
 
-Anatomy: `<nav aria-label="Breadcrumb"><ol>` · các `<li><a>` · mục cuối `<span aria-current="page">` · dấu "/" bằng CSS `::before` (không đọc lên).
-- Chữ 14/20 (`--font-size-sm`), link `--color-muted` (8.45), mục cuối `--color-foreground` 500, dấu phân cách `--color-muted-light`.
-- Link cao 44 (vùng chạm), padding-block-start 16 → 24 từ 64rem. Mục cuối cắt "…" ở 22ch (mobile) / 48ch.
-- Hover: link sang foreground + gạch chân. Focus: outline accent.
-- Trang không có breadcrumb: trang chủ, cart, 404, password. Collection: Home / Collections / {collection}. Product: Home / {collection nếu có} / {product}. Article: Home / {blog} / {article}.
-- SEO: JSON-LD `BreadcrumbList` (1 khối, BE/FE bàn ở ticket trang), URL qua `routes.*`.
-
-Tiêu đề trang: eyebrow (tuỳ trang, accent 16/800 uppercase) → h1 `--font-size-h1` → meta (số sản phẩm, ngày đăng) 14 muted. Padding 16 / 48, từ 64rem 24 / 64. Một h1 mỗi trang.
+Tiêu đề trang: eyebrow (accent 16/800 uppercase) → h1 → meta 14 muted. Padding 16 / 48, từ 64rem 24 / 64. Một h1 mỗi trang.
 
 ## 6. Nút
 
 | Loại | Kích thước | Màu | Code hiện có | Nguồn |
 | --- | --- | --- | --- | --- |
-| Primary | cao 48 (52 từ 80rem), padding-inline 32, chữ 16/600, bo `--radius-button` | nền accent, chữ accent-foreground (5.01) | `.button` | DESIGN, Figma 1:1104 CTA 52 |
-| Secondary | như primary, viền 1px currentColor | nền trong suốt, chữ foreground; trên dark chữ trắng | `.button--secondary` | DESIGN |
-| Link CTA | cao 44, heading 700 28/34, mũi tên 20 × 16 | currentColor | `.button--link` | Figma 1:462 |
-| Text link | inline, gạch chân 1px offset 0.2em | inherit, hover accent | — (ĐỀ XUẤT) | 06 §6, Lighthouse `link-in-text-block` |
-| Tròn 52 (next/back) | 52 × 52, icon 20 × 16 | trắng, viền `--color-border`, icon foreground; hover nền accent, icon trắng | `.carousel-nav__button`, `.collection-list__button` | Sổ quyết định 09/11 |
-| Đóng 48 | 48 × 48 tròn, icon 20 | trắng viền border; hover nền foreground, icon trắng | `.quiz__dialog-close` | base.css, 15 §1 (≥ 48 mobile) |
-| Icon header | 44 × 44, icon 24 | currentColor | `.site-header__icon` | critical.css |
-| Back (trong drawer) | 44 cao, icon 16, chữ 14 muted | nhỏ và nhạt hơn nút đóng | — (ĐỀ XUẤT) | 14 §3 |
+| Primary | cao 48 (52 từ 80rem), padding 32, 16/600, bo `--radius-button` | nền accent, chữ trắng (5.01) | `.button` | DESIGN, Figma 1:1104 |
+| Secondary | như primary, viền 1px currentColor | trong suốt, chữ foreground; trên dark chữ trắng | `.button--secondary` | DESIGN |
+| Link CTA | cao 44, heading 700 28/34, mũi tên 16 × 14 | currentColor | `.button--link` | Figma 1:462 |
+| Text link | inline, gạch chân 1px offset 0.2em | inherit, hover accent | — (ĐỀ XUẤT) | 06 §6, `link-in-text-block` |
+| Chevron tròn 52 (prev/next) | 52 × 52, chevron 11 × 16 giữa (`slideshow-icon` previous/next), 2 nút cách 8 | nền trắng, viền `--color-border`, icon foreground; hover nền accent, icon trắng; trên nền tối viền trắng (không thấy viền, như Figma) | `.carousel-nav__button`, `.collection-list__button`, `.slideshow__arrow` | Sổ 09/11, Figma 1:398 |
+| Đóng 48 | tròn 48, icon 20 | trắng viền border; hover nền foreground | `.quiz__dialog-close` | 15 §1 |
+| Icon header | ô 44, icon 20/24 | trắng | `.site-header__icon` | Figma 1:373 |
+| Back (drawer) | cao 44, icon 16, chữ 14 muted | nhỏ, nhạt hơn × | — (ĐỀ XUẤT) | 14 §3 |
 
-Trạng thái (mọi nút; Figma không có, theo code + ĐỀ XUẤT 05 §3):
-- Hover < 200ms: primary nền `color-mix(accent 88%, foreground)`, nhấc 1px + bóng (base.css); secondary đảo nền foreground; tròn 52 cam + scale 1.06.
-- Active: scale 0.98 (tròn 0.94).
-- Focus: outline 2px `--color-accent` offset 2 (tròn offset 3); chỉ `:focus-visible`.
-- Disabled (ĐỀ XUẤT, code chưa có): nền `--color-border`, chữ `--color-muted` (6.70), không bóng, `cursor: not-allowed`; secondary disabled viền border, chữ muted-light. Nút tròn ở đầu/cuối hàng: opacity 0.35, `aria-disabled` (code đã có).
-- Loading: `aria-busy="true"`, chữ trong suốt, spinner 20 trắng ở giữa, bề rộng giữ nguyên (0 CLS), chữ ẩn "Adding" cho screen reader; nút không bấm lại được (05 §5).
-- Sold out: nút primary disabled, chữ "Sold out" (chuỗi Shopify).
+Trạng thái (Figma không có; code + ĐỀ XUẤT 05 §3):
+- Hover < 200ms: primary `color-mix(accent 88%, foreground)` + nhấc 1px + bóng; secondary đảo nền foreground; chevron cam + scale 1.06.
+- Active: scale 0.98 (tròn 0.94). Focus: outline 2px accent offset 2 (tròn 3), chỉ `:focus-visible`; trên nền tối outline trắng.
+- Disabled: nền `--color-border`, chữ `--color-muted` (6.70), `cursor: not-allowed`. Chevron ở đầu/cuối hàng: opacity 0.35 + `aria-disabled` (code).
+- Loading: `aria-busy="true"`, chữ trong suốt, spinner 20, giữ bề rộng, chữ ẩn "Adding".
+- Sold out: primary disabled, chữ "Sold out".
 
-Quy tắc dùng: 1 primary mỗi section, ≤ 5 primary mỗi trang (04 §1). Nhãn 2–4 từ, Title Case, mở bằng động từ (DESIGN CTA); chuỗi thương mại theo locale ("Add To Cart" theo sổ quyết định 07/11). Hai nút cạnh nhau cách 16 (12 trong hàng nút dialog), mobile xếp dọc cách 12–20 (04 §1).
-
-Lighthouse: `<button>` cho hành động, `<a href>` cho điều hướng (crawlable, SEO); mọi nút icon có `aria-label` (button-name); không dùng `<div>` bấm được.
+Quy tắc: 1 primary mỗi section, ≤ 5 mỗi trang (04 §1); nhãn 2–4 từ Title Case mở bằng động từ ("Add To Cart", sổ 07/11); hai nút cách 16, mobile xếp dọc cách 12–20. `<button>` cho hành động, `<a href>` cho điều hướng; nút icon có `aria-label`.
 
 ## 7. Tab
 
-Figma 1:490: cao 40, padding 7 / 28, gap 8, chữ 16/500.
-- Chưa chọn: nền `--color-background-alt`, viền `--color-border`, chữ foreground (15.8). Đang chọn: nền foreground, chữ background. Hover: viền foreground.
-- Mobile/tablet: cao 44, một hàng cuộn ngang, không xuống dòng (04 §4, 15 §6). ≤ 5 tab, nhãn 1–2 từ.
-- `role="tablist"`/`tab`/`tabpanel`, `aria-selected`, phím ←/→. Panel ẩn dùng `hidden` (code `featured-collection`). Không trộn tab với accordion cùng khu (15 §6).
-- Code: `.featured-collection__tab`.
+Figma 1:490: cao 40, padding 7 / 28, gap 8, 16/500, bo 4.
+- Chưa chọn: nền alt, viền border, chữ foreground (15.8). Đang chọn: nền foreground, chữ trắng. Hover: viền foreground.
+- < 80rem: cao 44, một hàng cuộn ngang. ≤ 5 tab, nhãn 1–2 từ.
+- `role="tablist"`/`tab`/`tabpanel`, `aria-selected`, phím ←/→, panel ẩn `hidden`. Code `.featured-collection__tab`.
 
 ## 8. Badge
 
 | Badge | Nền / chữ | Tỉ lệ | Khi nào |
 | --- | --- | --- | --- |
-| -N% | sale / sale-foreground | 6.38 | có compare_at_price > price, N làm tròn từ dữ liệu |
-| New | badge-new / badge-new-foreground | 4.57 | tag `new` |
-| Sold out | foreground / background | 17.4 | mọi variant hết hàng |
-| Tag bài viết | accent / accent-foreground | 5.01 | tag đầu tiên của article |
-| Rating | background, viền background-alt, sao rating + chữ foreground | 17.4 | có metafield rating |
+| -N% | sale / trắng | 6.38 | compare_at_price > price |
+| New | badge-new / trắng | 4.57 | tag `new` |
+| Sold out | foreground / trắng | 17.4 | mọi variant hết hàng |
+| Tag bài viết | accent / trắng | 5.01 | tag đầu của article |
+| Rating | trắng, viền alt, sao rating + chữ foreground | 17.4 | có metafield rating |
 
-Pill cao 28, padding 12, chữ 13/600, bo `--radius-pill`. Ưu tiên một góc: Sold out > -N% > New (base.css). Chữ, không chỉ màu (01). Rating có chữ ẩn "out of 5 stars". Code: `.product-card__badge`, `.product-card__rating`, `.article-card__tag`.
+Pill cao 28, padding 12, 13/600, bo pill. Ưu tiên góc: Sold out > -N% > New. Rating có chữ ẩn "out of 5 stars". Code `.product-card__badge`, `.product-card__rating`, `.article-card__tag`.
 
 ## 9. Card sản phẩm
 
-Figma 1:502 (trong 1:490). Snippet `product-card`. Dữ liệu động từ Shopify (sổ quyết định 07/11).
+Figma 1:502 (component 1:213). Snippet `product-card`. Dữ liệu động (sổ 07/11).
 
-Anatomy: media 1:1 (nền cream, bo 12, ảnh `contain` + `mix-blend-mode: darken`) · badge trái trên · rating phải trên · tiêu đề 16/500 lh 26 · giá (sale đỏ + giá gạch 14 muted) · swatch 32 × 16 (vùng bấm 44) hoặc "N colors".
-- Khoảng: media → info 8, title → price 4, badge cách mép 8 (< 64rem) / 16.
-- Kích thước theo mốc: 152 / 232 / 292 / 336.
-- Hover: card nhấc 4px, ảnh scale 1.04 (hoặc đổi ảnh 2 nếu có), tiêu đề gạch chân. Focus: outline trên link tiêu đề. Swatch chọn: viền accent 2px.
-- Hết hàng: badge Sold out, ảnh opacity 0.6 (ĐỀ XUẤT, 05 §3 sold-out phải rõ), giá giữ nguyên.
-- Không ảnh (`edge_cases` "Sản phẩm không có media"): placeholder SVG `--color-muted-light` trên cream, không ảnh vỡ (DESIGN Images).
-- Tên dài: tối đa 2 dòng, cắt "…" (ĐỀ XUẤT, giữ hàng đều).
-- Đang tải: skeleton §18.
+Anatomy: media 1:1 nền cream bo 12, KHÔNG viền, ảnh `contain` + `mix-blend-mode: darken` · hàng badge padding 16 (8 dưới 64rem), trái badge, phải rating · tiêu đề Inter 16/500 lh 26 ls −0.01em · giá (sale đỏ 16/500 + giá gạch 14 muted, cách 8) · swatch.
+- Khoảng: media → tiêu đề 8, tiêu đề → giá 4, giá → swatch 8; swatch 32 × 16 bo 8, cách 4.
+- Kích thước: 152 / 232 / 292 / 336.
+- Hover: card nhấc 4px, ảnh scale 1.04 (hoặc ảnh 2), tiêu đề gạch chân. Focus: outline trên link tiêu đề.
+- ĐỀ XUẤT swatch (câu CTO 2): swatch trên card là chỉ báo, `aria-hidden`, không bấm, không focus; tên link đọc thêm ", 3 colors". Lý do: Figma swatch 32 × 16 cách 4 không thể thành vùng chạm 44 trên mobile (sổ 09/11) mà không phá bố cục; chọn màu ở trang sản phẩm / quickview. Desktop rê chuột lên swatch đổi ảnh card là tăng cường, không bắt buộc.
+- Hết hàng: badge Sold out, ảnh opacity 0.6 (05 §3), giá giữ. Không ảnh: placeholder SVG `--color-muted-light` trên cream. Tên dài: tối đa 2 dòng, cắt "…". Đang tải: §18.
 
-A11y + Lighthouse: một link duy nhất (tiêu đề, `::after` phủ card), ảnh alt = alt Shopify hoặc tên sản phẩm; `<img>` có width/height; chỉ hàng card đầu của collection không banner được eager (AGENTS Images), còn lại lazy; giá có chữ ẩn "Sale price"/"Regular price"; swatch là radio có tên màu.
+A11y + Lighthouse: một link (tiêu đề, `::after` phủ card), ảnh alt = alt Shopify hoặc tên sản phẩm, `<img>` có width/height, chỉ hàng đầu collection không banner được eager, giá có chữ ẩn "Sale price"/"Regular price".
 
 ## 10. Card bài viết
 
-Figma 1:1022. Code `.article-card`.
-Anatomy: ảnh nền 3/4 phủ kín, bo 16 (`--radius-card` + 4) · gradient tối từ 50% → đáy (code đang 63.72%) · tag pill accent phải trên cách 12 · tiêu đề Inter 700 18/28 trắng, tối đa 3 dòng · meta 14/500 (ngày đăng; Figma ghi thời gian đọc nhưng dữ liệu demo không có trường này).
-- Hover: card nhấc 6px + bóng, ảnh scale 1.04, tiêu đề gạch chân. Focus: outline accent.
-- Không ảnh: nền `--color-background-dark`, chữ vẫn đọc được (16.7).
-ĐỀ XUẤT: gradient bắt đầu 50% thay 63.72% để tiêu đề 3 dòng luôn nằm trên vùng tối (06 text over images; 14 #290D). Ảnh là trang trí, `alt=""`, tên đọc từ tiêu đề trong link.
+Figma 1:1022. Code `.article-card`. Ảnh 3/4 phủ kín bo 16 · gradient tối 50% → đáy · tag accent phải trên cách 12 · tiêu đề Inter 700 18/28 trắng tối đa 3 dòng · meta 14/500.
+- Hover: nhấc 6px + bóng, ảnh scale 1.04, tiêu đề gạch chân. Focus outline accent. Không ảnh: nền dark (17.4).
+- ĐỀ XUẤT: gradient bắt đầu 50% (code 63.72%) để tiêu đề 3 dòng luôn trên vùng tối (06; 14 #290D). Ảnh `alt=""`, tên đọc từ tiêu đề.
 
 ## 11. Hàng ngang + thanh tiến trình
 
-Sổ quyết định 09/11: nút next/back ở đầu khối (cùng hàng tiêu đề, phải), thanh tiến trình mảnh dưới hàng, không thanh cuộn trình duyệt, mobile ẩn nút và vuốt.
-- Header khối: lưới `1fr auto`, nút căn đáy với tiêu đề, gap nút 8.
-- Track: `scroll-snap-type: x mandatory`, card snap start, card kế tiếp lộ ra (15 §5: ≥ 1.2 item; mỗi item ≤ 80% viewport).
-- Thanh tiến trình: cao 2, cách hàng 32, nền `--color-border`, thumb `--color-foreground`; trên dark nền trắng 12% + thumb trắng. Thumb rộng = tỉ lệ nhìn thấy, trượt theo vị trí cuộn.
-- Ở đầu/cuối: nút mờ 0.35, không biến mất (code).
-- Không JS: hàng vẫn cuộn bằng tay, thanh cuộn hiện (code `scroll-buttons:not([data-enhanced])`).
-- Code: `scroll-buttons`, `.carousel-nav`, `.carousel-progress`. Thanh tiến trình `aria-hidden` (trang trí); hàng là `<ul>` có `aria-label`.
+Sổ 09/11: next/back ở đầu khối, thanh tiến trình mảnh, không thanh cuộn trình duyệt, mobile ẩn nút và vuốt.
+- Header khối `1fr auto`, nút căn đáy với tiêu đề, cách 8 (Figma 1:395).
+- Track `scroll-snap-type: x mandatory`, lộ card kế (15 §5).
+- Thanh tiến trình cao 2, cách hàng 32, nền border, thumb foreground; trên nền tối nền trắng 12% + thumb trắng. `aria-hidden`.
+- Trên nền tối (Figma 1:395 "Browse Categories" nằm trên dải #1A1A1A): eyebrow xám, chevron trắng, hover cam.
+- Không JS: hàng vẫn cuộn tay (`scroll-buttons:not([data-enhanced])`). Code `scroll-buttons`, `.carousel-nav`, `.carousel-progress`.
 
 ## 12. Input và form lỗi
 
-Figma chỉ có input email footer 1:1104. Phần còn lại ĐỀ XUẤT theo 04 §5, 05 §4–5.
+Figma chỉ có input footer 1:1104; còn lại ĐỀ XUẤT theo 04 §5, 05 §4–5.
+- Label 14/600 phía trên cách 8 · `*` đỏ + `required` · input/select/textarea · gợi ý 14 muted · lỗi 14/500 sale + icon 16.
+- Input cao `--control-height`, padding 16, bo `--radius-input`, chữ 16. Textarea 144. Select có chevron.
+- Viền: nền sáng `--color-muted-light` (5.33), nền tối `--color-muted-on-dark` (6.11) (sổ 09/11). Hover foreground (tối: trắng). Focus viền accent + outline 2px offset −1 (tối: trắng).
+- Lỗi: hiện khi rời trường hoặc submit; viền sale 2px; câu nói cách sửa; `aria-invalid` + `aria-describedby`; tóm tắt đầu form `role="alert"` + focus trường lỗi đầu. Trên nền tối chữ lỗi trắng (§4).
+- Disabled: nền alt, viền border, chữ muted-light. Thành công: hộp viền trái 4px badge-new + icon, `role="status"`.
+- Checkbox/radio 20, cả nhãn bấm, hàng 44, `accent-color: var(--color-accent)`. Form 2 cột từ 48rem, cách 24.
 
-Anatomy: label (14/600, phía trên, cách 8) · dấu * đỏ cho bắt buộc + `required` · input / select / textarea · gợi ý (14 muted) · lỗi (14/500 sale + icon 16).
-- Input cao `--control-height` (48 / 52), padding-inline 16, bo `--radius-input`, chữ 16 (không zoom iOS). Textarea cao 144. Select có chevron.
-- Viền mặc định: ĐỀ XUẤT `--color-muted-light` (5.33) thay `--color-border` (1.26) để nhận ra ô nhập (WCAG 1.4.11); xem câu hỏi CTO 2. Hover: viền foreground.
-- Focus: viền accent + outline 2px accent offset −1 (theo `.site-footer__field:focus-within`).
-- Lỗi: hiện khi rời trường hoặc khi submit; viền sale 2px; câu nói rõ cách sửa ("Enter an email like name@example.com."); `aria-invalid="true"` + `aria-describedby` trỏ tới lỗi. Submit lỗi: hộp tóm tắt đầu form `role="alert"` ("Check 1 field") và focus về trường lỗi đầu tiên.
-- Disabled: nền background-alt, viền border, chữ muted-light, `cursor: not-allowed`.
-- Thành công: hộp viền trái 4px badge-new + icon check + chữ foreground, `role="status"`.
-- Checkbox / radio: ô 20, cả nhãn bấm được, hàng cao 44, `accent-color: var(--color-accent)`.
-- Form 2 cột từ 48rem, 1 cột ở 360; khoảng giữa trường 24.
-
-A11y + Lighthouse: mọi trường có `<label for>` thật (label, select-name), `autocomplete` (name, email, tel, street-address…), không chặn dán (Best Practices `paste-preventing-inputs`), không dùng placeholder thay label, nút submit không gọi là "Submit" (04 §2).
+Lighthouse: `<label for>` thật, `autocomplete`, không chặn dán, không placeholder thay label, nút không ghi "Submit".
 
 ## 13. Accordion
 
-Figma 1:1057 (FAQ): dấu + cam 24 bên trái câu hỏi, gạch phân cách 1px border, câu hỏi 18/600 (16 dưới 80rem). Figma thắng 15 §6 (icon bên phải).
-- `<details>/<summary>`, chạy không JS; mở sẵn mục đầu; cho mở nhiều mục (15 §6).
-- Hàng cao ≥ 56, vùng chạm cả hàng. Mở: + đổi thành −, nội dung trượt `--motion-accordion`.
-- Nội dung thụt bằng icon + gap (40), chữ muted.
-- Không giấu phí ship, điều kiện khuyến mãi trong accordion đóng (15 §6).
-- Code: `.faq-item`, `.site-footer__disclosure`.
+Figma 1:1057: + cam 24 bên trái, gạch 1px border, câu hỏi 18/600 (16 dưới 80rem). Figma thắng 15 §6 (icon phải). `<details>/<summary>`, mở sẵn mục đầu, cho mở nhiều mục; hàng ≥ 56; nội dung thụt 40, chữ muted; `--motion-accordion`. Không giấu phí ship, điều kiện KM. Code `.faq-item`, `.site-footer__disclosure`.
 
 ## 14. Dropdown và mega menu
 
-Figma: chỉ có chevron trên Shop, Collection (1:362). ĐỀ XUẤT theo 14 §1, 05 §2.
-- Dropdown (Collection): panel trắng, viền border, bo 12, bóng raised, rộng ≥ 224, link cao 44 padding 24, hover chữ accent. Code `.site-header__submenu`.
-- Mega menu (Shop, từ 64rem): full bề ngang nội dung, ngay dưới header, padding 40; 2–3 cột link (tiêu đề cột 14/600 uppercase muted) + 1 card ảnh (collection/sản phẩm nổi bật, ảnh lazy). Link đầu cột là "View all products" (14 §1: link "Xem tất cả" đặt đầu). Nền trang phía dưới phủ scrim 50%.
-- Mở: hover (desktop) hoặc click/Enter; rê sang mục khác thì đổi nội dung ngay, không chạy lại hiệu ứng (05 §2); đóng bằng Escape, rời chuột, click ngoài. Hiệu ứng `motion-drop` 250ms.
-- Mobile: không có mega; mục cha trong drawer menu mở cấp 2 (§15).
-- A11y: trigger `<details><summary>` hoặc `<button aria-expanded aria-controls>`; danh sách `<ul>`; không bẫy focus.
+Figma chỉ có chevron Shop, Collection (1:362). ĐỀ XUẤT theo 14 §1, 05 §2. Chỉ từ 80rem (menu ngang chỉ có từ 80rem; < 80rem dùng drawer §15).
+- Header giữ tối khi mở; mục đang mở trắng 100%, chevron xoay; trang hiện tại vẫn gạch chân. Thay nội dung "header chuyển trắng khi mở" trong `docs/ui-spec/navigation.md` (ES1-T260) cho khớp sổ 10/11.
+- Dropdown (Collection): panel trắng, viền border, bo 12, bóng raised, rộng ≥ 224, link 44 padding 24, hover chữ accent. Code `.site-header__submenu`.
+- Mega (Shop): full bề ngang ngay dưới header (top 80), nền trắng, padding 40; 2–3 cột link (tiêu đề 14/600 uppercase muted) + 1 ô ảnh (lazy, tải khi mở, sổ 09/11). Link đầu cột "View all products". Scrim 50% phía dưới.
+- Mở: hover hoặc click/Enter; đổi mục không chạy lại hiệu ứng; đóng Escape, rời chuột, click ngoài. 250ms drop 8px.
+- A11y: `<details><summary>` hoặc `<button aria-expanded aria-controls>`; tiêu đề cột không dùng `<h*>`.
 
 ## 15. Drawer
 
-Theo 15 §2 (chuẩn NextSky), 14 §3; code `.site-header__drawer`, `.cart-drawer__dialog`.
+15 §2, 14 §3; code `.site-header__drawer`, `.cart-drawer__dialog`.
 
 | Drawer | Hướng | Rộng 360 / 768 / 1280+ | Nội dung |
 | --- | --- | --- | --- |
 | Menu | trái | 90% / 420 / — | menu 2 cấp, account, localization |
-| Filter (collection) | trái | 90% / 420 / 420 | nhóm filter, nút Apply + Clear ở chân |
+| Filter | trái | 90% / 420 / 420 | nhóm filter, Apply + Clear ở chân |
 | Cart | phải | 90% / 420 / 480 | dòng hàng, tổng, Checkout |
 | Search | phải | 90% / 420 / 480 | ô tìm, gợi ý, kết quả nhanh |
 
-Anatomy: header cao 72 (tiêu đề h2 heading 28, nút đóng 48 ở inline-end, cách mép 12) · body cuộn riêng (`overscroll-behavior: contain`) · footer dính đáy (nút chính full width) · scrim `--overlay-scrim`.
-- Cao toàn màn hình mọi mốc; mobile chiếm 90% để thấy nền phía sau (đóng bằng chạm scrim).
-- Cấp 2 trong menu: trượt ngang trong cùng drawer, nút Back (nhỏ hơn ×) ở inline-start header (14 §3, 15 §7).
-- Mở 250ms `--ease-out`, đóng 200ms (`calc(var(--motion-base) * 0.8)`), chỉ transform + opacity (15 §4).
-- Đóng: ×, Escape, chạm scrim; trả focus về nút mở.
-- A11y: `<dialog>` + `showModal()` (bẫy focus, inert nền sẵn), `aria-labelledby` tiêu đề (aria-dialog-name); khoá cuộn body. Không JS: menu dùng `<details>` (code), cart link sang `routes.cart_url`.
-- Lighthouse: nội dung drawer không render ảnh eager; ảnh trong cart drawer lazy, có width/height.
+- Header drawer 72 (tiêu đề heading 22–28, × 48 cách mép 12) · body cuộn riêng (`overscroll-behavior: contain`) · footer dính đáy (nút chính full width) · scrim `--overlay-scrim`. Nền drawer trắng (header trang tối không lặp vào drawer).
+- Cao toàn màn; mobile 90% để chạm scrim đóng. Cấp 2 trượt ngang, Back nhỏ hơn × (14 §3).
+- Mở 250ms `--ease-out`, đóng 200ms; chỉ transform + opacity. Đóng: ×, Escape, scrim; trả focus.
+- A11y: `<dialog>` + `showModal()`, `aria-labelledby`; khoá cuộn. Không JS: menu `<details>`, cart link `routes.cart_url`. Ảnh trong drawer lazy, có width/height.
 
 ## 16. Dialog và bottom sheet
 
-Theo 15 §1–2, sổ quyết định 09/11 (quiz: popup, mobile bottom sheet); code `.quiz__dialog`.
+15 §1–2, sổ 09/11 (quiz popup, mobile bottom sheet); code `.quiz__dialog`.
 
 | Cỡ | ≥ 768 | < 768 |
 | --- | --- | --- |
-| S (xác nhận, chọn variant, size chart ngắn) | 480 | bottom sheet |
+| S (xác nhận, chọn variant) | 480 | bottom sheet |
 | M (quick view, ask a question) | 720 | bottom sheet |
-| L (quiz kết quả, lightbox có nội dung) | 1120 | bottom sheet |
+| L (kết quả quiz, lightbox) | 1120 | bottom sheet |
 
-- Desktop / tablet: giữa màn, bo `--radius-dialog` (24), padding 32 (768) / 48 (1280+), cao tối đa `min(860, 100dvh − 48)`, nút đóng 48 cách góc 24.
-- Mobile: dính đáy, rộng 100%, cao tối đa 88dvh, bo 2 góc trên, thanh kéo 40 × 4 ở giữa đỉnh, nút đóng cách góc 12; vuốt xuống để đóng (15 §2); hàng nút xếp dọc, nút chính dưới cùng (ngón cái).
-- Tiêu đề h2 heading 800 (28–40), có `padding-inline-end` chừa nút đóng. Nội dung < 50 từ với popup marketing (15 §1).
-- Hàng nút: phải, cách nội dung 32, gạch trên 1px border.
-- Motion: mở 300ms (`calc(var(--motion-base) * 1.2)`) fade + nhấc 24 + scale 0.97; đóng 200ms; mobile trượt từ đáy (base.css quiz).
-- Quy tắc: một lớp popup một lúc; không popup khi vừa vào trang (chờ ≥ 5–10s hoặc cuộn 50–60%); không popup ở 404; không confirmshaming; tối đa 1 lần/phiên cho popup marketing (15 §1).
-- A11y: `<dialog>` + `showModal()`, `aria-labelledby`, Escape đóng, focus vào phần tử đầu tiên có nghĩa, trả focus khi đóng.
+- ≥ 768: giữa màn, bo 24, padding 32 (48 từ 1280), cao ≤ `min(860, 100dvh − 48)`, × 48 cách góc 24.
+- < 768: dính đáy, rộng 100%, cao ≤ 88dvh, bo 2 góc trên, thanh kéo 40 × 4, × cách góc 12, vuốt xuống đóng; nút xếp dọc, chính dưới cùng.
+- Tiêu đề h2 heading 800 (28–40), chừa chỗ ×. Popup marketing < 50 từ. Hàng nút phải, cách 32, gạch trên.
+- Motion: mở 300ms fade + nhấc 24 + scale 0.97; đóng 200ms; mobile trượt từ đáy.
+- Quy tắc: một lớp một lúc; không mở lúc tải trang (chờ thời gian/cuộn/ý định rời); không ở 404; không confirmshaming; 1 lần/phiên (15 §1, sổ 09/11).
+- A11y: `<dialog>` + `showModal()`, `aria-labelledby`, Escape, focus phần tử đầu, trả focus.
 
 ## 17. Toast
 
-ĐỀ XUẤT (Figma không có; 04 §6, 05 §6, 14 #1097M).
-- Vị trí: mobile dính đáy cách mép 16 (full width trừ lề); ≥ 768 góc dưới inline-end cách 24, rộng 400. `position: fixed` nên 0 CLS.
-- Anatomy: thanh màu 4px inline-start · icon 20 · tiêu đề 16/600 + mô tả 14 · nút đóng 44.
-- Nền trắng, viền border, bóng raised. 4 loại cố định:
+Sổ 09/11 đã chốt màu. Vị trí: mobile đáy cách 16 full width; ≥ 768 góc dưới inline-end cách 24, rộng 400; `position: fixed` (0 CLS). Thanh màu 4px · icon 20 · tiêu đề 16/600 + mô tả 14 · nút đóng 44 có tên riêng ("Dismiss: Added to cart"). Nền trắng, viền border, bóng raised.
 
 | Loại | Thanh + icon | Icon | role | Tự ẩn |
 | --- | --- | --- | --- | --- |
-| info | `--color-muted` (8.45) | i trong tròn | status | 6s, dừng khi hover/focus |
-| success | `--color-badge-new` (4.57) | check | status | 6s, dừng khi hover/focus |
-| warning | `--color-accent` (5.01) | tam giác ! | alert | không, đóng tay |
-| error | `--color-sale` (6.38) | ! trong tròn | alert | không, đóng tay |
+| info | `--color-muted` | i | status | 6s, dừng khi hover/focus |
+| success | `--color-badge-new` | check | status | 6s, dừng khi hover/focus |
+| warning | `--color-accent` | tam giác ! | alert | không |
+| error | `--color-sale` | ! tròn | alert | không |
 
-- Màu thanh/icon chỉ là tín hiệu phụ; loại đọc được từ icon + chữ (01, 06). Không tắt sau ~2s (04 §6).
-- Dùng sau: thêm giỏ, cập nhật giỏ, lỗi mạng, newsletter. Tối đa 3 toast chồng, mới nhất ở dưới.
-- Câu hỏi CTO 3 về màu warning.
+Màu chỉ là tín hiệu phụ, loại đọc từ icon + chữ. Tối đa 3 toast chồng.
 
 ## 18. Trạng thái rỗng, lỗi, đang tải
 
-ĐỀ XUẤT (Figma không có; 05 §6–7, 14 #928M). Dùng chung cho mọi trang; trang cụ thể chỉ đổi chữ và CTA.
-
-Đang tải:
-- Skeleton: khối `--color-background-alt` cùng kích thước nội dung thật (card: media 1:1 + 2 dòng 14, dòng 2 rộng 40%), shimmer sang `--color-background` 1.4s; reduced motion thì tĩnh. Đặt đúng chỗ nội dung sẽ hiện (0 CLS).
-- Vùng đang cập nhật: `aria-busy="true"`; câu thông báo trong `role="status"` (vd "Updating cart…") + spinner 24 cạnh vùng đổi.
-- Nút: §6 loading.
-
-Rỗng (giỏ rỗng, search không kết quả, collection rỗng, chưa có đơn):
-- Căn giữa, rộng ≤ 512: icon 32 trong tròn 72 nền alt · h2/h3 nói rõ ("Your Cart Is Empty") · 1 câu gợi ý · primary CTA cụ thể ("Shop Bestsellers") + text link phụ ("Browse collections").
-- Search không kết quả thêm gợi ý từ khoá / collection (05 §7). Trang rỗng là nội dung, hiện cho người mua (AGENTS empty state).
-
-Lỗi:
-- Section/khối: hộp viền 1px sale, bo 12, icon ! 24 sale, tiêu đề 16/600, câu cách xử lý 14 muted, nút secondary "Try Again"; `role="alert"`.
-- Trường form: §12. Thao tác nền (thêm giỏ thất bại): toast error §17.
-- 404: không popup, có search + link trang chủ (TE-9 AC2).
+ĐỀ XUẤT (Figma không có; 05 §6–7, 14 #928M).
+- Đang tải: skeleton `--color-background-alt` đúng kích thước nội dung (card: media 1:1 + 2 dòng 14, dòng 2 rộng 40%), shimmer 1.4s, tĩnh khi giảm chuyển động; vùng đổi `aria-busy` + `role="status"` + spinner 24. Không làm mờ chữ (Lighthouse color-contrast tính opacity).
+- Rỗng: giữa, ≤ 512: icon 32 trong tròn 72 nền alt · h2/h3 rõ ("Your Cart Is Empty") · 1 câu gợi ý · primary cụ thể ("Shop Bestsellers") + text link phụ. Search không kết quả thêm gợi ý (05 §7).
+- Lỗi khối: viền 1px sale, bo 12, icon 24 sale, tiêu đề 16/600, câu xử lý 14 muted, secondary "Try Again", `role="alert"`. Trường: §12. Thao tác nền: toast error. 404: không popup, có search + link trang chủ (TE-9 AC2).
 
 ## 19. Motion
 
-Token: `--motion-fast` 150 (hover nhỏ, swatch), `--motion-base` 250 (màu nút, drawer mở, dropdown), `--motion-slow` 500 (ảnh scale, card nhấc), `--motion-accordion` 350, `--motion-reveal` 900 (hiện dần khi cuộn), easing `--ease-out` (vào), `--ease-in-out` (accordion), `--ease-expo` (reveal, dialog).
+Token: `--motion-fast` 150, `--motion-base` 250, `--motion-slow` 500, `--motion-accordion` 350, `--motion-reveal` 900; `--ease-out` (vào), `--ease-in-out` (accordion), `--ease-expo` (reveal, dialog).
 
 | Thành phần | Vào | Ra | Thuộc tính |
 | --- | --- | --- | --- |
-| Hover nút, link, tab | 150–250 | 150–250 | màu, translate, scale |
+| Hover nút, link, tab, menu header | 150–250 | 150–250 | màu, translate, scale |
 | Dropdown / mega | 250 drop 8px | 150 | opacity, translate |
 | Drawer | 250 | 200 | translate, scrim opacity |
 | Dialog | 300 | 200 | opacity, translate, scale |
-| Bottom sheet | 300 trượt từ đáy | 200 | translate |
+| Bottom sheet | 300 từ đáy | 200 | translate |
 | Accordion | 350 | 350 | block-size, opacity |
-| Toast | 250 trượt lên 8px | 150 fade | opacity, translate |
-| Reveal khi cuộn (tiêu đề, card, ảnh lớn) | 900, lệch 80ms/card | không chạy lại | opacity, translate, clip-path |
+| Toast | 250 lên 8px | 150 | opacity, translate |
+| Bóng header khi cuộn | 250 | 250 | box-shadow (1 phần tử, không layout) |
+| Reveal khi cuộn | 900, lệch 80ms/card | không lặp | opacity, translate, clip-path |
 
-- Chỉ transform / opacity / clip-path (sổ quyết định 09/11; 15 §3). Reveal chạy 1 lần, chỉ tiêu đề, card, ảnh chính, CTA; không cho đoạn văn dài.
-- `prefers-reduced-motion: reduce`: tắt toàn bộ, nội dung hiện ngay (AGENTS).
-- Reveal 900ms dài hơn mức < 500ms của 15 §3 / 22 §13: theo quyết định CTO 09/11 (đã code ES1-T250), không đổi.
-- Accordion 350 dài hơn 200–300 của 15 §6: token có sẵn, giữ.
+Chỉ transform / opacity / clip-path (sổ 09/11); reveal 1 lần, chỉ tiêu đề, card, ảnh chính, CTA; `prefers-reduced-motion: reduce` tắt hết. Reveal 900 và accordion 350 dài hơn 15 §3/§6: theo token và quyết định CTO 09/11, giữ.
 
-## 20. Ràng buộc Lighthouse (SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90)
+## 20. Ràng buộc Lighthouse
 
-Chung cho mọi trang ghép từ foundation:
-- A11y: tương phản theo §2 (không dùng `--color-border` hay accent trên dark cho chữ nhỏ); mọi `<button>`/`<a>` icon có tên; mọi trường có label; một `<main>`, một h1, heading không nhảy bậc; danh sách là `<ul>/<ol>`; `role="tablist"` đủ tab/tabpanel; dialog có tên; link trong đoạn văn gạch chân (link-in-text-block); vùng chạm ≥ 24 (target-size) và ≥ 44 cho control; `html lang`; không `user-scalable=no`; skip link.
-- SEO: `<title>` + meta description mỗi template; link là `<a href>` thật (không `javascript:`); chữ link mô tả đích (không "Click here", "Learn more" trần — 04 §2, 07 §D); ảnh có alt; breadcrumb JSON-LD; canonical (snippet `meta-tags`).
-- Best Practices: 0 lỗi console; ảnh đúng tỉ lệ (`object-fit`, không kéo méo) và đủ độ phân giải (`image` snippet srcset 360–1440); không chặn dán vào input; không xin quyền khi tải trang; không thư viện có lỗ hổng.
-- Performance: chỉ 1 ảnh eager + `fetchpriority="high"` mỗi trang (LCP; AGENTS Images); mọi ảnh khác lazy, có width/height; skeleton giữ chỗ; toast, drawer, dialog, header sticky không đẩy layout; font `swap`, preload 1 font; header, breadcrumb, tiêu đề trang, nút ở critical.css (≤ 10 KB), còn lại base.css; JS mỗi file ≤ 8 KB, trang ≤ 40 KB; animation chỉ transform/opacity.
+Chỉ tiêu (sổ 09/11): A11y 100, BP 100 desktop và mobile; Performance desktop ≥ 98, mobile ≥ 90; SEO 100 bắt buộc ở trang index (ticket vòng 3), trang con vẫn thiết kế để đạt.
+- A11y: tương phản theo §2 (không dùng border, accent trên dark, sale trên dark cho chữ nhỏ); mọi nút/link icon có tên riêng; mọi trường có label; một `<main>`, một h1, heading không nhảy bậc (tiêu đề cột menu/footer không dùng `<h*>` nếu lệch bậc); danh sách `<ul>/<ol>`; tablist đủ; dialog có tên; link trong đoạn văn gạch chân; vùng chạm ≥ 24, control mobile ≥ 44; swatch card `aria-hidden` (không có control 16px); skip link; không thuộc tính ARIA trên phần tử không role.
+- SEO: `<title>` + meta description; link `<a href>` thật; chữ link mô tả đích; ảnh có alt; breadcrumb JSON-LD; canonical (`meta-tags`); chữ ≥ 12px.
+- Best Practices: 0 lỗi console; ảnh đúng tỉ lệ và độ phân giải (`image` snippet srcset); không chặn dán; không xin quyền khi tải.
+- Performance: 1 ảnh eager + `fetchpriority="high"` mỗi trang (hero, banner, hoặc ảnh sản phẩm đầu); ảnh khác lazy có width/height; ảnh mega/popup tải khi mở; skeleton giữ chỗ; toast, drawer, dialog, header không đẩy layout; tối đa 2 họ font, `swap`; header (gồm noise) + breadcrumb + tiêu đề trang + nút ở critical.css (≤ 10 KB); JS mỗi file ≤ 8 KB, trang ≤ 40 KB; animation chỉ transform/opacity.
 
 ## 21. Map sang code hiện có
 
 | Thành phần | Class / file đã có | Thiếu (ticket trang làm) |
 | --- | --- | --- |
-| Header A/B/C | `.site-header`, `[data-header-overlay]`, `[data-scrolled]` (critical.css) | viền dưới 1px ở biến thể A; `aria-current` cho menu |
-| Footer | `.site-footer*` | link policy; viền input 100% |
-| Nút | `.button`, `.button--secondary`, `.button--link`, `[aria-busy]` | style `:disabled`; cao 48 dưới 80rem (code 44) |
-| Nút tròn, tiến trình | `.carousel-nav__button`, `.carousel-progress`, `scroll-buttons` | — |
+| Header | `.site-header`, `[data-scrolled]`, base.css 7452–7497 (nền tối, logo 100, gap 40, icon 20/24) | bỏ điều kiện `body:has(.slideshow)` để mọi trang tối; bỏ `[data-header-overlay]` (không đè ảnh); `aria-current` gạch chân; focus trắng |
+| Banner trang con | — | `.page-banner` §3.3 |
+| Footer | `.site-footer*`, `.site-footer__main` (dải rộng, bo 16, noise) | link policy; viền input 100% muted-on-dark; chữ lỗi trắng |
+| Nút | `.button`, `.button--secondary`, `.button--link`, `[aria-busy]` | `:disabled`; cao 48 dưới 80rem |
+| Chevron 52, tiến trình | `.carousel-nav__button`, `.collection-list__button`, `snippets/slideshow-icon`, `.carousel-progress`, `scroll-buttons` | — |
 | Tab | `.featured-collection__tab` | — |
-| Card sản phẩm, giá, badge | `snippets/product-card`, `snippets/price`, `.product-card__*` | ảnh mờ khi sold out; clamp 2 dòng tên |
+| Card sản phẩm, giá, badge | `snippets/product-card`, `snippets/price`, `.product-card__*` | swatch `aria-hidden` + số màu trong tên link; ảnh mờ khi sold out; clamp 2 dòng |
 | Card bài viết | `.article-card*` | gradient 50% |
 | Accordion | `.faq-item`, `.site-footer__disclosure` | — |
 | Dropdown | `.site-header__submenu` | mega menu |
-| Drawer | `.site-header__drawer*`, `.cart-drawer__dialog` | header/footer drawer chung, filter, search |
-| Dialog | `.quiz__dialog`, `.quiz__dialog-close` | tách thành class chung cho mọi popup |
-| Breadcrumb, toast, empty, alert, skeleton chung | — | tạo mới theo §5, §17, §18 |
+| Drawer | `.site-header__drawer*`, `.cart-drawer__dialog` | khung drawer chung, filter, search |
+| Dialog | `.quiz__dialog`, `.quiz__dialog-close` | class chung cho mọi popup |
+| Breadcrumb, toast, empty, alert, skeleton | — | tạo mới §5, §17, §18 |
 
-Settings merchant: foundation không thêm setting. Thành phần mới đọc token có sẵn; setting riêng (vd bật breadcrumb) do ticket trang đề xuất.
+Settings merchant: foundation không thêm setting; dùng `background_dark_color` có sẵn cho header và footer.
 
 ## 22. Quyết định CTO cần chốt
 
-1. Header trang con: chốt nền trắng (biến thể A) làm mặc định và biến thể đè ảnh (B) cho trang có ảnh lớn đầu trang? Đề xuất: có (lý do §3).
-2. Viền input nền sáng dùng `--color-muted-light` (5.33:1) thay `--color-border` (1.26:1), và viền input footer dùng 100% `--color-muted-on-dark` (5.85) thay 50% (2.49), để đạt WCAG 1.4.11? Đề xuất: có; Lighthouse không đo tiêu chí này nhưng axe/QA thủ công sẽ bắt, và không cần token mới.
-3. Toast warning dùng `--color-accent` cho thanh màu + icon (ngoại lệ "accent chỉ cho hành động" trong DESIGN.md, như eyebrow 09/11), success dùng `--color-badge-new` cho thanh + icon (không làm màu chữ)? Đề xuất: có; theme không có token vàng/cam riêng và ticket cấm thêm token.
+1. Banner trang con (collection, ảnh bìa bài viết): thẻ bo 16 trong container dưới header, lớp tối ≥ 60% (khác hero 30%) để chữ trắng AA với mọi ảnh merchant chọn? Đề xuất: có (§3.3).
+2. Swatch trên card sản phẩm là chỉ báo không bấm (`aria-hidden`, số màu đọc trong tên link), chọn màu ở trang sản phẩm/quickview, vì 32 × 16 cách 4 của Figma không đạt vùng chạm 44 trên mobile? Đề xuất: có (§9).
+3. Khi mở mega menu/dropdown header giữ tối (bỏ "chuyển trắng khi mở" trong `navigation.md` ES1-T260), mục đang mở trắng 100% + chevron xoay? Đề xuất: có (§14, sổ 10/11).
