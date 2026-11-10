@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Efitco marketing popups — ES1-T263</title>
+<meta name="description" content="Newsletter popup, before you leave popup and big offer popup for the Efitco theme at 360, 768, 1280 and 1920, with error, success, copied and loading states.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* CSS riêng ES1-T263. Spec: docs/ui-spec/marketing-popups.md. Chỉ đọc var(--*) của kit. */
+  .sheet-intro { padding-block: var(--space-5) var(--space-6); }
+  .sheet-intro p { max-width: 70ch; margin-block-start: var(--space-3); color: var(--color-muted); }
+
+  /* Khung màn hình: mobile tràn mép như điện thoại thật, từ 48rem bo góc */
+  .popup-stage { position: relative; overflow: hidden; height: 720px; margin-inline: calc(var(--page-margin) * -1); background: var(--color-background-dark); }
+  .popup-stage--short { height: 200px; }
+  @media (min-width: 48rem) { .popup-stage { height: 760px; margin-inline: 0; border-radius: var(--radius-card); } .popup-stage--short { height: 220px; } }
+  @media (min-width: 80rem) { .popup-stage { height: 720px; } .popup-stage--short { height: 220px; } }
+  .stage-page { position: absolute; inset: 0; color: var(--color-background-dark-foreground); }
+  .stage-page > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 70% 30%; }
+  .stage-page::after { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--color-background-dark) 30%, transparent); }
+  .stage-page .site-header { z-index: 2; }
+  .stage-page .site-header__count { color: var(--color-background-dark); }
+  @media (min-width: 80rem) { .stage-page .site-header__logo svg { width: calc(var(--space-1) * 25); } }
+  .stage-hero { position: absolute; z-index: 1; inset-inline: 0; inset-block-start: 140px; display: grid; gap: var(--space-3); width: var(--content-width); margin-inline: auto; }
+  .stage-hero .eyebrow { color: var(--color-background-dark-foreground); }
+  .stage-hero__title { font-family: var(--font-heading--family); font-size: var(--font-size-display); font-weight: var(--font-heading--weight-display); line-height: 1; letter-spacing: -0.04em; text-transform: uppercase; }
+  .popup-stage > .scrim, .popup-stage > .dialog, .popup-stage > .offer-teaser, .popup-stage > .offer-card { position: absolute; }
+  .popup-stage > .dialog { max-height: calc(100% - var(--space-7)); }
+  @media (max-width: 47.99rem) { .popup-stage > .dialog { max-height: 88%; } }
+
+  /* Chữ chung của popup */
+  .popup-title { margin: 0; padding-inline-end: calc(var(--space-1) * 14); font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight); line-height: calc(44 / 36); letter-spacing: -0.02em; text-transform: uppercase; }
+  .popup-title .accent { color: var(--color-accent); }
+  .popup-text { color: var(--color-muted); line-height: 1.625; }
+  .popup-stack { display: grid; gap: var(--space-3); }
+  .link-button { display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; cursor: pointer; }
+  .link-button:hover, .link-button.is-hover { color: var(--color-foreground); }
+
+  /* 1. Newsletter popup: M 720, ảnh trái từ 48rem; mobile sheet không ảnh, ẩn đoạn mô tả */
+  .dialog.nl { --dialog-width: 720px; padding: 0; }
+  .nl__grid { display: grid; }
+  .nl__media { display: none; }
+  .nl__body { display: grid; gap: var(--space-4); padding: var(--space-6) var(--space-4) var(--space-4); }
+  .nl__text { display: none; }
+  .nl__form { display: grid; gap: var(--space-4); }
+  .nl__links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-4); }
+  .choice--top { align-items: flex-start; padding-block: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); line-height: 20px; }
+  .choice--top input { margin-block-start: 0; }
+  .choice.is-invalid input { outline: 2px solid var(--color-sale); outline-offset: 1px; }
+  @media (min-width: 48rem) {
+    .nl__grid { grid-template-columns: 264px minmax(0, 1fr); }
+    .nl__media { position: relative; display: block; min-height: 100%; background: var(--color-background-dark); }
+    .nl__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+    .nl__body { padding: var(--space-6); }
+    .nl__text { display: block; }
+  }
+  @media (min-width: 80rem) {
+    .nl__grid { grid-template-columns: 288px minmax(0, 1fr); }
+    .nl__body { padding: var(--space-7) var(--space-7) var(--space-6); }
+  }
+
+  /* 2. Before you leave: S 480 */
+  .dialog.byl { --dialog-width: 480px; }
+  .byl__head { display: grid; gap: var(--space-2); margin-block-end: var(--space-4); }
+  .byl__text { display: none; }
+  .byl__lines { margin: 0; padding: 0; border-block: 1px solid var(--color-border); list-style: none; }
+  .byl__line { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: var(--space-4); padding-block: var(--space-3); }
+  .byl__line + .byl__line { border-block-start: 1px solid var(--color-border); }
+  .byl__media { width: 64px; height: 64px; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); }
+  .byl__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
+  .byl__name { font-weight: 500; line-height: 1.4; text-decoration: none; }
+  .byl__name:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+  .byl__meta { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .byl__price { display: grid; justify-items: end; font-weight: 500; }
+  .byl__price s { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+  .byl__price .price__sale { color: var(--color-sale); }
+  .byl__more { margin-block-start: var(--space-3); font-size: var(--font-size-sm); }
+  .byl__total { display: flex; justify-content: space-between; margin-block-start: var(--space-4); font-weight: 600; }
+  .byl .dialog__actions { margin-block-start: var(--space-5); padding-block-start: 0; border: 0; }
+  @media (max-width: 47.99rem) {
+    .byl__line:nth-child(n + 2) { display: none; }
+    .byl .dialog__actions { gap: var(--space-1); }
+    .byl .dialog__actions > .link-button { justify-content: center; }
+  }
+  @media (min-width: 48rem) {
+    .byl__text { display: block; }
+    .byl__more--mobile { display: none; }
+    .byl .dialog__actions { align-items: center; justify-content: space-between; }
+  }
+
+  /* Ô mã ưu đãi */
+  .code { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-3) var(--space-3) var(--space-4); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background-alt); }
+  .code__label { display: block; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .code__value { display: inline-block; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight-display); line-height: 1.1; letter-spacing: 0.06em; }
+  .code__value.is-selected { background: color-mix(in srgb, var(--color-accent) 16%, var(--color-background)); outline: 1px solid var(--color-accent); }
+  .code__copy { min-height: 48px; padding-inline: var(--space-4); background: var(--color-background); }
+  .code__copy.is-copied { border-color: var(--color-badge-new); }
+  .code__copy.is-copied svg { color: var(--color-badge-new); }
+  .code__status { display: flex; align-items: center; gap: var(--space-2); min-height: 20px; margin-block-start: var(--space-2); font-size: var(--font-size-sm); }
+  .code__status svg { flex: none; width: 16px; height: 16px; color: var(--color-badge-new); }
+
+  /* 3. Offer: nút gợi ý (teaser) + thẻ ưu đãi. Mobile sheet có scrim; từ 48rem popover không modal */
+  .offer-teaser { position: absolute; z-index: 15; inset-block-end: var(--space-4); inset-inline-start: var(--space-4); display: flex; align-items: center; border-radius: var(--radius-pill); background: var(--color-foreground); color: var(--color-background); box-shadow: var(--shadow-raised); }
+  .offer-teaser__open { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 48px; padding-inline: var(--space-4) var(--space-3); border: 0; border-radius: var(--radius-pill) 0 0 var(--radius-pill); background: none; color: inherit; font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out); }
+  .offer-teaser__open > svg { width: 20px; height: 20px; }
+  .offer-teaser__open .badge { min-height: 24px; padding-inline: var(--space-2); }
+  .offer-teaser__open:hover, .offer-teaser__open.is-hover { background: color-mix(in srgb, var(--color-background) 14%, var(--color-foreground)); }
+  .offer-teaser__hide { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 48px; padding: 0; border: 0; border-inline-start: 1px solid color-mix(in srgb, var(--color-background) 24%, transparent); border-radius: 0 var(--radius-pill) var(--radius-pill) 0; background: none; color: inherit; cursor: pointer; }
+  .offer-teaser__hide svg { width: 16px; height: 16px; }
+  .offer-teaser :focus-visible, .offer-teaser .is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; box-shadow: 0 0 0 2px var(--color-background); }
+  @media (min-width: 48rem) { .offer-teaser { inset-block-end: var(--space-5); inset-inline-start: var(--space-5); } }
+
+  .offer-card { position: absolute; z-index: 21; inset-block: auto 0; inset-inline: 0; display: grid; gap: var(--space-4); padding: var(--space-6) var(--space-4) var(--space-5); border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); }
+  .offer-card::before { content: ''; position: absolute; inset-block-start: var(--space-2); inset-inline-start: calc(50% - 20px); width: 40px; height: 4px; border-radius: 2px; background: var(--color-border); }
+  .offer-card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .offer-product { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: var(--space-4); }
+  .offer-product__media { position: relative; display: block; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); }
+  .offer-product__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
+  .offer-product__media .badge { position: absolute; inset-block-start: var(--space-1); inset-inline-start: var(--space-1); min-height: 24px; padding-inline: var(--space-2); }
+  .offer-product__media .product-card__placeholder svg { width: 48%; }
+  .offer-product__title { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); line-height: 1.1; }
+  .offer-product__info { display: grid; gap: var(--space-1); }
+  .offer-product__save { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .offer-countdown { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); padding: var(--space-2) var(--space-2) var(--space-2) var(--space-4); border-radius: var(--space-2); background: var(--color-foreground); color: var(--color-background); font-size: var(--font-size-sm); font-weight: 600; }
+  .offer-countdown__cells { display: flex; align-items: center; gap: var(--space-1); }
+  .offer-countdown__cells b { display: grid; place-items: center; min-width: 36px; height: 32px; border-radius: var(--space-1); background: color-mix(in srgb, var(--color-background) 14%, var(--color-foreground)); font-family: var(--font-heading--family); font-size: var(--font-size-lg); font-weight: var(--font-heading--weight-display); }
+  @media (min-width: 48rem) {
+    .offer-card { inset-block: auto calc(var(--space-5) + 48px + var(--space-3)); inset-inline: var(--space-5) auto; width: 400px; padding: var(--space-5); border-radius: var(--radius-dialog); }
+    .offer-card::before { display: none; }
+    .offer-card .close-button { width: 40px; height: 40px; }
+    .offer-product { grid-template-columns: 120px minmax(0, 1fr); }
+    .offer-scrim { display: none; }
+  }
+
+  /* Trạng thái (cuối file) */
+  .state-grid { display: grid; gap: var(--space-6); }
+  @media (min-width: 48rem) { .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 80rem) { .state-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .state-card { position: relative; display: grid; align-content: start; gap: var(--space-4); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-dialog); background: var(--color-background); box-shadow: var(--shadow-raised); }
+  .state-card .popup-title { font-size: var(--font-size-h3); }
+  .state-card .close-button { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); }
+  .result-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--color-background-alt); }
+  .result-icon svg { width: 28px; height: 28px; }
+  .result-icon--success { color: var(--color-badge-new); }
+  .result-icon--info { color: var(--color-muted); }
+  .note-card { display: grid; gap: var(--space-2); padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-dialog); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .note-card strong { color: var(--color-foreground); font-size: var(--font-size-base); }
+  .field__input[readonly] { background: var(--color-background-alt); }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-info" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 9v5M10 5.8v.1"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
+  <symbol id="i-tick" viewBox="0 0 20 20"><path d="m4 10.5 4 4 8-9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M10.6 2H17a1 1 0 0 1 1 1v6.4a1 1 0 0 1-.3.7l-7.9 7.9a1 1 0 0 1-1.4 0l-6.4-6.4a1 1 0 0 1 0-1.4l7.9-7.9a1 1 0 0 1 .7-.3Z"/><circle cx="14" cy="6" r="1.2"/></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/><path d="M13.5 6.5V4A1.5 1.5 0 0 0 12 2.5H4A1.5 1.5 0 0 0 2.5 4v8A1.5 1.5 0 0 0 4 13.5h2.5"/></g></symbol>
+  <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<main id="main" class="container">
+  <div class="sheet-intro">
+    <p class="eyebrow">ES1-T263 · Overlay</p>
+    <h1>Marketing Popups</h1>
+    <p>Newsletter popup, before you leave popup and big offer popup. None of them opens while the page loads: newsletter waits for time and scroll, before you leave waits for exit intent, big offer opens only when the shopper hovers or taps the offer button. One popup at a time, at most one popup opens by itself per session.</p>
+  </div>
+
+  <!-- ===== 1. Newsletter popup ===== -->
+  <section class="demo-block" aria-labelledby="b1">
+    <h2 id="b1">1. Newsletter Popup</h2>
+    <p class="demo-note">Mở sau 10 s VÀ cuộn 50% trang (setting). Mobile: bottom sheet không ảnh, ẩn đoạn mô tả, cao ≤ 60% màn. Từ 48rem: dialog 720, ảnh trái 264 / 288. Copy từ Figma 1:1146 (footer newsletter).</p>
+    <div class="popup-stage" role="group" aria-label="Newsletter popup over the home page">
+      <div class="stage-page" inert>
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
+        <div class="site-header site-header--overlay"><div class="site-header__inner">
+          <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
+          <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__icons"><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
+        </div></div>
+        <div class="stage-hero"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
+      </div>
+      <div class="scrim"></div>
+      <div class="dialog nl" role="dialog" aria-modal="true" aria-labelledby="nl-title" aria-describedby="nl-text">
+        <button class="close-button dialog__close" type="button" aria-label="Close newsletter popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+        <div class="nl__grid">
+          <div class="nl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="Athlete in pink training set stretching before a workout" width="600" height="800"></div>
+          <div class="nl__body">
+            <div class="popup-stack">
+              <h2 class="popup-title" id="nl-title"><span class="accent">Get 15% Off</span> Your First Order</h2>
+              <p class="popup-text nl__text" id="nl-text">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+            </div>
+            <form class="nl__form" action="#" novalidate>
+              <div class="field">
+                <label class="field__label" for="nl-email">Email</label>
+                <input class="field__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="name@example.com" required>
+              </div>
+              <label class="choice choice--top"><input type="checkbox" name="contact[accepts_marketing]" required><span>I agree to get emails from Efitco. No spam. Unsubscribe anytime.</span></label>
+              <button class="button button--full" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button>
+              <div class="nl__links"><button class="link-button" type="button">No, thanks</button><a class="link-button" href="#">Privacy policy</a></div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 2. Before you leave: giỏ có hàng ===== -->
+  <section class="demo-block" aria-labelledby="b2">
+    <h2 id="b2">2. Before You Leave: Cart Has Items</h2>
+    <p class="demo-note">Desktop: chuột rời mép trên cửa sổ sau ≥ 15 s trên trang. Mobile (setting, mặc định tắt): cuộn ngược nhanh lên đầu trang sau khi đã cuộn ≥ 50%; không chặn nút Back. Dữ liệu giỏ thật (2 dòng demo-data). Mobile chỉ hiện 1 dòng + "1 more item".</p>
+    <div class="popup-stage" role="group" aria-label="Before you leave popup with saved cart">
+      <div class="stage-page" inert>
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
+        <div class="stage-hero"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
+      </div>
+      <div class="scrim"></div>
+      <div class="dialog byl" role="dialog" aria-modal="true" aria-labelledby="byl-title" aria-describedby="byl-text">
+        <button class="close-button dialog__close" type="button" aria-label="Close and keep shopping"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+        <div class="byl__head">
+          <p class="eyebrow">Before You Go</p>
+          <h2 class="popup-title" id="byl-title">Your Cart Is Saved</h2>
+          <p class="popup-text byl__text" id="byl-text">Your 2 items are still in your cart. Check out in a few steps.</p>
+        </div>
+        <ul class="byl__lines" aria-label="Items in your cart">
+          <li class="byl__line">
+            <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="128" height="128"></div>
+            <div><a class="byl__name" href="#">Ativafit Lava 66 lb Adjustable</a><p class="byl__meta">Black · Qty 1</p></div>
+            <p class="byl__price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s>$499.99</s></p>
+          </li>
+          <li class="byl__line">
+            <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="128" height="128"></div>
+            <div><a class="byl__name" href="#">Iron Core Kettlebell 16 kg</a><p class="byl__meta">Black · Qty 1</p></div>
+            <p class="byl__price">$119.00</p>
+          </li>
+        </ul>
+        <p class="byl__more byl__more--mobile"><a class="text-link" href="#">View 1 more item in your cart</a></p>
+        <p class="byl__total"><span>Subtotal</span><span>$498.99</span></p>
+        <div class="dialog__actions">
+          <button class="link-button" type="button">Keep shopping</button>
+          <a class="button" href="#">Check Out Now</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 3. Before you leave: giỏ rỗng, có mã ===== -->
+  <section class="demo-block" aria-labelledby="b3">
+    <h2 id="b3">3. Before You Leave: Empty Cart With Code</h2>
+    <p class="demo-note">Chỉ hiện khi merchant nhập mã ưu đãi. Giỏ rỗng và không có mã: không mở popup. KHÔNG CHẮC: demo-data không có mã giảm giá, WELCOME15 là mã mẫu (ES1-T273).</p>
+    <div class="popup-stage" role="group" aria-label="Before you leave popup with discount code">
+      <div class="stage-page" inert>
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
+        <div class="stage-hero"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
+      </div>
+      <div class="scrim"></div>
+      <div class="dialog byl" role="dialog" aria-modal="true" aria-labelledby="byl2-title" aria-describedby="byl2-text">
+        <button class="close-button dialog__close" type="button" aria-label="Close discount popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+        <div class="byl__head">
+          <p class="eyebrow">Before You Go</p>
+          <h2 class="popup-title" id="byl2-title"><span class="accent">Take 15% Off</span> Your First Order</h2>
+          <p class="popup-text" id="byl2-text">Use this code at checkout on your first order.</p>
+        </div>
+        <div class="code">
+          <p><span class="code__label">Your code</span><span class="code__value" id="code-1">WELCOME15</span></p>
+          <button class="button button--secondary code__copy" type="button" aria-describedby="code-1"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy Code</button>
+        </div>
+        <p class="code__status" role="status"></p>
+        <div class="dialog__actions">
+          <button class="link-button" type="button">No, thanks</button>
+          <a class="button" href="#">Shop All Equipment</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 4. Big offer ===== -->
+  <section class="demo-block" aria-labelledby="b4">
+    <h2 id="b4">4. Big Offer Popup</h2>
+    <p class="demo-note">Nút "Big Offer" nổi góc dưới trái, hiện sau khi cuộn 25% (không có lúc tải trang). Desktop có chuột: rê vào 150 ms mở thẻ ưu đãi không modal, rời chuột 300 ms mới đóng; bấm/Enter cũng mở. Mobile, tablet cảm ứng: chạm mở bottom sheet. Dữ liệu: deal Figma 1:759 (figma-ativafit-lava-featured, $379.99 / $499.99, đếm ngược của khối featured product).</p>
+    <p class="demo-label">Đóng (teaser)</p>
+    <div class="popup-stage popup-stage--short" role="group" aria-label="Big offer button closed">
+      <div class="stage-page" inert>
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
+      </div>
+      <div class="offer-teaser">
+        <button class="offer-teaser__open" type="button" aria-expanded="false" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></button>
+        <button class="offer-teaser__hide" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+    </div>
+    <p class="demo-label" style="margin-block-start: var(--space-5)">Mở (rê chuột / chạm)</p>
+    <div class="popup-stage" role="group" aria-label="Big offer card open">
+      <div class="stage-page" inert>
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
+        <div class="stage-hero"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
+      </div>
+      <div class="offer-teaser">
+        <button class="offer-teaser__open is-hover" type="button" aria-expanded="true" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></button>
+        <button class="offer-teaser__hide" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="scrim offer-scrim"></div>
+      <div class="offer-card" id="offer-card" role="dialog" aria-labelledby="offer-title">
+        <div class="offer-card__head">
+          <p class="eyebrow">Big Offer</p>
+          <button class="close-button" type="button" aria-label="Close big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+        </div>
+        <div class="offer-product">
+          <span class="offer-product__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="" width="240" height="240"><span class="badge badge--sale">-24%<span class="visually-hidden"> off</span></span></span>
+          <div class="offer-product__info">
+            <h2 class="offer-product__title" id="offer-title">Ativafit Lava 66 lb Adjustable</h2>
+            <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><span class="price__compare">$499.99</span></p>
+            <p class="offer-product__save">You save $120.00</p>
+          </div>
+        </div>
+        <div class="offer-countdown" role="timer" aria-label="Sale ends in 22 hours 36 minutes 28 seconds"><span aria-hidden="true">Sale ends in</span><span class="offer-countdown__cells" aria-hidden="true"><b>22</b>:<b>36</b>:<b>28</b></span></div>
+        <a class="button button--full" href="#">Shop The Deal</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 5. Trạng thái: lỗi, thành công, đã đăng ký, đã copy, đang tải, rỗng ===== -->
+  <section class="demo-block" aria-labelledby="b5">
+    <h2 id="b5">5. States</h2>
+    <p class="demo-note">Nội dung thay trong cùng popup, không mở popup mới. Lỗi hiện khi rời ô hoặc khi bấm gửi; thành công thay nội dung form và giữ nút đóng.</p>
+    <div class="state-grid">
+      <div>
+        <p class="demo-label">Newsletter · email sai</p>
+        <div class="state-card">
+          <div class="field">
+            <label class="field__label" for="s-email-1">Email</label>
+            <input class="field__input" id="s-email-1" type="email" value="mike@gmail" autocomplete="email" aria-invalid="true" aria-describedby="s-email-1-err">
+            <p class="field__error" id="s-email-1-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Please enter a valid email, like name@example.com.</p>
+          </div>
+          <button class="button button--full" type="button"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Newsletter · chưa đồng ý nhận tin</p>
+        <div class="state-card">
+          <div class="field">
+            <label class="field__label" for="s-email-2">Email</label>
+            <input class="field__input" id="s-email-2" type="email" value="mike.ross@gmail.com" autocomplete="email">
+          </div>
+          <div>
+            <label class="choice choice--top is-invalid"><input type="checkbox" aria-invalid="true" aria-describedby="s-consent-err"><span>I agree to get emails from Efitco. No spam. Unsubscribe anytime.</span></label>
+            <p class="field__error" id="s-consent-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Tick the box to agree to emails, then try again.</p>
+          </div>
+          <button class="button button--full" type="button"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Newsletter · đang gửi</p>
+        <div class="state-card" aria-busy="true">
+          <div class="field">
+            <label class="field__label" for="s-email-3">Email</label>
+            <input class="field__input" id="s-email-3" type="email" value="mike.ross@gmail.com" readonly>
+          </div>
+          <button class="button button--full" type="button" aria-busy="true"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button>
+          <p class="visually-hidden" role="status">Signing you up…</p>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Newsletter · thành công</p>
+        <div class="state-card" role="status">
+          <button class="close-button" type="button" aria-label="Close newsletter popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          <span class="result-icon result-icon--success"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
+          <h3 class="popup-title">You're On The List</h3>
+          <p class="popup-text">Thanks for subscribing. Your 15% code is on its way to mike.ross@gmail.com.</p>
+          <button class="button button--full" type="button">Continue Shopping</button>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Newsletter · email đã đăng ký</p>
+        <div class="state-card" role="status">
+          <button class="close-button" type="button" aria-label="Close newsletter popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          <span class="result-icon result-icon--info"><svg aria-hidden="true"><use href="#i-info"/></svg></span>
+          <h3 class="popup-title">You're Already Subscribed</h3>
+          <p class="popup-text">This email is already on our list. Look for your 15% code in your inbox.</p>
+          <button class="button button--full" type="button">Continue Shopping</button>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Newsletter · lỗi gửi (mạng, server)</p>
+        <div class="state-card">
+          <div class="form-message form-message--error" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div><strong>We couldn't sign you up</strong>Check your connection, then try again.</div></div>
+          <div class="field">
+            <label class="field__label" for="s-email-4">Email</label>
+            <input class="field__input" id="s-email-4" type="email" value="mike.ross@gmail.com" autocomplete="email">
+          </div>
+          <button class="button button--full" type="button"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Mã ưu đãi · đã copy</p>
+        <div class="state-card">
+          <div>
+            <div class="code">
+              <p><span class="code__label">Your code</span><span class="code__value" id="code-2">WELCOME15</span></p>
+              <button class="button button--secondary code__copy is-copied" type="button" aria-describedby="code-2"><svg aria-hidden="true"><use href="#i-tick"/></svg>Copied</button>
+            </div>
+            <p class="code__status" role="status"><svg aria-hidden="true"><use href="#i-check"/></svg>Code copied. Paste it at checkout.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Mã ưu đãi · trình duyệt chặn copy</p>
+        <div class="state-card">
+          <div>
+            <div class="code">
+              <p><span class="code__label">Your code</span><span class="code__value is-selected" id="code-3">WELCOME15</span></p>
+              <button class="button button--secondary code__copy" type="button" aria-describedby="code-3"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy Code</button>
+            </div>
+            <p class="field__hint" role="status" style="margin-block-start: var(--space-2)">We selected the code for you. Press Ctrl+C or Cmd+C to copy it.</p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Before you leave · giỏ ≥ 3 dòng (desktop)</p>
+        <div class="state-card">
+          <ul class="byl__lines" aria-label="Items in your cart" style="display:block">
+            <li class="byl__line" style="display:grid">
+              <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="128" height="128"></div>
+              <div><a class="byl__name" href="#">Ativafit Lava 66 lb Adjustable</a><p class="byl__meta">Black · Qty 1</p></div>
+              <p class="byl__price"><span class="price__sale">$379.99</span><s>$499.99</s></p>
+            </li>
+            <li class="byl__line" style="display:grid">
+              <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="128" height="128"></div>
+              <div><a class="byl__name" href="#">Iron Core Kettlebell 16 kg</a><p class="byl__meta">Black · Qty 1</p></div>
+              <p class="byl__price">$119.00</p>
+            </li>
+          </ul>
+          <p class="byl__more" style="margin:0"><a class="text-link" href="#">View 1 more item in your cart</a></p>
+          <p class="byl__total" style="margin:0"><span>Subtotal</span><span>$532.99</span></p>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Big offer · sản phẩm không có ảnh</p>
+        <div class="state-card">
+          <div class="offer-product">
+            <span class="offer-product__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span>
+            <div class="offer-product__info">
+              <h3 class="offer-product__title">Sản phẩm không có media</h3>
+              <p class="price"><span>$34.00</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Big offer · ảnh đang tải</p>
+        <div class="state-card">
+          <div class="offer-product">
+            <span class="offer-product__media skeleton" aria-hidden="true"></span>
+            <div class="offer-product__info">
+              <h3 class="offer-product__title">Ativafit Lava 66 lb Adjustable</h3>
+              <p class="price"><span class="price__sale">$379.99</span><span class="price__compare">$499.99</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="demo-label">Rỗng · không hiện</p>
+        <div class="note-card">
+          <strong>No popup is rendered</strong>
+          <span>Before you leave: cart empty and no code. Big offer: product sold out, no compare-at price, or countdown ended. Newsletter: shopper already subscribed, closed it in the last 7 days, or page is 404, cart, password.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
