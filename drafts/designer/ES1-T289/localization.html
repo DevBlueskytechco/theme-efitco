@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Country and language – Efitco</title>
+<meta name="description" content="Choose the country you ship to and the language of the Efitco store from one button in the footer.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* ES1-T289 · Localization. Chỉ CSS riêng; phần chung ở ../_kit/kit.css */
+  .site-header.demo-static { position: relative; }
+  .page-stub { padding-block: var(--space-7); }
+
+  /* ---------- Trigger (Figma 1:1104: cờ 26 + USD / EN + chevron) ---------- */
+  .loc-trigger { list-style: none; }
+  .loc-trigger::-webkit-details-marker { display: none; }
+  .site-footer__locale > svg:last-child { transition: rotate var(--motion-base) var(--ease-out); }
+  .loc[open] .site-footer__locale > svg:last-child, .site-footer__locale.is-open > svg:last-child { rotate: 180deg; }
+  .site-footer__locale:hover .loc-trigger__text, .site-footer__locale.is-hover .loc-trigger__text { text-decoration: underline; text-underline-offset: 0.2em; }
+  .site-footer__locale.is-focus { outline: 2px solid var(--color-background-dark-foreground); outline-offset: 2px; }
+  .site-footer__end { position: relative; }
+
+  /* ---------- Popover ≥ 48rem (spec §4.2) ---------- */
+  .loc__panel { position: absolute; inset-block-end: calc(100% + var(--space-2)); inset-inline-start: 50%; z-index: 5; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-5); width: calc(var(--space-1) * 150); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); font-size: var(--font-size-base); font-weight: 400; text-align: start; translate: -50% 0; }
+  .loc__panel--one { grid-template-columns: minmax(0, 1fr); width: calc(var(--space-1) * 80); }
+  @media (min-width: 64rem) { .loc__panel { inset-inline: auto 0; translate: none; } }
+  @media (max-width: 47.99rem) { .site-footer .loc__panel { display: none; } }
+  .loc__panel--static { position: static; translate: none; box-shadow: var(--shadow-raised); }
+  @media (max-width: 47.99rem) { .loc__panel--static { grid-template-columns: minmax(0, 1fr); width: 100%; } }
+
+  .loc__group { display: grid; align-content: start; gap: var(--space-3); min-width: 0; }
+  .loc__label { margin: 0; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: 0.04em; line-height: 20px; text-transform: uppercase; }
+
+  .loc__search { position: relative; }
+  .loc__search > svg { position: absolute; inset-block-start: 50%; inset-inline-start: var(--space-3); width: 20px; height: 20px; color: var(--color-muted); translate: 0 -50%; pointer-events: none; }
+  .loc__search .field__input { min-height: 44px; padding-inline: calc(var(--space-1) * 10) 44px; }
+  .loc__clear { position: absolute; inset-block: 0; inset-inline-end: 0; display: inline-flex; align-items: center; justify-content: center; width: 44px; padding: 0; border: 0; background: none; color: var(--color-muted); cursor: pointer; }
+  .loc__clear svg { width: 16px; height: 16px; }
+
+  .loc__list { position: relative; display: grid; gap: 0; max-height: calc(var(--space-1) * 80); margin: 0; padding: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; }
+  .loc__option { display: flex; align-items: center; gap: var(--space-2); width: 100%; min-height: 44px; padding: var(--space-2) var(--space-3); border: 0; border-radius: var(--radius-input); background: none; color: var(--color-foreground); font-size: var(--font-size-base); line-height: 1.5; text-align: start; cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out); }
+  .loc__option:hover, .loc__option.is-hover { background: var(--color-background-alt); }
+  .loc__option:focus-visible, .loc__option.is-focus { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+  .loc__option[aria-current='true'] { background: var(--color-background-alt); font-weight: 600; }
+  .loc__option[aria-disabled='true'] { color: var(--color-muted-light); cursor: not-allowed; }
+  .loc__option[aria-disabled='true'] .loc__meta { color: var(--color-muted-light); }
+  .loc__check { flex: none; width: 16px; height: 16px; visibility: hidden; }
+  .loc__option[aria-current='true'] .loc__check { visibility: visible; }
+  .loc__name { flex: 1; min-width: 0; }
+  .loc__name b { font-weight: 600; }
+  .loc__meta { flex: none; align-self: flex-start; padding-block-start: 2px; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+  .loc__spinner { flex: none; width: 16px; height: 16px; border: 2px solid var(--color-border); border-block-start-color: var(--color-foreground); border-radius: 50%; animation: kit-spin 700ms linear infinite; }
+
+  .loc__empty { display: grid; justify-items: center; gap: var(--space-2); min-height: calc(var(--space-1) * 50); align-content: center; padding: var(--space-4); color: var(--color-muted); font-size: var(--font-size-sm); text-align: center; }
+  .loc__empty > svg { width: 24px; height: 24px; color: var(--color-muted-light); }
+  .loc__empty .text-link { display: inline-flex; align-items: center; min-height: 44px; border: 0; background: none; color: var(--color-foreground); font-size: var(--font-size-sm); cursor: pointer; }
+
+  .loc .alert { padding: var(--space-3) var(--space-4); }
+  .loc .alert > svg { width: 20px; height: 20px; }
+  .alert .button { justify-self: start; min-height: 44px; padding-inline: var(--space-5); }
+
+  /* ---------- Bottom sheet < 48rem (spec §4.3) ---------- */
+  .site-footer { position: relative; }
+  .loc-scrim { position: absolute; inset: 0; z-index: 6; background: var(--overlay-scrim); }
+  .loc-sheet { position: absolute; inset-inline: 0; inset-block-end: 0; z-index: 7; display: flex; flex-direction: column; gap: var(--space-4); height: 704px; padding: var(--space-6) var(--space-4) var(--space-5); border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); text-align: start; }
+  .loc-sheet::before { content: ''; position: absolute; inset-block-start: var(--space-2); inset-inline-start: calc(50% - 20px); width: 40px; height: 4px; border-radius: 2px; background: var(--color-border); }
+  .loc-sheet .dialog__title { margin: 0; padding-inline-end: calc(var(--space-1) * 14); }
+  .loc-sheet .dialog__close { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); }
+  .loc-sheet .loc__search .field__input { min-height: 48px; }
+  .loc-sheet .loc__list { flex: 1; max-height: none; }
+  .loc-sheet .loc__option { min-height: 48px; }
+  .loc-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
+  .loc-tabs .tab { justify-content: center; padding-inline: var(--space-3); }
+  @media (min-width: 48rem) { .site-footer .loc-scrim, .site-footer .loc-sheet { display: none; } }
+  .loc-sheet--static { position: relative; height: 640px; }
+  .loc-sheet--short { height: auto; }
+
+  /* ---------- Drawer menu (spec §4.4) ---------- */
+  .drawer-stage { position: relative; overflow: hidden; width: 360px; max-width: 100%; height: 680px; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background-dark) var(--dark-texture); }
+  .drawer-stage .scrim, .drawer-stage .drawer { position: absolute; }
+  .drawer-stage .drawer { width: 90%; }
+  .drawer-loc { display: flex; align-items: center; gap: var(--space-2); min-height: 52px; padding-inline: var(--space-4); border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); background: none; font-size: var(--font-size-base); font-weight: 500; cursor: pointer; }
+  .drawer-loc .flag { width: 20px; height: 20px; }
+  .drawer-loc > span { flex: 1; text-align: start; }
+  .drawer-loc > svg:last-child { width: 12px; height: 7px; color: var(--color-muted); rotate: -90deg; }
+  .drawer-account { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; font-weight: 500; text-decoration: none; }
+  .drawer-account svg { width: 24px; height: 24px; }
+  .level2__top { display: flex; align-items: center; justify-content: space-between; min-height: 72px; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5); border-block-end: 1px solid var(--color-border); }
+  .level2__body { display: flex; flex: 1; flex-direction: column; gap: var(--space-4); min-height: 0; padding: var(--space-4) var(--space-5) var(--space-5); }
+  .level2__body h2 { font-size: var(--font-size-h2); font-weight: var(--font-heading--weight-display); text-transform: uppercase; }
+  .level2__body .loc__list { flex: 1; max-height: none; }
+  .level2__body .loc__option { min-height: 48px; }
+
+  /* ---------- States layout ---------- */
+  .demo-states { padding-block: var(--space-7); }
+  .state-grid { display: grid; gap: var(--space-6); align-items: start; }
+  @media (min-width: 48rem) { .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stage-light { padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background-alt); }
+  .stage-dark { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); padding: var(--space-4) var(--space-5); border-radius: var(--radius-card); background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); }
+  .stage-dark .demo-label { width: 100%; margin: 0; color: var(--color-muted-on-dark); }
+  .stage-dark :focus-visible { outline-color: var(--color-background-dark-foreground); }
+  .stage-stack { display: grid; gap: var(--space-3); }
+  .phone-stage { position: relative; overflow: hidden; width: 360px; max-width: 100%; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--overlay-scrim); padding-block-start: var(--space-7); }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 16 16"><path d="m2.5 8.5 3.5 3.5 7.5-8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 20 20"><path d="m4 4 12 12M16 4 4 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
+  <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 28 28"><path d="M16 4v13.5a4.2 4.2 0 1 1-4.2-4.2M16 4c.4 3 2.4 5 5.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="20" height="20" rx="5"/><circle cx="14" cy="14" r="4.5"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="6.5" width="22" height="15" rx="4"/><path d="m12 11 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 28 28"><path d="M16.5 4.5h-2a4 4 0 0 0-4 4v3H8v3.5h2.5v8.5H14V15h3l.5-3.5H14V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<a class="visually-hidden" href="#main">Skip to content</a>
+
+<header class="site-header demo-static">
+  <div class="site-header__inner">
+    <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+    <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+    <nav class="site-header__nav" aria-label="Main">
+      <ul class="site-header__menu">
+        <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Sale</a></li>
+        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Blog</a></li>
+        <li><a class="site-header__link" href="#">Contact</a></li>
+        <li><a class="site-header__link" href="#">Help</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__icons">
+      <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="container page-stub">
+    <p class="demo-label">ES1-T289 · Localization · cuối trang: footer Figma 1:1104, bảng đang mở (≥ 768 popover, 360 bottom sheet)</p>
+    <h1 class="visually-hidden">Country and language selector</h1>
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container site-footer__band">
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
+    <div class="site-footer__newsletter">
+      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+    </div>
+    <form class="site-footer__form" action="#" method="post" novalidate>
+      <label class="visually-hidden" for="nl-email">Email</label>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+  <div class="site-footer__panel">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <svg class="site-footer__logo" viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+        <ul class="site-footer__social">
+          <li><a href="#" aria-label="Efitco on TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        </ul>
+      </div>
+      <div class="site-footer__menus">
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
+    </div>
+    <ul class="site-footer__trust">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© 2026 Efitco, Powered by Shopify</p>
+    <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
+    <div class="site-footer__end">
+      <form action="#" method="post" class="loc-form">
+        <details class="loc" open>
+          <summary class="site-footer__locale loc-trigger" data-testid="footer-localization-toggle"><span class="visually-hidden">Change country and language: </span><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">USD / EN</span><span class="visually-hidden">, United States, English</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
+          <div class="loc__panel" data-testid="footer-localization-panel">
+            <div class="loc__group" data-testid="footer-country-selector">
+              <label class="loc__label" for="loc-search" id="loc-country-label">Country/region</label>
+              <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="loc-search" type="search" placeholder="Search countries" autocomplete="off" aria-controls="loc-countries" aria-describedby="loc-status" data-testid="footer-country-search"></div>
+              <p class="visually-hidden" id="loc-status" role="status" data-testid="footer-country-status">18 countries</p>
+              <ul class="loc__list" id="loc-countries" aria-labelledby="loc-country-label" data-scroll-current>
+                <li><button class="loc__option" type="submit" name="country_code" value="AU" data-testid="footer-country-option"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="AT"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="BE"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="CA"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="DK"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Denmark</span><span class="loc__meta">DKK kr.</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="FR"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">France</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="DE"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Germany</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="IE"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Ireland</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="IT"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Italy</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="JP"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Japan</span><span class="loc__meta">JPY ¥</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="NL"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Netherlands</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="NZ"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">New Zealand</span><span class="loc__meta">NZD $</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="SG"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Singapore</span><span class="loc__meta">SGD $</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="ES"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Spain</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="SE"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Sweden</span><span class="loc__meta">SEK kr</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="GB"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="US" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+                <li><button class="loc__option" type="submit" name="country_code" value="VN"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Vietnam</span><span class="loc__meta">VND ₫</span></button></li>
+              </ul>
+            </div>
+            <div class="loc__group" data-testid="footer-language-selector">
+              <p class="loc__label" id="loc-language-label">Language</p>
+              <ul class="loc__list" aria-labelledby="loc-language-label">
+                <li><button class="loc__option" type="submit" name="language_code" value="en" lang="en" aria-current="true" data-testid="footer-language-option"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">English</span></button></li>
+                <li><button class="loc__option" type="submit" name="language_code" value="fr" lang="fr"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Français</span></button></li>
+                <li><button class="loc__option" type="submit" name="language_code" value="de" lang="de"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Deutsch</span></button></li>
+                <li><button class="loc__option" type="submit" name="language_code" value="es" lang="es"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Español</span></button></li>
+                <li><button class="loc__option" type="submit" name="language_code" value="vi" lang="vi"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Tiếng Việt</span></button></li>
+              </ul>
+            </div>
+          </div>
+        </details>
+      </form>
+      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
+    </div>
+  </div>
+
+  <!-- < 48rem: bottom sheet thay popover (spec §4.3). Tab Country/region đang chọn -->
+  <div class="loc-scrim" aria-hidden="true"></div>
+  <div class="loc-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <h2 class="dialog__title" id="sheet-title">Country and language</h2>
+    <button class="close-button dialog__close" type="button" aria-label="Close country and language"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+    <div class="loc-tabs" role="tablist" aria-label="Country and language">
+      <button class="tab" type="button" role="tab" aria-selected="true" id="tab-country" aria-controls="panel-country">Country/region</button>
+      <button class="tab" type="button" role="tab" aria-selected="false" id="tab-language" aria-controls="panel-language" tabindex="-1">Language</button>
+    </div>
+    <div class="loc__group" role="tabpanel" id="panel-country" aria-labelledby="tab-country" style="flex:1;min-height:0;display:flex;flex-direction:column">
+      <label class="visually-hidden" for="sheet-search">Search countries</label>
+      <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="sheet-search" type="search" placeholder="Search countries" autocomplete="off" aria-controls="sheet-countries"></div>
+      <ul class="loc__list" id="sheet-countries" aria-label="Countries" data-scroll-current style="flex:1;margin-block-start:var(--space-2)">
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Denmark</span><span class="loc__meta">DKK kr.</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">France</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Germany</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Ireland</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Italy</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Japan</span><span class="loc__meta">JPY ¥</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Netherlands</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">New Zealand</span><span class="loc__meta">NZD $</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Singapore</span><span class="loc__meta">SGD $</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Spain</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Sweden</span><span class="loc__meta">SEK kr</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
+        <li><button class="loc__option" type="button" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Vietnam</span><span class="loc__meta">VND ₫</span></button></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== TRẠNG THÁI (spec §6) ===================== -->
+<section class="demo-states container" aria-labelledby="states-title">
+  <p class="demo-label">ES1-T289 · Localization · trạng thái</p>
+  <h2 id="states-title" class="visually-hidden">Localization states</h2>
+
+  <div class="demo-block">
+    <h2>L1–L3 · Rỗng, chỉ nhiều nước, chỉ nhiều ngôn ngữ</h2>
+    <p class="demo-note">L1 (AC5): 1 nước + 1 ngôn ngữ thì không nút, không form; drawer menu không có hàng gộp. L2: ≤ 10 nước, không ô tìm, popover 320 một cột, nút chỉ "USD". L3: chỉ ngôn ngữ, nút "EN" (cờ là nước hiện tại).</p>
+    <div class="state-grid">
+      <div class="stage-stack">
+        <div class="stage-dark"><p class="demo-label">L1 · Rỗng: chỉ icon thanh toán</p><ul class="payment-icons" aria-label="Payment methods, sample L1"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul></div>
+        <div class="stage-dark"><p class="demo-label">L2 · Trigger chỉ tiền tệ</p><button class="site-footer__locale is-open" type="button" aria-label="Change country: USD, United States, sample L2"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">USD</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
+        <div class="loc__panel loc__panel--static loc__panel--one">
+          <div class="loc__group">
+            <p class="loc__label" id="l2-label">Country/region</p>
+            <ul class="loc__list" aria-labelledby="l2-label">
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
+              <li><button class="loc__option" type="button" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="stage-stack">
+        <div class="stage-dark"><p class="demo-label">L3 · Trigger chỉ ngôn ngữ</p><button class="site-footer__locale is-open" type="button" aria-label="Change language: EN, English, sample L3"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">EN</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
+        <div class="loc__panel loc__panel--static loc__panel--one">
+          <div class="loc__group">
+            <p class="loc__label" id="l3-label">Language</p>
+            <ul class="loc__list" aria-labelledby="l3-label">
+              <li><button class="loc__option" type="button" lang="en" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">English</span></button></li>
+              <li><button class="loc__option" type="button" lang="fr"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Français</span></button></li>
+              <li><button class="loc__option" type="button" lang="vi"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Tiếng Việt</span></button></li>
+              <li><button class="loc__option" type="button" lang="ar" dir="auto"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">العربية</span></button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-block">
+    <h2>L5–L6 · Đang lọc, không kết quả</h2>
+    <p class="demo-note">Gõ lọc theo tên và mã tiền tệ, không phân biệt dấu; phần khớp đậm 600; status đọc "3 countries found". ↓ vào mục đầu, Enter chọn, Esc xoá chữ. Không kết quả: giữ chiều cao danh sách, gợi ý xoá tìm.</p>
+    <div class="state-grid">
+      <div class="loc__panel loc__panel--static loc__panel--one">
+        <div class="loc__group">
+          <label class="loc__label" for="l5-search" id="l5-label">Country/region</label>
+          <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input is-focus" id="l5-search" type="search" value="land" autocomplete="off"><button class="loc__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+          <p class="visually-hidden" role="status">3 countries found</p>
+          <ul class="loc__list" aria-labelledby="l5-label">
+            <li><button class="loc__option is-hover" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Ire<b>land</b></span><span class="loc__meta">EUR €</span></button></li>
+            <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Nether<b>land</b>s</span><span class="loc__meta">EUR €</span></button></li>
+            <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">New Zea<b>land</b></span><span class="loc__meta">NZD $</span></button></li>
+          </ul>
+        </div>
+      </div>
+      <div class="loc__panel loc__panel--static loc__panel--one">
+        <div class="loc__group">
+          <label class="loc__label" for="l6-search">Country/region</label>
+          <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="l6-search" type="search" value="brazil" autocomplete="off"><button class="loc__clear" type="button" aria-label="Clear search, sample L6"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+          <div class="loc__empty" role="status"><svg aria-hidden="true"><use href="#i-search"/></svg><p>No countries match “brazil”. Check the spelling or clear the search.</p><button class="text-link" type="button">Clear search</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-block">
+    <h2>L7–L8 · Trigger và hàng: các trạng thái</h2>
+    <p class="demo-note">Trigger trên footer tối: hover gạch chân chữ, focus outline trắng, mở chevron xoay 180°. Hàng: hover nền alt, focus outline cam inset, hiện tại ✓ + 600 + nền alt, disabled chữ muted-light (khi đang đổi).</p>
+    <div class="state-grid">
+      <div class="stage-dark">
+        <p class="demo-label">L7 · Default · Hover · Focus · Mở</p>
+        <button class="site-footer__locale" type="button" aria-label="Change country and language: USD / EN, sample default"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">USD / EN</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+        <button class="site-footer__locale is-hover" type="button" aria-label="Change country and language: USD / EN, sample hover"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">USD / EN</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+        <button class="site-footer__locale is-focus" type="button" aria-label="Change country and language: USD / EN, sample focus"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">USD / EN</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+        <button class="site-footer__locale is-open" type="button" aria-expanded="true" aria-label="Change country and language: USD / EN, sample open"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">USD / EN</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      </div>
+      <div class="loc__panel loc__panel--static loc__panel--one">
+        <div class="loc__group">
+          <p class="loc__label" id="l8-label">L8 · Hàng</p>
+          <ul class="loc__list" aria-labelledby="l8-label">
+            <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada · default</span><span class="loc__meta">CAD $</span></button></li>
+            <li><button class="loc__option is-hover" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Denmark · hover</span><span class="loc__meta">DKK kr.</span></button></li>
+            <li><button class="loc__option is-focus" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">France · focus</span><span class="loc__meta">EUR €</span></button></li>
+            <li><button class="loc__option" type="button" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States · current</span><span class="loc__meta">USD $</span></button></li>
+            <li><button class="loc__option" type="button" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Vietnam · disabled</span><span class="loc__meta">VND ₫</span></button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-block">
+    <h2>L9–L11 · Đang đổi, lỗi, tên dài</h2>
+    <p class="demo-note">L9: bấm Canada → spinner thay tiền tệ (chỉ khi > 300 ms), hàng khác aria-disabled, bảng aria-busy; Shopify chuyển trang xong là hết. L10: chỉ khi BE gửi bằng fetch và lỗi mạng; alert trên danh sách, nút "Try Again" gửi lại. L11: tên dài xuống 2 dòng.</p>
+    <div class="state-grid">
+      <div class="loc__panel loc__panel--static loc__panel--one" aria-busy="true">
+        <div class="loc__group">
+          <p class="loc__label" id="l9-label">Country/region</p>
+          <ul class="loc__list" aria-labelledby="l9-label">
+            <li><button class="loc__option" type="button" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+            <li><button class="loc__option is-hover" type="button" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name" style="color:var(--color-foreground)">Canada</span><span class="loc__spinner" aria-hidden="true"></span><span class="visually-hidden">Switching to Canada</span></button></li>
+            <li><button class="loc__option" type="button" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
+            <li><button class="loc__option" type="button" aria-current="true" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+          </ul>
+        </div>
+      </div>
+      <div class="stage-stack">
+        <div class="loc__panel loc__panel--static loc__panel--one">
+          <div class="loc__group">
+            <div class="alert" role="alert" data-testid="footer-localization-error"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><p>We couldn't switch to Canada. Check your connection and try again.</p><button class="button button--secondary" type="button">Try Again</button></div></div>
+            <p class="loc__label" id="l10-label">Country/region</p>
+            <ul class="loc__list" aria-labelledby="l10-label">
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+              <li><button class="loc__option" type="button" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+            </ul>
+          </div>
+        </div>
+        <div class="loc__panel loc__panel--static loc__panel--one">
+          <div class="loc__group">
+            <p class="loc__label" id="l11-label">L11 · Tên dài</p>
+            <ul class="loc__list" aria-labelledby="l11-label">
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Saint Vincent &amp; Grenadines</span><span class="loc__meta">XCD $</span></button></li>
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Bosnia &amp; Herzegovina</span><span class="loc__meta">BAM KM</span></button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-block">
+    <h2>Drawer menu &lt; 1280 · Sheet tab Language</h2>
+    <p class="demo-note">Chân drawer: 1 hàng gộp thay 2 nút Currency / Language (đề xuất trỏ navigation.md §5.3). Chạm hàng → cấp 2 trượt vào trong drawer (Back + ×), cùng nội dung sheet; không mở sheet chồng drawer. Sheet tab Language: danh sách ngắn, sheet giữ cao 88dvh khi có ô tìm để không nhảy khi đổi tab.</p>
+    <div class="state-grid">
+      <div class="drawer-stage">
+        <div class="scrim" aria-hidden="true"></div>
+        <div class="drawer drawer--start" role="dialog" aria-modal="true" aria-labelledby="dr1-title">
+          <div class="overlay__header"><h2 class="overlay__title" id="dr1-title">Menu</h2><button class="close-button" type="button" aria-label="Close menu"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+          <div class="overlay__body">
+            <ul class="drawer-menu">
+              <li><a href="#">Shop <svg width="12" height="7" aria-hidden="true" style="rotate:-90deg"><use href="#i-chevron"/></svg></a></li>
+              <li><a href="#">Collection <svg width="12" height="7" aria-hidden="true" style="rotate:-90deg"><use href="#i-chevron"/></svg></a></li>
+              <li><a href="#">Sale</a></li>
+              <li><a href="#">Our Story</a></li>
+              <li><a href="#">Blog</a></li>
+            </ul>
+          </div>
+          <div class="overlay__footer">
+            <a class="drawer-account" href="#"><svg aria-hidden="true"><use href="#i-user"/></svg>Sign In</a>
+            <button class="drawer-loc" type="button" data-testid="header-drawer-localization" aria-label="Change country and language: USD / EN, United States, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span>USD / EN</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="drawer-stage">
+        <div class="scrim" aria-hidden="true"></div>
+        <div class="drawer drawer--start" role="dialog" aria-modal="true" aria-labelledby="dr2-title">
+          <div class="level2__top"><button class="back-button" type="button" aria-label="Back to menu"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Back</button><button class="close-button" type="button" aria-label="Close menu, sample level 2"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+          <div class="level2__body">
+            <h2 id="dr2-title">Country and language</h2>
+            <div class="loc-tabs" role="tablist" aria-label="Country and language, drawer">
+              <button class="tab" type="button" role="tab" aria-selected="true">Country/region</button>
+              <button class="tab" type="button" role="tab" aria-selected="false" tabindex="-1">Language</button>
+            </div>
+            <label class="visually-hidden" for="dr-search">Search countries</label>
+            <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="dr-search" type="search" placeholder="Search countries" autocomplete="off"></div>
+            <ul class="loc__list" aria-label="Countries, drawer">
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Denmark</span><span class="loc__meta">DKK kr.</span></button></li>
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">France</span><span class="loc__meta">EUR €</span></button></li>
+              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Germany</span><span class="loc__meta">EUR €</span></button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="phone-stage">
+        <p class="demo-label" style="padding-inline:var(--space-4);color:var(--color-background)">Sheet 360 · tab Language</p>
+        <div class="loc-sheet loc-sheet--static loc-sheet--short" role="dialog" aria-modal="true" aria-labelledby="sheet2-title">
+          <h2 class="dialog__title" id="sheet2-title">Country and language</h2>
+          <button class="close-button dialog__close" type="button" aria-label="Close country and language, sample"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          <div class="loc-tabs" role="tablist" aria-label="Country and language, sample">
+            <button class="tab" type="button" role="tab" aria-selected="false" tabindex="-1">Country/region</button>
+            <button class="tab" type="button" role="tab" aria-selected="true">Language</button>
+          </div>
+          <ul class="loc__list" aria-label="Languages">
+            <li><button class="loc__option" type="button" lang="en" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">English</span></button></li>
+            <li><button class="loc__option" type="button" lang="fr"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Français</span></button></li>
+            <li><button class="loc__option" type="button" lang="de"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Deutsch</span></button></li>
+            <li><button class="loc__option" type="button" lang="es"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Español</span></button></li>
+            <li><button class="loc__option" type="button" lang="vi"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Tiếng Việt</span></button></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script>
+  // Chỉ cho mockup: cuộn danh sách tới mục hiện tại như hành vi mở bảng (spec §5)
+  document.querySelectorAll('[data-scroll-current]').forEach(function (list) {
+    var current = list.querySelector('[aria-current="true"]');
+    if (current) list.scrollTop = current.closest('li').offsetTop - 88;
+  });
+</script>
+</body>
+</html>
