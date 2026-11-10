@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Efitco home — 5 blocks changed at 768 and 360 (ES1-T252)</title>
+<meta name="description" content="Efitco home page mockup, round 3: only the five blocks with a proposed change at 768 and 360. Base is the live store, every other block stays as live.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sofia+Sans+Condensed:wght@700;800&display=swap">
+<style>
+/*
+  ES1-T252 lần 3. Gốc: trang live hoa-qua-nhap-khau (ảnh drafts/designer/ES1-T252/live/<khối>-<w>.png).
+  Chỉ 5 khối có ĐỀ XUẤT; khối khác giữ như live (docs/ui-spec/index.md §2).
+  Màu, cỡ chữ chép từ assets/base.css đang live; không dùng kit.css (ticket lần 3).
+  Mốc: < 48rem = 360, ≥ 48rem = 768. Desktop không thuộc mockup này.
+*/
+:root {
+  --fg: #1a1a1a; --muted: #4d4d4d; --muted-light: #6b6b6b; --border: #e5e5e5;
+  --cream: #f5f5f1; --sand: #ebe6e0; --dark: #1e1e1e; --panel: #393942;
+  --accent: #c8400e; --sale: #bd1616; --rating: #ffc107;
+  --head: 'Sofia Sans Condensed', sans-serif; --body: Inter, sans-serif;
+  --margin: 20px;
+}
+* { box-sizing: border-box; }
+body { margin: 0; font-family: var(--body); font-size: 16px; line-height: 1.625; color: var(--fg); background: #fff; overflow-x: clip; }
+img { display: block; max-width: 100%; }
+h1, h2, h3, p { margin: 0; }
+a { color: inherit; }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.page { padding-inline: var(--margin); }
+
+/* Ghi chú đề xuất trên mỗi khối (chỉ trong mockup) */
+.note { margin: 0; padding: 12px var(--margin); background: #fff4d6; border-block: 1px solid #e8d49a; font-size: 14px; line-height: 1.5; color: var(--fg); }
+.note b { font-weight: 700; }
+
+.eyebrow { font-family: var(--head); font-size: 16px; font-weight: 800; line-height: 1.25; letter-spacing: 0.04em; text-transform: uppercase; color: var(--accent); }
+.h2 { font-family: var(--head); font-weight: 700; font-size: 33px; line-height: 1.1; letter-spacing: -0.02em; }
+.band { padding-block: 48px; }
+.band--cream { background: var(--cream); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 52px; padding: 13px 32px; border: 0; border-radius: 8px; font: 600 16px/26px var(--body); letter-spacing: -0.01em; text-decoration: none; cursor: pointer; }
+.btn--accent { background: var(--accent); color: #fff; }
+.btn--light { background: #e5e5e5; color: var(--fg); }
+.icon { width: 20px; height: 20px; flex: none; }
+.nav-btn { display: inline-grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--border); background: #fff; color: var(--fg); }
+.nav-btn[aria-disabled='true'] { color: #b3b3b3; }
+.progress { position: relative; height: 2px; margin-block-start: 32px; background: var(--border); }
+.progress > span { position: absolute; inset-block: 0; inset-inline-start: 0; width: 33%; background: var(--fg); }
+
+/* ===== 1. Hero (1:422) ===== */
+.hero { position: relative; aspect-ratio: 4 / 5; overflow: hidden; background: var(--dark); color: #fff; }
+.hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 30%; }
+/* ĐỀ XUẤT: overlay_opacity 30 (setting có sẵn); ≥ 80rem lớp này đã display:none trong base.css nên desktop không đổi */
+.hero__overlay { position: absolute; inset: 0; background: color-mix(in srgb, var(--dark) 30%, transparent); }
+.hero__content { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 16px; height: 100%; padding: 24px var(--margin) 64px; text-align: start; }
+.hero__eyebrow { font-family: var(--head); font-weight: 800; font-size: 16px; line-height: 20px; letter-spacing: 0.04em; text-transform: uppercase; }
+.hero__h1 { font-family: var(--head); font-weight: 800; font-size: 48px; line-height: 1; letter-spacing: -0.04em; text-transform: uppercase; }
+.hero__sub { font-weight: 500; font-size: 16px; line-height: 26px; letter-spacing: -0.02em; max-width: 30ch; }
+.hero__content .btn { margin-block-start: 8px; }
+.hero__dots { position: absolute; inset-block-end: 4px; inset-inline: 0; display: flex; justify-content: center; }
+.hero__dot { position: relative; width: 44px; height: 44px; border: 0; padding: 0; background: none; color: #fff; }
+.hero__dot::before { content: ''; position: absolute; inset: 16px; border: 1px solid currentcolor; border-radius: 50%; }
+.hero__dot[aria-current='true']::before { background: currentcolor; }
+.hero__arrow { display: none; }
+
+/* ===== 2. Shop the look (1:560) ===== */
+.stl__head { display: flex; flex-direction: column; gap: 8px; margin-block-end: 24px; }
+.stl__link { display: inline-flex; align-items: center; min-height: 44px; font-weight: 600; text-decoration: none; }
+.stl__media { position: relative; aspect-ratio: 936 / 816; border-radius: 16px; overflow: hidden; background: var(--cream); }
+.stl__media img { width: 100%; height: 100%; object-fit: cover; }
+.hotspot { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; border: 0; padding: 0; background: none; }
+.hotspot::before { content: ''; position: absolute; inset: 12px; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px rgb(0 0 0 / 0.35), 0 0 0 6px rgb(255 255 255 / 0.35); }
+.hotspot[aria-pressed='true']::before { inset: 10px; box-shadow: 0 0 0 2px var(--fg), 0 0 0 7px rgb(255 255 255 / 0.6); }
+.stl__body { display: grid; gap: 24px; margin-block-start: 24px; }
+.stl__fits { display: flex; align-items: center; gap: 16px; padding: 24px; border-radius: 12px; background: var(--sand); }
+.stl__fits-icon { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: #fff; flex: none; }
+.stl__fits b { display: block; font-size: 18px; line-height: 1.4; }
+.stl__fits span { font-size: 14px; color: var(--muted); }
+.stl__rows { display: grid; gap: 12px; margin: 16px 0 0; padding: 0; list-style: none; }
+.stl__row { display: flex; align-items: center; gap: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: #fff; }
+.stl__row[aria-current='true'] { border-color: var(--accent); }
+.stl__row img { width: 64px; height: 64px; border-radius: 6px; background: var(--cream); object-fit: contain; }
+.stl__row p { font-size: 16px; line-height: 1.5; }
+.panel { padding: 24px; border-radius: 16px; background: var(--panel); color: #fff; }
+.panel__line { display: flex; justify-content: space-between; gap: 16px; padding-block: 4px; color: color-mix(in srgb, #fff 70%, var(--panel)); }
+.panel__line--total { margin-block-start: 8px; padding-block-start: 12px; border-block-start: 1px solid rgb(255 255 255 / 0.2); color: #fff; }
+.panel__line--total b { font-size: 18px; }
+.panel .btn { width: 100%; margin-block-start: 16px; min-height: 44px; }
+
+/* ===== 3. Featured product (1:759) ===== */
+.fp__media { position: relative; aspect-ratio: 1; border-radius: 12px; background: var(--cream); overflow: hidden; }
+.fp__media img { width: 100%; height: 100%; object-fit: contain; padding: 8%; }
+.fp__stamp { position: absolute; inset-block-start: 12px; inset-inline-start: 12px; width: 72px; height: 72px; color: #8a8a8a; }
+.fp__info { display: grid; gap: 16px; margin-block-start: 24px; }
+.fp__title { font-family: var(--head); font-weight: 700; font-size: 33px; line-height: 1.1; }
+.countdown { display: flex; align-items: center; justify-content: space-between; gap: 16px; width: fit-content; max-width: 100%; white-space: nowrap; min-height: 60px; padding: 8px 24px; border-radius: 8px; background: var(--fg); color: #fff; }
+.countdown__units { display: flex; gap: 12px; }
+.countdown__unit { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #333; border-radius: 8px; font: 700 18px/28px var(--body); }
+.price { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.price__sale { color: var(--sale); font-size: 18px; }
+.price__compare { color: var(--muted-light); text-decoration: line-through; }
+.badge { display: inline-flex; align-items: center; min-height: 26px; padding: 0 12px; border-radius: 999px; background: var(--sale); color: #fff; font-size: 13px; font-weight: 600; }
+.rating { display: flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+.stars { color: var(--rating); letter-spacing: 1px; }
+.fp__desc { color: var(--muted); font-weight: 500; }
+.specs { margin: 0; border: 1px solid var(--sand); border-radius: 8px; overflow: hidden; font-size: 14px; }
+.specs div { display: grid; grid-template-columns: 38% 1fr; gap: 12px; padding: 10px 12px; }
+.specs div:nth-child(odd) { background: var(--sand); }
+.specs dt { color: var(--muted); }
+.specs dd { margin: 0; text-align: end; font-size: 16px; }
+.fp__actions { display: grid; gap: 12px; }
+
+/* ===== 4. Testimonials (1:885) ===== */
+.t__head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-block-end: 24px; }
+.t__head > div:first-child { display: grid; gap: 8px; }
+.t__nav { display: none; gap: 12px; }
+.t__row { display: flex; gap: 16px; margin: 0 calc(var(--margin) * -1); padding: 0 var(--margin); list-style: none; overflow: hidden; }
+.t__card { flex: 0 0 272px; display: flex; flex-direction: column; border-radius: 12px; background: #fff; overflow: hidden; }
+.t__card > img { width: 100%; aspect-ratio: 456 / 270; object-fit: cover; }
+.t__body { display: flex; flex: 1; flex-direction: column; gap: 8px; padding: 24px; }
+.t__who { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 16px; }
+.t__verified { font-size: 14px; color: var(--muted-light); }
+.t__title { font-size: 18px; font-weight: 700; line-height: 1.4; }
+.t__quote { color: var(--muted-light); }
+.t__product { display: flex; align-items: center; gap: 16px; margin-block-start: auto; padding-block-start: 24px; border-block-start: 1px solid var(--border); }
+.t__product img { width: 56px; height: 56px; border-radius: 50%; background: var(--cream); object-fit: contain; }
+.t__product p { font-size: 16px; line-height: 1.4; }
+
+/* ===== 5. FAQ (1:1057) ===== */
+.faq__list { margin: 24px 0 0; padding: 0; list-style: none; }
+.faq__item { border-block-end: 1px solid var(--border); }
+.faq__q { display: flex; align-items: center; gap: 16px; width: 100%; min-height: 56px; padding: 12px 0; border: 0; background: none; font: 600 18px/1.4 var(--body); color: var(--fg); text-align: start; }
+.faq__q svg { flex: none; width: 20px; height: 20px; }
+.faq__a { padding: 0 0 16px 36px; font-size: 14px; line-height: 1.6; color: var(--muted-light); }
+.faq__aside { display: grid; gap: 12px; margin-block-start: 40px; }
+.faq__media { aspect-ratio: 509 / 542; border-radius: 12px; overflow: hidden; }
+.faq__media img { width: 100%; height: 100%; object-fit: cover; }
+.faq__stats { display: grid; gap: 12px; }
+.stat { display: grid; align-content: center; gap: 4px; padding: 24px; border-radius: 12px; color: #fff; }
+.stat--accent { background: var(--accent); }
+.stat--dark { background: var(--fg); }
+.stat__label { font-family: var(--head); font-weight: 800; font-size: 16px; letter-spacing: 0.04em; text-transform: uppercase; }
+.stat__value { font-family: var(--head); font-weight: 800; font-size: 40px; line-height: 1; }
+.stat p:last-child { font-size: 14px; }
+
+@media (min-width: 48rem) {
+  .h2 { font-size: 43px; }
+  .band { padding-block: 48px; }
+
+  /* Hero 768: giữ khung bo 12 cách lề 20, 2 nút 52 giữa cạnh như live; dot lên 44 */
+  .hero-wrap { padding-inline: var(--margin); }
+  .hero { aspect-ratio: 4 / 3; border-radius: 12px; }
+  .hero__content { justify-content: center; gap: 20px; padding: 24px 0 64px 92px; max-width: 560px; }
+  .hero__h1 { font-size: 70px; }
+  .hero__sub { max-width: none; }
+  .hero__arrow { position: absolute; inset-block-start: calc(50% - 26px); display: inline-grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; border: 0; background: #fff; color: var(--fg); }
+  .hero__arrow--prev { inset-inline-start: 24px; }
+  .hero__arrow--next { inset-inline-end: 24px; }
+
+  /* Shop the look 768: ảnh rộng hết, dưới chia 2 cột hàng | tổng (dính trong khối) */
+  .stl__head { flex-direction: row; align-items: flex-end; justify-content: space-between; }
+  .stl__body { grid-template-columns: minmax(0, 1fr) 300px; align-items: start; gap: 16px; }
+  .stl__summary { position: sticky; inset-block-start: 96px; }
+
+  /* Featured product 768: ảnh 4/3 */
+  .fp__media { aspect-ratio: 4 / 3; }
+  .fp__stamp { inset-block-start: 24px; inset-inline-start: 24px; width: 113px; height: 113px; }
+  .fp__title { font-size: 43px; }
+  .fp__actions { grid-template-columns: auto auto; justify-content: start; }
+
+  /* Testimonials 768: hàng cuộn + nút 52 + thanh tiến trình, card 307 như blog */
+  .t__nav { display: flex; }
+  .t__card { flex-basis: 307px; }
+
+  /* FAQ 768: ảnh 7fr | 2 ô số xếp dọc 5fr */
+  .faq__aside { grid-template-columns: 7fr 5fr; }
+  .faq__stats { grid-template-rows: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+<main>
+
+  <!-- 1. HERO -->
+  <p class="note"><b>Hero</b> — khác live: lớp tối 30% (setting overlay_opacity, chỉ &lt; 80rem); 768: dot 44 × 44 (live 24); 360: chữ căn trái mép 20 (live căn giữa, chờ CTO câu 2).</p>
+  <div class="hero-wrap">
+    <section class="hero" aria-roledescription="carousel" aria-label="Featured">
+      <img class="hero__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-2.jpg?width=1440" alt="Athlete training with a dumbbell" width="1440" height="1080" fetchpriority="high">
+      <div class="hero__overlay" aria-hidden="true"></div>
+      <div class="hero__content">
+        <p class="hero__eyebrow">Trusted by 10,000+ athletes</p>
+        <h1 class="hero__h1">Level Up<br>Your Fitness</h1>
+        <p class="hero__sub">Upgrade your journey with Efitco gear made for every workout.</p>
+        <a class="btn btn--accent" href="#">Explore Equipment
+          <svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5"/></svg></a>
+      </div>
+      <button class="hero__arrow hero__arrow--prev" type="button" aria-label="Previous slide"><svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg></button>
+      <button class="hero__arrow hero__arrow--next" type="button" aria-label="Next slide"><svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg></button>
+      <div class="hero__dots">
+        <button class="hero__dot" type="button" aria-label="Go to slide 1" aria-current="true"></button>
+        <button class="hero__dot" type="button" aria-label="Go to slide 2"></button>
+      </div>
+    </section>
+  </div>
+
+  <!-- 2. SHOP THE LOOK -->
+  <p class="note"><b>Shop the look</b> — khác live chỉ ở 768: dưới ảnh chia 2 cột (ô kích thước + 4 hàng | tổng tiền dính trong khối). 360 giữ như live.</p>
+  <section class="band page" aria-labelledby="stl-h">
+    <div class="stl__head">
+      <div>
+        <p class="eyebrow">Shop this setup</p>
+        <h2 class="h2" id="stl-h">A Complete Corner Gym, Itemised</h2>
+      </div>
+      <a class="stl__link" href="#">Browse All Setups</a>
+    </div>
+    <div class="stl__media">
+      <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-look.jpg?width=1440" alt="Corner home gym with bench, dumbbells and storage rack" width="1440" height="1255">
+      <button class="hotspot" type="button" style="left:85.04%;top:15.3%" aria-pressed="true" aria-label="Show product 1 in this setup"></button>
+      <button class="hotspot" type="button" style="left:26.5%;top:67.6%" aria-pressed="false" aria-label="Show product 2 in this setup"></button>
+      <button class="hotspot" type="button" style="left:78.2%;top:64%" aria-pressed="false" aria-label="Show product 3 in this setup"></button>
+      <button class="hotspot" type="button" style="left:46.4%;top:58.2%" aria-pressed="false" aria-label="Show product 4 in this setup"></button>
+    </div>
+    <div class="stl__body">
+      <div>
+        <div class="stl__fits">
+          <span class="stl__fits-icon" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 20 20 4l4 4L8 24zM9 15l2 2M12 12l2 2M15 9l2 2"/></svg></span>
+          <p><b>Fits: 2.4×2.0 m</b><span>Folds flat when you're done.</span></p>
+        </div>
+        <ul class="stl__rows">
+          <li class="stl__row" aria-current="true"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=160" alt="" width="64" height="64"><p>Ativafit Lava 66 lb<br>$379.99</p></li>
+          <li class="stl__row"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P06.jpg?width=160" alt="" width="64" height="64"><p>FlexFold Bench<br>$189.99</p></li>
+          <li class="stl__row"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P07.jpg?width=160" alt="" width="64" height="64"><p>Compact Power Rack R3<br>$549.00</p></li>
+          <li class="stl__row"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=160" alt="" width="64" height="64"><p>Training Mat 12 mm<br>$69.00</p></li>
+        </ul>
+      </div>
+      <div class="panel stl__summary">
+        <p class="panel__line"><span>4 items</span><span>$1,187.98</span></p>
+        <p class="panel__line"><span>Setup Discount (10%)</span><span>− $118.80</span></p>
+        <p class="panel__line panel__line--total"><span>Total</span><b>$1,069.18</b></p>
+        <button class="btn btn--accent" type="button">Add Setup To Cart
+          <svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5"/></svg></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. FEATURED PRODUCT -->
+  <p class="note"><b>Featured product</b> — khác live: 768 ảnh 4/3 (live 1/1); đồng hồ hiện ngay từ số Liquid (live để visibility:hidden tới khi JS chạy, chừa ô trống 100–150px).</p>
+  <section class="band page" aria-labelledby="fp-h">
+    <div class="fp__media">
+      <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg?width=1080" alt="Ativafit Lava 66 lb Adjustable dumbbell" width="1080" height="1080">
+      <svg class="fp__stamp" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="stamp-ring" d="M60 60m-44 0a44 44 0 1 1 88 0a44 44 0 1 1-88 0"/></defs><text font-family="Inter" font-size="13" letter-spacing="3" fill="currentColor"><textPath href="#stamp-ring">EFITCO - FEATURE PRODUCT -</textPath></text><circle cx="60" cy="64" r="11" fill="none" stroke="currentColor" stroke-width="5"/><path d="M53 54a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="4"/></svg>
+    </div>
+    <div class="fp__info">
+      <p class="eyebrow">Featured product · Free weights</p>
+      <h2 class="fp__title" id="fp-h">Ativafit Lava 66 lb Adjustable</h2>
+      <div class="countdown" role="timer" aria-label="Sale ends in 22 hours 36 minutes 28 seconds">
+        <span>Sale ends in</span>
+        <span class="countdown__units" aria-hidden="true"><span class="countdown__unit">22</span><span class="countdown__unit">36</span><span class="countdown__unit">28</span></span>
+      </div>
+      <div class="price"><span class="price__sale">$379.99</span><span class="price__compare">$499.99</span><span class="badge">-24%</span></div>
+      <div class="rating"><span class="stars" role="img" aria-label="Rated 4.9 out of 5">★★★★★</span><span>(4.9)</span><span>| 341 reviews</span></div>
+      <p class="fp__desc">11 to 66 lb in seconds. One pair replaces a whole rack of fixed dumbbells - and takes up less floor space than a shoebox. No plates to swap, no waiting between sets, just one dial and go.</p>
+      <dl class="specs">
+        <div><dt>Weight range</dt><dd>11 – 66 lb per hand</dd></div>
+        <div><dt>Footprint</dt><dd>0.18 m² — fits under a desk</dd></div>
+        <div><dt>Materials</dt><dd>Cast iron core, reinforced rubber</dd></div>
+        <div><dt>Assembly</dt><dd>None — ready out of the box</dd></div>
+      </dl>
+      <div class="fp__actions">
+        <button class="btn btn--accent" type="button"><svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="7" width="14" height="10" rx="2"/><path d="M7 7a3 3 0 0 1 6 0M3 11h14"/></svg>Add To Cart</button>
+        <a class="btn btn--light" href="#">View Detail<span class="visually-hidden"> of Ativafit Lava 66 lb Adjustable</span>
+          <svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h13M11 5l5 5-5 5"/></svg></a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. TESTIMONIALS -->
+  <p class="note"><b>Testimonials</b> — khác live chỉ ở 768: hàng cuộn card 307, nút 52 đầu khối + thanh tiến trình (live lưới 2 × 2), theo sổ quyết định 09/11. 360 giữ như live.</p>
+  <section class="band band--cream page" aria-labelledby="t-h">
+    <div class="t__head">
+      <div>
+        <p class="eyebrow">Testimonial</p>
+        <h2 class="h2" id="t-h">What Our Customers Say?</h2>
+      </div>
+      <div class="t__nav">
+        <button class="nav-btn" type="button" aria-label="Previous reviews" aria-disabled="true"><svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg></button>
+        <button class="nav-btn" type="button" aria-label="Next reviews"><svg class="icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg></button>
+      </div>
+    </div>
+    <ul class="t__row" aria-label="Customer reviews" tabindex="0">
+      <li class="t__card">
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-1.jpg?width=720" alt="" width="720" height="426">
+        <div class="t__body">
+          <p class="t__who"><span>E. Johnson</span><span class="t__verified">Verified</span><span class="stars" role="img" aria-label="Rated 5 out of 5">★★★★★</span></p>
+          <h3 class="t__title">Versatile Gear For All Exercises</h3>
+          <p class="t__quote">High quality equipment that doesn't break the bank. I am very impressed with the overall durability.</p>
+          <div class="t__product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P16_b6c798cf-e03c-4995-b522-1737773992d2.png?width=120" alt="" width="56" height="56"><p>Ativafit Lava 66 lb<br><span style="color:var(--sale)">$379.99</span> <s style="color:var(--muted-light)">$499.99</s></p></div>
+        </div>
+      </li>
+      <li class="t__card">
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-2.jpg?width=720" alt="" width="720" height="426">
+        <div class="t__body">
+          <p class="t__who"><span>S. Williams</span><span class="t__verified">Verified</span><span class="stars" role="img" aria-label="Rated 4 out of 5">★★★★<span style="color:#d9d9d9">★</span></span></p>
+          <h3 class="t__title">Folds Away In Seconds</h3>
+          <p class="t__quote">The rack folds flat against the wall. My garage is a garage again between sessions.</p>
+          <div class="t__product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P07.jpg?width=120" alt="" width="56" height="56"><p>Compact Power Rack R3<br>$549.00</p></div>
+        </div>
+      </li>
+      <li class="t__card">
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-3.jpg?width=720" alt="" width="720" height="426">
+        <div class="t__body">
+          <p class="t__who"><span>M. Anderson</span><span class="t__verified">Verified</span><span class="stars" role="img" aria-label="Rated 5 out of 5">★★★★★</span></p>
+          <h3 class="t__title">Smooth Every Single Rep</h3>
+          <p class="t__quote">The dial switches weight fast, no jamming at all. Saves an entire corner of my room.</p>
+          <div class="t__product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=120" alt="" width="56" height="56"><p>FlexFold Adjustable Bench<br><span style="color:var(--sale)">$189.00</span> <s style="color:var(--muted-light)">$229.00</s></p></div>
+        </div>
+      </li>
+      <li class="t__card">
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-4.jpg?width=720" alt="" width="720" height="426">
+        <div class="t__body">
+          <p class="t__who"><span>J. Miller</span><span class="t__verified">Verified</span><span class="stars" role="img" aria-label="Rated 5 out of 5">★★★★★</span></p>
+          <h3 class="t__title">Worth Every Penny</h3>
+          <p class="t__quote">Spins so smoothly, no tangling even at high speed. Best rope I have owned.</p>
+          <div class="t__product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=120" alt="" width="56" height="56"><p>Revllen Pro Speed Rope<br><span style="color:var(--sale)">$34.99</span> <s style="color:var(--muted-light)">$44.99</s></p></div>
+        </div>
+      </li>
+    </ul>
+    <div class="progress" aria-hidden="true"><span></span></div>
+  </section>
+
+  <!-- 5. FAQ -->
+  <p class="note"><b>FAQ</b> — khác live chỉ ở 768: ảnh 7fr | 2 ô số xếp dọc 5fr (live ảnh rộng hết 728 × 775, ô số dưới). 360 giữ như live.</p>
+  <section class="band band--cream page" aria-labelledby="faq-h">
+    <p class="eyebrow">Questions and answers</p>
+    <h2 class="h2" id="faq-h" style="margin-block-start:8px">We're Proud To Be The Best At Training</h2>
+    <ul class="faq__list">
+      <li class="faq__item">
+        <button class="faq__q" type="button" aria-expanded="true"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h14"/></svg>How long does shipping take?</button>
+        <p class="faq__a">Orders ship within one business day. Standard delivery is 2-4 business days across the continental US, and shipping is free on orders over $99.</p>
+      </li>
+      <li class="faq__item"><button class="faq__q" type="button" aria-expanded="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h14M10 3v14"/></svg>Are adjustable dumbbells easy for beginners?</button></li>
+      <li class="faq__item"><button class="faq__q" type="button" aria-expanded="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h14M10 3v14"/></svg>How much floor space do I actually need?</button></li>
+      <li class="faq__item"><button class="faq__q" type="button" aria-expanded="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h14M10 3v14"/></svg>Does equipment arrive assembled?</button></li>
+      <li class="faq__item"><button class="faq__q" type="button" aria-expanded="false"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 10h14M10 3v14"/></svg>What's covered by the warranty?</button></li>
+    </ul>
+    <div class="faq__aside">
+      <div class="faq__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-faq.jpg?width=1080" alt="" width="1080" height="1150"></div>
+      <div class="faq__stats">
+        <div class="stat stat--accent"><p class="stat__label">Products</p><p class="stat__value">360+</p><p>Home gym gear in stock.</p></div>
+        <div class="stat stat--dark"><p class="stat__label">Warranty</p><p class="stat__value">12</p><p>Months on every item.</p></div>
+      </div>
+    </div>
+  </section>
+
+</main>
+</body>
+</html>

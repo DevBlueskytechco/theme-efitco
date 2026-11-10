@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Training Tips &amp; Inspiration – Efitco</title>
+<meta name="description" content="Training tips, home gym setups and nutrition advice from the Efitco team.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* Riêng trang blog (ES1-T257). Spec: docs/ui-spec/blog.md */
+  .blog-page { padding-block-end: var(--section-gap); }
+
+  /* Lọc tag: link thật, dáng tab (foundation §7) */
+  .blog-page .page-title { padding-block-end: var(--space-5); }
+  @media (min-width: 64rem) { .blog-page .page-title { padding-block-end: var(--space-6); } }
+  .topic-nav { margin-block-end: var(--space-6); }
+  .topic-nav .tabs { padding: 3px; margin: -3px; }
+  /* < 48rem: hàng tab tràn sát mép màn để lộ tab kế tiếp (cuộn ngang trong hàng, không cuộn trang) */
+  @media (max-width: 47.99rem) { .topic-nav .tabs { margin-inline: calc(var(--page-margin) * -1); padding-inline: var(--page-margin); scroll-padding-inline: var(--page-margin); } }
+  .topic-nav .tab { text-decoration: none; }
+  .topic-nav .tab[aria-current='page'] { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
+  @media (min-width: 80rem) { .topic-nav { margin-block-end: calc(var(--space-1) * 10); } }
+
+  /* Bài nổi bật (trang 1, không lọc tag) */
+  .featured-post { position: relative; display: grid; gap: var(--space-5); margin-block-end: var(--space-7); }
+  .featured-post__media { aspect-ratio: 4 / 3; overflow: hidden; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-dark); }
+  .featured-post__media img { width: 100%; height: 100%; object-fit: cover; transition: scale var(--motion-slow) var(--ease-out); }
+  .featured-post:hover .featured-post__media img, .featured-post.is-hover .featured-post__media img { scale: 1.04; }
+  .featured-post__body { display: grid; align-content: center; justify-items: start; gap: var(--space-4); }
+  .featured-post__title { font-size: var(--font-size-h2); }
+  .featured-post__title a { text-decoration: none; }
+  .featured-post__title a::after { content: ''; position: absolute; inset: 0; z-index: 1; }
+  .featured-post__title a:hover, .featured-post.is-hover .featured-post__title a { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.12em; }
+  .featured-post__title a:focus-visible { outline: none; }
+  .featured-post:has(a:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: calc(var(--radius-card) + var(--space-1)); }
+  .featured-post__excerpt { max-width: 60ch; color: var(--color-muted); }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); line-height: calc(22 / 14); }
+  .meta > span + span::before { content: '·'; margin-inline-end: var(--space-2); color: var(--color-muted-light); }
+  @media (min-width: 48rem) {
+    .featured-post { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-6); }
+  }
+  @media (min-width: 64rem) {
+    .featured-post { gap: var(--space-7); margin-block-end: calc(var(--space-1) * 16); }
+  }
+  @media (min-width: 80rem) {
+    .featured-post__title { font-size: var(--font-size-h1); line-height: calc(58 / 48); }
+    .featured-post__excerpt { font-size: var(--font-size-lg); }
+  }
+
+  /* Lưới card (Figma 1:1022): 1 / 2 / 3 / 4 cột */
+  .article-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
+  .article-grid .article-card__title { font-size: var(--font-size-lg); }
+  .article-card__meta { color: var(--color-muted-on-dark); }
+  .article-card__meta span + span::before { content: '·'; margin-inline: var(--space-2); }
+  @media (min-width: 48rem) { .article-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 64rem) { .article-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (min-width: 80rem) { .article-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: calc(var(--space-1) * 10); } }
+
+  /* Phân trang (ĐỀ XUẤT) */
+  .pagination { margin-block-start: var(--space-7); }
+  .pagination ul { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+  .pagination a, .pagination span { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-width: 44px; min-height: 44px; padding-inline: var(--space-3); border: 1px solid transparent; border-radius: var(--radius-button); font-weight: 500; text-decoration: none; }
+  .pagination a:hover { border-color: var(--color-foreground); }
+  .pagination [aria-current='page'] { background: var(--color-foreground); color: var(--color-background); }
+  .pagination__step { border-color: var(--color-border) !important; padding-inline: var(--space-4) !important; }
+  .pagination__step svg { width: 20px; height: 16px; }
+  .pagination__step--prev svg { scale: -1 1; }
+  .pagination__step[aria-disabled='true'] { color: var(--color-muted-light); }
+  .pagination__count { display: none !important; color: var(--color-muted); }
+  @media (max-width: 47.99rem) {
+    .pagination__num { display: none !important; }
+    .pagination__count { display: inline-flex !important; }
+    .pagination ul { justify-content: space-between; }
+  }
+  @media (min-width: 64rem) { .pagination { margin-block-start: calc(var(--space-1) * 16); } }
+
+  /* Trạng thái */
+  .skeleton--card { aspect-ratio: 3 / 4; border-radius: calc(var(--radius-card) + var(--space-1)); }
+  .demo-states { padding-block: var(--space-7); }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-article" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="20" height="24" rx="2.5"/><path d="M11 10h10M11 15h10M11 20h6"/></g></symbol>
+  <symbol id="i-tag" viewBox="0 0 32 32"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M4 5.5V15l13 13 11-11L15 4H5.5A1.5 1.5 0 0 0 4 5.5Z"/><circle cx="10.5" cy="10.5" r="2"/></g></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="20" height="20" rx="5"/><circle cx="13" cy="13" r="4.5"/><circle cx="18.6" cy="7.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="5.5" width="22" height="15" rx="4"/><path d="m11 10 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 26 26"><path d="M15.5 4.5h-2a4 4 0 0 0-4 4v3h-2.5v3.5h2.5v8.5h3.5V15h3l.5-3.5h-3.5V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
+  <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<a class="visually-hidden" href="#main">Skip to content</a>
+
+<!-- Header biến thể A (nền trắng): trang blog không có ảnh lớn đầu trang (sổ quyết định 09/11) -->
+<header class="site-header">
+  <div class="site-header__inner">
+    <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+    <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+    <nav class="site-header__nav" aria-label="Main">
+      <ul class="site-header__menu">
+        <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Sale</a></li>
+        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#" aria-current="page">Blog</a></li>
+        <li><a class="site-header__link" href="#">Contact</a></li>
+        <li><a class="site-header__link" href="#">Help</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__icons">
+      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main" class="blog-page" data-testid="blog-page">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <ol><li><a href="#">Home</a></li><li><span aria-current="page">Training Tips &amp; Inspiration</span></li></ol>
+    </nav>
+
+    <div class="page-title">
+      <p class="eyebrow">From the Efitco blog</p>
+      <h1>Training Tips &amp; Inspiration</h1>
+      <p class="page-title__meta">4 articles</p>
+    </div>
+
+    <nav class="topic-nav" aria-label="Blog topics" data-testid="blog-topics">
+      <ul class="tabs">
+        <li><a class="tab" href="#" aria-current="page">All</a></li>
+        <li><a class="tab" href="#">Diet plans</a></li>
+        <li><a class="tab" href="#">Exercises</a></li>
+        <li><a class="tab" href="#">Featured</a></li>
+      </ul>
+    </nav>
+
+    <!-- Bài mới nhất = bài nổi bật; ảnh là LCP (eager + fetchpriority high) -->
+    <article class="featured-post" data-testid="blog-featured">
+      <div class="featured-post__media">
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg?width=1200" alt="" width="1200" height="900" fetchpriority="high">
+      </div>
+      <div class="featured-post__body">
+        <span class="badge badge--tag">Exercises</span>
+        <h2 class="featured-post__title"><a href="#">How to stretch properly after training</a></h2>
+        <p class="featured-post__excerpt">A short cool-down routine for the muscles you just worked, and how long to hold each stretch.</p>
+        <p class="meta"><span><time datetime="2026-11-05">Nov 5, 2026</time></span><span>2 min read</span></p>
+      </div>
+    </article>
+
+    <ul class="article-grid" data-testid="blog-grid">
+      <li>
+        <a class="article-card" href="#">
+          <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960">
+          <span class="badge badge--tag">Featured</span>
+          <div class="article-card__content">
+            <h2 class="article-card__title">Set up a perfect home gym in just 15m²</h2>
+            <p class="article-card__meta"><span><time datetime="2026-11-04">Nov 4, 2026</time></span><span>5 min read</span></p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="article-card" href="#">
+          <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960">
+          <span class="badge badge--tag">Diet plans</span>
+          <div class="article-card__content">
+            <h2 class="article-card__title">What to eat before and after a heavy session</h2>
+            <p class="article-card__meta"><span><time datetime="2026-11-02">Nov 2, 2026</time></span><span>7 min read</span></p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="article-card" href="#">
+          <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=720" alt="" width="720" height="960">
+          <span class="badge badge--tag">Diet plans</span>
+          <div class="article-card__content">
+            <h2 class="article-card__title">Rubber vs urethane: which plates last longer</h2>
+            <p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>5 min read</span></p>
+          </div>
+        </a>
+      </li>
+    </ul>
+    <!-- 4 bài < articles_per_page (9): không có phân trang. Mẫu phân trang ở cuối file. -->
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__newsletter">
+      <div>
+        <h2><span>Get 15% Off</span> Your First Order</h2>
+        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+      </div>
+      <form class="site-footer__form" onsubmit="return false">
+        <label class="visually-hidden" for="nl-email">Email</label>
+        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+      </form>
+    </div>
+    <div class="site-footer__panel">
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <svg class="logo" viewBox="0 0 100 30" aria-label="Efitco" role="img"><use href="#i-logo"/></svg>
+          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+          <div class="site-footer__social"><a href="#" aria-label="Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a><a href="#" aria-label="YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a><a href="#" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></div>
+        </div>
+        <div class="site-footer__menus">
+          <div class="site-footer__menu"><details open><summary>Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+          <div class="site-footer__menu"><details open><summary>Information <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        </div>
+      </div>
+      <ul class="site-footer__trust">
+        <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+        <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+        <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+        <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+      </ul>
+    </div>
+    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
+    <div class="site-footer__bottom">
+      <p>© 2026 Efitco, Powered by Shopify</p>
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English">USD / EN <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== TRẠNG THÁI (chỉ mockup) ===================== -->
+<div class="demo-states container" aria-label="Page states">
+
+  <section class="demo-block">
+    <h2>Trạng thái: lọc theo tag "Diet plans"</h2>
+    <p class="demo-note">URL /blogs/figma-blog/tagged/diet-plans. Không có bài nổi bật; breadcrumb thêm tag; meta đổi; tab tag có aria-current. Ảnh hàng card đầu eager (LCP khi không có bài nổi bật).</p>
+    <nav class="breadcrumb" aria-label="Breadcrumb, tag sample"><ol><li><a href="#">Home</a></li><li><a href="#">Training Tips &amp; Inspiration</a></li><li><span aria-current="page">Diet plans</span></li></ol></nav>
+    <div class="page-title">
+      <p class="eyebrow">From the Efitco blog</p>
+      <p class="h1" style="font-family: var(--font-heading--family); font-weight: var(--font-heading--weight); letter-spacing: -0.02em;">Training Tips &amp; Inspiration</p>
+      <p class="page-title__meta">2 articles tagged Diet plans</p>
+    </div>
+    <nav class="topic-nav" aria-label="Blog topics, tag sample">
+      <ul class="tabs">
+        <li><a class="tab" href="#">All</a></li>
+        <li><a class="tab" href="#" aria-current="page">Diet plans</a></li>
+        <li><a class="tab" href="#">Exercises</a></li>
+        <li><a class="tab" href="#">Featured</a></li>
+      </ul>
+    </nav>
+    <ul class="article-grid">
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__meta"><span><time datetime="2026-11-02">Nov 2, 2026</time></span><span>7 min read</span></p></div></a></li>
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>5 min read</span></p></div></a></li>
+    </ul>
+  </section>
+
+  <section class="demo-block">
+    <h2>Trạng thái: blog rỗng (0 bài)</h2>
+    <p class="demo-note">Trang rỗng là nội dung, hiện cho người mua (AGENTS empty state). Ẩn lọc tag và meta số bài. 1 CTA chính.</p>
+    <div class="empty-state" data-testid="blog-empty">
+      <span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-article"/></svg></span>
+      <h3 class="h2">No Articles Yet</h3>
+      <p>New training tips are on the way. Until then, find the right gear for your next session.</p>
+      <div class="empty-state__actions">
+        <a class="button" href="#">Explore Equipment</a>
+        <a class="text-link" href="#" style="align-self: center">Back to homepage</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo-block">
+    <h2>Trạng thái: tag không có bài</h2>
+    <p class="demo-note">Mở URL tag không còn bài (vd tag đã xoá khỏi mọi bài). Giữ lọc tag để chọn chủ đề khác.</p>
+    <div class="empty-state">
+      <span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-tag"/></svg></span>
+      <h3 class="h2">No Articles On This Topic</h3>
+      <p>Try another topic above or browse every article.</p>
+      <div class="empty-state__actions"><a class="button" href="#">View All Articles</a></div>
+    </div>
+  </section>
+
+  <section class="demo-block">
+    <h2>Trạng thái: đang tải (chỉ khi BE làm lọc tag không tải lại trang)</h2>
+    <p class="demo-note">Lưới aria-busy="true", skeleton đúng tỉ lệ 3/4 (0 CLS), câu "Loading articles" trong role="status". Không JS: link tag tải lại trang, không có trạng thái này.</p>
+    <p class="visually-hidden" role="status">Loading articles</p>
+    <ul class="article-grid" aria-busy="true">
+      <li><span class="skeleton skeleton--card"></span></li>
+      <li><span class="skeleton skeleton--card"></span></li>
+      <li><span class="skeleton skeleton--card"></span></li>
+      <li><span class="skeleton skeleton--card"></span></li>
+    </ul>
+  </section>
+
+  <section class="demo-block">
+    <h2>Trạng thái: lỗi tải (chỉ khi lọc bằng JS)</h2>
+    <p class="demo-note">Request partial lỗi: giữ lưới cũ, hiện hộp lỗi trên lưới, focus vào hộp. Nút thử lại; link tag vẫn là URL thật nên mở thẳng được.</p>
+    <div class="alert" role="alert">
+      <svg aria-hidden="true"><use href="#i-alert"/></svg>
+      <div class="alert__body">
+        <strong>Couldn't load these articles</strong>
+        <p>Check your connection, then try again.</p>
+        <div><button class="button button--secondary" type="button">Try Again</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo-block">
+    <h2>Trạng thái: card không ảnh, không tag, không thời gian đọc · hover · focus</h2>
+    <p class="demo-note">Không ảnh: nền --color-background-dark (16.7:1). Không tag: không pill. article.content rỗng: ẩn thời gian đọc (AC-H27), còn ngày.</p>
+    <ul class="article-grid">
+      <li><a class="article-card" href="#"><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span></p></div></a></li>
+      <li><a class="article-card is-hover" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Featured</span><div class="article-card__content"><h3 class="article-card__title" style="text-decoration: underline; text-underline-offset: 0.1em">Set up a perfect home gym in just 15m²</h3><p class="article-card__meta"><span>Hover</span></p></div></a></li>
+      <li><a class="article-card" href="#" style="outline: 2px solid var(--color-accent); outline-offset: 2px"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__meta"><span>Focus</span></p></div></a></li>
+    </ul>
+  </section>
+
+  <section class="demo-block">
+    <h2>Phân trang (khi số bài &gt; Articles per page)</h2>
+    <p class="demo-note">Link thật (crawl được, chạy không JS). ≥ 768: số trang; &lt; 768: "Page 2 of 3". Chữ nút mô tả đích, không "Next" trần.</p>
+    <nav class="pagination" aria-label="Pagination">
+      <ul>
+        <li><a class="pagination__step pagination__step--prev" href="#"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Newer articles</a></li>
+        <li class="pagination__num"><a href="#" aria-label="Page 1">1</a></li>
+        <li class="pagination__num"><span aria-current="page" aria-label="Page 2">2</span></li>
+        <li class="pagination__num"><a href="#" aria-label="Page 3">3</a></li>
+        <li class="pagination__count"><span>Page 2 of 3</span></li>
+        <li><a class="pagination__step" href="#">Older articles<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+      </ul>
+    </nav>
+    <nav class="pagination" aria-label="Pagination, first page sample">
+      <ul>
+        <li><span class="pagination__step pagination__step--prev" aria-disabled="true"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Newer articles</span></li>
+        <li class="pagination__num"><span aria-current="page" aria-label="Page 1">1</span></li>
+        <li class="pagination__num"><a href="#" aria-label="Page 2">2</a></li>
+        <li class="pagination__num"><a href="#" aria-label="Page 3">3</a></li>
+        <li class="pagination__count"><span>Page 1 of 3</span></li>
+        <li><a class="pagination__step" href="#">Older articles<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
+      </ul>
+    </nav>
+  </section>
+</div>
+</body>
+</html>
