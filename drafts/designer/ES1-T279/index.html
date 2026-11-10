@@ -65,6 +65,64 @@
   .bpanel .button svg { width: 16px; height: 14px; }
   .bpanel:focus-visible, .bpanel :focus-visible { outline-color: var(--color-background-dark-foreground); }
 
+  /* ===== 1b. Thanh dính bundle < 48rem (ES1-T286, CTO chốt 10/11 H4 + audit câu 3) =====
+     Trang thật: position fixed đáy màn; mockup vẽ trong khung .phone (position absolute). */
+  .bundle-bar { --bundle-bar-muted: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel)); position: fixed; z-index: 14; inset-inline: 0; inset-block-end: 0; display: grid; gap: var(--space-3); padding: var(--space-3) var(--page-margin) calc(var(--space-3) + env(safe-area-inset-bottom, 0px)); border-radius: calc(var(--radius-card) + var(--space-1)) calc(var(--radius-card) + var(--space-1)) 0 0; background: var(--color-background-panel); color: var(--color-background-dark-foreground); box-shadow: 0 calc(var(--space-2) * -1) var(--space-5) color-mix(in srgb, var(--color-foreground) 16%, transparent); translate: 0 100%; visibility: hidden; transition: translate var(--motion-fast) var(--ease-in-out), visibility 0s linear var(--motion-fast); }
+  .bundle-bar.is-visible { translate: 0 0; visibility: visible; transition: translate var(--motion-base) var(--ease-out), visibility 0s; }
+  .bundle-bar[hidden] { display: none; }
+  .bundle-bar__row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  /* "{n} Items" trên, "{total}" dưới: giá dài ($1,234.56) vẫn vừa cạnh nút ở 320 */
+  .bundle-bar__sum { display: grid; min-width: 0; color: var(--bundle-bar-muted); font-size: var(--font-size-sm); font-weight: 500; line-height: 1.43; white-space: nowrap; }
+  .bundle-bar__sum strong { color: var(--color-background-dark-foreground); font-size: var(--font-size-lg); font-weight: 700; line-height: 1.4; font-variant-numeric: tabular-nums; }
+  .bundle-bar .button { flex: none; min-height: 48px; padding-inline: var(--space-4); }
+  .bundle-bar :focus-visible { outline-color: var(--color-background-dark-foreground); }
+  /* Lỗi: ô cảnh báo nền trắng trong thanh (đỏ trên panel chỉ 1.79:1, nên không đặt chữ/icon đỏ trực tiếp lên panel) */
+  .bundle-bar__error { display: flex; align-items: flex-start; gap: var(--space-2); padding: var(--space-2) var(--space-3); border: 1px solid var(--color-sale); border-radius: var(--space-2); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); line-height: 1.43; }
+  .bundle-bar__error svg { flex: none; width: 20px; height: 20px; color: var(--color-sale); }
+  @media (min-width: 48rem) { .bundle-bar { display: none; } }
+  @media (prefers-reduced-motion: reduce) { .bundle-bar, .bundle-bar.is-visible { transition: none; } }
+
+  /* Nút Big Offer (teaser, ES1-T263 §4): góc dưới trái cách 16; thanh bundle hiện thì nhấc lên trên thanh, cách 16 (không đè) */
+  .offer-teaser { position: fixed; z-index: 15; inset-block-end: calc(var(--space-4) + env(safe-area-inset-bottom, 0px)); inset-inline-start: var(--space-4); display: flex; align-items: center; border-radius: var(--radius-pill); background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); box-shadow: var(--shadow-raised); transition: translate var(--motion-base) var(--ease-out); }
+  :root:has(.bundle-bar.is-visible) .offer-teaser { translate: 0 calc(var(--bundle-bar-height, 72px) * -1); }
+  .offer-teaser__open { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 48px; padding-inline: var(--space-4) var(--space-3); border: 0; border-radius: var(--radius-pill) 0 0 var(--radius-pill); background: none; color: inherit; font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; }
+  .offer-teaser__open > svg { width: 20px; height: 20px; }
+  .offer-teaser__open:hover { background: color-mix(in srgb, var(--color-background-dark-foreground) 14%, transparent); }
+  .offer-teaser__hide { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 48px; padding: 0; border: 0; border-inline-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); border-radius: 0 var(--radius-pill) var(--radius-pill) 0; background: none; color: inherit; cursor: pointer; }
+  .offer-teaser__hide svg { width: 16px; height: 16px; }
+  .offer-teaser :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; box-shadow: 0 0 0 2px var(--color-background); }
+  @media (prefers-reduced-motion: reduce) { .offer-teaser { transition: none; } }
+
+  /* Khung điện thoại 360 × 640 cho mockup (không phải UI theme) */
+  .phone-row { display: grid; gap: var(--space-6); }
+  .phone-wrap { display: grid; gap: var(--space-2); align-content: start; }
+  .phone { position: relative; height: 640px; overflow: hidden; margin-inline: calc(var(--page-margin) * -1); background: var(--color-background-cream); color: var(--color-background-cream-foreground); border-block: 1px solid var(--color-border); }
+  .phone .bundle-bar, .phone .offer-teaser { position: absolute; }
+  .phone:has(.bundle-bar.is-visible) .offer-teaser { translate: 0 calc(var(--bundle-bar-height, 72px) * -1); }
+  .phone:not(:has(.bundle-bar.is-visible)) .offer-teaser { translate: none; } /* mockup: mỗi khung là 1 màn riêng */
+  .phone__page { padding: var(--space-5) var(--page-margin) 0; }
+  .phone__page .bundle__header { margin-block-end: var(--space-5); }
+  .phone__h2 { font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight); line-height: var(--line-height-heading); letter-spacing: -0.02em; text-transform: uppercase; }
+  .phone__page .bpanel { margin-block-start: var(--space-6); }
+  .bar-demo { display: grid; gap: var(--space-4); align-content: start; }
+  .bar-demo .bundle-bar { position: relative; z-index: auto; translate: none; visibility: visible; border-radius: calc(var(--radius-card) + var(--space-1)); }
+  /* Mockup 768 vẫn vẽ khung 360 (thanh chỉ có < 48rem trên trang thật) */
+  .phone .bundle-bar, .bar-demo .bundle-bar { display: grid; }
+  @media (min-width: 48rem) {
+    .phone-row { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-4); }
+    .phone { margin-inline: 0; border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+    .phone-row > .phone-wrap--wide { grid-column: 1 / -1; }
+    .phone-row > .phone-wrap--wide .bar-demo { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: end; }
+    /* Khung 360 giữ bố cục 360 khi mockup xem ở 768 */
+    .phone .bundle__header { grid-template-columns: minmax(0, 1fr); }
+    .phone .bundle__header .text-cta { grid-column: 1; grid-row: auto; justify-self: start; }
+    .phone .bundle__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .phone .bcard { padding: var(--space-2) var(--space-2) var(--space-3); }
+    .phone .bcard__check { inset-block-start: var(--space-2); inset-inline-end: var(--space-2); }
+    .phone .bpanel { grid-template-columns: minmax(0, 1fr); padding: var(--space-5); }
+    .phone .phone__h2 { font-size: 1.75rem; }
+  }
+
   /* ===== 2. Featured product (Figma 1:759) ===== */
   .fp { display: grid; gap: var(--space-6); }
   .fp__media { position: relative; aspect-ratio: 1; overflow: hidden; border: 1px solid var(--color-border); border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-cream); }
@@ -209,8 +267,7 @@
   }
   /* Tiến trình: --size = bề ngang nhìn thấy / tổng bề ngang hàng (đầu hàng) */
   .p-video { --size: 21%; } .p-review { --size: 30%; } .p-blog { --size: 32%; }
-  @media (min-width: 48rem) { .p-video { --size: 45%; } .p-review, .p-blog { --size: 59%; } }
-</style>
+  @media (min-width: 48rem) { .p-video { --size: 45%; } .p-review, .p-blog { --size: 59%; } }</style>
 </head>
 <body>
 <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -224,6 +281,8 @@
   <symbol id="i-verified" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="3"/><path d="m5.2 8.2 2 2 3.8-4"/></g></symbol>
   <symbol id="i-lock" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7.5" rx="1.5"/><path d="M5.2 7V5a2.8 2.8 0 0 1 5.6 0v2"/></g></symbol>
   <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-tag" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M10.6 2H17a1 1 0 0 1 1 1v6.4a1 1 0 0 1-.3.7l-7.9 7.9a1 1 0 0 1-1.4 0l-6.4-6.4a1 1 0 0 1 0-1.4l7.9-7.9a1 1 0 0 1 .7-.3Z"/><circle cx="14" cy="6" r="1.2"/></g></symbol>
+  <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
   <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
   <symbol id="i-play" viewBox="0 0 16 18"><path fill="currentColor" d="M15 7.3a2 2 0 0 1 0 3.4L3 17.6A2 2 0 0 1 0 15.9V2.1A2 2 0 0 1 3 .4l12 6.9Z"/></symbol>
   <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
@@ -250,7 +309,7 @@
         <h2 id="bundle-h">Pick Your Kit, Save As You Go</h2>
         <a class="text-cta" href="#">View Preset Bundles</a>
       </div>
-      <form onsubmit="return false">
+      <form id="bundle-form" onsubmit="return false">
         <fieldset style="margin:0;padding:0;border:0">
           <legend class="visually-hidden">Choose products for your bundle</legend>
           <ul class="bundle__grid">
@@ -284,6 +343,13 @@
           </div>
         </div>
       </form>
+      <!-- Thanh dính < 48rem (ES1-T286): in sẵn hidden, BE bỏ hidden + .is-visible theo IntersectionObserver; vẽ ở mục States -->
+      <div class="bundle-bar" data-testid="bundle-sticky-bar" hidden>
+        <div class="bundle-bar__row">
+          <p class="bundle-bar__sum"><span>5 Items</span><span class="visually-hidden">Total</span><strong>$436.90</strong></p>
+          <button class="button" type="submit" form="bundle-form">Add Bundle To Cart</button>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -473,8 +539,89 @@
 <!-- ===== Trạng thái (ĐỀ XUẤT, Figma không có) ===== -->
 <section class="container demo-block" aria-labelledby="states-h">
   <h2 id="states-h">States</h2>
-  <p class="demo-note">Bundle with 2 items, sold-out card, empty bundle, add error; featured product sold out; video that cannot play; loading row.</p>
+  <p class="demo-note">Bundle sticky bar on mobile (grid on screen, panel on screen, empty, adding, error) with the Big Offer button above it; bundle with 2 items, sold-out card, empty bundle, add error; featured product sold out; video that cannot play; loading row.</p>
   <div class="states">
+    <div class="phone-row" data-testid="bundle-sticky-bar-states">
+      <div class="phone-wrap">
+        <p class="demo-label">Mobile 360 × 640: grid on screen, panel not yet · bar shown, Big Offer lifted 16 above bar</p>
+        <div class="phone" inert aria-hidden="true">
+          <div class="phone__page">
+            <div class="bundle__header">
+              <p class="eyebrow">Build your bundle</p>
+              <p class="phone__h2">Pick Your Kit, Save As You Go</p>
+              <span class="text-cta">View Preset Bundles</span>
+            </div>
+            <ul class="bundle__grid">
+              <li><label class="bcard"><input type="checkbox" checked><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg?width=480" alt="" width="480" height="480"><span class="bcard__check"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Adjustable dumbbell pair</span><span class="bcard__price">$259.00</span></label></li>
+              <li><label class="bcard"><input type="checkbox" checked><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P10.jpg?width=480" alt="" width="480" height="480"><span class="bcard__check"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Foldable bench</span><span class="bcard__price">$89.00</span></label></li>
+              <li><label class="bcard"><input type="checkbox" checked><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P11.jpg?width=480" alt="" width="480" height="480"><span class="bcard__check"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Resistance band set</span><span class="bcard__price">$45.00</span></label></li>
+              <li><label class="bcard"><input type="checkbox"><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P12.jpg?width=480" alt="" width="480" height="480"><span class="bcard__check"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Speed rope</span><span class="bcard__price">$34.00</span></label></li>
+            </ul>
+          </div>
+          <div class="offer-teaser"><span class="offer-teaser__open"><svg><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="offer-teaser__hide"><svg><use href="#i-close"/></svg></span></div>
+          <div class="bundle-bar is-visible">
+            <div class="bundle-bar__row">
+              <p class="bundle-bar__sum"><span>5 Items</span><strong>$436.90</strong></p>
+              <span class="button">Add Bundle To Cart</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-wrap">
+        <p class="demo-label">Mobile 360 × 640: panel on screen · bar hidden, Big Offer back to 16 from bottom</p>
+        <div class="phone" inert aria-hidden="true">
+          <div class="phone__page">
+            <ul class="bundle__grid">
+              <li><label class="bcard"><input type="checkbox" checked><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P13.jpg?width=480" alt="" width="480" height="480"><span class="bcard__check"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Recovery roller</span><span class="bcard__price">$52.00</span></label></li>
+              <li><label class="bcard"><input type="checkbox" checked><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P14.jpg?width=480" alt="" width="480" height="480"><span class="bcard__check"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Training mat</span><span class="bcard__price">$69.00</span></label></li>
+            </ul>
+            <div class="bpanel">
+              <div>
+                <div class="bpanel__head"><span class="bpanel__title">Your Bundle</span><span class="bpanel__count">5 Items</span></div>
+                <ul class="bpanel__lines">
+                  <li><span>Adjustable dumbbell pair</span><span>$259.00</span></li>
+                  <li><span>Foldable bench</span><span>$89.00</span></li>
+                  <li><span>Resistance band set</span><span>$45.00</span></li>
+                  <li><span>Recovery roller</span><span>$52.00</span></li>
+                  <li><span>Training mat</span><span>$69.00</span></li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="offer-teaser"><span class="offer-teaser__open"><svg><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="offer-teaser__hide"><svg><use href="#i-close"/></svg></span></div>
+          <div class="bundle-bar">
+            <div class="bundle-bar__row">
+              <p class="bundle-bar__sum"><span>5 Items</span><strong>$436.90</strong></p>
+              <span class="button">Add Bundle To Cart</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="phone-wrap phone-wrap--wide">
+        <p class="demo-label">Sticky bar states: 0 items · adding · add error (bar grows, Big Offer follows its height)</p>
+        <div class="bar-demo">
+          <div class="bundle-bar">
+            <div class="bundle-bar__row">
+              <p class="bundle-bar__sum"><span>0 Items</span><span class="visually-hidden">Total</span><strong>$0.00</strong></p>
+              <button class="button" type="button" disabled>Add Bundle To Cart</button>
+            </div>
+          </div>
+          <div class="bundle-bar">
+            <div class="bundle-bar__row">
+              <p class="bundle-bar__sum"><span>5 Items</span><span class="visually-hidden">Total</span><strong>$436.90</strong></p>
+              <button class="button" type="button" aria-busy="true">Add Bundle To Cart</button>
+            </div>
+          </div>
+          <div class="bundle-bar">
+            <div class="bundle-bar__error" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><p>We couldn't add your bundle to the cart. Check your cart and try again.</p></div>
+            <div class="bundle-bar__row">
+              <p class="bundle-bar__sum"><span>5 Items</span><span class="visually-hidden">Total</span><strong>$436.90</strong></p>
+              <button class="button" type="button">Add Bundle To Cart</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="state-row">
       <div class="state-card">
         <p class="demo-label">Bundle: 2 items, next tier</p>

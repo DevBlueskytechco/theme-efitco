@@ -2,6 +2,17 @@ KHÔNG CHẮC: (1) Figma 1:359 chỉ có desktop 1920 và không có trạng th�
 
 # UI spec: Trang chủ 768 và 360, phần B (ES1-T279)
 
+## Thay đổi audit (ES1-T286, audit ES1-T283 A6, CTO 10/11 câu 3)
+
+| # | Chỗ | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | §1 thanh dính bundle 360 | "Mockup chưa vẽ, chờ CTO" | đã chốt (H4), vẽ đủ: hiện/ẩn, 0 món, đang thêm, lỗi; mục 1.1 | sổ 10/11 H4 |
+| 2 | §1 nút Big Offer ở trang chủ 360 | chưa xét va chạm với thanh dính | nút nhấc lên trên thanh, cách 16, theo chiều cao thật của thanh; không đè | sổ 10/11 audit (3); `marketing-popups.md` §4 |
+| 3 | Mockup | không có | `index.html` mục States: 2 khung 360 × 640 + 3 trạng thái thanh; PNG mới `index-360.png` 360 × 11847, `index-768.png` 768 × 10164 (thay số ở dòng Đầu ra) | ticket |
+| 4 | §12 | câu 1 còn dạng hỏi | ghi đã chốt, thêm "Quyết định CTO cần chốt" | ticket |
+
+Không đổi: bố cục lưới, card, panel, trạng thái panel, mọi khối từ §2 trở đi.
+
 Khối: bundle builder (1:636) · featured product (1:759) · video demo (1:817) · testimonial (1:885) · why choose (1:992) · blog (1:1022) · FAQ (1:1057) · footer (1:1104).
 Phần A (hero → inspiration) thuộc ES1-T278. Spec `docs/ui-spec/index.md` (ES1-T252, gốc live) không sửa; với 8 khối này, spec này thay thế phần tương ứng vì gốc là Figma (sổ 10/11 BGĐ).
 
@@ -48,7 +59,7 @@ Figma desktop: header (eyebrow "Build your bundle", h2 "Pick Your Kit, Save As Y
 - ĐỀ XUẤT dòng giảm giá: Figma xanh (#4B824D ~ `--color-badge-new`) trên panel chỉ 2.50:1, trượt AA. Dùng `color-mix(in srgb, var(--color-badge-new) 55%, var(--color-background-dark-foreground))` = 5.41:1 (cùng cách `--color-accent-on-sand`). Câu CTO 3.
 - Số liệu luôn tính thật (sổ 06/11 E7): demo chọn sẵn 5 món (`preselect ,1,2,3,5,6,`) → $514.00, giảm 15% −$77.10, tổng $436.90, thanh đầy, ghi chú "You reached 15% off" (icon check). Figma vẽ "3 Items / 5%" là chữ mẫu, không theo.
 - Không dòng ghi chú giảm giá dưới khối (sổ 07/11).
-- ĐỀ XUẤT 360 (câu CTO 1): nút ở ~1.350 px tính từ đầu khối (3 hàng card + panel). Thêm thanh dính đáy màn hình khi lưới đang trong màn hình và panel chưa vào: "{n} Items · {total}" + nút "Add Bundle To Cart" cao 48, nền panel, ẩn khi panel vào màn hình (05 nhóm 4 §1.3; 14 §2 #1097M phản hồi chọn món). Mockup chưa vẽ, chờ CTO.
+- 360: nút panel ở ~1.350 px tính từ đầu khối (3 hàng card + panel) nên có thanh dính đáy (CTO chốt 10/11 H4), chi tiết ở mục 1.1.
 
 Trạng thái (Figma không có; ĐỀ XUẤT theo 05 nhóm 4 §3, §6):
 - Card chọn: dấu tròn nền accent + tick trắng; chưa chọn: tròn trắng viền `--color-muted-light` (5.33:1, ≥ 3 cho thành phần không phải chữ). Hover: nhấc 2px + bóng raised. Focus: outline accent bao card (`:has(input:focus-visible)`).
@@ -59,6 +70,66 @@ Trạng thái (Figma không có; ĐỀ XUẤT theo 05 nhóm 4 §3, §6):
 - Không JS: Liquid in sẵn tạm tính, giảm, tổng theo món chọn sẵn (đã nêu ở `index.md` §5, giữ).
 
 A11y: mỗi card là `<label>` bọc checkbox thật (tên "Add {title} to bundle"), cả card là vùng chạm (≥ 152 × 230); `<fieldset>` + legend ẩn; panel `role="group"` có tên; dòng trạng thái ẩn `role="status"` ("5 selected, total $436.90"). Settings giữ như schema (`eyebrow`, `heading`, `link_label`, `link_url`, `collection`, `tier_1..3_quantity/percent` mặc định 2/10, 3/15, 5/0), không thêm.
+
+### 1.1 Thanh dính bundle và nút Big Offer (chỉ < 48rem; ES1-T286)
+
+Mockup: `drafts/designer/ES1-T279/index.html` mục States, khung "Mobile 360 × 640" (2 khung) + "Sticky bar states". Figma không có (desktop panel nằm cạnh lưới); mọi chi tiết dưới đây là phát triển từ panel Figma 1:636, CTO đã chốt có thanh (H4).
+
+Anatomy (`data-testid="bundle-sticky-bar"`, in trong khối bundle ngay sau `<form>`, thuộc tính `hidden` sẵn):
+1. Thanh `position: fixed` đáy màn, tràn 360, nền `--color-background-panel` (cùng panel), bo 16 hai góc trên (= panel), bóng hướng lên `0 -8px 24px foreground 16%`, padding 12 / 20 / 12 + `env(safe-area-inset-bottom)`. Cao 72 (nút 48 + 12 × 2).
+2. Trái, 2 dòng: "{n} Items" Inter 14/500 trắng 70% trộn panel (locale `count_one` / `count_other`: "1 Item", "5 Items") · trên tổng "{total}" Inter 18/700 trắng, số tabular; chữ ẩn "Total" (locale `total`) đứng trước số. Ticket ghi "{n} Items · {total}" 1 dòng: ĐỀ XUẤT xếp 2 dòng, bỏ dấu "·", vì 1 dòng ở 320 chỉ còn ~126 px cạnh nút (đo mockup: "5 Items · $436.90" đã xuống dòng, giá "$1,234.56" càng không vừa). Tổng là số sau giảm (cùng dòng Total của panel).
+3. Phải: nút primary "Add Bundle To Cart" (locale `submit`) cao 48, padding 16, không icon, `type="submit" form="bundle-form-{{ block.id }}"` (mockup `bundle-form`; id theo block để không trùng): gửi đúng form của panel, không cần JS riêng cho việc gửi.
+
+Hiện / ẩn (BE, IntersectionObserver, không nghe scroll):
+
+| Điều kiện | Thanh |
+| --- | --- |
+| Viewport ≥ 48rem | không có (`display: none`); 768 panel 2 cột đã gần lưới |
+| Lưới chưa vào màn (đang ở khối trên) | ẩn |
+| Lưới trong màn, mép trên panel chưa qua vạch đỉnh thanh (rootMargin panel `0px 0px -72px 0px`) | hiện (`.is-visible`) |
+| Mép trên panel vào vùng trên thanh | ẩn (thanh không bao giờ che panel) |
+| Đã cuộn qua hết khối (lưới và panel ở trên màn) | ẩn |
+| Focus đang trong thanh | giữ hiện tới khi focus rời (không làm mất focus) |
+| Không JS | giữ `hidden`; nút panel vẫn gửi form |
+
+Chuyển động: vào trượt từ đáy 250 ms `--ease-out`, ra 150 ms; chỉ `translate` (+ `visibility` sau khi ra); `prefers-reduced-motion` tắt trượt, hiện/ẩn tức thì (15 §Motion; sổ 09/11 chuyển động). Thanh `position: fixed` nên không xô bố cục (CLS 0).
+
+Trạng thái (Figma không có; ĐỀ XUẤT theo 05 nhóm 4 §3, §6; 14 #1097M phản hồi khi chọn món):
+
+| Trạng thái | Thanh | Ghi chú |
+| --- | --- | --- |
+| Mặc định (demo chọn sẵn 5) | "5 Items" / "$436.90" + nút | số đổi ngay khi tích/bỏ card, không hiệu ứng số |
+| 0 món | "0 Items" / "$0.00" + nút `disabled` (nền `--color-border`, chữ `--color-muted`, 6.71:1) | thanh vẫn hiện để người mua thấy số tăng khi chọn; giống quy tắc nút panel |
+| 1 món | "1 Item" (`count_one`) | — |
+| Đang thêm | nút `aria-busy="true"` + spinner trắng, giữ bề rộng; nút panel busy cùng lúc (chung form) | — |
+| Lỗi | ô cảnh báo trong thanh, trên hàng nút: nền trắng, viền 1px `--color-sale`, bo 8, padding 8 / 12, icon cảnh báo 20 `--color-sale`, chữ 14/20 foreground, locale `error`; thanh cao lên (~150 ở 360) | đỏ trực tiếp trên panel chỉ 1.79:1 nên không dùng; ô biến mất khi người mua đổi lựa chọn hoặc bấm lại |
+| Thành công | theo luồng thêm giỏ hiện có của bundle (không đổi ở ticket này) | — |
+
+Thông báo cho trình đọc màn hình: thanh không phải live region (dòng `role="status"` của panel đã đọc "5 selected, total $436.90"; 2 nơi đọc là trùng). Lỗi: chỉ 1 nơi có `role="alert"`: thanh khi thanh đang hiện, ngược lại alert dưới panel (§1 trạng thái lỗi).
+
+Nút Big Offer (teaser, `marketing-popups.md` §4) trên trang chủ 360:
+- Mặc định góc dưới trái cách 16 (+ safe area), như ES1-T263.
+- Thanh hiện: nút nhấc lên đúng chiều cao thanh, đáy nút cách đỉnh thanh 16 (`translate: 0 calc(var(--bundle-bar-height, 72px) * -1)`; BE đo chiều cao thật bằng ResizeObserver ghi `--bundle-bar-height` lên `:root`, nên khi thanh cao lên vì lỗi nút vẫn không đè). Trượt cùng nhịp 250 ms, reduced motion tắt.
+- Thanh ẩn: nút về cách đáy 16.
+- Setting "Position" = Right cũng nhấc như trên. Từ 768 không có thanh, nút giữ vị trí ES1-T263.
+- Khoảng cách 16 giữa 2 vùng chạm (04 §1 thumb zone ≥ 16; 14 #1094M). Lớp: thanh `z-index` 14, nút 15, toast 30, dialog/drawer trên cùng; mở thẻ big offer (sheet modal) hay drawer giỏ thì thanh và nút nằm dưới scrim, `inert`.
+- PDP và cart không có nút (sổ 10/11 audit (3)), ngoài phạm vi trang này.
+
+Tương phản và vùng chạm:
+
+| Chỗ | Cặp | Tỉ lệ |
+| --- | --- | --- |
+| Tổng | trắng / panel #393942 | 11.43 |
+| "{n} Items" | trắng 70% trộn panel / panel | 6.5 |
+| Chữ nút | trắng / accent #C8400E | 5.01 |
+| Nút disabled | #4D4D4D / #E5E5E5 | 6.71 |
+| Chữ lỗi / icon, viền lỗi | #1A1A1A / trắng; #BD1616 / trắng | 17.4; 6.38 |
+| Focus trong thanh | outline 2px trắng / panel | 11.43 |
+| Teaser | trắng / #1A1A1A | 17.4 (ES1-T263) |
+
+Vùng chạm: nút thanh 48 cao × ~182; nút teaser 48, × teaser 44 × 48; cách nhau 16. Chữ nhỏ nhất 14.
+
+Việc FE / BE (theo `fe-be-boundary.md`): FE1 markup thanh (in sẵn `hidden`, `data-testid="bundle-sticky-bar"`, `form="bundle-form"`, ô lỗi rỗng giữ trong markup) + CSS thanh và luật nhấc teaser (`:root:has(.bundle-bar.is-visible) .offer-teaser`); BE1 IntersectionObserver (lưới, panel), cập nhật số/tổng từ cùng hàm tính của panel, `--bundle-bar-height`, busy/lỗi dùng chung với nút panel. Không thêm setting.
 
 ## 2. Featured product (Figma 1:759)
 
@@ -223,6 +294,16 @@ Không thêm setting. Dùng setting có sẵn: bundle (`eyebrow`, `heading`, `li
 ## 12. Quyết định CTO đã chốt (10/11)
 
 CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
-1. Bundle 360: thêm thanh dính đáy ("{n} Items · {total}" + "Add Bundle To Cart") khi panel chưa vào màn hình, vì nút cách đầu khối ~1.350 px? Đề xuất: có.
+1. Bundle 360: thanh dính đáy ("{n} Items" / "{total}" + "Add Bundle To Cart") khi lưới trong màn và panel chưa vào. Đã chốt: có (H4); đã vẽ, mục 1.1. Audit 10/11 (3): trang chủ 360 nút Big Offer nằm trên thanh, không đè (mục 1.1).
 2. Video card: thêm nút play 52 giữa poster (code đã có, Figma không vẽ) để người dùng biết bấm được, phát tại chỗ, không tự chạy? Đề xuất: có.
 3. Dòng "Bundle discount" trong panel: đổi xanh Figma (2.50:1, trượt AA) sang `color-mix(badge-new 55%, trắng)` 5.41:1? Đề xuất: có, cùng cách `--color-accent-on-sand`.
+
+Đề xuất sửa file ngoài phạm vi ES1-T286 (không sửa ở ticket này):
+- §11 dòng "Thanh dính đáy 360 nếu CTO duyệt (câu 1)" → bỏ "nếu CTO duyệt", trỏ mục 1.1; dòng Đầu ra đầu spec đổi kích thước PNG (360 × 11847, 768 × 10164).
+- `docs/ui-spec/marketing-popups.md` §4 "Không đè": thêm "thanh dính bundle trang chủ < 48rem → teaser nhấc theo `--bundle-bar-height`" và `kit.css` `.offer-teaser` thêm luật nhấc chung.
+- `kit.css` / foundation §17: `.toast-region` < 48rem cũng nhấc theo `--bundle-bar-height` khi thanh hiện (toast đang ở đáy cách 16 sẽ đè thanh).
+
+## Quyết định CTO cần chốt (ES1-T286)
+
+1. Thanh hiện cả khi 0 món (nút disabled) hay chỉ khi ≥ 1 món? Đề xuất: hiện cả 0 món, để thấy số tăng khi chọn (14 #1097M).
+2. Toast < 48rem khi thanh bundle hiện: nhấc lên trên thanh như nút Big Offer? Đề xuất: có, cùng biến `--bundle-bar-height` (foundation §17).
