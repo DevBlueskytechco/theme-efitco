@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your $50.00 Gift Card – Efitco</title>
+<meta name="description" content="Your Efitco gift card: balance, code and QR code to use at checkout.">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* ES1-T258 · gift_card ({% layout none %}: tự dựng head, không header/footer theme) */
+  body { background: var(--color-background-alt); }
+  .gc-top { display: flex; justify-content: center; padding-block: var(--space-4); border-block-end: 1px solid var(--color-border); background: var(--color-background); }
+  .gc-top a { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-foreground); }
+  .gc-top svg { width: calc(var(--space-1) * 25); height: auto; }
+
+  .gc { padding-block: var(--space-7) var(--section-gap); }
+  .gc__intro { display: grid; justify-items: center; gap: var(--space-3); margin-block-end: var(--space-6); text-align: center; }
+  .gc__intro p:last-child { color: var(--color-muted); }
+  .gc__grid { display: grid; gap: var(--space-5); width: min(100%, calc(var(--space-1) * 140)); margin-inline: auto; }
+
+  /* Thẻ: chỉ CSS + SVG logo, không ảnh (0 request, in được) */
+  .gc-card { position: relative; display: grid; grid-template-rows: auto 1fr auto; aspect-ratio: 1.586; overflow: hidden; padding: var(--space-5); border-radius: var(--radius-dialog); background: var(--color-background-dark); color: var(--color-background-dark-foreground); }
+  .gc-card::after { content: ''; position: absolute; inset-block-start: -30%; inset-inline-end: -20%; width: 70%; aspect-ratio: 1; border: calc(var(--space-1) * 10) solid color-mix(in srgb, var(--color-background-dark-foreground) 6%, transparent); border-radius: 50%; pointer-events: none; }
+  .gc-card > * { position: relative; z-index: 1; }
+  .gc-card__mark { display: none; }
+  .gc-card__head { position: relative; display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); }
+  .gc-card__head svg { width: calc(var(--space-1) * 23); height: auto; }
+  .gc-card__tag { padding: var(--space-1) var(--space-3); border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 40%, transparent); border-radius: var(--radius-pill); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+  .gc-card__balance { position: relative; align-self: end; display: grid; gap: var(--space-1); }
+  .gc-card__label { color: var(--color-muted-on-dark); font-size: var(--font-size-sm); }
+  .gc-card__value { font-family: var(--font-heading--family); font-size: clamp(2.5rem, 1.6rem + 3vw, 4rem); font-weight: var(--font-heading--weight-display); letter-spacing: -0.03em; line-height: 1; }
+  .gc-card__initial { color: var(--color-muted-on-dark); font-size: var(--font-size-sm); }
+  @media (min-width: 48rem) { .gc-card { padding: var(--space-6); } }
+
+  .gc-panel { display: grid; gap: var(--space-5); padding: var(--space-5); border-radius: var(--radius-dialog); background: var(--color-background); }
+  @media (min-width: 48rem) { .gc-panel { padding: var(--space-6); } }
+
+  .gc-code { display: grid; gap: var(--space-2); }
+  .gc-code__row { display: grid; gap: var(--space-3); }
+  .gc-code__value { display: flex; align-items: center; min-height: var(--control-height); padding-inline: var(--space-4); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-input); background: var(--color-background-alt); font-size: var(--font-size-lg); font-weight: 600; letter-spacing: 0.08em; white-space: nowrap; user-select: all; }
+  .gc-code__row .button { width: 100%; }
+  @media (min-width: 48rem) { .gc-code__row .button { width: auto; justify-self: start; } }
+
+  .gc-qr { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: var(--space-4); padding-block: var(--space-5); border-block: 1px solid var(--color-border); }
+  .gc-qr svg { width: 144px; height: 144px; padding: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-background); color: var(--color-foreground); }
+  .gc-qr p { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .gc-qr strong { display: block; margin-block-end: var(--space-1); color: var(--color-foreground); font-size: var(--font-size-base); }
+
+  .gc-meta { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; font-size: var(--font-size-sm); }
+  .gc-meta li { display: flex; justify-content: space-between; gap: var(--space-4); }
+  .gc-meta span { color: var(--color-muted); }
+
+  .gc-actions { display: grid; gap: var(--space-3); }
+  .gc-actions .button { width: 100%; }
+  .wallet { display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); min-height: 48px; padding-inline: var(--space-5); border-radius: var(--radius-button); background: var(--color-foreground); color: var(--color-background); font-size: var(--font-size-sm); font-weight: 600; text-decoration: none; }
+  .wallet svg { width: 24px; height: 18px; }
+  @media (min-width: 48rem) { .gc-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); } .gc-actions .wallet { grid-column: 1 / -1; justify-self: start; } }
+
+  @media (min-width: 80rem) {
+    .gc__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); align-items: start; width: min(100%, calc(var(--space-1) * 270)); gap: var(--space-6); }
+    .gc-card { position: sticky; inset-block-start: var(--space-5); }
+    .gc-panel { padding: calc(var(--space-1) * 10); }
+  }
+
+  /* In: bỏ nút, thẻ viền thay nền tối, ẩn khu trạng thái */
+  @media print {
+    body { background: #fff; }
+    .gc-actions, .gc-code .button, .demo-states { display: none !important; }
+    .gc-card { border: 2px solid #000; background: #fff; color: #000; }
+    .gc-card__mark { display: none; }
+    .gc-card__label, .gc-card__initial { color: #000; }
+  }
+
+  .is-expired .gc-card { filter: grayscale(1); }
+  .is-expired .gc-card__value { text-decoration: line-through; text-decoration-thickness: 3px; }
+  .demo-states { padding-block: var(--space-7); background: var(--color-background); }
+  .stage-white { align-content: start; padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background-alt); }
+  .state-grid { align-items: start; }
+  .state-grid { display: grid; gap: var(--space-6); }
+  @media (min-width: 80rem) { .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stack-5 { display: grid; gap: var(--space-5); }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
+  <symbol id="i-copy" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="7" y="7" width="10.5" height="10.5" rx="2"/><path d="M13 4.5V4a1.5 1.5 0 0 0-1.5-1.5h-7A1.5 1.5 0 0 0 3 4v7a1.5 1.5 0 0 0 1.5 1.5H5"/></g></symbol>
+  <symbol id="i-print" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M5.5 7V2.5h9V7M5.5 14.5h-2A1.5 1.5 0 0 1 2 13V8.5A1.5 1.5 0 0 1 3.5 7h13A1.5 1.5 0 0 1 18 8.5V13a1.5 1.5 0 0 1-1.5 1.5h-2"/><path d="M5.5 11.5h9v6h-9z"/></g></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 18"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="1" y="1" width="22" height="16" rx="3"/><path d="M1 6h22M1 10h22"/></g></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+  <!-- QR minh hoạ (thật: vendor/qrcode.js của Shopify vẽ từ gift_card.qr_identifier) -->
+  <symbol id="i-qr" viewBox="0 0 25 25"><g fill="currentColor" shape-rendering="crispEdges"><path d="M0 0h7v7H0zM18 0h7v7h-7zM0 18h7v7H0z"/><path fill="#fff" d="M1 1h5v5H1zM19 1h5v5h-5zM1 19h5v5H1z"/><path d="M2 2h3v3H2zM20 2h3v3h-3zM2 20h3v3H2z"/><path d="M8 0h1v2H8zM10 1h2v1h-2zM13 0h2v2h-2zM9 3h3v1H9zM14 3h1v3h-1zM8 5h2v2H8zM11 5h2v1h-2zM16 2h1v2h-1zM0 8h2v1H0zM3 8h3v1H3zM8 8h1v3H8zM10 8h3v1h-3zM15 8h2v2h-2zM18 8h3v1h-3zM22 8h3v1h-3zM1 10h2v2H1zM4 10h1v3H4zM10 10h2v2h-2zM13 10h1v1h-1zM17 11h2v1h-2zM20 10h2v2h-2zM23 11h2v1h-2zM0 13h3v1H0zM6 12h2v2H6zM9 13h3v1H9zM14 12h2v3h-2zM18 13h1v2h-1zM21 13h3v1h-3zM2 15h2v1H2zM7 15h1v2H7zM10 15h2v2h-2zM16 16h2v1h-2zM20 15h1v2h-1zM23 15h2v2h-2zM8 18h2v1H8zM12 18h1v3h-1zM14 18h3v1h-3zM18 18h1v2h-1zM20 18h2v1h-2zM24 19h1v2h-1zM9 20h2v2H9zM15 20h2v2h-2zM19 21h3v1h-3zM8 23h3v2H8zM12 23h2v1h-2zM15 23h1v2h-1zM17 23h3v1h-3zM22 23h2v2h-2zM18 16h1v1h-1z"/></g></symbol>
+</svg>
+
+<header class="gc-top">
+  <a href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+</header>
+
+<main class="gc container" data-testid="gift-card">
+  <div class="gc__intro">
+    <p class="eyebrow">Gift card</p>
+    <h1>Your Efitco Gift Card</h1>
+    <p>Use this gift card at checkout.</p>
+  </div>
+
+  <div class="gc__grid">
+    <div class="gc-card" data-testid="gift-card-visual">
+      <svg class="gc-card__mark" viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg>
+      <div class="gc-card__head">
+        <svg viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <span class="gc-card__tag">Gift card</span>
+      </div>
+      <span></span>
+      <p class="gc-card__balance">
+        <span class="gc-card__label">Balance</span>
+        <span class="gc-card__value">$50.00</span>
+      </p>
+    </div>
+
+    <div class="gc-panel">
+      <div class="gc-code">
+        <span class="field__label" id="gc-code-label">Gift card code</span>
+        <div class="gc-code__row">
+          <p class="gc-code__value" aria-labelledby="gc-code-label" data-testid="gift-card-code">7H3K 9QXF 2M8P 4LDW</p>
+          <button class="button button--secondary" type="button"><svg aria-hidden="true"><use href="#i-copy"/></svg>Copy Code</button>
+        </div>
+        <p class="visually-hidden" role="status"></p>
+      </div>
+
+      <figure class="gc-qr" style="margin:0">
+        <svg role="img" aria-label="QR code, scan to redeem gift card"><use href="#i-qr"/></svg>
+        <figcaption><strong>Pay in store</strong><p>Show this QR code at the counter, or enter the code at online checkout.</p></figcaption>
+      </figure>
+
+      <ul class="gc-meta">
+        <li><span>Initial value</span>$50.00</li>
+        <li><span>Expires</span>December 31, 2027</li>
+      </ul>
+
+      <div class="gc-actions">
+        <a class="wallet" href="#"><svg aria-hidden="true"><use href="#i-wallet"/></svg>Add to Apple Wallet</a>
+        <a class="button" href="#">Start Shopping</a>
+        <button class="button button--secondary" type="button"><svg aria-hidden="true"><use href="#i-print"/></svg>Print Gift Card</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- ===================== TRẠNG THÁI ===================== -->
+<section class="demo-states" aria-label="States">
+  <div class="container">
+    <p class="demo-label">ES1-T258 · gift_card · trạng thái</p>
+    <div class="demo-block">
+      <h2>S1–S2 · Đã dùng một phần, hết hạn / bị tắt</h2>
+      <p class="demo-note">Hết hạn (gift_card.expired) hoặc bị tắt (enabled == false): thẻ xám, số dư gạch, hộp lỗi có icon + chữ (không chỉ màu), ẩn QR, Apple Wallet, Copy; vẫn hiện mã để báo hỗ trợ; CTA chuyển sang Contact.</p>
+      <div class="state-grid">
+        <div class="stage-white stack-5">
+          <p class="demo-label">S1 · Đã dùng một phần</p>
+          <div class="gc-card">
+            <svg class="gc-card__mark" viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg>
+            <div class="gc-card__head"><svg viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg><span class="gc-card__tag">Gift card</span></div>
+            <span></span>
+            <p class="gc-card__balance"><span class="gc-card__label">Balance</span><span class="gc-card__value">$18.40</span><span class="gc-card__initial">of $50.00 initial value</span></p>
+          </div>
+        </div>
+        <div class="stage-white stack-5 is-expired">
+          <p class="demo-label">S2 · Hết hạn</p>
+          <div class="gc-card">
+            <svg class="gc-card__mark" viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg>
+            <div class="gc-card__head"><svg viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg><span class="gc-card__tag">Expired</span></div>
+            <span></span>
+            <p class="gc-card__balance"><span class="gc-card__label">Balance</span><span class="gc-card__value">$25.00</span></p>
+          </div>
+          <div class="alert" role="alert">
+            <svg aria-hidden="true"><use href="#i-alert"/></svg>
+            <div class="alert__body"><strong>This gift card has expired</strong><p>It expired on October 1, 2026 and can't be used at checkout. Contact us with the code below if you think this is a mistake.</p></div>
+          </div>
+          <div class="gc-code"><span class="field__label">Gift card code</span><p class="gc-code__value">4FG2 9KXQ 7H3K 2M8P</p></div>
+          <a class="button button--secondary" href="#">Contact Us</a>
+        </div>
+      </div>
+    </div>
+    <div class="demo-block">
+      <h2>S3–S4 · Đã chép mã, không có Apple Wallet / logo</h2>
+      <p class="demo-note">Copy cần JS (BE): đổi nhãn nút thành "Copied" + icon check 2s, đọc qua role="status". Không JS: nút ẩn, mã chọn được cả khối (user-select: all). Không pass_url: bỏ nút Wallet. Không logo trong theme settings: thẻ hiện shop.name chữ heading.</p>
+      <div class="state-grid">
+        <div class="stage-white gc-code">
+          <span class="field__label">Gift card code</span>
+          <div class="gc-code__row"><p class="gc-code__value">7H3K 9QXF 2M8P 4LDW</p><button class="button button--secondary" type="button"><svg aria-hidden="true"><use href="#i-check"/></svg>Copied</button></div>
+          <p class="visually-hidden" role="status">Gift card code copied</p>
+        </div>
+        <div class="stage-white">
+          <div class="gc-card" style="aspect-ratio:auto;min-height:180px">
+            <div class="gc-card__head"><span style="font-family:var(--font-heading--family);font-size:var(--font-size-h3);font-weight:700">Efitco</span><span class="gc-card__tag">Gift card</span></div>
+            <span></span>
+            <p class="gc-card__balance"><span class="gc-card__label">Balance</span><span class="gc-card__value">$100.00</span></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
