@@ -9,16 +9,13 @@
 <style>
   /* Riêng trang bài viết (ES1-T257). Spec: docs/ui-spec/article.md */
 
-  /* Ảnh bìa: LCP. Header đè ảnh (sổ quyết định 09/11), dải tối trên đỉnh giữ chữ header AA */
-  .article-hero { position: relative; background: var(--color-background-dark); }
-  .article-hero__frame { position: relative; aspect-ratio: 4 / 3; overflow: hidden; background: var(--color-background-dark); }
-  .article-hero__frame img { width: 100%; height: 100%; object-fit: cover; }
-  .article-hero__frame::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, color-mix(in srgb, var(--color-background-dark) 85%, transparent) 0, color-mix(in srgb, var(--color-background-dark) 85%, transparent) calc(var(--header-height) * 0.75), transparent calc(var(--header-height) * 2)); }
-  @media (min-width: 48rem) {
-    .article-hero { padding-inline: var(--page-margin); background: none; }
-    .article-hero__frame { aspect-ratio: 16 / 9; border-radius: var(--radius-hero); }
-  }
-  @media (min-width: 80rem) { .article-hero__frame { aspect-ratio: 1798 / 827; } }
+  /* Ảnh bìa (LCP), vòng 3: thẻ bo 16 NẰM DƯỚI header tối, trong container (khung .page-banner foundation §3.3,
+     tỉ lệ hero Figma 1:361 1798/827 từ 80rem). Không chữ đè ảnh → không lớp tối, ảnh giữ màu thật */
+  .article-cover { width: var(--content-width); margin: var(--space-4) auto 0; aspect-ratio: 4 / 3; overflow: hidden; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-dark); }
+  .article-cover img { width: 100%; height: 100%; object-fit: cover; }
+  @media (min-width: 48rem) { .article-cover { aspect-ratio: 16 / 9; } }
+  @media (min-width: 64rem) { .article-cover { margin-block-start: var(--space-5); } }
+  @media (min-width: 80rem) { .article-cover { aspect-ratio: 1798 / 827; } }
 
   /* Cột đọc */
   .article-column { width: min(100%, 46rem); margin-inline: auto; }
@@ -80,14 +77,17 @@
   .related { margin-block-start: var(--section-gap); padding-block-end: var(--section-gap); }
   .related .card-row > li { display: flex; }
   .related .article-card { flex: 1; }
-  .related .article-card__meta { color: var(--color-muted-on-dark); }
+  /* Card Figma 1:1022: padding 24 từ 48rem (1:1030, như base.css); meta chữ trắng như code ES1-T174 */
+  .related .article-card__meta { color: var(--color-background-dark-foreground); }
   .related .article-card__meta span + span::before { content: '·'; margin-inline: var(--space-2); }
+  @media (min-width: 48rem) { .related .article-card__content { padding: 0 var(--space-5) var(--space-5); } }
   .related h2 { font-size: var(--font-size-h1); line-height: calc(58 / 48); }
   /* 1280+: 3 card vừa khung, không tràn → ẩn nút và thanh tiến trình (như AC-H9) */
   @media (min-width: 80rem) { .related .carousel-nav, .related .carousel-progress { display: none; } }
 
   .demo-states { padding-block: var(--space-7); }
   .demo-stage > .demo-plain-header { position: relative; }
+  .demo-stage .site-header__inner { width: auto; padding-inline: var(--space-5); }
 </style></head>
 <body>
 <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -101,9 +101,13 @@
   <symbol id="i-info" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 9v5M10 5.8v.1"/></g></symbol>
   <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
   <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
-  <symbol id="i-instagram" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="20" height="20" rx="5"/><circle cx="13" cy="13" r="4.5"/><circle cx="18.6" cy="7.4" r=".6" fill="currentColor"/></g></symbol>
-  <symbol id="i-youtube" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="5.5" width="22" height="15" rx="4"/><path d="m11 10 5 3-5 3v-6Z"/></g></symbol>
-  <symbol id="i-facebook" viewBox="0 0 26 26"><path d="M15.5 4.5h-2a4 4 0 0 0-4 4v3h-2.5v3.5h2.5v8.5h3.5V15h3l.5-3.5h-3.5V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 28 28"><path d="M16 4v13.5a4.2 4.2 0 1 1-4.2-4.2M16 4c.4 3 2.4 5 5.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="20" height="20" rx="5"/><circle cx="14" cy="14" r="4.5"/><circle cx="19.6" cy="8.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="6.5" width="22" height="15" rx="4"/><path d="m12 11 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 28 28"><path d="M16.5 4.5h-2a4 4 0 0 0-4 4v3H8v3.5h2.5v8.5H14V15h3l.5-3.5H14V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
   <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
   <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
   <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
@@ -113,15 +117,15 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- Header biến thể B (đè ảnh bìa) -->
-<header class="site-header site-header--overlay" style="z-index: 3">
+<!-- Header vòng 3: thanh tối #1A1A1A + noise, cao 80, KHÔNG đè ảnh bìa (sổ 10/11, Figma 1:362, foundation §3) -->
+<header class="site-header">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
     <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
     <nav class="site-header__nav" aria-label="Main">
       <ul class="site-header__menu">
-        <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
-        <li><a class="site-header__link" href="#">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#">Sale</a></li>
         <li><a class="site-header__link" href="#">Our Story</a></li>
         <li><a class="site-header__link" href="#" aria-current="page">Blog</a></li>
@@ -130,7 +134,7 @@
       </ul>
     </nav>
     <div class="site-header__icons">
-      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
     </div>
@@ -139,10 +143,8 @@
 
 <main id="main" data-testid="article-page">
   <article>
-    <div class="article-hero" data-testid="article-cover">
-      <div class="article-hero__frame">
-        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg?width=1800" alt="Athlete resting on a bench after a training session" width="1800" height="828" fetchpriority="high">
-      </div>
+    <div class="article-cover" data-testid="article-cover">
+      <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg?width=1800" alt="Athlete resting on a bench after a training session" width="1800" height="828" fetchpriority="high">
     </div>
 
     <div class="container">
@@ -216,8 +218,8 @@
       <p class="eyebrow">From the Efitco blog</p>
       <h2 id="related-title">More Training Tips</h2>
       <div class="carousel-nav">
-        <button class="round-button round-button--prev" type="button" aria-label="Previous articles" aria-disabled="true"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-        <button class="round-button" type="button" aria-label="Next articles"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        <button class="round-button" type="button" aria-label="Previous articles" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
+        <button class="round-button" type="button" aria-label="Next articles"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
       </div>
     </div>
     <ul class="card-row" aria-label="More training tips">
@@ -229,43 +231,50 @@
   </section>
 </main>
 
+<!-- Footer vòng 3 (Figma 1:1104, foundation §4): newsletter · panel dải rộng · hàng cuối có wordmark -->
 <footer class="site-footer">
-  <div class="container">
+  <div class="container site-footer__band">
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
     <div class="site-footer__newsletter">
-      <div>
-        <h2><span>Get 15% Off</span> Your First Order</h2>
-        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
-      </div>
-      <form class="site-footer__form" onsubmit="return false">
-        <label class="visually-hidden" for="nl-email">Email</label>
-        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
-        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
-      </form>
+      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
-    <div class="site-footer__panel">
-      <div class="site-footer__top">
-        <div class="site-footer__brand">
-          <svg class="logo" viewBox="0 0 100 30" aria-label="Efitco" role="img"><use href="#i-logo"/></svg>
-          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
-          <div class="site-footer__social"><a href="#" aria-label="Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a><a href="#" aria-label="YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a><a href="#" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></div>
-        </div>
-        <div class="site-footer__menus">
-          <div class="site-footer__menu"><details open><summary>Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-          <div class="site-footer__menu"><details open><summary>Information <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
-        </div>
+    <form class="site-footer__form" onsubmit="return false" novalidate>
+      <label class="visually-hidden" for="nl-email">Email</label>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+  <div class="site-footer__panel">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <svg class="site-footer__logo" viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+        <ul class="site-footer__social">
+          <li><a href="#" aria-label="Efitco on TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        </ul>
       </div>
-      <ul class="site-footer__trust">
-        <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
-        <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
-        <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
-        <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
-      </ul>
+      <div class="site-footer__menus">
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
     </div>
-    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
-    <div class="site-footer__bottom">
-      <p>© 2026 Efitco, Powered by Shopify</p>
-      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English">USD / EN <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button>
-      <ul class="payment-icons" aria-label="Payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul>
+    <ul class="site-footer__trust">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© 2026 Efitco, Powered by Shopify</p>
+    <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
+    <div class="site-footer__end">
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
     </div>
   </div>
 </footer>
@@ -275,13 +284,13 @@
 
   <section class="demo-block">
     <h2>Trạng thái: bài không có ảnh bìa</h2>
-    <p class="demo-note">Không có ảnh lớn đầu trang → header biến thể A (nền trắng, sổ quyết định 09/11). LCP là h1. Bố cục cột đọc giữ nguyên.</p>
+    <p class="demo-note">Không ảnh bìa (hoặc tắt "Show cover image"): header tối giữ nguyên (sổ 10/11, chỉ 1 biến thể), cột đọc bắt đầu ngay dưới header. LCP là h1, không ảnh eager nào.</p>
     <div class="demo-stage" style="min-height: 0; background: var(--color-background)">
       <header class="site-header demo-plain-header">
         <div class="site-header__inner">
           <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu, sample"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
           <a class="site-header__logo" href="#" aria-label="Efitco home, sample"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
-          <div class="site-header__icons" style="margin-inline-start: auto"><a class="site-header__icon" href="#" aria-label="Search, sample"><svg aria-hidden="true"><use href="#i-search"/></svg></a><a class="site-header__icon" href="#" aria-label="Cart, 2 items, sample"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a></div>
+          <div class="site-header__icons" style="margin-inline-start: auto"><a class="site-header__icon site-header__icon--search" href="#" aria-label="Search, sample"><svg aria-hidden="true"><use href="#i-search"/></svg></a><a class="site-header__icon" href="#" aria-label="Cart, 2 items, sample"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a></div>
         </div>
       </header>
       <div class="article-column" style="padding-inline: var(--space-4)">
