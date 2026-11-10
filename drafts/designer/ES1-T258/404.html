@@ -27,11 +27,20 @@
   .not-found__actions { display: grid; gap: var(--space-3); width: 100%; }
   @media (min-width: 48rem) { .not-found__actions { display: flex; justify-content: center; width: auto; } }
 
+  /* Vòng 3: link danh mục theo kiểu tab Figma 1:490 (bo 4, nền alt, viền #E5E5E5, 16/500, padding 28) thay chip bo tròn vòng 2 */
   .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
   .chips__label { width: 100%; margin-block-end: var(--space-1); color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; }
-  .chip { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding-inline: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background-alt); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
-  .chip:hover { border-color: var(--color-foreground); }
-  .chip span { color: var(--color-muted); font-weight: 400; }
+  .chip { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding-inline: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-button); background: var(--color-background-alt); font-size: var(--font-size-base); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
+  .chip:hover { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
+  .chip:hover span { color: inherit; }
+  .chip span { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+  @media (min-width: 80rem) { .chip { padding-inline: calc(var(--space-1) * 7); } }
+
+  /* Khối sản phẩm: nền trắng (Figma 1:490); không lặp 120 + 120 giữa 2 khối trắng */
+  .nf-products { padding-block-start: 0; }
+  /* Swatch Figma 1:502: 32 × 16 bo 8 cách 4, cách giá 8; chỉ báo aria-hidden (foundation §9) */
+  .nf-swatches { display: flex; gap: var(--space-1); margin: var(--space-1) 0 0; padding: 0; list-style: none; }
+  .nf-swatches li { width: 32px; height: 16px; border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent); border-radius: var(--space-2); background: var(--swatch); }
 
   .section-header--split .button--link { grid-column: 2; grid-row: 1 / span 2; }
   @media (max-width: 47.99rem) { .section-header--split { grid-template-columns: minmax(0, 1fr); } .section-header--split .button--link { grid-column: 1; grid-row: auto; font-size: var(--font-size-lg); } }
@@ -59,14 +68,18 @@
   <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
   <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
   <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
-  <symbol id="i-instagram" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="20" height="20" rx="5"/><circle cx="13" cy="13" r="4.5"/><circle cx="18.6" cy="7.4" r=".6" fill="currentColor"/></g></symbol>
-  <symbol id="i-youtube" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="5.5" width="22" height="15" rx="4"/><path d="m11 10 5 3-5 3v-6Z"/></g></symbol>
-  <symbol id="i-facebook" viewBox="0 0 26 26"><path d="M15.5 4.5h-2a4 4 0 0 0-4 4v3h-2.5v3.5h2.5v8.5h3.5V15h3l.5-3.5h-3.5V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-star" viewBox="0 0 14 13"><path fill="currentColor" d="m7 0 2.1 4.2 4.6.7-3.3 3.2.8 4.6L7 10.5l-4.2 2.2.8-4.6L.3 4.9l4.6-.7L7 0Z"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 28 28"><path d="M16 4v13.5a4.2 4.2 0 1 1-4.2-4.2M16 4c.4 3 2.4 5 5.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="20" height="20" rx="5"/><circle cx="14" cy="14" r="4.5"/><circle cx="19.6" cy="8.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="6.5" width="22" height="15" rx="4"/><path d="m12 11 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 28 28"><path d="M16.5 4.5h-2a4 4 0 0 0-4 4v3H8v3.5h2.5v8.5H14V15h3l.5-3.5H14V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
   <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
 </svg>
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
+<!-- Header vòng 3: thanh tối #1A1A1A + noise, cao 80 (sổ 10/11, Figma 1:362, foundation §3) -->
 <header class="site-header demo-static">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -83,7 +96,7 @@
       </ul>
     </nav>
     <div class="site-header__icons">
-      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
       <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
     </div>
@@ -127,7 +140,8 @@
   </section>
 
   <!-- featured-collection dùng lại (Figma 1:490), không tab; ảnh lazy -->
-  <section class="section section--alt" aria-labelledby="nf-products">
+  <!-- Vòng 3: nền trắng như Figma 1:490 (padding 120, header → lưới 40, card 336 cách 24); thứ tự + badge theo Figma 1:502–1:505 -->
+  <section class="section nf-products" aria-labelledby="nf-products">
     <div class="container">
       <div class="section-header section-header--split">
         <p class="eyebrow">Bestsellers</p>
@@ -136,78 +150,90 @@
       </div>
       <ul class="product-grid">
         <li class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P16_b6c798cf-e03c-4995-b522-1737773992d2.png?width=720" width="720" height="720" alt="Ativafit Lava 66 lb"></div>
-          <div class="product-card__badges"><span class="badge badge--sale">-24%</span></div>
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=720" width="720" height="720" alt="Ativafit Lava 66 lb Adjustable" loading="lazy"></div>
+          <div class="product-card__badges"><span class="badge badge--sale">-24%</span><span class="badge badge--neutral"><svg aria-hidden="true"><use href="#i-star"/></svg>5.0<span class="visually-hidden"> out of 5 stars</span></span></div>
           <div class="product-card__info">
-            <h3 class="product-card__title"><a href="#">Ativafit Lava 66 lb</a></h3>
+            <h3 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable<span class="visually-hidden">, 3 colors</span></a></h3>
             <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s></p>
           </div>
+          <ul class="nf-swatches" aria-hidden="true"><li style="--swatch:#1a1a1a"></li><li style="--swatch:#8a8a8a"></li><li style="--swatch:#f2f2f2"></li></ul>
         </li>
         <li class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=720" width="720" height="720" alt="FlexFold Adjustable Bench"></div>
-          <div class="product-card__badges"><span class="badge badge--sale">-17%</span></div>
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg?width=720" width="720" height="720" alt="Iron Core Kettlebell 16 kg" loading="lazy"></div>
+          <div class="product-card__badges"><span class="badge badge--new">New</span></div>
           <div class="product-card__info">
-            <h3 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h3>
-            <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$189.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$229.00</s></p>
-          </div>
-        </li>
-        <li class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=720" width="720" height="720" alt="Revllen Pro Speed Rope"></div>
-          <div class="product-card__badges"><span class="badge badge--sale">-22%</span></div>
-          <div class="product-card__info">
-            <h3 class="product-card__title"><a href="#">Revllen Pro Speed Rope</a></h3>
-            <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$34.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$44.99</s></p>
-          </div>
-        </li>
-        <li class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg?width=720" width="720" height="720" alt="Iron Core Kettlebell 16 kg"></div>
-          <div class="product-card__info">
-            <h3 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg</a></h3>
+            <h3 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg<span class="visually-hidden">, 3 colors</span></a></h3>
             <p class="price"><span class="visually-hidden">Regular price</span>$119.00</p>
           </div>
+          <ul class="nf-swatches" aria-hidden="true"><li style="--swatch:#1a1a1a"></li><li style="--swatch:#8a8a8a"></li><li style="--swatch:#f2f2f2"></li></ul>
+        </li>
+        <li class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=720" width="720" height="720" alt="FlexFold Adjustable Bench" loading="lazy"></div>
+          <div class="product-card__badges"><span class="badge badge--sale">-17%</span><span class="badge badge--neutral"><svg aria-hidden="true"><use href="#i-star"/></svg>5.0<span class="visually-hidden"> out of 5 stars</span></span></div>
+          <div class="product-card__info">
+            <h3 class="product-card__title"><a href="#">FlexFold Adjustable Bench<span class="visually-hidden">, 3 colors</span></a></h3>
+            <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$189.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$229.00</s></p>
+          </div>
+          <ul class="nf-swatches" aria-hidden="true"><li style="--swatch:#1a1a1a"></li><li style="--swatch:#8a8a8a"></li><li style="--swatch:#f2f2f2"></li></ul>
+        </li>
+        <li class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=720" width="720" height="720" alt="Revllen Pro Speed Rope" loading="lazy"></div>
+          <div class="product-card__badges"><span class="badge badge--sale">-22%</span></div>
+          <div class="product-card__info">
+            <h3 class="product-card__title"><a href="#">Revllen Pro Speed Rope<span class="visually-hidden">, 3 colors</span></a></h3>
+            <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$34.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$44.99</s></p>
+          </div>
+          <ul class="nf-swatches" aria-hidden="true"><li style="--swatch:#1a1a1a"></li><li style="--swatch:#8a8a8a"></li><li style="--swatch:#f2f2f2"></li></ul>
         </li>
       </ul>
     </div>
   </section>
 </main>
 
+<!-- Footer Figma 1:1104 (foundation §4 vòng 3) -->
 <footer class="site-footer">
-  <div class="container">
+  <div class="container site-footer__band">
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
     <div class="site-footer__newsletter">
-      <div>
-        <h2><span>Get 15% Off</span> Your First Order</h2>
-        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
-      </div>
-      <form class="site-footer__form" action="#" method="post">
-        <label class="visually-hidden" for="nl-email">Email</label>
-        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
-        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
-      </form>
+      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
-    <div class="site-footer__panel">
-      <div class="site-footer__top">
-        <div class="site-footer__brand">
-          <svg class="logo" viewBox="0 0 100 30" aria-label="Efitco" role="img"><use href="#i-logo"/></svg>
-          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
-          <div class="site-footer__social"><a href="#" aria-label="Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a><a href="#" aria-label="YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a><a href="#" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></div>
-        </div>
-        <div class="site-footer__menus">
-          <div class="site-footer__menu"><details open><summary>Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-          <div class="site-footer__menu"><details open><summary>Information <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
-        </div>
+    <form class="site-footer__form" action="#" method="post" novalidate>
+      <label class="visually-hidden" for="nl-email">Email</label>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+  <div class="site-footer__panel">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <svg class="site-footer__logo" viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+        <ul class="site-footer__social">
+          <li><a href="#" aria-label="Efitco on TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        </ul>
       </div>
-      <ul class="site-footer__trust">
-        <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
-        <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
-        <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
-        <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
-      </ul>
+      <div class="site-footer__menus">
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
     </div>
-    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
-    <div class="site-footer__bottom">
-      <p>© 2026 Efitco, Powered by Shopify</p>
-      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English">USD / EN <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button>
-      <ul class="payment-icons" aria-label="Payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul>
+    <ul class="site-footer__trust">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© 2026 Efitco, Powered by Shopify</p>
+    <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
+    <div class="site-footer__end">
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
     </div>
   </div>
 </footer>

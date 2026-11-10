@@ -1,6 +1,16 @@
 KHÔNG CHẮC: demo-data không có pages, shop.email, shop policies (hỏi BA ở ES1-T268). Copy mẫu lấy từ Figma 1:992, 1:1057, 1:1104 và locale `blocks.faq_item.*`; nội dung thật do merchant soạn trong Pages.
 
-# UI spec: Page nội dung và Contact (ES1-T258)
+# UI spec: Page nội dung và Contact (ES1-T258, vòng 3)
+
+## Thay đổi so với vòng 2
+
+| # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Header | Header A nền trắng, viền dưới | thanh tối `--color-background-dark` + noise, cao 80, không đè nội dung; logo 100 × 30; menu trắng 60%, "Contact" `aria-current` trắng 100% + gạch chân 2px; search 20, account/cart 24 | Sổ 10/11, Figma 1:362, 1:377, foundation §3 |
+| 2 | Footer | newsletter 2 cột, 3 social, wordmark tách hàng | footer Figma 1:1104: ảnh 98 × 123 + 2 thẻ sau, panel dải rộng bo 16 nền +2% trắng, 4 social (TikTok, Instagram, YouTube, Facebook) tên "Efitco on …", wordmark giữa hàng cuối với copyright và cờ + USD / EN + 5 icon thanh toán | Figma 1:1104–1:1192, foundation §4 |
+| 3 | Aside Contact | bo 24 (`--radius-dialog`) | bo 16 (`--radius-card` + 4) như thẻ Figma 1:361, 1:1022, 1:1106 | Figma |
+| 4 | Câu hỏi accordion aside | 16 mọi mốc | 18/600 từ 1280 như Figma 1:1057; 16 dưới 1280 | Figma 1:1057 |
+| 5 | Breadcrumb, form, RTE, trạng thái S1–S6 | — | giữ nguyên; breadcrumb nằm trên nền trắng ngay dưới thanh tối | foundation §5 |
 
 Mục đích: người mua đọc trang nội dung (Our Story, FAQs, chính sách) dễ đọc trên mọi màn; trên Contact Us gửi được câu hỏi trong 1 form 3 trường, và thấy câu trả lời nhanh trước khi viết. Story TE-9 AC2 (page.contact: form name/email/message có validation và thông báo), AC5 (link chính sách từ `shop.policies`).
 
@@ -20,14 +30,14 @@ Merchant gán template "contact" cho page Contact Us trong Admin. Không thêm J
 ## 2. Anatomy
 
 Page mặc định (S1):
-1. Header A (foundation §3, nền trắng, viền dưới). Menu "Our Story" có `aria-current="page"` khi đúng trang.
+1. Header (foundation §3 vòng 3: thanh tối + noise, cao 80, không đè nội dung). Menu "Our Story" có `aria-current="page"` khi đúng trang (trắng 100% + gạch chân 2px).
 2. Breadcrumb: Home / {page.title} (foundation §5).
 3. Tiêu đề: h1 `--font-size-h1`.
 4. RTE `.rte`: đoạn, h2–h4, link, danh sách, trích dẫn, ảnh + chú thích, bảng, đường kẻ.
-5. Footer (foundation §4).
+5. Footer (foundation §4, Figma 1:1104).
 
 Contact (phần chính mockup):
-1. Header A, breadcrumb Home / Contact Us, h1 "Contact Us".
+1. Header tối (menu "Contact" `aria-current`), breadcrumb Home / Contact Us, h1 "Contact Us".
 2. `.rte` intro (page.content).
 3. Form `contact-form`: h2 "Send Us A Message" + ghi chú "* Required fields" · Name* · Email* · Message* + gợi ý "Add your order number if your message is about an order." · câu quyền riêng tư có link Privacy policy (`shop.policies`) · nút primary "Send Message" (icon gửi).
 4. Aside: eyebrow "Questions and Answers" (Figma 1:1057) · h2 "Quick Answers Before You Write" · accordion 5 câu (locale `faq_item`, câu đầu mở) · link "Shipping policy", "Refund policy" (`shop.policies`).
@@ -53,7 +63,7 @@ Trường đúng SRS TE-9 AC2 (name, email, message); không thêm phone, subjec
 | Contact: lưới | 1 cột: intro → form → aside | 1 cột | 12 cột: form 1–7, aside 9–12 sticky (top 80+24) | như 1280, nội dung 1416 |
 | Form trường | 1 cột, gap 24 | Name + Email 2 cột, Message cả hàng | như 768 | như 768 |
 | Nút Send Message | full width, cao 48 | auto, min 200, căn trái | cao 52 | cao 52 |
-| Aside | padding 32/24, bo 24, nền alt | padding 32 | padding 40 | padding 40 |
+| Aside | padding 32/24, bo 16, nền alt, câu hỏi 16 | padding 32 | padding 40, câu hỏi 18/600 | như 1280 |
 | Breadcrumb → h1 → nội dung | 16 / 48 | 16 / 48 | 24 / 64 | 24 / 64 |
 | Contact → footer | 48 | 48 | 120 | 120 |
 
@@ -103,11 +113,13 @@ Spam: Shopify có thể chuyển sang trang hCaptcha `/challenge` sau submit; kh
 
 ## 8. Token dùng
 
-`--color-background|foreground|muted|muted-light|border|background-alt|background-sand|accent|sale|badge-new`, `--font-heading--*`, `--font-primary--family`, `--font-size-sm|base|lg|h1|h2|h3`, `--space-1..8`, `--radius-input|button|card`, `--radius-dialog` (dẫn xuất), `--control-height`, `--section-gap`, `--grid-gap`, `--header-height`, `--motion-accordion`. Không token mới.
+`--color-background|foreground|muted|muted-light|border|background-alt|background-sand|accent|sale|badge-new`, `--font-heading--*`, `--font-primary--family`, `--font-size-sm|base|lg|h1|h2|h3`, `--space-1..8`, `--radius-input|button|card` (bo 16 = `--radius-card` + `--space-1`), `--color-background-dark(-foreground)`, `--color-muted-on-dark` (header, footer), `--control-height`, `--section-gap`, `--grid-gap`, `--header-height`, `--motion-accordion`. Không token mới.
 
 ## 9. Lighthouse
 
 - LCP: Contact = h1 "Contact Us" (không ảnh trên màn đầu). Page mặc định = h1 hoặc ảnh đầu tiên trong RTE nếu nằm trên màn đầu.
+- Header tối: noise là `background-image` nhỏ có sẵn (`assets/noise-dark.png`) trong critical.css, không phải ảnh LCP; ảnh footer 98 × 123 lazy.
+- SEO: page nằm trong phạm vi SEO 100 (sổ 10/11).
 - Ảnh lazy: mọi ảnh trong RTE. Liquid: `page.content | replace: '<img ', '<img loading="lazy" decoding="async" '` (ĐỀ XUẤT; ảnh RTE Shopify không có width/height → rủi ro CLS, CSS `height: auto` + bo góc giữ tỉ lệ khi ảnh đã tải).
 - Font: 2 họ qua font_picker (Sofia Sans Condensed 700/800, Inter 400/500/600); preload 1 font body.
 - Rủi ro A11y và cách tránh: `link-in-text-block` → link RTE gạch chân; `heading-order` → merchant gõ h1 trong nội dung: CSS không sửa được, thêm hướng dẫn trong gợi ý editor; `label` → label thật; `target-size` → control ≥ 44; bảng thiếu `<th>` do merchant → không sửa được, ghi chú QA.
