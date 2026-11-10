@@ -1,8 +1,25 @@
-KHÔNG CHẮC: SRS 0.2 không có story/AC cho 3 popup (chỉ newsletter footer TE-1 AC6), demo-data không có mã giảm giá (WELCOME15 là mã mẫu), "khu vực khuyến mãi" của offer hiểu là deal Figma 1:759 → hỏi BA ES1-T273. Hành vi customer form khi email đã đăng ký, mở lại popup sau POST không JS, ngân sách JS → hỏi Tech Lead ES1-T274.
+KHÔNG CHẮC: SRS 0.2 không có story/AC cho 3 popup (chỉ newsletter footer TE-1 AC6), demo-data không có mã giảm giá (WELCOME15 là mã mẫu) → hỏi BA ES1-T273 #1, #2, #4. Hành vi customer form khi email đã đăng ký, mở lại popup sau POST không JS, ngân sách JS (thêm bộ quản lý hàng đợi) → hỏi Tech Lead ES1-T274 #1–#3. ES1-T273 #3 và ES1-T274 #4 đã có CTO chốt 10/11 (mục 11).
 
-# UI spec: Popup marketing — newsletter, before you leave, big offer (ES1-T263, vòng 3)
+# UI spec: Popup marketing — newsletter, before you leave, big offer (ES1-T263, vòng 3b)
 
-## Thay đổi so với vòng 2
+## Thay đổi vòng 3b (CTO chốt 10/11)
+
+| # | Thành phần | Vòng 3 | Vòng 3b | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Before you leave trên mobile | setting "Show on mobile" mặc định tắt (câu CTO 1) | mặc định BẬT; tín hiệu cuộn ngược nhanh (≥ 30% chiều cao màn trong < 500 ms, sau khi đã cuộn ≥ 50% và ≥ 15 s); không `history.pushState` | CTO 10/11 MK1 |
+| 2 | Mặc định khi cài theme | newsletter tắt, before you leave bật (desktop), big offer bật | cả 3 BẬT | CTO 10/11 MK3 |
+| 3 | Tần suất | tối đa 1 popup tự mở mỗi phiên (cái nào tới trước) | mỗi lúc 1 popup, hàng đợi: đóng popup đang hiện thì popup kế mới được hiện; mỗi popup tự mở tối đa 1 lần mỗi phiên (≤ 2 popup tự mở mỗi phiên) + số ngày theo setting | CTO 10/11 MK3; mục 1.2 |
+| 4 | Thứ tự, điều kiện, popup cùng đủ điều kiện, nút Big Offer có là popup | chỉ 1 câu "before you leave > newsletter" | bảng điều kiện + quy tắc hàng đợi 8 điều (mục 1.2); nút Big Offer không phải popup, thẻ big offer chiếm lớp | CTO 10/11 MK3; ĐỀ XUẤT 15 §1, 22 §6 #5, §7 |
+| 5 | Big offer | "khu vực khuyến mãi" là KHÔNG CHẮC (câu CTO 2) | chốt: nút nổi góc dưới trái mở thẻ deal; nút chỉ hiện khi còn hàng, có giá gạch, chưa hết giờ | CTO 10/11 MK2 |
+| 6 | Before you leave biến thể B | luôn dùng khi giỏ rỗng có mã | bỏ nếu người mua đã đăng ký newsletter trong phiên (đã nhận mã 15%) | ĐỀ XUẤT 22 §6 #7 (nội dung liên quan) |
+| 7 | Settings | before you leave không có số ngày | thêm "Days before showing again" (mặc định 1) cho before you leave | 15 §1 (Frequency capping ≤ 1 lần/ngày) |
+| 8 | Mockup | mục 1 newsletter, mục 2 before you leave riêng | mục 1 "One Popup At A Time": dòng thời gian 4 bước + 3 khung nối tiếp: bước 1 newsletter hiện → bước 2 đã đóng, nghỉ 3 s, chỉ còn nút Big Offer → bước 3 before you leave hiện; nút Big Offer vẽ dưới scrim ở bước 1, 3; sửa khung ngắn ở 1280/1920 (trước bị kéo cao 720) | CTO 10/11 MK3 |
+| 9 | Trạng thái | — | thêm "Hàng đợi · popup đang chờ" | mục 5 |
+| 10 | Mục 11 | "Quyết định CTO cần chốt" 3 câu | "Quyết định CTO đã chốt (10/11)" + 3 câu mới, mỗi câu 1 dòng | ticket vòng 3b |
+
+Giữ nguyên từ vòng 3: giao diện 3 popup, copy, cỡ chữ, đếm ngược, badge, trạng thái cũ, motion, tương phản.
+
+## Thay đổi so với vòng 2 (vòng 3, giữ để tra)
 
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
 | --- | --- | --- | --- | --- |
@@ -16,7 +33,7 @@ KHÔNG CHẮC: SRS 0.2 không có story/AC cho 3 popup (chỉ newsletter footer 
 | 8 | Teaser "Big Offer" | nền `--color-foreground` phẳng | nền `--color-background-dark` + noise như header, hover trắng 14% | foundation §2 (`--dark-texture`) |
 | 9 | Trạng thái | — | thêm "thẻ tĩnh, đếm ngược ẩn" (ngày kết thúc sai định dạng) | §5 |
 
-Giữ nguyên: nội dung, copy, trigger, tần suất, settings, mọi trạng thái vòng 2, 3 câu CTO.
+Giữ nguyên (vòng 3): nội dung, copy, trigger, tần suất, settings, mọi trạng thái vòng 2, 3 câu CTO. Tần suất, mặc định và trigger mobile đã đổi ở vòng 3b (bảng trên).
 
 Lệch đã biết, không sửa trong ticket này (ticket cấm đổi token): Figma 1:1152/1:1154 bo input và nút 8, token `--radius-input`/`--radius-button` = 4 (P4, thuộc foundation); tiêu đề popup Sofia 700 theo Figma 1:1148, foundation §16 ghi 800 cho tiêu đề dialog — popup marketing theo Figma (Figma > bộ kiến thức).
 
@@ -25,7 +42,7 @@ Story: TE-9 (overlay toàn theme, sổ quyết định 09/11); newsletter liên 
 
 Đầu ra:
 - Spec này.
-- `drafts/designer/ES1-T263/marketing-popups.html` + `marketing-popups-360|768|1280|1920.png`. Nhúng `../_kit/kit.css` (foundation vòng 3); CSS riêng ở `<style>` đầu file. Đầu file là header tối như mọi trang; mỗi khung popup vẽ trang chủ vòng 3 phía sau (dải tối noise, header 80, hero thẻ bo góc dưới header). Trạng thái ở mục 5 cuối file.
+- `drafts/designer/ES1-T263/marketing-popups.html` + `marketing-popups-360|768|1280|1920.png`. Nhúng `../_kit/kit.css` (foundation vòng 3); CSS riêng ở `<style>` đầu file. Đầu file là header tối như mọi trang; mỗi khung popup vẽ trang chủ vòng 3 phía sau (dải tối noise, header 80, hero thẻ bo góc dưới header). Mục 1 là chuỗi hàng đợi (newsletter → đóng → before you leave), mục 2 before you leave có mã, mục 3 big offer, trạng thái ở mục 4 cuối file.
 
 Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:359 (gốc duy nhất, sổ 10/11; không dùng trang live hay ảnh chụp store) > bộ kiến thức (file `NN`). Figma không có popup nào. Copy và cỡ chữ newsletter lấy Figma 1:1146 (footer); deal, hàng giá, đếm ngược lấy Figma 1:759 (featured product: 1:772, 1:773, 1:782). Mọi thứ khác là `ĐỀ XUẤT:` kèm nguồn. Thành phần nền: `docs/ui-spec/foundation.md` §6 nút, §12 form, §16 dialog/bottom sheet, §17 toast, §18 trạng thái, §19 motion.
 
@@ -36,15 +53,40 @@ Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:359 (gốc d
 | Quy tắc | Giá trị | Nguồn |
 | --- | --- | --- |
 | Không mở lúc tải trang | newsletter: ≥ 10 s VÀ cuộn ≥ 50%; before you leave: ý định rời trang sau ≥ 15 s; big offer: chỉ mở khi người mua rê/chạm nút | Sổ quyết định 09/11 (Performance); 15 §1; 22 §6 #1 |
-| Một lớp | không mở khi drawer, dialog, mega menu, search đang mở; chờ đóng xong mới xét lại | 15 §1; foundation §16 |
-| Tần suất | tối đa 1 popup **tự mở** mỗi phiên (newsletter hoặc before you leave, cái nào tới trước); đóng newsletter thì không hiện lại trong 7 ngày (setting); đã đăng ký thì không hiện nữa | 15 §1 (Frequency capping); 22 §7 |
+| Một lớp, hàng đợi | mỗi lúc 1 popup; đóng popup đang hiện thì popup kế mới được hiện; chi tiết mục 1.2 | CTO 10/11 MK3; 15 §1; 22 §6 #5; foundation §16 |
+| Tần suất | mỗi popup tự mở tối đa 1 lần mỗi phiên (≤ 2 popup tự mở mỗi phiên); newsletter đóng mà không đăng ký: ẩn 7 ngày (setting); đã đăng ký: không hiện nữa; before you leave: ẩn 1 ngày (setting) | CTO 10/11 MK3; 15 §1 (Frequency capping); 22 §7 |
+| Mặc định | cả 3 BẬT (newsletter, before you leave cả mobile, big offer) | CTO 10/11 MK1, MK3 |
 | Không hiện ở | 404, cart, password, gift card, trang tài khoản; khách đăng nhập có `customer.accepts_marketing` thì không render newsletter | 15 §1 (không popup 404); 22 §6 #9 |
 | Đóng | nút × (48 mobile, 40–48 desktop), Escape, chạm scrim, vuốt xuống trên sheet; "No, thanks" trung tính (không confirmshaming) | 15 §1, §2; 14 |
 | Mobile | bottom sheet, cao ≤ 60% màn hình, thấy được nội dung phía sau; không full-screen | 15 §1–2; Google intrusive interstitial (ticket) |
 | Nội dung | < 50 từ, tiêu đề nói rõ ưu đãi, 1 CTA chính, nhãn mở bằng động từ | 15 §1; 04 §1–2 |
 | Không JS | không popup nào (trigger cần JS); form newsletter footer vẫn chạy (NFR-4) | SRS NFR-4 |
 
-Thứ tự ưu tiên khi trùng thời điểm: before you leave > newsletter (người mua sắp rời đi). Big offer không tính vào giới hạn phiên vì người mua tự mở.
+### 1.1 Điều kiện kích hoạt và thứ tự ưu tiên
+
+Không popup nào mở lúc tải trang (sổ 09/11). Thời gian tính trên từng trang, chỉ khi tab đang hiển thị.
+
+| Popup | Kiểu | Mở khi (sớm nhất) | Ưu tiên | Sau khi đã hiện |
+| --- | --- | --- | --- | --- |
+| Before you leave | tự mở, modal | desktop có chuột: con trỏ rời mép trên cửa sổ sau ≥ 15 s trên trang; cảm ứng (mobile, tablet): cuộn ngược ≥ 30% chiều cao màn trong < 500 ms, sau khi đã cuộn ≥ 50% trang và ≥ 15 s; có nội dung (giỏ có hàng, hoặc giỏ rỗng có mã) | 1 | không hiện lại trong phiên; thêm 1 ngày (setting) |
+| Newsletter | tự mở, modal | ≥ 10 s trên trang VÀ cuộn ≥ 50% (setting) | 2 | không hiện lại trong phiên; đóng không đăng ký: 7 ngày; đã đăng ký: không hiện nữa |
+| Thẻ big offer | người mua mở (rê 150 ms / chạm / Enter trên nút Big Offer); sheet modal < 48rem, popover ≥ 48rem | không tự mở | — | mở lại được, không tính giới hạn phiên (người mua chủ động) |
+| Nút Big Offer (teaser) | **không phải popup**: nút nổi, không che nội dung, không tự mở thẻ | cuộn ≥ 25%, sản phẩm còn hàng, có giá gạch, chưa hết giờ | — | × trên nút: ẩn trong phiên + 1 ngày (setting) |
+
+Lý do before you leave đứng trước newsletter: tín hiệu rời trang là cơ hội cuối, nội dung cá nhân hoá theo giỏ (22 §8 "Bạn muốn lưu giỏ hàng trước khi thoát?"); newsletter là điều kiện trạng thái nên chờ được.
+
+### 1.2 Quy tắc hàng đợi (CTO 10/11 MK3; chi tiết là ĐỀ XUẤT, nguồn 15 §1, 22 §6 #5, §7)
+
+1. **Lớp** = popup tự mở, thẻ big offer, drawer giỏ, menu, search, quickview, mega menu, dialog quiz. Có lớp đang mở thì popup tự mở không mở.
+2. **Đủ điều kiện khi đang có lớp:** newsletter (điều kiện trạng thái) vào trạng thái chờ. Before you leave (tín hiệu tức thời) không giữ chỗ, chờ tín hiệu rời trang kế tiếp sau khi lớp đóng: mở ngay sau khi người mua vừa đóng lớp khác là chồng popup trá hình (22 §6 #5).
+3. **Lớp đóng** (×, Esc, chạm scrim, vuốt xuống, "No, thanks", "Keep shopping", "Continue Shopping", rời thẻ big offer) → nghỉ 3 s → mở popup đang chờ có ưu tiên cao nhất nếu điều kiện vẫn đúng (còn ở trang, không lớp nào mở, không đang gõ trong ô nhập). Tín hiệu rời trang trong 3 s nghỉ bị bỏ qua.
+4. **Hai popup cùng đủ điều kiện cùng lúc** (vd rời trang đúng lúc newsletter vừa đủ 10 s + 50%): before you leave mở, newsletter chờ; đóng before you leave → nghỉ 3 s → newsletter mở nếu người mua còn ở trang.
+5. **Đánh dấu "đã hiện"** ngay khi popup mở (không đợi đóng), dù đóng bằng cách nào. Cờ phiên trong `sessionStorage`, cờ số ngày trong `localStorage` có hạn. Bấm CTA rời trang cũng tính đã hiện.
+6. **Chuyển trang:** hàng đợi không mang sang trang mới; thời gian, độ cuộn tính lại; cờ phiên giữ nguyên.
+7. **Đã đăng ký newsletter trong phiên** (popup hoặc footer): before you leave không dùng biến thể B (mã 15% trùng), chỉ biến thể A khi giỏ có hàng; giỏ rỗng thì không mở.
+8. **Nút Big Offer** không vào hàng đợi, không chặn popup tự mở, hiện độc lập theo điều kiện riêng. Khi popup modal mở, nút nằm dưới scrim (`inert`), không bấm được. Khi thẻ big offer đang mở (người mua chủ động), popup tự mở chờ theo điều 2.
+
+Chuỗi mẫu trong mockup mục 1: giỏ 2 món, t = 12 s, cuộn 55% → newsletter hiện (bước 1) → người mua bấm "No, thanks" (newsletter ghi đã hiện, ẩn 7 ngày) → nghỉ 3 s, chỉ còn nút Big Offer (bước 2) → lần rời trang kế tiếp (chuột lên thanh tab / cuộn ngược nhanh) → before you leave biến thể A hiện (bước 3) → đóng → hết popup tự mở trong phiên.
 
 ---
 
@@ -82,7 +124,7 @@ Mobile chỉ còn tiêu đề + form vì 15 §1 "không che nội dung chính" v
 
 | Tên | Kiểu | Default | Giới hạn |
 | --- | --- | --- | --- |
-| Show newsletter popup | checkbox | ĐỀ XUẤT false (câu CTO 3) | — |
+| Show newsletter popup | checkbox | true (CTO 10/11 MK3) | — |
 | Image | image_picker | `efx-news.jpg` truyền từ layout như footer | ảnh dọc 3:4, ≥ 600 px rộng |
 | Heading | inline_richtext | `<em>Get 15% Off</em> Your First Order` (`<em>` hiện màu accent, không nghiêng) | ≤ 8 từ |
 | Text | inline_richtext | Figma 1:1149 | ≤ 30 từ |
@@ -105,14 +147,15 @@ Figma: không có. ĐỀ XUẤT theo 15 §1, §2 #12; 22 §8.
 
 ### Trigger
 - Desktop (con trỏ chuột): con trỏ ra khỏi cửa sổ qua mép trên (`clientY ≤ 0`, `relatedTarget` null) sau ≥ 15 s trên trang (setting). Không mở nếu người mua đang gõ trong ô nhập.
-- Mobile/tablet cảm ứng: ticket ghi "quay lại trên mobile"; 15 §1 và 22 §8 khuyên tránh mobile. ĐỀ XUẤT setting "Show on mobile" mặc định tắt; khi bật, tín hiệu là cuộn ngược nhanh (≥ 30% chiều cao màn trong < 500 ms) sau khi đã cuộn ≥ 50%. Không dùng `history.pushState` chặn nút Back (người mua mất quyền điều khiển; 22 §7 User control). Câu CTO 1, câu Tech Lead ES1-T274 #4.
+- Mobile/tablet cảm ứng (CTO 10/11 MK1): setting "Show on mobile" mặc định BẬT. Tín hiệu: cuộn ngược nhanh (≥ 30% chiều cao màn trong < 500 ms) sau khi đã cuộn ≥ 50% trang và ≥ 15 s trên trang. Không dùng `history.pushState` chặn nút Back (người mua mất quyền điều khiển; 22 §7 User control). Kết hợp nhiều tín hiệu (thời gian + độ cuộn) để giảm mở nhầm khi người mua chỉ cuộn lên đọc lại (15 §1 exit-intent, 22 §8 Rủi ro).
+- Cả hai: chỉ mở khi hàng đợi trống (mục 1.2); không mở khi đang gõ trong ô nhập.
 
 ### Nội dung theo giỏ
 
 | Biến thể | Khi nào | Nội dung |
 | --- | --- | --- |
 | A. Giỏ có hàng | `cart.item_count > 0` | eyebrow "Before You Go" · h2 "Your Cart Is Saved" · câu "Your {n} items are still in your cart. Check out in a few steps." · tối đa 2 dòng hàng (desktop), 1 dòng (mobile) + link "View {n} more item(s) in your cart" · Subtotal · "Keep shopping" (đóng) + primary "Check Out Now" |
-| B. Giỏ rỗng, có mã | `cart.item_count == 0` và setting mã không rỗng | eyebrow · h2 "<em>Take 15% Off</em> Your First Order" · "Use this code at checkout on your first order." · ô mã + "Copy Code" · "No, thanks" + primary "Shop All Equipment" |
+| B. Giỏ rỗng, có mã | `cart.item_count == 0`, setting mã không rỗng, người mua chưa đăng ký newsletter trong phiên (mục 1.2 điều 7) | eyebrow · h2 "<em>Take 15% Off</em> Your First Order" · "Use this code at checkout on your first order." · ô mã + "Copy Code" · "No, thanks" + primary "Shop All Equipment" |
 | Rỗng | giỏ rỗng, không có mã | không render, không mở |
 
 Dữ liệu trên mockup (demo-data): Ativafit Lava 66 lb Adjustable (`figma-ativafit-lava-featured`, Black, $379.99 gạch $499.99, ảnh `efx-prod-P15.jpg`) + Iron Core Kettlebell 16 kg (`figma-iron-core-kettlebell`, Black, $119.00, ảnh `efx-prod-P02.jpg`), Subtotal $498.99. Trạng thái ≥ 3 dòng thêm Speed rope $34.00 → $532.99. KHÔNG CHẮC: ảnh P02 đúng kettlebell trên PNG, nhưng store dev nhiều ảnh lệch tên (ES1-T245).
@@ -138,9 +181,10 @@ Dòng hàng: lưới `64px 1fr auto`, gap 16, padding-block 12, gạch 1px `--co
 
 | Tên | Kiểu | Default | Giới hạn |
 | --- | --- | --- | --- |
-| Show before you leave popup | checkbox | true (câu CTO 3) | — |
+| Show before you leave popup | checkbox | true (CTO 10/11 MK3) | — |
 | Minimum time on page | range (s) | 15 | 5–60 |
-| Show on mobile | checkbox | false | — |
+| Show on mobile | checkbox | true (CTO 10/11 MK1) | tín hiệu cuộn ngược nhanh |
+| Days before showing again | range | 1 | 1–30 (15 §1 ≤ 1 lần/ngày) |
 | Show cart items | checkbox | true | tắt thì giỏ có hàng dùng biến thể B |
 | Discount code | text | rỗng | KHÔNG CHẮC: store dev chưa có mã (ES1-T273) |
 | Offer heading | inline_richtext | `<em>Take 15% Off</em> Your First Order` | ≤ 8 từ |
@@ -152,7 +196,7 @@ Dòng hàng: lưới `64px 1fr auto`, gap 16, padding-block 12, gạch 1px `--co
 
 ## 4. Big offer (offer popup, rê vào khu vực khuyến mãi)
 
-Figma: không có popup. "Khu vực khuyến mãi" = nút nổi "Big Offer" (teaser); nội dung là deal của Figma 1:759 (sản phẩm giảm giá + "Sale ends in" đếm ngược). KHÔNG CHẮC, câu CTO 2 + ES1-T273 #3. Kiểu mobile theo 15 §2 #6 (offer: popup từ dưới lên có ×).
+Figma: không có popup. CTO chốt 10/11 (MK2): "khu vực khuyến mãi" = nút nổi "Big Offer" (teaser) góc dưới trái, mở thẻ deal của sản phẩm giảm giá (Figma 1:759: sản phẩm + "Sale ends in" đếm ngược); teaser chỉ hiện khi còn hàng, có giá gạch, chưa hết giờ. Mặc định BẬT (MK3). Teaser không phải popup; thẻ đang mở chiếm lớp trong hàng đợi (mục 1.2 điều 1, 8). Kiểu mobile theo 15 §2 #6 (offer: popup từ dưới lên có ×).
 
 ### Anatomy
 1. Teaser (nút nổi, `position: fixed`, góc dưới inline-start): pill nền `--color-background-dark` + noise (như header vòng 3), chữ `--color-background-dark-foreground` · nút mở (icon tag 20 + "Big Offer" 14/600 + badge sale "-24%" pill 28) cao 48 · nút ẩn × 44 × 48 tách bằng gạch 1px trắng 24%.
@@ -188,7 +232,7 @@ Dữ liệu mockup: `figma-ativafit-lava-featured` $379.99 / $499.99 → −24% 
 
 | Tên | Kiểu | Default | Giới hạn |
 | --- | --- | --- | --- |
-| Show big offer button | checkbox | true (câu CTO 3) | — |
+| Show big offer button | checkbox | true (CTO 10/11 MK3) | — |
 | Product | product | `figma-ativafit-lava-featured` truyền từ layout | phải có giá gạch |
 | Button text | text | Big Offer | ≤ 3 từ |
 | Sale end date | text | rỗng; demo truyền như featured product | định dạng YYYY-MM-DD HH:MM, giờ store; sai định dạng thì ẩn đếm ngược (như `featured_product.countdown_invalid`) |
@@ -203,7 +247,7 @@ Dữ liệu mockup: `figma-ativafit-lava-featured` $379.99 / $499.99 → −24% 
 
 ## 5. Trạng thái
 
-Figma không có trạng thái nào (figma-inventory). Tất cả là ĐỀ XUẤT theo foundation §12, §17, §18; 05 §3–5. Mockup mục 5 cuối file.
+Figma không có trạng thái nào (figma-inventory). Tất cả là ĐỀ XUẤT theo foundation §12, §17, §18; 05 §3–5. Mockup mục 4 cuối file.
 
 | Trạng thái | Popup | Hiển thị | ARIA |
 | --- | --- | --- | --- |
@@ -219,7 +263,8 @@ Figma không có trạng thái nào (figma-inventory). Tất cả là ĐỀ XU�
 | Sản phẩm không ảnh | big offer | placeholder icon ảnh `--color-muted-light` trên cream (edge case "Sản phẩm không có media", $34.00) | — |
 | Ảnh đang tải | big offer, newsletter | skeleton cùng tỉ lệ (`.skeleton`), không đổi kích thước | `aria-hidden` |
 | Đếm ngược ẩn | big offer | ngày kết thúc rỗng hoặc sai định dạng: thẻ bỏ thanh đếm ngược, giữ sản phẩm + giá + "Shop The Deal" (như `featured_product.countdown_invalid`) | — |
-| Rỗng | cả 3 | không render: giỏ rỗng không mã; sản phẩm hết hàng/không giá gạch/hết giờ; đã đăng ký, đóng trong N ngày, trang loại trừ | — |
+| Hàng đợi · đang chờ | newsletter | không hiện gì; mở 3 s sau khi lớp đang mở (thẻ big offer, drawer, menu, search) đóng, nếu còn ở trang; before you leave không chờ (mục 1.2) | — |
+| Rỗng | cả 3 | không render: giỏ rỗng không mã (hoặc đã đăng ký trong phiên); sản phẩm hết hàng/không giá gạch/hết giờ; đã đăng ký, đã hiện trong phiên, đóng trong N ngày, trang loại trừ | — |
 | Hover/focus | mọi nút | theo foundation §6: primary đậm + nhấc 1px; × đảo nền foreground; link-button sang foreground; teaser phủ trắng 14%; focus outline 2px accent offset 2 (teaser thêm vòng trắng 2px để thấy trên ảnh tối) | — |
 | Disabled | nút gửi | không disable trước khi nhập (lỗi chỉ hiện sau gửi, 05 §4); trong lúc gửi dùng busy | — |
 
@@ -289,7 +334,7 @@ Không token mới. Giá trị lẻ (264, 288, 400, 720, 480, 96, 120) là kích
 - Ảnh lazy: tất cả ảnh trong popup. Newsletter (`efx-news.jpg`, `sizes` 288px, srcset 360/720), ảnh dòng giỏ (64 → srcset 128), ảnh sản phẩm big offer (120 → 240) nằm trong `<dialog>` đóng (không hiển thị nên trình duyệt chưa tải) + `loading="lazy"`; có `width`/`height`, `object-fit` (không méo, BP "image aspect ratio"). Mobile không render ảnh newsletter.
 - Font: chỉ Sofia Sans Condensed + Inter có sẵn, không thêm weight mới (heading 700/800, body 400/500/600/700; Inter 700 cho số đếm ngược đã có ở featured product Figma 1:777).
 - CLS 0: popup, scrim, teaser đều `position: fixed`; nút giữ bề rộng khi busy; dòng trạng thái copy giữ chỗ 20px; skeleton cùng tỉ lệ.
-- JS: 1 module chung cho 3 popup (trigger thời gian/cuộn/rời trang, cờ `localStorage`/`sessionStorage`, copy bằng `navigator.clipboard` chỉ khi người mua bấm), nạp lúc rảnh (`requestIdleCallback`) sau `load`, không chặn render. Ngân sách: ES1-T274 #3.
+- JS: 1 module chung cho 3 popup (trigger thời gian/cuộn/rời trang/cuộn ngược nhanh, hàng đợi 1 lớp mục 1.2, cờ `localStorage`/`sessionStorage`, copy bằng `navigator.clipboard` chỉ khi người mua bấm), nạp lúc rảnh (`requestIdleCallback`) sau `load`, không chặn render. Bắt cuộn bằng listener `passive` (không ảnh hưởng INP/cuộn). Ngân sách: ES1-T274 #3.
 - A11y rủi ro và cách tránh: dialog không tên (có h2 + `aria-labelledby`); nút icon không tên (mọi × có `aria-label` riêng); placeholder nhạt (muted-light 5.33); chữ cam nhỏ (accent chỉ dùng cho eyebrow 16/800 và tiêu đề lớn, đều ≥ 4.5 trên nền trắng); chữ đỏ trên nền tối (không có, footer foundation §4 đã cảnh báo; popup nền trắng); vùng chạm < 24 (không có); focus mất khi đóng (trả focus); `aria-hidden` chứa phần tử focus được (ảnh big offer không phải link).
 - SEO: link mô tả đích ("Check Out Now", "Shop All Equipment", "Shop The Deal", "View 1 more item in your cart", "Privacy policy"); không "Learn more" trần; chữ ≥ 14 (badge 13 theo DESIGN); ảnh có alt (ảnh trang trí `alt=""`). Nội dung popup ở cuối `<body>`, sau `<main>`, không đẩy nội dung chính xuống trong DOM.
 - Best Practices: không xin quyền khi tải (clipboard chỉ khi bấm); không `history.pushState` chặn Back; 0 lỗi console (render mockup 4 mốc: 0 lỗi); không chặn dán vào ô email.
@@ -305,12 +350,17 @@ Không token mới. Giá trị lẻ (264, 288, 400, 720, 480, 96, 120) là kích
 | Form newsletter | `.site-footer__form`, chuỗi `footer.newsletter_*` | block `newsletter-popup`, chuỗi success/already/consent mới |
 | Nút, link, badge, giá | `.button`, `.button--secondary`, `.product-card__badge`, `snippets/price` | `.link-button` (nút dạng link nhỏ) |
 | Đếm ngược | `featured-product` (TE-13) | dùng lại snippet đếm ngược, bản nhỏ |
-| Trigger, tần suất, copy | — | JS (BE), tách ticket FE1 markup / BE1 JS theo `fe-be-boundary.md`; `data-testid`: `newsletter-popup`, `exit-popup`, `offer-teaser`, `offer-card`, `offer-code-copy` |
+| Trigger, hàng đợi, tần suất, copy | — | JS (BE), tách ticket FE1 markup / BE1 JS theo `fe-be-boundary.md`; `data-testid`: `newsletter-popup`, `exit-popup`, `offer-teaser`, `offer-card`, `offer-code-copy`; markup popup tự mở có `data-popup-priority` (exit-popup 1, newsletter-popup 2) và `data-popup-days` từ setting để JS xếp hàng đợi |
 
 ---
 
-## 11. Quyết định CTO cần chốt
+## 11. Quyết định CTO đã chốt (10/11)
 
-1. Before you leave trên mobile: ticket ghi "quay lại trên mobile", file 15 §1 / 22 §8 khuyên tránh. Đề xuất: setting "Show on mobile" mặc định tắt; khi bật dùng tín hiệu cuộn ngược nhanh, không chặn nút Back bằng `history.pushState`.
-2. Big offer: chốt "khu vực khuyến mãi" là nút nổi "Big Offer" góc dưới trái, rê chuột (desktop) / chạm (mobile) mở thẻ deal của sản phẩm giảm giá (mặc định Figma 1:759, Ativafit Lava −24% + đếm ngược)? Đề xuất: có; teaser chỉ hiện khi sản phẩm còn hàng, có giá gạch và chưa hết giờ.
-3. Mặc định khi cài theme: newsletter popup tắt (footer đã có form; 15 §1 "demo chỉ show before-you-leave"), before you leave bật (desktop), big offer bật; tối đa 1 popup tự mở mỗi phiên. Đề xuất: có.
+- MK1: before you leave BẬT cả trên mobile ("Show on mobile" mặc định bật); mobile dùng tín hiệu cuộn ngược nhanh, không chặn Back bằng `history.pushState` (mục 3).
+- MK2: nút nổi "Big Offer" góc dưới trái mở thẻ deal sản phẩm giảm giá; teaser chỉ hiện khi còn hàng, có giá gạch, chưa hết giờ (mục 4).
+- MK3: newsletter, before you leave, big offer mặc định BẬT; mỗi lúc 1 popup, đóng popup đang hiện thì popup kế mới hiện (hàng đợi, mục 1.2).
+
+Câu mới:
+1. Khoảng nghỉ giữa hai popup tự mở: đề xuất 3 s, newsletter chờ được, before you leave cần tín hiệu rời trang mới (mục 1.2 điều 2–3).
+2. Thẻ big offer người mua mở có chặn popup tự mở: đề xuất có (chiếm lớp, popup tự mở chờ); nút Big Offer không phải popup (điều 1, 8).
+3. Đã đăng ký newsletter trong phiên thì bỏ before you leave biến thể B (mã 15% trùng): đề xuất có (điều 7).
