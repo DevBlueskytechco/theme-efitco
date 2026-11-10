@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sale – Efitco</title>
+<meta name="description" content="Selected Efitco home gym gear on sale, up to 24% off adjustable dumbbells, benches, plates and speed ropes.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* ES1-T289 · Announcement bar. Chỉ CSS riêng; phần chung ở ../_kit/kit.css */
+  .site-header.demo-static { position: relative; }
+
+  /* Bar 44 mọi mốc, nền tối + noise liền header, gạch đáy 1px trắng 12% (spec §3) */
+  .announcement-bar {
+    display: grid;
+    min-height: calc(var(--space-1) * 11);
+    border-block-end: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent);
+    background: var(--color-background-dark) var(--dark-texture);
+    color: var(--color-background-dark-foreground);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    line-height: 20px;
+    text-align: center;
+  }
+  .announcement-bar__text { display: flex; align-items: center; justify-content: center; width: var(--content-width); margin-inline: auto; padding-block: var(--space-3); }
+  /* inline-block + padding 12: vùng chạm 44; mũi tên inline nên khi xuống dòng đi theo chữ cuối (A8) */
+  .announcement-bar__link { display: inline-block; min-height: 44px; margin-block: calc(var(--space-3) * -1); padding-block: var(--space-3); color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; transition: text-decoration-thickness var(--motion-fast) var(--ease-out); }
+  .announcement-bar__link svg { display: inline-block; width: 16px; height: 13px; margin-inline-start: var(--space-2); vertical-align: -2px; transition: translate var(--motion-fast) var(--ease-out); }
+  .announcement-bar__link:hover, .announcement-bar__link.is-hover { text-decoration-thickness: 2px; }
+  .announcement-bar__link:hover svg, .announcement-bar__link.is-hover svg { translate: var(--space-1) 0; }
+  .announcement-bar__link:active svg, .announcement-bar__link.is-active svg { translate: 0 0; }
+  .announcement-bar :focus-visible, .announcement-bar .is-focus { outline: 2px solid var(--color-background-dark-foreground); outline-offset: -2px; }
+  .announcement-bar--placeholder { background: var(--color-background-alt); color: var(--color-muted-light); outline: 1px dashed var(--color-border); outline-offset: -1px; border: 0; }
+  @media (prefers-reduced-motion: reduce) { .announcement-bar__link:hover svg { translate: none; } }
+
+  /* Trang nền: đầu collection Sale */
+  .sale-grid { padding-block-end: var(--section-gap); }
+
+  /* States */
+  .demo-states { padding-block: var(--space-7); }
+  .state-grid { display: grid; gap: var(--space-6); }
+  @media (min-width: 80rem) { .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .stage { overflow: hidden; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background); }
+  .stage__body { padding: var(--space-4) var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .stage--phone { width: 360px; max-width: 100%; }
+  .stage .site-header__inner { width: calc(100% - var(--space-6)); }
+  .state-row { display: grid; gap: var(--space-3); }
+  .scroll-note { display: flex; justify-content: space-between; padding: var(--space-2) var(--space-5); color: var(--color-muted); font-size: var(--font-size-xs); }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-star" viewBox="0 0 14 13"><path fill="currentColor" d="m7 0 2.1 4.2 4.6.7-3.3 3.2.8 4.6L7 10.5l-4.2 2.2.8-4.6L.3 4.9l4.6-.7L7 0Z"/></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<a class="visually-hidden" href="#main">Skip to content</a>
+
+<!-- Announcement bar (spec §1–3): trên header, không dính, 44, nền tối + noise, gạch đáy 1px -->
+<aside class="announcement-bar" aria-label="Announcement" data-testid="announcement-bar">
+  <p class="announcement-bar__text">
+    <a class="announcement-bar__link" href="#" data-testid="announcement-bar-link">Up to 24% off selected gear<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+  </p>
+</aside>
+
+<!-- Header vòng 3: thanh tối 80, dính top 0 sau khi bar khuất (spec §4) -->
+<header class="site-header demo-static">
+  <div class="site-header__inner">
+    <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+    <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+    <nav class="site-header__nav" aria-label="Main">
+      <ul class="site-header__menu">
+        <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#" aria-current="page">Sale</a></li>
+        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Blog</a></li>
+        <li><a class="site-header__link" href="#">Contact</a></li>
+        <li><a class="site-header__link" href="#">Help</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__icons">
+      <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="container">
+    <nav class="breadcrumb" aria-label="Breadcrumb"><ol><li><a href="#">Home</a></li><li><a href="#">Collections</a></li><li><span aria-current="page">Sale</span></li></ol></nav>
+    <div class="page-title">
+      <p class="eyebrow">Limited Offers</p>
+      <h1>Sale</h1>
+      <p class="page-title__meta">4 products</p>
+    </div>
+  </div>
+  <section class="container sale-grid" aria-label="Products">
+    <ul class="product-grid">
+      <li class="product-card">
+        <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=720" width="720" height="720" alt="Ativafit Lava 66 lb Adjustable" loading="lazy"></div>
+        <div class="product-card__badges"><span class="badge badge--sale">-24%</span><span class="badge badge--neutral"><svg aria-hidden="true"><use href="#i-star"/></svg>5.0<span class="visually-hidden"> out of 5 stars</span></span></div>
+        <div class="product-card__info">
+          <h2 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable</a></h2>
+          <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s></p>
+        </div>
+      </li>
+      <li class="product-card">
+        <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=720" width="720" height="720" alt="Revllen Pro Speed Rope" loading="lazy"></div>
+        <div class="product-card__badges"><span class="badge badge--sale">-22%</span></div>
+        <div class="product-card__info">
+          <h2 class="product-card__title"><a href="#">Revllen Pro Speed Rope</a></h2>
+          <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$34.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$44.99</s></p>
+        </div>
+      </li>
+      <li class="product-card">
+        <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=720" width="720" height="720" alt="FlexFold Adjustable Bench" loading="lazy"></div>
+        <div class="product-card__badges"><span class="badge badge--sale">-17%</span></div>
+        <div class="product-card__info">
+          <h2 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h2>
+          <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$189.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$229.00</s></p>
+        </div>
+      </li>
+      <li class="product-card">
+        <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=720" width="720" height="720" alt="Olympic Plate Set 100" loading="lazy"></div>
+        <div class="product-card__badges"><span class="badge badge--sale">-15%</span></div>
+        <div class="product-card__info">
+          <h2 class="product-card__title"><a href="#">Olympic Plate Set 100</a></h2>
+          <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$289.00</span><span class="visually-hidden">Regular price</span><s class="price__compare">$339.00</s></p>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ===================== TRẠNG THÁI (spec §5) ===================== -->
+  <section class="demo-states container" aria-labelledby="states-title">
+    <p class="demo-label">ES1-T289 · Announcement bar · trạng thái</p>
+    <h2 id="states-title" class="visually-hidden">Announcement bar states</h2>
+
+    <div class="demo-block">
+      <h2>A1–A3 · Rỗng, editor, chữ không link</h2>
+      <p class="demo-note">A1 mặc định: text rỗng thì không render, header ở y 0 (AC4). A2 chỉ trong theme editor. A3 có chữ, không link: không gạch chân, không mũi tên.</p>
+      <div class="state-grid">
+        <div class="stage">
+          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A1 · Rỗng, storefront</p>
+          <div class="site-header"><div class="site-header__inner"><a class="site-header__logo" href="#" aria-label="Efitco home, sample A1"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a><div class="site-header__icons"><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div></div></div>
+          <p class="stage__body">Không có bar, header bắt đầu ở y 0.</p>
+        </div>
+        <div class="stage">
+          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A2 · Rỗng, theme editor (placeholder)</p>
+          <div class="announcement-bar announcement-bar--placeholder" data-testid="announcement-bar-placeholder"><p class="announcement-bar__text">Announcement bar is hidden. Add text in this block's settings to show it above the header.</p></div>
+          <div class="site-header"><div class="site-header__inner"><a class="site-header__logo" href="#" aria-label="Efitco home, sample A2"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a></div></div>
+        </div>
+        <div class="stage">
+          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A3 · Chữ, không link</p>
+          <div class="announcement-bar"><p class="announcement-bar__text">90 day money back on every order</p></div>
+          <div class="site-header"><div class="site-header__inner"><a class="site-header__logo" href="#" aria-label="Efitco home, sample A3"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="demo-block">
+      <h2>A4–A7 · Link: mặc định, hover, focus, nhấn</h2>
+      <p class="demo-note">Hover: gạch chân 2px + mũi tên dịch 4 về inline-end, 150 ms. Focus bàn phím: outline trắng 2px offset −2, nằm trong bar (cam trên tối chỉ 3.48:1). Vùng chạm link cao 44.</p>
+      <div class="state-row">
+        <div class="stage"><p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A4 · Mặc định</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link" href="#">Up to 24% off selected gear, sample default<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
+        <div class="stage"><p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A5 · Hover</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link is-hover" href="#">Up to 24% off selected gear, sample hover<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
+        <div class="stage"><p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A6 · Focus</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link is-focus" href="#">Up to 24% off selected gear, sample focus<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
+        <div class="stage"><p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A7 · Nhấn</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link is-active" href="#">Up to 24% off selected gear, sample active<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
+      </div>
+    </div>
+
+    <div class="demo-block">
+      <h2>A8–A9 · Câu dài ở 360, đã cuộn</h2>
+      <p class="demo-note">A8: không cắt chữ, xuống 2 dòng, bar cao 64; info setting khuyên dưới 40 ký tự. A9: bar khuất, header dính top 0, có bóng (sentinel đặt ngay trước header, spec §4).</p>
+      <div class="state-grid">
+        <div class="stage stage--phone">
+          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A8 · 360, 2 dòng</p>
+          <div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link" href="#">Up to 24% off selected gear for your home gym this week<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div>
+          <div class="site-header"><div class="site-header__inner"><span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span><a class="site-header__logo" href="#" aria-label="Efitco home, sample A8"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a><div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div></div></div>
+        </div>
+        <div class="stage">
+          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A9 · Cuộn ≥ 44: header dính có bóng</p>
+          <div class="site-header site-header--scrolled"><div class="site-header__inner"><a class="site-header__logo" href="#" aria-label="Efitco home, sample A9"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a><div class="site-header__icons"><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div></div></div>
+          <div class="scroll-note"><span>top 0 viewport</span><span>bar đã cuộn đi</span></div>
+          <p class="stage__body">Header 80 dính; bar không dính (sticky ≤ 80, 04 §3.8).</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+</body>
+</html>
