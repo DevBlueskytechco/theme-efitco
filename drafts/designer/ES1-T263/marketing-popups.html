@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Efitco marketing popups — ES1-T263 (round 3)</title>
-<meta name="description" content="Newsletter popup, before you leave popup and big offer popup for the Efitco theme at 360, 768, 1280 and 1920, over the round 3 dark header, with error, success, copied and loading states.">
+<title>Efitco marketing popups — ES1-T263 (round 3b)</title>
+<meta name="description" content="Newsletter popup, before you leave popup and big offer popup for the Efitco theme at 360, 768, 1280 and 1920: one popup at a time with a queue, over the round 3 dark header, with error, success, copied and loading states.">
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
   /* CSS riêng ES1-T263 vòng 3. Spec: docs/ui-spec/marketing-popups.md. Chỉ đọc var(--*) của kit (foundation vòng 3). */
@@ -15,7 +15,7 @@
   .popup-stage { position: relative; isolation: isolate; overflow: hidden; height: 720px; margin-inline: calc(var(--page-margin) * -1); background: var(--color-background-dark); }
   .popup-stage--short { height: 240px; }
   @media (min-width: 48rem) { .popup-stage { height: 760px; margin-inline: 0; border-radius: var(--radius-card); } .popup-stage--short { height: 260px; } }
-  @media (min-width: 80rem) { .popup-stage { height: 720px; } }
+  @media (min-width: 80rem) { .popup-stage { height: 720px; } .popup-stage--short { height: 260px; } }
 
   /* Trang chủ phía sau popup = vòng 3: dải tối có noise, header 80 riêng (Figma 1:362), hero là thẻ bo góc NẰM DƯỚI header (1:361) */
   .stage-page { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); }
@@ -145,6 +145,18 @@
     .offer-scrim { display: none; }
   }
 
+  /* Vòng 3b: hàng đợi 1 popup một lúc. Dòng thời gian 4 bước; mobile dọc, 48rem 2 cột, 80rem 4 cột */
+  .queue { display: grid; gap: var(--space-3); margin: 0 0 var(--space-6); padding: 0; list-style: none; }
+  .queue__step { display: grid; grid-template-columns: 32px minmax(0, 1fr); align-items: start; gap: var(--space-3); padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); }
+  .queue__num { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--color-foreground); color: var(--color-background); font-size: var(--font-size-sm); font-weight: 600; }
+  .queue__step--popup .queue__num { background: var(--color-accent); color: var(--color-accent-foreground); }
+  .queue__title { margin: 0; font-weight: 600; line-height: 1.5; }
+  .queue__text { margin: var(--space-1) 0 0; color: var(--color-muted); font-size: var(--font-size-sm); }
+  @media (min-width: 48rem) { .queue { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 80rem) { .queue { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .stage-label { margin-block-start: var(--space-6); }
+  .stage-page .offer-teaser { position: absolute; }
+
   /* Trạng thái (cuối file) */
   .state-grid { display: grid; gap: var(--space-6); }
   @media (min-width: 48rem) { .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
@@ -208,16 +220,25 @@
 
 <main id="main" class="container">
   <div class="sheet-intro">
-    <p class="eyebrow">ES1-T263 · Overlay · Round 3</p>
+    <p class="eyebrow">ES1-T263 · Overlay · Round 3b</p>
     <h1>Marketing Popups</h1>
-    <p>Newsletter popup, before you leave popup and big offer popup over the round 3 home page (dark header bar, rounded hero card below it). None of them opens while the page loads: newsletter waits for time and scroll, before you leave waits for exit intent, big offer opens only when the shopper hovers or taps the offer button. One popup at a time, at most one popup opens by itself per session.</p>
+    <p>Newsletter popup, before you leave popup and big offer popup over the round 3 home page (dark header bar, rounded hero card below it). All three are on by default. None of them opens while the page loads: newsletter waits for time and scroll, before you leave waits for exit intent (mouse on desktop, fast scroll up on mobile), big offer opens only when the shopper hovers or taps the offer button. Only one popup shows at a time: the next one waits until the shopper closes the current one.</p>
   </div>
 
-  <!-- ===== 1. Newsletter popup ===== -->
+  <!-- ===== 1. Hàng đợi: popup 1 hiện → đóng → popup 2 hiện (vòng 3b) ===== -->
   <section class="demo-block" aria-labelledby="b1">
-    <h2 id="b1">1. Newsletter Popup</h2>
-    <p class="demo-note">Mở sau 10 s VÀ cuộn 50% trang (setting). Mobile: bottom sheet không ảnh, ẩn đoạn mô tả, cao ≤ 60% màn. Từ 48rem: dialog 720, ảnh trái 264 / 288. Chữ và cỡ theo Figma 1:1146 (tiêu đề Sofia 700 36/44, mô tả Inter 500 16/26, nút "Get 15% Off" + icon gửi).</p>
-    <div class="popup-stage" role="group" aria-label="Newsletter popup over the home page">
+    <h2 id="b1">1. One Popup At A Time</h2>
+    <p class="demo-note">Chuỗi mẫu trên trang chủ, giỏ 2 món: newsletter hiện trước (đủ 10 s và cuộn 50%) → người mua đóng → nghỉ 3 s, không popup nào, nút Big Offer vẫn ở góc → lần rời trang kế tiếp mở before you leave. Thứ tự ưu tiên khi cùng đủ điều kiện: before you leave (1) &gt; newsletter (2). Mỗi popup tự mở tối đa 1 lần mỗi phiên. Nút Big Offer không phải popup, không vào hàng đợi; thẻ big offer người mua mở thì chiếm lớp, popup tự mở chờ.</p>
+    <ol class="queue" aria-label="Popup queue example">
+      <li class="queue__step queue__step--popup"><span class="queue__num" aria-hidden="true">1</span><div><p class="queue__title">Newsletter opens</p><p class="queue__text">10 s on the page and 50% scrolled. Marked as shown for this session.</p></div></li>
+      <li class="queue__step"><span class="queue__num" aria-hidden="true">2</span><div><p class="queue__title">Shopper closes it</p><p class="queue__text">Close button, Esc, tap outside, swipe down or "No, thanks". Hidden for 7 days.</p></div></li>
+      <li class="queue__step"><span class="queue__num" aria-hidden="true">3</span><div><p class="queue__title">3 s pause</p><p class="queue__text">No popup. The Big Offer button stays. Exit signals in the pause are ignored.</p></div></li>
+      <li class="queue__step queue__step--popup"><span class="queue__num" aria-hidden="true">4</span><div><p class="queue__title">Before you leave opens</p><p class="queue__text">Next exit intent: mouse leaves the top edge (desktop) or fast scroll up (mobile).</p></div></li>
+    </ol>
+
+    <p class="demo-label">Bước 1 · Popup 1: newsletter</p>
+    <p class="demo-note">Mở sau 10 s VÀ cuộn 50% trang (setting). Mobile: bottom sheet không ảnh, ẩn đoạn mô tả, cao ≤ 60% màn. Từ 48rem: dialog 720, ảnh trái 264 / 288. Chữ và cỡ theo Figma 1:1146 (tiêu đề Sofia 700 36/44, mô tả Inter 500 16/26, nút "Get 15% Off" + icon gửi). Nút Big Offer nằm dưới scrim, không bấm được khi popup mở.</p>
+    <div class="popup-stage" role="group" aria-label="Step 1: newsletter popup over the home page">
       <div class="stage-page" inert>
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
@@ -229,6 +250,7 @@
           <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
           <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
         </div>
+        <div class="offer-teaser"><span class="offer-teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="offer-teaser__hide"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
       </div>
       <div class="scrim"></div>
       <div class="dialog nl" role="dialog" aria-modal="true" aria-labelledby="nl-title" aria-describedby="nl-text">
@@ -253,13 +275,25 @@
         </div>
       </div>
     </div>
-  </section>
 
-  <!-- ===== 2. Before you leave: giỏ có hàng ===== -->
-  <section class="demo-block" aria-labelledby="b2">
-    <h2 id="b2">2. Before You Leave: Cart Has Items</h2>
-    <p class="demo-note">Desktop: chuột rời mép trên cửa sổ sau ≥ 15 s trên trang. Mobile (setting, mặc định tắt): cuộn ngược nhanh lên đầu trang sau khi đã cuộn ≥ 50%; không chặn nút Back. Dữ liệu giỏ thật (2 dòng demo-data). Mobile chỉ hiện 1 dòng + "1 more item".</p>
-    <div class="popup-stage" role="group" aria-label="Before you leave popup with saved cart">
+    <p class="demo-label stage-label">Bước 2 · Đã đóng: nghỉ 3 s, không popup</p>
+    <p class="demo-note">Newsletter ghi "đã hiện" trong phiên và ẩn 7 ngày. Hàng đợi trống; trang dùng bình thường, nút Big Offer vẫn ở góc dưới trái.</p>
+    <div class="popup-stage popup-stage--short" role="group" aria-label="Step 2: popup closed, no popup during the pause">
+      <div class="stage-page" inert>
+        <div class="site-header"><div class="site-header__inner">
+          <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
+          <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
+        </div></div>
+        <div class="stage-hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080"></div>
+        <div class="offer-teaser"><span class="offer-teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="offer-teaser__hide"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
+      </div>
+    </div>
+
+    <p class="demo-label stage-label">Bước 3 · Popup 2: before you leave, giỏ có hàng</p>
+    <p class="demo-note">Mở ở lần rời trang kế tiếp sau khoảng nghỉ. Desktop: chuột rời mép trên cửa sổ sau ≥ 15 s trên trang. Mobile và tablet cảm ứng (mặc định BẬT, CTO 10/11): cuộn ngược nhanh ≥ 30% chiều cao màn trong &lt; 500 ms, sau khi đã cuộn ≥ 50% và ≥ 15 s; không chặn nút Back. Dữ liệu giỏ thật (2 dòng demo-data). Mobile chỉ hiện 1 dòng + "1 more item".</p>
+    <div class="popup-stage" role="group" aria-label="Step 3: before you leave popup with saved cart">
       <div class="stage-page" inert>
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
@@ -270,6 +304,7 @@
           <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
           <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
         </div>
+        <div class="offer-teaser"><span class="offer-teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="offer-teaser__hide"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
       </div>
       <div class="scrim"></div>
       <div class="dialog byl" role="dialog" aria-modal="true" aria-labelledby="byl-title" aria-describedby="byl-text">
@@ -301,10 +336,10 @@
     </div>
   </section>
 
-  <!-- ===== 3. Before you leave: giỏ rỗng, có mã ===== -->
+  <!-- ===== 2. Before you leave: giỏ rỗng, có mã ===== -->
   <section class="demo-block" aria-labelledby="b3">
-    <h2 id="b3">3. Before You Leave: Empty Cart With Code</h2>
-    <p class="demo-note">Chỉ hiện khi merchant nhập mã ưu đãi. Giỏ rỗng và không có mã: không mở popup. KHÔNG CHẮC: demo-data không có mã giảm giá, WELCOME15 là mã mẫu (ES1-T273).</p>
+    <h2 id="b3">2. Before You Leave: Empty Cart With Code</h2>
+    <p class="demo-note">Chỉ hiện khi merchant nhập mã ưu đãi. Giỏ rỗng và không có mã: không mở popup. Người mua đã đăng ký newsletter trong phiên (đã có mã 15%): không dùng biến thể này. KHÔNG CHẮC: demo-data không có mã giảm giá, WELCOME15 là mã mẫu (ES1-T273).</p>
     <div class="popup-stage" role="group" aria-label="Before you leave popup with discount code">
       <div class="stage-page" inert>
         <div class="site-header"><div class="site-header__inner">
@@ -338,10 +373,10 @@
     </div>
   </section>
 
-  <!-- ===== 4. Big offer ===== -->
+  <!-- ===== 3. Big offer ===== -->
   <section class="demo-block" aria-labelledby="b4">
-    <h2 id="b4">4. Big Offer Popup</h2>
-    <p class="demo-note">Nút "Big Offer" nổi góc dưới trái, hiện sau khi cuộn 25% (không có lúc tải trang). Desktop có chuột: rê vào 150 ms mở thẻ ưu đãi không modal, rời chuột 300 ms mới đóng; bấm/Enter cũng mở. Mobile, tablet cảm ứng: chạm mở bottom sheet. Hàng giá và thanh đếm ngược chép Figma 1:782, 1:773 (figma-ativafit-lava-featured, $379.99 / $499.99).</p>
+    <h2 id="b4">3. Big Offer Popup</h2>
+    <p class="demo-note">CTO chốt 10/11: nút "Big Offer" nổi góc dưới trái mở thẻ deal sản phẩm giảm giá; nút chỉ hiện khi sản phẩm còn hàng, có giá gạch, chưa hết giờ, và sau khi cuộn 25% (không có lúc tải trang). Nút không phải popup, không vào hàng đợi. Desktop có chuột: rê vào 150 ms mở thẻ ưu đãi không modal, rời chuột 300 ms mới đóng; bấm/Enter cũng mở. Mobile, tablet cảm ứng: chạm mở bottom sheet. Thẻ đang mở chiếm lớp: popup tự mở phải chờ thẻ đóng. Hàng giá và thanh đếm ngược chép Figma 1:782, 1:773 (figma-ativafit-lava-featured, $379.99 / $499.99).</p>
     <p class="demo-label">Đóng (teaser)</p>
     <div class="popup-stage popup-stage--short" role="group" aria-label="Big offer button closed">
       <div class="stage-page" inert>
@@ -397,9 +432,9 @@
     </div>
   </section>
 
-  <!-- ===== 5. Trạng thái: lỗi, thành công, đã đăng ký, đã copy, đang tải, rỗng ===== -->
+  <!-- ===== 4. Trạng thái: lỗi, thành công, đã đăng ký, đã copy, đang tải, chờ, rỗng ===== -->
   <section class="demo-block" aria-labelledby="b5">
-    <h2 id="b5">5. States</h2>
+    <h2 id="b5">4. States</h2>
     <p class="demo-note">Nội dung thay trong cùng popup, không mở popup mới. Lỗi hiện khi rời ô hoặc khi bấm gửi; thành công thay nội dung form và giữ nút đóng.</p>
     <div class="state-grid">
       <div>
@@ -556,10 +591,17 @@
         </div>
       </div>
       <div>
+        <p class="demo-label">Hàng đợi · popup đang chờ</p>
+        <div class="note-card">
+          <strong>Nothing shows yet</strong>
+          <span>Newsletter is ready while the big offer card, cart drawer, menu or search is open. It waits, then opens 3 s after that layer closes if the shopper is still on the page. An exit signal while another layer is open is not kept: before you leave waits for the next one.</span>
+        </div>
+      </div>
+      <div>
         <p class="demo-label">Rỗng · không hiện</p>
         <div class="note-card">
           <strong>No popup is rendered</strong>
-          <span>Before you leave: cart empty and no code. Big offer: product sold out, no compare-at price, or countdown ended. Newsletter: shopper already subscribed, closed it in the last 7 days, or page is 404, cart, password.</span>
+          <span>Before you leave: cart empty and no code, or already shown this session or in the last day. Big offer button: product sold out, no compare-at price, or countdown ended. Newsletter: shopper already subscribed, already shown this session, closed it in the last 7 days, or page is 404, cart, password.</span>
         </div>
       </div>
     </div>
