@@ -1,6 +1,20 @@
-KHÔNG CHẮC: (1) ảnh của handle `figma-ativafit-lava-adjustable` là áo tạ, không phải tạ tay (lệch tên, ES1-T245); mockup giữ đúng URL, alt trung tính. Ảnh một số sản phẩm gợi ý cũng lệch tên. (2) demo-data không có description, metafield rating, spec: mô tả, 4 dòng spec, 4.9 / 341 reviews lấy từ Figma 1:759; review mẫu lấy từ locale testimonial (Figma 1:885). (3) Nguồn dữ liệu review chưa chốt: hỏi ở ES1-T264.
+KHÔNG CHẮC: (1) ảnh của handle `figma-ativafit-lava-adjustable` là áo tạ, không phải tạ tay (lệch tên, ES1-T245); mockup giữ đúng URL, alt trung tính. Ảnh một số sản phẩm gợi ý cũng lệch tên. (2) demo-data không có description, metafield rating, spec: mô tả, 4 dòng spec, 4.9 / 341 reviews lấy từ Figma 1:759; review mẫu lấy từ chữ testimonial Figma 1:885. (3) Nguồn dữ liệu review chưa chốt: hỏi ở ES1-T264. (4) Figma nút CTA bo 8 (1:815, 1:816), mặc định `button_corner_radius` = 4: mockup giữ token, lệch báo cho foundation (ES1-T251), không đổi token ở trang này.
 
-# UI spec: Trang sản phẩm (ES1-T253)
+# UI spec: Trang sản phẩm (ES1-T253, vòng 3)
+
+## Thay đổi so với vòng 2
+
+| # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | Header | A nền trắng viền dưới, sticky | thanh tối `--color-background-dark` + noise, cao 80, logo 100 × 30, menu trắng 60%, search 20 / account, cart 24; sticky, không đè ảnh | Sổ 10/11; Figma 1:362; foundation §3 |
+| 2 | Nút trước/sau 52 (gallery, lightbox, You May Also Like) | icon mũi tên 20 × 16 | chevron 11 × 16 trong khung 52 (`slideshow-icon` previous/next); trắng viền border, hover cam | Sổ 09/11; Figma 1:398; foundation §6 |
+| 3 | Gallery dính | top = header trắng 80 + 24 | giữ 80 + 24, header tối sticky cùng cao (không đổi số) | foundation §3.1 |
+| 4 | Hàng rating | "4.9" foreground + "341 reviews" gạch chân | "(4.9)" + vạch + "341 reviews" chữ muted 14 như Figma; gạch chân + foreground khi hover | Figma 1:786 |
+| 5 | Card review | sao trên, tiêu đề 600, tên cuối card, bo 12 | hàng đầu tên (trái) + sao (phải), tiêu đề Inter 18/700, quote 16/27 muted, bo 16; bỏ ảnh và sản phẩm đính kèm của testimonial | Figma 1:885 |
+| 6 | Footer | newsletter 2 cột, 3 social, wordmark tách hàng | theo foundation vòng 3: ảnh 98 × 123 + chữ + form, panel dải rộng bo 16, 4 social, wordmark giữa hàng cuối với copyright và localization | Figma 1:1104; foundation §4 |
+| 7 | Lệch Figma ghi nhận, không sửa ở trang | — | Nút bo 8 (Figma) vs 4 (token); "View Detail" nền xám #E5E5E5 (1:816) không dùng cho Buy It Now vì trùng nút disabled foundation §6; quote #808080 (3.95:1) đổi `--color-muted`; dấu tròn "Feature Product" (1:762) là trang trí khối trang chủ, không đưa lên gallery | Figma 1:759, 1:885 |
+
+Giữ nguyên nội dung, bố cục 2 cột, accordion, trạng thái A–I và settings của vòng 2.
 
 Mục đích: người mua xem ảnh/video/3D, chọn biến thể và thấy giá, tồn, nút cập nhật ngay, thêm giỏ hoặc mua nhanh, đọc mô tả, thông số, review, rồi tìm sản phẩm mua kèm hoặc thay thế. Story TE-4 (AC1–AC12), `docs/srs.md#TE-4`.
 
@@ -18,7 +32,7 @@ Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma > kiến thứ
 
 | # | Khối | Block | Ghi chú |
 | --- | --- | --- | --- |
-| 1 | Header A (nền trắng, sticky) | `header` | Sổ quyết định 09/11; foundation §3 |
+| 1 | Header tối (#1A1A1A + noise, cao 80, sticky, không đè ảnh) | `header` | Sổ quyết định 10/11; Figma 1:362; foundation §3 |
 | 2 | Breadcrumb | — (foundation §5) | Home / {collection} / {product} |
 | 3 | Gallery + buy box | `product-media`, `product-info`, `product-form` | §3–§6 |
 | 4 | Pairs Well With | `product-recommendations` intent complementary | §7 |
@@ -56,7 +70,7 @@ Không dùng tab ngang cho mô tả / thông số / review (09 §1 #753). Không
 Anatomy: track ảnh (scroll-snap) · nút phóng to (ảnh là link tới bản 2048, icon kính lúp 44 trắng góc phải trên, chỉ trang trí) · bộ đếm "1 / 3" (pill trắng, `aria-hidden`) · nút trước/sau tròn 52 góc phải dưới (≥768) · hàng thumbnail.
 
 - Thứ tự media: featured media của variant đang chọn trước (code đã có). Đổi variant thì track trượt tới ảnh variant (AC1).
-- Nút 52: trắng viền `--color-border`, hover cam (sổ quyết định 09/11). Ở đầu/cuối: mờ 0.35 + `aria-disabled`. 360: ẩn nút, vuốt.
+- Nút 52: chevron 11 × 16 (`snippets/slideshow-icon`), trắng viền `--color-border`, hover nền cam icon trắng + scale 1.06 (sổ quyết định 09/11, Figma 1:398). Hai nút cách 8. Ở đầu/cuối: mờ 0.35 + `aria-disabled`. 360: ẩn nút, vuốt.
 - Thumbnail: nền cream, viền 1px `--color-border`, bo 4 (8 từ 80rem); đang xem viền 2px foreground (ĐỀ XUẤT, code 1px: 1px foreground khó thấy khác hover); hover viền foreground. Thumbnail hiện cả trên mobile (09 §3 #774M). Video: nhãn ▶ đen góc phải dưới; 3D: nhãn "3D". Chỉ hiện khi ≥ 2 media.
 - Không lặp badge giảm giá trên ảnh: -24% đặt cạnh giá (Figma 1:783; 10 §8 không lặp khuyến mãi).
 - Hover ảnh desktop: con trỏ zoom-in. Không làm hover zoom ở bản này (06 §6 gợi ý; ĐỀ XUẤT để sau vì phải tải ảnh 2048 khi rê chuột, chạm Performance).
@@ -79,7 +93,7 @@ Thứ tự (Figma 1:769 + 09 §1 thứ tự Baymard): eyebrow vendor → h1 → 
 | Giá bán | Inter 600 `--font-size-h3` | `--color-sale` khi giảm (6.38), foreground khi không | ĐỀ XUẤT cỡ ≈ tên (10 §8 #792); Figma 1:784 chỉ 16px vì là khối trang chủ |
 | Giá gạch | 16/500 line-through | `--color-muted` (8.45) | Figma 1:784 (14) tăng 1 bậc theo giá |
 | Badge -N% | pill 28, 13/600 | sale / sale-foreground | Figma 1:785; N tính từ compare_at_price |
-| Rating | 5 sao 16 + "4.9" + vạch 1px + "341 reviews" gạch chân | sao `--color-rating`, chữ foreground | Figma 1:786; metafield `reviews.rating`, `reviews.rating_count` (như featured-product) |
+| Rating | 5 sao 16 + "(4.9)" + vạch 1px + "341 reviews", 14/400 | sao `--color-rating`, chữ `--color-muted` (8.45); hover "341 reviews" foreground + gạch chân | Figma 1:786; metafield `reviews.rating`, `reviews.rating_count` (như featured-product) |
 | Thuế, ship | 14/400 | muted | code (`taxes_included`, `shipping_at_checkout_html`) |
 
 - Giá, gạch, badge cùng một hàng, cách 8–12 (10 §8 gộp nhóm giá, nhãn giảm sát giá).
@@ -140,7 +154,7 @@ Theo foundation §13 (dấu + cam bên trái như Figma 1:1057, hàng ≥ 56, `<
 
 Nền cream (section `--color-background-cream`), `id="reviews"` (đích của link rating).
 - Trái (4/12 từ 64rem): h2 "Customer Reviews" · điểm "4.9" heading 800 `--font-size-display` · 5 sao 20 + "Based on 341 reviews" 14 muted · nút secondary "Write A Review".
-- Phải (8/12): danh sách review của app; mockup dùng card trắng bo 12 padding 24: sao 16, tiêu đề Inter 18/600 (h3), nội dung muted, tên 14/600. 2 cột từ 48rem. Nút secondary "Show More Reviews" dưới danh sách.
+- Phải (8/12): danh sách review của app; mockup dùng thân card testimonial Figma 1:885: card trắng bo 16 padding 24 · hàng đầu tên 16/400 trái + sao 16 phải · tiêu đề Inter 18/700 (h3) · quote 16/27 `--color-muted` (Figma #808080 chỉ 3.95:1). Bỏ ảnh và sản phẩm đính kèm (đang ở chính trang sản phẩm). Badge Verified mặc định tắt (sổ 06/11, E9). 2 cột từ 48rem. Nút secondary "Show More Reviews" dưới danh sách.
 - 360: xếp dọc, tóm tắt trên.
 - Theme chỉ hiện tóm tắt từ metafield + vùng nhận app block; danh sách, lọc, ảnh khách, phân bố sao (10 §10 #749, #750, #2557) do app. Không metafield và không app: ẩn khối.
 - Tương phản: số "4.9" foreground trên cream 15.9; muted trên trắng 8.45.
@@ -242,7 +256,9 @@ Tương phản (tính tay WCAG; L foreground 0.0103, sand 0.796, cream 0.910, ac
 
 ## 14. Lighthouse
 
-Chỉ tiêu: SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90 (sổ 09/11).
+Chỉ tiêu: SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90 (sổ 09/11). Trang sản phẩm nằm trong phạm vi SEO 100 (sổ 10/11).
+
+- Header tối: noise là `background-image` 1 file nhỏ có sẵn (`assets/noise-dark.png`) trong critical.css, không phải ứng viên LCP; menu trắng 60% 6.93:1, focus trắng (foundation §3.4). Ảnh footer 98 × 123 lazy.
 
 - LCP: ảnh đầu gallery (featured media của variant), `loading="eager"` + `fetchpriority="high"`, srcset 360–1800 (code). ĐỀ XUẤT sửa `sizes` theo bố cục mới: `(min-width: 80rem) min(668px, 50vw), (min-width: 64rem) 50vw, 100vw` (code đang `58vw`, tải thừa ~16% ở desktop). Không hiệu ứng reveal cho gallery, h1, giá, nút (màn đầu, chặn LCP); reveal chỉ cho tiêu đề và card từ §7 trở xuống (sổ 09/11).
 - Lazy: ảnh gallery 2+, mọi thumbnail, poster video không phải media đầu, ảnh sticky bar, ảnh lightbox (gắn khi mở), ảnh swatch, ảnh complementary/related/review. Video `preload="none"`, iframe YouTube/Vimeo và model-viewer chỉ tải khi bấm.
@@ -260,8 +276,9 @@ Chỉ token foundation §2. Dẫn xuất: `--control-height`, `--grid-gap`, `--s
 
 | Phần | Code hiện có | Việc cho Dev FE (FE) / BE |
 | --- | --- | --- |
+| Header | `.site-header`, nền tối chỉ khi `body:has(.slideshow)` | FE: theo foundation §21 (mọi trang tối); trang sản phẩm không thêm gì |
 | Bố cục 2 cột | `.product` 7fr/5fr, `.product__details` sticky | FE: 1fr/1fr, gap 48 → 80 từ 80rem, sticky chuyển sang media |
-| Gallery | `.product-media__*` xếp dọc từ 64rem | FE: 1 ảnh + thumbnail mọi mốc, tỉ lệ 4:3 ở 48–64rem, tràn mép <48rem, đếm ảnh, nút 52 (`round-button`); BE: nút trước/sau, đồng bộ `aria-current` |
+| Gallery | `.product-media__*` xếp dọc từ 64rem | FE: 1 ảnh + thumbnail mọi mốc, tỉ lệ 4:3 ở 48–64rem, tràn mép <48rem, đếm ảnh, nút 52 dùng lại `.carousel-nav__button` + `snippets/slideshow-icon`; BE: nút trước/sau, đồng bộ `aria-current` |
 | Lightbox | `.product-media__dialog` | FE: nền cream, đếm, nút 52, thumbnail; BE: chuyển ảnh trong dialog |
 | Giá, rating | `snippets/price`, `snippets/rating-stars` | FE: cỡ giá h3, badge -N%, hàng rating link `#reviews` |
 | Mô tả | trong `product-info` | FE: chuyển sang accordion `product-details` |
@@ -275,6 +292,6 @@ Chỉ token foundation §2. Dẫn xuất: `--control-height`, `--grid-gap`, `--s
 
 ## 17. Quyết định CTO cần chốt
 
-1. Khối Customer Reviews: theme làm block `product-reviews` hiện tóm tắt từ metafield `reviews.rating` + chừa chỗ app block (danh sách review do app), ẩn khi không có dữ liệu? Đề xuất: có (chi tiết ES1-T264).
-2. Sticky bar có hiện trên tablet và desktop (thêm biến thể đang chọn, select biến thể từ 1024) hay chỉ mobile như AC5? Đề xuất: hiện mọi mốc, setting "Show on desktop" mặc định tắt để giữ AC5, merchant bật khi trang dài (09 §1 #784).
-3. Countdown "Sale ends in" (Figma 1:773) chỉ ở khối Featured product trang chủ, không đưa lên trang sản phẩm? Đề xuất: không đưa, vì không có ngày hết sale thật cho từng sản phẩm (đếm giả là dark pattern) và nó chen giữa giá và nút (10 §8 #789).
+1. Block `product-reviews` hiện tóm tắt từ metafield rating + chỗ cho app block, ẩn khi không dữ liệu? Đề xuất: có (§8, ES1-T264).
+2. Sticky bar hiện cả tablet/desktop hay chỉ mobile (AC5)? Đề xuất: mọi mốc, setting "Show on desktop" mặc định tắt (§10, 09 §1 #784).
+3. Không đưa countdown "Sale ends in" (Figma 1:773) lên trang sản phẩm? Đề xuất: không đưa, vì không có ngày hết sale thật mỗi sản phẩm (10 §8 #789).
