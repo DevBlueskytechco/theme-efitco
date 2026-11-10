@@ -171,6 +171,90 @@
   .note-card { display: grid; gap: var(--space-2); padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-dialog); color: var(--color-muted); font-size: var(--font-size-sm); }
   .note-card strong { color: var(--color-foreground); font-size: var(--font-size-base); }
   .field__input[readonly] { background: var(--color-background-alt); }
+
+  /* 5. Vùng đáy màn hình (ES1-T290, docs/ui-spec/layers.md §2). Mép dưới teaser = --edge + chiều cao thanh đáy */
+  .layer-list { display: grid; gap: var(--space-2); margin: 0 0 var(--space-6); padding: 0; list-style: none; counter-reset: layer; }
+  .layer-list li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: var(--space-3); align-items: center; min-height: 44px; padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--space-2); font-size: var(--font-size-sm); }
+  .layer-list b { display: grid; place-items: center; height: 28px; border-radius: var(--radius-pill); background: var(--color-background-alt); font-weight: 600; }
+  @media (min-width: 48rem) { .layer-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 80rem) { .layer-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .bz-grid { display: grid; gap: var(--space-6); } /* 1 cột: khung rộng bằng màn để header, thanh đáy đúng mốc */
+  .bz-stage { height: 520px; }
+  @media (min-width: 48rem) { .bz-stage { height: 460px; } }
+  .bz-stage .stage-page { background: var(--color-background); color: var(--color-foreground); }
+  .bz-stage--cream .stage-page { background: var(--color-background-cream); }
+  .bz-body { flex: 1; display: grid; align-content: start; gap: var(--space-4); overflow: hidden; padding: var(--space-5) var(--page-margin) 0; }
+  @media (min-width: 48rem) { .bz-body { padding-inline: var(--space-6); } }
+  .bz-body h3 { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: -0.02em; line-height: 1.15; text-transform: uppercase; }
+  .bz-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+  @media (min-width: 48rem) { .bz-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .bz-card { display: grid; gap: var(--space-1); padding: var(--space-2); border-radius: var(--radius-card); background: var(--color-background); font-size: var(--font-size-sm); font-weight: 500; }
+  .bz-card img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: var(--space-2); background: var(--color-background-cream); mix-blend-mode: darken; }
+  .bz-card:nth-child(n + 3) { display: none; }
+  @media (min-width: 48rem) { .bz-card:nth-child(3) { display: grid; } }
+  .bz-lines { display: grid; margin: 0; padding: 0; border-block: 1px solid var(--color-border); list-style: none; }
+  .bz-lines li { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: var(--space-4); padding-block: var(--space-3); }
+  .bz-lines li + li { border-block-start: 1px solid var(--color-border); }
+  .bz-lines img { width: 64px; height: 64px; object-fit: contain; border-radius: var(--space-2); background: var(--color-background-cream); mix-blend-mode: darken; }
+  .bz-lines span { font-weight: 500; }
+  .bz-pdp { display: grid; gap: var(--space-3); }
+  .bz-pdp p { margin: 0; color: var(--color-muted); }
+
+  .bz-stage > .bz-bar, .bz-stage > .toast-region, .bz-stage > .bz-consent, .bz-stage > .bz-panel { position: absolute; }
+  .bz-bar { z-index: 5; inset-inline: 0; inset-block-end: 0; display: flex; align-items: center; gap: var(--space-3); min-height: 72px; padding: var(--space-3) var(--page-margin); }
+  .bz-bar .button { min-height: 48px; }
+  .bz-bar--panel { background: var(--color-background-panel); color: var(--color-background-dark-foreground); box-shadow: 0 calc(var(--space-1) * -1) var(--space-4) color-mix(in srgb, var(--color-foreground) 16%, transparent); }
+  .bz-bar--panel .button { flex: 1; }
+  .bz-bar--panel :focus-visible { outline-color: var(--color-background-dark-foreground); }
+  .bz-bar__sum { display: grid; color: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel)); font-size: var(--font-size-sm); line-height: 1.4; }
+  .bz-bar__sum b { color: var(--color-background-dark-foreground); font-size: var(--font-size-lg); }
+  .bz-bar--light { border-block-start: 1px solid var(--color-border); background: var(--color-background); box-shadow: 0 calc(var(--space-1) * -1) var(--space-4) color-mix(in srgb, var(--color-foreground) 10%, transparent); }
+  .bz-bar--light .button { flex: none; padding-inline: var(--space-4); }
+  .bz-bar--light .button svg { display: none; }
+  .bz-bar__media { flex: none; width: 48px; height: 48px; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); }
+  .bz-bar__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
+  .bz-bar__info { display: grid; flex: 1; min-width: 0; }
+  .bz-bar__name { overflow: hidden; font-size: var(--font-size-sm); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+  .bz-bar__variant { display: none; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .bz-bar__info .price { display: flex; gap: var(--space-2); align-items: baseline; margin: 0; font-size: var(--font-size-sm); font-weight: 500; }
+  .bz-bar__info .price__compare { display: none; }
+  .bz-qty { display: none; align-items: center; height: 48px; border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); }
+  .bz-qty button { width: 44px; height: 46px; border: 0; background: none; color: var(--color-foreground); font-size: var(--font-size-lg); cursor: pointer; }
+  .bz-qty output { min-width: 24px; text-align: center; font-weight: 500; }
+  .bz-panel { display: none; z-index: 4; inset-block-start: calc(var(--header-height) + var(--space-5)); inset-inline-end: var(--space-6); width: 340px; gap: var(--space-4); padding: var(--space-5); border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-panel); color: var(--color-background-dark-foreground); }
+  .bz-panel h4 { margin: 0; font-size: var(--font-size-lg); font-weight: 700; }
+  .bz-panel p { display: flex; justify-content: space-between; margin: 0; padding-block-start: var(--space-4); border-block-start: 1px solid var(--color-muted); font-weight: 500; }
+  .bz-panel :focus-visible { outline-color: var(--color-background-dark-foreground); }
+
+  /* Teaser trang chủ: 360 nằm trên thanh bundle 72 (16 + 72 = 88); từ 48rem không thanh, mép 24 */
+  .bz-stage--home .offer-teaser { inset-block-end: calc(var(--space-4) + 72px); }
+  .bz-stage .toast-region { z-index: 30; inset-block-end: calc(var(--space-4) + 72px); inset-inline: var(--space-4); }
+  .bz-stage .toast-region .toast { margin: 0; }
+  .bz-consent { z-index: 40; inset-inline: 0; inset-block-end: 0; display: grid; gap: var(--space-2); padding: var(--space-5) var(--page-margin); border-block-start: 2px dashed var(--color-muted-light); background: var(--color-background-alt); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .bz-consent strong { color: var(--color-foreground); font-size: var(--font-size-base); }
+  .bz-consent__ph { display: flex; gap: var(--space-3); }
+  .bz-consent__ph span { flex: 1; height: 44px; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-button); }
+  .bz-stage--consent .toast-region { inset-block-end: calc(var(--space-4) + 196px); } /* mockup: số đo banner giả; theme dùng --consent-height đo thật */
+  @media (min-width: 48rem) {
+    .bz-bar { min-height: 80px; gap: var(--space-4); padding-inline: var(--space-6); }
+    .bz-bar--panel { min-height: 72px; }
+    .bz-bar--home { display: none; }
+    .bz-stage--home .offer-teaser { inset-block-end: var(--space-5); }
+    .bz-bar__media { width: 56px; height: 56px; }
+    .bz-bar__name { font-size: var(--font-size-base); }
+    .bz-bar__variant { display: block; }
+    .bz-bar__info .price__compare { display: inline; }
+    .bz-bar--light .button svg { display: inline; }
+    .bz-stage .toast-region { inset-block-end: calc(var(--space-5) + 80px); inset-inline: auto var(--space-5); width: 400px; }
+    .bz-stage--consent .toast-region { inset-block-end: calc(var(--space-5) + 148px); }
+    .bz-consent { padding-inline: var(--space-6); }
+  }
+  @media (min-width: 64rem) {
+    .bz-qty { display: inline-flex; }
+    .bz-bar--cart { display: none; }
+    .bz-panel { display: grid; }
+    .bz-body--cart { padding-inline-end: calc(340px + var(--space-6) * 2); }
+  }
 </style>
 </head>
 <body>
@@ -188,6 +272,7 @@
   <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
   <symbol id="i-tag" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M10.6 2H17a1 1 0 0 1 1 1v6.4a1 1 0 0 1-.3.7l-7.9 7.9a1 1 0 0 1-1.4 0l-6.4-6.4a1 1 0 0 1 0-1.4l7.9-7.9a1 1 0 0 1 .7-.3Z"/><circle cx="14" cy="6" r="1.2"/></g></symbol>
   <symbol id="i-copy" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="6.5" y="6.5" width="11" height="11" rx="2"/><path d="M13.5 6.5V4A1.5 1.5 0 0 0 12 2.5H4A1.5 1.5 0 0 0 2.5 4v8A1.5 1.5 0 0 0 4 13.5h2.5"/></g></symbol>
+  <symbol id="i-arrow" viewBox="0 0 16 14"><path d="M1 7h13M8.5 1.5 14 7l-5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
   <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
 </svg>
@@ -376,7 +461,7 @@
   <!-- ===== 3. Big offer ===== -->
   <section class="demo-block" aria-labelledby="b4">
     <h2 id="b4">3. Big Offer Popup</h2>
-    <p class="demo-note">CTO chốt 10/11: nút "Big Offer" nổi góc dưới trái mở thẻ deal sản phẩm giảm giá; nút chỉ hiện khi sản phẩm còn hàng, có giá gạch, chưa hết giờ, và sau khi cuộn 25% (không có lúc tải trang). Nút không phải popup, không vào hàng đợi. Desktop có chuột: rê vào 150 ms mở thẻ ưu đãi không modal, rời chuột 300 ms mới đóng; bấm/Enter cũng mở. Mobile, tablet cảm ứng: chạm mở bottom sheet. Thẻ đang mở chiếm lớp: popup tự mở phải chờ thẻ đóng. Hàng giá và thanh đếm ngược chép Figma 1:782, 1:773 (figma-ativafit-lava-featured, $379.99 / $499.99).</p>
+    <p class="demo-note">CTO chốt 10/11: nút "Big Offer" nổi góc dưới trái mở thẻ deal sản phẩm giảm giá; nút chỉ hiện khi sản phẩm còn hàng, có giá gạch, chưa hết giờ, và sau khi cuộn 25% (không có lúc tải trang). Nút không phải popup, không vào hàng đợi. Desktop có chuột: rê vào 150 ms mở thẻ ưu đãi không modal, rời chuột 300 ms mới đóng; bấm/Enter cũng mở. Mobile, tablet cảm ứng: chạm mở bottom sheet. Thẻ đang mở chiếm lớp: popup tự mở phải chờ thẻ đóng. Audit 10/11 (ES1-T290): không có nút ở trang sản phẩm (mọi mốc) và cart; trang chủ 360 nút nằm trên thanh bundle (mục 5). Hàng giá và thanh đếm ngược chép Figma 1:782, 1:773 (figma-ativafit-lava-featured, $379.99 / $499.99).</p>
     <p class="demo-label">Đóng (teaser)</p>
     <div class="popup-stage popup-stage--short" role="group" aria-label="Big offer button closed">
       <div class="stage-page" inert>
@@ -602,6 +687,160 @@
         <div class="note-card">
           <strong>No popup is rendered</strong>
           <span>Before you leave: cart empty and no code, or already shown this session or in the last day. Big offer button: product sold out, no compare-at price, or countdown ended. Newsletter: shopper already subscribed, already shown this session, closed it in the last 7 days, or page is 404, cart, password.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 5. Vùng đáy màn hình (ES1-T290, docs/ui-spec/layers.md) ===== -->
+  <section class="demo-block" aria-labelledby="b6">
+    <h2 id="b6">5. Bottom Of The Screen</h2>
+    <p class="demo-note">Audit ES1-T283 A15, A22; CTO chốt 10/11 câu 3. Thứ tự lớp (trên → dưới) và vị trí trong dải đáy theo docs/ui-spec/layers.md. Mỗi trang tối đa 1 thanh đáy. Nút Big Offer ở làn trái, mép dưới = 16 / 24 + chiều cao thanh đang hiện; làn phải dành cho Shopify Inbox và toast. Không có nút Big Offer ở trang sản phẩm (mọi mốc) và cart. Focus bàn phím không bị che: scroll-padding trên = header 80 + 16, dưới = thanh đáy + 16.</p>
+    <ol class="layer-list" aria-label="Layer order, top to bottom">
+      <li><b>Top</b><span>Modal dialogs and drawers (browser top layer): popups, cart, menu, search, filter, quick view, lightbox, quiz result</span></li>
+      <li><b>Shopify</b><span>Cookie banner, Shopify Inbox. The theme never goes above them</span></li>
+      <li><b>30</b><span>Toasts (only when no modal is open)</span></li>
+      <li><b>21</b><span>Big offer card and country or language panel on desktop</span></li>
+      <li><b>15</b><span>Big Offer button</span></li>
+      <li><b>10</b><span>Header 80, dropdown, mega menu and its overlay</span></li>
+      <li><b>5</b><span>Bottom bars: add to cart, cart checkout, bundle (one per page)</span></li>
+      <li><b>4</b><span>Sticky in page: collection toolbar, cart summary, product gallery</span></li>
+      <li><b>0–2</b><span>Page content</span></li>
+    </ol>
+
+    <div class="bz-grid">
+      <div>
+        <p class="demo-label">Trang chủ · 360 thanh bundle + nút Big Offer phía trên (88) · từ 768 không thanh, nút cách đáy 24</p>
+        <div class="popup-stage bz-stage bz-stage--cream bz-stage--home" role="group" aria-label="Home page, bundle builder in view">
+          <div class="stage-page" inert>
+            <div class="site-header"><div class="site-header__inner">
+              <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
+              <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
+              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+              <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div>
+            </div></div>
+            <div class="bz-body">
+              <p class="eyebrow" style="margin:0">Build your bundle</p>
+              <h3>Pick Your Kit, Save As You Go</h3>
+              <ul class="bz-cards">
+                <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg?width=480" alt="" width="480" height="480">Adjustable dumbbell pair<span>$259.00</span></li>
+                <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P10.jpg?width=480" alt="" width="480" height="480">Foldable bench<span>$89.00</span></li>
+                <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P11.jpg?width=480" alt="" width="480" height="480">Resistance band set<span>$45.00</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="offer-teaser">
+            <button class="offer-teaser__open" type="button" aria-expanded="false"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%<span class="visually-hidden"> off</span></span></button>
+            <button class="offer-teaser__hide" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          </div>
+          <aside class="bz-bar bz-bar--panel bz-bar--home" aria-label="Bundle total">
+            <p class="bz-bar__sum" style="margin:0">5 Items<b>$436.90</b></p>
+            <button class="button" type="button">Add Bundle To Cart</button>
+          </aside>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">Trang sản phẩm · thanh mua mọi mốc (72 / 80), không nút Big Offer · toast lỗi trên thanh</p>
+        <div class="popup-stage bz-stage" role="group" aria-label="Product page, sticky add to cart bar">
+          <div class="stage-page" inert>
+            <div class="site-header"><div class="site-header__inner">
+              <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
+              <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
+              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+              <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div>
+            </div></div>
+            <div class="bz-body">
+              <div class="bz-pdp">
+                <h3>Specifications</h3>
+                <p>Adjusts from 10 to 66 lb in seconds with one dial. Replaces 15 sets of dumbbells and fits under a bed. Black or Gray.</p>
+                <p>Weight plates are steel with a rubber coat that keeps floors safe. Handle has a knurled grip.</p>
+              </div>
+            </div>
+          </div>
+          <div class="toast-region">
+            <div class="toast toast--error" role="alert">
+              <svg aria-hidden="true"><use href="#i-alert"/></svg>
+              <div class="toast__body"><strong>We couldn't add this item</strong>Check your connection, then try again.</div>
+              <button class="toast__close" type="button" aria-label="Dismiss: We couldn't add this item"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+          </div>
+          <aside class="bz-bar bz-bar--light" aria-label="Quick add to cart">
+            <span class="bz-bar__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="" width="112" height="112" loading="lazy"></span>
+            <span class="bz-bar__info">
+              <span class="bz-bar__name">Ativafit Lava 66 lb Adjustable</span>
+              <span class="bz-bar__variant">Black</span>
+              <span class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s></span>
+            </span>
+            <span class="bz-qty"><button type="button" aria-label="Decrease quantity">−</button><output aria-label="Quantity">1</output><button type="button" aria-label="Increase quantity">+</button></span>
+            <button class="button" type="button"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+          </aside>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">Cart · dưới 1024 thanh checkout 72, không nút Big Offer · từ 1024 panel dính trong trang, không thanh</p>
+        <div class="popup-stage bz-stage" role="group" aria-label="Cart page, sticky checkout bar">
+          <div class="stage-page" inert>
+            <div class="site-header"><div class="site-header__inner">
+              <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
+              <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
+              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+              <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count">4</span></span></div>
+            </div></div>
+            <div class="bz-body bz-body--cart">
+              <h3>Your Cart</h3>
+              <ul class="bz-lines">
+                <li><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="" width="128" height="128">Iron Core Kettlebell 16 kg · Qty 2<span>$238.00</span></li>
+                <li><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png" alt="" width="128" height="128">FlexFold Adjustable Bench<span>$189.00</span></li>
+                <li><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg" alt="" width="128" height="128">Revllen Pro Speed Rope<span>$34.99</span></li>
+              </ul>
+            </div>
+          </div>
+          <section class="bz-panel" aria-label="Order summary">
+            <h4>Order Summary</h4>
+            <p><span>Total</span><span>$461.99</span></p>
+            <a class="button button--full" href="#">Checkout<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          </section>
+          <aside class="bz-bar bz-bar--panel bz-bar--cart" aria-label="Cart total and checkout">
+            <p class="bz-bar__sum" style="margin:0">Total<b>$461.99</b></p>
+            <a class="button" href="#">Checkout<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          </aside>
+        </div>
+      </div>
+
+      <div>
+        <p class="demo-label">Banner consent Shopify đang hiện · không thanh đáy, không nút Big Offer, popup tự mở chờ · toast trên banner</p>
+        <div class="popup-stage bz-stage bz-stage--cream bz-stage--consent" role="group" aria-label="Home page with the Shopify cookie banner open">
+          <div class="stage-page" inert>
+            <div class="site-header"><div class="site-header__inner">
+              <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
+              <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
+              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+              <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count">1</span></span></div>
+            </div></div>
+            <div class="bz-body">
+              <p class="eyebrow" style="margin:0">Build your bundle</p>
+              <h3>Pick Your Kit, Save As You Go</h3>
+              <ul class="bz-cards">
+                <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg?width=480" alt="" width="480" height="480">Adjustable dumbbell pair<span>$259.00</span></li>
+                <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P10.jpg?width=480" alt="" width="480" height="480">Foldable bench<span>$89.00</span></li>
+                <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P11.jpg?width=480" alt="" width="480" height="480">Resistance band set<span>$45.00</span></li>
+              </ul>
+            </div>
+          </div>
+          <div class="toast-region">
+            <div class="toast toast--success" role="status">
+              <svg aria-hidden="true"><use href="#i-check"/></svg>
+              <div class="toast__body"><strong>Added to cart</strong>Foldable bench, 1 item.</div>
+              <button class="toast__close" type="button" aria-label="Dismiss: Added to cart"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            </div>
+          </div>
+          <div class="bz-consent" role="note" aria-label="Placeholder for the Shopify cookie banner">
+            <strong>Shopify cookie banner</strong>
+            <span>Placeholder. Shopify draws and places this banner, the theme does not style it. The theme waits until the shopper chooses.</span>
+            <span class="bz-consent__ph" aria-hidden="true"><span></span><span></span></span>
+          </div>
         </div>
       </div>
     </div>
