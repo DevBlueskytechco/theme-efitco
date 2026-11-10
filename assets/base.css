@@ -8020,20 +8020,28 @@ scroll-buttons:not([data-scrollable]) .carousel-nav { visibility: hidden; }
 .video-carousel__row > .carousel-nav { margin-inline-start: auto; }
 .video-carousel__link + .carousel-nav { margin-inline-start: 0; }
 
+/* Thanh tiến trình nằm trong khoảng đệm đáy có sẵn của khối (absolute), không thêm chiều cao: trang giữ đúng
+   13300 của Figma 1:359 (ES1-T275). Cách hàng card 20px (đệm 48) và 40px từ 64rem (đệm 120 theo Figma). */
+.collection-list, .video-carousel, .testimonials, .blog-posts { position: relative; }
 .carousel-progress {
-  position: relative;
+  position: absolute;
+  inset-block-end: calc(var(--space-7) - 22px);
+  inset-inline: 0;
   height: 2px;
-  margin-block-start: 32px;
+  margin: 0;
   overflow: hidden;
   border-radius: var(--figma-radius-2);
   background: var(--figma-e5e5e5);
   visibility: hidden;
 }
+@media (min-width: 64rem) {
+  .carousel-progress { inset-block-end: 78px; }
+}
 scroll-buttons[data-scrollable] .carousel-progress { visibility: visible; }
-.testimonials > .carousel-progress { margin-inline: max(0px, (100% - var(--content-width)) / 2); }
-.blog-posts > .carousel-progress { margin-inline: var(--blog-posts-inset); margin-block-start: 0; }
-.video-carousel .carousel-progress { margin-inline: var(--video-carousel-inset); margin-block-start: 0; }
-.collection-list > .carousel-progress { margin-inline: calc((100% - var(--content-width)) / 2); background: var(--figma-white-12); }
+.testimonials > .carousel-progress { inset-inline: max(0px, (100% - var(--content-width)) / 2); }
+.blog-posts > .carousel-progress { inset-inline: var(--blog-posts-inset); }
+.video-carousel .carousel-progress { inset-inline: var(--video-carousel-inset); }
+.collection-list > .carousel-progress { inset-inline: calc((100% - var(--content-width)) / 2); background: var(--figma-white-12); }
 .carousel-progress__thumb {
   position: absolute;
   inset-block: 0;

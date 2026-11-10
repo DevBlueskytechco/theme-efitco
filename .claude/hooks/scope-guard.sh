@@ -5,9 +5,16 @@ INPUT=$(cat)
 AGENT="${1:-${AI_AGENT:-unknown}}"
 FILE=$(echo "$INPUT" | jq -r '.tool_input.file_path // empty')
 [ -z "$FILE" ] && exit 0
-REL="${FILE#"$PWD"/}"
+# Chuẩn hoá trước khi so (10/11): blocks/../.claude/x hay ../ai-team/... từng lọt vì chỉ cắt tiền tố $PWD rồi so regex.
+ROOTDIR="${CLAUDE_PROJECT_DIR:-$PWD}"
+REL=$(python3 -c 'import os,sys
+f, r = sys.argv[1], os.path.realpath(sys.argv[2])
+p = os.path.realpath(f if os.path.isabs(f) else os.path.join(r, f))
+print(os.path.relpath(p, r))' "$FILE" "$ROOTDIR")
 
 deny() { echo "scope-guard: $AGENT không được ghi $REL ($1)" >&2; exit 2; }
+
+case "$REL" in ..|../*|/*) deny "ngoài repo theme" ;; esac
 
 # Memory riêng của agent (frontmatter memory: project) — chỉ thư mục của chính nó
 case "$REL" in
