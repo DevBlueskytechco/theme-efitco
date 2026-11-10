@@ -3,7 +3,8 @@
 Quyết định đã chốt, không hỏi lại. Mâu thuẫn với Figma hay bộ kiến thức thì sổ này thắng; mới nhất ở trên. Thêm dòng khi CTO chốt câu hỏi `[Q]`.
 
 ## Đã chốt
-- 09/11 Header trang con: nền trắng mặc định; trang có ảnh lớn đầu trang (banner collection, ảnh bìa bài viết) thì header đè ảnh như trang chủ (ES1-T251).
+- 10/11 Header trang chủ: thanh tối riêng cao 80px trên dải nền #1A1A1A có noise (Figma 1:362), hero là thẻ bo góc nằm dưới header, KHÔNG đè ảnh. Sửa nhận định sai của ES1-T251.
+- 10/11 Header trang con giống trang chủ: luôn là thanh tối riêng (#1A1A1A có noise, như Figma 1:362), không đè ảnh, kể cả trang có banner hay ảnh bìa lớn. Thay quyết định 09/11 (nền trắng, đè ảnh khi có ảnh lớn).
 - 09/11 Viền ô nhập: nền sáng dùng `--color-muted-light` (5.33:1), footer nền tối dùng `--color-muted-on-dark` (5.85:1); không dùng `--color-border` cho ô nhập (ES1-T251).
 - 09/11 Toast: cảnh báo dùng cam accent, thành công dùng `--color-badge-new`, không thêm token (ngoại lệ của quy tắc accent chỉ cho hành động, ES1-T251).
 - 09/11 CHỈ TIÊU NGHIỆM THU (ưu tiên số 1, đo Lighthouse trên demo): SEO 100, Accessibility 100, Best Practices 100 cả desktop và mobile; Performance desktop ≥98, mobile ≥90. Mọi thiết kế phải đạt được khi dựng. Hệ quả cho thiết kế:
