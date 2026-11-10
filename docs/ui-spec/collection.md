@@ -14,6 +14,16 @@ Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:359 > bộ k
 
 Figma tham chiếu: header 1:362, card sản phẩm 1:502 (trong 1:490), card collection + nút chevron 52 1:395 / 1:398, hero thẻ bo góc 1:361, footer 1:1104.
 
+## Thay đổi audit (ES1-T283, sửa ở ES1-T287)
+
+| # | Mã | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | A4, câu CTO 5 | trang 1 không có Previous, trang cuối không có Next; < 768 "Page X of Y" dồn trái khi thiếu nút | luôn có Previous/Next; đầu/cuối mờ 0.35 + `aria-disabled`, giữ chỗ 52 (0 CLS); "Page X of Y" luôn giữa 2 nút | Sổ 10/11 audit (5), `docs/ui-spec/pagination.md` |
+| 2 | A4 | §8 tự mô tả phân trang | §8 trỏ về `pagination.md` (snippet chung) | Sổ 10/11 S3/C3 |
+| 3 | A12 | S7: card cũ mờ 40%, không bấm | không làm mờ: chờ ≤ 300 ms giữ card nguyên; > 300 ms hoặc sang trang bằng JS thì lưới thành skeleton cùng số ô, cùng cỡ card, như search S5 | foundation §18 (không làm mờ chữ, AA mọi trạng thái), search.md §6 S5 |
+
+Mockup `drafts/designer/ES1-T254/collection.html`: phân trang trang chính (1/2, Previous tắt), S4 (2/2 Next tắt; 5/9), S7 vẽ lại.
+
 ## Thay đổi so với vòng 2
 
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
@@ -155,17 +165,10 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 - Swatch là chỉ báo (foundation §9 vòng 3): `aria-hidden`, không bấm, không focus; tên link đọc thêm ", 3 colors". Nhiều hơn 3 màu: 3 swatch + "N colors" 14 muted.
 - Ca biên (S5, edge_cases): hết hàng toàn bộ → Sold out + ảnh 0.6; không media → placeholder; "Sale giá nhỏ" $0.99 / $1.99 → -50%; compare_at ($100) thấp hơn giá ($200) → không badge, không giá gạch; gift card → "From $10.00".
 - Phân trang 24 / trang (SRS AC1; giữ số trang thay Load more: link thật cho SEO, chạy không JS, 08 #2167D).
-
-| | < 768 | ≥ 768 |
-| --- | --- | --- |
-| Bố cục | `[‹]  Page 1 of 2  [›]` trải hết hàng | `[‹]  1 … 4 (5) 6 … 9  [›]` canh giữa |
-| Previous / Next | tròn 52, chevron 11 × 16 (`snippets/slideshow-icon` previous/next) | như < 768, cách số trang 16 |
-| Số trang | ẩn | tròn 44 (pill), chữ 14/500 |
-
-- Previous / Next (sổ 09/11, Figma 1:398): nền trắng, viền `--color-border`, chevron foreground; hover nền accent, chevron trắng, scale 1.06; active scale 0.94; focus outline 2px accent offset 3. `<a href>` với `aria-label="Previous page"` / `"Next page"` (tên mô tả đích, SEO + A11y). Trang 1 không có Previous, trang cuối không có Next (code); dưới 768 "Page X of Y" dồn trái khi thiếu Previous.
-- Số trang: viền `--color-border`, hover viền foreground; trang hiện tại nền accent, chữ trắng 700, `aria-current="page"` (ES1-T107 #6 CTO chấp nhận). Dấu "…" muted, không phải link.
-- ĐỀ XUẤT "Page X of Y" dưới 768 (08 #504D): 9 nút × 44 không vừa 320.
-- Sang trang: cuộn về đầu lưới, focus vào h1 hoặc số kết quả (BE nếu chặn link).
+- Dùng snippet `pagination` chung; hình, trạng thái, mốc, A11y theo `docs/ui-spec/pagination.md`: `{% paginate collection.products by 24, window_size: 1 %}` → `{% render 'pagination', paginate: paginate %}` (không `anchor`, không `summary`: số kết quả đã ở thanh công cụ).
+- Tóm tắt: < 768 `[‹ 52]  Page 1 of 2  [› 52]` trải hết hàng; ≥ 768 `[‹]  1 … 4 (5) 6 … 9  [›]` canh giữa, chevron cách số 16. Previous/Next tròn 52 (`aria-label="Previous page"` / `"Next page"`), số pill 44, trang hiện tại accent (ES1-T107 #6).
+- Trang 1 / trang cuối: Previous / Next vẫn hiện, mờ 0.35 + `aria-disabled`, không link (sổ 10/11 audit 5). Bỏ "Trang 1 không có Previous" của vòng 3.
+- Sang trang có JS (BE chặn link): vùng kết quả theo S7 (skeleton), cuộn về đầu lưới, focus vào số kết quả (pagination.md §3). Không JS: tải trang mới.
 
 ## 9. Trạng thái
 
@@ -173,13 +176,13 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 | --- | --- | --- |
 | Collection rỗng (S6) | empty-state foundation §18: icon hộp trong tròn 72 · h2 "No Products Here Yet" · "No products in this collection yet. Browse all our gear or pick another category." · primary "Shop All Products" (`routes.all_products_collection_url`) + text link "Browse collections" (`routes.collections_url`). Ẩn Filter/Sort khi `all_products_count` = 0. | AGENTS empty state, 05 §7 |
 | Lọc không ra (S6) | chip vẫn hiện để bỏ từng lọc · icon lọc · h2 "No Matching Products" · "No products match these filters. Remove a filter or widen the price range." · primary "Clear filters". | 05 §7 |
-| Đang cập nhật (S7) | `aria-busy="true"` trên vùng kết quả; card cũ mờ 40%, không bấm; chỗ số kết quả thành spinner 20 + "Updating products…" (`role="status"`). Nhảy trang chưa có card: skeleton cùng kích thước card. Không đổi chiều cao (0 CLS). | foundation §18, 05 §6 |
+| Đang cập nhật (S7) | Không làm mờ card, không làm mờ chữ (foundation §18: Lighthouse color-contrast tính opacity). Ngay khi lọc/sort/xoá chip: chỗ số kết quả thành spinner 20 + "Updating products…" (`role="status"`). Chờ ≤ 300 ms: card cũ giữ nguyên độ đậm, vẫn bấm được (link sản phẩm còn đúng). Chờ > 300 ms, hoặc sang trang bằng JS: lưới `aria-busy="true"` + skeleton foundation §18 (media 1:1 + 2 dòng 14, dòng 2 rộng 40%), số ô = số card đang hiện, cùng cỡ card (0 CLS), như search S5. Thanh công cụ, chip, cột lọc vẫn dùng được. ĐỀ XUẤT ngưỡng 300 ms: tránh nháy skeleton khi phản hồi nhanh (05 §3 mục 6, 05 §6 "không delay không rõ lý do"). | foundation §18, search.md §6 S5, 05 §6 |
 | Lỗi tải (S7) | alert foundation §18 trên lưới: icon ! sale · "We couldn't update the products" · "Check your connection, then try again. Your filters are kept." · secondary "Try Again". Lưới cũ giữ nguyên. `role="alert"`. | foundation §18, 05 §4 |
 | Lỗi giá (S3) | §5.2 | 05 §4 |
 | Hover / focus / active | card nhấc 4 + ảnh 1.04; chip đảo đen; số trang viền đen; Previous/Next cam; select viền đen; focus outline 2px accent (trên header tối outline trắng) | foundation §3, §6, sổ 07/11, 09/11 |
 | Không JS | form GET + chip/phân trang/Clear all là link; drawer là popover gốc (code); "Show N products" submit | SRS AC2 |
 
-Chuỗi mới (ĐỀ XUẤT, `locales/en.default.json`): `blocks.collection_products.empty_heading`, `empty_hint`, `empty_filtered_heading`, `empty_filtered_hint`, `browse_collections`, `active_filters`, `remove_filter` ("Remove filter {{ label }}: {{ value }}"), `updating`, `error_heading`, `error_text`, `retry`, `color_count` (", {{ count }} colors"); `blocks.collection_filters.show_results`, `show_more`, `show_more_label`, `selected`, `price_highest`; `collections.pagination.page_of`, `previous_page` ("Previous page"), `next_page` ("Next page"). Có sẵn: `filter`, `sort_label`, `results_count`, `filters_applied`, `clear_all`, `price_min`, `price_max`, `price_invalid`, `empty`, `empty_filtered`, `empty_cta`, `empty_clear`.
+Chuỗi mới (ĐỀ XUẤT, `locales/en.default.json`): `blocks.collection_products.empty_heading`, `empty_hint`, `empty_filtered_heading`, `empty_filtered_hint`, `browse_collections`, `active_filters`, `remove_filter` ("Remove filter {{ label }}: {{ value }}"), `updating`, `error_heading`, `error_text`, `retry`, `color_count` (", {{ count }} colors"); `blocks.collection_filters.show_results`, `show_more`, `show_more_label`, `selected`, `price_highest`. Phân trang: chuỗi chung `collections.pagination.*` (đổi `previous`/`next`, thêm `page_of`; pagination.md §5). Có sẵn: `filter`, `sort_label`, `results_count`, `filters_applied`, `clear_all`, `price_min`, `price_max`, `price_invalid`, `empty`, `empty_filtered`, `empty_cta`, `empty_clear`.
 
 ## 10. Accessibility
 
@@ -188,7 +191,7 @@ Tương phản (L tính tay, foundation §2):
 | Cặp | Tỉ lệ | Dùng |
 | --- | --- | --- |
 | foreground / background | 17.4 | nhãn lọc, chip, giá, số trang, chevron |
-| muted / background | 8.45 | số đếm, "Sort by" 12px, số kết quả, chữ disabled, "Page X of Y" |
+| muted / background | 8.45 | số đếm, "Sort by" 12px, số kết quả, chữ disabled |
 | muted-light / background | 5.33 | viền select, ô giá (WCAG 1.4.11 ≥ 3) |
 | accent-foreground / accent | 5.01 | badge số lọc, trang hiện tại, chevron hover, nút Show N products |
 | background / foreground | 17.4 | chip hover |
@@ -206,7 +209,7 @@ Tương phản (L tính tay, foundation §2):
 
 ## 11. Motion
 
-Chỉ transform/opacity (sổ 09/11). Drawer 250 / 200; chevron nhóm xoay 250; chip hover 150; Previous/Next hover 250 (màu + scale); lưới mờ khi cập nhật opacity 250; card reveal khi cuộn chỉ cho trang tải lần đầu, không chạy lại sau khi lọc (tránh nháy). `prefers-reduced-motion`: tắt hết.
+Chỉ transform/opacity (sổ 09/11). Drawer 250 / 200; chevron nhóm xoay 250; chip hover 150; Previous/Next hover 250 (màu + scale); lưới không mờ khi cập nhật, skeleton shimmer 1.4s sau 300 ms (S7); card reveal khi cuộn chỉ cho trang tải lần đầu, không chạy lại sau khi lọc (tránh nháy). `prefers-reduced-motion`: tắt hết.
 
 ## 12. Lighthouse
 
@@ -234,7 +237,7 @@ Chỉ tiêu: SEO 100 (collection nằm trong phạm vi SEO, sổ 10/11), A11y 10
 | Drawer | 100% / 28rem, nút Apply ẩn khi có JS | 90% / 420 (câu hỏi 2); chân dính Clear all + Show N products |
 | Thanh công cụ | Filter + Sort; số kết quả trong partial | dính dưới header < 64rem; số kết quả cùng hàng; Sort nhãn nổi, viền muted-light |
 | Chip | — | mới trong partial `collection-products` |
-| Phân trang | Previous / số / Next chữ, 44 | Previous/Next = `.round-button` 52 + `slideshow-icon` (class có sẵn `.carousel-nav__button`); số trang pill 44; < 48rem "Page X of Y" |
+| Phân trang | Previous / số / Next chữ, 44; ẩn nút ở đầu/cuối | sửa `snippets/pagination.liquid` theo `pagination.md` §10 (dùng chung mọi trang) |
 | Card | swatch radio | swatch `aria-hidden` + ", N colors" trong tên link (foundation §21) |
 | Rỗng / lỗi / tải | câu + nút secondary | empty-state đầy đủ, alert, aria-busy (BE) |
 

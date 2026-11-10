@@ -7,6 +7,15 @@ Template: `templates/article.liquid` (hiện là markup Skeleton thô: ảnh, h1
 Figma: không có trang bài viết. Dùng ngôn ngữ trang chủ: hero 1:361 (thẻ bo 16 dưới header, tỉ lệ 1798/827), header 1:362, block Blog posts 1:1022 (eyebrow, heading, card), chevron 52 1:398, FAQ 1:1057 (gạch phân cách), input 1:1104. Thành phần chung: `docs/ui-spec/foundation.md` (F§). Trang danh sách: `docs/ui-spec/blog.md`.
 Mockup: `drafts/designer/ES1-T257/article.html` + `article-360|768|1280|1920.png`. Trạng thái ở cuối file.
 
+## Thay đổi audit (ES1-T283, sửa ở ES1-T287)
+
+| # | Mã | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | A4 | phân trang bình luận theo blog.md §5 cũ, chữ "Earlier comments" / "Later comments" | snippet `pagination` chung: Previous/Next tròn 52 ("Previous page"/"Next page"), số pill 44, trang hiện tại accent; nav `aria-label="Comment pages"`, neo `#comments` | Sổ 10/11 S3/C3, `docs/ui-spec/pagination.md` §5–§6 |
+| 2 | A4, câu CTO 5 | — | trang đầu/cuối giữ nút mờ 0.35 + `aria-disabled` | Sổ 10/11 audit (5) |
+
+Mockup: thêm khối "Trạng thái: phân trang bình luận" trong `drafts/designer/ES1-T257/article.html` (trang 1/3, trang 3/3).
+
 ## Thay đổi so với vòng 2
 
 | # | Phần | Vòng 2 | Vòng 3 | Nguồn |
@@ -34,7 +43,7 @@ Giữ nguyên: cột đọc 46rem, RTE, bình luận, form, bài liên quan, m�
 4. Bình luận (chỉ khi `blog.comments_enabled?`), gạch trên 1px border:
    - h2 "{n} Comments" (`article.comments_count`; 0 thì "Comments").
    - Danh sách `<ol>`: avatar 40 tròn nền alt chữ cái đầu (`aria-hidden`) · tên 16/600 · ngày 14 muted `<time>` · nội dung 16. Gạch giữa các mục.
-   - Phân trang bình luận 10 / trang, neo `#comments` (component phân trang của blog.md §5, chữ "Earlier comments" / "Later comments").
+   - Phân trang bình luận 10 / trang (khi > 10), dưới danh sách cách 24, trên form: `{% paginate article.comments by 10, window_size: 1 %}` → `{% render 'pagination', paginate: paginate, label: blog_comments_pagination_label, anchor: '#comments' %}`. Hình, trạng thái, A11y theo `docs/ui-spec/pagination.md` (nút tròn 52 "Previous page"/"Next page", nav "Comment pages", đầu/cuối mờ 0.35 + `aria-disabled`).
    - Form `{% form 'new_comment', article %}`: h2 "Add a comment" (cỡ h3) · ghi chú duyệt (chỉ khi `blog.moderated?`, icon i + "Comments are reviewed before they appear.") · Name*, Email* (gợi ý "Not published."), Comment* · nút primary "Post Comment" · "* Required".
 5. Bài liên quan: hàng ngang (sổ quyết định 09/11): eyebrow "From the Efitco blog" · h2 "More Training Tips" (cỡ h1 như Figma 1:1025) · nút chevron tròn 52 next/back ở đầu khối, căn đáy với tiêu đề, cách 8 (F§6, F§11) · `<ul>` card Figma 1:1022 (title h3) · thanh tiến trình. Nguồn: bài cùng tag đầu, thiếu thì bài mới nhất; bỏ bài đang xem; tối đa theo setting.
 6. Footer (F§4).
@@ -132,7 +141,7 @@ Không chữ nào đặt trên ảnh bìa (tiêu đề, meta nằm dưới ảnh
 - Ảnh bìa có alt = alt Shopify của ảnh (không rỗng: ảnh mang nội dung bài); ảnh card liên quan `alt=""` (tên ở tiêu đề link).
 - Form: `<label for>` thật, `autocomplete="name"`, `"email"`, `required` + dấu * `aria-hidden` + chú thích "* Required"; không chặn dán; nút là `<button type="submit">` có chữ "Post Comment" (không "Submit").
 - Breadcrumb cuối `aria-current="page"`; tag link tên = tên tag.
-- Vùng chạm: tag pill 28 cao, vùng chạm 44 bằng `::after`; tab Topics 44; link "Back to…" cao 44; nút 48/52; nút chevron 52 (tên "Previous articles" / "Next articles", đầu/cuối hàng `aria-disabled`).
+- Vùng chạm: tag pill 28 cao, vùng chạm 44 bằng `::after`; tab Topics 44; link "Back to…" cao 44; nút 48/52; nút chevron 52 (tên "Previous articles" / "Next articles", đầu/cuối hàng `aria-disabled`); phân trang bình luận chevron 52, số 44 (pagination.md §7).
 - Chữ ≥ 14 ở mọi chỗ (SEO ≥ 12).
 
 ## 7. Lighthouse
@@ -164,7 +173,7 @@ Motion: `--motion-base`, `--motion-slow`, `--ease-out`. Không thêm token.
 | Breadcrumb, form, nút, toast | F§5, F§6, F§12, F§17 | dùng chung |
 | Card liên quan + hàng ngang | `article-card`, `scroll-buttons`, `.carousel-nav__button`, `snippets/slideshow-icon`, `.carousel-progress` | logic chọn bài cùng tag (Liquid) |
 | Bình luận | markup thô trong template | block `article-comments`, lỗi theo trường, hộp thành công |
-| Chuỗi | `blog.article_comments`, `comment_form_*`, `article_metadata_html` | sửa `comment_form_submit` "Post" → "Post Comment" (câu CTO 3); thêm `blog.comments_count` (one/other), `blog.no_comments`, `blog.comment_moderated_note`, `blog.comment_pending_*`, `blog.comment_posted`, `blog.comment_errors_summary`, `blog.comment_error_author/email/body`, `blog.email_hint`, `blog.required_note`, `blog.topics`, `blog.back_to_blog` ("Back to {{ blog }}"), `blog.related_*`; nhãn breadcrumb dùng chung F§5 |
+| Chuỗi | `blog.article_comments`, `comment_form_*`, `article_metadata_html` | sửa `comment_form_submit` "Post" → "Post Comment" (câu CTO 3); thêm `blog.comments_count` (one/other), `blog.no_comments`, `blog.comment_moderated_note`, `blog.comment_pending_*`, `blog.comment_posted`, `blog.comment_errors_summary`, `blog.comment_error_author/email/body`, `blog.email_hint`, `blog.required_note`, `blog.topics`, `blog.back_to_blog` ("Back to {{ blog }}"), `blog.related_*`, `blog.comments_pagination_label` ("Comment pages"); nút phân trang dùng `collections.pagination.*` chung; nhãn breadcrumb dùng chung F§5 |
 
 ## 10. Quyết định CTO đã chốt (10/11)
 

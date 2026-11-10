@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pagination – Efitco (component sheet ES1-T287)</title>
+<meta name="description" content="Efitco shared pagination: round 52 previous and next buttons, page pills, current page, first and last page disabled states.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* Phân trang chung (docs/ui-spec/pagination.md, ES1-T287). Khối CSS này chép nguyên vào mọi mockup dùng phân trang. */
+  .pagination__list { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+  .pagination__step { text-decoration: none; }
+  .pagination__step[aria-disabled='true'] { cursor: default; }
+  .pagination__item--prev { margin-inline-end: var(--space-2); }
+  .pagination__item--next { margin-inline-start: var(--space-2); }
+  .pagination__page { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
+  a.pagination__page:hover, .pagination__page.is-hover { border-color: var(--color-foreground); }
+  .pagination__page:focus-visible, .pagination__page.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .pagination__page[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
+  .pagination__gap { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 44px; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .pagination__status { font-size: var(--font-size-sm); font-weight: 500; white-space: nowrap; }
+  .pagination__summary { margin: var(--space-4) 0 0; text-align: center; color: var(--color-muted); font-size: var(--font-size-sm); }
+  :dir(rtl) .pagination__step svg { scale: -1 1; }
+  @media (max-width: 47.99rem) { .pagination__num { display: none; } .pagination__list { justify-content: space-between; } .pagination__item--prev, .pagination__item--next { margin: 0; } }
+  @media (min-width: 48rem) { .pagination__status { display: none; } }
+
+  /* Chỉ cho bảng thành phần */
+  .sheet { padding-block: var(--space-7) var(--section-gap); }
+  .sheet__grid { display: grid; gap: var(--space-5); }
+  @media (min-width: 80rem) { .sheet__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .state-box { padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
+  .state-box > h2 { margin: 0 0 var(--space-2); font-size: var(--font-size-h3); }
+  .state-box > p { margin: 0 0 var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .is-active-sample { scale: 0.94; }
+  .spec-table { width: 100%; border-collapse: collapse; font-size: var(--font-size-sm); }
+  .spec-table th, .spec-table td { padding: var(--space-2) var(--space-3); border-block-end: 1px solid var(--color-border); text-align: start; vertical-align: top; }
+  .spec-table th { font-weight: 600; }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+</svg>
+
+<main class="container sheet">
+  <h1>Pagination</h1>
+  <p class="demo-note">Một snippet `pagination` cho collection, list-collections, search, blog, bình luận bài viết. Previous/Next tròn 52 chevron (Figma 1:398, sổ 09/11), số trang pill 44, trang hiện tại accent. Đầu/cuối: nút giữ chỗ, mờ 0.35 + aria-disabled (sổ 10/11 audit 5). Dưới 768: [‹] Page X of Y [›].</p>
+
+  <div class="sheet__grid">
+    <section class="state-box" aria-labelledby="p1">
+      <h2 id="p1">Trang đầu (1 / 2)</h2>
+      <p>Previous tắt: span role="link", không href, không Tab.</p>
+      <nav class="pagination" aria-label="Pagination, first page sample" data-testid="pagination">
+        <ul class="pagination__list" role="list">
+          <li class="pagination__item--prev"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Previous page" data-testid="pagination-previous"><svg aria-hidden="true"><use href="#i-prev"/></svg></span></li>
+          <li class="pagination__status" data-testid="pagination-status">Page 1 of 2</li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page" data-testid="pagination-current"><span class="visually-hidden">Page </span>1</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 2" data-testid="pagination-page">2</a></li>
+          <li class="pagination__item--next"><a class="round-button pagination__step" href="#" aria-label="Next page" data-testid="pagination-next"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
+        </ul>
+      </nav>
+    </section>
+
+    <section class="state-box" aria-labelledby="p2">
+      <h2 id="p2">Trang giữa (5 / 9)</h2>
+      <p>window_size 1: 1 … 4 (5) 6 … 9; tối đa 7 mục số.</p>
+      <nav class="pagination" aria-label="Pagination, middle page sample">
+        <ul class="pagination__list" role="list">
+          <li class="pagination__item--prev"><a class="round-button pagination__step" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
+          <li class="pagination__status">Page 5 of 9</li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 1">1</a></li>
+          <li class="pagination__num"><span class="pagination__gap">…</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 4">4</a></li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>5</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 6">6</a></li>
+          <li class="pagination__num"><span class="pagination__gap">…</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 9">9</a></li>
+          <li class="pagination__item--next"><a class="round-button pagination__step" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
+        </ul>
+      </nav>
+    </section>
+
+    <section class="state-box" aria-labelledby="p3">
+      <h2 id="p3">Trang cuối (9 / 9)</h2>
+      <p>Next tắt, giữ chỗ 52: hàng không xô khi sang trang cuối (0 CLS).</p>
+      <nav class="pagination" aria-label="Pagination, last page sample">
+        <ul class="pagination__list" role="list">
+          <li class="pagination__item--prev"><a class="round-button pagination__step" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
+          <li class="pagination__status">Page 9 of 9</li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 1">1</a></li>
+          <li class="pagination__num"><span class="pagination__gap">…</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 8">8</a></li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>9</span></li>
+          <li class="pagination__item--next"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></span></li>
+        </ul>
+      </nav>
+    </section>
+
+    <section class="state-box" aria-labelledby="p4">
+      <h2 id="p4">Hover · active · focus</h2>
+      <p>Previous hover (cam, scale 1.06) · trang 2 hover (viền đen) · trang 4 focus (outline accent offset 2) · Next active (scale 0.94) + focus (offset 3).</p>
+      <nav class="pagination" aria-label="Pagination, interaction sample">
+        <ul class="pagination__list" role="list">
+          <li class="pagination__item--prev"><a class="round-button pagination__step is-hover" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
+          <li class="pagination__status">Page 3 of 4</li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 1">1</a></li>
+          <li class="pagination__num"><a class="pagination__page is-hover" href="#" aria-label="Page 2">2</a></li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>3</span></li>
+          <li class="pagination__num"><a class="pagination__page is-focus" href="#" aria-label="Page 4">4</a></li>
+          <li class="pagination__item--next"><a class="round-button pagination__step is-focus is-active-sample" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
+        </ul>
+      </nav>
+    </section>
+
+    <section class="state-box" aria-labelledby="p5">
+      <h2 id="p5">Search: có dòng tóm tắt</h2>
+      <p>Tham số summary. Chỉ search (câu CTO 2).</p>
+      <nav class="pagination" aria-label="Pagination, search sample">
+        <ul class="pagination__list" role="list">
+          <li class="pagination__item--prev"><a class="round-button pagination__step" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
+          <li class="pagination__status">Page 2 of 2</li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 1">1</a></li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>2</span></li>
+          <li class="pagination__item--next"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></span></li>
+        </ul>
+        <p class="pagination__summary">Showing 25–37 of 37 results</p>
+      </nav>
+    </section>
+
+    <section class="state-box" aria-labelledby="p6">
+      <h2 id="p6">Bình luận bài viết</h2>
+      <p>10 bình luận / trang; nav "Comment pages", link ?page=N#comments.</p>
+      <nav class="pagination" aria-label="Comment pages">
+        <ul class="pagination__list" role="list">
+          <li class="pagination__item--prev"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></span></li>
+          <li class="pagination__status">Page 1 of 3</li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>1</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#comments" aria-label="Page 2">2</a></li>
+          <li class="pagination__num"><a class="pagination__page" href="#comments" aria-label="Page 3">3</a></li>
+          <li class="pagination__item--next"><a class="round-button pagination__step" href="#comments" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
+        </ul>
+      </nav>
+    </section>
+  </div>
+
+  <section class="demo-block" aria-labelledby="p7" style="margin-block-start: var(--space-7)">
+    <h2 id="p7">Đo</h2>
+    <table class="spec-table">
+      <thead><tr><th scope="col">Phần</th><th scope="col">Kích thước</th><th scope="col">Màu</th></tr></thead>
+      <tbody>
+        <tr><td>Previous / Next</td><td>52, chevron 11 × 16</td><td>trắng, viền border, chevron foreground 17.4; hover accent 5.01</td></tr>
+        <tr><td>Số trang</td><td>pill 44, 14/500, gap 8</td><td>viền border, chữ foreground 17.4</td></tr>
+        <tr><td>Trang hiện tại</td><td>pill 44, 14/700</td><td>accent, chữ accent-foreground 5.01</td></tr>
+        <tr><td>Chevron ↔ số</td><td>16</td><td>—</td></tr>
+        <tr><td>Nút tắt</td><td>52, opacity 0.35</td><td>miễn tương phản (thành phần không hoạt động)</td></tr>
+        <tr><td>Page X of Y</td><td>14/500, &lt; 768</td><td>foreground 17.4</td></tr>
+      </tbody>
+    </table>
+  </section>
+</main>
+</body>
+</html>
