@@ -1,0 +1,518 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Efitco home page, tablet and mobile (bundle to footer) — ES1-T279</title>
+<meta name="description" content="Efitco home page lower blocks at 768 and 360: bundle builder, featured product, video demo, testimonials, why choose, blog, FAQ and footer, developed from Figma 1:359.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /*
+    ES1-T279. Gốc: Figma 1:359 (desktop 1920). Mockup chỉ vẽ < 80rem (768 và 360);
+    desktop 1280/1920 là Figma, không vẽ lại. Spec: docs/ui-spec/index-mobile-b.md.
+    Mọi màu là var(--*) của kit (token theme) hoặc color-mix trên token.
+  */
+  body { overflow-x: hidden; }
+  .home-section { padding-block: var(--section-gap); }
+  .home-section--cream { background: var(--color-background-cream); color: var(--color-background-cream-foreground); }
+  /* Hàng ngang tràn tới mép phải màn hình, mép trái thẳng container (Figma 1:817, 1:885, 1:1022) */
+  .bleed-row { margin-inline-end: calc(var(--page-margin) * -1); padding-inline-end: var(--page-margin); scroll-padding-inline-start: 0; }
+  .bleed-row::after { content: ''; flex: 0 0 1px; }
+  .text-cta { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-foreground); font-size: var(--font-size-base); font-weight: 600; letter-spacing: -0.01em; text-decoration: none; }
+  .text-cta:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+  .stars { display: inline-flex; gap: 2px; color: var(--color-rating); }
+  .stars svg { width: 14px; height: 13px; }
+  .stars .is-empty { color: var(--color-border); }
+
+  /* ===== 1. Bundle builder (Figma 1:636) ===== */
+  .bundle__header { display: grid; gap: var(--space-3); margin-block-end: var(--heading-gap); }
+  .bundle__header .text-cta { justify-self: start; margin-block-start: calc(var(--space-1) * -1); }
+  .bundle__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+  .bcard { position: relative; display: grid; align-content: start; gap: var(--space-2); height: 100%; padding: var(--space-2) var(--space-2) var(--space-3); border-radius: var(--radius-card); background: var(--color-background); cursor: pointer; transition: translate var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out); }
+  .bcard:hover { translate: 0 -2px; box-shadow: var(--shadow-raised); }
+  .bcard:has(input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .bcard input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .bcard__media { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); }
+  .bcard__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
+  .bcard__check { position: absolute; inset-block-start: var(--space-2); inset-inline-end: var(--space-2); display: grid; place-items: center; width: 24px; height: 24px; border: 1.5px solid var(--color-muted-light); border-radius: 50%; background: var(--color-background); color: transparent; }
+  .bcard__check svg { width: 12px; height: 12px; }
+  .bcard input:checked ~ .bcard__media .bcard__check { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); }
+  .bcard__title { font-size: var(--font-size-base); font-weight: 500; line-height: 1.5; letter-spacing: -0.01em; display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  .bcard__price { font-weight: 500; }
+  .bcard.is-sold-out { cursor: not-allowed; }
+  .bcard.is-sold-out img { opacity: 0.6; }
+  .bcard.is-sold-out .bcard__check { display: none; }
+  .bcard .badge { position: absolute; inset-block-start: var(--space-2); inset-inline-start: var(--space-2); }
+
+  /* Panel tổng: nền --color-background-panel (#393942), chữ trắng 11.43:1 */
+  .bpanel { display: grid; gap: var(--space-5); margin-block-start: var(--space-6); padding: var(--space-5); border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-panel); color: var(--color-background-dark-foreground); }
+  .bpanel__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding-block-end: var(--space-4); border-block-end: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 14%, transparent); }
+  .bpanel__title { font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: -0.01em; line-height: 1.5; }
+  .bpanel__count { display: inline-flex; align-items: center; min-height: 28px; padding-inline: var(--space-3); border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-accent-foreground); font-size: var(--font-size-xs); font-weight: 600; }
+  /* Dòng hàng: trắng 70% trộn panel = 6.5:1 (không dùng #999: 4.01:1 trên panel) */
+  .bpanel__lines { display: grid; gap: var(--space-2); margin: var(--space-4) 0 0; padding: 0; list-style: none; color: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel)); font-size: var(--font-size-sm); }
+  .bpanel__lines li, .bpanel__row { display: flex; justify-content: space-between; gap: var(--space-4); }
+  .bpanel__summary { display: grid; gap: var(--space-3); }
+  .bpanel__row { font-size: var(--font-size-base); }
+  /* Giảm giá: badge-new 55% trộn trắng = 5.41:1 trên panel (Figma xanh #4B824D chỉ 2.50:1) */
+  .bpanel__row--discount { color: color-mix(in srgb, var(--color-badge-new) 55%, var(--color-background-dark-foreground)); }
+  .bpanel__progress { height: 4px; overflow: hidden; border-radius: 2px; background: color-mix(in srgb, var(--color-background-dark-foreground) 20%, transparent); }
+  .bpanel__progress span { display: block; height: 100%; width: var(--fill, 100%); border-radius: inherit; background: var(--color-accent); }
+  .bpanel__note { display: flex; align-items: center; gap: var(--space-2); color: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel)); font-size: var(--font-size-sm); }
+  .bpanel__note svg { flex: none; width: 16px; height: 16px; }
+  .bpanel__row--total { align-items: baseline; padding-block-start: var(--space-4); border-block-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 14%, transparent); }
+  .bpanel__row--total strong { font-size: calc(var(--space-1) * 5); font-weight: 700; }
+  .bpanel .button svg { width: 16px; height: 14px; }
+  .bpanel:focus-visible, .bpanel :focus-visible { outline-color: var(--color-background-dark-foreground); }
+
+  /* ===== 2. Featured product (Figma 1:759) ===== */
+  .fp { display: grid; gap: var(--space-6); }
+  .fp__media { position: relative; aspect-ratio: 1; overflow: hidden; border: 1px solid var(--color-border); border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-cream); }
+  .fp__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; padding: 8%; }
+  .fp__seal { position: absolute; inset-block-start: var(--space-4); inset-inline-start: var(--space-4); width: 72px; height: 72px; color: var(--color-muted-light); }
+  .fp__details { display: grid; gap: var(--space-4); align-content: start; }
+  .fp__title { font-size: var(--font-size-h1); line-height: 1.1; }
+  .countdown { display: inline-flex; align-items: center; gap: var(--space-2); justify-self: start; padding: var(--space-2) var(--space-2) var(--space-2) var(--space-5); border-radius: var(--space-2); background: var(--color-background-dark); color: var(--color-background-dark-foreground); }
+  .countdown__label { margin-inline-end: var(--space-2); font-weight: 500; }
+  .countdown__unit { display: grid; place-items: center; min-width: 44px; height: 44px; padding-inline: var(--space-1); border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 15%, var(--color-background-dark)); border-radius: 6px; font-size: calc(var(--space-1) * 5); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .fp__price { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+  .fp__price .price__sale { color: var(--color-sale); font-size: var(--font-size-lg); font-weight: 500; }
+  .fp__price s { color: var(--color-muted); }
+  .fp__rating { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .fp__rating .sep { width: 1px; height: 14px; background: var(--color-muted-light); }
+  .fp__desc { color: var(--color-muted); line-height: 1.7; }
+  .specs { margin: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--space-2); }
+  .specs > div { display: grid; gap: var(--space-1); padding: var(--space-3) var(--space-4); }
+  .specs > div:nth-child(odd) { background: var(--color-background-sand); }
+  .specs dt { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .specs dd { margin: 0; font-weight: 500; }
+  .fp__actions { display: grid; gap: var(--space-3); padding-block-start: var(--space-2); }
+  .fp__actions .button svg { width: 20px; height: 20px; }
+  .button--muted { border-color: var(--color-border); background: var(--color-background-alt); color: var(--color-foreground); }
+  .button--muted:hover { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
+  .button--muted svg { width: 16px !important; height: 14px !important; }
+
+  /* ===== 3. Video demo (Figma 1:817) ===== */
+  .vrow > li { flex: 0 0 252px; }
+  .vcard { display: grid; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); }
+  .vcard__media { position: relative; aspect-ratio: 9 / 16; background: var(--color-background-dark); }
+  .vcard__media img { width: 100%; height: 100%; object-fit: cover; }
+  .vcard__play { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+  .vcard__play span { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: color-mix(in srgb, var(--color-background) 92%, transparent); color: var(--color-foreground); transition: scale var(--motion-fast) var(--ease-out), background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out); }
+  .vcard__play svg { width: 16px; height: 18px; margin-inline-start: 3px; }
+  .vcard__play:hover span { scale: 1.06; background: var(--color-accent); color: var(--color-accent-foreground); }
+  .vcard__play:focus-visible { outline-offset: -4px; }
+  .vcard__product { position: relative; display: grid; grid-template-columns: 48px minmax(0, 1fr); align-items: center; gap: var(--space-3); min-height: 76px; padding: var(--space-3); }
+  .vcard__thumb { width: 48px; height: 48px; border-radius: 50%; background: var(--color-background-cream); object-fit: contain; mix-blend-mode: darken; }
+  .vcard__name { overflow: hidden; font-weight: 500; letter-spacing: -0.01em; text-overflow: ellipsis; white-space: nowrap; }
+  .vcard__name a { text-decoration: none; }
+  .vcard__name a::after { content: ''; position: absolute; inset: 0; }
+  .vcard__name a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+  .vcard .price { font-size: var(--font-size-base); }
+
+  /* ===== 4. Testimonials (Figma 1:885) ===== */
+  .trow > li { flex: 0 0 272px; }
+  .tcard { display: flex; flex-direction: column; height: 100%; overflow: hidden; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background); }
+  .tcard > img { width: 100%; aspect-ratio: 456 / 270; object-fit: cover; }
+  .tcard__body { display: flex; flex: 1; flex-direction: column; gap: var(--space-3); padding: var(--space-5) var(--space-5) var(--space-5); }
+  .tcard__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-3); }
+  .tcard__name { font-weight: 500; }
+  .tcard__verified { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--color-muted-light); font-size: var(--font-size-sm); }
+  .tcard__verified svg { width: 16px; height: 16px; color: var(--color-badge-new); }
+  .tcard__meta .stars { flex-basis: 100%; }
+  .tcard__title { font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: -0.01em; line-height: 1.4; }
+  .tcard__quote { flex: 1; color: var(--color-muted); line-height: 1.7; }
+  .tcard__product { position: relative; display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: var(--space-3); margin-block-start: var(--space-2); padding-block-start: var(--space-5); border-block-start: 1px solid var(--color-border); }
+  .tcard__product img { width: 56px; height: 56px; border-radius: 50%; background: var(--color-background-cream); object-fit: contain; mix-blend-mode: darken; }
+  .tcard__product a { font-weight: 500; text-decoration: none; }
+  .tcard__product a::after { content: ''; position: absolute; inset: 0; }
+  .tcard__product a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+
+  /* ===== 5. Why choose (Figma 1:992) ===== */
+  .why { background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); }
+  .why__media { position: relative; aspect-ratio: 1; overflow: hidden; }
+  .why__media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+  .why__media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 55%, var(--color-background-dark)); }
+  .why__content { position: relative; display: grid; gap: var(--space-4); justify-items: start; padding-block: var(--space-2) var(--space-7); }
+  .why .eyebrow { color: var(--color-muted-on-dark); }
+  .why__heading { font-size: var(--font-size-display); font-weight: var(--font-heading--weight-display); line-height: 0.95; letter-spacing: -0.03em; text-transform: uppercase; }
+  .why__body { max-width: 65ch; color: var(--color-muted-on-dark); line-height: 1.7; }
+  .why .button { margin-block-start: var(--space-2); }
+  .why .button svg { width: 16px; height: 14px; }
+  .why :focus-visible { outline-color: var(--color-background-dark-foreground); }
+  .why__accent { display: none; position: absolute; overflow: hidden; border-radius: var(--radius-card); }
+  .why__accent img { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ===== 6. Blog (Figma 1:1022) ===== */
+  .blog-row > li { flex: 0 0 252px; }
+
+  /* ===== 7. FAQ (Figma 1:1057) ===== */
+  .faq { display: grid; gap: var(--space-6); }
+  /* Figma: +/− màu chữ của câu hỏi (mở: foreground, đóng: muted); câu đóng #4D4D4D */
+  .faq .accordion summary { color: var(--color-muted); }
+  .faq .accordion details[open] > summary { color: var(--color-foreground); }
+  .faq .accordion summary::before { color: currentColor; }
+  .faq .accordion details > div { padding-inline-start: calc(var(--space-5) + var(--space-4)); }
+  .faq__aside { position: relative; }
+  .faq__image { width: 100%; aspect-ratio: 509 / 542; object-fit: cover; border-radius: calc(var(--radius-card) + var(--space-1)); }
+  .faq__stats { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3); margin: calc(var(--space-7) * -1) var(--space-3) 0; padding: 0; list-style: none; }
+  .faq__stat { display: grid; gap: var(--space-1); padding: var(--space-4); border-radius: var(--space-2); color: var(--color-background-dark-foreground); }
+  .faq__stat:first-child { background: var(--color-accent); }
+  .faq__stat:last-child { background: var(--color-background-dark); }
+  .faq__stat-label { font-family: var(--font-heading--family); font-size: var(--font-size-base); font-weight: var(--font-heading--weight-display); letter-spacing: 0.04em; text-transform: uppercase; }
+  .faq__stat-value { font-family: var(--font-heading--family); font-size: calc(var(--space-1) * 10); font-weight: var(--font-heading--weight-display); line-height: 1; letter-spacing: -0.02em; }
+  .faq__stat-text { font-size: var(--font-size-sm); font-weight: 500; }
+
+  /* ===== Footer: kit.css (foundation §4) ===== */
+
+  /* ===== Trạng thái (cuối file) ===== */
+  .states { display: grid; gap: var(--space-6); }
+  .state-card { display: grid; gap: var(--space-3); padding: var(--space-4); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background); }
+  .state-row { display: grid; gap: var(--space-4); }
+  .vcard--error .vcard__media { display: grid; place-items: center; padding: var(--space-5); text-align: center; color: var(--color-background-dark-foreground); }
+  .vcard--error .vcard__media p { display: grid; justify-items: center; gap: var(--space-2); font-size: var(--font-size-sm); }
+  .vcard--error svg { width: 24px; height: 24px; color: var(--color-background-dark-foreground); }
+  .state-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
+  .state-card .button { white-space: normal; text-align: center; }
+  /* Mockup: footer menu 360 là accordion đóng, 768 là 2 cột mở (foundation §4); 2 bản, mỗi mốc 1 bản */
+  .only-tablet { display: none !important; }
+  @media (min-width: 48rem) { .only-tablet { display: grid !important; } .only-mobile { display: none !important; } }
+
+  /* ===== 768 (48rem → < 80rem) ===== */
+  @media (min-width: 48rem) {
+    .bundle__header { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--space-5); }
+    .bundle__header > :not(.text-cta) { grid-column: 1; }
+    .bundle__header .text-cta { grid-column: 2; grid-row: 1 / span 2; margin: 0; }
+    .bundle__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .bcard { padding: var(--space-3) var(--space-3) var(--space-4); }
+    .bcard__check { inset-block-start: var(--space-3); inset-inline-end: var(--space-3); }
+    .bpanel { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-6); align-items: start; padding: var(--space-6); }
+    .fp__media { aspect-ratio: 4 / 3; }
+    .fp__seal { inset-block-start: var(--space-5); inset-inline-start: var(--space-5); width: 88px; height: 88px; }
+    .specs > div { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-4); padding-inline: var(--space-5); }
+    .specs dd { text-align: end; }
+    .fp__actions { grid-template-columns: auto auto; justify-content: start; }
+    .vrow > li { flex-basis: 264px; }
+    .trow > li, .blog-row > li { flex-basis: 307px; }
+    .why__media { aspect-ratio: 4 / 3; }
+    .why__media img { object-position: 50% 25%; }
+    .why__content { padding-block: var(--space-4) var(--space-7); padding-inline-end: calc(var(--space-1) * 50); }
+    .why__accent { display: block; }
+    .why__accent--1 { inset-block-start: calc(var(--space-1) * -10); inset-inline-end: 0; width: 168px; height: 168px; }
+    .why__accent--2 { inset-block-end: var(--space-7); inset-inline-end: var(--space-6); width: 100px; height: 100px; }
+    .faq { gap: calc(var(--space-1) * 10); }
+    .faq__image { display: block; width: 76%; margin-inline-start: auto; }
+    .faq__stats { position: absolute; inset-block-end: 7.5%; inset-inline-start: 0; width: 80%; margin: 0; }
+    .faq__stat { padding: var(--space-5); }
+    .faq__stat-value { font-size: calc(var(--space-1) * 12); }
+    .state-row { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+  }
+  /* Tiến trình: --size = bề ngang nhìn thấy / tổng bề ngang hàng (đầu hàng) */
+  .p-video { --size: 21%; } .p-review { --size: 30%; } .p-blog { --size: 32%; }
+  @media (min-width: 48rem) { .p-video { --size: 45%; } .p-review, .p-blog { --size: 59%; } }
+</style>
+</head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 16 14"><path d="M8.29289 0.292893C8.68342 -0.0976311 9.31658 -0.0976311 9.70711 0.292893L15.7071 6.29289C15.8946 6.48043 16 6.73478 16 7C16 7.26522 15.8946 7.51957 15.7071 7.70711L9.70711 13.7071C9.31658 14.0976 8.68342 14.0976 8.29289 13.7071C7.90237 13.3166 7.90237 12.6834 8.29289 12.2929L12.5858 8L1 8C0.447715 8 0 7.55229 0 7C0 6.44772 0.447715 6 1 6L12.5858 6L8.29289 1.70711C7.90237 1.31658 7.90237 0.683417 8.29289 0.292893Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-star" viewBox="0 0 14 13"><path fill="currentColor" d="m7 0 2.1 4.2 4.6.7-3.3 3.2.8 4.6L7 10.5l-4.2 2.2.8-4.6L.3 4.9l4.6-.7L7 0Z"/></symbol>
+  <symbol id="i-tick" viewBox="0 0 12 12"><path d="m2.5 6.2 2.3 2.3 4.7-4.9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
+  <symbol id="i-verified" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="3"/><path d="m5.2 8.2 2 2 3.8-4"/></g></symbol>
+  <symbol id="i-lock" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><rect x="3" y="7" width="10" height="7.5" rx="1.5"/><path d="M5.2 7V5a2.8 2.8 0 0 1 5.6 0v2"/></g></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-play" viewBox="0 0 16 18"><path fill="currentColor" d="M15 7.3a2 2 0 0 1 0 3.4L3 17.6A2 2 0 0 1 0 15.9V2.1A2 2 0 0 1 3 .4l12 6.9Z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
+  <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 28 28"><path d="M16 4v13.5a4.2 4.2 0 1 1-4.2-4.2M16 4c.4 3 2.4 5 5.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="20" height="20" rx="5"/><circle cx="14" cy="14" r="4.5"/><circle cx="19.6" cy="8.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="6.5" width="22" height="15" rx="4"/><path d="m12 11 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 28 28"><path d="M16.5 4.5h-2a4 4 0 0 0-4 4v3H8v3.5h2.5v8.5H14V15h3l.5-3.5H14V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<main id="main">
+  <h1 class="visually-hidden">Efitco home page, lower blocks</h1>
+
+  <!-- ===== 1. Bundle builder (Figma 1:636), nền cream ===== -->
+  <section class="home-section home-section--cream" aria-labelledby="bundle-h" data-testid="container-home-bundle-builder">
+    <div class="container">
+      <div class="bundle__header">
+        <p class="eyebrow">Build your bundle</p>
+        <h2 id="bundle-h">Pick Your Kit, Save As You Go</h2>
+        <a class="text-cta" href="#">View Preset Bundles</a>
+      </div>
+      <form onsubmit="return false">
+        <fieldset style="margin:0;padding:0;border:0">
+          <legend class="visually-hidden">Choose products for your bundle</legend>
+          <ul class="bundle__grid">
+            <li><label class="bcard"><input type="checkbox" checked aria-label="Add Adjustable dumbbell pair to bundle"><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg?width=480" alt="Adjustable dumbbell pair" width="480" height="480"><span class="bcard__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Adjustable dumbbell pair</span><span class="bcard__price">$259.00</span></label></li>
+            <li><label class="bcard"><input type="checkbox" checked aria-label="Add Foldable bench to bundle"><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P10.jpg?width=480" alt="Foldable bench" width="480" height="480"><span class="bcard__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Foldable bench</span><span class="bcard__price">$89.00</span></label></li>
+            <li><label class="bcard"><input type="checkbox" checked aria-label="Add Resistance band set to bundle"><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P11.jpg?width=480" alt="Resistance band set" width="480" height="480"><span class="bcard__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Resistance band set</span><span class="bcard__price">$45.00</span></label></li>
+            <li><label class="bcard"><input type="checkbox" aria-label="Add Speed rope to bundle"><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P12.jpg?width=480" alt="Speed rope" width="480" height="480"><span class="bcard__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Speed rope</span><span class="bcard__price">$34.00</span></label></li>
+            <li><label class="bcard"><input type="checkbox" checked aria-label="Add Recovery roller to bundle"><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P13.jpg?width=480" alt="Recovery roller" width="480" height="480"><span class="bcard__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Recovery roller</span><span class="bcard__price">$52.00</span></label></li>
+            <li><label class="bcard"><input type="checkbox" checked aria-label="Add Training mat to bundle"><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P14.jpg?width=480" alt="Training mat" width="480" height="480"><span class="bcard__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></span><span class="bcard__title">Training mat</span><span class="bcard__price">$69.00</span></label></li>
+          </ul>
+        </fieldset>
+        <div class="bpanel" role="group" aria-labelledby="bpanel-h">
+          <div>
+            <div class="bpanel__head"><h3 class="bpanel__title" id="bpanel-h">Your Bundle</h3><span class="bpanel__count">5 Items</span></div>
+            <ul class="bpanel__lines">
+              <li><span>Adjustable dumbbell pair</span><span>$259.00</span></li>
+              <li><span>Foldable bench</span><span>$89.00</span></li>
+              <li><span>Resistance band set</span><span>$45.00</span></li>
+              <li><span>Recovery roller</span><span>$52.00</span></li>
+              <li><span>Training mat</span><span>$69.00</span></li>
+            </ul>
+          </div>
+          <div class="bpanel__summary">
+            <p class="bpanel__row"><span>Subtotal</span><span>$514.00</span></p>
+            <p class="bpanel__row bpanel__row--discount"><span>Bundle discount (15%)</span><span>- $77.10</span></p>
+            <div class="bpanel__progress" aria-hidden="true"><span style="--fill:100%"></span></div>
+            <p class="bpanel__note"><svg aria-hidden="true"><use href="#i-check"/></svg>You reached 15% off</p>
+            <p class="bpanel__row bpanel__row--total"><span>Total</span><strong>$436.90</strong></p>
+            <button class="button button--full" type="submit">Add Bundle To Cart <svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            <p class="visually-hidden" role="status">5 selected, total $436.90</p>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== 2. Featured product (Figma 1:759), nền trắng ===== -->
+  <section class="home-section" aria-labelledby="fp-h" data-testid="container-home-featured-product">
+    <div class="container fp">
+      <div class="fp__media">
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg?width=1080" alt="Ativafit Lava 66 lb Adjustable dumbbells on their base" width="1080" height="1080">
+        <svg class="fp__seal" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="seal-path" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0"/></defs><text font-family="Inter, sans-serif" font-size="13" font-weight="500" letter-spacing="3.2" fill="currentColor"><textPath href="#seal-path">EFITCO · FEATURE PRODUCT ·</textPath></text><circle cx="60" cy="64" r="12" fill="none" stroke="currentColor" stroke-width="5"/><path d="M52 52c0-6 16-6 16 0" fill="none" stroke="currentColor" stroke-width="4"/></svg>
+      </div>
+      <div class="fp__details">
+        <p class="eyebrow">Featured Product · Free Weights</p>
+        <h2 class="fp__title" id="fp-h">Ativafit Lava 66 lb Adjustable</h2>
+        <div class="countdown" role="timer" aria-label="Sale ends in 22 hours 36 minutes 28 seconds">
+          <span class="countdown__label" aria-hidden="true">Sale ends in</span>
+          <span class="countdown__unit" aria-hidden="true">22</span><span class="countdown__unit" aria-hidden="true">36</span><span class="countdown__unit" aria-hidden="true">28</span>
+        </div>
+        <div class="fp__price">
+          <span class="price__sale"><span class="visually-hidden">Sale price</span>$379.99</span>
+          <s><span class="visually-hidden">Regular price</span>$499.99</s>
+          <span class="badge badge--sale">-24%</span>
+        </div>
+        <p class="fp__rating"><span class="stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span><span><span class="visually-hidden">Rated 4.9 out of 5 stars</span><span aria-hidden="true">(4.9)</span></span><span class="sep" aria-hidden="true"></span><span>341 reviews</span></p>
+        <p class="fp__desc">11 to 66 lb in seconds. One pair replaces a whole rack of fixed dumbbells - and takes up less floor space than a shoebox. No plates to swap, no waiting between sets, just one dial and go. Fifteen pairs of dumbbells living quietly in the corner - and your room stays a room.</p>
+        <dl class="specs" aria-label="Specifications">
+          <div><dt>Weight range</dt><dd>11 – 66 lb per hand</dd></div>
+          <div><dt>Footprint</dt><dd>0.18 m² — fits under a desk</dd></div>
+          <div><dt>Materials</dt><dd>Cast iron core, reinforced rubber</dd></div>
+          <div><dt>Assembly</dt><dd>None — ready out of the box</dd></div>
+        </dl>
+        <div class="fp__actions">
+          <button class="button" type="button"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+          <a class="button button--muted" href="#">View Detail<span class="visually-hidden"> of Ativafit Lava 66 lb Adjustable</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 3. Video demo (Figma 1:817), nền trắng ===== -->
+  <section class="home-section" aria-labelledby="video-h" data-testid="container-home-video-carousel">
+    <div class="container">
+      <div class="section-header section-header--split">
+        <p class="eyebrow">Video demo</p>
+        <h2 id="video-h">See Real Equipment In Action, Before You Buy</h2>
+        <div class="carousel-nav"><button class="round-button" type="button" aria-label="Previous videos" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button><button class="round-button" type="button" aria-label="Next videos"><svg aria-hidden="true"><use href="#i-next"/></svg></button></div>
+      </div>
+      <ul class="card-row bleed-row vrow" aria-label="Product videos. Scroll sideways to see more." tabindex="0">
+        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-1.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Ativafit Lava 66 lb"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="vcard__product"><img class="vcard__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P16_b6c798cf-e03c-4995-b522-1737773992d2.png?width=120" alt="" width="48" height="48"><div><p class="vcard__name"><a href="#">Ativafit Lava 66 lb</a></p><p class="price"><span class="price__sale">$379.99</span><s class="price__compare">$499.99</s></p></div></div></li>
+        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-2.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Compact Power Rack"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="vcard__product"><img class="vcard__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P17.jpg?width=120" alt="" width="48" height="48"><div><p class="vcard__name"><a href="#">Compact Power Rack</a></p><p class="price"><span>$549.00</span></p></div></div></li>
+        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-3.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Olympic Plate Set 100"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="vcard__product"><img class="vcard__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=120" alt="" width="48" height="48"><div><p class="vcard__name"><a href="#">Olympic Plate Set 100</a></p><p class="price"><span class="price__sale">$289.00</span><s class="price__compare">$339.00</s></p></div></div></li>
+        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-4.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Home Starter Kit"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="vcard__product"><img class="vcard__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png?width=120" alt="" width="48" height="48"><div><p class="vcard__name"><a href="#">Home Starter Kit</a></p><p class="price"><span class="price__sale">$399.00</span><s class="price__compare">$512.00</s></p></div></div></li>
+        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-5.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Recovery Roller Pro"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="vcard__product"><img class="vcard__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P20.jpg?width=120" alt="" width="48" height="48"><div><p class="vcard__name"><a href="#">Recovery Roller Pro</a></p><p class="price"><span>$52.00</span></p></div></div></li>
+        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-6.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Resistance Band Set"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="vcard__product"><img class="vcard__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png?width=120" alt="" width="48" height="48"><div><p class="vcard__name"><a href="#">Resistance Band Set</a></p><p class="price"><span>$45.00</span></p></div></div></li>
+      </ul>
+      <div class="carousel-progress p-video" aria-hidden="true"><span class="carousel-progress__thumb"></span></div>
+    </div>
+  </section>
+
+  <!-- ===== 4. Testimonials (Figma 1:885), nền cream ===== -->
+  <section class="home-section home-section--cream" aria-labelledby="t-h" data-testid="container-home-testimonials">
+    <div class="container">
+      <div class="section-header section-header--split">
+        <p class="eyebrow">Testimonial</p>
+        <h2 id="t-h">What Our Customers Say?</h2>
+        <div class="carousel-nav"><button class="round-button" type="button" aria-label="Previous reviews" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button><button class="round-button" type="button" aria-label="Next reviews"><svg aria-hidden="true"><use href="#i-next"/></svg></button></div>
+      </div>
+      <ul class="card-row bleed-row trow" aria-label="Customer reviews" tabindex="0">
+        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-1.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">E. Johnson</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title">Versatile Gear For All Exercises</h3><p class="tcard__quote">High quality equipment that doesn't break the bank. I am very impressed with the overall durability.</p><div class="tcard__product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P16_b6c798cf-e03c-4995-b522-1737773992d2.png?width=120" alt="" width="56" height="56"><div><a href="#">Ativafit Lava 66 lb</a><p class="price"><span class="price__sale">$379.99</span><s class="price__compare">$499.99</s></p></div></div></div></article></li>
+        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-2.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">S. Williams</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="stars" role="img" aria-label="4 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg class="is-empty" aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title">Folds Away In Seconds</h3><p class="tcard__quote">The rack folds flat against the wall. My garage is a garage again between sessions.</p><div class="tcard__product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P07.jpg?width=120" alt="" width="56" height="56"><div><a href="#">Compact Power Rack R3</a><p class="price"><span>$549.00</span></p></div></div></div></article></li>
+        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-3.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">M. Anderson</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title">Smooth Every Single Rep</h3><p class="tcard__quote">The dial switches weight fast, no jamming at all. Saves an entire corner of my room.</p><div class="tcard__product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=120" alt="" width="56" height="56"><div><a href="#">FlexFold Adjustable Bench</a><p class="price"><span class="price__sale">$189.00</span><s class="price__compare">$229.00</s></p></div></div></div></article></li>
+        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-4.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">J. Miller</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title">Worth Every Penny</h3><p class="tcard__quote">Spins so smoothly, no tangling even at high speed. Best rope I have owned.</p><div class="tcard__product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=120" alt="" width="56" height="56"><div><a href="#">Revllen Pro Speed Rope</a><p class="price"><span class="price__sale">$34.99</span><s class="price__compare">$44.99</s></p></div></div></div></article></li>
+      </ul>
+      <div class="carousel-progress p-review" aria-hidden="true"><span class="carousel-progress__thumb"></span></div>
+    </div>
+  </section>
+
+  <!-- ===== 5. Why choose (Figma 1:992), nền tối + noise ===== -->
+  <section class="why" aria-labelledby="why-h" data-testid="container-home-why-choose">
+    <div class="why__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-why-b.jpg?width=1200" alt="Athlete holding a weighted bar in front of his face" width="1200" height="1140"></div>
+    <div class="container why__content">
+      <div class="why__accent why__accent--1"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-why-1.jpg?width=400" alt="" width="400" height="400"></div>
+      <p class="eyebrow">We are about</p>
+      <h2 class="why__heading" id="why-h">Why Choose<br> Efitco?</h2>
+      <p class="why__body">Affordable, high-quality fitness gear that supports beginners to elite athletes. We design for the home first — equipment that folds, stacks or disappears when you're done, so your living room stays a living room between sessions.</p>
+      <a class="button" href="#">View About Us <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <div class="why__accent why__accent--2"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-why-2.jpg?width=240" alt="" width="240" height="240"></div>
+    </div>
+  </section>
+
+  <!-- ===== 6. Blog (Figma 1:1022), nền trắng ===== -->
+  <section class="home-section" aria-labelledby="blog-h" data-testid="container-home-blog-posts">
+    <div class="container">
+      <div class="section-header section-header--split">
+        <p class="eyebrow">From the Efitco blog</p>
+        <h2 id="blog-h">Training Tips &amp; Inspiration</h2>
+        <div class="carousel-nav"><button class="round-button" type="button" aria-label="Previous articles" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button><button class="round-button" type="button" aria-label="Next articles"><svg aria-hidden="true"><use href="#i-next"/></svg></button></div>
+      </div>
+      <ul class="card-row bleed-row blog-row" aria-label="Blog articles. Scroll sideways to see more." tabindex="0">
+        <li><a class="article-card" href="/blogs/figma-blog/figma-stretch-after-training"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Exercises</span><span class="article-card__content"><h3 class="article-card__title">How to stretch properly after training</h3><span class="article-card__meta">2 min read</span></span></a></li>
+        <li><a class="article-card" href="/blogs/figma-blog/figma-home-gym-15m2"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Featured</span><span class="article-card__content"><h3 class="article-card__title">Set up a perfect home gym in just 15m²</h3><span class="article-card__meta">5 min read</span></span></a></li>
+        <li><a class="article-card" href="/blogs/figma-blog/figma-eat-before-after-session"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Diet plans</span><span class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><span class="article-card__meta">7 min read</span></span></a></li>
+        <li><a class="article-card" href="/blogs/figma-blog/figma-rubber-vs-urethane"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Diet plans</span><span class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><span class="article-card__meta">5 min read</span></span></a></li>
+      </ul>
+      <div class="carousel-progress p-blog" aria-hidden="true"><span class="carousel-progress__thumb"></span></div>
+    </div>
+  </section>
+
+  <!-- ===== 7. FAQ (Figma 1:1057), nền cream ===== -->
+  <section class="home-section home-section--cream" aria-labelledby="faq-h" data-testid="container-home-faq">
+    <div class="container faq">
+      <div>
+        <div class="section-header">
+          <p class="eyebrow">Questions and Answers</p>
+          <h2 id="faq-h">We're Proud To Be The Best At Training</h2>
+        </div>
+        <div class="accordion">
+          <details open><summary>How long does shipping take?</summary><div><p>Orders ship within one business day. Standard delivery is 2-4 business days across the continental US, and shipping is free on orders over $99.</p></div></details>
+          <details><summary>Are adjustable dumbbells easy for beginners?</summary><div><p>Yes. The dial changes the weight in seconds, from 11 to 66 lb per hand, so you can start light and add load as you get stronger.</p></div></details>
+          <details><summary>How much floor space do I actually need?</summary><div><p>A pair of adjustable dumbbells takes just 0.18 m² and fits under a desk.</p></div></details>
+          <details><summary>Does equipment arrive assembled?</summary><div><p>Adjustable dumbbells arrive ready to use, with no assembly needed.</p></div></details>
+          <details><summary>What's covered by the warranty?</summary><div><p>Every item comes with a 12-month warranty, and you can return it within 90 days for your money back.</p></div></details>
+        </div>
+      </div>
+      <div class="faq__aside">
+        <img class="faq__image" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-faq.jpg?width=1080" alt="" width="1080" height="1150">
+        <ul class="faq__stats">
+          <li class="faq__stat"><span class="faq__stat-label">Products</span><span class="faq__stat-value">360+</span><span class="faq__stat-text">Home gym gear in stock.</span></li>
+          <li class="faq__stat"><span class="faq__stat-label">Warranty</span><span class="faq__stat-value">12</span><span class="faq__stat-text">Months on every item.</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===== 8. Footer (Figma 1:1104, foundation §4) ===== -->
+<footer class="site-footer" data-testid="footer">
+  <div class="container site-footer__band">
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg?width=200" alt="" width="196" height="246"></div>
+    <div class="site-footer__newsletter">
+      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+    </div>
+    <form class="site-footer__form" onsubmit="return false" novalidate>
+      <label class="visually-hidden" for="nl-email">Email</label>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+  <div class="site-footer__panel">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <svg class="site-footer__logo" viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+        <ul class="site-footer__social">
+          <li><a href="#" aria-label="Efitco on TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        </ul>
+      </div>
+      <div class="site-footer__menus only-mobile">
+        <div class="site-footer__menu"><details><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
+      <div class="site-footer__menus only-tablet">
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
+    </div>
+    <ul class="site-footer__trust">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© 2026 Efitco, Powered by Shopify</p>
+    <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
+    <div class="site-footer__end">
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
+    </div>
+  </div>
+</footer>
+
+<!-- ===== Trạng thái (ĐỀ XUẤT, Figma không có) ===== -->
+<section class="container demo-block" aria-labelledby="states-h">
+  <h2 id="states-h">States</h2>
+  <p class="demo-note">Bundle with 2 items, sold-out card, empty bundle, add error; featured product sold out; video that cannot play; loading row.</p>
+  <div class="states">
+    <div class="state-row">
+      <div class="state-card">
+        <p class="demo-label">Bundle: 2 items, next tier</p>
+        <div class="bpanel" style="margin:0;grid-template-columns:1fr">
+          <div class="bpanel__summary">
+            <p class="bpanel__row"><span>Subtotal</span><span>$348.00</span></p>
+            <p class="bpanel__row bpanel__row--discount"><span>Bundle discount (10%)</span><span>- $34.80</span></p>
+            <div class="bpanel__progress" aria-hidden="true"><span style="--fill:66%"></span></div>
+            <p class="bpanel__note"><svg aria-hidden="true"><use href="#i-lock"/></svg>Add 1 more item to unlock 15% off</p>
+            <p class="bpanel__row bpanel__row--total"><span>Total</span><strong>$313.20</strong></p>
+            <button class="button button--full" type="button" aria-busy="true">Add Bundle To Cart</button>
+          </div>
+        </div>
+      </div>
+      <div class="state-card">
+        <p class="demo-label">Bundle: empty, sold out, error</p>
+        <ul class="state-grid-2">
+          <li><label class="bcard is-sold-out"><input type="checkbox" disabled aria-label="Speed rope is sold out"><span class="bcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P12.jpg?width=480" alt="Speed rope" width="480" height="480"><span class="bcard__check" aria-hidden="true"></span></span><span class="badge badge--sold-out">Sold out</span><span class="bcard__title">Speed rope</span><span class="bcard__price">$34.00</span></label></li>
+          <li><div class="bpanel" style="margin:0;padding:var(--space-4);height:100%;align-content:center"><p class="bpanel__note">Select products to build your bundle.</p><button class="button button--full" type="button" disabled>Add Bundle To Cart</button></div></li>
+        </ul>
+        <div class="alert" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><strong>Bundle not added</strong><p>We couldn't add your bundle to the cart. Check your cart and try again.</p></div></div>
+      </div>
+    </div>
+    <div class="state-row">
+      <div class="state-card">
+        <p class="demo-label">Featured product: sold out, countdown ended (hidden)</p>
+        <div class="fp__price"><span>$379.99</span><span class="badge badge--sold-out">Sold out</span></div>
+        <div class="fp__actions"><button class="button" type="button" disabled>Sold out</button><a class="button button--muted" href="#">View Detail<span class="visually-hidden"> of Ativafit Lava 66 lb Adjustable</span> <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+      </div>
+      <div class="state-card">
+        <p class="demo-label">Video error · loading</p>
+        <ul class="state-grid-2">
+          <li class="vcard vcard--error"><div class="vcard__media"><p><svg aria-hidden="true"><use href="#i-alert"/></svg>Video unavailable. <a class="text-link" href="#">View Recovery Roller Pro</a></p></div></li>
+          <li aria-busy="true"><span class="skeleton" style="aspect-ratio:9/16"></span><span class="visually-hidden" role="status">Loading videos</span></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>
