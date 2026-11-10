@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cart – Efitco</title>
+<meta name="description" content="Review the fitness gear in your Efitco cart, change quantities, add an order note and check out securely.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* ES1-T255 cart page. Chỉ CSS riêng trang; thành phần chung ở ../_kit/kit.css (foundation ES1-T251). Không hex: chỉ var(--*). */
+
+  /* ---- Đầu trang ---- */
+  .cart-page { padding-block: 0 var(--section-gap); }
+  .cart-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-2) var(--space-4); padding-block: var(--space-5); }
+  @media (min-width: 64rem) { .cart-head { padding-block: var(--space-6) calc(var(--space-1) * 10); } }
+  .cart-head__title { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); }
+  .cart-head__count { color: var(--color-muted); font-size: var(--font-size-base); }
+  .back-link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+  .back-link svg { width: 16px; height: 13px; scale: -1 1; }
+  .back-link:hover, .back-link.is-hover { color: var(--color-accent); }
+
+  /* ---- Bố cục 2 cột (ES1-T93 #2: < 64rem 1 cột, từ 64rem 8/12 + 4/12 sticky) ---- */
+  .cart-layout { display: grid; gap: var(--space-6); }
+  @media (min-width: 64rem) { .cart-layout { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); column-gap: var(--space-7); align-items: start; } }
+
+  /* ---- Freeship (AC3) ---- */
+  .ship { display: grid; gap: var(--space-3); margin-block-end: var(--space-5); padding: var(--space-4); border-radius: var(--radius-card); background: var(--color-background-cream); color: var(--color-background-cream-foreground); }
+  @media (min-width: 48rem) { .ship { padding: var(--space-4) var(--space-5); } }
+  .ship__text { display: flex; align-items: center; gap: var(--space-3); }
+  .ship__text svg { flex: none; width: 24px; height: 24px; }
+  .ship__bar { display: block; width: 100%; height: var(--space-2); overflow: hidden; border: 0; border-radius: var(--radius-pill); background: color-mix(in srgb, var(--color-foreground) 10%, transparent); appearance: none; }
+  .ship__bar::-webkit-progress-bar { background: color-mix(in srgb, var(--color-foreground) 10%, transparent); }
+  .ship__bar::-webkit-progress-value { border-radius: var(--radius-pill); background: var(--color-accent); }
+  .ship__bar::-moz-progress-bar { border-radius: var(--radius-pill); background: var(--color-accent); }
+
+  /* ---- Dòng hàng ---- */
+  .lines-head { display: none; }
+  .lines { margin: 0; padding: 0; list-style: none; border-block-start: 1px solid var(--color-border); }
+  .line {
+    position: relative;
+    display: grid;
+    grid-template-columns: calc(var(--space-1) * 22) minmax(0, 1fr) auto;
+    grid-template-areas: "media info remove" "media qty total";
+    gap: var(--space-3);
+    padding-block: var(--space-5);
+    border-block-end: 1px solid var(--color-border);
+  }
+  .line__media { grid-area: media; align-self: start; display: block; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); }
+  .line__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
+  .line__media .product-card__placeholder svg { width: 50%; }
+  .line__info { grid-area: info; display: grid; align-content: start; gap: var(--space-1); min-width: 0; }
+  .line__title { font-weight: 500; letter-spacing: -0.01em; line-height: 1.5; text-decoration: none; overflow-wrap: anywhere; }
+  .line__title:hover, .line__title.is-hover { text-decoration: underline; text-underline-offset: 0.2em; }
+  .line__meta { display: grid; gap: 2px; margin: 0; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .line__meta dt, .line__meta dd { display: inline; margin: 0; }
+  .line__meta dd { color: var(--color-foreground); }
+  .line .price { font-size: var(--font-size-sm); }
+  .line__discount { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--color-sale); font-size: var(--font-size-sm); font-weight: 500; }
+  .line__discount svg { width: 14px; height: 14px; flex: none; }
+  .line__alert { display: flex; align-items: flex-start; gap: var(--space-2); margin-block-start: var(--space-1); color: var(--color-sale); font-size: var(--font-size-sm); font-weight: 500; }
+  .line__alert svg { flex: none; width: 16px; height: 16px; margin-block-start: 2px; }
+  .line__qty { grid-area: qty; align-self: end; }
+  .line__total { grid-area: total; align-self: end; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-height: 44px; margin: 0; font-weight: 600; text-align: end; }
+  .line__total s { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+  .line__remove { grid-area: remove; justify-self: end; align-self: start; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; margin-block-start: calc(var(--space-3) * -1); margin-inline-end: calc(var(--space-3) * -1); border-radius: 50%; color: var(--color-muted); transition: color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out); }
+  .line__remove svg { width: 20px; height: 20px; }
+  .line__remove:hover, .line__remove.is-hover { background: var(--color-background-alt); color: var(--color-sale); }
+  .line__remove:focus-visible, .line__remove.is-focus { outline: 2px solid var(--color-accent); outline-offset: 0; }
+  .line.is-sold-out .line__media img { opacity: 0.6; }
+  .line.is-busy .line__total, .line.is-busy .line__info .price { opacity: 0.4; }
+
+  @media (min-width: 48rem) {
+    .lines-head { display: grid; grid-template-columns: calc(var(--space-1) * 30) minmax(0, 1fr) auto calc(var(--space-1) * 24) 44px; gap: var(--space-4); padding-block-end: var(--space-3); color: var(--color-muted); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+    .lines-head span:first-child { grid-column: 1 / 3; }
+    .lines-head .qh { width: 138px; }
+    .lines-head .th { text-align: end; }
+    .line { grid-template-columns: calc(var(--space-1) * 30) minmax(0, 1fr) auto calc(var(--space-1) * 24) 44px; grid-template-areas: "media info qty total remove"; gap: var(--space-4); align-items: start; }
+    .line__qty, .line__total { align-self: start; }
+    .line__remove { margin: 0; }
+    .line .price { font-size: var(--font-size-base); }
+  }
+  @media (min-width: 80rem) { .line, .lines-head { column-gap: var(--space-5); } }
+
+  /* Bộ tăng giảm số lượng (ĐỀ XUẤT, câu CTO 1) */
+  .qty { position: relative; display: inline-flex; align-items: stretch; height: 44px; border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); background: var(--color-background); }
+  .qty button { display: grid; place-items: center; width: 44px; padding: 0; border: 0; background: none; color: var(--color-foreground); cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out); }
+  .qty button:first-child { border-start-start-radius: var(--radius-input); border-end-start-radius: var(--radius-input); }
+  .qty button:last-child { border-start-end-radius: var(--radius-input); border-end-end-radius: var(--radius-input); }
+  .qty button svg { width: 14px; height: 14px; }
+  .qty button:hover, .qty button.is-hover { background: var(--color-background-alt); }
+  .qty button:focus-visible, .qty button.is-focus { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+  .qty button:disabled, .qty button[aria-disabled='true'] { background: none; color: color-mix(in srgb, var(--color-muted-light) 45%, var(--color-background)); cursor: not-allowed; }
+  .qty input { width: 48px; padding: 0; border: 0; border-inline: 1px solid var(--color-border); background: none; font-size: var(--font-size-base); font-weight: 500; text-align: center; -moz-appearance: textfield; appearance: textfield; }
+  .qty input::-webkit-inner-spin-button, .qty input::-webkit-outer-spin-button { margin: 0; -webkit-appearance: none; }
+  .qty input:focus-visible, .qty input.is-focus { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+  .qty:hover { border-color: var(--color-foreground); }
+  .qty.is-disabled { border-color: var(--color-border); background: var(--color-background-alt); }
+  .qty.is-disabled input { color: var(--color-muted-light); }
+  .qty.is-busy input { color: transparent; }
+  .qty.is-busy::after { content: ''; position: absolute; inset: 0; width: 18px; height: 18px; margin: auto; border: 2px solid var(--color-border); border-block-start-color: var(--color-foreground); border-radius: 50%; animation: kit-spin 700ms linear infinite; }
+
+  /* Ghi chú đơn (AC5) */
+  .cart-note { margin-block-start: var(--space-6); }
+  .cart-note textarea.field__input { min-height: calc(var(--space-1) * 30); }
+
+  /* Nút Update khi không có JS */
+  .cart-update { margin-block-start: var(--space-4); }
+
+  /* ---- Tóm tắt ---- */
+  .summary-col { display: grid; align-content: start; gap: var(--space-4); }
+  @media (min-width: 64rem) { .summary-col { position: sticky; inset-block-start: calc(var(--header-height) + var(--space-4)); } }
+  .summary { display: grid; gap: var(--space-4); padding: var(--space-5); border-radius: var(--radius-card); background: var(--color-background-alt); color: var(--color-background-alt-foreground); }
+  @media (min-width: 80rem) { .summary { padding: var(--space-6); } }
+  .summary__title { font-size: var(--font-size-h3); }
+  .summary__rows { display: grid; gap: var(--space-3); margin: 0; }
+  .summary__rows > div { display: flex; justify-content: space-between; gap: var(--space-4); }
+  .summary__rows dt, .summary__rows dd { margin: 0; }
+  .summary__rows .is-muted { color: var(--color-muted); font-size: var(--font-size-sm); text-align: end; }
+  .summary__rows .is-discount dd { color: var(--color-sale); font-weight: 500; }
+  .summary__rows .is-discount dt { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .summary__rows .is-discount svg { width: 16px; height: 16px; }
+  .summary__total { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); margin: 0; padding-block-start: var(--space-4); border-block-start: 1px solid var(--color-border); font-size: var(--font-size-lg); font-weight: 600; }
+  .summary__total span:last-child { font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: -0.01em; }
+  .summary__note { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .summary__secure { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .summary__secure > span { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .summary__secure svg { width: 18px; height: 18px; }
+  .summary .payment-icons li { border: 1px solid var(--color-border); background: var(--color-background); color: var(--color-foreground); }
+  .summary.is-busy .summary__rows dd, .summary.is-busy .summary__total span:last-child { opacity: 0.4; }
+  .accelerated { display: grid; gap: var(--space-2); }
+  .accelerated__or { display: flex; align-items: center; gap: var(--space-3); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .accelerated__or::before, .accelerated__or::after { content: ''; flex: 1; height: 1px; background: var(--color-border); }
+  .accelerated__buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+  .pay-button { display: grid; place-items: center; min-height: var(--control-height); border-radius: var(--radius-button); background: var(--color-foreground); color: var(--color-background); font-weight: 700; }
+
+  /* Thanh checkout dính đáy mobile (ĐỀ XUẤT) */
+  .sticky-checkout { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--page-margin); border-block-start: 1px solid var(--color-border); background: var(--color-background); box-shadow: 0 calc(var(--space-1) * -1) var(--space-4) color-mix(in srgb, var(--color-foreground) 8%, transparent); }
+  .sticky-checkout__total { display: grid; font-size: var(--font-size-sm); color: var(--color-muted); }
+  .sticky-checkout__total b { color: var(--color-foreground); font-size: var(--font-size-lg); }
+  .sticky-checkout .button { flex: 1; }
+
+  /* ---- Upsell (ĐỀ XUẤT, chờ ES1-T247) ---- */
+  .upsell { padding-block-start: var(--section-gap); }
+  .upsell__row { display: flex; gap: var(--grid-gap); margin: 0; padding: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; list-style: none; }
+  .upsell__row > li { flex: 0 0 45%; scroll-snap-align: start; }
+  @media (min-width: 48rem) { .upsell__row > li { flex-basis: calc((100% - var(--grid-gap) * 3) / 3.25); } }
+  @media (min-width: 80rem) {
+    .upsell__row { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
+    .upsell .carousel-nav, .upsell .carousel-progress { display: none; }
+  }
+  .product-card__add { position: relative; z-index: 1; width: 100%; min-height: 44px; margin-block-start: var(--space-2); padding-inline: var(--space-3); }
+
+  /* ---- Khu trạng thái cuối file ---- */
+  .states { padding-block-end: var(--section-gap); background: var(--color-background); }
+  .states .demo-block > h2 { font-size: var(--font-size-h3); }
+  .state-pair { display: grid; gap: var(--space-6); }
+  @media (min-width: 64rem) { .state-pair { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); column-gap: var(--space-7); align-items: start; } }
+  .state-frame { border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); padding: var(--space-4); }
+  @media (min-width: 48rem) { .state-frame { padding: var(--space-5); } }
+  .state-frame--mobile { max-width: 360px; padding: 0; overflow: hidden; }
+  .control-grid { display: grid; gap: var(--space-5); }
+  @media (min-width: 48rem) { .control-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .control-grid > div { display: grid; gap: var(--space-3); align-content: start; }
+</style></head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
+  <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
+  <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
+  <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="20" height="20" rx="5"/><circle cx="13" cy="13" r="4.5"/><circle cx="18.6" cy="7.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 26 26"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="5.5" width="22" height="15" rx="4"/><path d="m11 10 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 26 26"><path d="M15.5 4.5h-2a4 4 0 0 0-4 4v3h-2.5v3.5h2.5v8.5h3.5V15h3l.5-3.5h-3.5V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 5.5h13M8 5.5V3.8c0-.4.3-.8.8-.8h2.4c.5 0 .8.4.8.8v1.7M5 5.5l.8 10.8c.1.9.8 1.7 1.8 1.7h4.8c1 0 1.7-.8 1.8-1.7L15 5.5M8.5 9v5.5M11.5 9v5.5"/></g></symbol>
+  <symbol id="i-minus" viewBox="0 0 14 14"><path d="M2 7h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 14 14"><path d="M2 7h10M7 2v10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3.5" y="8.5" width="13" height="9" rx="2"/><path d="M6.5 8.5V6a3.5 3.5 0 0 1 7 0v2.5"/></g></symbol>
+  <symbol id="i-tag" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"><path d="M1.8 8.6V2.5c0-.4.3-.7.7-.7h6.1l5.6 5.6a1 1 0 0 1 0 1.4l-4.7 4.7a1 1 0 0 1-1.4 0L1.8 8.6Z"/><circle cx="5.3" cy="5.3" r="1.1"/></g></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<a class="visually-hidden" href="#main">Skip to content</a>
+
+<!-- ===== Header trang con, biến thể A nền trắng (foundation §3) ===== -->
+<header class="site-header">
+  <div class="site-header__inner">
+    <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+    <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+    <nav class="site-header__nav" aria-label="Main">
+      <ul class="site-header__menu">
+        <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Sale</a></li>
+        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Blog</a></li>
+        <li><a class="site-header__link" href="#">Contact</a></li>
+        <li><a class="site-header__link" href="#">Help</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__icons">
+      <a class="site-header__icon" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Cart, 4 items" aria-current="page"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">4</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+  <div class="container cart-page" data-testid="cart-page">
+    <div class="cart-head">
+      <div class="cart-head__title">
+        <h1 tabindex="-1" data-testid="cart-page-heading">Cart</h1>
+        <p class="cart-head__count">4 items</p>
+      </div>
+      <a class="back-link" href="#"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Continue shopping</a>
+    </div>
+
+    <div class="visually-hidden" role="status" aria-live="polite" data-testid="cart-items-status"></div>
+
+    <div class="cart-layout">
+      <!-- Cột trái: freeship, dòng hàng, ghi chú -->
+      <div class="cart-main">
+        <div class="ship" data-testid="cart-free-shipping">
+          <p class="ship__text" id="ship-text"><svg aria-hidden="true"><use href="#i-truck"/></svg><span>Spend <strong>$38.01</strong> more to get free shipping.</span></p>
+          <progress class="ship__bar" value="461.99" max="500" aria-labelledby="ship-text"></progress>
+        </div>
+
+        <div class="lines-head" aria-hidden="true"><span>Product</span><span class="qh">Quantity</span><span class="th">Total</span><span></span></div>
+        <ul class="lines" role="list" aria-label="Items in your cart" data-testid="cart-lines">
+          <li class="line" data-testid="cart-line">
+            <div class="line__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="240" height="240" loading="eager"></div>
+            <div class="line__info">
+              <a class="line__title" href="#">Iron Core Kettlebell 16 kg</a>
+              <dl class="line__meta"><div><dt>Color: </dt><dd>Black</dd></div></dl>
+              <div class="price"><span class="visually-hidden">Regular price</span><span>$119.00</span></div>
+            </div>
+            <div class="line__qty">
+              <label class="visually-hidden" for="q1">Quantity for Iron Core Kettlebell 16 kg</label>
+              <div class="qty"><button type="button" aria-label="Decrease quantity for Iron Core Kettlebell 16 kg"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="q1" type="number" name="updates[]" value="2" min="0" inputmode="numeric"><button type="button" aria-label="Increase quantity for Iron Core Kettlebell 16 kg"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+            </div>
+            <p class="line__total"><span class="visually-hidden">Line total</span><span>$238.00</span></p>
+            <a class="line__remove" href="#" aria-label="Remove Iron Core Kettlebell 16 kg"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+          </li>
+          <li class="line" data-testid="cart-line">
+            <div class="line__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png" alt="FlexFold Adjustable Bench" width="240" height="240" loading="lazy"></div>
+            <div class="line__info">
+              <a class="line__title" href="#">FlexFold Adjustable Bench</a>
+              <div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$189.00</span><span class="visually-hidden">Regular price</span><s class="price__compare">$229.00</s></div>
+            </div>
+            <div class="line__qty">
+              <label class="visually-hidden" for="q2">Quantity for FlexFold Adjustable Bench</label>
+              <div class="qty"><button type="button" aria-label="Decrease quantity for FlexFold Adjustable Bench" aria-disabled="true"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="q2" type="number" name="updates[]" value="1" min="0" inputmode="numeric"><button type="button" aria-label="Increase quantity for FlexFold Adjustable Bench"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+            </div>
+            <p class="line__total"><span class="visually-hidden">Line total</span><span>$189.00</span></p>
+            <a class="line__remove" href="#" aria-label="Remove FlexFold Adjustable Bench"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+          </li>
+          <li class="line" data-testid="cart-line">
+            <div class="line__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg" alt="Revllen Pro Speed Rope" width="240" height="240" loading="lazy"></div>
+            <div class="line__info">
+              <a class="line__title" href="#">Revllen Pro Speed Rope</a>
+              <dl class="line__meta"><div><dt>Color: </dt><dd>Gray</dd></div></dl>
+              <div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$34.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$44.99</s></div>
+            </div>
+            <div class="line__qty">
+              <label class="visually-hidden" for="q3">Quantity for Revllen Pro Speed Rope</label>
+              <div class="qty"><button type="button" aria-label="Decrease quantity for Revllen Pro Speed Rope" aria-disabled="true"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="q3" type="number" name="updates[]" value="1" min="0" inputmode="numeric"><button type="button" aria-label="Increase quantity for Revllen Pro Speed Rope"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+            </div>
+            <p class="line__total"><span class="visually-hidden">Line total</span><span>$34.99</span></p>
+            <a class="line__remove" href="#" aria-label="Remove Revllen Pro Speed Rope"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+          </li>
+        </ul>
+
+        <div class="field cart-note">
+          <label class="field__label" for="cart-note">Order note</label>
+          <textarea class="field__input" id="cart-note" name="note" rows="4" aria-describedby="cart-note-hint" data-testid="cart-page-note"></textarea>
+          <p class="field__hint" id="cart-note-hint">Optional. Delivery instructions or a gift message.</p>
+        </div>
+      </div>
+
+      <!-- Cột phải: tóm tắt sticky + accelerated -->
+      <div class="summary-col">
+        <section class="summary" aria-labelledby="summary-title">
+          <h2 class="summary__title" id="summary-title">Order Summary</h2>
+          <dl class="summary__rows">
+            <div><dt>Subtotal</dt><dd data-testid="cart-subtotal">$461.99</dd></div>
+            <div><dt>Shipping</dt><dd class="is-muted">Calculated at checkout</dd></div>
+          </dl>
+          <p class="summary__total"><span>Total</span><span data-testid="cart-total">$461.99</span></p>
+          <p class="summary__note">Taxes and shipping calculated at checkout.</p>
+          <a class="button button--full" href="#" data-testid="cart-checkout"><svg aria-hidden="true"><use href="#i-lock"/></svg>Checkout</a>
+          <div class="summary__secure"><span><svg aria-hidden="true"><use href="#i-shield"/></svg>Secure checkout</span><ul class="payment-icons" aria-label="Payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul></div>
+        </section>
+        <div class="accelerated" data-testid="cart-page-accelerated">
+          <p class="accelerated__or">or pay with</p>
+          <div class="accelerated__buttons" aria-label="Express checkout, rendered by Shopify"><span class="pay-button">Shop Pay</span><span class="pay-button">G Pay</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Upsell (ĐỀ XUẤT, ES1-T247) -->
+    <section class="upsell" aria-labelledby="upsell-title">
+      <div class="section-header section-header--split">
+        <p class="eyebrow">Complete your setup</p>
+        <h2 id="upsell-title">You May Also Need</h2>
+        <div class="carousel-nav">
+          <button class="round-button round-button--prev" type="button" aria-label="Previous products" aria-disabled="true"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <button class="round-button" type="button" aria-label="Next products"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+        </div>
+      </div>
+      <ul class="upsell__row" aria-label="Recommended products">
+        <li class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg" alt="Training Mat 12 mm" width="600" height="600" loading="lazy"></div>
+          <div class="product-card__info"><h3 class="product-card__title"><a href="#">Training Mat 12 mm</a></h3><div class="price"><span class="visually-hidden">Regular price</span><span>$69.00</span></div></div>
+          <button class="button button--secondary product-card__add" type="button" aria-label="Add Training Mat 12 mm to cart">Add To Cart</button>
+        </li>
+        <li class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P20.jpg" alt="Recovery Roller Pro" width="600" height="600" loading="lazy"></div>
+          <div class="product-card__info"><h3 class="product-card__title"><a href="#">Recovery Roller Pro</a></h3><div class="price"><span class="visually-hidden">Regular price</span><span>$52.00</span></div></div>
+          <button class="button button--secondary product-card__add" type="button" aria-label="Add Recovery Roller Pro to cart">Add To Cart</button>
+        </li>
+        <li class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png" alt="Resistance Band Set" width="600" height="600" loading="lazy"></div>
+          <div class="product-card__info"><h3 class="product-card__title"><a href="#">Resistance Band Set</a></h3><div class="price"><span class="visually-hidden">Regular price</span><span>$45.00</span></div></div>
+          <button class="button button--secondary product-card__add" type="button" aria-label="Add Resistance Band Set to cart">Add To Cart</button>
+        </li>
+        <li class="product-card">
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P12.jpg" alt="Speed rope" width="600" height="600" loading="lazy"></div>
+          <div class="product-card__info"><h3 class="product-card__title"><a href="#">Speed rope</a></h3><div class="price"><span class="visually-hidden">Regular price</span><span>$34.00</span></div></div>
+          <button class="button button--secondary product-card__add" type="button" aria-label="Add Speed rope to cart">Add To Cart</button>
+        </li>
+      </ul>
+      <div class="carousel-progress" aria-hidden="true"><span class="carousel-progress__thumb" style="--size: 70%"></span></div>
+    </section>
+  </div>
+</main>
+
+<!-- ===== Footer (Figma 1:1104, foundation §4) ===== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__newsletter">
+      <div>
+        <h2><span>Get 15% Off</span> Your First Order</h2>
+        <p style="margin-block-start: var(--space-3)">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+      </div>
+      <form class="site-footer__form" onsubmit="return false">
+        <label class="visually-hidden" for="nl-email">Email</label>
+        <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+        <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+      </form>
+    </div>
+    <div class="site-footer__panel">
+      <div class="site-footer__top">
+        <div class="site-footer__brand">
+          <svg class="logo" viewBox="0 0 100 30" aria-label="Efitco" role="img"><use href="#i-logo"/></svg>
+          <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+          <div class="site-footer__social"><a href="#" aria-label="Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a><a href="#" aria-label="YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a><a href="#" aria-label="Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></div>
+        </div>
+        <div class="site-footer__menus">
+          <div class="site-footer__menu"><details open><summary>Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+          <div class="site-footer__menu"><details open><summary>Information <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        </div>
+      </div>
+      <ul class="site-footer__trust">
+        <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+        <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+        <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+        <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+      </ul>
+    </div>
+    <p class="site-footer__wordmark" aria-hidden="true">EFITCO</p>
+    <div class="site-footer__bottom">
+      <p>© 2026 Efitco, Powered by Shopify</p>
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English">USD / EN <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Accepted payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== TRẠNG THÁI (cuối file) ===================== -->
+<aside class="states" aria-label="Cart page states">
+  <div class="container">
+
+    <section class="demo-block" aria-labelledby="s-empty">
+      <h2 id="s-empty">State 1 · Empty Cart</h2>
+      <p class="demo-note">AC4. h1 "Cart" giữ nguyên; khối rỗng foundation §18; không có freeship, tóm tắt, ghi chú, accelerated. Hàng sản phẩm dưới là ĐỀ XUẤT (setting collection, ẩn khi trống).</p>
+      <div class="state-frame">
+        <div class="empty-state" data-testid="cart-empty">
+          <span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span>
+          <h3>Your Cart Is Empty</h3>
+          <p>Find gear for your next session, from free weights to recovery tools.</p>
+          <div class="empty-state__actions"><a class="button" href="#" data-testid="cart-empty-cta">Continue Shopping</a><a class="text-link" href="#" style="align-self: center">Browse collections</a></div>
+        </div>
+        <div class="section-header" style="margin-block: var(--space-6) var(--space-5)"><h3>Bestsellers</h3></div>
+        <ul class="product-grid" aria-label="Bestsellers">
+          <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png" alt="FlexFold Adjustable Bench" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div><div class="product-card__info"><h4 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h4><div class="price"><span class="price__sale">$189.00</span><s class="price__compare">$229.00</s></div></div></li>
+          <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png" alt="Home Starter Kit" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-22%</span></div></div><div class="product-card__info"><h4 class="product-card__title"><a href="#">Home Starter Kit</a></h4><div class="price"><span class="price__sale">$399.00</span><s class="price__compare">$512.00</s></div></div></li>
+          <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg" alt="Olympic Plate Set 100" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-15%</span></div></div><div class="product-card__info"><h4 class="product-card__title"><a href="#">Olympic Plate Set 100</a></h4><div class="price"><span class="price__sale">$289.00</span><s class="price__compare">$339.00</s></div></div></li>
+          <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P16_b6c798cf-e03c-4995-b522-1737773992d2.png" alt="Ativafit Lava 66 lb" width="600" height="600" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div><div class="product-card__info"><h4 class="product-card__title"><a href="#">Ativafit Lava 66 lb</a></h4><div class="price"><span class="price__sale">$379.99</span><s class="price__compare">$499.99</s></div></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="s-busy">
+      <h2 id="s-busy">State 2 · Updating Quantity</h2>
+      <p class="demo-note">AC2. Bấm + ở dòng Kettlebell: số trong ô thành spinner, giá dòng và số tiền tóm tắt mờ 40% tại chỗ (0 CLS), cart-items aria-busy, Checkout aria-disabled tới khi partial về. Screen reader nghe "Cart updated." từ live region.</p>
+      <div class="state-pair">
+        <ul class="lines" role="list" aria-label="Items, updating" aria-busy="true">
+          <li class="line is-busy">
+            <div class="line__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="240" height="240" loading="lazy"></div>
+            <div class="line__info"><a class="line__title" href="#">Iron Core Kettlebell 16 kg</a><dl class="line__meta"><div><dt>Color: </dt><dd>Black</dd></div></dl><div class="price"><span>$119.00</span></div></div>
+            <div class="line__qty"><label class="visually-hidden" for="qb1">Quantity for Iron Core Kettlebell 16 kg</label><div class="qty is-busy"><button type="button" aria-label="Decrease quantity for Iron Core Kettlebell 16 kg" aria-disabled="true"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qb1" type="number" value="3" min="0" inputmode="numeric" readonly><button type="button" aria-label="Increase quantity for Iron Core Kettlebell 16 kg" aria-disabled="true"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div></div>
+            <p class="line__total"><span>$238.00</span></p>
+            <a class="line__remove" href="#" aria-label="Remove Iron Core Kettlebell 16 kg"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+          </li>
+        </ul>
+        <section class="summary is-busy" aria-labelledby="sb-title">
+          <h3 class="summary__title" id="sb-title">Order Summary</h3>
+          <dl class="summary__rows"><div><dt>Subtotal</dt><dd>$461.99</dd></div><div><dt>Shipping</dt><dd class="is-muted">Calculated at checkout</dd></div></dl>
+          <p class="summary__total"><span>Total</span><span>$461.99</span></p>
+          <p class="demo-row" role="status" style="font-size: var(--font-size-sm)"><span class="spinner" aria-hidden="true"></span>Updating cart…</p>
+          <a class="button button--full" aria-disabled="true"><svg aria-hidden="true"><use href="#i-lock"/></svg>Checkout</a>
+        </section>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="s-error">
+      <h2 id="s-error">State 3 · Errors</h2>
+      <p class="demo-note">AC2 lỗi 422: hộp alert đầu danh sách (cart-items__error, role alert) hiện câu của API + câu locale; ô số về giá trị server. Lỗi mạng: locale cart.error + link tải lại giỏ (chạy cả khi không JS).</p>
+      <div class="state-pair">
+        <div class="stack">
+          <div class="alert" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><strong>You can't add more Iron Core Kettlebell 16 kg - Black to the cart.</strong><p>Quantity changed to the amount available.</p></div></div>
+          <div class="alert" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><strong>Something went wrong. Refresh the page and try again.</strong><div><a class="button button--secondary" href="#">Reload Cart</a></div></div></div>
+        </div>
+        <div class="stack">
+          <p class="demo-label">Trường ghi chú: không có lỗi nhập (Shopify nhận mọi chuỗi). Chỉ hiện lỗi nếu lưu thất bại.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="s-soldout">
+      <h2 id="s-soldout">State 4 · Sold-Out Line</h2>
+      <p class="demo-note">Edge case "Hết hàng toàn bộ": variant hết hàng sau khi đã vào giỏ. Badge Sold out + ảnh mờ + câu đỏ có icon; bộ số lượng khoá, chỉ còn nút xoá. Không chặn Checkout (Shopify checkout tự xử lý).</p>
+      <ul class="lines" role="list" aria-label="Sold-out item">
+        <li class="line is-sold-out">
+          <div class="line__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg" alt="Hết hàng toàn bộ" width="240" height="240" loading="lazy"></div>
+          <div class="line__info">
+            <span><span class="badge badge--sold-out">Sold out</span></span>
+            <a class="line__title" href="#">Hết hàng toàn bộ</a>
+            <dl class="line__meta"><div><dt>Color: </dt><dd>Green</dd></div></dl>
+            <div class="price"><span>$1,000.00</span></div>
+            <p class="line__alert"><svg aria-hidden="true"><use href="#i-alert"/></svg>This item sold out after you added it. Remove it before checkout.</p>
+          </div>
+          <div class="line__qty"><label class="visually-hidden" for="qs1">Quantity for Hết hàng toàn bộ</label><div class="qty is-disabled"><button type="button" aria-label="Decrease quantity for Hết hàng toàn bộ" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qs1" type="number" value="1" disabled><button type="button" aria-label="Increase quantity for Hết hàng toàn bộ" disabled><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div></div>
+          <p class="line__total"><span>$1,000.00</span></p>
+          <a class="line__remove" href="#" aria-label="Remove Hết hàng toàn bộ"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="demo-block" aria-labelledby="s-lines">
+      <h2 id="s-lines">State 5 · Line Variants</h2>
+      <p class="demo-note">Gift card có mệnh giá; sản phẩm không ảnh (placeholder trên cream); giá sale nhỏ; tên dài + 2 option; discount dòng (tên và giá trị minh hoạ: store dev chưa có discount tự động).</p>
+      <ul class="lines" role="list" aria-label="Line variants">
+        <li class="line">
+          <div class="line__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/1-1668682587206912817789.jpg" alt="Gift card" width="240" height="240" loading="lazy"></div>
+          <div class="line__info"><a class="line__title" href="#">Gift card</a><dl class="line__meta"><div><dt>Denominations: </dt><dd>$25.00</dd></div></dl><div class="price"><span>$25.00</span></div></div>
+          <div class="line__qty"><label class="visually-hidden" for="qv1">Quantity for Gift card</label><div class="qty"><button type="button" aria-label="Decrease quantity for Gift card" aria-disabled="true"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qv1" type="number" value="1" min="0"><button type="button" aria-label="Increase quantity for Gift card"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div></div>
+          <p class="line__total"><span>$25.00</span></p>
+          <a class="line__remove" href="#" aria-label="Remove Gift card"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+        </li>
+        <li class="line">
+          <div class="line__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></div>
+          <div class="line__info"><a class="line__title" href="#">Sản phẩm không có media</a><div class="price"><span>$34.00</span></div></div>
+          <div class="line__qty"><label class="visually-hidden" for="qv2">Quantity for Sản phẩm không có media</label><div class="qty"><button type="button" aria-label="Decrease quantity for Sản phẩm không có media" aria-disabled="true"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qv2" type="number" value="1" min="0"><button type="button" aria-label="Increase quantity for Sản phẩm không có media"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div></div>
+          <p class="line__total"><span>$34.00</span></p>
+          <a class="line__remove" href="#" aria-label="Remove Sản phẩm không có media"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+        </li>
+        <li class="line">
+          <div class="line__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg" alt="Sale giá nhỏ" width="240" height="240" loading="lazy"></div>
+          <div class="line__info"><a class="line__title" href="#">Sale giá nhỏ</a><div class="price"><span class="price__sale">$0.99</span><s class="price__compare">$1.99</s></div></div>
+          <div class="line__qty"><label class="visually-hidden" for="qv3">Quantity for Sale giá nhỏ</label><div class="qty"><button type="button" aria-label="Decrease quantity for Sale giá nhỏ"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qv3" type="number" value="10" min="0"><button type="button" aria-label="Increase quantity for Sale giá nhỏ"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div></div>
+          <p class="line__total"><span>$9.90</span></p>
+          <a class="line__remove" href="#" aria-label="Remove Sale giá nhỏ"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+        </li>
+        <li class="line">
+          <div class="line__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg" alt="2 option có tổ hợp không tồn" width="240" height="240" loading="lazy"></div>
+          <div class="line__info"><a class="line__title" href="#">2 option có tổ hợp không tồn</a><dl class="line__meta"><div><dt>Color: </dt><dd>Black</dd></div><div><dt>Size: </dt><dd>M</dd></div></dl><div class="price"><span>$30.00</span></div></div>
+          <div class="line__qty"><label class="visually-hidden" for="qv4">Quantity for 2 option có tổ hợp không tồn</label><div class="qty"><button type="button" aria-label="Decrease quantity for 2 option có tổ hợp không tồn" aria-disabled="true"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qv4" type="number" value="1" min="0"><button type="button" aria-label="Increase quantity for 2 option có tổ hợp không tồn"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div></div>
+          <p class="line__total"><span>$30.00</span></p>
+          <a class="line__remove" href="#" aria-label="Remove 2 option có tổ hợp không tồn"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+        </li>
+        <li class="line">
+          <div class="line__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="240" height="240" loading="lazy"></div>
+          <div class="line__info"><a class="line__title" href="#">Iron Core Kettlebell 16 kg</a><dl class="line__meta"><div><dt>Color: </dt><dd>Black</dd></div></dl><div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$107.10</span><span class="visually-hidden">Regular price</span><s class="price__compare">$119.00</s></div><span class="line__discount"><svg aria-hidden="true"><use href="#i-tag"/></svg>Bundle 10% off (-$23.80)</span></div>
+          <div class="line__qty"><label class="visually-hidden" for="qv5">Quantity for Iron Core Kettlebell 16 kg</label><div class="qty"><button type="button" aria-label="Decrease quantity for Iron Core Kettlebell 16 kg"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qv5" type="number" value="2" min="0"><button type="button" aria-label="Increase quantity for Iron Core Kettlebell 16 kg"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div></div>
+          <p class="line__total"><span>$214.20</span><s>$238.00</s></p>
+          <a class="line__remove" href="#" aria-label="Remove Iron Core Kettlebell 16 kg"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+        </li>
+      </ul>
+    </section>
+
+    <section class="demo-block" aria-labelledby="s-summary">
+      <h2 id="s-summary">State 6 · Summary Variants</h2>
+      <p class="demo-note">Trái: discount tự động cấp đơn (AC5; tên và số minh hoạ) + thuế đã gồm (AC4, market có taxes_included). Phải: đạt ngưỡng freeship (AC3) và thanh checkout dính đáy mobile (ĐỀ XUẤT) hiện khi tóm tắt ra khỏi màn hình.</p>
+      <div class="state-pair">
+        <section class="summary" aria-labelledby="sd-title">
+          <h3 class="summary__title" id="sd-title">Order Summary</h3>
+          <dl class="summary__rows">
+            <div><dt>Subtotal</dt><dd>$461.99</dd></div>
+            <div class="is-discount"><dt><svg aria-hidden="true"><use href="#i-tag"/></svg>Bundle 10% off</dt><dd>-$46.20</dd></div>
+            <div><dt>Shipping</dt><dd class="is-muted">Calculated at checkout</dd></div>
+          </dl>
+          <p class="summary__total"><span>Total</span><span>$415.79</span></p>
+          <p class="summary__note">Taxes included. Shipping calculated at checkout.</p>
+          <a class="button button--full" href="#"><svg aria-hidden="true"><use href="#i-lock"/></svg>Checkout</a>
+        </section>
+        <div class="stack">
+          <div class="ship"><p class="ship__text" id="ship-ok"><svg aria-hidden="true"><use href="#i-check"/></svg><span>Your order qualifies for free shipping.</span></p><progress class="ship__bar" value="500" max="500" aria-labelledby="ship-ok"></progress></div>
+          <p class="demo-label">Mobile 360 · sticky checkout bar</p>
+          <div class="state-frame state-frame--mobile">
+            <div class="sticky-checkout"><p class="sticky-checkout__total">Total<b>$461.99</b></p><a class="button" href="#"><svg aria-hidden="true"><use href="#i-lock"/></svg>Checkout</a></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="s-controls">
+      <h2 id="s-controls">State 7 · Controls</h2>
+      <p class="demo-note">Mặc định / hover / focus / disabled / loading. Không JS: ẩn nút − +, ô số + nút Update lưu số lượng; Remove là link url_to_remove.</p>
+      <div class="control-grid">
+        <div>
+          <p class="demo-label">Quantity stepper</p>
+          <div class="demo-row">
+            <div class="qty"><button type="button" aria-label="Decrease, default"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input type="number" value="2" aria-label="Quantity, default"><button type="button" aria-label="Increase, default"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+            <div class="qty"><button type="button" aria-label="Decrease, hover"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input type="number" value="2" aria-label="Quantity, hover"><button class="is-hover" type="button" aria-label="Increase, hover"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+          </div>
+          <div class="demo-row">
+            <div class="qty"><button type="button" aria-label="Decrease, focus"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="is-focus" type="number" value="2" aria-label="Quantity, focus"><button type="button" aria-label="Increase, focus"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+            <div class="qty"><button type="button" aria-label="Decrease, disabled at 1" aria-disabled="true"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input type="number" value="1" aria-label="Quantity, minimum"><button type="button" aria-label="Increase, enabled"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+          </div>
+          <p class="demo-label">No JavaScript</p>
+          <div class="demo-row"><input class="field__input" type="number" value="2" aria-label="Quantity, no JavaScript" style="width: 80px"><button class="button button--secondary cart-update" type="submit" style="margin: 0">Update</button></div>
+        </div>
+        <div>
+          <p class="demo-label">Remove (trash 44 × 44)</p>
+          <div class="demo-row">
+            <a class="line__remove" href="#" aria-label="Remove, default" style="margin: 0"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+            <a class="line__remove is-hover" href="#" aria-label="Remove, hover" style="margin: 0"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+            <a class="line__remove is-focus" href="#" aria-label="Remove, focus" style="margin: 0"><svg aria-hidden="true"><use href="#i-trash"/></svg></a>
+          </div>
+          <p class="demo-label">Product title link</p>
+          <div class="demo-row"><a class="line__title" href="#">Revllen Pro Speed Rope</a><a class="line__title is-hover" href="#">Revllen Pro Speed Rope</a></div>
+          <p class="demo-label">Continue shopping link</p>
+          <div class="demo-row"><a class="back-link" href="#"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Continue shopping</a><a class="back-link is-hover" href="#"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Continue shopping</a></div>
+        </div>
+        <div>
+          <p class="demo-label">Checkout button</p>
+          <a class="button button--full" href="#"><svg aria-hidden="true"><use href="#i-lock"/></svg>Checkout</a>
+          <a class="button button--full is-hover" href="#"><svg aria-hidden="true"><use href="#i-lock"/></svg>Checkout</a>
+          <a class="button button--full is-focus" href="#"><svg aria-hidden="true"><use href="#i-lock"/></svg>Checkout</a>
+          <a class="button button--full" aria-busy="true"><span class="visually-hidden">Loading</span>Checkout</a>
+          <a class="button button--full" aria-disabled="true"><svg aria-hidden="true"><use href="#i-lock"/></svg>Checkout</a>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</aside>
+</body>
+</html>
