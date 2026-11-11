@@ -4,7 +4,7 @@
 // Chưa có JS (ES1-T96): mở thử bằng thuộc tính open. EXPECT_CART_TYPE=page chỉ đặt khi preview có cart_type page (D12).
 import { test, expect, type APIRequestContext, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { clickAndLoad, expectJsonAllowed, expectNotChallenged, expectStoreAllowed, gotoStore } from './support/store-guard';
+import { clickAndLoad, expectJsonAllowed, expectNotChallenged, expectStoreAllowed, gotoStore, skipIfStoreBlocked } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
@@ -106,21 +106,24 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
   test('AC1-markup giỏ có hàng: dòng hàng, tóm tắt trong partial, accelerated ngoài partial, axe khi ép open', async ({ page }) => {
     test.skip(ENV.pageMode, 'Preview đặt cart_type page: không có dialog');
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-    await addToCart(page.request, ENV.product!);
-    await gotoStore(page, '/');
-    const body = tid(page, 'cart-drawer-body');
-    await expect(body).toHaveAttribute('data-item-count', '1');
-    await expect(body.getByTestId('cart-line')).toHaveCount(1);
-    await expect(body.getByTestId('cart-checkout')).toHaveAttribute('form', 'cart-form-drawer');
-    await expect(body.getByTestId('cart-drawer-accelerated')).toHaveCount(0);
+    // ES1-T300 (CTO 11/11 16:12): run 42981296470 đỏ do Cloudflare 429 tại /products/variant-co-anh-rieng.js = môi trường store dev → skip có lý do; lỗi khác vẫn fail.
+    await skipIfStoreBlocked('ES1-T300: store dev chặn /products/<handle>.js, Cart API hoặc trang / (môi trường)', async () => {
+      await addToCart(page.request, ENV.product!);
+      await gotoStore(page, '/');
+      const body = tid(page, 'cart-drawer-body');
+      await expect(body).toHaveAttribute('data-item-count', '1');
+      await expect(body.getByTestId('cart-line')).toHaveCount(1);
+      await expect(body.getByTestId('cart-checkout')).toHaveAttribute('form', 'cart-form-drawer');
+      await expect(body.getByTestId('cart-drawer-accelerated')).toHaveCount(0);
 
-    const accelerated = tid(page, 'cart-drawer-accelerated');
-    if (await accelerated.count()) await expect(accelerated).toHaveAttribute('data-cart-accelerated', '');
+      const accelerated = tid(page, 'cart-drawer-accelerated');
+      if (await accelerated.count()) await expect(accelerated).toHaveAttribute('data-cart-accelerated', '');
 
-    await forceOpen(page);
-    await expect(tid(page, 'cart-drawer-dialog')).toBeVisible();
-    await expect(tid(page, 'cart-checkout')).toBeVisible();
-    await expectNoSeriousAxe(page);
+      await forceOpen(page);
+      await expect(tid(page, 'cart-drawer-dialog')).toBeVisible();
+      await expect(tid(page, 'cart-checkout')).toBeVisible();
+      await expectNoSeriousAxe(page);
+    });
   });
 
   test('AC1-markup giỏ rỗng: thông báo + CTA, không tóm tắt, accelerated ẩn, axe khi ép open', async ({ page }) => {
@@ -138,20 +141,23 @@ test.describe('ES1-T95 TE-5 cart drawer', () => {
   test('AC1-markup bố cục: dưới 48rem toàn màn, từ 48rem rộng 28rem bám cạnh cuối, thân cuộn, ảnh 360/768/1280', async ({ page }) => {
     test.skip(ENV.pageMode, 'Preview đặt cart_type page: không có dialog');
     test.skip(!ENV.product, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
-    await addToCart(page.request, ENV.product!);
-    for (const width of [360, 768, 1280]) {
-      await page.setViewportSize({ width, height: 800 });
-      await gotoStore(page, '/');
-      await forceOpen(page);
-      const box = await tid(page, 'cart-drawer-dialog').boundingBox();
-      expect(box, `${width}: dialog có kích thước`).not.toBeNull();
-      expect(box!.height, `${width}: cao toàn màn`).toBe(800);
-      expect(box!.x + box!.width, `${width}: bám cạnh cuối`).toBe(width);
-      expect(box!.width, `${width}: chiều rộng`).toBe(width < 768 ? width : 448);
-      const overflow = await page.locator('.cart-drawer__main').evaluate((el) => getComputedStyle(el).overflowY);
-      expect(overflow).toBe('auto');
-      await test.info().attach(`cart-drawer-${width}.png`, { body: await page.screenshot(), contentType: 'image/png' });
-    }
+    // ES1-T300 (CTO 11/11 16:12): run 42981296470 đỏ do Cloudflare 429 tại /products/variant-co-anh-rieng.js = môi trường store dev → skip có lý do; lỗi khác vẫn fail.
+    await skipIfStoreBlocked('ES1-T300: store dev chặn /products/<handle>.js, Cart API hoặc trang / (môi trường)', async () => {
+      await addToCart(page.request, ENV.product!);
+      for (const width of [360, 768, 1280]) {
+        await page.setViewportSize({ width, height: 800 });
+        await gotoStore(page, '/');
+        await forceOpen(page);
+        const box = await tid(page, 'cart-drawer-dialog').boundingBox();
+        expect(box, `${width}: dialog có kích thước`).not.toBeNull();
+        expect(box!.height, `${width}: cao toàn màn`).toBe(800);
+        expect(box!.x + box!.width, `${width}: bám cạnh cuối`).toBe(width);
+        expect(box!.width, `${width}: chiều rộng`).toBe(width < 768 ? width : 448);
+        const overflow = await page.locator('.cart-drawer__main').evaluate((el) => getComputedStyle(el).overflowY);
+        expect(overflow).toBe('auto');
+        await test.info().attach(`cart-drawer-${width}.png`, { body: await page.screenshot(), contentType: 'image/png' });
+      }
+    });
   });
 
   test('AC1-markup /cart: không dialog, data-mode none, cart link không có hook drawer', async ({ page }) => {
