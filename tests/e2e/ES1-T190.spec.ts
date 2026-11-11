@@ -4,7 +4,7 @@
 // Dữ liệu P01, P02, P04 từ ES1-T178: thiếu thì skip có lý do. T190_NEW_SALE_HANDLE: sản phẩm vừa tag new vừa sale, không có thì test thứ tự dùng DOM.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
+import { expectNotChallenged, expectStoreAllowed, skipIfStoreBlocked } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { watchShopPay403 } from './support/console-guard';
 
@@ -215,27 +215,36 @@ test.describe('ES1-T190 vùng bấm swatch (D7, AC6)', () => {
 
   test('không chồng vùng bấm của swatch cạnh, 2 cỡ màn hình', async ({ page }, ti) => {
     test.skip(ti.project.name !== 'desktop', 'Đổi viewport ở project desktop; Pixel 7 đã có test đo ở trên');
-    for (const width of [360, 1280]) {
-      await page.setViewportSize({ width, height: 900 });
-      const groups = await swatches(page);
-      for (const group of await groups.all()) {
-        const overlaps = await group.evaluate((root) => {
-          const rects = [...root.querySelectorAll('[data-testid="product-card-swatch"]')].map((el) => {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el, '::after');
-            return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: parseFloat(s.width), h: parseFloat(s.height) };
+    // ES1-T300 (CTO 11/11 16:12): run 42981296470 đỏ do HTTP /?view=figma → 429 = môi trường store dev → skip có lý do; lỗi khác vẫn fail.
+    await skipIfStoreBlocked('ES1-T300: store dev trả 429 cho /?view=figma (môi trường)', async () => {
+      for (const width of [360, 1280]) {
+        await page.setViewportSize({ width, height: 900 });
+        // Như openFigma, thêm expectStoreAllowed: 429 ném 'store trả 429', cf-mitigated ném 'bị Cloudflare chặn' → skipIfStoreBlocked nhận ra. Mã lỗi khác vẫn fail ở assertion HTTP.
+        const res = await page.goto(FIGMA);
+        if (res) expectStoreAllowed(res);
+        expect(res?.status(), `HTTP ${FIGMA}`).toBeLessThan(400);
+        await expectNotChallenged(page);
+        const groups = page.getByTestId(T.block).getByTestId(T.swatches);
+        test.skip((await groups.count()) === 0, 'Không có card có swatch trong hàng 5: chờ dữ liệu ES1-T178');
+        for (const group of await groups.all()) {
+          const overlaps = await group.evaluate((root) => {
+            const rects = [...root.querySelectorAll('[data-testid="product-card-swatch"]')].map((el) => {
+              const r = el.getBoundingClientRect();
+              const s = getComputedStyle(el, '::after');
+              return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: parseFloat(s.width), h: parseFloat(s.height) };
+            });
+            let bad = 0;
+            rects.forEach((a, i) => rects.slice(i + 1).forEach((b) => {
+              const clearX = Math.abs(a.x - b.x) >= (a.w + b.w) / 2 - 0.5;
+              const clearY = Math.abs(a.y - b.y) >= (a.h + b.h) / 2 - 0.5;
+              if (!clearX && !clearY) bad += 1;
+            }));
+            return bad;
           });
-          let bad = 0;
-          rects.forEach((a, i) => rects.slice(i + 1).forEach((b) => {
-            const clearX = Math.abs(a.x - b.x) >= (a.w + b.w) / 2 - 0.5;
-            const clearY = Math.abs(a.y - b.y) >= (a.h + b.h) / 2 - 0.5;
-            if (!clearX && !clearY) bad += 1;
-          }));
-          return bad;
-        });
-        expect(overlaps, `${width}px`).toBe(0);
+          expect(overlaps, `${width}px`).toBe(0);
+        }
       }
-    }
+    });
   });
 
   test('bấm mép vùng bấm chọn đúng swatch', async ({ page }) => {

@@ -3,7 +3,7 @@
 // watchStore gộp console guard của T96, T97, T98 và luồng thật; ghi số 429, trang thử thách vào [429-tong-ket].
 import { expect, test, type Page, type Request, type Response } from '@playwright/test';
 import { basename } from 'node:path';
-import { MAX_WAITS, retryDelayMs } from './cart-api';
+import { MAX_WAITS, retryDelayMs, skip429 } from './cart-api';
 import { isCloudflareLog, watchShopPay403 } from './console-guard';
 import { record429 } from './report-429';
 
@@ -133,6 +133,23 @@ export async function gotoStore(page: Page, path: string, options: { waitUntil?:
     if (info.timeout > 0) info.setTimeout(info.timeout + delay);
     await new Promise((r) => setTimeout(r, delay));
     waited += delay;
+  }
+}
+
+// ES1-T300 (CTO 11/11 mục 4): luồng thêm giỏ thật (POST /cart/add) mà store dev chặn (Cloudflare cf-mitigated hoặc 429 sau khi đã thử lại)
+// thì skip có lý do, không fail gate. Chỉ dùng cho test được CTO cho phép (ES1-T156 nojs POST, ES1-T158 AC-H22; CTO 11/11 16:12: ES1-T95 :106 :138, ES1-T190 :216); test khác giữ quy tắc ES1-T203 (fail rõ).
+// Skip ghi vào [429-tong-ket] (record429 'skip') và log [cartApi], nên không im lặng. Lỗi khác (assertion, timeout) ném lại nguyên vẹn.
+export const isStoreBlockedError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes(CLOUDFLARE_BLOCKED) || /store trả 429/.test(message);
+};
+
+export async function skipIfStoreBlocked<T>(reason: string, flow: () => Promise<T>): Promise<T> {
+  try {
+    return await flow();
+  } catch (error) {
+    if (isStoreBlockedError(error)) skip429(`${reason}: ${(error as Error).message.split('\n')[0]}`);
+    throw error;
   }
 }
 
