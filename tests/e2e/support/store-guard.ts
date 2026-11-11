@@ -137,7 +137,7 @@ export async function gotoStore(page: Page, path: string, options: { waitUntil?:
 }
 
 // ES1-T300 (CTO 11/11 mục 4): luồng thêm giỏ thật (POST /cart/add) mà store dev chặn (Cloudflare cf-mitigated hoặc 429 sau khi đã thử lại)
-// thì skip có lý do, không fail gate. Chỉ dùng cho test được CTO cho phép (ES1-T156 nojs POST, ES1-T158 AC-H22); test khác giữ quy tắc ES1-T203 (fail rõ).
+// thì skip có lý do, không fail gate. Chỉ dùng cho test được CTO cho phép (ES1-T156 nojs POST, ES1-T158 AC-H22; CTO 11/11 16:12: ES1-T95 :106 :138, ES1-T190 :216); test khác giữ quy tắc ES1-T203 (fail rõ).
 // Skip ghi vào [429-tong-ket] (record429 'skip') và log [cartApi], nên không im lặng. Lỗi khác (assertion, timeout) ném lại nguyên vẹn.
 export const isStoreBlockedError = (error: unknown) => {
   const message = error instanceof Error ? error.message : String(error);

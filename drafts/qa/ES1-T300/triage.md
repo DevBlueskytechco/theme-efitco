@@ -1,4 +1,4 @@
-KHÔNG CHẮC: phiên QA không vào được store dev (thiếu STORE_PASSWORD), các spec sửa ở lượt 3 mới kiểm biên dịch (`npx playwright test --list`: 2108 test, 64 file) và helper mới kiểm bằng repro cục bộ; chưa chạy trên preview. DoD "e2e-gate xanh" chỉ chốt được khi CI chạy trên PR của nhánh này.
+KHÔNG CHẮC: phiên QA không vào được store dev (thiếu STORE_PASSWORD), các spec sửa ở lượt 3 và 4 mới kiểm biên dịch (`npx playwright test --list`: 2108 test, 64 file) và helper mới kiểm bằng repro cục bộ; chưa chạy trên preview. DoD "e2e-gate xanh" chỉ chốt được khi CI chạy trên PR của nhánh này.
 
 # ES1-T300: develop e2e đỏ từ 10/11, phân loại và sửa test
 
@@ -19,15 +19,15 @@ Lượt 3 (CTO 11/11 14:36): chuyển từ phân loại sang sửa test để de
 | 4 | ES1-T156.spec.ts:250 "nojs select variant, form POST vào giỏ" | Môi trường | Log run 42805384493 có "bị Cloudflare chặn (cf-mitigated, status 429)" ở POST /cart/add | Bọc luồng bằng `skipIfStoreBlocked` (helper mới trong support/store-guard.ts): store chặn thì skip có lý do qua `skip429`, ghi vào `[429-tong-ket]`; lỗi khác vẫn fail | - |
 | 5 | ES1-T158.spec.ts:362 "AC2 AC-H22 thêm giỏ thật đúng variant" | Môi trường | Log run 42805384493: "bị Cloudflare chặn (cf-mitigated, status 429)" tại /?view=te13 | Như #4. `themeAdd` vẫn thử lại 429 theo Retry-After trước khi skip | - |
 | 6 | ES1-T30.spec.ts:215 "focus bàn phím trong block giữ, rời focus chạy lại" (mobile, fail cả retry) | Test lệch thiết kế đã chốt. Không flaky, không phải lỗi code | decisions.md 07/11: mobile không mũi tên. base.css:7857 `@media (max-width: 47.99rem)` ẩn `.slideshow__arrow`. `focus()` trên nút display none không có tác dụng → không có focusin → autoplay chạy tiếp → index 1. Hỏng ở cả 2 lần chạy, vì vậy không phải flaky | Đã sửa ở lượt 2 (nhánh này, chưa vào develop): mobile focus `slideshow-pause` (hiện khi autoplay), desktop giữ `slideshow-next`, thêm `toBeVisible` | Không mở bug |
-| 7 | ES1-T190 "vùng bấm swatch (D7, AC6)" | Môi trường | Log run 42805384493: /?view=figma 429. Không có trong danh sách đỏ của run 42978078054. SRS 0.3 mục D7 đã bỏ vùng bấm 44px vì swatch card chỉ còn là chỉ báo | Không sửa trong lượt này. Spec lỗi thời theo SRS 0.4 (knowledge: "ES1-T190 vùng bấm swatch bỏ"), cần ticket QA viết lại | Đề xuất gộp vào đợt viết lại TE-3 swatch |
-| 8 | ES1-T95 "AC1-markup" (chỉ có ở PR #170) | Môi trường | Log run 42805384493: /products/variant-co-anh-rieng.js bị Cloudflare chặn. Không có ở run 42978078054 | Không sửa. Đã có `skip429` và `expectStoreAllowed` | - |
+| 7 | ES1-T190.spec.ts:216 "không chồng vùng bấm của swatch cạnh, 2 cỡ màn hình" (desktop) | Môi trường | Run 42805384493 và run 42981296470 lần 4 (CTO 16:12): HTTP /?view=figma → 429. Ghi thêm: SRS 0.3 D7 đã bỏ vùng bấm 44px (swatch card chỉ còn là chỉ báo) | Lượt 4: bọc test bằng `skipIfStoreBlocked`. Trong test, sau `page.goto` gọi thêm `expectStoreAllowed(res)`: 429 hoặc cf-mitigated thì skip; HTTP ≥ 400 khác vẫn fail như cũ. `openFigma` dùng chung không đổi, test khác của file giữ nguyên | Spec lỗi thời theo SRS 0.4, cần ticket QA viết lại cùng đợt TE-3 swatch |
+| 8 | ES1-T95.spec.ts:106 "AC1-markup giỏ có hàng" và :141 (CI ghi :138) "AC1-markup bố cục" (desktop) | Môi trường | Run 42981296470 lần 4: Cloudflare 429 tại /products/variant-co-anh-rieng.js (`addToCart` → `expectJsonAllowed` ném "bị Cloudflare chặn") | Lượt 4: bọc phần sau 2 `test.skip` điều kiện bằng `skipIfStoreBlocked`. Assertion giữ nguyên. ES1-T94 nojs không đụng (lần 4 đã pass) | - |
 
 ## 3. Tổng hợp
 
 - Bỏ test lỗi thời: 1 (TE-3 TC-12/TC-33).
 - Sửa test vì phụ thuộc dữ liệu: 1 (T139 AC-H16).
 - Tách khỏi gate, chỉ ghi số: 1 (T176 hàng 1, chỉ phần so ảnh).
-- Môi trường, skip có lý do: 2 (T156, T158). T95, T190 không đỏ ở run mới nhất.
+- Môi trường, skip có lý do: 5 test (T156:250, T158:362, T95:106, T95:138, T190:216). Chỉ skip khi store chặn; lỗi khác vẫn fail, có đếm vào `[429-tong-ket]`.
 - Test lệch sổ quyết định: 1 (T30 mobile), đã sửa.
 - Lỗi code: ES1-T303 (alt swatch) không còn chặn gate vì TC-12 đã bỏ.
 
@@ -36,14 +36,15 @@ Lượt 3 (CTO 11/11 14:36): chuyển từ phân loại sang sửa test để de
 - tests/e2e/TE-3.spec.ts: `test.skip` TC-12/TC-33, kèm comment lý do.
 - tests/e2e/ES1-T139.spec.ts: hằng `EMPTY_TAG`, page.route trong test AC-H16.
 - tests/e2e/ES1-T176.spec.ts, tests/e2e/support/figma-rows.json: chế độ `imageReportOnly` cho hàng 1.
-- tests/e2e/support/store-guard.ts: thêm `isStoreBlockedError`, `skipIfStoreBlocked` (chỉ dùng cho test được CTO cho phép; test khác giữ quy tắc ES1-T203 là fail rõ khi bị chặn).
+- tests/e2e/support/store-guard.ts: thêm `isStoreBlockedError`, `skipIfStoreBlocked` (chỉ dùng cho test được CTO cho phép; test khác giữ quy tắc ES1-T203 là fail rõ khi bị chặn). Lượt 4: comment ghi thêm T95 và T190 vào danh sách được phép.
+- tests/e2e/ES1-T95.spec.ts, tests/e2e/ES1-T190.spec.ts (lượt 4, CTO 11/11 16:12): bọc đúng 3 test.
 - tests/e2e/ES1-T156.spec.ts, tests/e2e/ES1-T158.spec.ts: bọc luồng thêm giỏ thật.
 - tests/e2e/ES1-T30.spec.ts (lượt 2).
-- drafts/qa/ES1-T300/repro/skip-blocked.repro.spec.ts: tự kiểm helper. Kết quả cục bộ đúng kỳ vọng: B1, B2 skipped; B3 failed (lỗi assertion được ném lại); B4 passed.
+- drafts/qa/ES1-T300/repro/skip-blocked.repro.spec.ts: tự kiểm helper. Kết quả cục bộ đúng kỳ vọng: B1, B2 skipped; B3 failed (lỗi assertion được ném lại); B4 passed. Lượt 4 thêm B5 (T95, `expectJsonAllowed` cf-mitigated) skipped, B6 (T190, 429) skipped, B7 (T190, HTTP 500) failed.
 
 ## 5. Tự kiểm tra và việc còn lại
 
-- `npx playwright test --list`: 2108 test trong 64 file, không lỗi biên dịch. Repo không có tsc nên chưa type-check.
+- `npx playwright test --list` (lượt 4): 2108 test trong 64 file, không lỗi biên dịch; dòng test T95 :106, :141 và T190 :216 vẫn liệt kê ở desktop và mobile. Repo không có tsc nên chưa type-check.
 - `npx playwright test -c drafts/qa/ES1-T300/repro/pw.repro.config.ts`: swatch-alt (lượt 2) và skip-blocked chạy đúng kỳ vọng.
 - Chưa chạy trên preview. Cần CI chạy store-tests trên PR của nhánh này để xác nhận e2e-gate xanh (DoD).
 - Còn mở: kiểm console preview develop xem có "Failed to resolve module specifier @shopify/partial-rendering" không (tách khỏi theme live); CTO chốt ngưỡng hàng 1 khi có fixture TE-17-R2-QA0.
