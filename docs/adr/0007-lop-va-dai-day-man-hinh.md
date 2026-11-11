@@ -1,7 +1,7 @@
 KHÔNG CHẮC: selector nút Shopify Inbox và tên API consent (`Shopify.customerPrivacy.shouldShowBanner()`, sự kiện `visitorConsentCollected`) lấy từ `docs/ui-spec/layers.md` §2.1, §5 (Designer ghi KHÔNG CHẮC); BE xác nhận trên store dev ở task TE-10-R2-BE1 trước khi merge.
 
 # 0007. Lớp, dải đáy màn hình và khung dialog chung
-Ngày: 2026-11-11 | Trạng thái: Đề xuất (ES1-T307, chờ CTO)
+Ngày: 2026-11-11 | Trạng thái: Chấp nhận (CTO duyệt 11/11/2026, ES1-T310; đề xuất ở ES1-T307)
 
 ## Bối cảnh
 - Thiết kế đã duyệt (BGĐ 11/11) có 13 lớp (`docs/ui-spec/layers.md` §4): drawer menu, mega menu, search, cart drawer, quickview, lightbox, drawer lọc, popup quiz, localization, 3 popup marketing, pickup dialog; 3 thanh dính đáy (sticky ATC, checkout bar cart < 64rem, bundle bar 360), teaser Big Offer, toast, nút Shopify Inbox, banner consent. SRS 0.4 TE-10 AC6–AC8, TE-18 AC2 bắt các phần tử này không chồng nhau.

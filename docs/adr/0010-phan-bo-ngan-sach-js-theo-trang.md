@@ -1,7 +1,7 @@
 KHÔNG CHẮC: số "hiện tại" là phép cộng tĩnh `wc -c` theo thẻ script và `data-lazy-module` trong `blocks/`, `layout/` ở develop `ce08212` (header có menu, `sticky_header` bật, cart drawer mọi trang); số đo thật theo URL chờ bước CI của ES1-T177.
 
 # 0010. Phân bổ ngân sách JS theo trang cho giai đoạn hoàn thiện theme (REQ-0002)
-Ngày: 2026-11-11 | Trạng thái: Đề xuất (ES1-T307, chờ CTO) | Bổ sung ADR 0006, không đổi trần
+Ngày: 2026-11-11 | Trạng thái: Chấp nhận (CTO duyệt 11/11/2026, ES1-T310; đề xuất ở ES1-T307) | Bổ sung ADR 0006, không đổi trần
 
 ## Bối cảnh
 - ADR 0006: mỗi trang JS theme tải sẵn ≤ 40 960 B, sau cuộn hết trang ≤ 65 536 B, mỗi file ≤ 8 192 B. SRS 0.4 AC-H31 chặn merge khi vượt.
@@ -51,5 +51,5 @@ C. Trần mỗi file giữ 8 192 B. Bảng trần dưới đây ghi vào DoD c�
 ## Hệ quả
 - Tốt: PDP về dưới 40 960; trang chủ sau cuộn về dưới 65 536 kể cả khi thêm `page-layers`, `modal-dialog`, `sale-countdown`, popup; có chỗ cho quick view, popup.
 - Xấu: featured product và quiz trễ ~1 vòng mạng ở lần tương tác đầu (markup chạy không JS nên vẫn mua/submit được); 6 file phải giảm byte (`motion`, `header-menu`, `cart-drawer`, `product-media`, `product-form`, `product-variant-picker` sau khi thêm tính năng).
-- Việc: BE `TE-10-R2-BE3` (`motion.js` ≤ 6 144, `lazy-module.js` interaction); `TE-1-R2-BE1` (tách `header-drawer.js`); `TE-3-R2-BE2` (gỡ `product-swatch.js` khỏi card); các task màn ghi trần ở DoD. DevOps hoàn tất bước đo theo URL ở ES1-T177.
+- Việc: BE `TE-10-R2-BE3` (`motion.js` ≤ 6 144, `lazy-module.js` interaction); `TE-22-R2-BE1` (`header-menu.js` ≤ 3 072, chỉ mega); `TE-1-R2-BE1` (tách `header-drawer.js` ≤ 4 096, lười); `TE-19-R2-BE1` (upsell cart page dùng lại `product-recommendations.js`, trần nâng 3 072 → 4 096, lười viewport, không tính vào tải sẵn cart); `TE-3-R2-BE2` (gỡ `product-swatch.js` khỏi card); các task màn ghi trần ở DoD. DevOps hoàn tất bước đo theo URL ở ES1-T177.
 - Đo: mỗi PR BE chạy `wc -c assets/*.js` (mọi file ≤ 8 192) và ghi phép cộng theo trang vào PR; CI ES1-T177 khi có: tải sẵn ≤ 40 960, sau cuộn ≤ 65 536 trên `/`, `/products/<demo>`, `/collections/all`, `/cart`, `/search?q=bench`; lhci perf desktop ≥ 96 (CI), nghiệm thu ≥ 98.

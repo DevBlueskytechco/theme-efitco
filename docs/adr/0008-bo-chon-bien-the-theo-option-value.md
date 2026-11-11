@@ -1,7 +1,7 @@
-KHÔNG CHẮC: (1) trang sản phẩm nhận `?option_values=<id>,<id>` khi gọi qua `partials.fetch` (Dawn dùng tham số này với Section Rendering API; theme không có sections) — task spike TE-4-R2-BE1 kiểm trên store dev trước khi FE/BE làm; không chạy thì phương án dự phòng ở "Hệ quả"; (2) AGENTS.md dòng 384–385 và 504 lấy `snippets/variant-json.liquid` làm ví dụ cho "JS đọc dữ liệu server": quyết định này bỏ snippet đó, CTO sửa ví dụ trong AGENTS.md (scope-guard chặn agent), câu hỏi ở ticket [Q] của ES1-T307.
+KHÔNG CHẮC: (1) trang sản phẩm nhận `?option_values=<id>,<id>` khi gọi qua `partials.fetch` (Dawn dùng tham số này với Section Rendering API; theme không có sections) — task spike TE-4-R2-BE1 kiểm trên store dev trước khi FE/BE làm; không chạy thì phương án dự phòng ở "Hệ quả". Đã chốt (ES1-T310 #2): CTO sửa tay 2 ví dụ `variant-json` trong AGENTS.md (dòng 384–385, 504) sang data-* trên radio option value (`snippets/product-variant-picker.liquid`) cùng PR TE-4-R2-FE2; thêm `modal-dialog`, `page-layers`, `sale-countdown` vào Theme map (gộp ES1-T194).
 
 # 0008. Bộ chọn biến thể theo option value, tên partial theo ngữ cảnh, quickview qua template thay thế
-Ngày: 2026-11-11 | Trạng thái: Đề xuất (ES1-T307, chờ CTO) | Bổ sung ADR 0002
+Ngày: 2026-11-11 | Trạng thái: Chấp nhận (CTO duyệt 11/11/2026, ES1-T310; đề xuất ở ES1-T307) | Bổ sung ADR 0002
 
 ## Bối cảnh
 - Sổ 10/11 "2048 biến thể", SRS 0.4 NFR-7, TE-4 AC13–AC16, TE-3 AC10: bộ chọn dựng từ option và option value, không vòng lặp biến thể, không JSON danh sách biến thể; sản phẩm > 250 biến thể phải đúng (TE-4 AC16).

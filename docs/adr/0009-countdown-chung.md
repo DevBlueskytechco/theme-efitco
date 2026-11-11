@@ -1,5 +1,5 @@
 # 0009. Một component countdown "Sale ends in" cho featured product, trang sản phẩm và big offer
-Ngày: 2026-11-11 | Trạng thái: Đề xuất (ES1-T307, chờ CTO)
+Ngày: 2026-11-11 | Trạng thái: Chấp nhận (CTO duyệt 11/11/2026, ES1-T310; đề xuất ở ES1-T307)
 
 ## Bối cảnh
 - Sổ 10/11 (P3–P5, audit (2)), 11/11 (CD1, CD2, ES1-T276); SRS 0.4 TE-4 AC17, TE-13 AC1, AC-H23, TE-18 AC6; `docs/ui-spec/countdown.md`. Ba nơi hiện countdown, cùng nguồn ngày: metafield sản phẩm `custom.sale_ends_at` trước, setting ngày của block sau; chỉ hiện khi ngày còn hạn, biến thể có giá gạch và còn hàng; số in sẵn bằng Liquid (CLS 0), JS chỉ cập nhật; hết giờ khi đang xem: "This sale has ended", không tự tải lại. Theme Store §8 (sổ 11/11 (7)): không đếm giả.
