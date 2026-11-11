@@ -311,7 +311,7 @@ CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions
 - `docs/ui-spec/marketing-popups.md` §4 "Không đè": thêm "thanh dính bundle trang chủ < 48rem → teaser nhấc theo `--bundle-bar-height`" và `kit.css` `.offer-teaser` thêm luật nhấc chung.
 - `kit.css` / foundation §17: `.toast-region` < 48rem cũng nhấc theo `--bundle-bar-height` khi thanh hiện (toast đang ở đáy cách 16 sẽ đè thanh).
 
-## Quyết định CTO cần chốt (ES1-T286)
+## Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11) (ES1-T286)
 
 1. Thanh hiện cả khi 0 món (nút disabled) hay chỉ khi ≥ 1 món? Đề xuất: hiện cả 0 món, để thấy số tăng khi chọn (14 #1097M).
 2. Toast < 48rem khi thanh bundle hiện: nhấc lên trên thanh như nút Big Offer? Đề xuất: có, cùng biến `--bundle-bar-height` (foundation §17).

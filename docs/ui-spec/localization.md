@@ -221,7 +221,7 @@ Token: `--color-background`, `--color-foreground`, `--color-muted`, `--color-mut
 - `docs/ui-spec/foundation.md` §4 (footer, hàng cuối) và §15 (drawer menu "localization"): trỏ spec này.
 - SRS TE-1 AC5 "country selector và language selector": BA ghi rõ đã thay bằng AC9 (1 nút gộp).
 
-## 11. Quyết định CTO cần chốt
+## 11. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. 1 nút gộp ở footer và chân drawer menu (bỏ 2 nút Currency / Language của navigation.md); ≥ 768 popover 2 cột, < 768 bottom sheet 2 tab, trong drawer là cấp 2? Đề xuất: có (TE-1 AC9, 15 §2 #9, 15 §1 một lớp).
 2. Ô tìm nước chỉ hiện khi > 10 nước (cùng hằng 10 của M5), không cờ trong từng hàng? Đề xuất: có (12 #560D, Performance sổ 09/11).

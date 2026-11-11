@@ -452,7 +452,7 @@ Default: từ chung, mỗi cụm khớp sản phẩm thật trong demo-data (Fle
 | `page.md` | aside FAQ | icon accordion theo §13 mới (không cam); PNG T258 render lại khi chạm trang |
 | `collection.md` | §9 S7 | (A12, ngoài ticket này) "card cũ mờ 40%" trái §18 "không làm mờ chữ" |
 
-## 26. Quyết định CTO cần chốt
+## 26. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. Chữ phụ trên mọi panel tối đổi về trắng 70% (6.56) kể cả chỗ Figma vẽ #B2B2B2 (bundle) và trắng 60% (shop the look, quiz) để một cặp màu toàn theme? Đề xuất: có (§2).
 2. "Popular searches" chuyển thành theme setting duy nhất, tối đa 5 cụm, bỏ setting ở header block và block search-results? Đề xuất: có (§24.1).

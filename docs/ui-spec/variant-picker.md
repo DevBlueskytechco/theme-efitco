@@ -211,7 +211,7 @@ Lệch code hiện tại (`snippets/product-variant-picker.liquid`):
 | không thu gọn | > 10 hiện 7 + "+N" | sổ M5 |
 | swatch ảnh `width: 88` | 36 / 72 (srcset) | §8 |
 
-## 13. Quyết định CTO cần chốt
+## 13. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. Add To Cart lúc đang tải biến thể giữ màu primary, `aria-disabled`, không spinner (spinner trên nút chỉ cho "đang thêm giỏ")? Đề xuất: có (§6).
 2. Chỉ báo màu trên card: ≤ 4 giá trị hiện hết, > 4 hiện 3 + "+N"? Đề xuất: có (§9, card 152 ở 360).

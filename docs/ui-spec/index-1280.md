@@ -164,7 +164,7 @@ Không thêm setting. Dùng sẵn: slideshow (`autoplay`, `overlay_opacity` ch�
 - `DESIGN.md` "Typography": display 80 ở 1280, 100 từ 1600.
 - `docs/ui-spec/index-mobile-a.md`, `-b.md`: dòng "Desktop 1280/1920 là chính Figma" trỏ sang spec này.
 
-## 8. Quyết định CTO cần chốt
+## 8. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 1. Chữ display ≥ 80rem dùng `min(display, 6.25vw)` (80 ở 1280, 100 từ 1600, 1920 không đổi) để Make fitness không đè ảnh rải và H1 hero cân thẻ? Đề xuất: có.
 2. Hero 1280: thẻ tràn mép (như panel footer, `--band-inset` 0) bo 16, chữ mép 20, mũi tên gộp góc dưới phải khi rìa < 100 (thay vì thẻ lùi 20 và chữ lùi vào cột 2, trái sổ 09/11)? Đề xuất: có.
 3. Hàng ngang 1280: card co để lộ ≥ 25% card kế (danh mục ≈ 271, review 360, video giữ 264), hàng vừa khung (blog 4 bài) thành lưới tĩnh không nút? Đề xuất: có.

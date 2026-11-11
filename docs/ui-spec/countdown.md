@@ -164,7 +164,7 @@ Ticket con theo `.claude/rules/fe-be-boundary.md`: FE1 snippet + CSS + locale (t
 - `marketing-popups.md` §4: thanh đếm ngược "theo countdown.md, cỡ Compact, 3 hoặc 4 ô"; setting "Sale end date" chỉ dùng khi sản phẩm không có metafield; dòng dữ liệu mockup "thời gian thật của khối featured product (`default_countdown_end`)" sửa thành "`custom.sale_ends_at` của sản phẩm"; trạng thái "Đếm ngược ẩn" thêm K3 khi thẻ đang mở. Render lại PNG T263 khi sửa.
 - `index-mobile-b.md` §10 Settings: ghi `countdown_end` là dự phòng (đã sửa §2 trong ticket này).
 
-## 12. Quyết định CTO cần chốt
+## 12. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. Thẻ big offer dùng cỡ Compact ở mọi mốc (popover 352 không đủ 4 ô Regular 367), thay vì nới popover lên 416? Đề xuất: Compact, giữ popover 400.
 2. Hết giờ khi đang xem (K3): giữ khung với "This sale has ended", giá và nút giữ nguyên tới khi tải lại, không tự tải lại trang? Đề xuất: có (0 CLS, giá thật do Shopify tính khi thanh toán).

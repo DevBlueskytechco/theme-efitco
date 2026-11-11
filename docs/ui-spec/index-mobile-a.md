@@ -292,7 +292,7 @@ CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions
 | `drafts/designer/ES1-T252/` | Xoá hoặc thêm `README` "ĐÃ THAY bởi ES1-T278" để không lẫn | Orchestrator |
 | 1280 (ticket trang chủ 1280 riêng) | Kiểm focal 25% ở khung thẻ 1280: thẻ gần tỉ lệ ảnh nên lệch nhỏ, chữ vẫn trên phông | Designer |
 
-## 15. Quyết định CTO cần chốt
+## 15. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. Chữ hero hiện dần lúc tải 400ms hay hiện ngay hoàn toàn? Đề xuất: hiện dần 400ms (§10), ảnh luôn hiện ngay.
 2. Focal point hero đặt trên file ảnh (Admin) hay thêm setting `image_position` cho slide? Đề xuất: focal point trên file, không thêm setting (Shopify có sẵn, merchant quen).

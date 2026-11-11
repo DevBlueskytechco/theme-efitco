@@ -153,7 +153,7 @@ Tương phản (số foundation §2, index-mobile-a §11):
 | Schema: `results_popup` default true; `empty_text` default copy T278 | `blocks/quiz.liquid`, locale schema | FE |
 | JS: mở popup ngay + skeleton, lỗi + Try Again, add to cart trong popup (status, giữ popup), quick view thay nội dung + Back, Retake, chặn popup marketing khi đang mở | `assets/quiz-dialog.js`, `assets/quiz-finder.js` (+ dùng lại quick view ES1-T262) | BE |
 
-## 10. Quyết định CTO cần chốt
+## 10. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. Add To Cart trong popup quiz giữ popup mở (nút "Added" + thông báo + số giỏ nhảy) thay vì đóng popup mở mini cart như TE-4 AC8 / TE-5 AC6, để người mua thêm tiếp từ shortlist? Đề xuất: có (§5 2d; 15 §1 một lớp popup).
 2. "Choose Options" / Quick View từ popup quiz thay nội dung trong cùng dialog, có "Back to shortlist", không mở lớp popup thứ hai? Đề xuất: có (§5 2f; 22 §6 #5).

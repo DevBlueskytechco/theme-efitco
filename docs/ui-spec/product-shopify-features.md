@@ -322,7 +322,7 @@ Lighthouse (SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90):
 
 Tách ticket theo `.claude/rules/fe-be-boundary.md`: FE trước (markup, `data-testid`: `product-volume-pricing`, `product-quantity-rules`, `product-selling-plan-frequency`, `product-subscription-policy`, `product-pickup-open`, `product-pickup-dialog`, `product-gift-card-error-*`, `cart-line-quantity-rule`, `cart-line-volume`), BE sau.
 
-## 17. Quyết định CTO cần chốt
+## 17. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. Selling plan dùng thẻ radio theo nhóm + select tần suất, giá chính đổi theo plan đang chọn (thay radio phẳng mọi plan của code)? Đề xuất: có (§4).
 2. Pickup mở dialog (drawer phải ≥ 768, bottom sheet < 768), giữ `<details>` chỉ khi không JS? Đề xuất: có (§7, 15 §2 #7).

@@ -135,7 +135,7 @@ Token dùng: `--color-background-dark(-foreground)`, `--color-background-alt`, `
 - `docs/ui-spec/navigation.md` §5.1 "Panel top 80" và §2 "Scrim: phủ trang từ đáy header": ghi rõ bám đáy header (y 124 khi bar hiện, y 80 khi đã cuộn).
 - `docs/ui-spec/foundation.md` §3: thêm dòng "announcement bar 44 nằm trên header, không dính" và trỏ spec này.
 
-## 10. Quyết định CTO cần chốt
+## 10. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. Bar dùng nền tối + noise liền header (gạch 1px), không thêm setting màu, không nút đóng, không xoay câu? Đề xuất: có (§1, AGENTS settings phẳng, 15 §5).
 2. Bar không dính, chỉ header 80 dính sau khi bar khuất; mega menu bám đáy header? Đề xuất: có (§4, 04 §3.8 sticky ≤ 80).

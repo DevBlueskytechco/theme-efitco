@@ -216,7 +216,7 @@ Mockup: ảnh card bundle P09/P10 (kettlebell, dây thừng) lệch tên "Adjust
 - `docs/ui-spec/navigation.md`: header thôi dính khi `max-height: 30rem` nếu CTO duyệt câu 3.
 - `docs/ui-spec/collection.md` §5, `search.md`, `mini-cart-quickview.md` §3.1, `predictive-search.md`: `scroll-padding` trong khung cuộn (layers §3); gắn `data-layer`.
 
-## Quyết định CTO cần chốt
+## Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. Shopify Inbox: theme tự dịch nút Inbox lên trên thanh đáy bằng CSS (`--bottom-bar-height`) và chừa làn 72 cho toast, hay chỉ hướng dẫn merchant chỉnh Inbox? Đề xuất: theme dịch + chừa làn, QA đo TE-10 AC6 ở 360 và 1280.
 2. Banner consent đang hiện: ẩn thanh dính đáy và teaser tới khi khách chọn? Đề xuất: có, toast vẫn hiện trên banner.

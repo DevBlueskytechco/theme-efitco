@@ -154,7 +154,7 @@ Gọi snippet chỉ từ `templates/` hoặc block trang (block `collection-prod
 - `drafts/designer/_kit/kit.css`: chuyển khối CSS `.pagination__*` (đang chép trong 5 mockup) vào kit để mockup sau dùng chung.
 - `drafts/designer/ES1-T256/search.html` S7: đổi sang class chung, chevron ↔ số 16, bỏ `aria-hidden` ở "Page X of Y".
 
-## 12. Quyết định CTO cần chốt
+## 12. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
 1. Bình luận bài viết dùng cùng tên nút "Previous page"/"Next page", ngữ cảnh đọc từ nav "Comment pages" (bỏ "Earlier/Later comments")? Đề xuất: có (§5, 06 §1).
 2. Dòng "Showing 25–37 of 37 results" dưới phân trang chỉ ở search (collection đã có số kết quả ở thanh công cụ, 08 #531D)? Đề xuất: có.
