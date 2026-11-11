@@ -1,5 +1,5 @@
 # 0012. Một snippet media sản phẩm cho PDP, featured product và quickview (rich media)
-Ngày: 2026-11-11 | Trạng thái: Đề xuất (ES1-T304, chờ CTO duyệt) | Bổ sung ADR 0008 (quickview template), ADR 0010 (ngân sách JS)
+Ngày: 2026-11-11 | Trạng thái: Chấp nhận (CTO 11/11, ES1-T304) | Bổ sung ADR 0008 (quickview template), ADR 0010 (ngân sách JS)
 
 ## Bối cảnh
 - Theme Store mục 4 yêu cầu rich media (video, YouTube/Vimeo, 3D) ở product template, featured product và quick view. Decisions 11/11 (6) và audit A#22, A#23 đã ghi yêu cầu này.

@@ -1,7 +1,7 @@
 KHÔNG CHẮC: chưa rõ Shopify lưu setting của static block trong template `.liquid` ở đâu khi merchant sửa bằng editor. Spike ES1-T331 sẽ trả lời. Nếu kết quả là không lưu được thì mục 2 phải đổi cách cấp nội dung demo, và Tech Lead sửa ADR này.
 
 # 0011. Logo, favicon toàn theme và nội dung mặc định trống: template không nhúng tài nguyên demo
-Ngày: 2026-11-11 | Trạng thái: Đề xuất (ES1-T304, chờ CTO duyệt) | Áp quyết định CTO ES1-T308 #1 và D10 của ES1-T307; bổ sung ADR 0004
+Ngày: 2026-11-11 | Trạng thái: Chấp nhận (CTO 11/11, ES1-T304) | Áp quyết định CTO ES1-T308 #1 và D10 của ES1-T307; bổ sung ADR 0004
 
 ## Bối cảnh
 - Rà soát Theme Store 11/11 (docs/design/shopify-audit-1111) có các lỗi CHẶN sau:
