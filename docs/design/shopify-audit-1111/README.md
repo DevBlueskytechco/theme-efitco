@@ -28,6 +28,6 @@ NÊN: menu code chỉ đọc 2 cấp (thiết kế 3); swatch dự phòng metafi
 
 ## 3. Cần CTO quyết
 
-1. Kiến trúc §5: yêu cầu 11/11 vẫn ghi template JSON, section groups cho header/footer, section Custom Liquid, `@app` ở main product và featured product. Theme đang block-first Skeleton, template `.liquid`, không thư mục `sections/` (ADR 0004, 22/10). Cần Shopify xác nhận bằng văn bản trước khi nộp; nếu không, phải thêm lớp JSON template + section groups.
+1. ~~Kiến trúc §5~~ ĐÃ CHỐT 11/11: giữ Skeleton block-first theo chuẩn "Shopify's Skeleton Theme is the only approved codebase for Theme Store development". Template .json, section groups, section Custom Liquid ở mục 5 là tài liệu cũ cho theme sections (không hỗ trợ Canvas), không áp dụng. Các dòng mục 5 trong bảng B ghi CHẶN coi là KHÔNG ÁP DỤNG.
 2. Ảnh demo có logo bên thứ ba (Nike, Gymshark, adidas, REP Fitness, Northern; video card có handle Instagram): §20 cần quyền chủ thương hiệu. Đề xuất: thay ảnh trước khi nộp (ảnh trang chủ hiện theo Figma 100%).
 3. Tên theme: "Efitco" là tên theme hay tên công ty khách (§18 cấm tên công ty).
