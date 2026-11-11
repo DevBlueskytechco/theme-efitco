@@ -489,7 +489,9 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
       await expect(card!.locator('[data-card-price]')).toHaveCount(1);
     });
 
-    test(`TC-12 TC-33 AC2: chọn swatch đổi ảnh, link ?variant=, giá, không reload, 0 console error (${path})`, async ({ page }, ti) => {
+    // ES1-T300: bỏ (lỗi thời). docs/srs.md TE-3 AC2 bản 0.3 (D9, ES1-T294): swatch card là chỉ báo aria-hidden, không bấm được; chọn màu qua Quick View (AC9).
+    // ES1-T306 đề xuất bỏ TC-12, TC-33. Đỏ ở run 42978078054 (TE-3.spec.ts:492) do lỗi alt khi hover rồi click (ES1-T303), hành vi sẽ bị gỡ theo AC2 0.3.
+    test.skip(`TC-12 TC-33 AC2: chọn swatch đổi ảnh, link ?variant=, giá, không reload, 0 console error (${path})`, async ({ page }, ti) => {
       const errors = trackErrors(page);
       const docs = trackDocuments(page);
       const card = await swatchCard(page, path);
