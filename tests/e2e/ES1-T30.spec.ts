@@ -212,13 +212,16 @@ test.describe('ES1-T30 autoplay', () => {
     await expect.poll(() => activeIndex(page), { timeout: AFTER_TICK }).toBe(1);
   });
 
-  test('focus bàn phím trong block giữ, rời focus chạy lại', async ({ page }) => {
+  test('focus bàn phím trong block giữ, rời focus chạy lại', async ({ page }, ti) => {
+    // ES1-T300: mobile ẩn next, back (docs/design/decisions.md 07/11, base.css @media max-width 47.99rem): focus nút pause (bật autoplay thì hiện) thay cho nút ẩn.
+    const target = page.getByTestId(ti.project.name === 'mobile' ? 'slideshow-pause' : 'slideshow-next');
     await enableAutoplay(page);
     await open(page);
-    await page.getByTestId('slideshow-next').focus();
+    await expect(target).toBeVisible();
+    await target.focus();
     await page.waitForTimeout(AFTER_TICK);
     expect(await activeIndex(page)).toBe(0);
-    await page.getByTestId('slideshow-next').blur();
+    await target.blur();
     await expect.poll(() => activeIndex(page), { timeout: AFTER_TICK }).toBe(1);
   });
 
