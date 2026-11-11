@@ -50,6 +50,8 @@
   /* Lưới card (Figma 1:1022): 1 / 2 / 3 / 4 cột */
   .article-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
   .article-grid .article-card__title { font-size: var(--font-size-lg); }
+  /* Shopify §7 Blog (11/11): trang blog hiện excerpt_or_content (truncatewords 20) */
+  .article-card__excerpt { margin: 0; color: color-mix(in srgb, var(--color-background-dark-foreground) 85%, transparent); font-size: var(--font-size-sm); line-height: calc(22 / 14); }
   /* Vòng 3: Figma 1:1030 padding 24 từ 48rem (code base.css cũng vậy; kit đang 16). Meta chữ trắng như code (ES1-T174), không #999 */
   .article-card__meta { color: var(--color-background-dark-foreground); }
   .article-card__meta span + span::before { content: '·'; margin-inline: var(--space-2); }
@@ -175,6 +177,7 @@
           <span class="badge badge--tag">Featured</span>
           <div class="article-card__content">
             <h2 class="article-card__title">Set up a perfect home gym in just 15m²</h2>
+            <p class="article-card__excerpt">A bench, adjustable dumbbells and a mat fit in a spare corner. Here is the layout we use.</p>
             <p class="article-card__meta"><span><time datetime="2026-11-04">Nov 4, 2026</time></span><span>5 min read</span></p>
           </div>
         </a>
@@ -185,6 +188,7 @@
           <span class="badge badge--tag">Diet plans</span>
           <div class="article-card__content">
             <h2 class="article-card__title">What to eat before and after a heavy session</h2>
+            <p class="article-card__excerpt">Simple carbs before, protein and water after: a timing guide for strength days.</p>
             <p class="article-card__meta"><span><time datetime="2026-11-02">Nov 2, 2026</time></span><span>7 min read</span></p>
           </div>
         </a>
@@ -195,6 +199,7 @@
           <span class="badge badge--tag">Diet plans</span>
           <div class="article-card__content">
             <h2 class="article-card__title">Rubber vs urethane: which plates last longer</h2>
+            <p class="article-card__excerpt">Rubber is quieter on concrete floors, urethane lasts longer and smells less. Here is how to choose.</p>
             <p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>5 min read</span></p>
           </div>
         </a>
@@ -229,6 +234,7 @@
           <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
           <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
         </ul>
+        <a class="shop-follow" href="#">Follow on <b>shop</b></a>
       </div>
       <div class="site-footer__menus">
         <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
@@ -247,7 +253,7 @@
     <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
     <div class="site-footer__end">
       <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
-      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
+      <ul class="payment-icons" aria-label="Payment methods"><li class="pi--disc">DISC</li><li class="pi--mc">MC</li><li class="pi--dc">DC</li><li class="pi--amex">AMEX</li><li class="pi--pp">PP</li></ul>
     </div>
   </div>
 </footer>
@@ -273,8 +279,8 @@
       </ul>
     </nav>
     <ul class="article-grid">
-      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__meta"><span><time datetime="2026-11-02">Nov 2, 2026</time></span><span>7 min read</span></p></div></a></li>
-      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>5 min read</span></p></div></a></li>
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__excerpt">Practical advice from our coaches on choosing, using and caring for your home gym gear.</p><p class="article-card__meta"><span><time datetime="2026-11-02">Nov 2, 2026</time></span><span>7 min read</span></p></div></a></li>
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__excerpt">Practical advice from our coaches on choosing, using and caring for your home gym gear.</p><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>5 min read</span></p></div></a></li>
     </ul>
   </section>
 
@@ -332,9 +338,9 @@
     <h2>Trạng thái: card không ảnh, không tag, không thời gian đọc · hover · focus</h2>
     <p class="demo-note">Không ảnh: nền --color-background-dark #1A1A1A (17.4:1). Không tag: không pill. article.content rỗng: ẩn thời gian đọc (AC-H27), còn ngày.</p>
     <ul class="article-grid">
-      <li><a class="article-card" href="#"><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span></p></div></a></li>
+      <li><a class="article-card" href="#"><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__excerpt">Practical advice from our coaches on choosing, using and caring for your home gym gear.</p><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span></p></div></a></li>
       <li><a class="article-card is-hover" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Featured</span><div class="article-card__content"><h3 class="article-card__title" style="text-decoration: underline; text-underline-offset: 0.1em">Set up a perfect home gym in just 15m²</h3><p class="article-card__meta"><span>Hover</span></p></div></a></li>
-      <li><a class="article-card" href="#" style="outline: 2px solid var(--color-accent); outline-offset: 2px"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__meta"><span>Focus</span></p></div></a></li>
+      <li><a class="article-card" href="#" style="outline: 2px solid var(--color-accent); outline-offset: 2px"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__excerpt">Practical advice from our coaches on choosing, using and caring for your home gym gear.</p><p class="article-card__meta"><span>Focus</span></p></div></a></li>
     </ul>
   </section>
 

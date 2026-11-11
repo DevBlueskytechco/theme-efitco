@@ -59,7 +59,7 @@ Code hiện có: `snippets/predictive-search.liquid` (dialog sau link `header-se
 4. Hàng tab (≥ 2 ký tự và có kết quả): All · Products n · Collections n · Articles n · Pages n. Chỉ hiện tab có kết quả.
 5. Thân (cuộn riêng): listbox gồm các nhóm theo thứ tự DOM Suggestions → Products → Collections → Articles → Pages.
    - Suggestions: tối đa 4 từ khoá, icon kính lúp 16, phần người mua đã gõ chữ thường 400, phần gợi ý thêm 600.
-   - Products: tối đa 4 ở tab All; ảnh, tên (tối đa 2 dòng), giá (sale đỏ + giá gạch), "Sold out" bằng chữ. Dạng card (lưới, desktop tab All): như card Figma 1:502 rút gọn: media 1:1 cream bo 12, badge -N% (`.badge--sale`) góc trái trên, tên 16/500 lh 26, giá; không rating, swatch (giữ gọn, chọn biến thể ở trang sản phẩm). Dạng hàng (ảnh 64): không badge, sale đọc từ giá đỏ + giá gạch.
+   - Products: tối đa 4 ở tab All; ảnh, tên (hiện đủ, không cắt), giá (sale đỏ + giá gạch), "Sold out" bằng chữ. Dạng card (lưới, desktop tab All): như card Figma 1:502 rút gọn: media 1:1 cream bo 12, badge -N% (`.badge--sale`) góc trái trên, tên 16/500 lh 26, giá; không rating, swatch (giữ gọn, chọn biến thể ở trang sản phẩm). Dạng hàng (ảnh 64): không badge, sale đọc từ giá đỏ + giá gạch.
    - Collections: icon lưới 16, tên, "N products" (14 muted) ở cuối hàng.
    - Articles: ảnh 64 × 48 bo 4, tiêu đề 2 dòng, ngày đăng 14 muted.
    - Pages: icon trang 16, tên.
@@ -146,7 +146,7 @@ Ca biên (demo-data `edge_cases`, khung 8):
 - Không ảnh ("Sản phẩm không có media"): placeholder icon ảnh `--color-muted-light` trên cream, không ảnh vỡ (DESIGN Images).
 - Hết hàng ("Hết hàng toàn bộ"): xếp cuối (`unavailable_products=last`), ảnh opacity 0.6, chữ "· Sold out" 14 muted cạnh giá (không chỉ dùng màu, 01).
 - Giá sale nhỏ ("Sale giá nhỏ" $0.99 / $1.99): giữ định dạng tiền `shop.money_format`.
-- Tên dài: cắt 2 dòng "…".
+- Tên dài: hiện đủ, xuống dòng, không cắt (Shopify §7).
 - Từ khoá dài: chữ trong nút chân xuống 2 dòng, không tràn (khung 4 ở 360).
 - Tên trùng ("FlexFold Adjustable Bench" ×2): dữ liệu thật, giữ; đã nêu ở ES1-T266.
 

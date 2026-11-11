@@ -105,7 +105,7 @@ Sổ 10/11: header trang con luôn là thanh tối riêng, không đè ảnh, k�
 | Đệm khối chữ | 32 / 24 | 32 / 24 | 48 | 48 |
 
 - Ảnh `object-fit: cover`, focal point của admin (`image_tag` gắn object-position).
-- Khối chữ đáy trái: breadcrumb trắng · h1 trắng · mô tả trắng tối đa 56ch, tối đa 3 dòng. Mô tả dài hơn: ĐỀ XUẤT đưa xuống dưới banner (nền trắng, muted) thay vì cắt chữ (06 "text over images"). 360: mô tả luôn dưới banner.
+- Khối chữ đáy trái: breadcrumb trắng · h1 trắng · mô tả trắng tối đa 56ch mỗi dòng, không cắt (Shopify §7: collection.description); dài hơn 3 dòng thì đưa xuống dưới banner. Mô tả dài hơn: ĐỀ XUẤT đưa xuống dưới banner (nền trắng, muted) thay vì cắt chữ (06 "text over images"). 360: mô tả luôn dưới banner.
 - Lớp tối (foundation §3.3): gradient `--color-background-dark` 75% ở đáy → 60% từ giữa lên. Chữ trắng trên ảnh trắng tuyệt đối sau lớp 60%: L nền 0.180 → 4.56:1; vùng đáy 75% → ≥ 7.3:1. Đạt AA với mọi ảnh merchant chọn.
 - Không ảnh nào khác eager khi có banner (ảnh banner là LCP).
 
@@ -161,7 +161,7 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 
 ## 8. Lưới card, phân trang
 
-- Card = foundation §9 (Figma 1:502): media 1:1 nền cream bo 12 không viền, badge góc, tiêu đề Inter 16/500 tối đa 2 dòng, giá, swatch 32 × 16 cách 4. Tiêu đề card h2 (code `heading_level: 'h2'`). Badge một góc: Sold out > -N% > New. Giá luôn hiện kể cả hết hàng (08 #452D).
+- Card = foundation §9 (Figma 1:502): media 1:1 nền cream bo 12 không viền, badge góc, tiêu đề Inter 16/500 hiện đủ, không cắt (yêu cầu Shopify §7, 11/11), giá, swatch 32 × 16 cách 4. Tiêu đề card h2 (code `heading_level: 'h2'`). Badge một góc: Sold out > -N% > New. Giá luôn hiện kể cả hết hàng (08 #452D).
 - Swatch là chỉ báo (foundation §9 vòng 3): `aria-hidden`, không bấm, không focus; tên link đọc thêm ", 3 colors". Nhiều hơn 3 màu: 3 swatch + "N colors" 14 muted.
 - Ca biên (S5, edge_cases): hết hàng toàn bộ → Sold out + ảnh 0.6; không media → placeholder; "Sale giá nhỏ" $0.99 / $1.99 → -50%; compare_at ($100) thấp hơn giá ($200) → không badge, không giá gạch; gift card → "From $10.00".
 - Phân trang 24 / trang (SRS AC1; giữ số trang thay Load more: link thật cho SEO, chạy không JS, 08 #2167D).

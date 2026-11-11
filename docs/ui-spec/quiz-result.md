@@ -49,7 +49,7 @@ Lý do 768 dùng 4 cột 154 thay 2 × 2: một hàng, popup không phải cuộ
 
 ## 4. Card kết quả
 
-Card foundation §9 (media 1:1 nền cream bo 12, badge, tiêu đề 16/500 tối đa 2 dòng, giá, swatch chỉ báo `aria-hidden`), thêm:
+Card foundation §9 (media 1:1 nền cream bo 12, badge, tiêu đề 16/500 hiện đủ, không cắt, giá, swatch chỉ báo `aria-hidden`), thêm:
 - Nút Quick View trên ảnh: nguyên ES1-T262 §4 (≥ 64rem hover: thanh 44 trượt lên; < 64rem / màn chạm: tròn 44 góc dưới). Đã chốt M1: mọi card cùng hành vi.
 - Nút dưới card (chỉ trong quiz, ĐỀ XUẤT, nguồn ticket + 08 #529D, 05 §5): secondary full width, cao 44, chữ 14/600, padding 12, icon túi + 20; `margin-block-start: auto` để các nút thẳng hàng; `z-index` trên link phủ card.
   - Sản phẩm 1 biến thể còn hàng: "Add To Cart" (sổ 07/11), tên đọc "Add To Cart: {title}".
