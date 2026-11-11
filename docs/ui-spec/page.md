@@ -72,6 +72,8 @@ Thứ tự DOM = thứ tự nhìn ở mọi mốc (intro → form → aside), fo
 
 ## 5. RTE (`.rte`)
 
+THAY (11/11, Shopify §8): dùng `.rte` chung foundation §28 (cũng cho mô tả sản phẩm, collection, bài viết).
+
 ĐỀ XUẤT (foundation §1, 03 §4, 06 §7.3); toàn bộ đọc token:
 - Đoạn 16, lh 1.7, `max-width: 65ch`; khoảng giữa khối 16.
 - h2 `--font-size-h2`, h3 `--font-size-h3` (heading 700); h4 Inter 600 18. Khoảng trên heading 48, dưới 12.

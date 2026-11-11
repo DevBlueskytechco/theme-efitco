@@ -181,6 +181,7 @@ Số lượng + nút:
 - Một hàng: ô số lượng 128 (− 44 · số 40 · + 44) + nút Add To Cart lấp phần còn lại, cách 12. Nhãn "Quantity" 14/600 phía trên ô (form có label thật). ĐỀ XUẤT stepper thay `input number` trần (12 §1 #2151D); không JS vẫn gõ số được. − khoá khi = 1.
 - Ô số lượng viền `--color-muted-light` (sổ 09/11), focus viền + outline accent.
 - Add To Cart: primary cam, icon túi 20 + "Add To Cart" (sổ 07/11; Figma 1:814). Cao 48 / 52, full phần còn lại.
+- Nút thanh toán nhanh có thương hiệu (Shop Pay, Apple Pay, G Pay, PayPal) do Shopify chọn và vẽ: giữ nguyên màu, theme chỉ chỉnh chiều cao/bo qua biến CSS chính thức (foundation §27).
 - Buy It Now (`payment_button`, mặc định bật): full width. Nút unbranded theo `.button--secondary` (viền foreground, hover đảo đen) để Add To Cart nổi nhất (10 §8 #791). Nút có thương hiệu (Shop Pay…) giữ màu của Shopify. "More payment options" link 14 gạch chân, cao 44, giữa.
 - Pickup (khi có): dưới Buy It Now, chữ 14, link "Check availability at other stores" (code có).
 

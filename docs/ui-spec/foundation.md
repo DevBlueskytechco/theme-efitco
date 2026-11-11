@@ -261,13 +261,13 @@ Anatomy: media 1:1 nền cream bo 12, KHÔNG viền, ảnh `contain` + `mix-blen
 - Kích thước: 152 / 232 / 292 / 336.
 - Hover: card nhấc 4px, ảnh scale 1.04 (hoặc ảnh 2), tiêu đề gạch chân. Focus: outline trên link tiêu đề.
 - ĐỀ XUẤT swatch (câu CTO 2): swatch trên card là chỉ báo, `aria-hidden`, không bấm, không focus; tên link đọc thêm ", 3 colors". Lý do: Figma swatch 32 × 16 cách 4 không thể thành vùng chạm 44 trên mobile (sổ 09/11) mà không phá bố cục; chọn màu ở trang sản phẩm / quickview. Desktop rê chuột lên swatch đổi ảnh card là tăng cường, không bắt buộc.
-- Hết hàng: badge Sold out, ảnh opacity 0.6 (05 §3), giá giữ. Không ảnh: placeholder SVG `--color-muted-light` trên cream. Tên dài: tối đa 2 dòng, cắt "…". Đang tải: §18.
+- Hết hàng: badge Sold out, ảnh opacity 0.6 (05 §3), giá giữ. Không ảnh: placeholder SVG `--color-muted-light` trên cream. Tên dài: hiện đủ, xuống dòng, không cắt (yêu cầu Shopify §7, 11/11): product.title not truncated; card cùng hàng căn đỉnh, giá theo ngay dưới tên. Đang tải: §18.
 
 A11y + Lighthouse: một link (tiêu đề, `::after` phủ card), ảnh alt = alt Shopify hoặc tên sản phẩm, `<img>` có width/height, chỉ hàng đầu collection không banner được eager, giá có chữ ẩn "Sale price"/"Regular price".
 
 ## 10. Card bài viết
 
-Figma 1:1022. Code `.article-card`. Ảnh 3/4 phủ kín bo 16 · gradient tối 50% → đáy · tag accent phải trên cách 12 · tiêu đề Inter 700 18/28 trắng tối đa 3 dòng · meta 14/500.
+Figma 1:1022. Code `.article-card`. Ảnh 3/4 phủ kín bo 16 · gradient tối 50% → đáy · tag accent phải trên cách 12 · tiêu đề Inter 700 18/28 trắng hiện đủ, không cắt (yêu cầu Shopify §7, 11/11) · meta 14/500.
 - Hover: nhấc 6px + bóng, ảnh scale 1.04, tiêu đề gạch chân. Focus outline accent. Không ảnh: nền dark (17.4).
 - ĐỀ XUẤT: gradient bắt đầu 50% (code 63.72%) để tiêu đề 3 dòng luôn trên vùng tối (06; 14 #290D). Ảnh `alt=""`, tên đọc từ tiêu đề.
 
@@ -456,3 +456,32 @@ Default: từ chung, mỗi cụm khớp sản phẩm thật trong demo-data (Fle
 
 1. Chữ phụ trên mọi panel tối đổi về trắng 70% (6.56) kể cả chỗ Figma vẽ #B2B2B2 (bundle) và trắng 60% (shop the look, quiz) để một cặp màu toàn theme? Đề xuất: có (§2).
 2. "Popular searches" chuyển thành theme setting duy nhất, tối đa 5 cụm, bỏ setting ở header block và block search-results? Đề xuất: có (§24.1).
+
+## 27. Nút và icon có thương hiệu (yêu cầu Shopify Theme Store §4, §7, CTO 11/11)
+
+Nguồn: https://shopify.dev/docs/storefronts/themes/store/requirements ("The branded dynamic and accelerator checkout button colors must not be modified"; Follow on Shop cùng quy tắc; payment icons full color; gift card Apple Wallet) và https://shopify.dev/docs/storefronts/themes/pricing-payments/accelerated-checkout.
+
+| Thành phần | Ai vẽ | Theme được chỉnh | Theme KHÔNG được |
+| --- | --- | --- | --- |
+| Accelerated checkout PDP (`{{ form \| payment_button }}`) và cart / drawer (`content_for_additional_checkout_buttons`) | Shopify (Shop Pay tím #5A31F4, Apple Pay đen, G Pay đen, PayPal vàng…) | chỉ biến CSS chính thức: `--shopify-accelerated-checkout-button-block-size` (25–55, đề xuất 52 PDP, 48 cart, 44 drawer), `-border-radius` (= `--radius-button`), `-box-shadow` (none), `-inline-alignment`, `-row-gap`, `-button-inline-size` (cart), skeleton (`--color-background-alt`); vị trí, khoảng cách của khối bao | màu nền, màu chữ, logo, viền, filter/opacity, selector vào HTML bên trong (shadow DOM đóng) |
+| Nút unbranded "Buy it now" (`.shopify-payment-button__button--unbranded`) | Shopify, không thương hiệu | được theo nút theme (`button--secondary`, product §5) | — |
+| Shop Pay Installments (`{{ form \| payment_terms }}`) | Shopify (logo shop Pay tím) | vị trí, cỡ/màu chữ thường của câu | màu logo Shop Pay |
+| Follow on Shop (`{{ shop \| login_button: action: 'follow' }}`) | Shopify (nút tím) | vị trí | màu nút |
+| Icon thanh toán (`shop.enabled_payment_types` + `payment_type_svg_tag`) | Shopify, FULL COLOR | kích thước, khoảng cách | đơn sắc, grayscale, đổi màu (Figma vẽ chip đơn sắc: lệch Figma có chủ đích) |
+| Apple Wallet (gift card, `gift-card/add-to-apple-wallet.svg \| shopify_asset_url`) | huy hiệu chính thức Apple | vị trí, cao ≥ 44 giữ tỉ lệ | màu, chữ, vẽ lại nút |
+
+Nền tối (panel #393942, footer, drawer): đặt nút có thương hiệu nguyên màu, không viền/lớp phủ thêm. Mockup minh hoạ bằng màu thương hiệu thật (`kit.css` `.brand-btn`, `.brand-shoppay`, `.apple-wallet`, `.payment-icons .pi--*`), không vẽ nút theo màu theme, không ô nét đứt.
+
+## 28. Rich text chung `.rte` (Shopify §8, CTO 11/11)
+
+Một component cho mọi nội dung merchant: mô tả sản phẩm, mô tả collection, nội dung page, bài viết, block rich text. Thay §4 article.md và §5 page.md.
+- Đoạn 16, lh 1.7, `max-width: 65ch` (trong cột đọc), khoảng giữa khối 16.
+- h2 `--font-size-h2`, h3 `--font-size-h3`, h4 Inter 600 20, h5 Inter 600 18, h6 Inter 600 16 uppercase ls 0.04em (6 cấp khác nhau về hình, Shopify §12); khoảng trên heading 48 (h2), 32 (h3–h6), dưới 12.
+- Link: gạch chân 1px offset 0.2em, 500; hover accent.
+- ul/ol thụt 24, gap 8, marker `--color-muted`.
+- blockquote: viền inline-start 4px accent, chữ heading 700 cỡ h3, không nghiêng, nguồn 14/500 muted.
+- Ảnh full cột bo `--radius-card`, chú thích 14 muted; bảng `.rte table { display: block; overflow-x: auto; }`; `hr` 1px border cách 48.
+
+## 29. Footer: Follow on Shop (Shopify §4, CTO 11/11)
+
+Nút `{{ shop | login_button: action: 'follow' }}` (Shopify vẽ, tím, §27) dưới hàng social media icons, căn trái, cách 16; chỉ hiện khi shop bật Shop. Không đổi màu.

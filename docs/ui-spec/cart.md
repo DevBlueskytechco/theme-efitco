@@ -118,6 +118,7 @@ Sắp xếp:
 - Dưới nút: icon khiên 18 + "Secure checkout" 14 `--panel-muted` và icon thanh toán (`shop.enabled_payment_types`, `payment_type_svg_tag`, nền trắng). ĐỀ XUẤT, 12 §1 Must.
 - Focus trong panel: outline trắng 2px (accent trên panel chỉ 2.28:1, giống quy tắc header/footer tối).
 - Không liệt kê lại sản phẩm trong panel (khác 1:723): dòng hàng đã ở cột trái, lặp làm dài trang mobile.
+- Nút accelerated có thương hiệu giữ nguyên màu Shopify (Shop Pay tím, G Pay đen…), chỉ chỉnh chiều cao/bo qua biến CSS (foundation §27); icon thanh toán full color.
 - Accelerated: "or pay with" giữa 2 gạch (nền trắng, ngoài panel), nút Shopify vẽ; khối chừa `min-height` = control + 32 để không xô layout khi script gắn nút.
 
 Màu dẫn xuất trên panel (không phải token mới, `color-mix` trên token như menu header 60% của foundation §2):

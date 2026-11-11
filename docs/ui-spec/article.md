@@ -93,6 +93,8 @@ Cột đọc 46rem ≈ 65 ký tự ở chữ 18 (F§1 `max-inline-size: 65ch`, 0
 
 ## 4. Nội dung bài (RTE)
 
+THAY (11/11, Shopify §8: RTE nhất quán mọi template): dùng `.rte` chung foundation §28; các dòng dưới chỉ còn để đối chiếu.
+
 ĐỀ XUẤT (06 §3 eye comfort, 03 §4, F§6 text link):
 - Đoạn cách nhau 24; h2 `--font-size-h2` cách trên 48, dưới 16; h3 `--font-size-h3` cách trên 32.
 - Danh sách thụt 24, cách mục 8, marker accent.

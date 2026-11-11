@@ -58,7 +58,7 @@ Figma desktop: header (eyebrow "Build your bundle", h2 "Pick Your Kit, Save As Y
 | --- | --- | --- |
 | Header | eyebrow, h2, link "View Preset Bundles" xếp dọc, link cao 44 | `1fr auto`: link bên phải căn đáy h2 (như Figma) |
 | Lưới | 2 cột 152, gap 16, 3 hàng | 3 cột 232, gap 16, 2 hàng (giữ bố cục 3 × 2 của Figma) |
-| Card | padding 8, ảnh 136, dấu chọn 24 cách góc 8; tên 16/500 tối đa 2 dòng; giá 16/500 | padding 12, ảnh 208, dấu 24 cách góc 12 |
+| Card | padding 8, ảnh 136, dấu chọn 24 cách góc 8; tên 16/500 hiện đủ, không cắt; giá 16/500 | padding 12, ảnh 208, dấu 24 cách góc 12 |
 | Panel | dưới lưới cách 32; 1 cột; padding 24; bo 16 | dưới lưới cách 32; ĐỀ XUẤT 2 cột 316 + 316, gap 32: trái tiêu đề + đếm + danh sách, phải tạm tính → nút; padding 32 |
 | Nút | "Add Bundle To Cart" full, cao 48 | như 360 |
 
@@ -141,6 +141,8 @@ Việc FE / BE (theo `fe-be-boundary.md`): FE1 markup thanh (in sẵn `hidden`, 
 
 ## 2. Featured product (Figma 1:759)
 
+Rich media (Shopify §4, 11/11): gallery featured product hiện cả video, YouTube/Vimeo, 3D của sản phẩm (cùng product-media PDP: poster + play 52, "View in 3D"), không lọc chỉ ảnh.
+
 Figma desktop: 2 cột; trái thẻ ảnh 668 × ~652 nền cream viền nhạt bo 16, dấu tròn "Efitco · Feature Product" 113 góc trên trái; phải eyebrow "Featured Product · Free Weights", h2 48, đồng hồ nền #1A1A1A ("Sale ends in" + 3 ô 44), giá sale + giá gạch + badge -24%, sao (4.9) | 341 reviews, mô tả, bảng 4 thông số xen kẽ sand/trắng, 2 nút "Add To Cart" (accent, icon túi) + "View Detail" (nền xám nhạt viền, mũi tên).
 
 | | 360 | 768 |
@@ -219,7 +221,7 @@ Figma desktop: nền trắng; eyebrow "From the Efitco blog", h2 "Training Tips 
 | Card | 252 × 336, lộ 72 px card kế | 307 × 410, lộ ~100 px card 3 |
 | Tiến trình | thumb 32% | thumb 59% |
 
-- Card theo foundation §10 (gradient từ 50%, cả card là link, tiêu đề tối đa 3 dòng). Dữ liệu: 4 bài trong `figma-blog`, mới nhất trước; read time lấy Figma (2, 5, 7, 5).
+- Card theo foundation §10 (gradient từ 50%, cả card là link, tiêu đề hiện đủ, không cắt). Dữ liệu: 4 bài trong `figma-blog`, mới nhất trước; read time lấy Figma (2, 5, 7, 5).
 - Không thêm link "View all" (Figma không có); 07 §G muốn đường vào blog → menu header có "Blog", đủ.
 - Trạng thái: không ảnh → nền tối (17.4:1); đang tải → skeleton 3:4; blog rỗng → khối không in (như code).
 

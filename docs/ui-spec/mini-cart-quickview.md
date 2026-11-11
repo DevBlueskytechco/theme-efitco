@@ -68,10 +68,11 @@ Drawer phải (foundation §15), `<dialog>` + `showModal()` như code.
    4. Ghi chú đơn `<details>` đóng sẵn: "Add order note" + icon bút; mở ra label "Order note" + textarea 96 + gợi ý.
    5. Gợi ý "Pairs Well With" (chờ ES1-T247): 2 hàng.
 3. Footer dính đáy = panel tối (vòng 3b, cart G3, Figma 1:718): nền `--color-background-panel`, bo `--radius-card + --space-1` (16), cách mép drawer 12 (< 48rem) / 16, padding 24 / 32, chữ `--color-background-dark-foreground`. Thứ tự: [Subtotal 14/500 trắng 70% · từng discount: icon tag 14 + mã, số "-$x" xanh nhạt 14/500 · vạch 1px `--color-muted`] (chỉ khi có discount cấp giỏ) · Total: nhãn Inter 500 16, số Inter 700 18 (Figma 1:756, 1:757) · "Taxes and shipping calculated at checkout." 14 trắng 70% · nút Checkout full width cao 52, chữ + mũi tên 16 × 14 bên phải (Figma 1:758) · accelerated checkout (Shopify render, TE-5 AC1 bật mặc định). Focus trong panel: outline 2px trắng. Màu trộn bằng `color-mix` từ token có sẵn, không thêm token: chữ phụ `color-mix(dark-foreground 70%, panel)`, xanh `color-mix(badge-new 50%, dark-foreground)`.
+   Nút accelerated trong panel tối: Shopify vẽ, giữ màu thương hiệu (Shop Pay tím, G Pay đen), không ô nét đứt, không viền thêm (foundation §27).
 
 Dòng hàng (`.cd-line`):
 - Ảnh 72 (< 48rem) / 96, nền cream, bo 8, `contain` + `mix-blend-mode: darken` như card; link ẩn khỏi tab (`tabindex="-1" aria-hidden`), chỉ tiêu đề là link.
-- Hàng trên: tiêu đề 16/500, tối đa 2 dòng, link PDP (12 §1: tên là link) · nút thùng rác 44 (12 §1 audit: remove lên đầu, icon thùng rác).
+- Hàng trên: tiêu đề 16/500, hiện đủ, không cắt, link PDP (12 §1: tên là link) · nút thùng rác 44 (12 §1 audit: remove lên đầu, icon thùng rác).
 - Option "Color: Black" 14 muted (giá trị foreground); properties, selling plan như code.
 - Giá đơn vị: sale `--color-sale` + compare-at gạch 14 muted; discount dòng (code có) 14 sale.
 - Hàng dưới: stepper − [n] + (44 cao, mỗi ô 44) · tổng dòng 16/600 căn phải.
@@ -112,7 +113,7 @@ Dialog cỡ M (foundation §16), `<dialog>` + `showModal()`, `aria-labelledby` t
 
 1. Nút đóng tròn 48, góc phải trên cách 24 (12 mobile).
 2. Đầu: eyebrow vendor (accent, Sofia 16/800 uppercase ls 0.04em, Figma 1:771) · cách 12 · h2 tên sản phẩm Sofia 700 (`--font-heading--weight`), `--font-size-h2`, ls −0.02em (Figma 1:772 là 48/58; dialog dùng h2 36 vì cột chỉ 408), chừa 56 bên phải cho nút đóng.
-3. Media: ảnh chính 1:1 nền cream bo 16 `contain` (Figma 1:759) · cặp chevron tròn 52 (`.round-button`, kit) góc phải dưới cách 16, cách nhau 8: trắng viền border, rê chuột cam; ở ảnh đầu/cuối `aria-disabled` opacity 0.35 (code `.carousel-nav__button`) · thumbnail 64 (72 từ 80rem) bo 8, đang chọn viền 2px foreground, tối đa 5. Mobile: dải ảnh vuốt (mỗi ảnh 78% bề ngang, lộ ảnh sau, 15 §5) + thanh tiến trình mảnh, không chevron, không thumbnail (sổ 09/11).
+3. Media (Shopify §4 rich product media, 11/11: quick view phải hiện video, YouTube/Vimeo, 3D như PDP; dùng chung product-media: poster + nút play 52, 3D poster + nút "View in 3D", bấm mới tải; thumbnail có icon loại media): ảnh chính 1:1 nền cream bo 16 `contain` (Figma 1:759) · cặp chevron tròn 52 (`.round-button`, kit) góc phải dưới cách 16, cách nhau 8: trắng viền border, rê chuột cam; ở ảnh đầu/cuối `aria-disabled` opacity 0.35 (code `.carousel-nav__button`) · thumbnail 64 (72 từ 80rem) bo 8, đang chọn viền 2px foreground, tối đa 5. Mobile: dải ảnh vuốt (mỗi ảnh 78% bề ngang, lộ ảnh sau, 15 §5) + thanh tiến trình mảnh, không chevron, không thumbnail (sổ 09/11).
 4. Giá (Figma 1:783, hàng cao 28, cách 8): sale 18/600 đỏ · compare-at 16 gạch muted · badge -N% (pill 28, kit `.badge--sale`). Không lặp badge trên ảnh. Không giá sale: giá foreground, không badge. `price_varies`: giá theo biến thể đang chọn.
 5. Rating (chỉ khi có metafield `reviews.rating`, như card AC-H13): sao 14 + "(4.9)" + gạch đứng + "341 reviews" 14 muted (Figma 1:786, cách giá 8).
 6. Mô tả (chỉ khi có): Inter 16/500 lh 26 muted (Figma 1:797), cắt 3 dòng "…". Demo-data không có.

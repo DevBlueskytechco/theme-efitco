@@ -39,7 +39,7 @@ Thứ tự giữ nguyên ở mọi mốc (06 §2).
 3. Tiêu đề trang (F§5): eyebrow "From the Efitco blog" (Figma 1:1024, accent) · h1 `{blog.title}` · meta số bài ("4 articles"; trang tag: "2 articles tagged Diet plans").
 4. Lọc chủ đề: `<nav aria-label="Blog topics">` + `<ul>` link thật tới `{blog.url}/tagged/{tag | handle}`; mục đầu "All" về `blog.url`. Dáng tab F§7, mục đang xem `aria-current="page"` (nền foreground, chữ background). Nguồn `blog.all_tags`, thứ tự chữ cái như Shopify trả.
 5. Bài nổi bật (trang 1, không lọc tag, setting bật): bài mới nhất. Ảnh 4/3 bo 16 · tag pill (tag đầu) · h2 tiêu đề (link duy nhất, `::after` phủ cả khối) · excerpt (`article.excerpt_or_content | strip_html | truncatewords: 30`) · meta: ngày · thời gian đọc.
-6. Lưới card: các bài còn lại, card Figma 1:1022 (snippet `article-card`): ảnh 3/4 phủ kín + gradient, tag pill accent phải trên cách 12, nội dung padding 16 (24 từ 48rem, Figma 1:1030), tiêu đề Inter 700 18/28 trắng tối đa 3 dòng, meta 14/500 chữ trắng "Nov 4, 2026 · 5 min read".
+6. Lưới card: các bài còn lại, card Figma 1:1022 (snippet `article-card`): ảnh 3/4 phủ kín + gradient, tag pill accent phải trên cách 12, nội dung padding 16 (24 từ 48rem, Figma 1:1030), tiêu đề Inter 700 18/28 trắng hiện đủ, không cắt (yêu cầu Shopify §7, 11/11); dưới tiêu đề trích đoạn `article.excerpt_or_content | strip_html | truncatewords: 20` 14/22 trắng 85% (bắt buộc ở trang blog, Shopify §7 Blog: excerpt_or_content; thay quyết định B1 10/11 cho trang blog; block blog posts trang chủ giữ Figma), meta 14/500 chữ trắng "Nov 4, 2026 · 5 min read".
 7. Phân trang (khi số bài > Articles per page).
 8. Footer (F§4).
 

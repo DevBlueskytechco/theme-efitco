@@ -139,8 +139,6 @@
   .accelerated { display: grid; gap: var(--space-2); min-height: calc(var(--control-height) + var(--space-6)); }
   .accelerated__or { display: flex; align-items: center; gap: var(--space-3); color: var(--color-muted); font-size: var(--font-size-sm); }
   .accelerated__or::before, .accelerated__or::after { content: ''; flex: 1; height: 1px; background: var(--color-border); }
-  .accelerated__buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
-  .pay-button { display: grid; place-items: center; min-height: var(--control-height); border-radius: var(--radius-button); background: var(--color-foreground); color: var(--color-background); font-weight: 700; }
 
   /* Thanh checkout dính đáy mobile (ĐỀ XUẤT) */
   .sticky-checkout { display: flex; align-items: center; gap: var(--space-4); padding: var(--space-3) var(--page-margin); background: var(--color-background-panel); color: var(--color-background-dark-foreground); box-shadow: 0 calc(var(--space-1) * -1) var(--space-4) color-mix(in srgb, var(--color-foreground) 16%, transparent); }
@@ -317,11 +315,12 @@
           <p class="summary__total"><span>Total</span><span data-testid="cart-total">$461.99</span></p>
           <p class="summary__note">Taxes and shipping calculated at checkout.</p>
           <a class="button button--full" href="#" data-testid="cart-checkout">Checkout<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
-          <div class="summary__secure"><span><svg aria-hidden="true"><use href="#i-shield"/></svg>Secure checkout</span><ul class="payment-icons" aria-label="Payment methods"><li>VISA</li><li>MC</li><li>AMEX</li><li>PP</li></ul></div>
+          <div class="summary__secure"><span><svg aria-hidden="true"><use href="#i-shield"/></svg>Secure checkout</span><ul class="payment-icons" aria-label="Payment methods"><li class="pi--visa">VISA</li><li class="pi--mc">MC</li><li class="pi--amex">AMEX</li><li class="pi--pp">PP</li></ul></div>
         </section>
         <div class="accelerated" data-testid="cart-page-accelerated">
           <p class="accelerated__or">or pay with</p>
-          <div class="accelerated__buttons" aria-label="Express checkout, rendered by Shopify"><span class="pay-button">Shop Pay</span><span class="pay-button">G Pay</span></div>
+          <div class="accelerated__buttons brand-buttons" aria-label="Express checkout, rendered by Shopify"><span class="brand-btn brand-btn--shop-pay"><b>shop</b>Pay</span><span class="brand-btn brand-btn--gpay">G Pay</span></div>
+          <p class="brand-note">Shopify renders these buttons and their brand colors; the theme only sets height and corner radius.</p>
         </div>
       </div>
     </div>
@@ -388,6 +387,7 @@
           <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
           <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
         </ul>
+        <a class="shop-follow" href="#">Follow on <b>shop</b></a>
       </div>
       <div class="site-footer__menus">
         <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
@@ -406,7 +406,7 @@
     <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
     <div class="site-footer__end">
       <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
-      <ul class="payment-icons" aria-label="Accepted payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
+      <ul class="payment-icons" aria-label="Accepted payment methods"><li class="pi--disc">DISC</li><li class="pi--mc">MC</li><li class="pi--dc">DC</li><li class="pi--amex">AMEX</li><li class="pi--pp">PP</li></ul>
     </div>
   </div>
 </footer>
