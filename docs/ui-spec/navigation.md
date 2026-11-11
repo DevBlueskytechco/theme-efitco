@@ -104,7 +104,7 @@ Chữ cố định qua locale `blocks.header.*` (không setting): `menu_title` "
 | A: tiêu đề cột | 14/600 uppercase, tracking 0.04em, `--color-muted`, cao 40 | | kit `.mega__title` |
 | A: link | Inter 16/400, cao 40, `--color-foreground` | | foundation §14 |
 | A: "View all …" | 16/600, gạch chân, mũi tên 16 × 13 | | 14 §1, 18 C2 |
-| Card sản phẩm | nền cream, bo 12, padding 16; ảnh 3/2 bo 8 nền trắng `contain`; eyebrow 14/800 accent; tên 18/600 tối đa 2 dòng; giá 16 | ảnh 367 × 245 | `--radius-card`, `--color-background-cream` |
+| Card sản phẩm | nền cream, bo 12, padding 16; ảnh 3/2 bo 8 nền trắng `contain`; eyebrow 14/800 accent; tên 18/600 hiện đủ, không cắt; giá 16 | ảnh 367 × 245 | `--radius-card`, `--color-background-cream` |
 | B: tiêu đề + View all | heading 700 28 trái; text link phải; cách hàng ô 24 | | `--font-size-h3`, `--space-5` |
 | B: ô | 5 cột × 229, gap 24; ảnh 229 × 150 bo 16 | 5 × 264, ảnh 264 × 173 | Figma 1:404 ảnh 336 × 220 bo 16 |
 | B: chữ dưới ảnh | cách ảnh 12; tên 16/600; số 14 muted | | |
@@ -183,7 +183,7 @@ Figma không có trạng thái nào; tất cả ĐỀ XUẤT (05 §3, 05 §6–7
 | Sản phẩm nổi bật không media (edge_cases "Sản phẩm không có media") | placeholder icon | như desktop |
 | Sản phẩm nổi bật hết hàng ("Hết hàng toàn bộ") | badge "Sold out" (foreground/background), ảnh mờ 60%, giá giữ | như desktop |
 | compare_at_price ≤ price ("Sản phẩm có màu sale và màu không sale") | không badge, không giá gạch | như desktop |
-| Tên dài | tối đa 2 dòng, cắt "…" (card); link menu xuống dòng tự nhiên | như desktop |
+| Tên dài | hiện đủ, không cắt (card, Shopify §7); link menu xuống dòng tự nhiên | như desktop |
 | Chưa chọn sản phẩm nổi bật | không card, cột giãn | không card |
 | Menu trống, theme editor | chữ `blocks.header.menu_placeholder` giữa thanh tối, `--color-muted-on-dark` 14 | chữ xuống dòng dưới logo |
 | Menu trống, storefront | không menu, không nút menu; logo trái, icon phải | như desktop |

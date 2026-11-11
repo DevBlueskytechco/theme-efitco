@@ -333,7 +333,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .article-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 50%, var(--color-background-dark)); }
 .article-card .badge { position: absolute; z-index: 2; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); }
 .article-card__content { position: relative; z-index: 2; display: grid; gap: var(--space-1); padding: var(--space-4); }
-.article-card__title { margin: 0; font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: -0.01em; line-height: calc(28 / 18); display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.article-card__title { margin: 0; font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: -0.01em; line-height: calc(28 / 18); }
 .article-card:hover .article-card__title { text-decoration: underline; text-underline-offset: 0.1em; }
 .article-card__meta { font-size: var(--font-size-sm); font-weight: 500; line-height: calc(22 / 14); }
 .article-card:focus-visible { outline-color: var(--color-accent); }
@@ -475,6 +475,9 @@ select.field__input { appearance: none; padding-inline-end: var(--space-7); back
 .site-footer__social a { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; color: var(--color-muted-on-dark); transition: color var(--motion-fast) var(--ease-out); }
 .site-footer__social a:hover { color: var(--color-background-dark-foreground); }
 .site-footer__social svg { width: 28px; height: 28px; }
+/* Follow on Shop (Shopify §4, foundation §29): nút Shopify vẽ, tím, không đổi màu */
+.shop-follow { display: inline-flex; align-items: center; gap: 6px; min-height: 36px; margin-block-start: var(--space-4); padding: 0 14px; border-radius: 999px; background: #5A31F4; color: #FFFFFF; font: 600 14px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-decoration: none; }
+.shop-follow b { font-weight: 800; letter-spacing: -0.03em; }
 .site-footer__menus { display: grid; }
 .site-footer__menu summary, .site-footer__menu-title { display: flex; align-items: center; justify-content: space-between; min-height: 52px; margin: 0; font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: -0.01em; line-height: 1.5; list-style: none; cursor: pointer; }
 .site-footer__menu summary::-webkit-details-marker { display: none; }
@@ -495,7 +498,14 @@ select.field__input { appearance: none; padding-inline-end: var(--space-7); back
 .site-footer__locale > svg:last-child { width: 9px; height: 5px; }
 .payment-icons { display: flex; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
 .site-footer__field .button { flex: 1 1 100%; }
-.payment-icons li { display: grid; place-items: center; width: 38px; height: 24px; border-radius: var(--space-1); background: var(--color-background-dark-foreground); color: var(--color-background-dark); font-size: var(--font-size-xs); font-weight: 700; letter-spacing: -0.04em; }
+.payment-icons li { display: grid; place-items: center; width: 38px; height: 24px; border: 1px solid #D9D9D9; border-radius: var(--space-1); background: #FFFFFF; font-size: var(--font-size-xs); font-weight: 800; letter-spacing: -0.04em; }
+/* Yêu cầu Shopify §7 Layout (11/11): icon thanh toán FULL COLOR (code: payment_type_svg_tag). Mockup minh hoạ màu thương hiệu, không đơn sắc. */
+.payment-icons .pi--visa { color: #1A1F71; font-style: italic; }
+.payment-icons .pi--mc { color: transparent; background: radial-gradient(circle at 38% 50%, #EB001B 0 7px, transparent 7.5px), radial-gradient(circle at 62% 50%, #F79E1B 0 7px, transparent 7.5px), #FFFFFF; }
+.payment-icons .pi--disc { color: #E55C20; }
+.payment-icons .pi--dc { color: #0079BE; }
+.payment-icons .pi--amex { border-color: #006FCF; background: #006FCF; color: #FFFFFF; }
+.payment-icons .pi--pp { color: #003087; }
 @media (min-width: 48rem) {
   .site-footer__band { grid-template-columns: auto minmax(0, 1fr); column-gap: var(--space-6); }
   .site-footer__form { grid-column: 1 / -1; }
@@ -544,3 +554,20 @@ select.field__input { appearance: none; padding-inline-end: var(--space-7); back
 .demo-block { padding-block: var(--space-7); border-block-start: 1px solid var(--color-border); }
 .demo-block > h2 { margin-block-end: var(--space-2); }
 .demo-block > .demo-note { margin-block-end: var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); max-width: 75ch; }
+
+/* Nút có thương hiệu (yêu cầu Shopify §4, 11/11): Shopify vẽ nút accelerated checkout (Shop Pay, Apple Pay, G Pay, PayPal),
+   Shop Pay Installments, Follow on Shop, Apple Wallet. Theme KHÔNG đổi màu, logo, viền; chỉ chỉnh qua biến CSS chính thức
+   (--shopify-accelerated-checkout-button-block-size 25–55, -border-radius, -box-shadow, -inline-alignment, -row-gap, skeleton).
+   Mockup dùng màu thương hiệu thật để minh hoạ. */
+.brand-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr)); gap: var(--space-2); }
+.brand-btn { display: flex; align-items: center; justify-content: center; gap: 2px; min-height: 44px; border-radius: var(--radius-button); font: 700 16px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; letter-spacing: -0.02em; text-decoration: none; }
+.brand-btn--shop-pay { background: #5A31F4; color: #FFFFFF; }
+.brand-btn--shop-pay b { font-weight: 800; }
+.brand-btn--gpay { background: #000000; color: #FFFFFF; }
+.brand-btn--apple-pay { background: #000000; color: #FFFFFF; }
+.brand-btn--paypal { background: #FFC439; color: #003087; font-style: italic; }
+.brand-shoppay { color: #5A31F4; font-weight: 800; letter-spacing: -0.03em; }
+.apple-wallet { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; padding: 6px 14px; border: 1px solid #A6A6A6; border-radius: 10px; background: #000000; color: #FFFFFF; font: 500 12px/1.15 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-decoration: none; }
+.apple-wallet__icon { width: 26px; height: 20px; border-radius: 4px; background: linear-gradient(#5AC8FA 0 25%, #FFCC00 25% 50%, #FF9500 50% 75%, #FF3B30 75%); }
+.apple-wallet__text { display: grid; } .apple-wallet__text strong { font-size: 16px; font-weight: 600; }
+.brand-note { color: var(--color-muted); font-size: var(--font-size-xs); }

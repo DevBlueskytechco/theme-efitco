@@ -33,6 +33,7 @@ Mockup: `drafts/designer/ES1-T258/gift_card.html` + `gift_card-360|768|1280|1920
    - "Gift card code" · mã `gift_card.code | format_code` 18/600 giãn chữ 0.08em trong ô viền đứt muted-light nền alt, `user-select: all` · nút secondary "Copy Code" (JS, BE).
    - QR 144 × 144 (≥ 120 theo SRS) viền border, nền trắng; tên "QR code, scan to redeem gift card"; chú thích "Pay in store" + "Show this QR code at the counter, or enter the code at online checkout."
    - Bảng meta: Initial value · Expires (`gift_card.expires_on | date: '%B %e, %Y'`; không có hạn thì bỏ dòng).
+   - Apple Wallet: huy hiệu chính thức `gift-card/add-to-apple-wallet.svg | shopify_asset_url`, không vẽ lại, không đổi màu (foundation §27). Yêu cầu Shopify: Apple Wallet, mã, QR ≥ 120 × 120, logo hoặc `shop.name`.
    - Hành động: Apple Wallet (asset Shopify, cao ≥ 44, chỉ khi `gift_card.pass_url`) · primary "Start Shopping" (`shop.url`) · secondary "Print Gift Card" (`window.print()`, BE).
 
 ## 3. Settings merchant

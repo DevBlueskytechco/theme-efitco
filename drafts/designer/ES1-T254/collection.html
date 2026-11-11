@@ -100,7 +100,7 @@
   /* Lưới kết quả */
   .results__grid { margin-block-start: var(--space-5); }
   @media (min-width: 64rem) { .results .product-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  .product-card__title a { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+  /* .product-card__title a: không cắt tên (Shopify §7, 11/11) */
   /* S7 (ES1-T287): không làm mờ card (foundation §18, Lighthouse color-contrast tính opacity); lưới thành skeleton như search S5 */
   .updating { display: inline-flex; align-items: center; gap: var(--space-2); }
   .updating .spinner { width: 20px; height: 20px; }
@@ -336,6 +336,7 @@
           <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
           <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
         </ul>
+        <a class="shop-follow" href="#">Follow on <b>shop</b></a>
       </div>
       <div class="site-footer__menus">
         <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
@@ -354,7 +355,7 @@
     <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
     <div class="site-footer__end">
       <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
-      <ul class="payment-icons" aria-label="Payment methods"><li>DISC</li><li>MC</li><li>DC</li><li>AMEX</li><li>PP</li></ul>
+      <ul class="payment-icons" aria-label="Payment methods"><li class="pi--disc">DISC</li><li class="pi--mc">MC</li><li class="pi--dc">DC</li><li class="pi--amex">AMEX</li><li class="pi--pp">PP</li></ul>
     </div>
   </div>
 </footer>

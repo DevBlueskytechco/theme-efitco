@@ -77,6 +77,8 @@ Dữ liệu: `variant.unit_price` + `variant.unit_price_measurement` (đã có t
 
 ### 3.2 Shop Pay Installments (F1, F9)
 
+Logo Shop Pay trong banner giữ màu tím Shopify (foundation §27).
+
 Shopify vẽ banner (`{{ form | payment_terms }}` → `shopify-payment-terms`): "Pay in 4 interest-free installments of $58.50 with Shop Pay Learn more". Theme chỉ chỉnh vị trí, cỡ chữ, màu chữ kế thừa; logo và link "Learn more" (mở dialog của Shopify) do Shopify.
 
 - PDP: dòng cuối nhóm giá, dưới ghi chú thuế/ship, cách 4. Chữ 14 `--color-muted` (8.45), lh 22. ĐỀ XUẤT dời khỏi vị trí hiện tại trong form (sau bộ chọn option): đặt sát giá như hướng dẫn Shopify, dùng 1 mini form `product` chỉ chứa `id` + `payment_terms` trong product-info (KHÔNG CHẮC (2)). Nguồn 10 §8 gộp nhóm giá.
