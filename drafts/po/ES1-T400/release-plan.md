@@ -13,7 +13,7 @@ Nguồn: REQ-0002; quyết định CTO ES1-T308, T309, T310, T311; comment CTO 1
 | Sprint 3 | 30/11–11/12 | Trang chủ, PDP và bộ chọn biến thể, trang phụ ES1-T304 |
 | Sprint 4 | 14/12–25/12 | Collection, cart, quickview, search, blog/article, trang phụ, quiz |
 | Code freeze Must | T3 22/12 | Sau ngày này chỉ merge sửa bug P1/P2 |
-| Hồi quy + lhci + checklist Canvas | 23–24/12 | Chạy trên yum-dev, zip từ ES1-T411 |
+| Hồi quy + lhci + checklist Canvas | 23–24/12 | Chạy trên store dev hoa-qua-nhap-khau (CTO ES1-T420), zip từ ES1-T411 |
 | Hồ sơ G5 | T5 24/12 | PO nộp hồ sơ theo §4 |
 | G5 ký | T6 25/12 | CTO ký |
 | R1 lên Canvas store thật | T2 28/12 (tuần 11) | Giữ mốc theo ES1-T308 #2, #4 và ES1-T311 |
