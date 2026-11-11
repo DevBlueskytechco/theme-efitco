@@ -130,6 +130,14 @@ async function compareImage(page: Page, row: Row) {
 
   // 1% tính trên phần không che: chia cho cả ảnh thì vùng che càng lớn càng dễ đạt. Số pixel lấy từ comparator của toMatchSnapshot ở trên.
   const pixels = probes.find((probe) => probe.threshold === thresholds.pixelThreshold)!.pixels;
+  const limit = Math.floor(thresholds.maxDiffRatio * visible);
+  // ES1-T300: hàng có imageReportOnly chỉ ghi số và annotation, không chặn gate; không nới ngưỡng (chỉ CTO nới). Lý do, ticket đóng ghi trong figma-rows.json.
+  const reportOnly = (row as { imageReportOnly?: { closedBy: string; why: string } }).imageReportOnly;
+  if (reportOnly) {
+    if (pixels > limit) info.annotations.push({ type: 'figma-report-only', description: `Hàng ${row.id}: ${pixels} pixel khác, ngưỡng ${limit}. ${reportOnly.closedBy} đóng: ${reportOnly.why}` });
+    log('image-report-only', row.id, { pixels, limit, closedBy: reportOnly.closedBy });
+    return;
+  }
   expect(pixels, `Hàng ${row.id}: ${pixels} pixel khác trên ${visible} pixel không che, xem ảnh diff`).toBeLessThanOrEqual(Math.floor(thresholds.maxDiffRatio * visible));
 }
 
