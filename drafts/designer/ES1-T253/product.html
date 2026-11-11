@@ -86,32 +86,39 @@
   /* Hết giờ khi đang xem: giữ khung 60 (không CLS), đổi chữ */
   .countdown--ended { color: color-mix(in srgb, var(--color-background-dark-foreground) 60%, var(--color-background-dark)); }
 
-  /* ---------- Bộ chọn option theo option value (vòng 3b, 2048 biến thể) ---------- */
-  /* 3 trạng thái giá trị theo lựa chọn hiện tại: còn hàng (mặc định) · hết hàng .opt--na (gạch ngang) · tổ hợp không tồn tại .opt--none (viền đứt, chữ muted) */
-  .opt--none { border-style: dashed; border-color: var(--color-muted-light); color: var(--color-muted); }
-  .opt--none:has(:checked) { border-style: solid; color: var(--color-background); }
-  .opt--swatch.opt--none { border-color: transparent; }
-  .opt--swatch.opt--none::before { border-style: dashed; border-color: var(--color-muted-light); opacity: 0.45; }
-  .option legend .option__loading { display: inline-block; width: 16px; height: 16px; margin-inline-start: var(--space-2); vertical-align: -3px; }
-  /* Option nhiều giá trị (> 12): lưới ô đều, hiện 11 giá trị + nút "+N" (Liquid tính N, không cần JS đếm) */
+  /* ---------- Bộ chọn biến thể chung PDP / quickview (docs/ui-spec/variant-picker.md, ES1-T284) ----------
+     Cùng quy tắc với ES1-T262/mini-cart-quickview.html. Còn hàng · hết hàng .opt--na (gạch chữ) · không tồn tại .opt--none (gạch chữ + viền đứt) · đang chọn. */
+  .opt.opt--none { border-style: dashed; border-color: var(--color-muted-light); color: var(--color-muted); }
+  .opt--none .opt__text { text-decoration: line-through; }
+  .opt.opt--none:hover, .opt.opt--none.is-hover { border-color: var(--color-foreground); }
+  .opt.opt--none:has(:checked) { border-style: solid; border-color: var(--color-foreground); color: var(--color-background); }
+  .opt--swatch.opt--none:not(:has(:checked)) { border-style: dashed; border-color: var(--color-muted-light); }
+  .opt--swatch.opt--none::after { content: ''; position: absolute; inset-block-start: calc(50% - 1px); inset-inline: var(--space-1); height: 2px; background: var(--color-foreground); box-shadow: 0 0 0 1px var(--color-background); rotate: -45deg; }
+  .opt.is-hover { border-color: var(--color-foreground); }
+  .opt.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  /* Option > 10 giá trị: lưới ô 72, 7 giá trị + "+N" ở ô 8 (Liquid tính N, ≤ 2 hàng mọi mốc); mở hết tại chỗ, "Show Fewer" ô cuối 2 cột */
   .option__values--many { display: grid; grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); gap: var(--space-2); }
   .option__values--many .opt { min-width: 0; padding-inline: var(--space-2); }
-  .opt-more { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-foreground); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
-  .opt-more:hover { background: var(--color-foreground); color: var(--color-background); }
-  .option__less { justify-self: start; margin-block-start: var(--space-2); }
-  .option-legend-key { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); margin: 0; padding: 0; color: var(--color-muted); font-size: var(--font-size-xs); list-style: none; }
-  .option-legend-key li { display: inline-flex; align-items: center; gap: var(--space-2); }
-  .option-legend-key i { display: inline-block; width: 28px; height: 16px; border: 1px solid var(--color-border); border-radius: var(--radius-pill); }
-  .option-legend-key i.is-none { border-style: dashed; border-color: var(--color-muted-light); }
-  .option-legend-key i.is-na { background: linear-gradient(transparent 7px, var(--color-muted) 7px 9px, transparent 9px); }
-  /* Đang tải biến thể: chỉ làm nhạt vùng sẽ đổi, giữ kích thước (0 CLS) */
-  /* Giá và tồn cũ bị phủ skeleton (không làm nhạt chữ: chữ nhạt trượt AA, giá cũ dễ đọc nhầm) */
-  .buy.is-loading .pdp-price, .buy.is-loading .stock { position: relative; }
-  .buy.is-loading .pdp-price::after, .buy.is-loading .stock::after { content: ''; position: absolute; inset: 0 auto 0 0; width: min(100%, 240px); border-radius: var(--space-1); background: linear-gradient(90deg, var(--color-background-alt) 0 25%, var(--color-background) 50%, var(--color-background-alt) 75%) 0 0 / 300% 100%; animation: kit-shimmer 1.4s linear infinite; }
-  @media (prefers-reduced-motion: reduce) { .buy.is-loading .pdp-price::after, .buy.is-loading .stock::after { animation: none; } }
-  .load-error { display: flex; align-items: flex-start; gap: var(--space-2); margin: var(--space-2) 0 0; color: var(--color-sale); font-size: var(--font-size-sm); font-weight: 500; }
-  .load-error svg { flex: none; width: 18px; height: 18px; margin-block-start: 1px; }
-  .load-error button { padding: 0; border: 0; background: none; color: var(--color-foreground); font-weight: 600; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; min-height: 24px; }
+  .opt.opt--more { border-color: var(--color-muted-light); background: var(--color-background-alt); color: var(--color-foreground); font-family: inherit; font-weight: 600; }
+  .opt.opt--more:hover, .opt.opt--more.is-hover { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
+  .opt--more svg { width: 12px; height: 8px; margin-inline-start: var(--space-1); }
+  .opt--more[aria-expanded='true'] svg { rotate: 180deg; }
+  .option__values--many .opt--less { grid-column: span 2; }
+  /* Bảng trạng thái J0 */
+  .vp-key { display: grid; grid-template-columns: repeat(auto-fill, minmax(112px, 1fr)); gap: var(--space-4) var(--space-3); margin: 0; padding: 0; list-style: none; }
+  .vp-key li { display: grid; justify-items: start; gap: var(--space-2); color: var(--color-muted); font-size: var(--font-size-xs); }
+  .vp-key__pair { display: flex; flex-wrap: wrap; gap: var(--space-2); align-items: center; }
+  /* Đang tải biến thể: giá skeleton cùng chiều cao; dòng tồn spinner 12 duy nhất; nút giữ màu, aria-disabled, không spinner */
+  .price-skel { display: block; width: 45%; height: 28px; border-radius: var(--space-1); }
+  .stock--busy { color: var(--color-muted); }
+  .stock--busy::before { width: 12px; height: 12px; border: 2px solid var(--color-border); border-block-start-color: var(--color-foreground); background: none; box-shadow: none; animation: kit-spin 700ms linear infinite; }
+  @media (prefers-reduced-motion: reduce) { .stock--busy::before { animation-duration: 1.5s; } }
+  .button.is-pending[aria-disabled='true'] { border-color: transparent; background: var(--color-accent); color: var(--color-accent-foreground); cursor: progress; }
+  /* Lỗi tải: chữ đỏ + icon dưới nhóm giá trị, nút secondary nhỏ "Try Again" cao 44 */
+  .vp-error { display: grid; justify-items: start; gap: var(--space-3); margin-block-start: var(--space-3); }
+  .vp-error p { display: flex; align-items: flex-start; gap: var(--space-2); margin: 0; color: var(--color-sale); font-size: var(--font-size-sm); font-weight: 500; }
+  .vp-error svg { flex: none; width: 16px; height: 16px; margin-block-start: 2px; }
+  .vp-retry { min-height: 44px; padding-inline: var(--space-4); font-size: var(--font-size-sm); }
 
   /* Option */
   .option { min-width: 0; margin: 0; padding: 0; border: 0; }
@@ -129,7 +136,8 @@
   .opt--swatch { width: 44px; min-width: 44px; padding: 0; border-radius: 50%; border-color: transparent; }
   .opt--swatch::before { content: ''; position: absolute; inset: var(--space-1); border: 1px solid color-mix(in srgb, var(--color-foreground) 50%, transparent); border-radius: 50%; background: var(--swatch-color, var(--color-background-cream)); }
   .opt--swatch:has(:checked) { border: 2px solid var(--color-foreground); background: var(--color-background); }
-  .opt--swatch.opt--na::after { content: ''; position: absolute; inset-block-start: 50%; inset-inline: var(--space-1); height: 2px; background: var(--color-foreground); box-shadow: 0 0 0 1px var(--color-background); rotate: -45deg; }
+  .opt--swatch:hover, .opt--swatch.is-hover { border-color: var(--color-foreground); }
+  .opt--swatch.opt--na::after { content: ''; position: absolute; inset-block-start: calc(50% - 1px); inset-inline: var(--space-1); height: 2px; background: var(--color-foreground); box-shadow: 0 0 0 1px var(--color-background); rotate: -45deg; }
 
   /* Số lượng + Add To Cart */
   .buy__purchase { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-2) var(--space-3); align-items: end; }
@@ -302,6 +310,7 @@
   <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-star" viewBox="0 0 14 13"><path fill="currentColor" d="m7 0 2.1 4.2 4.6.7-3.3 3.2.8 4.6L7 10.5l-4.2 2.2.8-4.6L.3 4.9l4.6-.7L7 0Z"/></symbol>
+  <symbol id="i-caret" viewBox="0 0 12 8"><path d="m1 1.5 5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
   <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
   <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
@@ -604,7 +613,7 @@
             <div class="buy__purchase">
               <label for="qty-a">Quantity</label>
               <div class="qty is-disabled"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-a" type="number" value="1" disabled><button type="button" aria-label="Increase quantity" disabled><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-              <button class="button buy__add" type="submit" disabled>Sold out</button>
+              <button class="button buy__add" type="submit" disabled>Sold Out</button>
             </div>
             <p class="stock stock--out">Sold out</p>
           </div>
@@ -615,7 +624,7 @@
     <section class="demo-block" aria-labelledby="st-b">
       <p class="demo-label">Trạng thái B · edge_cases "2 option có tổ hợp không tồn"</p>
       <h2 id="st-b">Many variants, unavailable combination</h2>
-      <p class="demo-note">Gold + L không có variant (value.exists = false): pill L viền đứt, chữ muted, không gạch ngang (gạch ngang dành cho hết hàng); nút "Unavailable" khoá, gợi ý chọn cỡ khác ngay dưới nút. Size dùng pill (không dropdown, 10 §6 #850); Color là swatch khi có value.swatch, không có thì pill chữ.</p>
+      <p class="demo-note">Gold + L không có variant (value.exists = false): pill L gạch chữ + viền đứt, chữ muted (variant-picker §4, như quickview 5c; hết hàng chỉ gạch chữ); nút "Unavailable" khoá, gợi ý chọn cỡ khác ngay dưới nút. Size dùng pill (không dropdown, 10 §6 #850); Color là swatch khi có value.swatch, không có thì pill chữ.</p>
       <div class="state-pdp">
         <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, variant sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=900" width="900" height="900" alt="2 option có tổ hợp không tồn"></li></ul></div>
         <div class="buy">
@@ -788,12 +797,20 @@
     <section class="demo-block" aria-labelledby="st-j">
       <p class="demo-label">Trạng thái J · 2048 biến thể: 3 option, Weight 40 giá trị · DỮ LIỆU MẪU (demo-data chưa có, hỏi ES1-T282)</p>
       <h2 id="st-j">Three options, one with 40 values</h2>
-      <p class="demo-note">Bộ chọn dựng từ product.options_with_values (option + option value), không lặp product.variants, không nhúng JSON biến thể. Trạng thái mỗi giá trị theo lựa chọn hiện tại (Black + Pair): còn hàng = viền thường; hết hàng (value.available = false) = gạch ngang; tổ hợp không tồn tại (value.exists = false) = viền đứt, chữ muted. Option &gt; 12 giá trị: lưới ô đều, hiện 11 giá trị + nút "+29" (Liquid tính N; giá trị đang chọn luôn nằm trong phần hiện). Ô tối thiểu 72: 360 (buy box 320) 4 ô/hàng, 3 hàng; 768 9 ô/hàng; 1280 (buy box 580) 7 ô/hàng, 2 hàng. Bấm "+29" mở hết tại chỗ (J2), "Show Fewer" thu lại.</p>
-      <ul class="option-legend-key" aria-hidden="true">
-        <li><i></i>In stock</li>
-        <li><i class="is-na"></i>Sold out (line-through)</li>
-        <li><i class="is-none"></i>Not available with current choice (dashed)</li>
-      </ul>
+      <p class="demo-note">Component chung PDP / quickview: docs/ui-spec/variant-picker.md (ES1-T284). Bộ chọn dựng từ product.options_with_values (option + option value), không lặp product.variants, không nhúng JSON biến thể. Trạng thái mỗi giá trị theo lựa chọn hiện tại (Black + Pair): hết hàng (value.available = false) = gạch chữ; tổ hợp không tồn tại (value.exists = false) = gạch chữ + viền đứt. Option &gt; 10 giá trị (sổ M5, hằng, không setting): lưới ô 72, hiện 7 + "+33" ở ô 8 (Liquid tính N); giá trị đang chọn ở sau thì 6 giá trị đầu + giá trị chọn ở ô 7. 360 (buy box 320) 4 ô/hàng, 2 hàng; 768 (728) 1 hàng; 1280 (580) 7 ô/hàng, 2 hàng; 1920 (668) 1 hàng.</p>
+      <div class="demo-card" style="margin-block-start: var(--space-4)">
+        <p class="demo-label">J0 · Bảng trạng thái giá trị (pill / swatch), dùng chung PDP và quickview</p>
+        <ul class="vp-key" role="list" aria-label="Variant value states">
+          <li><span class="vp-key__pair"><label class="opt"><input type="radio" name="k1"><span class="opt__text">20 lb</span></label><label class="opt opt--swatch" style="--swatch-color:#8c8c8c"><input type="radio" name="k1b"><span class="visually-hidden">Gray</span></label></span>Còn hàng</li>
+          <li><span class="vp-key__pair"><label class="opt is-hover"><input type="radio" name="k2"><span class="opt__text">20 lb</span></label><label class="opt opt--swatch is-hover" style="--swatch-color:#8c8c8c"><input type="radio" name="k2b"><span class="visually-hidden">Gray</span></label></span>Hover: viền foreground</li>
+          <li><span class="vp-key__pair"><label class="opt"><input type="radio" name="k3" checked><span class="opt__text">45 lb</span></label><label class="opt opt--swatch" style="--swatch-color:#1a1a1a"><input type="radio" name="k3b" checked><span class="visually-hidden">Black</span></label></span>Đang chọn</li>
+          <li><span class="vp-key__pair"><label class="opt is-focus"><input type="radio" name="k4"><span class="opt__text">35 lb</span></label><label class="opt opt--swatch is-focus" style="--swatch-color:#8c8c8c"><input type="radio" name="k4b"><span class="visually-hidden">Gray</span></label></span>Focus: outline accent 2</li>
+          <li><span class="vp-key__pair"><label class="opt opt--na"><input type="radio" name="k5"><span class="opt__text">25 lb</span><span class="visually-hidden">, sold out</span></label><label class="opt opt--swatch opt--na" style="--swatch-color:#1a1a1a"><input type="radio" name="k5b"><span class="visually-hidden">Black, sold out</span></label></span>Hết hàng: gạch</li>
+          <li><span class="vp-key__pair"><label class="opt opt--none"><input type="radio" name="k6"><span class="opt__text">5 lb</span><span class="visually-hidden">, unavailable</span></label><label class="opt opt--swatch opt--none" style="--swatch-color:#ffffff"><input type="radio" name="k6b"><span class="visually-hidden">White, unavailable</span></label></span>Không tồn tại: gạch + viền đứt</li>
+          <li><span class="vp-key__pair"><label class="opt opt--na"><input type="radio" name="k7" checked><span class="opt__text">25 lb</span><span class="visually-hidden">, sold out</span></label><label class="opt opt--swatch opt--na" style="--swatch-color:#8c8c8c"><input type="radio" name="k7b" checked><span class="visually-hidden">Gray, sold out</span></label></span>Đang chọn + hết hàng</li>
+          <li><span class="vp-key__pair"><button class="opt opt--more" type="button" aria-expanded="false">+33<span class="visually-hidden"> more Weight options</span><svg aria-hidden="true"><use href="#i-caret"/></svg></button><button class="opt opt--more is-hover" type="button" aria-expanded="false">+33<span class="visually-hidden"> more Weight options, hover</span><svg aria-hidden="true"><use href="#i-caret"/></svg></button></span>"+N" · hover</li>
+        </ul>
+      </div>
       <div class="state-pdp" style="margin-block-start: var(--space-4)">
         <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, three option sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=900" width="900" height="900" alt="Sample product with three options" loading="lazy"></li></ul></div>
         <div class="buy">
@@ -806,7 +823,7 @@
               <legend>Color: <span>Black</span></legend>
               <div class="option__values">
                 <label class="opt opt--swatch" style="--swatch-color:#1a1a1a"><input type="radio" name="j1c" checked><span class="visually-hidden">Black</span></label>
-                <label class="opt opt--swatch" style="--swatch-color:#8c8c8c"><input type="radio" name="j1c"><span class="visually-hidden">Gray</span></label>
+                <label class="opt opt--swatch opt--na" style="--swatch-color:#8c8c8c"><input type="radio" name="j1c"><span class="visually-hidden">Gray, sold out</span></label>
               </div>
             </fieldset>
             <fieldset class="option">
@@ -825,14 +842,11 @@
                 <label class="opt"><input type="radio" name="j1w"><span class="opt__text">20 lb</span></label>
                 <label class="opt opt--na"><input type="radio" name="j1w"><span class="opt__text">25 lb</span><span class="visually-hidden">, sold out</span></label>
                 <label class="opt"><input type="radio" name="j1w"><span class="opt__text">30 lb</span></label>
-                <label class="opt"><input type="radio" name="j1w"><span class="opt__text">35 lb</span></label>
-                <label class="opt"><input type="radio" name="j1w"><span class="opt__text">40 lb</span></label>
                 <label class="opt"><input type="radio" name="j1w" checked><span class="opt__text">45 lb</span></label>
-                <label class="opt opt--na"><input type="radio" name="j1w"><span class="opt__text">50 lb</span><span class="visually-hidden">, sold out</span></label>
-                <label class="opt"><input type="radio" name="j1w"><span class="opt__text">55 lb</span></label>
-                <button class="opt-more" type="button" aria-expanded="false" aria-controls="j1-weight">+29<span class="visually-hidden"> more weights, show all 40</span></button>
+                <button class="opt opt--more" type="button" aria-expanded="false" aria-controls="j1-weight">+33<span class="visually-hidden"> more Weight options</span><svg aria-hidden="true"><use href="#i-caret"/></svg></button>
               </div>
             </fieldset>
+            <p class="demo-label" style="margin: 0">J1 · thu gọn: 6 giá trị đầu + 45 lb (đang chọn, gốc ở vị trí 9) ở ô 7 + "+33" ở ô 8. 5, 10 lb không tồn tại với Pair; 25 lb và Gray hết hàng.</p>
             <p class="stock">In stock</p>
             <div class="buy__purchase">
               <label for="qty-j1">Quantity</label>
@@ -845,12 +859,12 @@
 
       <div class="demo-pair" style="margin-block-start: var(--space-5)">
         <div class="demo-card">
-          <p class="demo-label">J2 · đã mở hết 40 giá trị · đang tải biến thể sau khi chọn 120 lb</p>
-          <div class="buy is-loading">
+          <p class="demo-label">J2 · bấm "+33": mở hết 40 giá trị tại chỗ, đúng thứ tự gốc; focus vào 35 lb (giá trị đầu tiên vừa hiện, không chọn nó); "Show Fewer" ô cuối 2 cột, thu lại thì focus về "+33"</p>
+          <div class="buy">
             <div class="buy__head"><div class="pdp-price"><span class="pdp-price__current">$189.00</span></div></div>
             <div class="buy__form" style="border: 0; padding: 0">
               <fieldset class="option">
-                <legend>Weight: <span>120 lb</span><i class="spinner option__loading" aria-hidden="true"></i></legend>
+                <legend>Weight: <span>45 lb</span></legend>
                 <div class="option__values option__values--many" id="j2-weight">
                   <label class="opt opt--none"><input type="radio" name="j2w"><span class="opt__text">5 lb</span><span class="visually-hidden">, unavailable</span></label>
                   <label class="opt opt--none"><input type="radio" name="j2w"><span class="opt__text">10 lb</span><span class="visually-hidden">, unavailable</span></label>
@@ -858,9 +872,9 @@
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">20 lb</span></label>
                   <label class="opt opt--na"><input type="radio" name="j2w"><span class="opt__text">25 lb</span><span class="visually-hidden">, sold out</span></label>
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">30 lb</span></label>
-                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">35 lb</span></label>
+                  <label class="opt is-focus"><input type="radio" name="j2w"><span class="opt__text">35 lb</span></label>
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">40 lb</span></label>
-                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">45 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w" checked><span class="opt__text">45 lb</span></label>
                   <label class="opt opt--na"><input type="radio" name="j2w"><span class="opt__text">50 lb</span><span class="visually-hidden">, sold out</span></label>
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">55 lb</span></label>
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">60 lb</span></label>
@@ -875,7 +889,7 @@
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">105 lb</span></label>
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">110 lb</span></label>
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">115 lb</span></label>
-                  <label class="opt"><input type="radio" name="j2w" checked><span class="opt__text">120 lb</span></label>
+                  <label class="opt"><input type="radio" name="j2w"><span class="opt__text">120 lb</span></label>
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">125 lb</span></label>
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">130 lb</span></label>
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">135 lb</span></label>
@@ -892,41 +906,83 @@
                   <label class="opt"><input type="radio" name="j2w"><span class="opt__text">190 lb</span></label>
                   <label class="opt opt--none"><input type="radio" name="j2w"><span class="opt__text">195 lb</span><span class="visually-hidden">, unavailable</span></label>
                   <label class="opt opt--none"><input type="radio" name="j2w"><span class="opt__text">200 lb</span><span class="visually-hidden">, unavailable</span></label>
+                  <button class="opt opt--more opt--less" type="button" aria-expanded="true" aria-controls="j2-weight">Show Fewer<span class="visually-hidden"> Weight options</span><svg aria-hidden="true"><use href="#i-caret"/></svg></button>
                 </div>
-                <button class="button button--secondary button--small option__less" type="button" aria-expanded="true" aria-controls="j2-weight">Show Fewer<span class="visually-hidden"> weights</span></button>
               </fieldset>
               <p class="stock">In stock</p>
               <div class="buy__purchase">
                 <label for="qty-j2">Quantity</label>
                 <div class="qty"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-j2" type="number" min="1" value="1"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-                <button class="button buy__add" type="submit" aria-busy="true" aria-disabled="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
-              </div>
-              <p class="visually-hidden" role="status">Loading 120 lb</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="demo-card">
-          <p class="demo-label">J3 · setting "Options with many values" = Dropdown · lỗi tải biến thể</p>
-          <div class="buy">
-            <div class="buy__head"><div class="pdp-price"><span class="pdp-price__current">$189.00</span></div></div>
-            <div class="buy__form" style="border: 0; padding: 0">
-              <div class="field">
-                <label class="field__label" for="j3-weight">Weight</label>
-                <select class="field__input" id="j3-weight" aria-describedby="j3-error">
-                  <option>5 lb - Unavailable</option><option>10 lb - Unavailable</option><option>15 lb</option><option>20 lb</option><option>25 lb - Sold out</option><option>30 lb</option><option>35 lb</option><option>40 lb</option><option selected>45 lb</option><option>50 lb - Sold out</option>
-                </select>
-                <p class="load-error" id="j3-error" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><span>Couldn't load 120 lb. Check your connection. <button type="button">Try again</button></span></p>
-              </div>
-              <p class="stock">In stock</p>
-              <div class="buy__purchase">
-                <label for="qty-j3">Quantity</label>
-                <div class="qty"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-j3" type="number" min="1" value="1"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
                 <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
               </div>
             </div>
           </div>
-          <p class="demo-note" style="margin: 0">Lỗi: lựa chọn quay về 45 lb (biến thể cuối đã tải được), giá, nút giữ đúng 45 lb; chữ lỗi đỏ 6.38 + icon, nút "Try again". Dropdown chỉ hiện chữ trạng thái (không gạch được trong select).</p>
+        </div>
+
+        <div style="display: grid; gap: var(--space-5); align-content: start">
+          <div class="demo-card">
+            <p class="demo-label">J3 · đang tải sau khi bấm Pack: Single (cùng mẫu quickview 5g)</p>
+            <div class="buy">
+              <div class="buy__head" aria-busy="true"><span class="skeleton price-skel" aria-hidden="true"></span></div>
+              <div class="buy__form" style="border: 0; padding: 0">
+                <fieldset class="option">
+                  <legend>Pack: <span>Single</span></legend>
+                  <div class="option__values">
+                    <label class="opt"><input type="radio" name="j3p" checked><span class="opt__text">Single</span></label>
+                    <label class="opt"><input type="radio" name="j3p"><span class="opt__text">Pair</span></label>
+                  </div>
+                </fieldset>
+                <fieldset class="option">
+                  <legend>Weight: <span>45 lb</span></legend>
+                  <div class="option__values option__values--many">
+                    <label class="opt opt--none"><input type="radio" name="j3w"><span class="opt__text">5 lb</span><span class="visually-hidden">, unavailable</span></label>
+                    <label class="opt opt--none"><input type="radio" name="j3w"><span class="opt__text">10 lb</span><span class="visually-hidden">, unavailable</span></label>
+                    <label class="opt"><input type="radio" name="j3w"><span class="opt__text">15 lb</span></label>
+                    <label class="opt"><input type="radio" name="j3w"><span class="opt__text">20 lb</span></label>
+                    <label class="opt opt--na"><input type="radio" name="j3w"><span class="opt__text">25 lb</span><span class="visually-hidden">, sold out</span></label>
+                    <label class="opt"><input type="radio" name="j3w"><span class="opt__text">30 lb</span></label>
+                    <label class="opt"><input type="radio" name="j3w" checked><span class="opt__text">45 lb</span></label>
+                    <button class="opt opt--more" type="button" aria-expanded="false">+33<span class="visually-hidden"> more Weight options</span><svg aria-hidden="true"><use href="#i-caret"/></svg></button>
+                  </div>
+                </fieldset>
+                <p class="stock stock--busy">Checking availability…</p>
+                <div class="buy__purchase">
+                  <label for="qty-j3">Quantity</label>
+                  <div class="qty"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-j3" type="number" min="1" value="1"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+                  <button class="button buy__add is-pending" type="submit" aria-disabled="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+                </div>
+                <p class="visually-hidden" role="status">Loading Single…</p>
+              </div>
+            </div>
+            <p class="demo-note" style="margin: 0">Lựa chọn nhảy ngay; giá thành skeleton (không làm nhạt giá cũ); dòng tồn là spinner duy nhất; Add To Cart giữ màu, aria-disabled, không spinner (spinner trên nút chỉ cho đang thêm giỏ, trạng thái C). Trạng thái Weight giữ cũ tới khi server trả.</p>
+          </div>
+
+          <div class="demo-card">
+            <p class="demo-label">J4 · lỗi tải: Pack quay về Pair (biến thể cuối đã tải), giá và nút giữ đúng biến thể đó</p>
+            <div class="buy">
+              <div class="buy__head"><div class="pdp-price"><span class="pdp-price__current">$189.00</span></div></div>
+              <div class="buy__form" style="border: 0; padding: 0">
+                <fieldset class="option" aria-describedby="j4-error">
+                  <legend>Pack: <span>Pair</span></legend>
+                  <div class="option__values">
+                    <label class="opt"><input type="radio" name="j4p"><span class="opt__text">Single</span></label>
+                    <label class="opt is-focus"><input type="radio" name="j4p" checked><span class="opt__text">Pair</span></label>
+                  </div>
+                  <div class="vp-error" id="j4-error" role="alert">
+                    <p><svg aria-hidden="true"><use href="#i-alert"/></svg>Couldn't load Single. Check your connection.</p>
+                    <button class="button button--secondary vp-retry" type="button">Try Again</button>
+                  </div>
+                </fieldset>
+                <p class="stock">In stock</p>
+                <div class="buy__purchase">
+                  <label for="qty-j4">Quantity</label>
+                  <div class="qty"><button type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input id="qty-j4" type="number" min="1" value="1"><button type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
+                  <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+                </div>
+              </div>
+            </div>
+            <p class="demo-note" style="margin: 0">Chữ lỗi đỏ 6.38 + icon, role alert; "Try Again" secondary cao 44 gửi lại đúng lựa chọn lỗi. Focus ở lại radio đã khôi phục (Pair). Không dropdown cho option nhiều giá trị (sổ M5).</p>
+          </div>
         </div>
       </div>
     </section>

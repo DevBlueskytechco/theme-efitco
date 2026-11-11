@@ -474,8 +474,10 @@ Accessibility for blocks and snippets:
   Why: a duplicate key silently overrides the first one and the string is
   lost.
 - Copy is American English; labels and setting names are sentence case
-  without `&`; standard commerce strings ("Add to cart", "Sold out",
-  "Checkout") keep Shopify wording. CTA voice is in `DESIGN.md`.
+  without `&`; standard commerce strings ("Sold out", "Checkout") keep
+  Shopify wording, except the add-to-cart button, which reads "Add To Cart"
+  (Title Case as in Figma, `docs/design/decisions.md` 07/11). CTA voice is
+  in `DESIGN.md`.
   Why: one voice across the theme, and commerce words match checkout.
 - Visually hidden text and `aria-label` values are translated too.
   Why: screen reader users get the same language as the page.

@@ -2,6 +2,20 @@ KHÔNG CHẮC: (1) quickview chưa có story/AC trong SRS, ghi chú đơn trong 
 
 # UI spec: Mini cart (cart drawer) và quick view (ES1-T262, vòng 3b)
 
+## Thay đổi audit (ES1-T284, audit ES1-T283 A1, A2, A24)
+
+Bộ chọn biến thể quickview dùng component chung với PDP: `docs/ui-spec/variant-picker.md` (mâu thuẫn thì file đó thắng). Thay các dòng 2–4 của bảng vòng 3b.
+
+| # | Thành phần | Vòng 3b | Audit | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | §3.1 | quy tắc bộ chọn viết riêng cho quickview | trỏ variant-picker.md; chỉ giữ phần riêng quickview (sheet cuộn, `.qv--long`, tiền tố `qv-`, URL) | ticket ES1-T284 |
+| 2 | Swatch | viền lõi 20%, gạch chéo 1px | viền lõi 50% (3.36:1), gạch chéo 2px + viền nền 1px; không tồn tại thêm vòng ngoài nét đứt | variant-picker §3.2, §4 |
+| 3 | Nhãn | "Show fewer" | "Show Fewer" (Title Case như "Try Again", "Add To Cart") | Sổ 07/11 |
+| 4 | Đang tải (5g) | Add To Cart `aria-busy` + `aria-disabled` (xám + spinner) | Add To Cart giữ màu primary, `aria-disabled`, không spinner; skeleton giá + "Checking availability…" spinner 12 giữ nguyên | variant-picker §6 |
+| 5 | Lỗi tải biến thể | `.qv__error` + "Try Again", không vẽ | cùng mẫu PDP J4: chữ đỏ + icon dưới option + nút secondary nhỏ "Try Again" 44 | variant-picker §6 |
+| 6 | §5 settings | dòng "Ngưỡng thu gọn" chen giữa bảng (vỡ bảng) | chuyển ra dưới bảng | |
+| 7 | Mockup | khung 2b, 2c, 5b, 5c, 5g | CSS bộ chọn đồng bộ với `ES1-T253/product.html`; 2c, 5g đổi nhãn và nút; PNG render lại | |
+
 ## Thay đổi vòng 3b
 
 | # | Thành phần | Vòng 3 | Vòng 3b | Nguồn |
@@ -127,31 +141,17 @@ Theo mốc:
 
 ## 3.1 Bộ chọn biến thể theo option value (2048 biến thể, chốt 10/11)
 
-Cùng bộ chọn với PDP (ES1-T253) và card (nút Quick View mở bộ chọn này). Mockup khung 2, 2b, 2c, 5b, 5c, 5g.
+Component chung với PDP (ES1-T253) và chỉ báo card: toàn bộ quy tắc ở `docs/ui-spec/variant-picker.md` — dữ liệu theo option value (§2), pill và swatch chuẩn Shopify (§3), 3 trạng thái giá trị + đang chọn, hover, focus (§4), option > 10 giá trị hiện 7 + "+N" / "Show Fewer", focus vào giá trị đầu vừa hiện (§5), đang tải, xong, lỗi "Try Again" (§6), a11y (§7), chuỗi (§10), bàn giao và lệch code (§12). Không lặp lại ở đây. Mockup khung 2, 2b, 2c, 5b, 5c, 5g.
 
-Trạng thái từng giá trị (tính theo lựa chọn hiện tại của các option khác):
-
-| Trạng thái | Nguồn dữ liệu | Pill | Swatch | Tên đọc |
-| --- | --- | --- | --- | --- |
-| Còn hàng | `value.available` | viền `--color-border`, chữ foreground; hover viền foreground | vòng màu | "20 lb" |
-| Đang chọn | `value.selected` | nền foreground chữ trắng (17.4) | viền 2px foreground | radio `checked` |
-| Hết hàng | `value.exists` và không `available` | chữ muted (8.45) gạch ngang | gạch chéo 1px | "45 lb, sold out" |
-| Không tồn tại | không `value.exists` | như hết hàng + viền nét đứt `--color-muted-light` (5.33) | gạch chéo + viền nét đứt | "105 lb, unavailable" |
-
-- Mọi giá trị vẫn chọn được (chọn hết hàng → "Sold Out" khung 5b; chọn không tồn tại → "Unavailable" khung 5c). Không ẩn giá trị: người mua thấy đủ dải (10 §6 #2709 hiển thị rõ biến thể hết hàng). Không chỉ dùng màu: gạch chữ, nét đứt, chữ ẩn.
-- Option nhiều giá trị (ĐỀ XUẤT, 10 §6 #850 nút riêng thay dropdown, #849 swatch cho màu): > 10 giá trị thì lưới ô min 72 (`repeat(auto-fill, minmax(72px, 1fr))`, gap 8), hiện 7 giá trị + nút "+N" (N = còn lại) = 8 ô = đúng 2 hàng ở 360 / 768 (4 cột) và 1280 / 1920 (5 cột, hàng 2 còn 3). ≤ 10 giá trị hiện hết (vd 7 màu edge case).
-  - Giá trị đang chọn nằm ngoài 7 ô đầu: 6 ô đầu + ô đang chọn (khung 5g).
-  - "+N": pill nền alt viền `--color-muted-light`, chữ 600 + caret; hover nền foreground chữ trắng; `<button aria-expanded="false" aria-controls>`, tên "+33 more Weight options" (chứa chữ hiển thị, WCAG 2.5.3). Bấm: mở hết tại chỗ (không popup chồng popup, 15 §1), focus vào giá trị thứ 8, nút cuối đổi thành "Show fewer" (span 2 cột, caret lật). Thu lại: focus về "+N".
-  - Swatch > 10 màu: cùng luật, ô tròn 44, "+N" là pill tròn.
-- 360 bottom sheet: 3 option + mở hết 40 giá trị → sheet cuộn bên trong (`overscroll-behavior: contain`), hàng "Add To Cart + View Detail" dính đáy, nút đóng dính trên (khung 2c). ≥ 48rem: dialog vượt `100dvh − 48` thì BE gắn `.qv--long` → hàng mua dính đáy cột phải, nền trắng, vạch trên.
-- Đổi lựa chọn (khung 5g): giá trị vừa bấm đổi sang "đang chọn" ngay, legend đổi theo; giá thành skeleton cao 28, dòng tồn "Checking availability…" + spinner 12, Add To Cart `aria-busy` + `aria-disabled` cùng bề rộng; `aria-busy` trên fieldset; status ẩn "Loading 40 lb…". Xong: cập nhật giá, badge %, tồn, nút, ảnh (nếu biến thể có ảnh riêng: dải/ảnh chính nhảy tới ảnh đó, edge case "Variant có ảnh riêng"), trạng thái 3 option; status đọc "40 lb, $x, In stock". Lỗi tải: giữ biến thể cũ, câu lỗi `.qv__error` + "Try Again". Không làm mờ chữ.
-- URL: PDP `replaceState ?variant=`. Quickview không đổi URL trang đang đứng (collection, trang chủ): chỉ đổi `href` của "View Detail" sang `?variant={id}` và input `id` của form (ĐỀ XUẤT, suy từ sổ 10/11 "popup không pushState": overlay không đổi URL/lịch sử trang nền, Back vẫn về đúng collection; câu CTO 1).
-
-Bàn giao Dev (bắt buộc, sổ 10/11):
-- FE (Liquid): lặp `product.options_with_values` → `option.values`; mỗi value dùng `value.id`, `value.name`, `value.selected`, `value.available`, `value.exists`, `value.swatch`. Giá, tồn, nút từ `product.selected_or_first_available_variant`. KHÔNG `{% for variant in product.variants %}`, KHÔNG `product | json` hay `<script type="application/json">` chứa biến thể. Số "+N" = `option.values.size | minus: 7`, tính trong Liquid. Card: số màu, swatch card lấy từ `option.values` của option màu (giới hạn như card hiện có), không lặp biến thể.
-- FE: mỗi value là radio thật (`name="qv-{product.id}-{option.position}"`, `value="{value.id}"`), id tiền tố `qv-`; `data-option-value-id` cho BE.
-- BE: đổi radio → gom id các value đang chọn → fetch URL sản phẩm kèm `option_values=id1,id2,id3` và partial `quick-view` (PDP: partial thông tin sản phẩm) → thay vùng giá, tồn, bộ chọn, nút, ảnh. `AbortController` huỷ request cũ khi bấm tiếp; giữ focus trên giá trị vừa chọn sau khi thay markup. Không tải JSON toàn bộ biến thể.
-- Không JS: quickview không mở (card là link PDP); PDP form chuẩn Shopify.
+Phần riêng của quickview:
+- Bề rộng vùng chứa: 320 (sheet 360) / 316 / 408 / 408 → lưới thu gọn 4 / 4 / 5 / 5 ô mỗi hàng, 7 + "+N" luôn đúng 2 hàng (variant-picker §5). Legend cách giá trị 8, fieldset cách nhau 16 (< 80rem) / 24.
+- 360 bottom sheet: 3 option + mở hết 40 giá trị → sheet cuộn bên trong (`overscroll-behavior: contain`), hàng "Add To Cart + View Detail" dính đáy, nút đóng dính trên (khung 2c). Sau khi mở "+N", focus vào giá trị đầu vừa hiện; sheet cuộn để giá trị đó nằm trên hàng mua dính (`scroll-padding-block-end` = cao hàng mua). ≥ 48rem: dialog vượt `100dvh − 48` thì BE gắn `.qv--long` → hàng mua dính đáy cột phải, nền trắng, vạch trên.
+- Đang tải (khung 5g, variant-picker §6): skeleton giá cao 28, "Checking availability…" + spinner 12, Add To Cart giữ màu primary + `aria-disabled`, "View Detail" vẫn dùng được (href cũ tới khi xong). Xong: ảnh nhảy tới ảnh của biến thể (dải mobile / ảnh chính), `href` "View Detail" đổi `?variant=`.
+- Lỗi tải: cùng mẫu PDP J4 (chữ đỏ + icon dưới option + "Try Again"), không vẽ lại trong mockup quickview.
+- URL: quickview không đổi URL trang đang đứng (collection, trang chủ): chỉ đổi `href` của "View Detail" sang `?variant={id}` và input `id` của form (sổ 10/11 M4).
+- Id: mọi id tiền tố `qv-`; radio `name="qv-{product.id}-{option.position}"`, `value="{value.id}"` (snippet chung, tham số `id_prefix: 'qv-'`).
+- BE: fetch URL sản phẩm kèm `option_values=id1,id2,id3` và partial `quick-view` → thay vùng giá, tồn, bộ chọn, nút, ảnh.
+- Không JS: quickview không mở (card là link PDP).
 
 ## 4. Quick view: nút mở trên card
 
@@ -177,8 +177,9 @@ Figma 1:502 không có (figma-inventory hàng 5 liệt "quick add" là thiếu).
 | Recommendations heading | text | Pairs Well With | ≤ 30 ký tự | ĐỀ XUẤT |
 | Empty cart products | collection | trống | trống → chỉ empty state, không hàng gợi ý | ĐỀ XUẤT (12 §1 Must giỏ trống) |
 | Show quick view button | checkbox | true | nhóm Product cards | Chốt M1 (10/11); AC chờ ES1-T272 |
-Ngưỡng thu gọn option (> 10 giá trị, hiện 7 + "+N") là hằng trong snippet bộ chọn, không thành setting (câu CTO 2).
 | Show vendor in quick view | checkbox | true | eyebrow | ĐỀ XUẤT |
+
+Ngưỡng thu gọn option (> 10 giá trị, hiện 7 + "+N") là hằng trong snippet bộ chọn, không thành setting (sổ M5, variant-picker §11).
 
 Label qua `t:` trong `locales/en.default.schema.json`, không ký tự `&`. Không thêm setting màu: drawer, dialog dùng scheme mặc định.
 
@@ -209,8 +210,8 @@ Quick view:
 | Đang tải (5a) | dialog mở ngay khi bấm, skeleton: tên, ảnh vuông, giá, 3 swatch, nút; "Loading product…" status | foundation §18; sổ 09/11 ảnh popup tải khi mở |
 | Mặc định | khung 2 | |
 | 3 option, option > 10 giá trị (2b, 2c) | thu 7 + "+N"; mở hết tại chỗ, sheet/dialog cuộn, hàng mua + nút đóng dính | §3.1; ticket 3b |
-| Đang tải biến thể (5g) | giá skeleton, "Checking availability…", Add To Cart `aria-busy`, lựa chọn đổi ngay | §3.1; 05 §5 |
-| Lỗi tải biến thể | giữ biến thể cũ + `.qv__error` + "Try Again" (dùng mẫu 5d/5e, không vẽ riêng) | foundation §18 |
+| Đang tải biến thể (5g) | giá skeleton, "Checking availability…" + spinner 12, Add To Cart giữ màu `aria-disabled` (không spinner), lựa chọn đổi ngay | §3.1; variant-picker §6 |
+| Lỗi tải biến thể | giữ biến thể cũ + chữ đỏ, icon dưới option + "Try Again" (mẫu PDP J4, không vẽ riêng) | variant-picker §6 |
 | Biến thể hết hàng (5b) | giá + badge Sold out; mọi option gạch (kiểu hết hàng §3.1); chấm muted "Sold out"; stepper + nút disabled "Sold Out"; "View Detail" vẫn dùng được | code product-form; 05 §3, §5 |
 | Tổ hợp không tồn tại (5c) | option đang chọn gạch + viền nét đứt (kiểu không tồn tại §3.1); "Unavailable"; nút disabled "Unavailable"; khung 5c vẽ thêm hover "View Detail" | code `data-label-unavailable` |
 | Đang thêm (5d) | nút `aria-busy`, spinner, cùng bề rộng; không bấm lại | foundation §6; 05 §5 |
@@ -275,7 +276,7 @@ Tương phản (tính tay WCAG, số từ foundation §2; L muted-light 0.147, a
 
 Token: chỉ token có sẵn (`--color-*`, `--space-*`, `--radius-*`, `--motion-*`, `--font-*`) + giá trị dẫn xuất foundation §2 (`--overlay-scrim`, `--shadow-overlay`, `--shadow-raised`, `--radius-dialog`, `--control-height`). Không thêm token. Màu swatch lấy từ `value.swatch.color` của Shopify (mockup giả lập bằng token).
 
-Chuỗi mới (đề xuất key, Dev FE thêm vào `locales/en.default.json`): `cart.view_cart` "View cart", `cart.item_count` "{{ count }} item(s)" (one/other), `cart.added` "Added to cart", `cart.shipping_at_checkout` "Taxes and shipping calculated at checkout.", `cart.note_toggle` "Add order note", `cart.note_hint` "Saved with your order.", `cart.line_sold_out` "This item is sold out. Remove it to check out.", `cart.sold_out_summary` "{{ count }} item is sold out", `cart.update_error_title` "We couldn't update your cart", `cart.decrease_label` / `cart.increase_label` "Decrease/Increase quantity for {{ title }}", `cart.empty_heading` "Your Cart Is Empty", `cart.empty_text`, `cart.empty_cta` "Shop Bestsellers", `cart.recommendations_add` "Add", `cart.recommendations_choose` "Choose", `products.quick_view.open` "Quick View", `.close` "Close quick view", `.view_detail` "View Detail" (Figma 1:816), `.previous_image` "Previous image", `.next_image` "Next image", `.quantity` "Quantity", `.image_label` "Show image {{ index }} of {{ count }}", `.loading` "Loading product…", `.load_error_title` "We couldn't load this product", `general.try_again` "Try Again". Vòng 3b: `products.variant.sold_out_suffix` ", sold out", `.unavailable_suffix` ", unavailable", `.show_more` "+{{ count }}" + ẩn "more {{ option }} options", `.show_fewer` "Show fewer", `.checking` "Checking availability…", `.loading_value` "Loading {{ value }}…", `cart.subtotal` (có sẵn trong code), `cart.discount_label` ẩn "Discount". Giữ có sẵn: `cart.title`, `cart.checkout`, `cart.free_shipping_*`, `cart.quantity_*`, `cart.remove_label`, `cart.removed`, `cart.error`.
+Chuỗi mới (đề xuất key, Dev FE thêm vào `locales/en.default.json`): `cart.view_cart` "View cart", `cart.item_count` "{{ count }} item(s)" (one/other), `cart.added` "Added to cart", `cart.shipping_at_checkout` "Taxes and shipping calculated at checkout.", `cart.note_toggle` "Add order note", `cart.note_hint` "Saved with your order.", `cart.line_sold_out` "This item is sold out. Remove it to check out.", `cart.sold_out_summary` "{{ count }} item is sold out", `cart.update_error_title` "We couldn't update your cart", `cart.decrease_label` / `cart.increase_label` "Decrease/Increase quantity for {{ title }}", `cart.empty_heading` "Your Cart Is Empty", `cart.empty_text`, `cart.empty_cta` "Shop Bestsellers", `cart.recommendations_add` "Add", `cart.recommendations_choose` "Choose", `products.quick_view.open` "Quick View", `.close` "Close quick view", `.view_detail` "View Detail" (Figma 1:816), `.previous_image` "Previous image", `.next_image` "Next image", `.quantity` "Quantity", `.image_label` "Show image {{ index }} of {{ count }}", `.loading` "Loading product…", `.load_error_title` "We couldn't load this product", `general.try_again` "Try Again". Bộ chọn biến thể (`products.variant.*`: hậu tố ẩn, "+N", "Show Fewer", "Checking availability…", "Loading {{ value }}…", lỗi tải): variant-picker §10. Vòng 3b: `cart.subtotal` (có sẵn trong code), `cart.discount_label` ẩn "Discount". Giữ có sẵn: `cart.title`, `cart.checkout`, `cart.free_shipping_*`, `cart.quantity_*`, `cart.remove_label`, `cart.removed`, `cart.error`.
 
 ## 10. Lệch giữa code hiện tại và spec (cho Dev FE)
 

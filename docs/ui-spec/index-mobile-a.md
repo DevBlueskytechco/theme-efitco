@@ -1,6 +1,24 @@
-KHÔNG CHẮC: (1) Figma chỉ có desktop 1920 và không có trạng thái: mọi bố cục 768/360 và mọi trạng thái là ĐỀ XUẤT phát triển từ 1:359. (2) Ảnh `efx-slide-2.jpg` trên store dev cắt sát đỉnh đầu người mẫu ở khung 4/3 và 3/4 (khác Figma 1:437 còn khoảng trống trên đầu); mockup để `object-position` 0% dọc, merchant chỉnh focal point. (3) demo-data không xuất metafield `reviews.rating`: badge "★ 5.0" trên card 1 và 3 lấy theo Figma, thật thì theo metafield. (4) Giá, % giảm lấy từ demo-data nên khác số tĩnh của Figma (−24%, −17%, −22% thay −25%; tổng shop the look $1,187.98 thay $1,186.99). (5) SRS TE-2 AC2 còn ghi "360 luôn căn giữa", trái sổ quyết định 10/11 (căn trái mép 20): theo sổ, đã hỏi BA ở ES1-T280 (kèm câu rating ở (3)).
+KHÔNG CHẮC: (1) Figma chỉ có desktop 1920 và không có trạng thái: mọi bố cục 768/360 và mọi trạng thái là ĐỀ XUẤT phát triển từ 1:359. (2) Ảnh `efx-slide-2.jpg` trên store dev cắt sát đỉnh đầu người mẫu ở khung 4/3 và 3/4 (khác Figma 1:437 còn khoảng trống trên đầu); focal point 25% / 0% (§9.1). Tỉ lệ ảnh ~2.18:1 đo từ bản CDN `?width=960` (960 × 440), không có kích thước gốc; màu nền sau chữ ước lượng bằng mắt trên PNG, không có công cụ lấy mẫu điểm ảnh. (3) demo-data không xuất metafield `reviews.rating`: badge "★ 5.0" trên card 1 và 3 lấy theo Figma, thật thì theo metafield. (4) Giá, % giảm lấy từ demo-data nên khác số tĩnh của Figma (−24%, −17%, −22% thay −25%; tổng shop the look $1,187.98 thay $1,186.99). (5) SRS TE-2 AC2 còn ghi "360 luôn căn giữa", trái sổ quyết định 10/11 (căn trái mép 20): theo sổ, đã hỏi BA ở ES1-T280 (kèm câu rating ở (3)).
 
 # UI spec: Trang chủ 768 và 360, phần A (ES1-T278)
+
+## Thay đổi audit (ES1-T292, audit ES1-T283 A8, A9, A10)
+
+| Audit | Chỗ sửa | Trước | Sau |
+| --- | --- | --- | --- |
+| A8 | §10, §9.2 | Ảnh hero hiện dần khi cuộn tới (900ms): trễ LCP mobile | Ảnh slide 1 hiện ngay, không reveal; chỉ chữ hero được hiện dần lúc tải (400ms, không chờ cuộn). `sizes` hero sửa theo bề rộng ảnh thật khi `cover` (291vw / 164vw), srcset tối đa 1920w |
+| A9 | §9.1 | `efx-slide-2.jpg` focal 66% (360) / 70% (768): chữ đè người mẫu, điểm sáng ~2.7:1 | Giữ `efx-slide-2.jpg` (ảnh có nền phông trơn 40% trái), focal point 25% / 0% cho mọi mốc: vùng chữ 360 và 768 nằm hẳn trên phông trơn, ≥ 5.4:1; `efx-slide-1.jpg` loại (360 không có vùng trơn đủ rộng cạnh mặt người mẫu) |
+| A10 | `docs/ui-spec/index.md` dòng đầu | Spec ES1-T252 (gốc live) còn hiệu lực ngầm | Ghi "ĐÃ THAY bởi index-mobile-a.md, index-mobile-b.md (10/11)"; `drafts/designer/ES1-T252/` ngoài phạm vi file, xem §14 |
+
+Giữ nguyên các mục khác. Mockup `drafts/designer/ES1-T278/index.html` chỉ đổi thẻ ảnh hero (focal, srcset/sizes, kích thước 1920 × 880); PNG 360, 768 render lại.
+
+### Thay đổi audit (ES1-T291, audit ES1-T283 A13)
+
+| # | Mục | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | §7 Shop the look, panel | chữ phụ trắng 60% (5.27); dòng giảm giá chữ trắng | `--panel-muted` (6.56), `--panel-saving` (5.64) + icon tag, cặp chung foundation §2 | foundation §2; sổ 10/11 G3 |
+
+Chỉ §7 đổi (trỏ màu). Mockup T278 render lại khi chạm khối shop the look; §6 Quiz, §9.1 ghi ở foundation §25.
 
 Mục đích: người mua trên tablet và điện thoại hiểu Efitco bán gì ngay màn đầu, tới được danh mục, cấp độ, bestseller, quiz, combo mà không mở menu. Story TE-17 (khối thuộc TE-1, TE-2, TE-3, TE-11, TE-12, TE-7). Template `templates/index.liquid`.
 
@@ -123,6 +141,8 @@ A11y: `role="tablist"/"tab"/"tabpanel"`, ←/→ đổi tab, tab chưa chọn `t
 
 ## 6. Quiz (Figma 1:506)
 
+Kết quả quiz (popup sau bước 3, mọi mốc): `docs/ui-spec/quiz-result.md` (ES1-T285).
+
 Figma: panel #393942 1416 × 570 bo 24, padding 60; trái pill accent "● Our most-loved feature", h2 48 trắng "Find Your Perfect Gear", câu phụ, 2 ghi chú icon (20 seconds, No sign-up required); phải thẻ trắng 608 × 450 bo 16: thanh tiến độ accent 1/3 + "Step 1 of 3", h3 "Where do you want to focus?", gợi ý, body map 152 × 256 nền sand bo 12, 3 lựa chọn 80 cao (ảnh tròn 44, tên 18/600, mô tả 14, radio phải; chọn: nền sand + dấu check cam).
 
 | | 360 | 768 |
@@ -149,10 +169,10 @@ Figma: eyebrow "SHOP THIS SETUP", h2 48, link "Browse All Setups" phải; ảnh 
 | Ảnh | 320 × 279 (giữ 936/816 để điểm nóng đúng vị trí), bo 16 | 728 × 635 |
 | Dưới ảnh | 1 cột, cách 24: ô Fits → 4 hàng (cách 12) → panel | ĐỀ XUẤT: lưới `1fr 280`, gap 16: trái ô Fits + 4 hàng, phải panel `position: sticky` (top 80 + 16) |
 | Hàng | 64 + tên/giá, padding 12, bo 8; đang chọn viền 2px accent | như 360 |
-| Panel | padding 24; dòng 14/500 trắng 60%; tổng 18/700 trắng; nút full cao 48, cách 16 | như 360 |
+| Panel | padding 24; dòng 14/500 `--panel-muted` (foundation §2, 6.56); tổng 18/700 trắng; nút full cao 48, cách 16 | như 360 |
 
 Lý do 768: nút "Add Setup To Cart" đưa lên ngang danh sách, gần ảnh (05 nhóm 4 §1.3 "CTA rất gần khi cuộn nhẹ"; 19 §D1 tablet tận dụng bề ngang). Panel dính trong khối, không ra ngoài khối.
-Không có dòng ghi chú giảm giá dưới panel (sổ 07/11). Dòng giảm giá chữ trắng + dấu "−" (xanh Figma chỉ 2.50:1 trên panel, code ES1-T145 #4 đã làm vậy).
+Không có dòng ghi chú giảm giá dưới panel (sổ 07/11). Màu panel theo cặp chung của foundation §2 (panel tối G3, sổ 10/11): chữ phụ `--panel-muted`, dòng giảm giá `--panel-saving` (5.64) + icon tag 16 + dấu "−" (xanh Figma chỉ 2.50:1 trên panel; thay chữ trắng của vòng 3 / code ES1-T145 #4 để cùng cart, mini cart, bundle). Bảng §9.1 dòng "dòng phụ panel trắng 60%" không còn áp cho shop the look.
 Trạng thái (ĐỀ XUẤT): bấm điểm nóng → hàng tương ứng viền cam + cuộn tới hàng (360); hàng hết hàng: badge Sold out, ảnh 0.6, không tính vào tổng, số món giảm; tất cả hết hàng: ẩn panel (code đã có); đang thêm: nút `aria-busy` + spinner, giữ bề rộng; lỗi thêm giỏ: hộp lỗi `role="alert"` "Setup Not Added" + "Try Again"; thành công: mở mini cart (TE-5). Tổng nên in sẵn từ Liquid để không có ô trống trước khi JS chạy (như ĐỀ XUẤT ES1-T252 §1 khối 7).
 A11y: điểm nóng 44 × 44 (chấm 20), tên "Show {product} in the list", `aria-pressed`; hàng: 1 link (tên sản phẩm), ảnh `alt=""`; panel `aria-live="polite"` cho tổng; link "Browse All Setups" mô tả đích.
 
@@ -180,8 +200,17 @@ A11y: ảnh `alt=""` (trang trí), tiêu đề `<h2>` một khối, màu 2 tông
 
 | Chỗ | Cặp | Tỉ lệ | Kết luận |
 | --- | --- | --- | --- |
-| Chữ hero, lớp 30% trên tông nền chính #8B8279 | trắng / #69635C (L 0.127) | 5.93 | Đạt; điểm sáng (dây áo) còn ~2.7, theo sổ 10/11 chọn ảnh nền trơn sau chữ |
-| Dot hero (viền trắng) | trắng / như trên | 5.93 | Đạt ≥ 3 (phi chữ) |
+| Chữ hero 360/768, lớp 30% trên phông trơn `efx-slide-2.jpg` #8B8279 | trắng / #69635C (L 0.127) | 5.93 | Đạt |
+| Như trên, điểm sáng nhất của phông trong vùng chữ (#908A80) | trắng / #6D6861 (L 0.141) | 5.49 | Đạt; vùng chữ không chạm da, tóc, dây áo (focal 25% / 0%, dưới) |
+| Dot hero 360, nút 52 hero 768 (phi chữ) | trắng / phông như trên | ≥ 5.4 | Đạt ≥ 3 |
+
+Ảnh hero (sổ 10/11 "thiếu AA thì chọn ảnh nền trơn, không tăng lớp tối"), sửa ES1-T292:
+- File: `efx-slide-2.jpg` (slide 1, như Figma 1:422). Phông trơn chiếm ~40% bên trái ảnh, người mẫu từ ~40% sang phải (mặt 40–53% ngang, 0–36% dọc; tay trái 45–53% ngang, 43–100% dọc).
+- Focal point: x 25%, y 0% (đặt trên file trong Admin, Shopify xuất `object-position`); y không ảnh hưởng ở 360/768 vì ảnh rộng hơn khung, khớp theo chiều cao.
+- 360 (khung 360 × 480, ảnh hiện 1047 rộng): cửa sổ thấy 16–51% ngang ảnh; khối chữ x 20–300 = 18–45% ảnh, dọc 32–88%, chỉ trên phông; mặt người mẫu ở mép phải khung.
+- 768 (khung 768 × 576, ảnh hiện 1257 rộng): cửa sổ 10–71%; khối chữ x 20–415 = 11–43% ảnh, dọc 21–79%, chỉ trên phông; người mẫu, dây áo, tay ở nửa phải.
+- Loại `efx-slide-1.jpg` cho slide 1: phông trơn chỉ 0–29% ngang, mặt ở 49–63%; khung 360 (34% bề ngang ảnh) không thể vừa thấy mặt vừa để chữ trên phông.
+- Lớp tối giữ 30%, không tăng. Ảnh khác merchant thay vào: cần vùng trơn ≥ 45% ngang bên trái (ghi trong `info` setting ảnh, §14).
 | Tên danh mục, h2 trên dải tối | trắng / #1A1A1A | 17.4 | Đạt |
 | Tiêu đề intro, tên lựa chọn quiz đang chọn | #1A1A1A / sand (L 0.796) | 14.0 | Đạt |
 | Đoạn phụ trên sand (Make fitness, mô tả lựa chọn đang chọn) | #4D4D4D / sand | 6.81 | Đạt |
@@ -200,7 +229,7 @@ A11y: ảnh `alt=""` (trang trí), tiêu đề `<h2>` một khối, màu 2 tông
 - Không làm mờ chữ khi loading (Lighthouse tính opacity).
 
 ### 9.2 Performance
-- LCP: ảnh slide 1 (`efx-slide-2.jpg`) eager + `fetchpriority="high"`, `sizes="100vw"` dưới 80rem (360 → ~720w, 768 → ~1536w). Slide 2 lazy.
+- LCP: ảnh slide 1 (`efx-slide-2.jpg`) eager + `fetchpriority="high"`, hiện ngay khi tải, không reveal (§10). Ảnh `cover` khớp theo chiều cao nên rộng hơn khung: `sizes="(min-width: 80rem) 100vw, (min-width: 48rem) 164vw, 291vw"` (360: 480 × 2.18 = 1047 = 291vw; 768: 576 × 2.18 = 1257 = 164vw); srcset 1080, 1600, 1920w, không vượt 1920 (giới hạn dung lượng LCP mobile). Sửa ES1-T292: `sizes="100vw"` cũ tải ảnh hẹp hơn chỗ hiện, mờ ở DPR 2. Slide 2 lazy.
 - Mọi ảnh dưới màn đầu `loading="lazy"` + width/height; ảnh ẩn ở 360 (body map, ảnh 3 Make fitness) là lazy + `display: none` nên không tải.
 - Màn đầu 360: header 80 + hero 480 = 560, tiêu đề Browse Categories ở ~608 (thấy được trên máy 360 × 740): danh mục chính lộ ngay (07 §D "đường dẫn danh mục chính trên homepage").
 - CLS: mọi ảnh có `aspect-ratio`; tổng shop the look in từ Liquid; panel sticky không đổi layout.
@@ -214,7 +243,12 @@ A11y: ảnh `alt=""` (trang trí), tiêu đề `<h2>` một khối, màu 2 tông
 - Mockup 0 lỗi console ở 360 và 768; PNG đúng bề ngang viewport (không tràn ngang; hàng cuộn tự cắt).
 
 ## 10. Motion
-Theo sổ 09/11 và F§19: tiêu đề, card, ảnh hero hiện dần khi cuộn tới (900ms, lệch 80ms/card, 1 lần); hover 150–250ms; tab đổi lưới fade 250ms; chỉ transform/opacity/clip-path; tắt khi `prefers-reduced-motion`.
+Theo sổ 09/11 và F§19, sửa ES1-T292 (audit A8):
+- Màn đầu (header, hero): ảnh slide 1 và lớp tối KHÔNG có hiệu ứng vào (không opacity, clip-path, scale), hiện ngay khi tải: ảnh là LCP, reveal làm trễ LCP mobile (chỉ tiêu ≥ 90, sổ 09/11). Cùng cách `product.md` §14, `blog.md` §7, `article.md`.
+- Chữ hero (eyebrow, H1, câu phụ, nút): ĐỀ XUẤT hiện dần ngay lúc tải, không chờ cuộn: opacity 0 → 1 + translate 16px → 0, 400ms, lệch 60ms, ease-out; xong trước 700ms (15 §1 "100–500ms"; 15 §3 chỉ tiêu đề, ảnh chính, CTA). Không áp cho ảnh.
+- Chuyển slide: opacity 500ms, chỉ khi người dùng bấm (§2).
+- Từ Browse Categories trở xuống: tiêu đề, card hiện dần khi cuộn tới (900ms, lệch 80ms/card, 1 lần).
+- Hover 150–250ms; tab đổi lưới fade 250ms; chỉ transform/opacity/clip-path; tắt khi `prefers-reduced-motion` (chữ hero hiện ngay).
 
 ## 11. Settings merchant
 Không thêm setting. Dùng có sẵn; chỉ đổi mặc định trong template:
@@ -246,3 +280,19 @@ CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions
 1. Hero 768 tràn màn 4/3 không bo, chữ mép 20, 2 nút 52 góc dưới phải, không dot (thay thẻ bo trong container chữ lùi vào)? Đề xuất: có (§2).
 2. 360 ẩn ảnh trang trí để khối ngắn: body map quiz và ảnh thứ 3 Make fitness, panel quiz tràn mép? Đề xuất: có (§6, §8; 07 §C, 19 §D6).
 3. Bestseller 768 lưới 4 cột 170 (1 hàng như Figma) thay 3 cột của foundation khi số sản phẩm chia hết cho 4? Đề xuất: có (§5).
+
+## 14. Đề xuất cho file ngoài phạm vi ES1-T292 (không sửa ở ticket này)
+
+| File | Đề xuất | Phía |
+| --- | --- | --- |
+| Admin store dev, Content > Files `efx-slide-2.jpg` | Đặt focal point 25% / 0% | DevOps người (store dev) |
+| `blocks/slideshow-slide.liquid` | Ảnh xuất `object-position` từ `image.presentation.focal_point` (kiểm `image_tag`); `sizes` như §9.2; không class reveal trên ảnh slide 1; `info` setting ảnh: "Keep the left 45% plain behind the text" | FE |
+| `templates/index.liquid` | `overlay_opacity: 30` cho slide 1, 2 (đã có ở §12) | FE |
+| `assets/*.js` (reveal) | Bỏ quan sát reveal cho ảnh hero; chữ hero chạy lúc tải, không chờ IntersectionObserver | BE |
+| `drafts/designer/ES1-T252/` | Xoá hoặc thêm `README` "ĐÃ THAY bởi ES1-T278" để không lẫn | Orchestrator |
+| 1280 (ticket trang chủ 1280 riêng) | Kiểm focal 25% ở khung thẻ 1280: thẻ gần tỉ lệ ảnh nên lệch nhỏ, chữ vẫn trên phông | Designer |
+
+## 15. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
+
+1. Chữ hero hiện dần lúc tải 400ms hay hiện ngay hoàn toàn? Đề xuất: hiện dần 400ms (§10), ảnh luôn hiện ngay.
+2. Focal point hero đặt trên file ảnh (Admin) hay thêm setting `image_position` cho slide? Đề xuất: focal point trên file, không thêm setting (Shopify có sẵn, merchant quen).

@@ -1,17 +1,23 @@
-# SRS — theme-efitco · bản 0.2 · BA · 06/11/2026 (bản 0.1: 22/10/2026)
+KHÔNG CHẮC: (1) B2B (quantity rules, volume pricing) cần store bật được B2B, chờ ES1-T297 #1; (2) mã giảm giá popup và email gửi mã chờ ES1-T297 #2, #3; (3) spec ES1-T288 (product-shopify-features) và ES1-T289 (localization) ở nhánh khác, chưa đọc được: TE-4 AC18, AC19 và TE-1 AC9 chỉ ghi phần CTO đã chốt, chi tiết hình theo spec khi merge; (4) file này thay `docs/srs.md` (BA không ghi được docs/, Orchestrator chép).
+
+# SRS — theme-efitco · bản 0.3 · BA · 10/11/2026 (bản 0.2: 06/11/2026, bản 0.1: 22/10/2026)
 
 Nguồn: charter, PRD, Figma Efitco T10 (home), Skeleton AGENTS.md, Theme Store requirements (chuẩn nội bộ, mã R), Canvas requirements (22/10/2026). Bản 0.2: ES1-T173, theo ES1-T167, T168, T169 và CTO duyệt 06/11. AC-H* có mã TC-H* tương ứng; bảng nội dung theo node ở `drafts/ba/ES1-T173/home-content.md`.
 
+Bản 0.3: ES1-T294, khớp `docs/design/decisions.md` (sổ quyết định, CTO 09/11, 10/11, audit ES1-T283) và trả lời ES1-T272, ES1-T273 #1, ES1-T280 #1. Bảng thay đổi: `drafts/ba/ES1-T294/srs-changes.md`; ma trận truy vết: `drafts/ba/ES1-T294/traceability.md`; dữ liệu demo: `drafts/ba/ES1-T294/demo-data-b2b.md`. SRS mâu thuẫn với sổ quyết định thì sổ thắng; lệch chưa sửa ở mục 4. AC đánh dấu "(0.3)" là sửa hoặc mới trong bản này.
+
 ## 0. Thuật ngữ
 Block = đơn vị giao diện trong `blocks/` của Skeleton (thay cho section). Template = `templates/*.liquid` compose block. Partial = vùng HTML refresh không reload. Canvas = nơi merchant sửa theme; Sidekick = agent sửa file theme.
+Option value = một giá trị của một option sản phẩm (vd "45 lb" của option Weight). Bộ chọn biến thể chung = cùng một bộ chọn dùng ở trang sản phẩm và quickview (TE-4 AC13–AC15). Lớp = popup, drawer, dialog, menu đang mở trên trang (TE-18).
 
 ## 1. Yêu cầu phi chức năng
-- NFR-1 Lighthouse home/product/collection: performance ≥ 96 desktop, ≥ 90 mobile; accessibility ≥ 98 (Theme Store tối thiểu 60/90).
+- NFR-1 Lighthouse home/product/collection: performance ≥ 96 desktop, ≥ 90 mobile; accessibility ≥ 98 (Theme Store tối thiểu 60/90). Lệch chỉ tiêu nghiệm thu 09/11: mục 4 L1.
 - NFR-2 theme check 0 lỗi, không override; không console error.
 - NFR-3 Kiến trúc đúng AGENTS.md; mọi thay đổi Sidekick làm vẫn giữ cấu trúc.
 - NFR-4 Mọi tương tác có fallback không JS (form submit).
 - NFR-5 Trình duyệt: Safari 2 bản, Chrome 3, Firefox 3, Edge 2; mobile Safari/Chrome/Samsung; webview IG/FB/Pinterest.
 - NFR-6 Không phụ thuộc app; không script ngoài Shopify CDN.
+- NFR-7 (0.3, sổ 10/11 "2048 biến thể") Mọi chỗ chọn biến thể (trang sản phẩm, quickview, card, sticky bar) chạy đúng với sản phẩm tới 2048 biến thể, tối đa 3 option: không dựng từ danh sách biến thể, không nhúng JSON toàn bộ biến thể vào HTML.
 
 ## 2. Module và story
 
@@ -21,16 +27,16 @@ Phía: FE · Ước lượng sơ bộ: 8 point (techlead chốt)
 Là merchant, tôi muốn theme có header 2 cấp, footer, announcement bar và màu/chữ theo Efitco T10 để mọi trang nhất quán ngay khi cài.
 
 - AC1 Given tokens.json từ Figma When render bất kỳ trang Then màu nền/chữ/accent, font chính, khoảng cách, bo góc lấy từ settings (css-variables), không hardcode trong CSS.
-- AC2 Given menu main-menu có 2 cấp When mở header desktop Then cấp 2 hiện dropdown, mở bằng hover và keyboard (Enter/Space, Esc đóng); mobile Then drawer có accordion.
+- AC2 (0.3, N1 CTO 10/11, `docs/ui-spec/navigation.md`) Given menu main-menu có 2 cấp When mở header từ 80rem Then cấp 2 mở bằng hover và keyboard (Enter/Space mở, Esc đóng) theo navigation.md. Given dưới 80rem, có JS When chạm mục có cấp 2 trong drawer Then panel cấp 2 trượt vào trong cùng drawer, có nút Back (tên truy cập "Back to menu", cao ≥ 44px) và nút đóng, focus chuyển vào Back; bấm Back Then về cấp 1, focus về mục vừa mở. Given không JS Then cấp 2 là accordion `<details>` tại chỗ, không trượt, không có Back.
 - AC3 Given shop bật customer accounts When render header desktop và mobile Then có <shopify-account>, cart link có số lượng, search link.
 - AC4 Given setting announcement text rỗng (mặc định — Figma không có announcement bar) When render Then không có announcement bar; có text Then bar hiện trên header, có link tuỳ chọn.
-- AC5 Given shop bán ≥ 2 nước hoặc ngôn ngữ When render footer Then có country selector và language selector theo UX guideline Shopify; 1 nước/ngôn ngữ Then không hiện.
+- AC5 (0.3) Given shop bán ≥ 2 nước hoặc ≥ 2 ngôn ngữ When render footer và drawer mobile Then có control localization gộp theo AC9, theo UX guideline Shopify; 1 nước và 1 ngôn ngữ Then không hiện control.
 - AC6 Given footer When render Then có newsletter form (customer form, thông báo thành công/lỗi), menu footer default footer, social icons từ settings, payment icons từ shop.enabled_payment_types đủ màu.
 - AC7 Given mọi trang When kiểm Then html lang = request.locale.iso_code, meta-tags snippet có title/description/canonical/og/twitter, page_image.
 - AC8 Given token docs/tokens.json When render Then font heading Sofia Sans Condensed qua font_picker, body Inter; chữ phụ trên nền sáng dùng `--color-muted-light` #6B6B6B (≥ 4.5:1), #999999 chỉ trên nền tối.
-- AC9 (trả lời ES1-T8, Designer 30/10) Given trang chủ có hero ở đầu When render header Then header trong suốt đè lên hero, chữ/icon trắng; trang không có hero Then nền `--color-background`, chữ `--color-foreground`. Given hero có ảnh When render Then lớp phủ đen theo setting `overlay_opacity` (mặc định 30%) để chữ đạt AA. Given cuộn quá 80px When header sticky (setting `sticky_header`, mặc định bật) Then nền trắng, bóng nhẹ, chữ `--color-foreground`. Given footer When render localization Then 1 nút gộp "USD / EN" mở 2 danh sách country và language (thay cách tách 2 selector ở AC5).
+- AC9 (0.3, sổ 10/11 "header trang chủ", "header trang con", "hero 768 và 360"; thay bản 30/10 của ES1-T8) Given mọi trang, kể cả trang chủ có hero và trang con có banner hoặc ảnh bìa When render header Then header là thanh tối riêng cao 80px, nền `--color-background-dark` có noise (Figma 1:362), chữ và icon dùng `--color-background-dark-foreground`; header không đè ảnh: đỉnh hero, banner nằm dưới đáy header. Given setting `sticky_header` bật (mặc định) When cuộn quá 80px Then header dính đỉnh, giữ nền tối, thêm bóng, chiều cao không đổi (CLS 0). Given hero có ảnh When render ở 768 và 360 Then lớp tối theo setting `overlay_opacity` mặc định 30%; từ 1280 hero giữ như Figma 1:361. Given localization hiện theo AC5 When render footer và drawer mobile Then đúng 1 control gộp (cờ + "USD / EN") mở 2 danh sách country và language; không có 2 nút tách Currency và Language (ES1-T289).
 - AC-H28 (TC-H28, hàng 16) Given footer mặc định When render 1920 Then đủ: logo, mô tả, ảnh newsletter nếu đã chọn, heading 2 màu đạt AA, nút "Get 15% Off" + icon, "No spam. Unsubscribe anytime.", đúng 1:1104.
-- AC-H29 (TC-H29, hàng 1, 2; story TE-1, TE-2) Given hero thật trên `/` When ở đầu trang và cuộn quá 80px Then header trong suốt chữ trắng, rồi nền trắng chữ foreground; bật lại TE-1 TC-46, TC-47.
+- AC-H29 (0.3, TC-H29 viết lại, hàng 1, 2; story TE-1, TE-2) Given hero thật trên `/` When ở đầu trang và khi cuộn quá 80px Then header là thanh tối cao 80px, đáy header ≤ đỉnh hero (không chồng lên hero), nền header không đổi khi cuộn; TE-1 TC-42, TC-46 bỏ, TC-47 viết lại theo AC9 (lớp tối 30% chỉ ở 768, 360).
 
 Mã R: R4 menu đa cấp, newsletter, country/language, Follow on Shop, shopify-account; R7 layout; R11 SEO; R13 social; R14–R16 settings/font/màu
 
@@ -40,57 +46,81 @@ Phía: FE + BE (JS slideshow) · Ước lượng sơ bộ: 8 point (techlead ch�
 Là merchant, tôi muốn block slideshow (mỗi slide: ảnh hoặc video, 2 nút, 3 bố cục) và block rich text để mở đầu trang chủ theo Figma.
 
 - AC1 Given hero có ảnh When render Then ảnh có focal point từ image_picker, srcset, eager load ở vị trí đầu trang; có video Then dùng video setting, autoplay muted loop, có poster.
-- AC2 Given bố cục chọn trái/giữa/phải When render Then nội dung căn đúng ở 1280 và 768; ở 360 luôn căn giữa theo Figma.
+- AC2 (0.3, sổ 10/11 "hero 360", ES1-T280 #1) Given bố cục chọn trái/giữa/phải When render Then nội dung căn đúng ở 1280 và 768; ở 360 luôn căn trái, cùng mép 20px với các khối bên dưới (thay căn giữa của bản 07/11).
 - AC3 Given 0, 1 hoặc 2 nút có label When render Then chỉ nút có label hiện; nút có href từ url setting; nút thứ hai kiểu secondary.
 - AC4 Given chưa chọn ảnh/video When trong editor Then placeholder lifestyle image; ngoài editor Then nền màu từ setting.
 - AC5 Given rich text When render Then heading, body richtext, nút tuỳ chọn, độ rộng tối đa setting; heading level chọn h1/h2.
-- AC6 Given slideshow có 1–5 slide (block con `slide`, mỗi slide theo AC1–AC4) When render Then chỉ slide đầu là LCP: ảnh slide 1 eager + fetchpriority high, slide sau lazy; 1 slide Then ẩn nút trái/phải và chấm. Root slideshow mang `data-header-overlay` khi đứng đầu trang (TE-1 AC9).
-- AC7 Given ≥ 2 slide When người dùng bấm nút trái/phải, chấm, hoặc vuốt (cảm ứng) Then chuyển slide, chấm hiện slide đang xem (`aria-current`), slide ẩn có `inert`; không JS Then các slide cuộn ngang bằng scroll-snap, vẫn xem được hết.
+- AC6 (0.3) Given slideshow có 1–5 slide (block con `slide`, mỗi slide theo AC1–AC4) When render Then chỉ slide đầu là LCP: ảnh slide 1 eager + fetchpriority high, slide sau lazy; 1 slide Then ẩn nút trái/phải và chấm. Hero nằm dưới header (TE-1 AC9): root slideshow không mang hook đè header `data-header-overlay`.
+- AC7 Given ≥ 2 slide When người dùng bấm nút trái/phải, chấm, hoặc vuốt (cảm ứng) Then chuyển slide, chấm hiện slide đang xem (`aria-current`), slide ẩn có `inert`; không JS Then các slide cuộn ngang bằng scroll-snap, vẫn xem được hết. Lệch sổ 07/11 về chấm desktop: mục 4 L2.
 - AC8 Given setting autoplay bật (mặc định tắt) When chạy Then đổi slide theo khoảng thời gian setting (3–10 s), có nút tạm dừng, dừng khi hover/focus và khi `prefers-reduced-motion: reduce`; không reset vòng lặp giả.
 - AC9 Given trình đọc màn hình When vào slideshow Then root `role="region"` + `aria-roledescription="carousel"` + `aria-label`; mỗi slide `role="group"` + `aria-roledescription="slide"` + nhãn "n / tổng"; nút có tên truy cập.
 
 Mã R: R3 layout; R12 a11y carousel; R14 settings; R17 ảnh responsive; R6 Lighthouse (LCP slide 1)
 
-### TE-3 — Block featured collection và product card
-Phía: FE+BE · Ước lượng sơ bộ: 8 point (techlead chốt)
+### TE-3 — Block featured collection, product card và quickview
+Phía: FE+BE · Ước lượng sơ bộ: 8 point (techlead chốt; quickview AC9–AC12 là phần mới, techlead tách)
 
 Là merchant, tôi muốn đặt block hiện sản phẩm của một collection trên trang chủ để khách thấy hàng nổi bật mà không vào trang collection.
+Là khách (0.3, ES1-T272), tôi muốn chọn biến thể và thêm vào giỏ từ card qua quickview để không phải rời trang đang xem.
 
 - AC1 Given chọn collection When render Then hiện tối đa N sản phẩm (4–12, mặc định 4 theo Figma, D7 của ES1-T169), lưới 2 cột ở 360, 3–5 cột ở 1280 theo setting.
-- AC2 Given sản phẩm có ≥ 2 màu có swatch When render card Then hiện swatch (swatch.color hoặc swatch.image); chọn swatch đổi ảnh card và link biến thể, không reload; keyboard chọn được.
+- AC2 (0.3, foundation §9, ES1-T294) Given sản phẩm có option màu ≥ 2 giá trị có swatch When render card Then swatch là chỉ báo: `aria-hidden="true"`, không nhận focus, không bấm được; tên truy cập của link card có thêm số màu (vd ", 3 colors"); swatch lấy từ option value của option màu, không lặp danh sách biến thể (NFR-7). Chọn màu qua nút Quick View (AC9), mở bộ chọn chung với trang sản phẩm (TE-4 AC13).
 - AC3 Given compare_at_price > price When render Then giá gạch + badge sale với % giảm làm tròn, tính đúng với giá nhỏ.
 - AC4 Given product.price_varies When render Then hiện khoảng giá min–max; có unit_price Then hiện unit price.
 - AC5 Given collection rỗng hoặc chưa chọn When trong editor Then placeholder hướng dẫn; ngoài editor Then không render block.
-- AC6 Given keyboard When tab qua card Then focus thấy được, ảnh có alt từ sản phẩm; touch target ≥ 44px; hình swatch giữ kích thước Figma, vùng bấm swatch ≥ 44px (D7 của ES1-T169, AGENTS.md).
+- AC6 (0.3) Given keyboard When tab qua card Then focus thấy được trên link card và nút Quick View, ảnh có alt từ sản phẩm; link card và nút Quick View có vùng chạm ≥ 44px; swatch giữ kích thước Figma 32 × 16 cách 4, không phải control nên không có yêu cầu vùng chạm (thay "vùng bấm swatch 44px" của D7, ES1-T169).
 - AC7 Given bật nút Xem tất cả When render Then nút link tới collection.url, vị trí theo setting.
-
-- AC8 (Editions Fall '26 #20) Given collection đa nguồn có phần tử là variant When render card Then ảnh, giá, link ?variant= theo đúng variant đó, swatch chọn sẵn variant đó.
+- AC8 (0.3, Editions Fall '26 #20) Given collection đa nguồn có phần tử là variant When render card Then ảnh, giá, link ?variant= theo đúng variant đó, swatch của variant đó hiện ở trạng thái đang chọn (chỉ báo, không bấm).
+- AC9 (0.3, ES1-T272, M1 CTO 10/11) Given setting `Show quick view button` bật (mặc định) When render card Then có nút Quick View cho mọi sản phẩm, kể cả 1 biến thể và hết hàng: từ 64rem trên thiết bị có hover, nút hiện khi rê chuột hoặc focus vào card hay nút; dưới 64rem hoặc màn cảm ứng, nút tròn 44px luôn hiện trên ảnh; tên truy cập "Quick View" + tên sản phẩm; bấm nút không mở trang sản phẩm. Setting tắt Then card không có nút.
+- AC10 (0.3, ES1-T272, M2) Given bấm Quick View When quickview mở Then từ 48rem là dialog giữa màn, dưới 48rem là bottom sheet; có tiêu đề là tên sản phẩm, ảnh, giá/giá gạch/badge %, rating khi có metafield (như AC-H13), bộ chọn biến thể chung (TE-4 AC13–AC15), tình trạng tồn, số lượng, Add To Cart, link "View Detail" tới trang sản phẩm; sản phẩm có quantity rule hoặc selling plan Then hiện như TE-4 AC18, AC19. Đang tải Then trạng thái tải trong dialog; tải lỗi Then thông báo lỗi, nút thử lại và link tới sản phẩm. Đóng bằng nút đóng, Esc, chạm scrim (sheet: vuốt xuống); đóng Then focus về nút Quick View.
+- AC11 (0.3, ES1-T272) Given Add To Cart trong quickview thành công When `cart_type` = drawer Then quickview đóng, cart drawer mở có thông báo đã thêm (TE-5 AC1), số giỏ tăng đúng; `cart_type` = page Then chuyển tới cart page. Lỗi 422 Then câu lỗi Shopify trả về hiện dưới nút trong `role="alert"`, quickview không đóng.
+- AC12 (0.3) Given không JS When render card Then không có nút Quick View, card là link tới trang sản phẩm.
 - AC-H11 (TC-H11, hàng 5) Given 4 tab gắn 4 collection When bấm hoặc dùng bàn phím đổi tab Then lưới đổi không reload, tab chọn có trạng thái chọn đọc được bởi trình đọc màn hình; không JS thì 4 tab là link tới collection.
 - AC-H12 (TC-H12, hàng 5) Given tab có collection rỗng When chọn Then hiện thông báo rỗng, không còn card của tab trước.
 - AC-H13 (TC-H13, hàng 5) Given sản phẩm có metafield rating When render card Then hiện sao + số; không có metafield thì không có badge.
 - AC-H14 (TC-H14, hàng 5) Given sản phẩm thoả quy tắc New (CR-3) When render card Then badge New đạt 4.5:1; đang sale thì hiện badge % như Figma, quy tắc ưu tiên do CR-3 chốt.
 
+Settings mới (0.3):
+
+| Block / nhóm | Setting | Kiểu | Default | Giới hạn | Nguồn |
+| --- | --- | --- | --- | --- | --- |
+| Product cards (theme settings) | `show_quick_view` "Show quick view button" | checkbox | true | — | M1 CTO 10/11, mini-cart-quickview.md §5 |
+
 Mã R: R7 collection (giá, unit price, ảnh); R7 product swatch; R12 a11y; R17
 
 ### TE-4 — Trang sản phẩm
-Phía: FE+BE · Ước lượng sơ bộ: 13 point (techlead chốt)
+Phía: FE+BE · Ước lượng sơ bộ: 13 point (techlead chốt; AC13–AC19 là phần mới, techlead tách)
 
-Là khách, tôi muốn xem ảnh/video, chọn biến thể thấy giá và tồn cập nhật, thêm vào giỏ và checkout nhanh trên mobile.
+Là khách, tôi muốn xem ảnh/video, chọn biến thể thấy giá và tồn cập nhật, thêm vào giỏ và thanh toán bằng accelerated checkout trên mobile mà không cuộn ngược lên nút mua.
 
 - AC1 Given sản phẩm có media When render Then gallery hiện ảnh, video, 3D model (media filters), thumbnail, zoom ảnh; biến thể chọn đổi sang featured_media của biến thể.
 - AC2 Given chọn option When đổi Then giá, compare_at, unit price, trạng thái tồn, nút Add to cart (disable khi hết/không tồn tại), URL ?variant= cập nhật không reload; first available variant load mặc định.
 - AC3 Given render Then hiện product.title đầy đủ, description, vendor (tuỳ setting), option names/values, cart.taxes_included thông báo khi có, số lượng chọn được.
-- AC4 Given shop bật When render Then có accelerated checkout (payment_button, bật mặc định, màu không đổi), Shop Pay Installments banner, pickup availability, selling plan selector nếu có.
-- AC5 Given cuộn xuống trên mobile When nút chính ra khỏi màn Then sticky bar hiện tên, giá, nút Add to cart.
+- AC4 Given shop bật When render Then có accelerated checkout (payment_button, bật mặc định, màu không đổi), Shop Pay Installments banner, pickup availability, selling plan selector nếu có (chi tiết AC19).
+- AC5 (0.3, P2 CTO 10/11; thay "chỉ mobile") Given trang sản phẩm ở 360, 768, 1280, 1920 When nút Add To Cart chính ra khỏi màn Then thanh mua dính đáy hiện; nút chính vào lại màn Then thanh ẩn. Nội dung: 360 ảnh, tên, giá, nút Add To Cart; từ 768 thêm biến thể đang chọn và giá gạch; từ 64rem thêm ô số lượng đồng bộ với ô trong form. Thanh không có bộ chọn biến thể (NFR-7). Biến thể hết hàng Then nút disabled "Sold out"; lựa chọn là tổ hợp không tồn tại Then nút "Choose Options", bấm thì cuộn về bộ chọn và focus option đầu tiên chưa hợp lệ. Setting "Show on desktop" mặc định bật; tắt Then thanh không hiện từ 64rem. Cuộn hết trang Then thanh không che footer.
 - AC6 Given gift card product When render Then form recipient (email, name, message, send_on).
 - AC7 Given cuối trang When render Then block related products và complementary products từ Product Recommendations API.
 - AC8 Given thêm giỏ thành công When Then cart drawer mở (TE-5) hoặc chuyển cart page theo setting.
-
 - AC9 (Editions #14) Given variant.requires_shipping = false (sản phẩm số, bán quyền truy cập) When render Then ẩn pickup availability và thông báo vận chuyển; sản phẩm 1 variant không hiện bộ chọn option.
 - AC10 (Editions #16) Given market có giá đã gồm thuế/phí (cart.taxes_included, cart.duties_included) When render giá Then hiện ghi chú tương ứng qua locale, theo từng market.
 - AC11 (Editions #28) Given trang sản phẩm When render Then có structured data Product (JSON-LD: name, image, offers theo variant, availability, price, priceCurrency, brand).
 - AC12 (Editions #5, BE) Given trang sản phẩm load hoặc đổi variant When Then dispatch event chuẩn `shopify:product:view` / variant theo tài liệu Standard storefront actions; override action show variant để UI đổi đúng variant.
-Mã R: R4 rich media, pickup, installments, recommendations, selling plans, variant images; R7 product page
+- AC13 (0.3, sổ 10/11 "2048 biến thể", NFR-7) Given sản phẩm có tới 2048 biến thể, tối đa 3 option When render trang sản phẩm hoặc quickview Then bộ chọn dựng từ option và option value; HTML không chứa danh sách biến thể dạng JSON và không có `<select>` liệt kê biến thể; mỗi giá trị hiện 1 trong 3 trạng thái theo lựa chọn hiện tại của các option khác: còn hàng; hết hàng (gạch chữ, tên đọc thêm ", sold out"); tổ hợp không tồn tại (viền nét đứt, tên đọc thêm ", unavailable"); mọi giá trị vẫn chọn được; hai trạng thái không mua được phân biệt bằng hình và chữ ẩn, không chỉ bằng màu.
+- AC14 (0.3, M5 CTO 10/11) Given một option có > 10 giá trị When render Then hiện 7 giá trị + nút "+N" (N = tổng − 7), giá trị đang chọn luôn nằm trong các ô đang hiện; bấm "+N" Then mở hết tại chỗ, nút đổi thành "Show fewer", focus không mất; ở 360 không tràn ngang. Option ≤ 10 giá trị Then hiện hết. Ngưỡng 10 và số 7 là hằng chung trang sản phẩm và quickview, không có setting.
+- AC15 (0.3, sổ 10/11, M4) Given đổi một giá trị option When chờ server trả biến thể theo option value Then giá trị vừa bấm chuyển trạng thái chọn ngay, vùng giá và tồn hiện trạng thái đang tải, Add To Cart `aria-busy`; xong Then giá, compare_at, badge %, ảnh biến thể, tồn, nút, countdown (AC17), sticky bar (AC5) và trạng thái giá trị của các option khác cập nhật theo biến thể; bấm liên tiếp Then chỉ kết quả của lần bấm cuối được áp dụng. Trang sản phẩm Then URL `?variant=` cập nhật bằng replace, không thêm mục lịch sử. Quickview Then URL trang nền không đổi, chỉ link "View Detail" đổi sang `?variant={id}`. Lỗi tải Then giữ biến thể cuối đã tải, thông báo lỗi `role="alert"` + nút thử lại.
+- AC16 (0.3, ES1-T282) Given sản phẩm > 250 biến thể trên store dev (demo-data-b2b.md D3) When chọn tổ hợp nằm sau vị trí 250 theo thứ tự tạo Then giá, tồn, ảnh, nút đúng biến thể đó; thêm giỏ thành công đúng biến thể đó.
+- AC17 (0.3, sổ 10/11 P3, P4, P5 và CTO audit (2)) Given sản phẩm có metafield `custom.sale_ends_at` (date_time) When render trang sản phẩm Then countdown "Sale ends in" hiện gần giá chỉ khi đủ 4 điều kiện: ngày còn trong tương lai lúc render, biến thể đang chọn có compare_at_price > price, biến thể còn hàng, setting "Show sale countdown" bật (mặc định); thiếu một điều kiện Then không in khối, không chừa chỗ. Còn ≥ 24 giờ Then 4 ô ngày, giờ, phút, giây; dưới 24 giờ Then 3 ô giờ, phút, giây. Số giảm mỗi giây, ô số `aria-hidden`, có chữ ẩn ngày giờ kết thúc đầy đủ theo giờ store, không `aria-live`, không chuyển động; tải lại trang không reset; hết giờ khi đang xem Then ngừng đếm, không đếm âm, không đếm lại. Countdown chỉ hiển thị, không đổi giá. Một component countdown chung với TE-13 và big offer (TE-18 AC6).
+- AC18 (0.3, CTO audit (4), ES1-T288) Given khách B2B đăng nhập và biến thể có quantity rule (min, max, bước) trong catalog When render trang sản phẩm và quickview Then hiện min, max, bước; ô số lượng mặc định = min, nút +/− đổi theo bước, không vượt max; nhập tay số không hợp lệ Then thông báo lỗi gắn với ô, không thêm giỏ. Biến thể có volume pricing Then hiện bảng bậc giá (số lượng từ, giá mỗi đơn vị). Khách không B2B Then không hiện các phần này. KHÔNG CHẮC: store dev có B2B (ES1-T297 #1).
+- AC19 (0.3, CTO audit (4), R4.14) Given sản phẩm có selling plan group When render trang sản phẩm và quickview Then có lựa chọn mua một lần và từng plan (tên plan, giá sau giảm hoặc % giảm); chọn plan Then giá, nút cập nhật và thêm giỏ kèm selling plan đã chọn. Given `product.requires_selling_plan` = true Then không có lựa chọn mua một lần, form luôn gửi kèm 1 plan. Không có selling plan Then không hiện khối. Lựa chọn mặc định theo spec ES1-T288.
+
+Settings mới hoặc đổi default (0.3):
+
+| Block | Setting | Kiểu | Default | Giới hạn | Nguồn |
+| --- | --- | --- | --- | --- | --- |
+| product-sticky-bar | `show_on_desktop` "Show on desktop" | checkbox | true (trước: false) | tắt thì không hiện từ 64rem | P2 CTO 10/11; product.md §10 |
+| product-info | `show_sale_countdown` "Show sale countdown" | checkbox | true | info: dùng metafield `custom.sale_ends_at`, không tự kết thúc giá gạch | P3 CTO 10/11; product.md §4.2 |
+
+Mã R: R4 rich media, pickup, installments, recommendations, selling plans, variant images; R4.16 unit price; R7 product page; R8 không fake urgency (AC17); R12 (AC13, AC14)
 
 ### TE-5 — Cart drawer và cart page
 Phía: BE+FE · Ước lượng sơ bộ: 10 point (techlead chốt)
@@ -103,14 +133,23 @@ Là khách, tôi muốn sửa giỏ không reload, thấy giảm giá, ghi chú 
 - AC4 Given giỏ rỗng When Then thông báo + nút tiếp tục mua; cart.taxes_included thông báo khi có.
 - AC5 Given cart page (templates/cart.liquid) When render Then đủ như drawer + cart note textarea + selling plan hiện + mã giảm giá tự động hiện; không JS vẫn update/checkout được bằng form.
 - AC6 Given setting cart type page When thêm giỏ Then chuyển cart page thay vì mở drawer.
-
 - AC7 (Editions #4, #5, #18, BE) Given agent hoặc app gọi `Shopify.actions` (add to cart, update cart lines, openCart) When Then theme override: openCart mở cart drawer (không sang trang cart), cart drawer + cart-count refresh từ dữ liệu cart thật qua partial (không cache client), dispatch `shopify:cart:lines-update` sau mỗi thay đổi do theme gây ra.
+- AC8 (0.3, ES1-T272 #2, M3 CTO 10/11) Given setting `Show order note` bật (mặc định) When render cart drawer Then có mục "Add order note" dạng `<details>` đóng sẵn; mở ra có label "Order note" và textarea; nội dung là cùng `cart.note` với cart page; rời ô Then ghi chú được lưu; refresh partial giỏ Then chữ đang gõ không mất. Setting tắt Then drawer không có mục ghi chú.
+- AC9 (0.3, CTO audit (4)) Given dòng giỏ có quantity rule (khách B2B) When đổi số lượng trong drawer hoặc cart page Then +/− theo bước, không dưới min, không vượt max; số không hợp lệ Then thông báo lỗi từ server trong live region, số lượng về giá trị server. Dòng có volume pricing Then giá đơn vị hiện theo bậc đang áp. KHÔNG CHẮC: store dev có B2B (ES1-T297 #1).
+- AC10 (0.3, CTO audit (4), R4.14) Given dòng giỏ mua theo selling plan When render drawer và cart page Then dòng hiện tên selling plan; giá dòng là giá theo plan.
+
+Settings mới (0.3):
+
+| Block | Setting | Kiểu | Default | Giới hạn | Nguồn |
+| --- | --- | --- | --- | --- | --- |
+| cart-drawer | `show_order_note` "Show order note" | checkbox | true | drawer và cart page cùng `cart.note` | M3 CTO 10/11; mini-cart-quickview.md §5 |
+
 Mã R: R4 discounts, selling plans, accelerated checkout; R7 cart page
 
 ### TE-6 — Trang collection: lọc, sắp xếp, phân trang
 Phía: FE+BE · Ước lượng sơ bộ: 10 point (techlead chốt)
 
-Là khách, tôi muốn lọc theo tình trạng, giá, loại, hãng, option và sắp xếp để tìm nhanh trong collection.
+Là khách, tôi muốn lọc theo tình trạng, giá, loại, hãng, option và sắp xếp để thu hẹp danh sách sản phẩm trong collection mà không mở từng trang.
 
 - AC1 Given collection When render Then title, description, image (focal), lưới 2/3/4 cột theo setting, mỗi card như TE-3; paginate 24; thông báo khi rỗng.
 - AC2 Given collection.filters When render Then faceted filter: availability, price range, product type, vendor, variant options (swatch nếu có); áp dụng cập nhật URL + partial collection-products/collection-filters không reload; không JS vẫn submit form được.
@@ -125,7 +164,7 @@ Phía: FE · Ước lượng sơ bộ: 8 point (techlead chốt)
 
 Là merchant, tôi muốn 4 block nội dung để kể chuyện thương hiệu đúng bố cục Figma.
 
-- AC1 Given testimonials có 1–6 mục When render Then carousel ở 360, lưới ở 1280; mỗi mục quote, tên, sao (0–5), ảnh tuỳ chọn.
+- AC1 Given testimonials có 1–6 mục When render Then carousel ở 360, lưới ở 1280; mỗi mục quote, tên, sao (0–5), ảnh tuỳ chọn. Lệch sổ 09/11: mục 4 L6.
 - AC2 Given FAQ có 1–10 mục When render Then disclosure dùng được bằng bàn phím (Enter/Space mở), trình đọc màn hình đọc được trạng thái mở/đóng (details/summary, không JS — PO 06/11, ES1-T115), một hoặc nhiều mở theo setting.
 - AC3 Given image with text When render Then ảnh trái/phải theo setting, ở 360 ảnh trên; heading, richtext, nút.
 - AC4 Given multicolumn 2–4 cột When render Then icon/ảnh, heading, text, link mỗi cột; 360 xếp 1 cột.
@@ -138,7 +177,7 @@ Mã R: R3 consistency; R5 Custom Liquid; R12 a11y; R14 settings
 ### TE-8 — Tìm kiếm predictive và trang kết quả
 Phía: BE+FE · Ước lượng sơ bộ: 8 point (techlead chốt)
 
-Là khách, tôi muốn gõ và thấy gợi ý sản phẩm/collection/trang, rồi trang kết quả có lọc, để tìm nhanh.
+Là khách, tôi muốn gõ và thấy gợi ý sản phẩm/collection/trang, rồi trang kết quả có lọc, để tới sản phẩm cần tìm mà không phải duyệt từng collection.
 
 - AC1 Given gõ ≥ 2 ký tự When 300ms Then gợi ý product (ảnh, tên, giá), collection, page, article từ predictive_search_url; ↑↓ Enter Esc; role listbox; mobile full màn.
 - AC2 Given trang search When render Then kết quả theo object_type (product, article, page) phân nhóm, phân trang, filter như collection, thông báo khi 0 kết quả.
@@ -155,22 +194,22 @@ Là merchant, tôi muốn cài theme là có trang chủ hoàn chỉnh và các 
 - AC2 Given 404 When Then thông báo rõ + search + link home; password Then logo/shop.name, password_message, form; page.contact Then form name/email/message có validation và thông báo; gift_card Then QR ≥ 120px, mã, Apple Wallet, logo.
 - AC3 Given blog/article When Then title, image, excerpt_or_content, published_at, comments phân trang, form comment hoạt động.
 - AC4 Given store hoa-qua-nhap-khau (efitco-ai-dev) When kiểm Then có dữ liệu Figma theo `drafts/ba/ES1-T173/home-content.md` mục 3: 24 sản phẩm, 12 collection handle `figma-*` cho hàng 3, 4b, 5, tag quiz, metafield rating và spec, discount tự động 10%, 15%, 5 bài blog, menu, tên shop Efitco; handle và dữ liệu trong `tests/e2e/store-data.json` không đổi; ảnh demo chỉ dùng trên store dev, quyền dùng ghi ở ES1-T174.
-
 - AC5 (Editions #25) Given shop.policies When render footer/trang phụ Then link chính sách lấy từ shop.policies, không nhập tay URL.
 - AC6 (Editions #27) Given chưa chọn logo/màu trong theme When render Then dùng shop.brand (logo, màu chính) làm mặc định nếu có.
-Mã R: R7 404/password/page/blog/article/gift card; R14 default; R18 preset cùng tên theme
+- AC7 (0.3, CTO audit (4), ES1-T282, ES1-T288) Given store dev When kiểm Then có thêm dữ liệu theo `drafts/ba/ES1-T294/demo-data-b2b.md` mục D1–D8: sản phẩm có quantity rule + volume pricing và 1 khách B2B, sản phẩm có selling plan và 1 sản phẩm `requires_selling_plan`, sản phẩm > 250 biến thể, metafield `custom.sale_ends_at`, gift card có form người nhận, unit price có số đo, sản phẩm số, 3 địa điểm pickup; key mới thêm vào `tests/e2e/store-data.json`, key cũ không đổi.
+
+Mã R: R7 404/password/page/blog/article/gift card; R14 default; R18 preset cùng tên theme; R20 demo store (AC7)
 
 ### TE-10 — Chuẩn chất lượng và sẵn sàng Canvas
 Phía: FE+BE+QA · Ước lượng sơ bộ: 8 point (techlead chốt)
 
 Là CTO, tôi muốn theme đạt ngưỡng chất lượng đo được và chạy đúng trong Canvas trước khi lên store thật.
 
-- AC1 Given home/product/collection với dữ liệu benchmark When chạy lhci Then performance ≥ 96 desktop, ≥ 90 mobile; accessibility ≥ 98; CI chặn merge khi dưới ngưỡng.
+- AC1 Given home/product/collection với dữ liệu benchmark When chạy lhci Then performance ≥ 96 desktop, ≥ 90 mobile; accessibility ≥ 98; CI chặn merge khi dưới ngưỡng. Lệch chỉ tiêu nghiệm thu 09/11: mục 4 L1.
 - AC2 Given toàn bộ repo When theme check Then 0 lỗi, .theme-check.yml không override; không console error trên 8 trang; không Sass, không minified, không robots.txt.liquid.
-- AC3 Given checklist Theme Store nội bộ When chạy Then nhóm bắt buộc (R4, R6–R17) pass 100%; nhóm tham khảo ghi N/A. R8 với nội dung mẫu (CTO 06/11 11:14, 11:15): copy, số liệu, review, bậc giảm mặc định tính đạt khi có đủ AC-H33 và ghi chú giảm giá ở AC-H18, H19; khi nộp Theme Store cần thêm demo store và ghi là nội dung mẫu.
+- AC3 Given checklist Theme Store nội bộ When chạy Then nhóm bắt buộc (R4, R6–R17) pass 100%; nhóm tham khảo ghi N/A. R8 với nội dung mẫu (CTO 06/11 11:14, 11:15): copy, số liệu, review, bậc giảm mặc định tính đạt khi có đủ AC-H33 và ghi chú giảm giá ở AC-H18, H19; khi nộp Theme Store cần thêm demo store và ghi là nội dung mẫu. Lệch sổ 07/11 về ghi chú giảm giá: mục 4 L3.
 - AC4 Given zip upload lên yum-dev (store người, đã có Canvas) When checklist Canvas Then 5 bước pass; 10 yêu cầu Sidekick mẫu cho ra theme check 0 lỗi và cấu trúc không đổi.
 - AC5 Given tài liệu merchant When kiểm Then 16/16 block có docs/merchant, có hướng dẫn nâng cấp theme trong Canvas.
-
 - AC6 (Editions #6, #17, #30, #40, QA) Given Chrome có WebMCP và inspector của `shopify theme dev` When gọi add_to_cart, update_cart_lines, show_variant Then UI theme (drawer, cart-count, variant) cập nhật đúng, 0 console error; nút dynamic checkout không vỡ layout với Apple Pay QR trên Chrome/Edge/Firefox; widget Shopify Inbox không che sticky add-to-cart, back-to-top, cart drawer ở 360 và 1280; header/account không dùng customer.has_account làm điều kiện hiển thị.
 - AC-H30 (TC-H30) Given `/` hoặc URL đại diện có đủ 16 block và ảnh When chạy lhci desktop và mobile Then performance ≥ 96 và ≥ 90, accessibility ≥ 98; CI chặn merge khi dưới ngưỡng.
 - AC-H31 (TC-H31) Given `/` đủ 16 block When tải xong, rồi cuộn hết trang Then JS tải sẵn ≤ 40 960 B, tổng sau cuộn ≤ 65 536 B; vượt thì chặn merge. Tính cả tabs và block mới.
@@ -187,7 +226,7 @@ Là khách mua, tôi muốn trả lời 3 câu hỏi để nhận tối đa 4 s�
 
 - AC1 Given block có 3 bước cấu hình bằng block con `quiz-step` (câu hỏi, 2–4 lựa chọn, mỗi lựa chọn gắn 1 tag sản phẩm) When render Then hiện bước 1, thanh tiến độ "Step 1 of 3"; không JS thì hiện cả 3 bước dạng form, nút Submit tới trang search với tag đã chọn.
 - AC2 Given chọn lựa chọn ở bước n When bấm Then sang bước n+1, tiến độ cập nhật, nút Back quay lại giữ lựa chọn cũ; bàn phím Tab/Enter/Space chọn được, focus chuyển vào tiêu đề bước mới.
-- AC3 Given hoàn tất bước 3 When có ≥ 1 sản phẩm khớp tag Then hiện tối đa 4 product card (snippet product-card) lấy qua `{% partial %}`; 0 sản phẩm Then hiện text rỗng cấu hình được + link tới collection mặc định.
+- AC3 Given hoàn tất bước 3 When có ≥ 1 sản phẩm khớp tag Then hiện tối đa 4 product card (snippet product-card) lấy qua `{% partial %}`; 0 sản phẩm Then hiện text rỗng cấu hình được + link tới collection mặc định. Lệch sổ 09/11 về popup kết quả: mục 4 L5.
 - AC4 (ES1-T136 #6) Given màn hình < 48rem When render Then body map ẩn, chỉ còn danh sách lựa chọn, touch target ≥ 44px.
 - AC-H15 (TC-H15, hàng 6) Given theme mới cài When mở `/` Then quiz theo Q1 (mục 3); copy bước 1 đúng 1:506 gồm "Our most-loved feature", "20 seconds".
 - AC-H16 (TC-H16, hàng 6) Given store chưa gắn tag khớp quiz When hoàn tất 3 bước Then hiện text rỗng và link collection, 0 console error; tài liệu merchant nêu cần gắn tag.
@@ -200,7 +239,7 @@ Phía: FE1 markup/CSS + BE1 JS · Ước lượng sơ bộ: 13 point (techlead c
 
 Là khách mua, tôi muốn chọn nhiều sản phẩm và thêm vào giỏ một lần, thấy tổng tiền và mức giảm theo số lượng.
 
-- AC1 (CTO 06/11 11:15) Given bundle builder nhận 1 collection (tối đa 9 sản phẩm) và bảng bậc giảm cấu hình bằng setting, mặc định 2 món 10%, 3 món 15% When chọn/bỏ sản phẩm Then panel "Your Bundle" cập nhật danh sách, tạm tính, mức giảm, tổng, thanh tiến độ theo AC-H18; luôn có ghi chú giảm giá chỉ áp dụng khi có discount tự động.
+- AC1 (CTO 06/11 11:15) Given bundle builder nhận 1 collection (tối đa 9 sản phẩm) và bảng bậc giảm cấu hình bằng setting, mặc định 2 món 10%, 3 món 15% When chọn/bỏ sản phẩm Then panel "Your Bundle" cập nhật danh sách, tạm tính, mức giảm, tổng, thanh tiến độ theo AC-H18; luôn có ghi chú giảm giá chỉ áp dụng khi có discount tự động. Lệch sổ 07/11: mục 4 L3.
 - AC2 Given giảm theo bậc When hiển thị Then chỉ là hiển thị — giảm thật áp ở checkout bằng Shopify automatic discount do merchant tạo; tài liệu merchant ghi rõ; không tự tính giá trong cart.
 - AC3 Given bấm "Add Bundle To Cart" / "Add Setup To Cart" When thành công Then gọi `/cart/add.js` với `items[]` một lần, cart drawer (TE-5) mở và refresh qua partial; lỗi 422 (hết hàng) Then báo tên sản phẩm lỗi, không thêm phần còn lại.
 - AC4 Given sản phẩm hết hàng When render Then thẻ disabled, có nhãn Sold out, không chọn được.
@@ -216,14 +255,14 @@ Phía: FE1 markup/CSS + BE1 JS · Ước lượng sơ bộ: 8 point (techlead ch
 
 Là merchant, tôi muốn làm nổi bật 1 sản phẩm đang khuyến mãi có thời hạn và cho khách xem video ngắn sản phẩm đang dùng.
 
-- AC1 Given featured product chọn 1 sản phẩm + setting ngày giờ kết thúc khuyến mãi When còn hạn và sản phẩm có giá gạch (compare at price > price) và còn hàng Then hiện countdown ngày/giờ/phút/giây theo giờ store (PO 06/11, ES1-T155 #2); hết hạn hoặc không nhập ngày Then ẩn hẳn countdown (không reset, không đếm giả — R8).
-- AC2 Given featured product When render Then gallery, giá/giá gạch/% giảm, rating (metafield reviews nếu có, không có thì ẩn), bảng spec 4 dòng từ metafield, Add to cart + View detail; dùng chung logic variant TE-4.
+- AC1 (0.3, CTO audit (2), sổ 10/11 P5) Given featured product chọn 1 sản phẩm When sản phẩm có metafield `custom.sale_ends_at` Then ngày kết thúc lấy từ metafield; không có metafield Then lấy từ setting ngày giờ kết thúc của block (giờ store). Countdown ngày/giờ/phút/giây hiện khi ngày còn hạn lúc render, biến thể đang chọn có giá gạch (compare at price > price) và còn hàng (PO 06/11, ES1-T155 #2); hết hạn, không có ngày ở cả 2 nguồn, hoặc biến thể không có giá gạch Then ẩn hẳn countdown (không reset, không đếm giả — R8). Hiển thị và hành vi theo component chung TE-4 AC17.
+- AC2 Given featured product When render Then gallery, giá/giá gạch/% giảm, rating (metafield reviews nếu có, không có thì ẩn), bảng spec 4 dòng từ metafield, Add to cart + View detail; dùng chung logic variant TE-4 (AC13–AC15).
 - AC3 Given video carousel nhận tối đa 8 block con `video-card` (Shopify video hoặc URL YouTube/Vimeo + 1 sản phẩm) When render Then video lazy (chỉ tải khi vào viewport), poster có sẵn, bấm mới chạy, không tự chạy kể cả tắt tiếng (ES1-T155 #4); 3 ô số liệu là text setting, mặc định trống và không hiện vì 1:827 ẩn trong Figma (Q5, mục 3).
 - AC4 Given video lỗi tải When render Then hiện poster + link sản phẩm, không vỡ layout.
 - AC5 Given Lighthouse trang chủ When có 2 block này Then vẫn đạt ngưỡng TE-10 (≥ 96 desktop, ≥ 90 mobile).
 - AC-H21 (TC-H21, hàng 11) Given mặc định When render 1920 Then 6 thẻ 264 × 554, đúng copy 1:817, không có 3 ô số liệu, link, nhãn (theo Q5); poster hiển thị, bấm mới chạy.
 - AC-H22 (TC-H22, hàng 10) Given featured product trên `/` có JS When đổi variant Then giá, nút, ảnh cập nhật không reload; Add to cart mở drawer, số giỏ tăng đúng.
-- AC-H23 (TC-H23, hàng 10) Given store dev, ngày kết thúc dưới 24 giờ When render `/` Then ô ngày ẩn, 3 ô giờ phút giây giảm mỗi giây, F5 không reset; quá hạn thì ẩn countdown.
+- AC-H23 (0.3, TC-H23 sửa) Given store dev, metafield `custom.sale_ends_at` của sản phẩm featured cách dưới 24 giờ When render `/` Then ô ngày ẩn, 3 ô giờ phút giây giảm mỗi giây, F5 không reset; quá hạn lúc render thì không có countdown. Given sản phẩm không có metafield và setting ngày còn hạn Then countdown theo setting.
 
 Mã R: R8 không fake urgency; R6 Lighthouse; R12 a11y
 
@@ -278,6 +317,45 @@ Là CTO, tôi muốn `/` trên store dev giống Figma và merchant mới cài t
 Ngưỡng 2 px, 1% chờ hiệu chuẩn ở cổng G1; chỉ CTO nới được. Chỉ so node có bản thân và mọi node cha không `visible:false`; ảnh export thắng snapshot khi lệch.
 Mã R: R3, R14 (AC-H1, H2); R8 (AC-H5, xem TE-10 AC3); R12 (AC-H7, H35)
 
+### TE-18 — Popup marketing: newsletter, before you leave, big offer (0.3, mới)
+Phía: FE1 markup/CSS + BE1 JS · Ước lượng: techlead chốt · Nguồn: sổ 09/11 (overlay cần có), 10/11 MK1–MK6, CTO audit (2), (3); `docs/ui-spec/marketing-popups.md` (ES1-T263); trả lời ES1-T273 #1
+
+Là merchant, tôi muốn 3 popup marketing bật sẵn khi cài theme để thu email và giữ khách sắp rời trang mà không làm giảm điểm Lighthouse và không chồng popup.
+
+- AC1 (MK1, MK3, sổ 09/11 Performance) Given theme mới cài When kiểm settings Then newsletter popup, before you leave, nút Big Offer đều bật. Given trang vừa tải When chưa có tương tác Then không popup nào mở. Newsletter Then mở khi ở trang ≥ 10 s VÀ đã cuộn ≥ 50% (2 setting). Before you leave trên thiết bị có chuột Then mở khi con trỏ rời mép trên cửa sổ sau ≥ 15 s ở trang; trên màn cảm ứng Then mở khi cuộn ngược ≥ 30% chiều cao màn trong < 500 ms, sau khi đã cuộn ≥ 50% trang và ≥ 15 s; không dùng `history.pushState` chặn nút Back. Đang gõ trong ô nhập Then không popup nào tự mở.
+- AC2 (MK3, MK4, MK5) Given có 1 lớp đang mở (popup, thẻ big offer, cart drawer, menu, search, quickview, dialog quiz) When popup khác đủ điều kiện Then không mở chồng: newsletter vào hàng đợi; before you leave chờ tín hiệu rời trang kế tiếp. Lớp đóng Then sau 3 s popup đang chờ có ưu tiên cao nhất mở nếu điều kiện còn đúng (ưu tiên: before you leave 1, newsletter 2). 2 popup đủ điều kiện cùng lúc Then before you leave mở, newsletter chờ. Nút Big Offer không phải popup, không vào hàng đợi; thẻ big offer khách tự mở chiếm lớp.
+- AC3 (MK3) Given popup tự mở đã hiện trong phiên When điều kiện đúng lần nữa Then không mở lại trong phiên (≤ 2 popup tự mở mỗi phiên). Newsletter đóng không đăng ký Then ẩn 7 ngày (setting); đã đăng ký Then không hiện nữa. Before you leave Then ẩn 1 ngày (setting). Popup tính là đã hiện ngay khi mở.
+- AC4 Given trang 404, cart, password, gift card When đủ điều kiện Then không popup tự mở nào hiện. Given khách đăng nhập có `customer.accepts_marketing` = true Then không render newsletter popup.
+- AC5 (MK6) Given before you leave mở When giỏ có hàng Then nội dung giỏ: tối đa 2 dòng hàng (1 dòng dưới 48rem), Subtotal, nút "Check Out Now" tới checkout và nút tiếp tục mua. Giỏ rỗng, setting mã giảm giá không rỗng, khách chưa đăng ký newsletter trong phiên Then nội dung mã + nút copy mã. Giỏ rỗng và không có mã, hoặc giỏ rỗng và đã đăng ký newsletter trong phiên Then không mở.
+- AC6 (MK2, CTO audit (2), (3)) Given sản phẩm của setting Big Offer còn hàng, có giá gạch, chưa hết giờ When khách cuộn ≥ 25% (setting) Then nút nổi "Big Offer" hiện góc dưới trái; thiếu một điều kiện Then không render nút. Trang sản phẩm ở mọi mốc và trang cart Then không có nút. Trang chủ ở 360 Then nút nằm trên thanh dính bundle, không chồng nhau. Rê chuột 150 ms, chạm, hoặc Enter/Space trên nút Then mở thẻ deal (dưới 48rem: bottom sheet có scrim); Esc Then đóng và trả focus về nút. Countdown trong thẻ theo component chung TE-4 AC17, ngày từ metafield `custom.sale_ends_at` của sản phẩm, không có metafield Then theo setting ngày của block; không có ngày hợp lệ Then thẻ không có countdown, vẫn có sản phẩm, giá, nút "Shop The Deal".
+- AC7 (TE-1 AC6) Given newsletter popup When gửi email Then dùng customer form của Shopify như footer; email sai Then lỗi gắn với ô (`aria-invalid`), focus về ô; đang gửi Then nút `aria-busy`, giữ bề rộng; thành công Then thay form bằng thông báo thành công trong `role="status"` và ghi nhận đã đăng ký; lỗi gửi Then thông báo `role="alert"`, giữ email đã nhập.
+- AC8 (sổ 09/11 A11y) Given popup tự mở When mở Then là dialog có tiêu đề (`aria-labelledby`) và nút đóng có tên riêng; focus vào tiêu đề; đóng được bằng nút đóng, Esc, chạm scrim, vuốt xuống trên sheet; đóng Then focus về vị trí trước đó; dưới 48rem là bottom sheet cao ≤ 60% màn; vùng chạm control ≥ 44px; `prefers-reduced-motion: reduce` Then không trượt, không scale.
+- AC9 (NFR-4, NFR-1) Given không JS When tải trang Then không popup nào, form newsletter footer vẫn gửi được. Given chạy lhci trên `/` When đo Then popup không là phần tử LCP, CLS do popup và nút Big Offer = 0, ảnh trong popup chỉ tải khi popup mở.
+
+Settings (0.3, theo marketing-popups.md, default theo MK1, MK3):
+
+| Block | Setting | Kiểu | Default | Giới hạn |
+| --- | --- | --- | --- | --- |
+| newsletter-popup | Show newsletter popup | checkbox | true | — |
+| newsletter-popup | Delay in seconds | range | 10 | 5–60, bước 5 |
+| newsletter-popup | Scroll depth | range (%) | 50 | 0–90, bước 10 |
+| newsletter-popup | Days before showing again | range | 7 | 1–30 |
+| newsletter-popup | Show on mobile | checkbox | true | — |
+| exit-popup | Show before you leave popup | checkbox | true | — |
+| exit-popup | Minimum time on page | range (s) | 15 | 5–60 |
+| exit-popup | Show on mobile | checkbox | true | — |
+| exit-popup | Days before showing again | range | 1 | 1–30 |
+| exit-popup | Discount code | text | rỗng | chờ ES1-T297 #2 |
+| offer-popup | Show big offer button | checkbox | true | — |
+| offer-popup | Product | product | sản phẩm demo truyền từ layout | phải có giá gạch |
+| offer-popup | Sale end date | text | rỗng | YYYY-MM-DD HH:MM giờ store; chỉ dùng khi sản phẩm không có metafield `custom.sale_ends_at` |
+| offer-popup | Scroll depth | range (%) | 25 | 0–90 |
+| offer-popup | Days before showing again | range | 1 | 1–30, khi khách bấm × trên nút |
+
+Setting còn lại (ảnh, heading, text, nhãn nút, consent, vị trí nút, mở bằng hover) theo marketing-popups.md §2–§4; label sentence case, không `&`.
+
+Mã R: R4.9 newsletter; R8 không fake urgency, không app-like; R12 a11y (dialog, focus, vùng chạm); R6 Lighthouse
+
 ## 3. Quyết định đã chốt (CTO 27/10/2026, trước là câu hỏi mở)
 - Hết hàng: sản phẩm vẫn hiện trong featured collection, bundle, shop the look, collection, kèm badge "Sold out"; nút thêm vào giỏ disabled. Áp cho TE-3, TE-4, TE-6, TE-12.
 - Cart: mặc định drawer (TE-5); setting `cart_type` cho đổi sang page.
@@ -289,4 +367,29 @@ Chốt CTO 06/11/2026 (ES1-T167, T168, T169):
 - Merchant mới cài không có sẵn ảnh, video, countdown. Cổng PR đo qua `?view=figma`, nghiệm thu trên `/`.
 - Duyệt 10 CR của ES1-T167. Ngoại lệ so với Figma: E1–E9 của ES1-T167 mục 2.4, thêm E10 (số mẫu 1:560), E11 ("Add to cart" theo AGENTS.md), mở rộng E7 (bậc giảm 5% của 1:636).
 - Mặc định Q1–Q6 của ES1-T168: Q1 bundle dùng collection `all`, quiz hiện đủ và kết quả rỗng khi chưa có tag, featured product và shop the look ẩn tới khi chọn sản phẩm. Q2 rating và 4 giá trị spec hàng 10 lấy từ metafield, nhãn spec là mặc định. Q3 giữ nguyên văn copy Figma kể cả lỗi, Designer sửa Figma thì đổi theo. Q4 wordmark, copyright dùng `shop.name`. Q5 hàng 11 không hiện 3 ô số liệu. Q6 thêm E10, E11, mở rộng E7.
-- D7 của ES1-T169: mặc định `products_to_show` 4; vùng bấm swatch 44px.
+- D7 của ES1-T169: mặc định `products_to_show` 4; vùng bấm swatch 44px (bỏ ở bản 0.3: swatch card là chỉ báo, TE-3 AC6).
+
+Chốt CTO 09/11–10/11/2026 đưa vào bản 0.3 (nguồn đầy đủ: `docs/design/decisions.md`):
+- Header mọi trang là thanh tối riêng cao 80px, không đè ảnh → TE-1 AC9, AC-H29, TE-2 AC6.
+- Hero 360 căn trái mép 20; lớp tối 30% chỉ ở 768, 360 → TE-2 AC2, TE-1 AC9.
+- Drawer menu cấp 2 trượt + Back, accordion chỉ khi không JS (N1) → TE-1 AC2.
+- Localization 1 control gộp mở 2 danh sách (ES1-T289) → TE-1 AC5, AC9.
+- Swatch card là chỉ báo; nút Quick View mở bộ chọn chung (M1, M2, M4, M5) → TE-3 AC2, AC6, AC8–AC12.
+- 2048 biến thể → NFR-7, TE-4 AC13–AC16.
+- Sticky ATC mọi mốc, "Show on desktop" mặc định bật (P2) → TE-4 AC5.
+- Countdown: metafield `custom.sale_ends_at` là nguồn chính, setting ngày chỉ khi không có metafield, 1 component chung (P3–P5, audit (2)) → TE-4 AC17, TE-13 AC1, AC-H23, TE-18 AC6.
+- Quantity rules, volume pricing, selling plan ở PDP, quickview, cart, mini cart (audit (4)) → TE-4 AC18, AC19, TE-5 AC9, AC10, TE-9 AC7.
+- Ghi chú đơn trong drawer (M3) → TE-5 AC8.
+- Popup marketing hàng đợi, mặc định bật, nút Big Offer ẩn ở PDP và cart (MK1–MK6, audit (3)) → TE-18.
+
+## 4. Lệch còn lại giữa SRS và sổ quyết định (chưa sửa trong 0.3, chờ ES1-T297 #4; mặc định: áp theo sổ ở bản 0.4)
+
+| # | SRS 0.3 | Sổ quyết định | Đề xuất sửa |
+| --- | --- | --- | --- |
+| L1 | NFR-1, TE-10 AC1, AC-H30: perf ≥ 96 desktop, ≥ 90 mobile, a11y ≥ 98 | 09/11: SEO 100, A11y 100, BP 100, perf desktop ≥ 98, mobile ≥ 90; 10/11 phạm vi SEO 6 loại trang | Sửa ngưỡng nghiệm thu; ngưỡng chặn merge CI do Tech Lead/DevOps chốt |
+| L2 | TE-2 AC7: chấm slide mọi mốc | 07/11: hero desktop không thanh chỉ báo, chỉ mũi tên; mobile không mũi tên, dot 44 × 44 | Tách AC7 theo mốc |
+| L3 | TE-12 AC1, AC-H18, AC-H19, TE-10 AC3: luôn có ghi chú giảm giá | 07/11: không dòng ghi chú giảm giá dưới bundle và shop the look | Bỏ ghi chú; R8 dựa vào AC2 (discount tự động thật) và AC-H33 |
+| L4 | E11 "Add to cart" (AGENTS.md: giữ chữ Shopify) | 07/11: "Add To Cart" Title Case | Sổ lệch AGENTS.md: Tech Lead quyết theo thứ tự nguồn sự thật |
+| L5 | TE-11 AC3: kết quả hiện trong block | 09/11: kết quả mở popup (mobile bottom sheet) | Sửa AC3, thêm AC dialog |
+| L6 | TE-7 AC1: testimonials lưới ở 1280 | 09/11: hàng ngang có next/back đầu khối + thanh tiến trình, mobile vuốt | Sửa AC1 theo AC-H24 |
+| L7 | TE-6 AC1, TE-8 AC2: phân trang không quy định trang đầu/cuối | 10/11 audit (5): Previous/Next ở trang đầu/cuối giữ chỗ, mờ 0.35 + `aria-disabled`, không ẩn; C3/S3 nút tròn 52, 1 snippet chung | Thêm AC phân trang chung |

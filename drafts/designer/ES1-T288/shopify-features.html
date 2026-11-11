@@ -1,0 +1,834 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shopify features on product, card, quick view and cart – Efitco</title>
+<meta name="description" content="Mockup ES1-T288: unit price, Shop Pay Installments, selling plans, B2B quantity rules and volume pricing, gift card recipient form, pickup availability, digital products, variant and combined listing cards.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* CSS riêng ES1-T288. Spec: docs/ui-spec/product-shopify-features.md. Chỉ var(--*); không hex. Buy box lấy từ ES1-T253 (product.html) */
+
+  .board-intro { padding-block: var(--space-6) var(--space-2); }
+  .board-intro p { max-width: 75ch; margin-block-start: var(--space-3); color: var(--color-muted); }
+  .demo-block > h2 { font-size: var(--font-size-h2); }
+  .tag-mock { display: inline-block; margin-inline-start: var(--space-2); padding: 0 var(--space-2); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-pill); color: var(--color-muted); font-family: var(--font-primary--family); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: 0; vertical-align: middle; }
+
+  /* ---------- Khung PDP: ≥ 64rem 2 cột (gallery | buy box), dưới 64rem chỉ buy box ---------- */
+  .pdp-f { display: grid; gap: var(--space-5); }
+  .pdp-f > * { min-width: 0; }
+  .pdp-f__media { display: none; }
+  @media (min-width: 64rem) {
+    .pdp-f { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-7); align-items: start; }
+    .pdp-f__media { display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-cream); }
+    .pdp-f__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
+  }
+  @media (min-width: 80rem) { .pdp-f { column-gap: calc(var(--space-1) * 20); } }
+
+  /* ---------- Buy box (ES1-T253) ---------- */
+  .buy { display: grid; gap: var(--space-5); align-content: start; }
+  .buy__head { display: grid; gap: var(--space-3); }
+  .buy__title { font-size: var(--font-size-h1); line-height: calc(58 / 48); }
+  .buy__meta { display: grid; gap: var(--space-1); }
+  .pdp-price { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1) var(--space-3); }
+  .pdp-price__current { font-size: var(--font-size-h3); font-weight: 600; letter-spacing: -0.01em; line-height: 1.25; }
+  .pdp-price__current--sale { color: var(--color-sale); }
+  .pdp-price__compare { color: var(--color-muted); font-size: var(--font-size-base); font-weight: 500; text-decoration: line-through; }
+  .unit { flex-basis: 100%; color: var(--color-muted); font-size: var(--font-size-sm); line-height: 22px; }
+  .buy__note { color: var(--color-muted); font-size: var(--font-size-sm); line-height: 22px; }
+  .buy__note a { color: inherit; text-decoration: underline; text-underline-offset: 0.2em; }
+  .buy__form { display: grid; align-content: start; gap: var(--space-5); padding-block-start: var(--space-5); border-block-start: 1px solid var(--color-border); }
+
+  /* Shop Pay Installments: Shopify vẽ (shopify-payment-terms); theme chỉ chỉnh chỗ, cỡ, màu chữ. Chừa 22px (CLS) */
+  .installments { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-1); min-height: 22px; color: var(--color-muted); font-size: var(--font-size-sm); line-height: 22px; }
+  .installments b { color: var(--color-foreground); font-weight: 600; }
+  .shoppay { display: inline-flex; align-items: baseline; padding: 0 var(--space-1); border: 1px dashed var(--color-muted-light); border-radius: var(--space-1); color: var(--color-foreground); font-weight: 800; letter-spacing: -0.03em; }
+  .installments u { color: var(--color-foreground); text-underline-offset: 0.2em; }
+
+  /* Option (ES1-T253) */
+  .option { min-width: 0; margin: 0; padding: 0; border: 0; }
+  .option legend { margin-block-end: var(--space-3); padding: 0; font-size: var(--font-size-sm); font-weight: 600; line-height: 20px; }
+  .option legend span { color: var(--color-muted); font-weight: 400; }
+  .option__values { display: flex; flex-wrap: wrap; gap: var(--space-2); }
+  .opt { position: relative; display: inline-flex; align-items: center; justify-content: center; min-width: 56px; min-height: 44px; padding-inline: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; cursor: pointer; }
+  .opt input { position: absolute; opacity: 0; pointer-events: none; }
+  .opt:hover { border-color: var(--color-foreground); }
+  .opt:has(:checked) { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
+  .opt--swatch { width: 44px; min-width: 44px; padding: 0; border-radius: 50%; border-color: transparent; }
+  .opt--swatch::before { content: ''; position: absolute; inset: var(--space-1); border: 1px solid color-mix(in srgb, var(--color-foreground) 50%, transparent); border-radius: 50%; background: var(--swatch-color, var(--color-background-cream)); }
+  .opt--swatch:has(:checked) { border: 2px solid var(--color-foreground); background: var(--color-background); }
+
+  /* Số lượng + Add To Cart (ES1-T253) */
+  .buy__purchase { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-2) var(--space-3); align-items: end; }
+  .buy__purchase > .qty-label { grid-column: 1 / -1; font-size: var(--font-size-sm); font-weight: 600; line-height: 20px; }
+  .qty-label span { color: var(--color-muted); font-weight: 400; }
+  .qty { display: inline-grid; grid-template-columns: 44px 40px 44px; align-items: stretch; min-height: var(--control-height); border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); }
+  .qty button { display: grid; place-items: center; padding: 0; border: 0; background: none; color: var(--color-foreground); cursor: pointer; }
+  .qty button svg { width: 14px; height: 14px; }
+  .qty button:disabled { color: var(--color-muted-light); cursor: not-allowed; }
+  .qty input { width: 100%; min-width: 0; padding: 0; border: 0; background: none; font-weight: 600; text-align: center; -moz-appearance: textfield; appearance: textfield; }
+  .qty input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .qty[aria-invalid='true'], .qty.is-invalid { border-color: var(--color-sale); box-shadow: inset 0 0 0 1px var(--color-sale); }
+  .qty.is-disabled { border-color: var(--color-border); background: var(--color-background-alt); }
+  .buy__add { width: 100%; }
+  .buy__buttons { display: grid; gap: var(--space-3); }
+  .buy__more { justify-self: center; display: inline-flex; align-items: center; min-height: 44px; color: var(--color-foreground); font-size: var(--font-size-sm); text-decoration: underline; text-underline-offset: 0.2em; }
+  .stock { display: flex; align-items: center; gap: var(--space-2); font-size: var(--font-size-sm); font-weight: 500; }
+  .stock::before { content: ''; flex: none; width: var(--space-2); height: var(--space-2); border-radius: 50%; background: var(--color-badge-new); box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-badge-new) 20%, transparent); }
+  .assure { display: grid; gap: var(--space-3); margin: 0; padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-card); list-style: none; font-size: var(--font-size-sm); }
+  .assure li { display: flex; align-items: center; gap: var(--space-3); }
+  .assure svg { flex: none; width: 24px; height: 24px; color: var(--color-accent); }
+  .assure a { color: inherit; font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
+  @media (min-width: 48rem) { .assure--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  /* ---------- §4 Purchase options (selling plan) ---------- */
+  .plans { display: grid; gap: var(--space-2); min-width: 0; margin: 0; padding: 0; border: 0; }
+  .plans legend { margin-block-end: var(--space-3); padding: 0; font-size: var(--font-size-sm); font-weight: 600; line-height: 20px; }
+  .plans__hint { margin-block-end: var(--space-1); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .plan { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: var(--space-2) var(--space-3); min-height: 64px; padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); cursor: pointer; transition: border-color var(--motion-fast) var(--ease-out); }
+  .plan:hover { border-color: var(--color-foreground); }
+  .plan:has(> input:checked) { padding: calc(var(--space-4) - 1px); border: 2px solid var(--color-foreground); }
+  .plan:has(> input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .plan > input { width: 20px; height: 20px; margin: 0; accent-color: var(--color-accent); }
+  .plan__name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: var(--font-size-base); font-weight: 600; line-height: 1.375; }
+  .plan__price { display: grid; justify-items: end; font-size: var(--font-size-base); font-weight: 600; line-height: 1.375; text-align: end; font-variant-numeric: tabular-nums; }
+  .plan__price--sale { color: var(--color-sale); }
+  .plan__price s { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+  .plan__price small { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+  .plan__body { grid-column: 2 / -1; display: grid; gap: var(--space-3); padding-block-start: var(--space-1); }
+  .plan__body p { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .plan .field__input { min-height: 44px; }
+  @media (max-width: 47.99rem) { .plan__body { grid-column: 1 / -1; } } /* 360: select rộng 288 thay 256 */
+  .policy-link { justify-self: start; display: inline-flex; align-items: center; min-height: 44px; color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
+  .plans--compact .plan { min-height: 56px; padding: var(--space-3); }
+  .plans--compact .plan:has(> input:checked) { padding: calc(var(--space-3) - 1px); }
+  .sk-inline { display: inline-block; width: 64px; height: 22px; border-radius: var(--space-1); background: linear-gradient(90deg, var(--color-background-alt) 0 25%, var(--color-background) 50%, var(--color-background-alt) 75%) 0 0 / 300% 100%; animation: kit-shimmer 1.4s linear infinite; }
+
+  /* ---------- §5 Volume pricing + quy tắc số lượng ---------- */
+  .vol { width: 100%; border: 1px solid var(--color-border); border-radius: var(--radius-card); border-spacing: 0; overflow: hidden; font-size: var(--font-size-sm); font-variant-numeric: tabular-nums; }
+  .vol caption { padding-block-end: var(--space-3); font-weight: 600; text-align: start; line-height: 20px; }
+  .vol th, .vol td { height: 44px; padding: 0 var(--space-4); text-align: start; }
+  .vol th { font-weight: 600; border-block-end: 1px solid var(--color-border); }
+  .vol th:last-child, .vol td:last-child { text-align: end; }
+  .vol tbody tr + tr td { border-block-start: 1px solid var(--color-border); }
+  .vol tr.is-current td { background: var(--color-background-cream); color: var(--color-background-cream-foreground); font-weight: 600; }
+  .vol td svg { width: 16px; height: 16px; margin-inline-end: var(--space-2); vertical-align: -3px; }
+  .vol td .tier-pad { display: inline-block; width: 24px; }
+  .show-all { display: inline-flex; align-items: center; min-height: 44px; margin-block-start: var(--space-1); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; list-style: none; }
+  .show-all::-webkit-details-marker { display: none; }
+  .rule { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); line-height: 22px; }
+  .rule svg { flex: none; width: 16px; height: 16px; margin-block-start: 3px; }
+  .rule--error { color: var(--color-sale); font-weight: 500; }
+  .rule a { color: var(--color-foreground); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
+  .vol-details summary { display: flex; align-items: center; gap: var(--space-2); min-height: 44px; font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; list-style: none; }
+  .vol-details summary::-webkit-details-marker { display: none; }
+  .vol-details summary svg { width: 12px; height: 7px; transition: rotate var(--motion-base) var(--ease-out); }
+  .vol-details[open] summary svg { rotate: 180deg; }
+
+  /* ---------- §6 Gift card ---------- */
+  .gift { display: grid; gap: var(--space-4); }
+  .gift .choice { font-weight: 500; }
+  .gift__fields { display: grid; gap: var(--space-5); min-width: 0; margin: 0; padding: 0 0 0 var(--space-4); border: 0; border-inline-start: 2px solid var(--color-border); }
+  .gift__fields .field__label span { color: var(--color-muted); font-weight: 400; }
+  .gift__fields .field__input[aria-invalid='true'] { border-width: 2px; }
+  @media (min-width: 48rem) { .gift__half { max-width: calc(50% - var(--space-2)); } }
+
+  /* ---------- §7 Pickup ---------- */
+  .pickup { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--space-1) var(--space-3); font-size: var(--font-size-sm); line-height: 22px; }
+  .pk-icon { display: grid; place-items: center; width: 20px; height: 20px; margin-block-start: 1px; border-radius: 50%; background: var(--color-badge-new); color: var(--color-badge-new-foreground); }
+  .pk-icon svg { width: 12px; height: 12px; }
+  .pk-icon--no { border: 1.5px solid var(--color-muted-light); background: var(--color-background); color: var(--color-muted-light); }
+  .pk-icon--no svg { width: 10px; height: 10px; }
+  .pickup__status { font-weight: 500; }
+  .pickup__time { color: var(--color-muted); }
+  .pickup__open { justify-self: start; display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
+  .pickup__open:hover { color: var(--color-accent); }
+  .stores { margin: 0; padding: 0; list-style: none; }
+  .stores li { display: grid; gap: var(--space-1); padding-block: var(--space-4); border-block-end: 1px solid var(--color-border); font-size: var(--font-size-sm); line-height: 22px; }
+  .stores h3 { font-family: var(--font-primary--family); font-size: var(--font-size-base); font-weight: 600; letter-spacing: -0.01em; line-height: 1.5; }
+  .stores__status { display: flex; align-items: center; gap: var(--space-2); font-weight: 500; }
+  .stores__status .pk-icon { width: 16px; height: 16px; margin: 0; }
+  .stores__status .pk-icon svg { width: 10px; height: 10px; }
+  .stores address { color: var(--color-muted); font-style: normal; }
+  .stores a { justify-self: start; display: inline-flex; align-items: center; min-height: 44px; font-weight: 500; text-underline-offset: 0.2em; }
+  .pk-product { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-3); padding-block-end: var(--space-2); border-block-end: 1px solid var(--color-border); }
+  .pk-product img { width: 64px; height: 64px; border-radius: var(--space-2); background: var(--color-background-cream); object-fit: contain; mix-blend-mode: darken; }
+  .pk-product p { font-weight: 600; }
+  .pk-product span { display: block; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+  .only-sm { display: block; }
+  .only-md { display: none !important; }
+  @media (min-width: 48rem) { .only-sm { display: none !important; } .only-md { display: flex !important; } }
+  .stage-pickup { min-height: 640px; }
+  .stage-pickup > .dialog { padding-block-start: var(--space-6); }
+
+  /* ---------- Lưới trạng thái ---------- */
+  .states { display: grid; gap: var(--space-5); margin-block-start: var(--space-6); }
+  @media (min-width: 48rem) { .states { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 80rem) { .states--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .state { display: grid; align-content: start; gap: var(--space-4); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+  .state > .demo-label { margin: 0; }
+  .hidden-list { margin: 0; padding-inline-start: var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .hidden-list li + li { margin-block-start: var(--space-1); }
+
+  /* ---------- §9 Card ---------- */
+  .card-variant { color: var(--color-muted); font-size: var(--font-size-sm); line-height: 22px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .product-card .unit { margin-block-start: calc(var(--space-1) * -1); }
+  .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  @media (min-width: 64rem) { .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .card-note { margin-block-start: var(--space-2); color: var(--color-muted); font-size: var(--font-size-xs); }
+
+  /* ---------- QV ---------- */
+  .stage-qv { min-height: 760px; }
+  .stage-qv > .dialog { --dialog-width: 960px; }
+  .qv { display: grid; gap: var(--space-5); }
+  .qv__media { display: grid; place-items: center; aspect-ratio: 1; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-cream); overflow: hidden; }
+  .qv__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
+  .qv__info { display: grid; gap: var(--space-4); align-content: start; }
+  .qv__title { padding-inline-end: calc(var(--space-1) * 14); font-size: var(--font-size-h2); line-height: 1.15; }
+  .qv__actions { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-3); }
+  .button--grey { background: var(--color-border); border-color: var(--color-border); color: var(--color-foreground); }
+  .button--grey svg { width: 16px; height: 14px; }
+  @media (max-width: 47.99rem) { .qv__media { aspect-ratio: 4 / 3; } }
+  @media (min-width: 48rem) { .qv { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 80rem) { .qv { column-gap: var(--space-7); } }
+
+  /* ---------- §11 Giỏ ---------- */
+  .cart-f { display: grid; gap: var(--space-6); }
+  @media (min-width: 64rem) { .cart-f { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); column-gap: var(--space-7); align-items: start; } }
+  .cl-list { margin: 0; padding: 0; list-style: none; border-block-start: 1px solid var(--color-border); }
+  .cl { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--space-3); padding-block: var(--space-4); border-block-end: 1px solid var(--color-border); }
+  .cl__img { width: 72px; height: 72px; border-radius: var(--radius-card); background: var(--color-background-cream); object-fit: contain; mix-blend-mode: darken; }
+  .cl__info { display: grid; gap: var(--space-1); min-width: 0; font-size: var(--font-size-sm); line-height: 22px; }
+  .cl__title { font-size: var(--font-size-base); font-weight: 500; letter-spacing: -0.01em; line-height: 1.5; }
+  .cl__title a { text-decoration: none; }
+  .cl__meta { color: var(--color-muted); }
+  .cl__meta b { color: var(--color-foreground); font-weight: 500; }
+  .cl__line { display: flex; align-items: flex-start; gap: var(--space-2); color: var(--color-muted); }
+  .cl__line svg { flex: none; width: 14px; height: 14px; margin-block-start: 4px; }
+  .cl__line--tag svg { color: var(--color-badge-new); }
+  .cl__msg { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 1; color: var(--color-muted); }
+  .cl__price { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); font-size: var(--font-size-base); font-weight: 500; }
+  .cl__price .sale { color: var(--color-sale); }
+  .cl__price s { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+  .cl__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-block-start: var(--space-2); }
+  .cl__row .qty { grid-template-columns: 44px 48px 44px; min-height: 44px; }
+  .cl__total { font-size: var(--font-size-base); font-weight: 600; }
+  .cl .rule { margin-block-start: var(--space-1); }
+  @media (min-width: 48rem) {
+    .cl { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-4); }
+    .cl__img { width: 96px; height: 96px; }
+  }
+  .panel { display: grid; gap: var(--space-4); padding: var(--space-5); border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-panel); color: var(--color-background-dark-foreground); }
+  .panel :focus-visible { outline-color: var(--color-background-dark-foreground); }
+  .panel__row { display: flex; justify-content: space-between; gap: var(--space-3); font-weight: 500; }
+  .panel__row--total { padding-block-start: var(--space-4); border-block-start: 1px solid var(--color-muted); }
+  .panel__row--total b { font-size: var(--font-size-lg); font-weight: 700; }
+  .panel__note { color: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel)); font-size: var(--font-size-sm); }
+  .panel .button svg { width: 16px; height: 14px; }
+  .cart-aside { display: grid; gap: var(--space-4); align-content: start; }
+  .cart-aside .installments { justify-content: center; text-align: center; }
+  @media (min-width: 80rem) { .panel { padding: calc(var(--space-1) * 10); } }
+  .stage-mc { min-height: 720px; }
+  .stage-mc .overlay__body { display: grid; align-content: start; }
+  .stage-mc .overlay__body .cl:first-child { padding-block-start: 0; }
+  .mc-badge { display: inline-flex; align-items: center; min-height: 28px; padding-inline: var(--space-3); border-radius: var(--radius-pill); background: var(--color-background-alt); font-size: var(--font-size-xs); font-weight: 600; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-check" viewBox="0 0 16 16"><path d="M3 8.5 6.5 12 13 4.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-x" viewBox="0 0 16 16"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-info" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 7v4.5M8 4.6v.1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="currentColor"/><path d="M8 4.5v4.2M8 11.2v.1" style="stroke: var(--color-background)" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 14 14"><path d="M2 7h10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 14 14"><path d="M2 7h10M7 2v10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-bag" viewBox="0 0 20 20"><path d="M4 7h12l-1 10H5L4 7Zm3 0V5.5a3 3 0 0 1 6 0V7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 16 16"><path d="M3 7V6a2 2 0 0 1 2-2h7m0 0-2-2m2 2-2 2M13 9v1a2 2 0 0 1-2 2H4m0 0 2 2m-2-2 2-2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 16 16"><path d="M2 8.6V2.8c0-.4.4-.8.8-.8h5.8l5.6 5.6-6.6 6.6L2 8.6Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><circle cx="5.3" cy="5.3" r="1.2" fill="currentColor"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 16 16"><path d="M2.5 7h11v7h-11zM1.5 4.5h13V7h-13zM8 4.5V14M8 4.5C6.5 1.5 3.5 2.5 5 4.5M8 4.5c1.5-3 4.5-2 3 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 20 20"><path d="M5 5l10 10M15 5 5 15" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+  <symbol id="i-caret" viewBox="0 0 12 7"><path d="M1 1l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 16 14"><path d="M1 7h13M9 2l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-truck" viewBox="0 0 24 24"><path d="M2 6h12v10H2zM14 10h4l3 3v3h-7M6 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm11 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 4.4 3.4 8 8 9 4.6-1 8-4.6 8-9V6l-8-3Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="m8.5 12 2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-return" viewBox="0 0 24 24"><path d="M4 9h11a5 5 0 0 1 0 10H8M4 9l4-4M4 9l4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+</svg>
+
+<main class="container">
+  <div class="board-intro">
+    <h1>Shopify features: product, card, quick view, cart</h1>
+    <p>ES1-T288. Mockup theo khối F1–F9, trùng mục spec docs/ui-spec/product-shopify-features.md. Khung PDP ≥ 1024 có cột gallery; dưới 1024 chỉ vẽ buy box. Nhãn "minh hoạ" = dữ liệu chưa có trong demo-data (BA bổ sung ở ES1-T294).</p>
+  </div>
+
+  <!-- ============ F1 · Giá, unit price, Shop Pay Installments ============ -->
+  <section class="demo-block" aria-labelledby="f1">
+    <h2 id="f1">F1 · Price, unit price, Shop Pay Installments</h2>
+    <p class="demo-note">§3. Unit price dòng riêng 14 muted dưới giá. Banner trả góp do Shopify vẽ (khung nét đứt quanh logo = phần Shopify), cuối nhóm giá, chừa 22px. Edge case "Unit price" $234.00; số đo 50 kg là minh hoạ.</p>
+    <div class="pdp-f">
+      <div class="pdp-f__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_7570d9df-a77b-4b59-938f-affb63d81db4.jpg" alt="Unit price, image 1 of 1" width="900" height="900" loading="lazy"></div>
+      <div class="buy">
+        <div class="buy__head">
+          <p class="eyebrow">efitco-ai-dev</p>
+          <p class="buy__title h1">Unit price</p>
+          <div class="buy__meta">
+            <div class="pdp-price">
+              <span class="visually-hidden">Regular price</span><span class="pdp-price__current">$234.00</span>
+              <span class="unit"><span class="visually-hidden">Unit price</span>$4.68/kg <span class="tag-mock">minh hoạ</span></span>
+            </div>
+            <p class="buy__note">Taxes included. <a href="#">Shipping</a> calculated at checkout.</p>
+            <p class="installments">Pay in 4 interest-free installments of <b>$58.50</b> with <span class="shoppay">shop Pay</span> <u>Learn more</u></p>
+          </div>
+        </div>
+        <div class="buy__form">
+          <fieldset class="option">
+            <legend>Color: <span>Green</span></legend>
+            <div class="option__values">
+              <label class="opt opt--swatch" style="--swatch-color: var(--color-badge-new)"><input type="radio" name="f1-color" checked><span class="visually-hidden">Green</span></label>
+              <label class="opt opt--swatch" style="--swatch-color: var(--color-rating)"><input type="radio" name="f1-color"><span class="visually-hidden">Gold</span></label>
+              <label class="opt opt--swatch" style="--swatch-color: var(--color-muted)"><input type="radio" name="f1-color"><span class="visually-hidden">Brown</span></label>
+            </div>
+          </fieldset>
+          <div class="buy__purchase">
+            <label class="qty-label" for="f1-qty">Quantity</label>
+            <div class="qty"><button type="button" disabled aria-label="Decrease quantity for Unit price"><svg><use href="#i-minus"/></svg></button><input id="f1-qty" type="number" value="1" min="1"><button type="button" aria-label="Increase quantity for Unit price"><svg><use href="#i-plus"/></svg></button></div>
+            <button class="button buy__add" type="button"><svg><use href="#i-bag"/></svg>Add To Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="states">
+      <div class="state">
+        <p class="demo-label">F1b · Shop không bật Installments / giá ngoài khoảng</p>
+        <div class="buy__meta">
+          <div class="pdp-price"><span class="visually-hidden">Sale price</span><span class="pdp-price__current pdp-price__current--sale">$0.99</span><span class="visually-hidden">Regular price</span><s class="pdp-price__compare">$1.99</s><span class="badge badge--sale">-50%</span></div>
+          <p class="buy__note">Taxes included. <a href="#">Shipping</a> calculated at checkout.</p>
+          <p class="installments" aria-hidden="true"></p>
+        </div>
+        <p class="hidden-list">Edge case "Sale giá nhỏ": không unit price (không có số đo) → không dòng; banner rỗng, còn khoảng 22px.</p>
+      </div>
+      <div class="state">
+        <p class="demo-label">F1c · Đổi biến thể đang tải</p>
+        <div class="buy__meta">
+          <div class="pdp-price"><span class="sk-inline" style="width:120px;height:30px"></span><span class="unit"><span class="sk-inline" style="width:72px"></span></span></div>
+          <p class="buy__note">Taxes included. <a href="#">Shipping</a> calculated at checkout.</p>
+          <p class="installments">Pay in 4 interest-free installments of <b>$58.50</b> with <span class="shoppay">shop Pay</span> <u>Learn more</u></p>
+        </div>
+        <p class="hidden-list">Giá + unit price thành skeleton cùng kích thước (partial product-price); banner Shopify tự cập nhật.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ F2 · Selling plan ============ -->
+  <section class="demo-block" aria-labelledby="f2">
+    <h2 id="f2">F2 · Purchase options (selling plan) <span class="tag-mock">plan minh hoạ</span></h2>
+    <p class="demo-note">§4. Khung chính S2: chọn "Subscribe and save" → thẻ mở select tần suất + mô tả, giá chính đổi theo plan. Resistance Band Set $45.00 (demo-data); nhóm và plan 10% là minh hoạ.</p>
+    <div class="pdp-f">
+      <div class="pdp-f__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png" alt="Resistance Band Set, image 1 of 1" width="900" height="900" loading="lazy"></div>
+      <div class="buy">
+        <div class="buy__head">
+          <p class="eyebrow">Efitco</p>
+          <p class="buy__title h1">Resistance Band Set</p>
+          <div class="buy__meta">
+            <div class="pdp-price"><span class="visually-hidden">Sale price</span><span class="pdp-price__current pdp-price__current--sale">$40.50</span><span class="visually-hidden">Regular price</span><s class="pdp-price__compare">$45.00</s><span class="badge badge--sale">-10%</span></div>
+            <p class="buy__note">Taxes included. <a href="#">Shipping</a> calculated at checkout.</p>
+          </div>
+        </div>
+        <div class="buy__form">
+          <fieldset class="plans">
+            <legend>Purchase options</legend>
+            <label class="plan"><input type="radio" name="f2-plan"><span class="plan__name">One-time purchase</span><span class="plan__price">$45.00</span></label>
+            <label class="plan"><input type="radio" name="f2-plan" checked><span class="plan__name">Subscribe and save <span class="badge badge--sale">Save 10%</span></span><span class="plan__price plan__price--sale"><span class="visually-hidden">Sale price</span>$40.50<s><span class="visually-hidden">Regular price</span>$45.00</s></span>
+              <span class="plan__body">
+                <span class="field"><span class="field__label">Delivery frequency</span>
+                  <select class="field__input" name="selling_plan" aria-label="Delivery frequency"><option>Delivery every 1 month, 10% off</option><option>Delivery every 2 months, 10% off</option><option>Delivery every 3 months, 10% off</option></select></span>
+                <p>Ships automatically every month. Skip or cancel any time from your account.</p>
+              </span>
+            </label>
+          </fieldset>
+          <a class="policy-link" href="#" style="margin-block-start: calc(var(--space-4) * -1)">Read the subscription policy</a>
+          <div class="buy__purchase">
+            <label class="qty-label" for="f2-qty">Quantity</label>
+            <div class="qty"><button type="button" disabled aria-label="Decrease quantity for Resistance Band Set"><svg><use href="#i-minus"/></svg></button><input id="f2-qty" type="number" value="1" min="1"><button type="button" aria-label="Increase quantity for Resistance Band Set"><svg><use href="#i-plus"/></svg></button></div>
+            <button class="button buy__add" type="button"><svg><use href="#i-bag"/></svg>Add To Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="states states--3">
+      <div class="state">
+        <p class="demo-label">S1 · One-time (mặc định)</p>
+        <fieldset class="plans">
+          <legend>Purchase options</legend>
+          <label class="plan"><input type="radio" name="s1-plan" checked><span class="plan__name">One-time purchase</span><span class="plan__price">$45.00</span></label>
+          <label class="plan"><input type="radio" name="s1-plan"><span class="plan__name">Subscribe and save <span class="badge badge--sale">Save 10%</span></span><span class="plan__price"><small>from</small> $40.50</span></label>
+        </fieldset>
+      </div>
+      <div class="state">
+        <p class="demo-label">S3 · Chỉ bán subscription</p>
+        <fieldset class="plans">
+          <legend>Purchase options</legend>
+          <p class="plans__hint">This product is sold as a subscription.</p>
+          <label class="plan"><input type="radio" name="s3-plan" checked><span class="plan__name">Monthly refill</span><span class="plan__price">$45.00</span>
+            <span class="plan__body"><p>Delivery every 1 month</p><p>$135.00 billed every 3 months · $45.00 per delivery</p></span></label>
+        </fieldset>
+        <a class="policy-link" href="#">Read the subscription policy</a>
+      </div>
+      <div class="state">
+        <p class="demo-label">S4 · Đổi biến thể đang tải</p>
+        <fieldset class="plans" aria-busy="true">
+          <legend>Purchase options</legend>
+          <label class="plan"><input type="radio" name="s4-plan"><span class="plan__name">One-time purchase</span><span class="plan__price"><span class="sk-inline"></span></span></label>
+          <label class="plan"><input type="radio" name="s4-plan" checked><span class="plan__name">Subscribe and save</span><span class="plan__price"><span class="sk-inline"></span></span></label>
+        </fieldset>
+        <p class="hidden-list">Radio vẫn bấm được; giữ plan đang chọn theo plan.id khi partial về.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ F3 · Quantity rules + volume pricing ============ -->
+  <section class="demo-block" aria-labelledby="f3">
+    <h2 id="f3">F3 · Quantity rules and volume pricing (B2B) <span class="tag-mock">quy tắc minh hoạ</span></h2>
+    <p class="demo-note">§5. Training Mat 12 mm $69.00 (demo-data). Khách B2B: min 6, max 120, bước 6, bậc 24+ $64.00, 60+ $59.00, đã có 12 trong giỏ (minh hoạ). Bậc hiện hành nền cream + check.</p>
+    <div class="pdp-f">
+      <div class="pdp-f__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg" alt="Training Mat 12 mm, image 1 of 1" width="900" height="900" loading="lazy"></div>
+      <div class="buy">
+        <div class="buy__head">
+          <p class="eyebrow">Efitco</p>
+          <p class="buy__title h1">Training Mat 12 mm</p>
+          <div class="buy__meta">
+            <div class="pdp-price"><span class="visually-hidden">Regular price</span><span class="pdp-price__current">$69.00</span></div>
+            <p class="buy__note">Taxes calculated at checkout. <a href="#">Shipping</a> calculated at checkout.</p>
+          </div>
+        </div>
+        <div class="buy__form">
+          <table class="vol">
+            <caption>Volume pricing</caption>
+            <thead><tr><th scope="col">Quantity</th><th scope="col">Price</th></tr></thead>
+            <tbody>
+              <tr><td><span class="tier-pad"></span>6+</td><td>$69.00/ea</td></tr>
+              <tr class="is-current"><td><svg aria-hidden="true"><use href="#i-check"/></svg>24+<span class="visually-hidden">, current price</span></td><td>$64.00/ea</td></tr>
+              <tr><td><span class="tier-pad"></span>60+</td><td>$59.00/ea</td></tr>
+            </tbody>
+          </table>
+          <div class="buy__purchase">
+            <label class="qty-label" for="f3-qty">Quantity <span>(12 in cart)</span></label>
+            <div class="qty"><button type="button" aria-label="Decrease quantity for Training Mat 12 mm"><svg><use href="#i-minus"/></svg></button><input id="f3-qty" type="number" value="12" min="6" max="108" step="6" aria-describedby="f3-rule"><button type="button" aria-label="Increase quantity for Training Mat 12 mm"><svg><use href="#i-plus"/></svg></button></div>
+            <button class="button buy__add" type="button"><svg><use href="#i-bag"/></svg>Add To Cart</button>
+            <p class="rule" id="f3-rule"><svg aria-hidden="true"><use href="#i-info"/></svg>Minimum of 6 · Maximum of 120 · Increments of 6</p>
+          </div>
+          <p class="stock">In stock</p>
+        </div>
+      </div>
+    </div>
+    <div class="states states--3">
+      <div class="state">
+        <p class="demo-label">Q2 · Gõ số sai, rời ô</p>
+        <div class="buy__purchase">
+          <label class="qty-label" for="q2-qty">Quantity <span>(12 in cart)</span></label>
+          <div class="qty is-invalid"><button type="button" aria-label="Decrease quantity for Training Mat 12 mm"><svg><use href="#i-minus"/></svg></button><input id="q2-qty" type="number" value="10" aria-invalid="true" aria-describedby="q2-err"><button type="button" aria-label="Increase quantity for Training Mat 12 mm"><svg><use href="#i-plus"/></svg></button></div>
+          <button class="button buy__add" type="button"><svg><use href="#i-bag"/></svg>Add To Cart</button>
+          <p class="rule rule--error" id="q2-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Enter a multiple of 6 between 6 and 108.</p>
+        </div>
+      </div>
+      <div class="state">
+        <p class="demo-label">Q3 · Giỏ đã đủ max</p>
+        <div class="buy__purchase">
+          <label class="qty-label" for="q3-qty">Quantity <span>(120 in cart)</span></label>
+          <div class="qty is-disabled"><button type="button" disabled aria-label="Decrease quantity for Training Mat 12 mm"><svg><use href="#i-minus"/></svg></button><input id="q3-qty" type="number" value="0" disabled><button type="button" disabled aria-label="Increase quantity for Training Mat 12 mm"><svg><use href="#i-plus"/></svg></button></div>
+          <button class="button buy__add" type="button" disabled><svg><use href="#i-bag"/></svg>Add To Cart</button>
+          <p class="rule"><svg aria-hidden="true"><use href="#i-info"/></svg><span>You have the maximum of 120 in your cart. <a href="#">View cart</a></span></p>
+        </div>
+      </div>
+      <div class="state">
+        <p class="demo-label">&gt; 3 bậc · thu gọn</p>
+        <div>
+          <table class="vol">
+            <caption>Volume pricing</caption>
+            <thead><tr><th scope="col">Quantity</th><th scope="col">Price</th></tr></thead>
+            <tbody>
+              <tr class="is-current"><td><svg aria-hidden="true"><use href="#i-check"/></svg>6+<span class="visually-hidden">, current price</span></td><td>$69.00/ea</td></tr>
+              <tr><td><span class="tier-pad"></span>24+</td><td>$64.00/ea</td></tr>
+              <tr><td><span class="tier-pad"></span>60+</td><td>$59.00/ea</td></tr>
+            </tbody>
+          </table>
+          <details><summary class="show-all">Show all 5 price breaks</summary></details>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ F4 · Pickup ============ -->
+  <section class="demo-block" aria-labelledby="f4">
+    <h2 id="f4">F4 · Pickup availability <span class="tag-mock">cửa hàng minh hoạ</span></h2>
+    <p class="demo-note">§7. Dòng dưới Buy It Now; nút mở dialog: drawer phải ≥ 768 (420 / 480), bottom sheet &lt; 768. Iron Core Kettlebell 16 kg, Black (demo-data); tên, địa chỉ, giờ cửa hàng là minh hoạ.</p>
+    <div class="states">
+      <div class="state">
+        <p class="demo-label">P1 · Có pickup, ≥ 2 địa điểm</p>
+        <div class="buy__buttons">
+          <button class="button button--secondary button--full" type="button">Buy it now</button>
+          <a class="buy__more" href="#">More payment options</a>
+        </div>
+        <div class="pickup">
+          <span class="pk-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+          <p class="pickup__status">Pickup available at <b>Efitco Saigon Centre</b></p>
+          <p class="pickup__time" style="grid-column:2">Usually ready in 24 hours</p>
+          <button class="pickup__open" type="button" aria-haspopup="dialog" style="grid-column:2">Check availability at other stores</button>
+        </div>
+      </div>
+      <div class="state">
+        <p class="demo-label">P2 · Địa điểm đầu không có</p>
+        <div class="pickup">
+          <span class="pk-icon pk-icon--no" aria-hidden="true"><svg><use href="#i-x"/></svg></span>
+          <p class="pickup__status">Pickup currently unavailable at <b>Efitco Saigon Centre</b></p>
+          <button class="pickup__open" type="button" aria-haspopup="dialog" style="grid-column:2">Check availability at other stores</button>
+        </div>
+        <p class="demo-label" style="margin-block-start: var(--space-3)">P1 · 1 địa điểm</p>
+        <div class="pickup">
+          <span class="pk-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+          <p class="pickup__status">Pickup available at <b>Efitco Saigon Centre</b></p>
+          <p class="pickup__time" style="grid-column:2">Usually ready in 2 hours</p>
+          <button class="pickup__open" type="button" aria-haspopup="dialog" style="grid-column:2">View store information</button>
+        </div>
+        <p class="hidden-list">P0: không địa điểm bật pickup, sản phẩm số, gift card → không in khối.</p>
+      </div>
+    </div>
+
+    <p class="demo-label" style="margin-block-start: var(--space-6)">Dialog danh sách cửa hàng</p>
+    <div class="demo-stage stage-pickup">
+      <div class="scrim"></div>
+      <section class="drawer drawer--end drawer--wide only-md" aria-labelledby="pk-title-md" style="flex-direction: column">
+        <div class="overlay__header"><h2 class="overlay__title" id="pk-title-md">Pickup availability</h2><button class="close-button" type="button" aria-label="Close pickup availability"><svg><use href="#i-close"/></svg></button></div>
+        <div class="overlay__body">
+          <div class="pk-product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="" width="64" height="64" loading="lazy"><p>Iron Core Kettlebell 16 kg<span>Black</span></p></div>
+          <ul class="stores">
+            <li><h3>Efitco Saigon Centre</h3><p class="stores__status"><span class="pk-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>Pickup available, usually ready in 24 hours</p><address>65 Le Loi, Ben Nghe Ward<br>District 1, Ho Chi Minh City<br>Vietnam</address><a href="#">Call Efitco Saigon Centre</a></li>
+            <li><h3>Efitco Thu Duc</h3><p class="stores__status"><span class="pk-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>Pickup available, usually ready in 2 days</p><address>12 Vo Van Ngan, Linh Chieu Ward<br>Thu Duc City, Ho Chi Minh City<br>Vietnam</address></li>
+            <li><h3>Efitco Hanoi Warehouse</h3><p class="stores__status"><span class="pk-icon pk-icon--no" aria-hidden="true"><svg><use href="#i-x"/></svg></span>Pickup currently unavailable</p><address>88 Lang Ha, Dong Da District<br>Hanoi, Vietnam</address><a href="#">Call Efitco Hanoi Warehouse</a></li>
+          </ul>
+        </div>
+      </section>
+      <section class="dialog only-sm" aria-labelledby="pk-title-sm" style="display:block">
+        <button class="close-button dialog__close" type="button" aria-label="Close pickup availability"><svg><use href="#i-close"/></svg></button>
+        <h2 class="overlay__title" id="pk-title-sm" style="padding-inline-end: 56px; margin-block-end: var(--space-4)">Pickup availability</h2>
+        <div class="pk-product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="" width="64" height="64" loading="lazy"><p>Iron Core Kettlebell 16 kg<span>Black</span></p></div>
+        <ul class="stores">
+          <li><h3>Efitco Saigon Centre</h3><p class="stores__status"><span class="pk-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>Pickup available, usually ready in 24 hours</p><address>65 Le Loi, Ben Nghe Ward<br>District 1, Ho Chi Minh City<br>Vietnam</address><a href="#">Call Efitco Saigon Centre</a></li>
+          <li><h3>Efitco Thu Duc</h3><p class="stores__status"><span class="pk-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>Pickup available, usually ready in 2 days</p><address>12 Vo Van Ngan, Linh Chieu Ward<br>Thu Duc City, Ho Chi Minh City</address></li>
+        </ul>
+      </section>
+    </div>
+  </section>
+
+  <!-- ============ F5 · Gift card ============ -->
+  <section class="demo-block" aria-labelledby="f5">
+    <h2 id="f5">F5 · Gift card recipient form</h2>
+    <p class="demo-note">§6. Gift card (gift-card-2, Denominations $10–$100, demo-data). Khung chính: đã chọn gửi tặng, nhập hợp lệ. Trạng thái G1 chưa chọn, G3 lỗi. Không ship nên không có ghi chú ship, pickup.</p>
+    <div class="pdp-f">
+      <div class="pdp-f__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/1-1668682587206912817789.jpg" alt="Gift card, image 1 of 1" width="900" height="900" loading="lazy"></div>
+      <div class="buy">
+        <div class="buy__head">
+          <p class="eyebrow">efitco-ai-dev</p>
+          <p class="buy__title h1">Gift card</p>
+          <div class="buy__meta">
+            <div class="pdp-price"><span class="visually-hidden">Regular price</span><span class="pdp-price__current">$50.00</span></div>
+            <p class="buy__note">Taxes included.</p>
+          </div>
+        </div>
+        <div class="buy__form">
+          <fieldset class="option">
+            <legend>Denominations: <span>$50.00</span></legend>
+            <div class="option__values">
+              <label class="opt"><input type="radio" name="f5-d">$10.00</label>
+              <label class="opt"><input type="radio" name="f5-d">$25.00</label>
+              <label class="opt"><input type="radio" name="f5-d" checked>$50.00</label>
+              <label class="opt"><input type="radio" name="f5-d">$100.00</label>
+            </div>
+          </fieldset>
+          <div class="buy__purchase">
+            <label class="qty-label" for="f5-qty">Quantity</label>
+            <div class="qty"><button type="button" disabled aria-label="Decrease quantity for Gift card"><svg><use href="#i-minus"/></svg></button><input id="f5-qty" type="number" value="1" min="1"><button type="button" aria-label="Increase quantity for Gift card"><svg><use href="#i-plus"/></svg></button></div>
+            <button class="button buy__add" type="button"><svg><use href="#i-bag"/></svg>Add To Cart</button>
+          </div>
+          <div class="gift">
+            <label class="choice"><input type="checkbox" checked>I want to send this as a gift</label>
+            <fieldset class="gift__fields">
+              <legend class="visually-hidden">Recipient information</legend>
+              <div class="form-grid form-grid--2">
+                <div class="field"><label class="field__label" for="g-email">Recipient email <span class="req" aria-hidden="true">*</span></label><input class="field__input" id="g-email" type="email" value="alex@example.com" required autocomplete="off"></div>
+                <div class="field"><label class="field__label" for="g-name">Recipient name <span>(optional)</span></label><input class="field__input" id="g-name" type="text" value="Alex Tran" autocomplete="off"></div>
+                <div class="field span-all"><label class="field__label" for="g-msg">Message <span>(optional)</span></label><textarea class="field__input" id="g-msg" rows="4" maxlength="200" aria-describedby="g-msg-hint">Happy birthday! Train hard and enjoy the new gear.</textarea><p class="field__hint" id="g-msg-hint">150 characters left</p></div>
+                <div class="field span-all gift__half"><label class="field__label" for="g-date">Send on <span>(optional)</span></label><input class="field__input" id="g-date" type="date" value="2026-11-24" min="2026-11-10" max="2027-02-08" aria-describedby="g-date-hint"><p class="field__hint" id="g-date-hint">Leave blank to send right after checkout, or choose a date up to 90 days from today.</p></div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="buy__buttons">
+            <button class="button button--secondary button--full" type="button">Buy it now</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="states">
+      <div class="state">
+        <p class="demo-label">G1 · Chưa chọn gửi tặng (mặc định)</p>
+        <div class="gift"><label class="choice"><input type="checkbox">I want to send this as a gift</label></div>
+        <p class="hidden-list">Trường ẩn + disabled, không gửi.</p>
+      </div>
+      <div class="state">
+        <p class="demo-label">G3 · Lỗi khi bấm Add To Cart</p>
+        <div class="form-message form-message--error" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div><strong>Check the recipient details.</strong></div></div>
+        <fieldset class="gift__fields">
+          <legend class="visually-hidden">Recipient information</legend>
+          <div class="field"><label class="field__label" for="g3-email">Recipient email <span class="req" aria-hidden="true">*</span></label><input class="field__input" id="g3-email" type="email" value="alex@example" aria-invalid="true" aria-describedby="g3-email-err"><p class="field__error" id="g3-email-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Enter an email address like name@example.com.</p></div>
+          <div class="field"><label class="field__label" for="g3-date">Send on <span>(optional)</span></label><input class="field__input" id="g3-date" type="date" value="2027-03-01" aria-invalid="true" aria-describedby="g3-date-err"><p class="field__error" id="g3-date-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Choose a date between Nov 10, 2026 and Feb 8, 2027.</p></div>
+          <div class="field"><label class="field__label" for="g3-msg">Message <span>(optional)</span></label><textarea class="field__input" id="g3-msg" rows="3" maxlength="200" aria-describedby="g3-msg-hint">Happy birthday! Train hard and enjoy the new gear. We picked this because you never stop moving, and every rep counts. See you at the gym on Saturday, coffee is on me after the session.</textarea><p class="field__hint" id="g3-msg-hint" style="color: var(--color-foreground); font-weight: 600">0 characters left</p></div>
+        </fieldset>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ F6 · Sản phẩm số ============ -->
+  <section class="demo-block" aria-labelledby="f6">
+    <h2 id="f6">F6 · Digital product (requires_shipping false)</h2>
+    <p class="demo-note">§8. Edge case "Sản phẩm số" $343.00, Operating system iOS / Fire OS / FreeBSD. Ẩn ghi chú ship, pickup, mục "Fast Shipping"; không thêm câu mới.</p>
+    <div class="pdp-f">
+      <div class="pdp-f__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/2-16686825872651420933582.jpg" alt="Sản phẩm số, image 1 of 1" width="900" height="900" loading="lazy"></div>
+      <div class="buy">
+        <div class="buy__head">
+          <p class="eyebrow">efitco-ai-dev</p>
+          <p class="buy__title h1">Sản phẩm số</p>
+          <div class="buy__meta">
+            <div class="pdp-price"><span class="visually-hidden">Regular price</span><span class="pdp-price__current">$343.00</span></div>
+            <p class="buy__note">Taxes included.</p>
+            <p class="installments">Pay in 4 interest-free installments of <b>$85.75</b> with <span class="shoppay">shop Pay</span> <u>Learn more</u></p>
+          </div>
+        </div>
+        <div class="buy__form">
+          <fieldset class="option">
+            <legend>Operating system: <span>iOS</span></legend>
+            <div class="option__values">
+              <label class="opt"><input type="radio" name="f6-os" checked>iOS</label>
+              <label class="opt"><input type="radio" name="f6-os">Fire OS</label>
+              <label class="opt"><input type="radio" name="f6-os">FreeBSD</label>
+            </div>
+          </fieldset>
+          <p class="stock">In stock</p>
+          <div class="buy__purchase">
+            <label class="qty-label" for="f6-qty">Quantity</label>
+            <div class="qty"><button type="button" disabled aria-label="Decrease quantity for Sản phẩm số"><svg><use href="#i-minus"/></svg></button><input id="f6-qty" type="number" value="1" min="1"><button type="button" aria-label="Increase quantity for Sản phẩm số"><svg><use href="#i-plus"/></svg></button></div>
+            <button class="button buy__add" type="button"><svg><use href="#i-bag"/></svg>Add To Cart</button>
+          </div>
+          <div class="buy__buttons">
+            <button class="button button--secondary button--full" type="button">Buy it now</button>
+            <a class="buy__more" href="#">More payment options</a>
+          </div>
+          <ul class="assure assure--2">
+            <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+            <li><svg aria-hidden="true"><use href="#i-return"/></svg><a href="#">90 Day Money Back</a></li>
+          </ul>
+          <div class="state" style="padding: var(--space-4)">
+            <p class="demo-label">Ẩn so với sản phẩm cần ship</p>
+            <ul class="hidden-list"><li>"Shipping calculated at checkout." (giữ câu thuế)</li><li>Khối pickup (P0)</li><li>Mục "Fast Shipping" trong hàng cam kết (còn 2 cột)</li></ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ F7 · Card ============ -->
+  <section class="demo-block" aria-labelledby="f7">
+    <h2 id="f7">F7 · Product cards: variant, combined listing, unit price</h2>
+    <p class="demo-note">§9. Card 1–2: cùng sản phẩm, 2 phần tử variant trong collection đa nguồn (Revllen Pro Speed Rope, demo-data): nhãn biến thể, swatch chọn sẵn, link ?variant=. Card 3: combined listing (minh hoạ: mỗi màu là 1 sản phẩm con). Card 4: unit price.</p>
+    <ul class="product-grid">
+      <li class="product-card">
+        <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg" alt="Revllen Pro Speed Rope, Black" width="900" height="900" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-22%</span></div></div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="#">Revllen Pro Speed Rope<span class="visually-hidden">, Black, 3 colors</span></a></h3>
+          <p class="card-variant" aria-hidden="true">Black</p>
+          <div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$34.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$44.99</s></div>
+          <ul class="swatches" aria-hidden="true"><li><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" style="--swatch: var(--color-background)"></span></li></ul>
+        </div>
+      </li>
+      <li class="product-card">
+        <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P04-1.jpg" alt="Revllen Pro Speed Rope, Gray" width="900" height="900" loading="lazy"><div class="product-card__badges"><span class="badge badge--sale">-22%</span></div></div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="#">Revllen Pro Speed Rope<span class="visually-hidden">, Gray, 3 colors</span></a></h3>
+          <p class="card-variant" aria-hidden="true">Gray</p>
+          <div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$34.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$44.99</s></div>
+          <ul class="swatches" aria-hidden="true"><li><span class="swatch" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch is-selected" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" style="--swatch: var(--color-background)"></span></li></ul>
+        </div>
+      </li>
+      <li class="product-card">
+        <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="900" height="900" loading="lazy"><div class="product-card__badges"><span class="badge badge--new">New</span></div></div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg<span class="visually-hidden">, 3 colors</span></a></h3>
+          <div class="price"><span class="visually-hidden">Regular price</span><span>$119.00</span></div>
+          <ul class="swatches" aria-hidden="true"><li><span class="swatch is-selected" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" style="--swatch: var(--color-background)"></span></li></ul>
+          <p class="card-note">Combined listing (minh hoạ): link = sản phẩm con Black; card không thêm nhãn.</p>
+        </div>
+      </li>
+      <li class="product-card">
+        <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_7570d9df-a77b-4b59-938f-affb63d81db4.jpg" alt="Unit price" width="900" height="900" loading="lazy"></div>
+        <div class="product-card__info">
+          <h3 class="product-card__title"><a href="#">Unit price<span class="visually-hidden">, 3 colors</span></a></h3>
+          <div class="price"><span class="visually-hidden">Regular price</span><span>$234.00</span></div>
+          <p class="unit"><span class="visually-hidden">Unit price</span>$4.68/kg</p>
+          <ul class="swatches" aria-hidden="true"><li><span class="swatch is-selected" style="--swatch: var(--color-badge-new)"></span></li><li><span class="swatch" style="--swatch: var(--color-rating)"></span></li><li><span class="swatch" style="--swatch: var(--color-muted)"></span></li></ul>
+        </div>
+      </li>
+    </ul>
+  </section>
+
+  <!-- ============ F8 · Quick view ============ -->
+  <section class="demo-block" aria-labelledby="f8">
+    <h2 id="f8">F8 · Quick view additions</h2>
+    <p class="demo-note">§10. QV giữ khung ES1-T262; thêm Purchase options thẻ gọn (56) + link chính sách; bên dưới: cột info QV của sản phẩm B2B (Volume pricing đóng sẵn, dòng quy tắc). Không installments, pickup, gift card trong QV.</p>
+    <div class="demo-stage stage-qv">
+      <div class="scrim"></div>
+      <section class="dialog" aria-labelledby="qv-title" style="display:block">
+        <button class="close-button dialog__close" type="button" aria-label="Close quick view"><svg><use href="#i-close"/></svg></button>
+        <div class="qv">
+          <div class="qv__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png" alt="Resistance Band Set" width="900" height="900" loading="lazy"></div>
+          <div class="qv__info">
+            <p class="eyebrow">Efitco</p>
+            <h2 class="qv__title" id="qv-title">Resistance Band Set</h2>
+            <div class="pdp-price"><span class="visually-hidden">Regular price</span><span class="pdp-price__current">$45.00</span></div>
+            <fieldset class="plans plans--compact">
+              <legend>Purchase options</legend>
+              <label class="plan"><input type="radio" name="qv-plan" checked><span class="plan__name">One-time purchase</span><span class="plan__price">$45.00</span></label>
+              <label class="plan"><input type="radio" name="qv-plan"><span class="plan__name">Subscribe and save <span class="badge badge--sale">Save 10%</span></span><span class="plan__price"><small>from</small> $40.50</span></label>
+            </fieldset>
+            <a class="policy-link" href="#" style="margin-block-start: calc(var(--space-2) * -1)">Read the subscription policy</a>
+            <div class="buy__purchase">
+              <label class="qty-label" for="qv-qty">Quantity</label>
+              <div class="qty"><button type="button" disabled aria-label="Decrease quantity for Resistance Band Set"><svg><use href="#i-minus"/></svg></button><input id="qv-qty" type="number" value="1" min="1"><button type="button" aria-label="Increase quantity for Resistance Band Set"><svg><use href="#i-plus"/></svg></button></div>
+            </div>
+            <div class="qv__actions">
+              <button class="button" type="button"><svg><use href="#i-bag"/></svg>Add To Cart</button>
+              <a class="button button--grey" href="#">View Detail<span class="visually-hidden"> of Resistance Band Set</span><svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <div class="states">
+      <div class="state">
+        <p class="demo-label">QV · B2B (cột info) <span class="tag-mock">minh hoạ</span></p>
+        <div class="pdp-price"><span class="visually-hidden">Regular price</span><span class="pdp-price__current">$69.00</span></div>
+        <details class="vol-details"><summary>Volume pricing available <svg aria-hidden="true"><use href="#i-caret"/></svg></summary></details>
+        <div class="buy__purchase">
+          <label class="qty-label" for="qvb-qty">Quantity <span>(12 in cart)</span></label>
+          <div class="qty"><button type="button" disabled aria-label="Decrease quantity for Training Mat 12 mm"><svg><use href="#i-minus"/></svg></button><input id="qvb-qty" type="number" value="6" min="6" step="6" aria-describedby="qvb-rule"><button type="button" aria-label="Increase quantity for Training Mat 12 mm"><svg><use href="#i-plus"/></svg></button></div>
+          <p class="rule" id="qvb-rule"><svg aria-hidden="true"><use href="#i-info"/></svg>Minimum of 6 · Maximum of 120 · Increments of 6</p>
+        </div>
+      </div>
+      <div class="state">
+        <p class="demo-label">QV · Volume pricing mở</p>
+        <details class="vol-details" open><summary>Volume pricing available <svg aria-hidden="true"><use href="#i-caret"/></svg></summary>
+          <table class="vol">
+            <caption class="visually-hidden">Volume pricing</caption>
+            <thead><tr><th scope="col">Quantity</th><th scope="col">Price</th></tr></thead>
+            <tbody>
+              <tr class="is-current"><td><svg aria-hidden="true"><use href="#i-check"/></svg>6+<span class="visually-hidden">, current price</span></td><td>$69.00/ea</td></tr>
+              <tr><td><span class="tier-pad"></span>24+</td><td>$64.00/ea</td></tr>
+              <tr><td><span class="tier-pad"></span>60+</td><td>$59.00/ea</td></tr>
+            </tbody>
+          </table>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ F9 · Giỏ ============ -->
+  <section class="demo-block" aria-labelledby="f9">
+    <h2 id="f9">F9 · Cart page and mini cart lines</h2>
+    <p class="demo-note">§11, §3.2. Dòng: subscription (plan + icon lặp), B2B (quy tắc rút gọn, "Volume pricing applied"), unit price, gift card (người nhận gọn). Installments dưới panel, nền trắng. Mini cart: dòng B2B lỗi số lượng. Số plan, bậc, người nhận là minh hoạ.</p>
+    <div class="cart-f">
+      <ul class="cl-list">
+        <li class="cl">
+          <img class="cl__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png" alt="" width="96" height="96" loading="lazy">
+          <div class="cl__info">
+            <p class="cl__title"><a href="#">Resistance Band Set</a></p>
+            <p class="cl__line"><svg aria-hidden="true"><use href="#i-repeat"/></svg>Delivery every 1 month, 10% off</p>
+            <p class="cl__price"><span class="visually-hidden">Sale price</span><span class="sale">$40.50</span><span class="visually-hidden">Regular price</span><s>$45.00</s></p>
+            <div class="cl__row"><div class="qty"><button type="button" disabled aria-label="Decrease quantity for Resistance Band Set"><svg><use href="#i-minus"/></svg></button><input type="number" value="1" aria-label="Quantity for Resistance Band Set"><button type="button" aria-label="Increase quantity for Resistance Band Set"><svg><use href="#i-plus"/></svg></button></div><span class="cl__total"><span class="visually-hidden">Line total</span>$40.50</span></div>
+          </div>
+        </li>
+        <li class="cl">
+          <img class="cl__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg" alt="" width="96" height="96" loading="lazy">
+          <div class="cl__info">
+            <p class="cl__title"><a href="#">Training Mat 12 mm</a></p>
+            <p class="cl__price">$64.00/ea</p>
+            <p class="cl__line cl__line--tag"><svg aria-hidden="true"><use href="#i-tag"/></svg>Volume pricing applied</p>
+            <p class="cl__meta">Min 6 · Increments of 6</p>
+            <div class="cl__row"><div class="qty"><button type="button" aria-label="Decrease quantity for Training Mat 12 mm"><svg><use href="#i-minus"/></svg></button><input type="number" value="24" step="6" aria-label="Quantity for Training Mat 12 mm"><button type="button" aria-label="Increase quantity for Training Mat 12 mm"><svg><use href="#i-plus"/></svg></button></div><span class="cl__total"><span class="visually-hidden">Line total</span>$1,536.00</span></div>
+          </div>
+        </li>
+        <li class="cl">
+          <img class="cl__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_7570d9df-a77b-4b59-938f-affb63d81db4.jpg" alt="" width="96" height="96" loading="lazy">
+          <div class="cl__info">
+            <p class="cl__title"><a href="#">Unit price</a></p>
+            <p class="cl__meta">Color: <b>Green</b></p>
+            <p class="cl__price">$234.00</p>
+            <p class="cl__meta"><span class="visually-hidden">Unit price</span>$4.68/kg</p>
+            <div class="cl__row"><div class="qty"><button type="button" disabled aria-label="Decrease quantity for Unit price"><svg><use href="#i-minus"/></svg></button><input type="number" value="1" aria-label="Quantity for Unit price"><button type="button" aria-label="Increase quantity for Unit price"><svg><use href="#i-plus"/></svg></button></div><span class="cl__total"><span class="visually-hidden">Line total</span>$234.00</span></div>
+          </div>
+        </li>
+        <li class="cl">
+          <img class="cl__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/1-1668682587206912817789.jpg" alt="" width="96" height="96" loading="lazy">
+          <div class="cl__info">
+            <p class="cl__title"><a href="#">Gift card</a></p>
+            <p class="cl__meta">Denominations: <b>$50.00</b></p>
+            <p class="cl__line"><svg aria-hidden="true"><use href="#i-gift"/></svg>To: Alex Tran (alex@example.com)</p>
+            <p class="cl__meta">Sends on Nov 24, 2026</p>
+            <p class="cl__msg">“Happy birthday! Train hard and enjoy the new gear.”</p>
+            <p class="cl__price">$50.00</p>
+            <div class="cl__row"><div class="qty"><button type="button" disabled aria-label="Decrease quantity for Gift card"><svg><use href="#i-minus"/></svg></button><input type="number" value="1" aria-label="Quantity for Gift card"><button type="button" aria-label="Increase quantity for Gift card"><svg><use href="#i-plus"/></svg></button></div><span class="cl__total"><span class="visually-hidden">Line total</span>$50.00</span></div>
+          </div>
+        </li>
+      </ul>
+      <div class="cart-aside">
+        <div class="panel">
+          <div class="panel__row"><span>Subtotal</span><span>$1,860.50</span></div>
+          <div class="panel__row panel__row--total"><span>Total</span><b>$1,860.50</b></div>
+          <p class="panel__note">Taxes and shipping calculated at checkout.</p>
+          <a class="button button--full" href="#">Checkout <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+        <p class="installments">Pay in 4 interest-free installments of <b>$465.13</b> with <span class="shoppay">shop Pay</span> <u>Learn more</u></p>
+      </div>
+    </div>
+
+    <p class="demo-label" style="margin-block-start: var(--space-6)">Mini cart · dòng B2B lỗi số lượng</p>
+    <div class="demo-stage stage-mc">
+      <div class="scrim"></div>
+      <section class="drawer drawer--end drawer--wide" aria-labelledby="mc-title">
+        <div class="overlay__header"><h2 class="overlay__title" id="mc-title">Cart</h2><span class="mc-badge">25 items</span><button class="close-button" type="button" aria-label="Close cart"><svg><use href="#i-close"/></svg></button></div>
+        <div class="overlay__body">
+          <ul class="cl-list" style="border:0">
+            <li class="cl">
+              <img class="cl__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png" alt="" width="72" height="72" loading="lazy">
+              <div class="cl__info">
+                <p class="cl__title"><a href="#">Resistance Band Set</a></p>
+                <p class="cl__line"><svg aria-hidden="true"><use href="#i-repeat"/></svg>Delivery every 1 month, 10% off</p>
+                <p class="cl__price"><span class="visually-hidden">Sale price</span><span class="sale">$40.50</span><span class="visually-hidden">Regular price</span><s>$45.00</s></p>
+                <div class="cl__row"><div class="qty"><button type="button" disabled aria-label="Decrease quantity for Resistance Band Set"><svg><use href="#i-minus"/></svg></button><input type="number" value="1" aria-label="Quantity for Resistance Band Set"><button type="button" aria-label="Increase quantity for Resistance Band Set"><svg><use href="#i-plus"/></svg></button></div><span class="cl__total">$40.50</span></div>
+              </div>
+            </li>
+            <li class="cl">
+              <img class="cl__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg" alt="" width="72" height="72" loading="lazy">
+              <div class="cl__info">
+                <p class="cl__title"><a href="#">Training Mat 12 mm</a></p>
+                <p class="cl__price">$64.00/ea</p>
+                <p class="cl__line cl__line--tag"><svg aria-hidden="true"><use href="#i-tag"/></svg>Volume pricing applied</p>
+                <p class="cl__meta">Min 6 · Increments of 6</p>
+                <div class="cl__row"><div class="qty is-invalid"><button type="button" aria-label="Decrease quantity for Training Mat 12 mm"><svg><use href="#i-minus"/></svg></button><input type="number" value="22" aria-invalid="true" aria-describedby="mc-err" aria-label="Quantity for Training Mat 12 mm"><button type="button" aria-label="Increase quantity for Training Mat 12 mm"><svg><use href="#i-plus"/></svg></button></div><span class="cl__total">$1,536.00</span></div>
+                <p class="rule rule--error" id="mc-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Enter a multiple of 6 between 6 and 120.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </section>
+    </div>
+  </section>
+</main>
+</body>
+</html>

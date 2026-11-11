@@ -8,6 +8,16 @@ Figma: không có trang blog. Dùng ngôn ngữ trang chủ: block Blog posts 1:
 Mockup: `drafts/designer/ES1-T257/blog.html` + `blog-360|768|1280|1920.png`. Trạng thái ở cuối file.
 Spec trang bài viết: `docs/ui-spec/article.md`.
 
+## Thay đổi audit (ES1-T283, sửa ở ES1-T287)
+
+| # | Mã | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | A3 | phân trang: nút chữ "Newer articles"/"Older articles" + mũi tên 20 × 16, ô số vuông 44 bo `--radius-button`, trang hiện tại nền foreground | snippet `pagination` chung: Previous/Next tròn 52 chevron ("Previous page"/"Next page"), số pill 44, trang hiện tại accent, < 48rem "Page X of Y" | Sổ 10/11 S3/C3, `docs/ui-spec/pagination.md` |
+| 2 | A4, câu CTO 5 | trang đầu/cuối: nút chữ `--color-muted-light` | nút tròn giữ chỗ, opacity 0.35 + `aria-disabled` | Sổ 10/11 audit (5) |
+| 3 | A4 | chuỗi `blog.pagination.*` | bỏ; dùng `collections.pagination.*` chung | pagination.md §5 |
+
+Mockup: khối "Phân trang" cuối `drafts/designer/ES1-T257/blog.html` vẽ lại (trang giữa, trang đầu, trang cuối).
+
 ## Thay đổi so với vòng 2
 
 | # | Phần | Vòng 2 | Vòng 3 | Nguồn |
@@ -94,13 +104,12 @@ Lọc tag mặc định là link thật, tải lại trang (AGENTS "Works withou
 
 ## 5. Phân trang
 
-ĐỀ XUẤT (Figma không có; 04 §1, 18 §link mô tả đích, F§6). Thay `default_pagination`.
-- `<nav aria-label="Pagination"><ul>`: "Newer articles" ← · số trang · "Older articles" →. Link thật (`paginate.previous.url`, `paginate.parts`), crawl được, chạy không JS.
-- Ô số 44 × 44, bo `--radius-button`; trang hiện tại nền foreground chữ background, `aria-current="page"`; hover viền foreground. Nút bước cao 44, viền `--color-border`, icon mũi tên 20 × 16 (lật bằng `:dir(rtl)`).
-- Trang đầu/cuối: nút bước thành `<span aria-disabled="true">` chữ `--color-muted-light` (5.33:1), giữ chỗ để không xô hàng.
-- < 48rem: ẩn số, hiện "Page 2 of 3" giữa 2 nút, 2 nút dạt 2 mép (vùng ngón cái).
-- Chữ nút mô tả đích, không "Next"/"Previous" trần (sổ quyết định 09/11 SEO).
-- Sau khi chuyển trang: Shopify tải trang mới, focus mặc định đầu trang; ĐỀ XUẤT link phân trang thêm `#blog-grid` để rơi thẳng vào lưới.
+Dùng snippet `pagination` chung, toàn bộ hình, trạng thái, A11y theo `docs/ui-spec/pagination.md` (sổ 10/11 S3/C3). Thay `default_pagination`.
+- `{% paginate blog.articles by section.settings.articles_per_page, window_size: 1 %}` → `{% render 'pagination', paginate: paginate, anchor: '#blog-grid' %}`.
+- Previous/Next tròn 52 chevron, `aria-label="Previous page"` / `"Next page"`; số pill 44, trang hiện tại accent; < 48rem "Page X of Y" giữa 2 nút dạt 2 mép.
+- Trang đầu/cuối: nút giữ chỗ mờ 0.35 + `aria-disabled` (sổ 10/11 audit 5).
+- Lưới → phân trang 48 / 64 từ 64rem (§3).
+- ĐỀ XUẤT neo `#blog-grid` (id trên lưới) để sau khi tải trang mới rơi thẳng vào lưới (pagination.md §5).
 
 ## 6. Accessibility
 
@@ -111,7 +120,8 @@ Lọc tag mặc định là link thật, tải lại trang (AGENTS "Works withou
 | muted / background | 8.45 | meta, excerpt, breadcrumb |
 | accent / background | 5.01 | eyebrow |
 | accent-foreground / accent | 5.01 | tag pill |
-| muted-light / background | 5.33 | dấu "/" breadcrumb, nút phân trang disabled |
+| muted-light / background | 5.33 | dấu "/" breadcrumb |
+| accent-foreground / accent | 5.01 | trang hiện tại phân trang (pagination.md §7) |
 | background-dark-foreground / background-dark | 17.4 | card không ảnh |
 | background-dark-foreground / header tối | 17.4 | logo, icon, menu đang xem |
 | menu trắng 60% / header tối | 6.93 | menu header |
@@ -120,7 +130,7 @@ Chữ trên ảnh card: tiêu đề và meta trắng nằm trên gradient tối 
 - Heading: h1 (tên blog) → h2 (bài nổi bật, từng card) → h2 footer. Card truyền `heading_tag: 'h2'`.
 - Mỗi card/bài nổi bật đúng 1 link, tên link = tiêu đề bài (18 §link mô tả đích); ảnh trang trí `alt=""` vì tiêu đề đã gọi tên link (snippet hiện có). Tag pill trong card không phải link (tránh link lồng link).
 - Tab lọc: `<a>` có `aria-current="page"`, không dùng `role="tab"` (đây là điều hướng, không phải tabpanel).
-- Vùng chạm: tab 44 (< 80rem) / 40 (≥ 80rem, ≥ 24 target-size), ô phân trang 44, card toàn khối.
+- Vùng chạm: tab 44 (< 80rem) / 40 (≥ 80rem, ≥ 24 target-size), ô phân trang 44, card toàn khối; phân trang: chevron 52, số 44.
 - Hàng tab cuộn ngang: `overflow-x: auto` riêng, có `padding` 3px để outline focus không bị cắt; zoom 200% không cuộn ngang cả trang.
 - Ngày trong `<time datetime>`.
 
@@ -154,9 +164,10 @@ Motion: `--motion-slow`, `--ease-out`, `--ease-expo`. Không thêm token.
 | Card | `snippets/article-card.liquid`, `.article-card*` (padding 24 từ 48rem, meta trắng: đã đúng) | tham số `heading_tag`, `show_date`; meta 2 phần ngăn "·" |
 | Tiêu đề trang, breadcrumb | — (F§21) | dùng chung theo F§5 |
 | Lọc chủ đề | `.featured-collection__tab` (dáng) | `<nav>` link + `aria-current` |
-| Bài nổi bật, phân trang, empty state | — | mới, class theo block |
+| Bài nổi bật, empty state | — | mới, class theo block |
+| Phân trang | `snippets/pagination.liquid` | render snippet chung, sửa snippet theo pagination.md §10 |
 | Template | `templates/blog.liquid` thô | thay bằng `container` + block `blog-articles` |
-| Chuỗi | `blog.*` có sẵn 7 khoá | thêm: `blog.topics_label`, `blog.all_topics`, `blog.articles_count` (one/other), `blog.tagged_count`, `blog.empty_*`, `blog.empty_tag_*`, `blog.pagination.*`, `blog.loading`; dùng `blocks.blog_posts.read_time` có sẵn |
+| Chuỗi | `blog.*` có sẵn 7 khoá | thêm: `blog.topics_label`, `blog.all_topics`, `blog.articles_count` (one/other), `blog.tagged_count`, `blog.empty_*`, `blog.empty_tag_*`, `blog.loading` (phân trang dùng `collections.pagination.*` chung); dùng `blocks.blog_posts.read_time` có sẵn |
 
 ## 10. Quyết định CTO đã chốt (10/11)
 

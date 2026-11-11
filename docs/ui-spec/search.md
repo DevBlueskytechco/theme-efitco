@@ -12,6 +12,16 @@ Mục tiêu: người mua giữ và sửa được từ khoá, thấy kết qu�
 
 Thứ tự nguồn: sổ quyết định CTO > ticket (ES1-T256, ES1-T127 CTO chốt 06/11) > AGENTS.md > DESIGN.md > Figma trang chủ 1:359 > foundation (ES1-T251 vòng 3) > bộ kiến thức. Figma không có trang search: mọi thứ dưới đây là ĐỀ XUẤT phát triển từ ngôn ngữ Figma trang chủ, trừ khi ghi nguồn chốt. Không dùng trang live hay ảnh chụp store làm gốc (sổ 10/11).
 
+## Thay đổi audit (ES1-T283, sửa ở ES1-T287)
+
+| # | Mã | Trước | Sau | Nguồn |
+| --- | --- | --- | --- | --- |
+| 1 | A4 | §3.9 tự mô tả phân trang (đã giữ nút đầu/cuối mờ 0.35) | §3.9 trỏ về `docs/ui-spec/pagination.md`; giữ hành vi đầu/cuối, nay là chuẩn chung | Sổ 10/11 audit (5), S3 |
+| 2 | A4 | chevron ↔ số cách 8; "Page X of Y" `aria-hidden` | chevron ↔ số 16 như collection; "Page X of Y" không `aria-hidden` (khi số trang ẩn < 48rem, đây là chỗ duy nhất trình đọc biết trang hiện tại) | pagination.md §2, §4 |
+| 3 | A4 | chuỗi `search.pagination_label/previous/next/page/summary` | `collections.pagination.*` chung (thêm `summary`) | pagination.md §5 |
+
+Mockup `drafts/designer/ES1-T256/` không thuộc phạm vi ES1-T287, chưa vẽ lại; bảng thành phần ở `drafts/designer/ES1-T287/pagination.html` (khối "Search: có dòng tóm tắt"). Đề xuất ticket sau cập nhật S7 của search.html theo khối CSS chung.
+
 ## Thay đổi so với vòng 2
 
 | # | Phần | Vòng 2 | Vòng 3 | Nguồn |
@@ -127,13 +137,12 @@ Dùng chung thành phần với collection (ES1-T254 §6), khác: search giữ n
 - Hover: tiêu đề gạch chân, ảnh scale 1.05 (500ms). Focus: outline 2px accent quanh cả dòng (`:focus-within`).
 
 ### 3.9 Phân trang (S7)
-- `paginate search.results by 24` (setting). Dưới nhóm cuối, cách 48 (64 từ 64rem), căn giữa.
-- `<nav aria-label="Pagination">`: [‹] [1] [2] … [›], gap 8.
-- Previous / Next: nút tròn 52 chevron 11 × 16 (kit `.round-button`, icon `snippets/slideshow-icon` previous/next, Figma 1:398; sổ 09/11): nền trắng viền `--color-border`, hover nền accent icon trắng scale 1.06, active 0.94, focus outline accent offset 3. `aria-label="Previous page"` / `"Next page"`. Ở đầu/cuối: hiện, `aria-disabled="true"` opacity 0.35, không phải link (giữ chỗ, không nhảy bố cục).
-- Số trang: pill 44, viền border, 14/500; hover viền foreground; trang hiện tại nền accent chữ trắng 700 (5.01, ES1-T107 #6), `aria-current="page"`, không phải link. Dấu … muted khi > 5 trang (`paginate.parts`).
-- < 48rem: [‹] "Page 2 of 2" (14/500) [›] trải hết hàng; ẩn số trang (9 nút × 44 không vừa 320; 08 #504D; như collection §8).
-- Dưới hàng: "Showing 25–37 of 37 results" 14 muted (08 #531D).
-- Link thật có `href` (SEO crawl, chạy không JS). Không infinite scroll (08 #2167D); "Load more" không làm ở ticket này (giữ đồng bộ collection).
+- Dùng snippet `pagination` chung; hình, trạng thái, mốc, A11y theo `docs/ui-spec/pagination.md`: `{% paginate search.results by section.settings.results_per_page, window_size: 1 %}` → `{% render 'pagination', paginate: paginate, summary: pagination_summary %}`.
+- Dưới nhóm cuối, cách 48 (64 từ 64rem), căn giữa.
+- Tóm tắt: Previous/Next tròn 52 chevron (`aria-label="Previous page"` / `"Next page"`), cách số 16; số pill 44, trang hiện tại accent (ES1-T107 #6); < 48rem [‹] "Page 2 of 2" [›] trải hết hàng.
+- Đầu/cuối: nút vẫn hiện, opacity 0.35 + `aria-disabled`, không link (sổ 10/11 audit 5).
+- Dưới hàng: "Showing 25–37 of 37 results" 14 muted (tham số `summary`, chỉ search; 08 #531D).
+- Link thật có `href` (chạy không JS). Không infinite scroll (08 #2167D); không "Load more" (đồng bộ collection).
 
 ## 4. Settings merchant (block `search-results` khi tách khỏi template)
 
@@ -198,7 +207,7 @@ Không có trong Shopify native: "Did you mean" / tự sửa chính tả (11 §4
 - Một h1; h2 cho nhóm (Products, Articles, Pages, gợi ý S1/S2, Popular Products); h3 cho tiêu đề card / dòng. Trong mockup, trạng thái dùng h3/h4 vì nằm dưới h2 của bảng trạng thái.
 - Landmark: `<nav>` breadcrumb, type-nav (`aria-label="Result type"`), pagination (`aria-label="Pagination"`); form `role="search"`.
 - Tên: ô search (label ẩn), nút xoá ("Clear search term"), nút submit icon ("Search" ẩn), nút Filter + badge ("Filter, 1 filter applied"), Sort (label "Sort by" thật), chip ("Remove filter Color: Black"), Previous/Next tròn ("Previous page", "Next page"), số trang ("Page 1"), đóng drawer ("Close filters"), link card có số màu (", 3 colors"). Next/Previous tắt: `role="link" aria-disabled="true"` + `aria-label`, không `href`.
-- Live: dòng status, "Updating results…", dòng đầu drawer là `role="status"`; lỗi là `role="alert"`. Sau refresh không dời focus; sau "Clear all" focus về nút Filter.
+- Live: dòng status, "Updating results…", dòng đầu drawer là `role="status"`; lỗi là `role="alert"`. Sau refresh không dời focus; sau "Clear all" focus về nút Filter. (Chuỗi phân trang: `collections.pagination.*` chung, pagination.md §5.)
 - Vùng chạm: mọi link/nút ≥ 44 (pill 40 từ 80rem vẫn ≥ 24), nút chính 48 / 52, nút tròn 52, checkbox hàng 44, icon header 44. Swatch card là chỉ báo `aria-hidden`, không phải control (foundation §9), nên không có đích 16px.
 - Tương phản (foundation §2, tính tay): chữ chính 17.4; muted trên trắng 8.45 (số nhóm, meta, trích đoạn, gợi ý giá, nhãn Sort, giá trị filter tắt); muted trên alt (#4D4D4D / #F4F4F4) = (0.905 + 0.05) / (0.0743 + 0.05) = 7.68 (chữ panel S2); placeholder + viền input muted-light 5.33; tab, chip gợi ý foreground trên alt 15.8; tab chọn, chip hover 17.4; badge Filter, trang hiện tại, nút primary, nút tròn hover 5.01; menu header trắng 60% trên dark 6.93; footer muted-on-dark 6.11 / panel 5.78; eyebrow cam trên trắng 5.01; icon kính lúp muted 8.45 (≥ 3 phi văn bản).
 - Không chỉ dùng màu: tab chọn có nền đảo + `aria-current`; trang hiện tại nền accent + đậm + `aria-current`; giá sale có chữ ẩn "Sale price"; giá trị filter tắt có `disabled` + gạch ngang + số 0.
@@ -239,7 +248,7 @@ Không token mới, không màu literal.
 `data-testid`: `search-head`, `search-form`, `search-status`, `search-type-nav`, `search-products`, `search-filter-toggle`, `search-sort`, `search-active-filters`, `search-product-grid`, `search-articles`, `search-pages`, `search-pagination`, `search-empty`, `search-error`, `filter-drawer`.
 Partial (BE): `search-products` (toolbar + chip + lưới + phân trang + status), `search-filters` (thân drawer). Sau refresh dispatch sự kiện theo AGENTS (search change) và `history.replaceState` URL.
 
-Chuỗi mới (`locales/en.default.json`, nhóm `search`): `results_title` "Search Results", `placeholder` (đổi), `clear` "Clear search term", `type_nav_label`, `type_all/products/articles/pages`, `filter`, `filters_applied` (one/other), `sort_by`, `remove_filter`, `clear_all`, `filter_note`, `no_results_title`, `no_results_text`, `shop_all`, `popular_searches`, `shop_by_category`, `popular_products`, `filtered_empty_title/text`, `clear_all_filters`, `updating`, `update_error_title/text`, `try_again`, `pagination_label/previous/next/page/summary`, `article_label`, `page_label`, `show_results` (one/other).
+Chuỗi mới (`locales/en.default.json`, nhóm `search`): `results_title` "Search Results", `placeholder` (đổi), `clear` "Clear search term", `type_nav_label`, `type_all/products/articles/pages`, `filter`, `filters_applied` (one/other), `sort_by`, `remove_filter`, `clear_all`, `filter_note`, `no_results_title`, `no_results_text`, `shop_all`, `popular_searches`, `shop_by_category`, `popular_products`, `filtered_empty_title/text`, `clear_all_filters`, `updating`, `update_error_title/text`, `try_again`, `article_label`, `page_label`, `show_results` (one/other).
 
 ## 11. Dữ liệu mockup
 

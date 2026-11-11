@@ -31,16 +31,21 @@
   .lc-card__meta { margin: calc(var(--space-2) * -1) 0 0; color: var(--color-muted); font-size: var(--font-size-sm); }
   @media (min-width: 80rem) { .lc-card__meta { margin-block-start: calc(var(--space-3) * -1); } }
   .section-end { padding-block-end: var(--section-gap); }
-  /* Phân trang dùng chung với collection.html: Previous/Next = nút tròn 52 chevron (Figma 1:398) */
-  .pagination ul { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-  .pagination .round-button { text-decoration: none; }
-  .pagination .round-button--next { margin-inline-start: var(--space-2); }
-  .page-link { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; }
-  .page-link[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
-  .page-status { color: var(--color-muted); font-size: var(--font-size-sm); }
-  .page-num { display: none; }
-  @media (max-width: 47.99rem) { .pagination ul { justify-content: space-between; } .pagination .round-button--next { margin: 0; } }
-  @media (min-width: 48rem) { .page-num { display: block; } .page-status-item { display: none; } }
+  /* Phân trang: khối chung docs/ui-spec/pagination.md (ES1-T287) */
+  .pagination__list { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+  .pagination__step { text-decoration: none; }
+  .pagination__step[aria-disabled='true'] { cursor: default; }
+  .pagination__item--prev { margin-inline-end: var(--space-2); }
+  .pagination__item--next { margin-inline-start: var(--space-2); }
+  .pagination__page { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
+  a.pagination__page:hover, .pagination__page.is-hover { border-color: var(--color-foreground); }
+  .pagination__page:focus-visible, .pagination__page.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .pagination__page[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
+  .pagination__gap { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 44px; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .pagination__status { font-size: var(--font-size-sm); font-weight: 500; white-space: nowrap; }
+  :dir(rtl) .pagination__step svg { scale: -1 1; }
+  @media (max-width: 47.99rem) { .pagination__num { display: none; } .pagination__list { justify-content: space-between; } .pagination__item--prev, .pagination__item--next { margin: 0; } }
+  @media (min-width: 48rem) { .pagination__status { display: none; } }
   .state-box { padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
 </style>
 </head>
@@ -51,6 +56,7 @@
   <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
   <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
   <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
@@ -174,13 +180,14 @@
 <div class="container section-end">
   <section class="demo-block" aria-labelledby="l1">
     <h2 id="l1">L1. Phân trang (khi &gt; 24 collection)</h2>
-    <p class="demo-note">Cùng snippet pagination với trang collection. Store dev có 14 collection nên trang thật không hiện phân trang.</p>
+    <p class="demo-note">Snippet pagination chung (docs/ui-spec/pagination.md). Trang 1: Previous giữ chỗ, mờ 0.35 + aria-disabled (sổ 10/11). Store dev có 14 collection nên trang thật không hiện phân trang.</p>
     <nav class="pagination" aria-label="Pagination sample" style="margin: 0">
-      <ul>
-        <li class="page-status-item"><span class="page-status">Page 1 of 2</span></li>
-        <li class="page-num"><span class="page-link" aria-current="page">1</span></li>
-        <li class="page-num"><a class="page-link" href="#" aria-label="Page 2">2</a></li>
-        <li><a class="round-button round-button--next" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
+      <ul class="pagination__list" role="list">
+        <li class="pagination__item--prev"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></span></li>
+        <li class="pagination__status">Page 1 of 2</li>
+        <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>1</span></li>
+        <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 2">2</a></li>
+        <li class="pagination__item--next"><a class="round-button pagination__step" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
       </ul>
     </nav>
   </section>
