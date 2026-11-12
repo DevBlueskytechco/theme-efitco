@@ -26,6 +26,15 @@
   product-card-badge-sold-out or product-card-badge.
   Rule: sold_out when the product or the variant is unavailable; sale when
   compare_at_price > price, label -N% (rounded) or Sale when N rounds to 0.
+  When no `variant` is passed and the card variant is not on sale, the badge
+  is still sale with label Sale if product.compare_at_price_max >
+  product.price_min (another variant is on sale). Swatch data-badge keeps the
+  per-variant rule, except the card variant's swatch, which repeats the card
+  badge so selecting it again restores the badge shown on load.
+
+  Swatches: only option values with a native swatch (value.swatch.color or
+  value.swatch.image). The first option with more than 1 value where every
+  value has a swatch is used; otherwise no swatches (VP3).
 
   New badge (AC-H14, ES1-T174): product tag `new`, lowercase, exact match. It is
   a separate element without data-card-badge, so assets/product-swatch.js leaves
@@ -102,6 +111,10 @@
     else
       assign badge_label = 'products.card.sale' | t
     endif
+  elsif variant == blank and product.compare_at_price_max > product.price_min
+    # No variant passed: another variant is on sale (Shopify Theme Store §7)
+    assign badge = 'sale'
+    assign badge_label = 'products.card.sale' | t
   endif
 
   case badge
@@ -128,12 +141,20 @@
     assign rating_on_five = rating_value | times: 5.0 | divided_by: rating_scale | round: 1
   endif
 
-  # custom.swatch_colors: hex colors separated by commas, for a color option without native swatches
-  assign swatch_colors = product.metafields.custom.swatch_colors.value | split: ','
+  # Swatches only from native option value swatches (value.swatch.color or
+  # value.swatch.image). VP3: if any value of the option has no swatch, the
+  # option prints no swatch on the card.
   assign swatch_option = nil
   for option in product.options_with_values
     if option.values.size > 1
-      if option.values.first.swatch != blank or swatch_colors.size > 0
+      assign option_has_swatches = true
+      for option_value in option.values
+        if option_value.swatch.color == blank and option_value.swatch.image == blank
+          assign option_has_swatches = false
+          break
+        endif
+      endfor
+      if option_has_swatches
         assign swatch_option = option
         break
       endif
@@ -301,6 +322,13 @@
               assign swatch_badge_label = 'products.card.sale' | t
             endif
           endif
+
+          # Card variant swatch keeps the card badge (product-level Sale), so
+          # selecting it again restores the badge shown on load.
+          if swatch_badge == 'none' and swatch_variant.id == card_variant.id
+            assign swatch_badge = badge
+            assign swatch_badge_label = badge_label
+          endif
         -%}
         <input
           class="product-card__swatch-input visually-hidden"
@@ -331,8 +359,6 @@
             style="--swatch-image: url({{ value.swatch.image | image_url: width: 64 }});"
           {% elsif value.swatch.color %}
             style="--swatch-color: {{ value.swatch.color }};"
-          {% elsif swatch_colors[forloop.index0] != blank %}
-            style="--swatch-color: {{ swatch_colors[forloop.index0] | strip }};"
           {% endif %}
         >
           <span class="visually-hidden">{{ value.name | escape }}</span>
