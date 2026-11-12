@@ -9,8 +9,8 @@
   They have other names than the settings, so they stay plain variables and a
   value the merchant saved always wins. Clearing a setting brings the sample back,
   so show_item is how a merchant hides the review. Text from the t filter may
-  already be escaped, so it goes through escape_once. The Verified label stays off
-  by default (exception E9).
+  already be escaped, so it goes through escape_once. The Verified label follows
+  the verified setting only, off by default (exception E9, ADR 0011).
 
   Rating: a number setting, so it can be empty and take default_rating, then 5.
   snippets/rating-stars.liquid rounds it and clamps it to 0-5.
@@ -78,7 +78,7 @@
             {%- if item_author != blank -%}
               <p class="testimonial-item__author" data-testid="testimonial-author">{{ item_author | escape_once }}</p>
             {%- endif -%}
-            {%- if block.settings.verified or default_verified -%}
+            {%- if block.settings.verified -%}
               <p class="testimonial-item__verified" data-testid="testimonial-verified">
                 {%- render 'icon-trust', icon: 'check' -%}
                 {{- 'blocks.testimonials.verified' | t -}}
