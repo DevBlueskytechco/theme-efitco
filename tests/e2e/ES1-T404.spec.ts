@@ -72,7 +72,8 @@ test.describe('ES1-T404 store', () => {
 
     let found = false;
     for (let n = 1; n <= MAX_PAGES && !found; n++) {
-      const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
+      // Claude Code 12/11: sort_by=created-descending cố định (quy ước ES1-T417) — dữ liệu ES1-T298 đẩy card khỏi 5 trang đầu theo thứ tự mặc định.
+      const res = await page.goto(`${ALL}?sort_by=created-descending${n > 1 ? `&page=${n}` : ''}`);
       expect(res?.status(), `${ALL} trang ${n}`).toBeLessThan(400);
       await expectNotChallenged(page);
       const cards = page.locator(CARD);
