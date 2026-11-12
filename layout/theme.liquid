@@ -36,6 +36,14 @@
   </head>
 
   <body>
+    {% comment %}
+      Đếm lớp đang mở, banner consent, nút Shopify Inbox (ADR 0007 mục 6). Thẻ script và
+      assets/page-layers.js do BE (TE-10-R2-BE1); element gắn html[data-layer-open],
+      html[data-consent] + --consent-height, html[data-inbox], phát layers:idle.
+      data-inbox-selector: KHÔNG CHẮC, BE xác nhận trên store dev; giữ trùng selector trong assets/base.css.
+    {% endcomment %}
+    <page-layers data-testid="page-layers" data-inbox-selector="#ShopifyChat, #dummy-chat-button-iframe"></page-layers>
+
     <div class="header-sticky-sentinel" data-testid="header-sticky-sentinel" aria-hidden="true"></div>
 
     {% block 'container', tag: 'div' %}
@@ -56,5 +64,12 @@
 
     {% # No container: the dialog sits outside the page flow, it is not a band. %}
     {% block 'cart-drawer' -%}{%- endblock %}
+
+    {% comment %}
+      Toast chung (layers.md §2.4): chỉ dùng khi không có lớp modal mở; phản hồi trong lớp modal
+      nằm ở role="status"/role="alert" của chính lớp. JS chèn toast vào đây; toast cảnh báo, lỗi
+      mang role="alert" riêng. Kiểu toast: TE-10-R2-FE2.
+    {% endcomment %}
+    <div class="toast-region" data-testid="toast-region" aria-live="polite"></div>
   </body>
 </html>

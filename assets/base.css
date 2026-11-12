@@ -1,3 +1,135 @@
+/** Lớp và dải đáy màn hình (ADR 0007, docs/ui-spec/layers.md §1–§3, TE-10 AC6, AC8).
+   Thang z và chiều cao thanh là giá trị dẫn xuất như --header-height, không phải token merchant.
+   Mọi z-index trong assets/*.css dùng var(--layer-*); không z-index ≥ 1000, không `popover`
+   cho phần tử không modal (không vượt banner consent, Shopify Inbox). */
+:root {
+  --layer-content: 1;
+  --layer-sticky: 4;
+  --layer-bottom-bar: 5;
+  --layer-header: 10;
+  --layer-floating: 15;
+  --layer-scrim: 20;
+  --layer-overlay: 21;
+  --layer-toast: 30;
+  --edge: var(--space-4);
+  --sticky-top: 0px;
+  --bottom-bar-height: 0px;
+  --inbox-clearance: 0px;
+  /* Toast ≥ 48rem rộng 400 (layers.md §2.3 bảng dải đáy) */
+  --toast-inline-size: 25rem;
+}
+
+@media (min-width: 48rem) {
+  :root {
+    --edge: var(--space-5);
+  }
+}
+
+/* Header dính: scroll-padding chừa đúng chiều cao header */
+html:has(.site-header[data-sticky]) {
+  --sticky-top: var(--header-height);
+}
+
+/* Thanh đáy (mỗi trang tối đa 1): module sở hữu (product-form.js, thanh checkout cart, bundle-form.js)
+   chỉ gắn/gỡ html[data-bottom-bar], không đo. data-sticky-bar-visible là tên cũ của product-form.js,
+   giữ song song tới khi QA chuyển test (ADR 0007 mục 2). */
+html:is([data-bottom-bar="product"], [data-bottom-bar="cart"], [data-bottom-bar="bundle"], [data-sticky-bar-visible]) {
+  --bottom-bar-height: calc(var(--space-1) * 18 + env(safe-area-inset-bottom, 0px));
+}
+
+@media (min-width: 48rem) {
+  html[data-bottom-bar="product"] {
+    --bottom-bar-height: calc(var(--space-1) * 20 + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Thanh cũ chỉ hiện dưới 48rem */
+  html[data-sticky-bar-visible]:not([data-bottom-bar]) {
+    --bottom-bar-height: 0px;
+  }
+}
+
+/* Thấy nút Shopify Inbox (page-layers.js gắn data-inbox): chừa làn cho toast, dịch Inbox lên trên thanh đáy.
+   Selector Inbox trùng data-inbox-selector trên <page-layers>, BE xác nhận ở TE-10-R2-BE1. */
+html[data-inbox] {
+  --inbox-clearance: calc(var(--space-1) * 18);
+}
+
+html[data-inbox] :is(#ShopifyChat, #dummy-chat-button-iframe) {
+  translate: 0 calc(-1 * var(--bottom-bar-height));
+}
+
+/* Focus bàn phím, link neo không nằm dưới header dính hay thanh đáy (WCAG 2.2 SC 2.4.11, layers §3).
+   scroll-margin trên :focus-visible, :target thay cho scroll-padding trên html: focus() bằng script sau
+   thao tác chuột (quiz-finder.js đưa focus tiêu đề bước) không cuộn thêm, lần bấm thứ 2 của double click
+   vẫn rơi đúng chỗ (ES1-T219). :where giữ specificity 0, scroll-margin riêng của block vẫn thắng. */
+:where(:focus-visible, :target) {
+  scroll-margin-block: calc(var(--sticky-top) + var(--space-4))
+    calc(var(--bottom-bar-height) + var(--consent-height, 0px) + var(--space-4));
+}
+
+body {
+  padding-block-end: var(--bottom-bar-height);
+}
+
+/* Lớp mở hoặc banner consent đang hiện: thanh đáy, teaser Big Offer ẩn (layers §2.3, §5).
+   visibility: hidden bỏ control khỏi thứ tự Tab; body giữ padding nên không xô bố cục. */
+html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .offer-popup__teaser) {
+  visibility: hidden;
+  opacity: 0;
+  translate: 0 var(--space-4);
+}
+
+/* Màn thấp (TE-10 AC8, layers §2.5): header thôi dính (critical.css), teaser ẩn, thanh mua giữ.
+   .offer-popup__teaser: tên class teaser của TE-18-R2-FE2 (blocks/offer-popup.liquid). */
+@media (max-height: 30rem) {
+  html:has(.site-header[data-sticky]) {
+    --sticky-top: 0px;
+  }
+
+  .offer-popup__teaser {
+    display: none;
+  }
+}
+
+/* Toast chung (layers §2.3, §2.4; foundation §17): 1 vùng cuối body, chỉ dùng khi không có lớp modal mở.
+   Dịch bằng translate theo thanh đáy, làn Inbox, banner consent; kiểu từng toast ở TE-10-R2-FE2. */
+.toast-region {
+  position: fixed;
+  inset-inline: var(--edge);
+  inset-block-end: var(--edge);
+  z-index: var(--layer-toast);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  pointer-events: none;
+  translate: 0 calc(-1 * (var(--bottom-bar-height) + var(--inbox-clearance) + var(--consent-height, 0px)));
+}
+
+.toast-region > * {
+  pointer-events: auto;
+}
+
+@media (min-width: 48rem) {
+  .toast-region {
+    inset-inline-start: auto;
+    inline-size: min(var(--toast-inline-size), 100% - 2 * var(--edge));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .toast-region,
+  html[data-inbox] :is(#ShopifyChat, #dummy-chat-button-iframe) {
+    transition: translate var(--motion-base) var(--ease-out);
+  }
+
+  .product-sticky-bar {
+    transition:
+      opacity var(--motion-base) var(--ease-out),
+      translate var(--motion-base) var(--ease-out),
+      visibility var(--motion-base);
+  }
+}
+
 /** Hello world block */
 .welcome {
   display: grid;
@@ -673,7 +805,7 @@ bundle-form {
 /* Vùng chọn phủ ảnh và lề thẻ; tên nổi lên trên để vẫn bấm được link */
 .bundle-builder__item .product-card__title {
   position: relative;
-  z-index: 1;
+  z-index: var(--layer-content);
 }
 
 .bundle-builder__select {
@@ -698,7 +830,7 @@ bundle-form {
 
 /* Input trong suốt nằm trên vòng: label bên dưới mở rộng vùng bấm */
 .bundle-builder__input {
-  z-index: 1;
+  z-index: var(--layer-content);
   margin: 0;
   opacity: 0;
   cursor: pointer;
@@ -1723,7 +1855,7 @@ collection-filters[data-enhanced] .button.collection-filters__apply {
 }
 
 .filter-option__control > .filter-option__input {
-  z-index: 1;
+  z-index: var(--layer-content);
   opacity: 0;
 }
 
@@ -2050,7 +2182,7 @@ a.pagination__link:focus-visible {
 }
 
 .image.site-footer__newsletter-image {
-  z-index: 1;
+  z-index: var(--layer-content);
   width: 6.125rem;
   margin-inline: auto;
   border-radius: calc(var(--radius-card) - var(--space-1));
@@ -2295,7 +2427,7 @@ a.pagination__link:focus-visible {
   position: absolute;
   inset-block-end: 100%;
   inset-inline-start: 0;
-  z-index: 1;
+  z-index: var(--layer-content);
   display: grid;
   gap: var(--space-5);
   width: min(32rem, calc(100vw - var(--page-margin) * 2));
@@ -3105,7 +3237,7 @@ product-media-gallery {
   overflow: hidden;
   scroll-snap-align: start;
   /* Bấm thumbnail (anchor) không để media nằm dưới header sticky */
-  scroll-margin-block-start: calc(var(--header-height) + var(--space-4));
+  scroll-margin-block-start: calc(var(--sticky-top) + var(--space-4));
   border-radius: var(--radius-card);
   background-color: var(--color-background-cream);
 }
@@ -3283,7 +3415,7 @@ product-media-gallery {
   position: absolute;
   inset-block-start: var(--space-4);
   inset-inline-end: var(--space-4);
-  z-index: 1;
+  z-index: var(--layer-content);
 }
 
 .product-media__dialog-close {
@@ -3838,7 +3970,7 @@ product-sticky-bar {
   position: fixed;
   inset-inline: 0;
   inset-block-end: 0;
-  z-index: 5;
+  z-index: var(--layer-bottom-bar);
   padding: var(--space-3) var(--page-margin);
   padding-block-end: max(var(--space-3), env(safe-area-inset-bottom));
   border-block-start: 1px solid var(--color-border);
@@ -3903,12 +4035,7 @@ product-sticky-bar {
   cursor: not-allowed;
 }
 
-@media (max-width: 47.99rem) {
-  html[data-sticky-bar-visible] body {
-    padding-block-end: calc(44px + var(--space-3) * 2);
-  }
-}
-
+/* Padding đáy body: chung theo --bottom-bar-height (đầu file, ADR 0007) */
 @media (min-width: 48rem) {
   .product-sticky-bar {
     display: none;
@@ -7302,7 +7429,7 @@ video-card {
 .video-card__poster {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: var(--layer-content);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -7357,7 +7484,7 @@ video-card {
   position: absolute;
   inset-block-start: 10px;
   inset-inline-end: 10px;
-  z-index: 2;
+  z-index: calc(var(--layer-content) + 1);
   padding-block: 3px;
   padding-inline: var(--space-3);
   border-radius: var(--radius-pill);
@@ -7566,7 +7693,7 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
   .level-card__link { border-radius: var(--figma-radius-16); aspect-ratio: 1; }
   .level-card__link { position: relative; }
   .level-card__link::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 63.16%, var(--figma-000000) 100%); pointer-events: none; }
-  .level-card__content { z-index: 1; padding: 0 40px 40px; background-image: none; }
+  .level-card__content { z-index: var(--layer-content); padding: 0 40px 40px; background-image: none; }
   .level-card__products .slideshow-icon { width: 16px; height: 14px; }
   .level-card__products { display: none; }
   .level-card:first-child .level-card__content { padding-block-end: 18px; }
@@ -7785,7 +7912,7 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
   .price { gap: 9px; }
   .price__compare { position: relative; top: -1px; }
   .quiz-option__label { position: relative; top: 1px; }
-  .quiz-option__input { z-index: 1; }
+  .quiz-option__input { z-index: var(--layer-content); }
   .shop-the-look__link, .bundle-builder__link { position: relative; top: 1px; left: -1px; }
   .shop-the-look__note-title, .bundle-builder__panel-title { position: relative; top: 1px; }
   .shop-the-look__line--total { padding-block-start: 7px; }

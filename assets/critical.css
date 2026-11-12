@@ -331,7 +331,7 @@ details[open] > .site-header__link svg {
 .site-header__drawer[open] > summary {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: var(--layer-content);
   background-color: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
 }
 
@@ -343,7 +343,7 @@ details[open] > .site-header__link svg {
   position: fixed;
   inset-block: 0;
   inset-inline-start: 0;
-  z-index: 2;
+  z-index: calc(var(--layer-content) + 1);
   width: min(22rem, 100vw - 3.5rem);
   overflow-y: auto;
   overscroll-behavior: contain;
@@ -399,13 +399,21 @@ details[open] > .site-header__link svg {
   pointer-events: none;
 }
 
+/* Thang z: --layer-* trong base.css (ADR 0007) */
 .block-container:has(> .site-header) {
-  z-index: 10;
+  z-index: var(--layer-header);
 }
 
 .block-container:has(> .site-header[data-sticky]) {
   position: sticky;
   inset-block-start: 0;
+}
+
+/* Màn thấp: header thôi dính (TE-10 AC8, layers §2.5) */
+@media (max-height: 30rem) {
+  .block-container:has(> .site-header[data-sticky]) {
+    position: relative;
+  }
 }
 
 /* Hero đầu trang: đè lên hero; không JS thì không sticky */
@@ -433,19 +441,7 @@ body:has(main > :first-child [data-header-overlay]) .site-header:not([data-scrol
   }
 }
 
-/** Block container layout utilities */
-
-/**
- * Setup a grid that enables both full-width and constrained layouts
- * depending on the class of the child elements.
- *
- * By default, a minimum content margin is set on the left and right
- * sides of the container and the content is centered in the viewport
- * to not exceed the maximum page width.
- *
- * When a child element is given the `full-width` class, it will span
- * the entire viewport.
- */
+/** Block container: lưới 3 cột, con ở cột giữa, `.full-width` tràn màn */
 .block-container {
   --content-width: min(
     calc(var(--page-width) - var(--page-margin) * 2),
@@ -454,7 +450,6 @@ body:has(main > :first-child [data-header-overlay]) .site-header:not([data-scrol
   --content-margin: minmax(var(--page-margin), 1fr);
   --content-grid: var(--content-margin) var(--content-width) var(--content-margin);
 
-  /* This is required to make <img> elements work as background images */
   position: relative;
   grid-template-columns: var(--content-grid);
   display: grid;
