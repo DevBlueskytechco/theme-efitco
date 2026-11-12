@@ -6,6 +6,7 @@
 // So tiền: .js lấy bằng fetch trong trang để cùng market (ES1-T74). Nhóm nojs không chạy script trong trang: sản phẩm đọc JSON nhúng variant-json, giỏ đọc qua context phụ (ES1-T100, support/product-data.ts).
 import { test as base, expect, type Page, type Request, type Route } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { autoDeclineConsent } from './support/consent';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
 import { pageJson, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
@@ -44,6 +45,8 @@ const test = base.extend<{ consoleGuard: ConsoleGuard }>({
     { auto: true },
   ],
 });
+// ES1-T434: banner cookie Shopify hiện muộn, che picker PDP mobile (TC-503) → Decline khi nó xuất hiện.
+test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 
 const DATA = {
   media: env('TE4_MEDIA_HANDLE'),
@@ -1104,7 +1107,13 @@ test.describe('ES1-T70 TE-4 AC5 sticky bar', () => {
     test.skip(!target, 'Sản phẩm chỉ có 1 variant');
     await selectOptions(page, target!.options);
     await settled(page);
-    await expect.poll(async () => cents(await tid(page, T.stickyPrice).getByTestId(T.priceRegular).first().textContent())).toBe(target!.price);
+    // ES1-T434: dữ liệu ES1-T298 không đổi TE4_OPTIONS_HANDLE; PR #191 đỏ chưa rõ nguyên nhân (không có log). Tách 3 bước để log chỉ đúng chỗ:
+    // variant chưa đổi (picker) → giá chính sai (.js/market) → sticky không theo giá chính (BE product-sticky-bar).
+    const what = `variant ${target!.id} (${target!.options.join(' / ')})`;
+    await expect(tid(page, T.variantId), `picker chưa đổi sang ${what}`).toHaveValue(String(target!.id));
+    const regular = (id: string) => tid(page, id).getByTestId(T.priceRegular).first();
+    await expect.poll(async () => cents(await regular(T.price).textContent()), { message: `giá chính của ${what} khác .js` }).toBe(target!.price);
+    await expect.poll(async () => cents(await regular(T.stickyPrice).textContent()), { message: `giá sticky không theo giá chính sau khi đổi sang ${what}` }).toBe(target!.price);
     await expect(tid(page, T.stickyAdd)).toHaveText(target!.available ? 'Add To Cart' : 'Sold out');
   });
 
