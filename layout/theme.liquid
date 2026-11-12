@@ -69,7 +69,34 @@
       Toast chung (layers.md §2.4): chỉ dùng khi không có lớp modal mở; phản hồi trong lớp modal
       nằm ở role="status"/role="alert" của chính lớp. JS chèn toast vào đây; toast cảnh báo, lỗi
       mang role="alert" riêng. Kiểu toast: TE-10-R2-FE2.
+      Hợp đồng cho BE (foundation §17, TE-10 AC11): clone template[data-testid="toast-template"]
+      > [data-toast="info|success|warning|error"], điền [data-toast-title], [data-toast-text]
+      (bỏ hidden khi có mô tả), chép tiêu đề vào [data-toast-dismiss-title] để nút đóng có tên
+      "Dismiss: {tiêu đề}"; nút [data-toast-dismiss] gỡ toast. info, success tự ẩn 6 s (dừng khi
+      hover/focus); warning, error không tự ẩn; tối đa 3 toast. Gắn data-closing trước khi gỡ để
+      CSS mờ dần.
     {% endcomment %}
     <div class="toast-region" data-testid="toast-region" aria-live="polite"></div>
+    <template data-testid="toast-template">
+      {%- assign toast_types = 'info,success,warning,error' | split: ',' -%}
+      {%- for toast_type in toast_types -%}
+        <div
+          class="toast toast--{{ toast_type }}"
+          role="{% if toast_type == 'warning' or toast_type == 'error' %}alert{% else %}status{% endif %}"
+          data-toast="{{ toast_type }}"
+          data-testid="toast-{{ toast_type }}"
+        >
+          <span class="toast__icon">{% render 'status-icon', name: toast_type %}</span>
+          <div class="toast__body">
+            <p class="toast__title" data-toast-title></p>
+            <p class="toast__text" data-toast-text hidden></p>
+          </div>
+          <button type="button" class="close-button toast__close" data-toast-dismiss data-testid="toast-dismiss">
+            <span class="visually-hidden">{{ 'general.dismiss' | t }} <span data-toast-dismiss-title></span></span>
+            {%- render 'header-icon', name: 'close' -%}
+          </button>
+        </div>
+      {%- endfor -%}
+    </template>
   </body>
 </html>
