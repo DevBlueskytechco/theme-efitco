@@ -26,11 +26,30 @@ function watchConsole(page: Page) {
 function watchAssets(page: Page) {
   const loaded = new Set<string>();
   page.on('request', (r) => {
-    const m = r.url().match(/\/([\w-]+\.js)(\?|$)/);
-    if (m && r.url().includes('/assets/')) loaded.add(m[1]);
+    const m = r.url().match(/\/t\/\d+\/assets\/([\w.-]+\.js)(?:[?#]|$)/);
+    if (m) loaded.add(m[1]);
   });
   return loaded;
 }
+
+/**
+ * JS của theme đã tải: [tên file, byte giải nén]. Chỉ asset theme có đoạn `/t/<theme id>/assets/`
+ * (`/cdn/shop/t/<id>/assets/…` hoặc `cdn.shopify.com/s/files/…/t/<id>/assets/…`); bỏ script Shopify
+ * (`/cdn/shopifycloud/…`, privacy banner, wallets, web pixels) không thuộc theme.
+ */
+async function themeJs(page: Page): Promise<[string, number][]> {
+  const entries = await page.evaluate(() =>
+    (performance.getEntriesByType('resource') as PerformanceResourceTiming[]).map((e) => [e.name, e.decodedBodySize || 0] as [string, number]),
+  );
+  const files = new Map<string, number>();
+  for (const [url, bytes] of entries) {
+    const m = url.match(/\/t\/\d+\/assets\/([^/?#]+\.js)(?:[?#]|$)/);
+    if (m) files.set(m[1], Math.max(files.get(m[1]) ?? 0, bytes));
+  }
+  return [...files];
+}
+const total = (files: [string, number][]) => files.reduce((n, [, b]) => n + b, 0);
+const list = (files: [string, number][]) => files.map(([f, b]) => `${f} ${b}`).join(', ') || '(không có)';
 
 /** Cuộn từng màn tới cuối trang, đủ để IntersectionObserver kịp chạy. */
 async function scrollToEnd(page: Page) {
@@ -106,7 +125,10 @@ test.describe('ES1-T316 lazy-module interaction', () => {
     await quiz.scrollIntoViewIfNeeded();
     await page.waitForTimeout(800);
     expect(loaded.has('quiz-finder.js')).toBe(false);
-    await quiz.locator('input, button, a, select').first().focus();
+    // Form quiz mở đầu bằng <input type="hidden" name="q">: không focus được, phải chọn control nhìn thấy.
+    const target = quiz.locator('input:not([type="hidden"]):visible, select:visible, button:visible, a[href]:visible').first();
+    await target.focus();
+    await expect(target).toBeFocused();
     await expect.poll(() => loaded.has('quiz-finder.js')).toBe(true);
     expect(errors).toEqual([]);
   });
@@ -211,18 +233,19 @@ test.describe('ES1-T316 motion', () => {
     const errors = watchConsole(page);
     await page.addInitScript(asUser);
     await page.goto('/');
-    await page.waitForLoadState('load');
-    const sum = () =>
-      page.evaluate(() =>
-        (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
-          .filter((e) => /\/assets\/[^?]+\.js(\?|$)/.test(e.name))
-          .reduce((n, e) => n + (e.decodedBodySize || 0), 0),
-      );
-    const preload = await sum();
+    // Chờ cả import() lười đã kích lúc tải (phần tử trong 200px khung nhìn đầu) để tính vào "tải sẵn".
+    await page.waitForLoadState('networkidle');
+    const preloadFiles = await themeJs(page);
+    const preload = total(preloadFiles);
     await scrollToEnd(page);
     await page.waitForLoadState('networkidle');
-    const after = await sum();
-    test.info().annotations.push({ type: 'js-bytes', description: `tải sẵn ${preload} B, sau cuộn ${after} B` });
+    const afterFiles = await themeJs(page);
+    const after = total(afterFiles);
+    test.info().annotations.push(
+      { type: 'js-bytes', description: `tải sẵn ${preload} B, sau cuộn ${after} B` },
+      { type: 'js-preload', description: list(preloadFiles) },
+      { type: 'js-after-scroll', description: list(afterFiles.filter(([f]) => !preloadFiles.some(([p]) => p === f))) },
+    );
     // decodedBodySize = 0 khi CDN không gửi Timing-Allow-Origin: chỉ ghi, đo chặn ở CI ES1-T177.
     // Sau cuộn (≤ 65 536) chỉ ghi: còn chờ TE-13-R2-BE1 (featured product lười interaction), TE-3-R2-BE2 (gỡ product-swatch).
     if (preload > 0) expect(preload).toBeLessThanOrEqual(40960);

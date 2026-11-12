@@ -15,7 +15,10 @@ KHÔNG CHẮC: (1) JS và spec chưa chạy trên preview (phiên agent không c
   - Icon giỏ nhún: tìm count/link trong `.site-header__icons` thay vì cả document.
 - `assets/motion-scrub.js` (mới, 2 794 B): code scrub + split cũ, chạy khi import. Công thức giữ nguyên: `--w = clamp((p·(n+2,5) − i) / 2,5)` (rút gọn đại số của bản cũ), `--lift = (0,5 − t)·[90,150,120]`.
 - `assets/lazy-module.js` (379 → 765 / 768 B): `data-lazy-on="interaction"` thì không quan sát viewport, nạp ở `pointerenter`, `focusin` hoặc `touchstart` đầu tiên trong element; 1 `AbortController` gỡ cả 3 listener sau lần đầu; listener passive. Không có `data-lazy-on` thì như cũ (viewport, 200px).
-- `tests/e2e/ES1-T316.spec.ts` (mới).
+- `tests/e2e/ES1-T316.spec.ts` (mới). Lượt 2, sửa theo CI run 43187345274:
+  - `:99` focus: form quiz mở đầu bằng `<input type="hidden" name="q">`, `.focus()` vào đó không có tác dụng nên không có `focusin`. `lazy-module.js` không sai (listener gắn trên chính element `data-lazy-module`, `focusin` bubble). Spec chọn control nhìn thấy (`input:not([type=hidden]):visible, select, button, a[href]`) và `toBeFocused()` trước khi chờ tải.
+  - `:210` AC-H31: 159 108 B là cộng cả script Shopify (`/cdn/shopifycloud/…`, privacy banner, wallets). Nay chỉ đếm asset theme khớp `/t/<id>/assets/<file>.js` (`/cdn/shop/t/<id>/assets/` và `cdn.shopify.com/s/files/…/t/<id>/assets/`), gom theo tên file; "tải sẵn" đo sau `networkidle` (tính cả import() lười đã kích ở khung nhìn đầu). Annotation `js-preload`, `js-after-scroll` ghi từng file + byte. Ngưỡng 40 960 giữ nguyên. `watchAssets` dùng cùng bộ lọc.
+  - Ước tính tĩnh tải sẵn trang chủ: 35 585 B; nếu hàng collection-list nằm trong 200px khung nhìn đầu thì + scroll-buttons 768 + scroll-extras 3 207 = 39 560 B, vẫn ≤ 40 960. CI vượt thì xem annotation `js-preload` rồi sửa code.
 - `tests/e2e/ES1-T139.spec.ts`: trần `lazy-module.js` 384 → 768 theo ADR 0010 (test cũ sẽ fail nếu giữ 384).
 
 ## Hợp đồng cho task sau
@@ -35,6 +38,7 @@ KHÔNG CHẮC: (1) JS và spec chưa chạy trên preview (phiên agent không c
 - `shopify theme check`: 0 lỗi (22 cảnh báo có sẵn ở templates/index*, blocks không chạm).
 - `node --check` 3 file JS, `node --experimental-strip-types --check` spec: ok; khẳng định tĩnh của spec chạy bằng node: pass; logic interaction lazy-module thử với DOM giả: 3 sự kiện chỉ import 1 lần, element không có `data-lazy-on` vẫn vào observer.
 - Không console.*, không fetch, không import tĩnh, không thêm thẻ `<script>`.
+- Lượt 2: `playwright test --list` parse spec ok (28 test); regex asset theme thử với 5 URL mẫu (2 theme khớp, 3 Shopify loại); không đổi `assets/*.js`.
 - Playwright `tests/e2e/ES1-T316.spec.ts` + hồi quy ES1-T235, ES1-T185, ES1-T139, ES1-T158 (desktop, Pixel 7), console, lhci: chờ CI.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
