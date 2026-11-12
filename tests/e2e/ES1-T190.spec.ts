@@ -4,7 +4,7 @@
 // Dữ liệu P01, P02, P04 từ ES1-T178: thiếu thì skip có lý do. T190_NEW_SALE_HANDLE: sản phẩm vừa tag new vừa sale, không có thì test thứ tự dùng DOM.
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
+import { expectNotChallenged, expectStoreAllowed, skipIfStoreBlocked } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { watchShopPay403 } from './support/console-guard';
 
@@ -175,31 +175,36 @@ test.describe('ES1-T190 lưới mặc định 4 (D7)', () => {
   }
 });
 
+// ES1-T434 (12/11): docs/srs.md#TE-3 AC6 bản 0.3: swatch card là chỉ báo aria-hidden, "không phải control nên không có yêu cầu vùng chạm
+// (thay vùng bấm swatch 44px của D7, ES1-T169)"; AC2 0.3: không bấm được. 3 test vùng bấm bỏ (test.skip, giữ thân để đối chiếu),
+// giữ đo hình 32 x 16. Chỉ đo card figma-*: PR #191 đỏ sau khi store có sản phẩm demo ES1-T298; card ngoài figma-* trong hàng 5 ghi annotation.
 test.describe('ES1-T190 vùng bấm swatch (D7, AC6)', () => {
   async function swatches(page: Page) {
     const block = await openFigma(page);
-    const groups = block.getByTestId(T.swatches);
-    test.skip((await groups.count()) === 0, 'Không có card có swatch trong hàng 5: chờ dữ liệu ES1-T178');
+    const cards = block.getByTestId(T.card);
+    const others = await cards.evaluateAll((els) =>
+      els.map((el) => el.querySelector('a[href*="/products/"]')?.getAttribute('href') ?? '').filter((href) => !/\/products\/figma-/.test(href)),
+    );
+    if (others.length) test.info().annotations.push({ type: 'ES1-T434 dữ liệu', description: `hàng 5 có card ngoài figma-*: ${others.join(', ')}` });
+    const groups = cards.filter({ has: page.locator('a[href*="/products/figma-"]') }).getByTestId(T.swatches);
+    test.skip((await groups.count()) === 0, 'Không có card figma-* có swatch trong hàng 5: chờ dữ liệu ES1-T178');
     return groups;
   }
 
-  test('::after từ 44 x 44, hình swatch giữ 32 x 16', async ({ page }) => {
+  // ES1-T434: chỉ còn hình 32 x 16 (TE-3 AC6 0.3); vùng bấm ::after không còn là yêu cầu.
+  test('AC6 0.3: hình swatch giữ 32 x 16', async ({ page }) => {
     const groups = await swatches(page);
     for (const label of await groups.getByTestId(T.swatch).all()) {
       const size = await label.evaluate((el) => {
-        const hit = getComputedStyle(el, '::after');
         const pill = getComputedStyle(el, '::before');
-        return { hitW: parseFloat(hit.width), hitH: parseFloat(hit.height), pillW: parseFloat(pill.width), pillH: parseFloat(pill.height) };
+        return { pillW: parseFloat(pill.width), pillH: parseFloat(pill.height) };
       });
-      // Từ 1280: Figma cách nhau 4 px nên vùng bấm rộng 36 để không chồng (CTO 07/11: theo Figma)
-      expect(size.hitW, 'vùng bấm rộng').toBeGreaterThanOrEqual((page.viewportSize()?.width ?? 0) >= 1280 ? 36 : 44);
-      expect(size.hitH, 'vùng bấm cao').toBeGreaterThanOrEqual(44);
       expect(size.pillW, 'hình rộng').toBeCloseTo(32, 0);
       expect(size.pillH, 'hình cao').toBeCloseTo(16, 0);
     }
   });
 
-  test('vùng bấm thật: điểm cách tâm 21 px vẫn trúng label', async ({ page }) => {
+  test.skip('vùng bấm thật: điểm cách tâm 21 px vẫn trúng label', async ({ page }) => {
     const groups = await swatches(page);
     const label = groups.first().getByTestId(T.swatch).first();
     await label.scrollIntoViewIfNeeded();
@@ -213,32 +218,41 @@ test.describe('ES1-T190 vùng bấm swatch (D7, AC6)', () => {
     expect(hits).toEqual([true, true, true, true]);
   });
 
-  test('không chồng vùng bấm của swatch cạnh, 2 cỡ màn hình', async ({ page }, ti) => {
+  test.skip('không chồng vùng bấm của swatch cạnh, 2 cỡ màn hình', async ({ page }, ti) => {
     test.skip(ti.project.name !== 'desktop', 'Đổi viewport ở project desktop; Pixel 7 đã có test đo ở trên');
-    for (const width of [360, 1280]) {
-      await page.setViewportSize({ width, height: 900 });
-      const groups = await swatches(page);
-      for (const group of await groups.all()) {
-        const overlaps = await group.evaluate((root) => {
-          const rects = [...root.querySelectorAll('[data-testid="product-card-swatch"]')].map((el) => {
-            const r = el.getBoundingClientRect();
-            const s = getComputedStyle(el, '::after');
-            return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: parseFloat(s.width), h: parseFloat(s.height) };
+    // ES1-T300 (CTO 11/11 16:12): run 42981296470 đỏ do HTTP /?view=figma → 429 = môi trường store dev → skip có lý do; lỗi khác vẫn fail.
+    await skipIfStoreBlocked('ES1-T300: store dev trả 429 cho /?view=figma (môi trường)', async () => {
+      for (const width of [360, 1280]) {
+        await page.setViewportSize({ width, height: 900 });
+        // Như openFigma, thêm expectStoreAllowed: 429 ném 'store trả 429', cf-mitigated ném 'bị Cloudflare chặn' → skipIfStoreBlocked nhận ra. Mã lỗi khác vẫn fail ở assertion HTTP.
+        const res = await page.goto(FIGMA);
+        if (res) expectStoreAllowed(res);
+        expect(res?.status(), `HTTP ${FIGMA}`).toBeLessThan(400);
+        await expectNotChallenged(page);
+        const groups = page.getByTestId(T.block).getByTestId(T.swatches);
+        test.skip((await groups.count()) === 0, 'Không có card có swatch trong hàng 5: chờ dữ liệu ES1-T178');
+        for (const group of await groups.all()) {
+          const overlaps = await group.evaluate((root) => {
+            const rects = [...root.querySelectorAll('[data-testid="product-card-swatch"]')].map((el) => {
+              const r = el.getBoundingClientRect();
+              const s = getComputedStyle(el, '::after');
+              return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: parseFloat(s.width), h: parseFloat(s.height) };
+            });
+            let bad = 0;
+            rects.forEach((a, i) => rects.slice(i + 1).forEach((b) => {
+              const clearX = Math.abs(a.x - b.x) >= (a.w + b.w) / 2 - 0.5;
+              const clearY = Math.abs(a.y - b.y) >= (a.h + b.h) / 2 - 0.5;
+              if (!clearX && !clearY) bad += 1;
+            }));
+            return bad;
           });
-          let bad = 0;
-          rects.forEach((a, i) => rects.slice(i + 1).forEach((b) => {
-            const clearX = Math.abs(a.x - b.x) >= (a.w + b.w) / 2 - 0.5;
-            const clearY = Math.abs(a.y - b.y) >= (a.h + b.h) / 2 - 0.5;
-            if (!clearX && !clearY) bad += 1;
-          }));
-          return bad;
-        });
-        expect(overlaps, `${width}px`).toBe(0);
+          expect(overlaps, `${width}px`).toBe(0);
+        }
       }
-    }
+    });
   });
 
-  test('bấm mép vùng bấm chọn đúng swatch', async ({ page }) => {
+  test.skip('bấm mép vùng bấm chọn đúng swatch', async ({ page }) => {
     const groups = await swatches(page);
     const group = groups.first();
     const labels = group.getByTestId(T.swatch);

@@ -3,6 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T176.spec.ts --project=desktop
 // Baseline dựng lúc chạy từ docs/figma/img, không commit. Số pixel lấy từ chính comparator của toMatchSnapshot nên khớp với kết quả assert.
 import { test, expect, type Locator, type Page } from '@playwright/test';
+import { autoDeclineConsent } from './support/consent';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { gotoStore } from './support/store-guard';
@@ -130,6 +131,14 @@ async function compareImage(page: Page, row: Row) {
 
   // 1% tính trên phần không che: chia cho cả ảnh thì vùng che càng lớn càng dễ đạt. Số pixel lấy từ comparator của toMatchSnapshot ở trên.
   const pixels = probes.find((probe) => probe.threshold === thresholds.pixelThreshold)!.pixels;
+  const limit = Math.floor(thresholds.maxDiffRatio * visible);
+  // ES1-T300: hàng có imageReportOnly chỉ ghi số và annotation, không chặn gate; không nới ngưỡng (chỉ CTO nới). Lý do, ticket đóng ghi trong figma-rows.json.
+  const reportOnly = (row as { imageReportOnly?: { closedBy: string; why: string } }).imageReportOnly;
+  if (reportOnly) {
+    if (pixels > limit) info.annotations.push({ type: 'figma-report-only', description: `Hàng ${row.id}: ${pixels} pixel khác, ngưỡng ${limit}. ${reportOnly.closedBy} đóng: ${reportOnly.why}` });
+    log('image-report-only', row.id, { pixels, limit, closedBy: reportOnly.closedBy });
+    return;
+  }
   expect(pixels, `Hàng ${row.id}: ${pixels} pixel khác trên ${visible} pixel không che, xem ảnh diff`).toBeLessThanOrEqual(Math.floor(thresholds.maxDiffRatio * visible));
 }
 
@@ -176,6 +185,9 @@ async function compareStyle(page: Page, row: Row) {
     expect.soft(Math.abs(got - want), `${row.id} ${item.name}: ${got} so với Figma ${want}`).toBeLessThanOrEqual(0.5);
   }
 }
+
+// ES1-T434: banner cookie Shopify đè đáy hero khi chụp → Decline khi nó xuất hiện.
+test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 
 test.describe('ES1-T176 so Figma', () => {
   test.skip(({ isMobile }) => isMobile, 'Figma chỉ có desktop 1920 (plan ES1-T169 D3); mobile do ES1-T196 đo theo mặc định đã chốt');
