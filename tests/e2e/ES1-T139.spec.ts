@@ -430,7 +430,8 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
   test('AC3 contract: tên partial khớp Liquid, trần byte', async () => {
     expect(source('assets/quiz-finder.js')).toContain('partials.fetch("quiz-results"');
     expect(source('blocks/quiz.liquid')).toContain("{% partial 'quiz-results' %}");
-    expect(statSync(join(process.cwd(), 'assets/lazy-module.js')).size).toBeLessThanOrEqual(384);
+    // ADR 0010 (ES1-T316): lazy-module thêm data-lazy-on="interaction", trần 384 → 768
+    expect(statSync(join(process.cwd(), 'assets/lazy-module.js')).size).toBeLessThanOrEqual(768);
     expect(statSync(join(process.cwd(), 'assets/quiz-finder.js')).size).toBeLessThanOrEqual(4352);
   });
 });
