@@ -5,6 +5,9 @@
   disclosures are <details>, so the menu and the drawer work without
   JavaScript; JS only enhances them.
 
+  Logo order (ADR 0011): the block logo, then the theme logo (Theme settings,
+  Logo and favicon), then the shop name as text.
+
   Hooks:
   - data-header-overlay: set on the root of a hero that opens the page. The
     header then sits transparent over the hero, with light text.
@@ -31,7 +34,7 @@
 
 {%- liquid
   assign menu = block.settings.menu
-  assign logo = block.settings.logo
+  assign logo = block.settings.logo | default: settings.logo
   assign has_menu = false
   if menu.links.size > 0
     assign has_menu = true
@@ -136,8 +139,7 @@
         {% assign logo_render_width = block.settings.logo_width | times: 2 %}
         {% render 'image', image: logo, class: 'site-header__logo-image', width: logo_render_width %}
       {%- else -%}
-        <span class="visually-hidden">{{ shop.name | escape }}</span>
-        {%- render 'logo-efitco', class: 'site-header__logo-svg' -%}
+        <span class="site-header__logo-text">{{ shop.name | escape }}</span>
       {%- endif -%}
     </a>
 
