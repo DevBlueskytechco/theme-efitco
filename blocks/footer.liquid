@@ -7,8 +7,9 @@
 
   Social URLs are global settings (config/settings_schema.json, Social
   group); everything else is a block setting. An empty newsletter heading
-  uses the two-color sample from the locale, and an empty logo uses the shop
-  name. Self-contained: callers must leave the body empty.
+  uses the two-color sample from the locale. Logo order (ADR 0011): the block
+  logo, then the theme logo (Theme settings, Logo and favicon), then the shop
+  name as text. Self-contained: callers must leave the body empty.
 
   @example
   {% block 'footer' -%}{%- endblock %}
@@ -16,7 +17,7 @@
 
 {%- liquid
   assign menu_links = block.settings.menu.links
-  assign logo = block.settings.logo
+  assign logo = block.settings.logo | default: settings.logo
   assign newsletter_image = block.settings.newsletter_image
   assign newsletter_heading = block.settings.newsletter_heading | strip
 
@@ -153,8 +154,7 @@
             {%- assign logo_render_width = block.settings.logo_width | times: 2 -%}
             {%- render 'image', image: logo, class: 'site-footer__logo-image', width: logo_render_width -%}
           {%- else -%}
-            <span class="visually-hidden">{{ shop.name | escape }}</span>
-            {%- render 'logo-efitco', class: 'site-footer__logo-svg' -%}
+            <span class="site-footer__logo-text">{{ shop.name | escape }}</span>
           {%- endif -%}
         </a>
 
