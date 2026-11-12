@@ -1,13 +1,16 @@
 {% doc %}
   Renders the theme's storefront footer: newsletter band (optional image,
-  two-color heading, form, note), logo, description, footer menu, social
+  heading, text, form, note), logo, description, footer menu, social
   links, Follow on Shop, trust bar, wordmark, localization, payment icons,
   and copyright line. Works without JavaScript. Composed directly in
   layout/theme.liquid so it appears on every page.
 
   Social URLs are global settings (config/settings_schema.json, Social
-  group); everything else is a block setting. An empty newsletter heading
-  uses the two-color sample from the locale. Logo order (ADR 0011): the block
+  group); everything else is a block setting. Text settings default to empty
+  (ADR 0011): an empty heading, text, description or trust item is not
+  rendered. The submit button uses the button label setting, then the
+  "Subscribe" locale string. Payment icons come only from
+  shop.enabled_payment_types, full color. Logo order (ADR 0011): the block
   logo, then the theme logo (Theme settings, Logo and favicon), then the shop
   name as text. Self-contained: callers must leave the body empty.
 
@@ -20,6 +23,11 @@
   assign logo = block.settings.logo | default: settings.logo
   assign newsletter_image = block.settings.newsletter_image
   assign newsletter_heading = block.settings.newsletter_heading | strip
+  assign newsletter_text = block.settings.newsletter_text
+  assign newsletter_button_label = block.settings.newsletter_button_label | strip
+  if newsletter_button_label == blank
+    assign newsletter_button_label = 'blocks.footer.newsletter_submit' | t
+  endif
 
   assign social_networks = 'tiktok,instagram,youtube,facebook,x,pinterest' | split: ','
   assign has_social = false
@@ -72,18 +80,18 @@
       </div>
     {%- endif -%}
 
-    <div class="site-footer__newsletter">
-      <h2 class="site-footer__newsletter-heading" data-testid="footer-newsletter-heading">
+    {%- if newsletter_heading != blank or newsletter_text != blank -%}
+      <div class="site-footer__newsletter">
         {%- if newsletter_heading != blank -%}
-          {{- newsletter_heading | escape -}}
-        {%- else -%}
-          {{- 'blocks.footer.newsletter_heading_html' | t -}}
+          <h2 class="site-footer__newsletter-heading" data-testid="footer-newsletter-heading">
+            {{- newsletter_heading | escape -}}
+          </h2>
         {%- endif -%}
-      </h2>
-      {%- if block.settings.newsletter_text != blank -%}
-        <p class="site-footer__newsletter-text">{{ block.settings.newsletter_text }}</p>
-      {%- endif -%}
-    </div>
+        {%- if newsletter_text != blank -%}
+          <p class="site-footer__newsletter-text" data-testid="footer-newsletter-text">{{ newsletter_text }}</p>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
 
     {%- form 'customer', id: 'footer-newsletter', class: 'site-footer__form', data-testid: 'footer-newsletter-form' -%}
       <input type="hidden" name="contact[tags]" value="newsletter">
@@ -110,7 +118,7 @@
         >
         <button class="site-footer__submit" type="submit" data-testid="footer-newsletter-submit">
           {%- render 'slideshow-icon', name: 'send' -%}
-          <span>{{ 'blocks.footer.newsletter_submit' | t }}</span>
+          <span>{{ newsletter_button_label | escape }}</span>
         </button>
       </div>
 
@@ -345,15 +353,7 @@
         {%- endform -%}
       {%- endif -%}
 
-      {%- assign figma_pay = images['efx-pay-1.png'] -%}
-      {%- if figma_pay != blank -%}
-        <ul class="site-footer__payment site-footer__payment--images" aria-label="{{ 'blocks.footer.payment_label' | t }}">
-          {%- for n in (1..5) -%}
-            {%- assign pay_name = 'efx-pay-' | append: n | append: '.png' -%}
-            <li data-testid="footer-payment-icon">{{ images[pay_name] | image_url: width: 64 | image_tag: width: 32, height: 22, alt: '', loading: 'lazy' }}</li>
-          {%- endfor -%}
-        </ul>
-      {%- elsif show_payment_icons -%}
+      {%- if show_payment_icons -%}
         <ul class="site-footer__payment" aria-label="{{ 'blocks.footer.payment_label' | t }}">
           {%- for type in shop.enabled_payment_types -%}
             <li data-testid="footer-payment-icon">{{ type | payment_type_svg_tag }}</li>
@@ -407,7 +407,7 @@
       "type": "inline_richtext",
       "id": "description",
       "label": "t:labels.footer_description",
-      "default": "Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence."
+      "info": "t:info.footer_hide_empty"
     },
     {
       "type": "header",
@@ -423,13 +423,19 @@
       "type": "text",
       "id": "newsletter_heading",
       "label": "t:labels.newsletter_heading",
-      "info": "t:info.sample_text"
+      "info": "t:info.footer_hide_empty"
     },
     {
       "type": "inline_richtext",
       "id": "newsletter_text",
       "label": "t:labels.newsletter_text",
-      "default": "Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers."
+      "info": "t:info.footer_hide_empty"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_button_label",
+      "label": "t:labels.newsletter_button_label",
+      "info": "t:info.newsletter_button_label"
     },
     {
       "type": "header",
@@ -452,8 +458,7 @@
       "type": "text",
       "id": "trust_text_1",
       "label": "t:labels.trust_text",
-      "info": "t:info.trust_text",
-      "default": "1 Year Warranty"
+      "info": "t:info.trust_text"
     },
     {
       "type": "header",
@@ -476,8 +481,7 @@
       "type": "text",
       "id": "trust_text_2",
       "label": "t:labels.trust_text",
-      "info": "t:info.trust_text",
-      "default": "Fast Shipping"
+      "info": "t:info.trust_text"
     },
     {
       "type": "header",
@@ -500,8 +504,7 @@
       "type": "text",
       "id": "trust_text_3",
       "label": "t:labels.trust_text",
-      "info": "t:info.trust_text",
-      "default": "Premium Quality"
+      "info": "t:info.trust_text"
     },
     {
       "type": "header",
@@ -524,8 +527,7 @@
       "type": "text",
       "id": "trust_text_4",
       "label": "t:labels.trust_text",
-      "info": "t:info.trust_text",
-      "default": "90 Day Money Back"
+      "info": "t:info.trust_text"
     }
   ]
 }
