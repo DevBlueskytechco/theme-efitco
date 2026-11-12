@@ -10,6 +10,7 @@ CHECK="$(mktemp "${TMPDIR:-/tmp}/theme-check.XXXXXX")"; trap 'rm -f "$CHECK"' EX
 rc=0; shopify theme check --output json --fail-level error > "$CHECK" || rc=$?
 "$H" check-report "$CHECK" || rc=1
 [ "$rc" = 0 ] || { echo "theme check lỗi, không đóng zip" >&2; exit 1; }
+# ES1-T177: bỏ template kiểm thử, template cổng (index.te*, index.figma) theo mẫu index.*.liquid; index.liquid không khớp mẫu nên giữ.
 zip -r "$OUT" assets blocks config layout locales snippets templates \
-  -x "config/markets.json" -x "*.DS_Store" -x "*/.gitkeep"
+  -x "config/markets.json" -x "*.DS_Store" -x "*/.gitkeep" -x "templates/index.*.liquid"
 echo "$OUT"; unzip -l "$OUT" | tail -1

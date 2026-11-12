@@ -2,6 +2,7 @@ name: Store tests
 # Lighthouse + e2e trên store dev, gọi từ ci.yml dưới một concurrency group toàn repo (ES1-T162).
 # Tách file vì concurrency đặt riêng từng job thì 4 shard + lighthouse tự xếp hàng và huỷ lẫn nhau;
 # đặt ở job gọi workflow này thì cả cụm giữ store cho 1 PR. Check bắt buộc lighthouse, e2e nằm ở ci.yml.
+# Job lighthouse gồm cả bước đo JS theo URL (ES1-T177): JS vượt trần → lighthouse_result failure → check lighthouse đỏ.
 on:
   workflow_call:
     inputs:
@@ -34,6 +35,8 @@ jobs:
         run: |
           Q="preview_theme_id=${THEME_ID}&pb=0"
           URLS=(--collect.url="${STORE_ORIGIN}/?${Q}")
+          # ES1-T177: preview không có block settings nên / thiếu block; /?view=figma là template cổng đủ 10 hàng (ES1-T175). Giữ /, không hạ ngưỡng.
+          URLS+=(--collect.url="${STORE_ORIGIN}/?view=figma&${Q}")
           [ -n "$BENCH_PRODUCT" ] && URLS+=(--collect.url="${STORE_ORIGIN}/products/${BENCH_PRODUCT}?${Q}")
           [ -n "$BENCH_COLLECTION" ] && URLS+=(--collect.url="${STORE_ORIGIN}/collections/${BENCH_COLLECTION}?${Q}")
           FAIL=0
@@ -47,14 +50,32 @@ jobs:
         run: |
           # Đọc thẳng lhr-*.json: có cả khi assert fail (manifest chỉ có sau upload)
           shopt -s nullglob
+          # Giữ ?view=... để / và /?view=figma không trùng tên dòng (ES1-T177)
           for f in lh-out/lhr-*.json; do
-            jq -r '"\(.configSettings.formFactor)  \(.finalDisplayedUrl | split("?")[0])  status=\(.runtimeError.code // "ok")  perf=\(.categories.performance.score)  a11y=\(.categories.accessibility.score)  bp=\(.categories["best-practices"].score)  seo=\(.categories.seo.score)"' "$f"
+            jq -r '"\(.configSettings.formFactor)  \(.finalDisplayedUrl | split("?") | .[0] + ((.[1] // "") | capture("(?:^|&)(?<v>view=[^&]+)").v? // "" | if . == "" then "" else "?" + . end))  status=\(.runtimeError.code // "ok")  perf=\(.categories.performance.score)  a11y=\(.categories.accessibility.score)  bp=\(.categories["best-practices"].score)  seo=\(.categories.seo.score)"' "$f"
           done
           # Audit accessibility chưa đạt (lấy từ lần đo đầu) — để biết sửa gì cho a11y >= 0.98
           F=$(ls lh-out/lhr-*.json 2>/dev/null | head -1)
           [ -n "$F" ] && jq -r '.categories.accessibility.auditRefs[] | select(.weight > 0) | .id' "$F" | while read id; do
             jq -r --arg id "$id" '.audits[$id] | select(.score != null and .score < 1) | "A11Y FAIL  \($id): \(.title)  — " + ([.details.items[]?.node.selector] | map(select(.)) | .[0:3] | join(" | "))' "$F"
           done
+      # ES1-T177 (ADR 0006, 0010): JS theme theo URL, tải sẵn ≤ 40 960 B, sau cuộn ≤ 65 536 B; vượt thì check lighthouse đỏ, chặn merge.
+      # Chạy cả khi lhci đỏ để PR luôn thấy bảng JS. Playwright có sẵn trong devDependencies, không thêm dependency, không secret mới.
+      - name: Cài Chromium cho đo JS
+        if: ${{ !cancelled() }}
+        run: npx playwright install --with-deps chromium
+      - name: Tự kiểm bộ đo JS (route giả, không gọi store)
+        if: ${{ !cancelled() }}
+        env: { JS_BUDGET_REQUIRE_BROWSER: '1' }
+        run: node scripts/js-budget.test.mjs
+      - name: Ngân sách JS theo URL (desktop + Pixel 7)
+        if: ${{ !cancelled() }}
+        env:
+          # Chỉ HẠ được trần (chứng minh đỏ, docs/runbook.md mục 11). Var trống = trần ADR.
+          JS_BUDGET_PRELOAD_MAX: ${{ vars.JS_BUDGET_PRELOAD_MAX }}
+          JS_BUDGET_SCROLL_MAX: ${{ vars.JS_BUDGET_SCROLL_MAX }}
+          JS_BUDGET_PRODUCT: ${{ vars.JS_BUDGET_PRODUCT }}
+        run: node scripts/js-budget.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with: { name: lighthouse, path: lh-out, if-no-files-found: ignore }

@@ -18,6 +18,15 @@ jobs:
         run: bash scripts/shopify-cli.test.sh
       - name: Test preview-push với shopify giả (ES1-T162)
         run: bash scripts/preview-push.test.sh
+      # Logic trần JS (ES1-T177): chạy được không cần npm ci, phần trình duyệt chạy ở job lighthouse.
+      - name: Test logic ngân sách JS
+        run: node scripts/js-budget.test.mjs
+      # CTO 11/11 (ES1-T310 #1): base.css nạp chặn render mọi trang, gzip ≤ 49 152 B. Không cần store nên chạy cả khi RUN_STORE_TESTS tắt.
+      - name: base.css gzip ≤ 49 152 B
+        run: |
+          S=$(gzip -c assets/base.css | wc -c | tr -d ' ')
+          echo "assets/base.css gzip: $S / 49152 B"
+          [ "$S" -le 49152 ] || { echo "::error file=assets/base.css::gzip $S B > 49 152 B (ES1-T310 #1): xoá CSS cũ của phần thay thế, xem docs/runbook.md mục 12"; exit 1; }
       # Runner có sẵn shellcheck. Chỉ báo, không chặn: script cũ chưa từng chạy shellcheck (ES1-T162).
       - name: shellcheck scripts
         continue-on-error: true
