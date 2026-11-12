@@ -5,6 +5,7 @@
 import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
+import { autoDeclineConsent } from './support/consent';
 import { fetchRetry429 } from './support/cart-api';
 
 const isDesktop = (ti: TestInfo) => ti.project.name === 'desktop';
@@ -67,6 +68,9 @@ const iconTranslateX = (l: Locator) =>
     const t = getComputedStyle(el).translate;
     return t === 'none' ? 0 : parseFloat(t);
   });
+
+// ES1-T434: banner cookie Shopify hiện muộn trong trang (setup không thấy), che footer/localization → Decline khi nó xuất hiện.
+test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 
 test.describe('ES1-T45 rich-text (ES1-T44, ADR 0005)', () => {
   test('TC-01 container home-intro nền sand rgb(235, 230, 224), chữ foreground sand', async ({ page }) => {
