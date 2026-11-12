@@ -10,6 +10,10 @@ import { clickAndLoad, expectLoaded, gotoStore } from './support/store-guard';
 const ALL = '/collections/all';
 const PAGE_SIZE = 20;
 const MAX_PAGES = 5;
+// ES1-T417 (CTO 11/11, ES1-T178 mục N): store dev 2065 sản phẩm, sắp theo tên thì sản phẩm test ở vị trí > 2000 → skip từ 03/11.
+// Duyệt /collections/all với sort_by=created-descending cố định: sản phẩm test mới tạo lên trang đầu.
+const SORT = 'sort_by=created-descending';
+const allPage = (n: number) => (n === 1 ? `${ALL}?${SORT}` : `${ALL}?${SORT}&page=${n}`);
 const SWATCH = 'input[type="radio"][data-variant-id]';
 const T = { collection: 'collection-products', card: 'product-card', title: 'product-card-title', swatch: 'product-card-swatch' } as const;
 const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
@@ -32,7 +36,7 @@ async function swatchCard(page: Page): Promise<string | null> {
   const handle = process.env.TE3_SWATCH_HANDLE;
   for (let n = 1; n <= MAX_PAGES; n++) {
     // ES1-T229: bị chặn thì fail nêu Cloudflare. Trước đây status 403 thành "không có card" và test bị skip.
-    await gotoStore(page, n === 1 ? ALL : `${ALL}?page=${n}`);
+    await gotoStore(page, allPage(n)); // ES1-T417: sort_by=created-descending
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     const count = await cards.count();
     if (!count) return null;

@@ -44,6 +44,10 @@ const ALL = '/collections/all';
 const PAGES = [HOME, ALL] as const;
 const PAGE_SIZE = 20; // templates/collection.liquid paginate by 20
 const MAX_PAGES = 5;
+// ES1-T417 (CTO 11/11, ES1-T178 mục N): store dev 2065 sản phẩm, thứ tự mặc định theo tên đẩy sản phẩm TE4 ra vị trí > 2000,
+// ngoài MAX_PAGES trang đầu → test skip từ 03/11. Mọi lần đọc /collections/all để tìm dữ liệu dùng sort_by=created-descending cố định.
+const SORT = 'sort_by=created-descending';
+const allPage = (n = 1) => (n === 1 ? `${ALL}?${SORT}` : `${ALL}?${SORT}&page=${n}`);
 const SWATCH = 'input[type="radio"][data-variant-id]';
 
 const ENV = {
@@ -218,7 +222,7 @@ async function openHome(page: Page): Promise<Locator> {
 
 async function cardsOn(page: Page, path: string): Promise<Locator> {
   if (path === HOME) return (await openHome(page)).getByTestId(T.card);
-  const res = await page.goto(path);
+  const res = await page.goto(path === ALL ? allPage() : path); // ES1-T417: trang đầu theo sort cố định
   expect(res?.status(), `HTTP ${path}`).toBeLessThan(400);
   const cards = page.getByTestId(T.collection).getByTestId(T.card);
   test.skip((await cards.count()) === 0, `${path} không có sản phẩm`);
@@ -234,7 +238,7 @@ function byHandle(page: Page, cards: Locator, handle: string): Locator {
 // không có handle → card đầu tiên có testid. Trả null khi không có.
 async function findCard(page: Page, testid: string | null, handle?: string, without?: string): Promise<Locator | null> {
   for (let n = 1; n <= MAX_PAGES; n++) {
-    const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
+    const res = await page.goto(allPage(n)); // ES1-T417: sort_by=created-descending
     if (!res || res.status() >= 400) return null;
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     const count = await cards.count();
@@ -357,7 +361,7 @@ async function expectBadge(card: Locator, target: Locator) {
 async function badgeSwatchCard(page: Page): Promise<Locator | null> {
   const handle = process.env.TE3_BADGE_SWATCH_HANDLE;
   for (let n = 1; n <= MAX_PAGES; n++) {
-    const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
+    const res = await page.goto(allPage(n)); // ES1-T417: sort_by=created-descending
     if (!res || res.status() >= 400) return null;
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     const count = await cards.count();
@@ -1116,7 +1120,7 @@ test.describe('ES1-T53 TE-3 không JS (NFR-4)', () => {
 
   // Chỉ assertion locator, không evaluate trong trang.
   test('B-01 AC2: tắt JS, card render đủ, radio đổi, link giữ variant mặc định', async ({ page }) => {
-    await page.goto(ALL);
+    await page.goto(allPage()); // ES1-T417: sort_by=created-descending
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     test.skip((await cards.count()) === 0, `${ALL} không có sản phẩm`);
     await expect(cards.first().getByTestId(T.title)).toBeVisible();
