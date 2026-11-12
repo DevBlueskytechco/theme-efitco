@@ -56,7 +56,7 @@ Trạng thái: "QA viết" = TC chưa có; "sửa" = TC cũ phải đổi kỳ v
 | navigation.md §8 a11y | TE-22 AC7 | TC-396-47 | R12 | ES1-T327, ES1-T329 | như TC-396-42 | QA viết |
 | navigation.md §7 menu trống | TE-22 AC8 | TC-396-48 | R14 | ES1-T327 | theme sạch, menu không gán | QA viết |
 | foundation §5 breadcrumb | TE-22 AC9 | TC-396-49 | R12, R7.3, R7.7 | TE-22-R2-FE1 (ES1-T326) | collection, sản phẩm trong/ngoài collection, blog, tag, bài, page | QA viết |
-| foundation §5 cắt mục cuối (ES1-T422 #2) | TE-22 AC10 | TC-396-50 | R12 | ES1-T326 | sản phẩm tên > 48 ký tự | QA viết, chờ ES1-T422 #2 |
+| Breadcrumb mục cuối không cắt tên, xuống dòng (ES1-T422 #2 CTO 12/11; rà soát Theme Store 11/11 CHẶN) | TE-22 AC10 | TC-396-50 | R12 | ES1-T326 | sản phẩm tên > 48 ký tự | QA viết |
 | foundation §3.3 banner | TE-22 AC11 | TC-396-51 | R12, R6.1 | ES1-T326 | collection có ảnh trắng | QA viết |
 | R11 BreadcrumbList | TE-22 AC12 | TC-396-52 | R11 | ES1-T326 | như TC-396-49 | QA viết |
 | foundation §5 tiêu đề trang | TE-22 AC13 | TC-396-53 | R12 | ES1-T326 | như TC-396-49 | QA viết |
