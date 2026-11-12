@@ -15,6 +15,7 @@ import { watchShopPay403 } from './support/console-guard';
 import { HARDCODED_RADIUS } from './support/css-lint';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
+import { autoDeclineConsent } from './support/consent';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 
@@ -238,6 +239,9 @@ async function submitNewsletter(page: Page) {
   test.skip(/\/challenge/.test(page.url()) || (!moved && captcha), 'hCaptcha chặn submit tự động, chạy tay (xem test-cases.md)');
   expect(moved, 'submit newsletter không chuyển trang và không có hCaptcha').toBe(true);
 }
+
+// ES1-T434: banner cookie Shopify hiện muộn trong trang (setup không thấy), che footer/localization → Decline khi nó xuất hiện.
+test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 
 test.describe('ES1-T23', () => {
   // ---------- AC1 ----------

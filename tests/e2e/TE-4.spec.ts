@@ -6,6 +6,7 @@
 // So tiền: .js lấy bằng fetch trong trang để cùng market (ES1-T74). Nhóm nojs không chạy script trong trang: sản phẩm đọc JSON nhúng variant-json, giỏ đọc qua context phụ (ES1-T100, support/product-data.ts).
 import { test as base, expect, type Page, type Request, type Route } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { autoDeclineConsent } from './support/consent';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
 import { pageJson, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
@@ -44,6 +45,8 @@ const test = base.extend<{ consoleGuard: ConsoleGuard }>({
     { auto: true },
   ],
 });
+// ES1-T434: banner cookie Shopify hiện muộn, che picker PDP mobile (TC-503) → Decline khi nó xuất hiện.
+test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 
 const DATA = {
   media: env('TE4_MEDIA_HANDLE'),
