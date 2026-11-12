@@ -6,6 +6,7 @@ KHÔNG CHẮC: task-split ES1-T307 và ADR 0007–0010 không có trên nhánh n
 - `drafts/dev-be/ES1-T347/spike.md`: hiện trạng (C1–C10), luồng `partials.fetch(...names, { url: ?option_values=, signal })`, hợp đồng markup cho FE, giả thuyết H1–H6, tách việc FE/BE2, ngân sách byte, rủi ro, kế hoạch test.
 - `tests/e2e/ES1-T347.spec.ts`: test đích AC15 (đang tải, bấm liên tiếp, lỗi + Try Again), AC16 (D3 `demo-many-variants`, tổ hợp sau vị trí 250 thêm giỏ đúng), tĩnh NFR-7 + contract partial. Trang/JS còn JSON biến thể → `test.fixme` có lý do; quickview fixme chờ TE-3.
 - Không đổi file theme (`assets/`, `blocks/`, `snippets/`).
+- Lượt 2 (CI run 43201138738, ES1-T171 TC-12): bỏ chuỗi đường dẫn Cart API khỏi message assert; lọc request vẫn qua `CART.add` (`support/cart-api.ts`). Không đổi AC.
 
 ## Phát hiện chính
 - AC16 FAIL trên code hiện tại: `variant-json` lặp `product.variants` (≤ 250) → `match()` không thấy biến thể 251+ → nút "Unavailable".
@@ -17,6 +18,7 @@ product-variant-picker.js 7 163; product-form.js 6 857. Tổng tải sẵn PDP t
 ## Tự kiểm tra
 - `shopify theme check`: 0 lỗi (22 warning có sẵn, không do PR này).
 - `playwright test --list`: spec biên dịch, 18 test (9 × 2 project). Chạy thật: chờ CI (globalSetup cần mạng).
+- Regex TC-12 `/\/cart\/.*\.js/` trên `tests/e2e/*.spec.ts`: 0 dòng trúng. Chạy ES1-T171 thật: chờ CI.
 - Lighthouse: không áp dụng (không đổi theme), chờ CI.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

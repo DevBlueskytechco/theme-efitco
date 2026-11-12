@@ -160,7 +160,7 @@ test.describe('ES1-T347 AC15 đổi biến thể theo option value', () => {
     await expect(add).toBeVisible();
     await add.click();
     await page.waitForTimeout(500);
-    expect(adds, 'bấm Add To Cart lúc đang tải không gửi /cart/add.js').toHaveLength(0);
+    expect(adds, 'bấm Add To Cart lúc đang tải không gửi request thêm giỏ').toHaveLength(0);
     await expect(tid(page, T.variantId)).toHaveValue(oldId);
 
     release();
