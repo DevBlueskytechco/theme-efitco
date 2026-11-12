@@ -10,7 +10,7 @@
     {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
 
-    {% # Social, title, etc. %}
+    {% # Charset, viewport (width=device-width,initial-scale=1), social, title. One viewport tag only: it lives in meta-tags. %}
     {% render 'meta-tags' %}
 
     {{ content_for_header }}
@@ -47,10 +47,25 @@
 
         <h2>{{ shop.name }}</h2>
         <p>{{ 'gift_card.use_at_checkout' | t }}</p>
-        <p>{{ gift_card.code | format_code }}</p>
+        <p class="gift-card__code" data-testid="gift-card-code">{{ gift_card.code | format_code }}</p>
+
+        {% # ES1-T408 (TS-FE8): QR frame 144 x 144 (Shopify 7 Gift card, audit A#60). TS-BE1 draws the QR inside and hides the fallback; without JS the fallback text stays. %}
+        {%- unless gift_card.expired or gift_card.enabled == false -%}
+          <div
+            class="gift-card__qr"
+            data-gift-card-qr
+            data-identifier="{{ gift_card.qr_identifier | escape }}"
+            data-label="{{ 'gift_card.qr_alt' | t | escape }}"
+            data-testid="gift-card-qr"
+          >
+            <p class="gift-card__qr-fallback" data-testid="gift-card-qr-fallback">
+              {{- 'gift_card.qr_fallback' | t -}}
+            </p>
+          </div>
+        {%- endunless -%}
 
         {% if gift_card.pass_url %}
-          <a href="{{ gift_card.pass_url }}">
+          <a href="{{ gift_card.pass_url }}" class="gift-card__wallet" data-testid="gift-card-wallet">
             <img
               src="{{ 'gift-card/add-to-apple-wallet.svg' | shopify_asset_url }}"
               alt="{{ 'gift_card.add_to_apple_wallet' | t }}"

@@ -1,11 +1,43 @@
+{% # ES1-T408 (TS-FE8): search form + link home (Shopify 7 404, audit B#32). Full design: ES1-T384 (TE-21-R2-FE2). %}
 {% block 'container' %}
-  <h1>{{ '404.title' | t }}</h1>
+  <div class="not-found">
+    <h1>{{ '404.title' | t }}</h1>
 
-  <p>
-    {{ '404.not_found' | t }}
-  </p>
+    <p>
+      {{ '404.not_found' | t }}
+    </p>
 
-  <a href="{{ routes.all_products_collection_url }}">
-    {{ '404.back_to_shopping' | t }}
-  </a>
+    <form
+      action="{{ routes.search_url }}"
+      method="get"
+      role="search"
+      class="not-found__search"
+      aria-labelledby="NotFoundSearchLabel"
+      data-testid="not-found-search"
+    >
+      <label id="NotFoundSearchLabel" for="NotFoundSearchInput" class="not-found__label">
+        {{- '404.search_label' | t -}}
+      </label>
+      <div class="not-found__field">
+        <input
+          id="NotFoundSearchInput"
+          class="not-found__input"
+          type="search"
+          name="q"
+          placeholder="{{ 'search.placeholder' | t }}"
+          autocomplete="off"
+        >
+        <button type="submit" class="button">{{ 'search.submit' | t }}</button>
+      </div>
+    </form>
+
+    <p class="not-found__actions">
+      <a href="{{ routes.root_url }}" class="button" data-testid="not-found-home">
+        {{- '404.home' | t -}}
+      </a>
+      <a href="{{ routes.all_products_collection_url }}" class="button button--secondary">
+        {{- '404.back_to_shopping' | t -}}
+      </a>
+    </p>
+  </div>
 {% endblock %}
