@@ -3,8 +3,13 @@
 // Không lặp ES1-T16.spec.ts (hành vi JS header/drawer/sticky) và smoke.spec.ts (status, console khi tải, axe trạng thái mặc định).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-1.spec.ts
 // Biến tuỳ chọn: EXPECT_ANNOUNCEMENT=off|text|link (mặc định off), EXPECT_MENU_ITEMS=<n>
-import { test, expect, type Page, type TestInfo } from '@playwright/test';
-import { pageJson } from './support/product-data';
+// ES1-T434 (12/11): sửa theo dữ liệu store dev ES1-T298 (en + fr, 18 nước, sản phẩm demo mới đứng đầu /products.json).
+//   TC-18 dùng TE1_PRODUCT_HANDLE; TC-28, TC-29, TC-31 chọn TE1_COUNTRY_TARGET, TE1_LANGUAGE_TARGET; mở nút gộp và bấm lựa chọn
+//   kiểm phần tử che trước khi click (báo tên lớp che thay vì timeout 30 s); TC-24 ghi theme id, biến font để tách lỗi môi trường và lỗi theme.
+//   Nguyên nhân từng test: drafts/qa/ES1-T434/test-cases.md.
+import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { pageJson, requireJson } from './support/product-data';
+import { env } from './support/store-data';
 import { CART, cartApi } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
 import { HARDCODED_RADIUS } from './support/css-lint';
@@ -80,15 +85,30 @@ async function pathOf(page: Page, href: string | null): Promise<string> {
 }
 
 type Product = { handle: string; variantId: number; hasImage: boolean; hasDescription: boolean };
+type JsProduct = { handle: string; description?: string | null; images?: unknown[]; requires_selling_plan?: boolean; variants: Array<{ id: number; available: boolean }> };
+
+// ES1-T434: sản phẩm cố định. Từ 12/11 đầu /products.json là demo-many-variants (304 biến thể), demo-subscription-only
+// (bắt buộc selling plan: /cart/add không kèm selling_plan trả 422, TC-18 đỏ trên mobile PR #191), te404-sale-second.
+const PRODUCT_HANDLE = env('TE1_PRODUCT_HANDLE');
+// Fallback khi chưa khai báo handle: bỏ sản phẩm demo-* (ES1-T298) và sản phẩm quá nhiều biến thể.
+const AUTO_SKIP = /^demo-/;
 
 // Dữ liệu TE-9: không có sản phẩm thì trả null, test tự skip phần liên quan.
 async function findProduct(page: Page): Promise<Product | null> {
   // ES1-T100: fetch trong trang, trang chưa mở thì mở trang chủ trước
   if (!/^https?:/.test(page.url())) await page.goto('/');
+  if (PRODUCT_HANDLE) {
+    const path = `/products/${encodeURIComponent(PRODUCT_HANDLE)}.js`;
+    const p = requireJson(await pageJson<JsProduct>(page, path), path);
+    const v = p.variants.find(x => x.available);
+    expect(v, `dữ liệu store: TE1_PRODUCT_HANDLE ${PRODUCT_HANDLE} không còn biến thể còn hàng`).toBeTruthy();
+    expect(p.requires_selling_plan ?? false, `dữ liệu store: TE1_PRODUCT_HANDLE ${PRODUCT_HANDLE} bắt buộc selling plan`).toBe(false);
+    return { handle: p.handle, variantId: v!.id, hasImage: (p.images ?? []).length > 0, hasDescription: !!p.description };
+  }
   const res = await pageJson<{ products?: Array<{ handle: string; body_html: string | null; images: unknown[]; variants: Array<{ id: number; available: boolean }> }> }>(page, '/products.json?limit=50');
   if (!res.ok) return null;
   const data = res.body;
-  const available = (data?.products ?? []).filter(p => p.variants.some(v => v.available));
+  const available = (data?.products ?? []).filter(p => !AUTO_SKIP.test(p.handle) && p.variants.length <= 100 && p.variants.some(v => v.available));
   const p = available.find(x => x.images.length > 0 && x.body_html) ?? available[0];
   if (!p) return null;
   return { handle: p.handle, variantId: p.variants.find(v => v.available)!.id, hasImage: p.images.length > 0, hasDescription: !!p.body_html };
@@ -150,15 +170,62 @@ function localization(page: Page) {
   return { form, summary: form.getByTestId('footer-localization-toggle').or(form.locator('summary')).first() };
 }
 
-// Đổi sang lựa chọn chưa chọn, trả về value để đối chiếu sau khi tải lại.
-async function chooseOther(page: Page, optId: string): Promise<string | null> {
-  const others = page.getByTestId(optId).and(page.locator(':not([aria-current="true"])'));
-  if ((await others.count()) === 0) return null;
-  const option = others.first();
-  const value = await option.getAttribute('value');
-  await localization(page).summary.click();
-  await option.click();
-  return value;
+// ES1-T434: đích cố định. Store dev từ 12/11 (ES1-T298 mục 18): market US, Canada, Pham, International (14 nước) = 18 nước; locale en, fr.
+const COUNTRY_TARGET = env('TE1_COUNTRY_TARGET');
+const LANGUAGE_TARGET = env('TE1_LANGUAGE_TARGET');
+
+const optionOf = (page: Page, optId: string, value: string) =>
+  page.getByTestId(T.footer).getByTestId(optId).and(page.locator(`[value="${value}"]`));
+
+// ES1-T434: phần tử nằm trên tâm của target; null khi chính target (hoặc con) nhận điểm bấm.
+// PR #191 TC-28 đỏ do locator.click chờ hết 30 s: báo ngay lớp nào che (lỗi theme: z-index, vị trí panel) thay vì timeout.
+// Trang tắt JS: evaluate có thể không chạy → null, để click tự báo.
+async function coveredBy(target: Locator): Promise<string | null> {
+  return target
+    .evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      if (!hit || el === hit || el.contains(hit)) return null;
+      const testid = hit.getAttribute('data-testid');
+      return `${hit.tagName.toLowerCase()}${hit.id ? `#${hit.id}` : ''}${testid ? `[data-testid=${testid}]` : ''}${hit.classList.length ? `.${[...hit.classList].join('.')}` : ''}`;
+    })
+    .catch(() => null);
+}
+
+// Mở nút gộp ở footer; fail nêu rõ khi nút bị che hoặc details không mở.
+async function openLocalization(page: Page) {
+  const { form, summary } = localization(page);
+  await summary.scrollIntoViewIfNeeded();
+  const cover = await coveredBy(summary);
+  expect(cover, `nút gộp localization bị ${cover} che`).toBeNull();
+  await summary.click({ timeout: 10_000 });
+  await expect(form.locator('details').first(), 'details localization không mở sau khi bấm nút gộp').toHaveAttribute('open', '');
+}
+
+// Đích: preferred nếu có và chưa chọn; không thì lựa chọn đầu tiên chưa chọn. Trả null khi không có gì để đổi.
+async function targetValue(page: Page, optId: string, preferred: string | undefined): Promise<string | null> {
+  if (preferred) {
+    const option = optionOf(page, optId, preferred);
+    if ((await option.count()) === 1 && (await option.getAttribute('aria-current')) !== 'true') return preferred;
+  }
+  const others = page.getByTestId(T.footer).getByTestId(optId).and(page.locator(':not([aria-current="true"])'));
+  return (await others.count()) ? others.first().getAttribute('value') : null;
+}
+
+// Mở nút gộp, bấm đúng lựa chọn value, chờ POST /localization và trang tải lại.
+async function choose(page: Page, optId: string, value: string) {
+  const option = optionOf(page, optId, value);
+  await expect(option, `không có ${optId} value=${value}`).toHaveCount(1);
+  await openLocalization(page);
+  await expect(option, `${optId} ${value} không hiện sau khi mở nút gộp`).toBeVisible();
+  await option.scrollIntoViewIfNeeded();
+  const cover = await coveredBy(option);
+  expect(cover, `${optId} ${value} bị ${cover} che (vị trí, z-index panel localization)`).toBeNull();
+  await Promise.all([
+    page.waitForRequest(r => r.method() === 'POST' && /\/localization\b/.test(r.url()), { timeout: 15_000 }),
+    option.click({ timeout: 10_000 }),
+  ]);
+  await page.waitForLoadState('domcontentloaded');
 }
 
 async function submitNewsletter(page: Page) {
@@ -369,6 +436,7 @@ test.describe('ES1-T23', () => {
     expect(await account.evaluate(el => el.tagName.toLowerCase())).toBe('shopify-account');
   });
 
+  // ES1-T434: sản phẩm từ TE1_PRODUCT_HANDLE (không bắt buộc selling plan), xem findProduct.
   test('TC-18 AC3 cart link + số lượng', async ({ page }) => {
     const product = await findProduct(page);
     test.skip(!product, 'store dev không có sản phẩm còn hàng');
@@ -456,25 +524,33 @@ test.describe('ES1-T23', () => {
     await expect(localization(page).form, 'form localization chỉ có khi có selector').toHaveCount(shown > 0 ? 1 : 0);
   });
 
+  // ES1-T434: đích TE1_COUNTRY_TARGET (CA); 18 nước → danh sách cuộn trong panel, kiểm phần tử che trước khi bấm.
   test('TC-28 AC5 đổi nước', async ({ page }) => {
     await page.goto('/collections/all');
     test.skip((await page.getByTestId(T.countryOpt).count()) < 2, 'store dev bán 1 nước');
     for (const o of await page.getByTestId(T.countryOpt).all()) {
       expect((await o.textContent()) ?? '', 'lựa chọn nước thiếu mã tiền tệ').toMatch(/\b[A-Z]{3}\b/);
     }
-    const value = await chooseOther(page, T.countryOpt);
+    const value = await targetValue(page, T.countryOpt, COUNTRY_TARGET);
     test.skip(!value, 'không có nước khác để chọn');
-    await expect(page.getByTestId(T.countryOpt).and(page.locator(`[value="${value}"]`))).toHaveAttribute('aria-current', 'true');
+    await choose(page, T.countryOpt, value!);
+    await expect(optionOf(page, T.countryOpt, value!)).toHaveAttribute('aria-current', 'true');
     expect(new URL(page.url()).pathname, 'return_to sai').toMatch(/\/collections\/all$/);
   });
 
+  // ES1-T434: đích TE1_LANGUAGE_TARGET (fr, publish 12/11). /fr bị chuyển tới /fr/password là lỗi môi trường (cookie mật khẩu), không phải theme.
   test('TC-29 AC5 đổi ngôn ngữ', async ({ page }) => {
     await page.goto('/collections/all');
     test.skip((await page.getByTestId(T.languageOpt).count()) < 2, 'store dev có 1 ngôn ngữ');
-    const value = await chooseOther(page, T.languageOpt);
+    const value = await targetValue(page, T.languageOpt, LANGUAGE_TARGET);
     test.skip(!value, 'không có ngôn ngữ khác để chọn');
+    await choose(page, T.languageOpt, value!);
+    const path = new URL(page.url()).pathname;
+    expect(path, `môi trường: ${path} là trang mật khẩu, cookie mật khẩu không theo sang /${value}`).not.toMatch(/\/password$/);
     await expect(page.locator('html')).toHaveAttribute('lang', value!);
-    expect(new URL(page.url()).pathname, 'thiếu tiền tố locale').toContain(`/${value!.toLowerCase()}`);
+    expect(path, 'thiếu tiền tố locale').toContain(`/${value!.toLowerCase()}`);
+    expect(path, 'return_to sai').toMatch(/\/collections\/all$/);
+    await expect(optionOf(page, T.languageOpt, value!)).toHaveAttribute('aria-current', 'true');
   });
 
   // ---------- AC6 ----------
@@ -591,13 +667,33 @@ test.describe('ES1-T23', () => {
       const selfHosted = readdirSync(join(ROOT, 'assets')).filter(f => /\.(woff2?|ttf|otf)$/i.test(f));
       expect(selfHosted, 'R15: không tự host font').toEqual([]);
     }
+    // ES1-T434: PR #191 nhận heading "Inter, sans-serif". Cùng run, ES1-T176 hàng 2-slide-1 (chữ hero, /?view=figma) không đỏ,
+    // nên chưa kết luận lỗi theme. Test ghi đủ dữ kiện để phân loại ở lần chạy sau:
+    //   theme id khác preview → môi trường (cookie preview mất); --font-heading--family là Inter → setting type_heading_font của theme preview;
+    //   biến đúng mà phần tử sai → CSS của phần tử (ghi tag, class, testid).
     await page.goto('/');
-    const fonts = await page.evaluate(() => {
-      const h = document.querySelector('h1, h2');
-      return { heading: h ? getComputedStyle(h).fontFamily : '', body: getComputedStyle(document.body).fontFamily };
+    await expectNotChallenged(page);
+    const info = await page.evaluate(() => {
+      const h = [...document.querySelectorAll('main h1, main h2')].find(el => el.getClientRects().length > 0) ?? document.querySelector('h1, h2');
+      const theme = (window as unknown as { Shopify?: { theme?: { id?: number; role?: string; name?: string } } }).Shopify?.theme ?? null;
+      const root = getComputedStyle(document.documentElement);
+      return {
+        path: location.pathname,
+        theme: theme ? { id: String(theme.id), role: theme.role ?? '', name: theme.name ?? '' } : null,
+        varHeading: root.getPropertyValue('--font-heading--family').trim(),
+        element: h ? `${h.tagName.toLowerCase()}${h.className ? `.${String(h.className).trim().split(/\s+/).join('.')}` : ''}[data-testid=${h.getAttribute('data-testid') ?? ''}]` : '',
+        heading: h ? getComputedStyle(h).fontFamily : '',
+        body: getComputedStyle(document.body).fontFamily,
+      };
     });
-    expect(fonts.heading, 'font heading').toMatch(FONT_HEADING);
-    expect(fonts.body, 'font body').toMatch(FONT_BODY);
+    ti.annotations.push({ type: 'ES1-T434 TC-24', description: JSON.stringify(info) });
+    console.log(`[ES1-T434 TC-24] ${ti.project.name} ${JSON.stringify(info)}`);
+    expect(info.path, 'môi trường: bị chuyển tới trang mật khẩu').not.toMatch(/\/password$/);
+    const preview = process.env.PREVIEW_URL ? new URL(process.env.PREVIEW_URL).searchParams.get('preview_theme_id') : null;
+    if (preview) expect(info.theme?.id, `môi trường: trang không chạy theme preview ${preview}, đang chạy ${JSON.stringify(info.theme)}`).toBe(preview);
+    expect(info.varHeading, `--font-heading--family (settings.type_heading_font của theme ${info.theme?.id})`).toMatch(FONT_HEADING);
+    expect(info.heading, `font heading của ${info.element}`).toMatch(FONT_HEADING);
+    expect(info.body, 'font body').toMatch(FONT_BODY);
   });
 
   test('TC-25 AC8 font-face body đủ 4 biến thể, swap, từ Shopify CDN', async ({ page }) => {
@@ -693,10 +789,13 @@ test.describe('ES1-T23', () => {
     await expect(summary).toHaveCount(1);
     await expect(summary).toContainText(/[A-Z]{3} \/ [A-Z-]{2,}/);
     await expect(summary).toHaveAccessibleName(/\S/);
-    const lists = page.getByTestId(T.footer).getByTestId(T.country).or(page.getByTestId(T.language));
-    for (const l of await lists.all()) await expect(l).toBeHidden();
-    await summary.click();
-    for (const l of await lists.all()) await expect(l).toBeVisible();
+    // ES1-T434: từ 12/11 store có 18 nước + 2 ngôn ngữ nên cả 2 danh sách đều phải có (AC10: chỉ ẩn danh sách có 1 mục).
+    const footer = page.getByTestId(T.footer);
+    const lists = [footer.getByTestId(T.country), footer.getByTestId(T.language)];
+    for (const l of lists) await expect(l).toHaveCount(1);
+    for (const l of lists) await expect(l).toBeHidden();
+    await openLocalization(page);
+    for (const l of lists) await expect(l).toBeVisible();
   });
 
   test.fixme('TC-46 AC9 hero thật TE-2: header trong suốt đè hero, chữ trắng', async ({ page }) => {
@@ -871,9 +970,11 @@ test.describe('ES1-T23 không JS', () => {
   test('TC-31 AC9 localization submit được khi không JS', async ({ page }) => {
     await page.goto('/collections/all');
     test.skip((await page.getByTestId(T.countryOpt).count()) < 2, 'store dev bán 1 nước');
-    const value = await chooseOther(page, T.countryOpt); // chooseOther mở summary trước khi click option
+    // ES1-T434: cùng đích TE1_COUNTRY_TARGET với TC-28; choose mở summary trước khi bấm option
+    const value = await targetValue(page, T.countryOpt, COUNTRY_TARGET);
     test.skip(!value, 'không có nước khác để chọn');
-    await expect(page.getByTestId(T.countryOpt).and(page.locator(`[value="${value}"]`))).toHaveAttribute('aria-current', 'true');
+    await choose(page, T.countryOpt, value!);
+    await expect(optionOf(page, T.countryOpt, value!)).toHaveAttribute('aria-current', 'true');
     expect(new URL(page.url()).pathname, 'return_to sai').toMatch(/\/collections\/all$/);
   });
 });
