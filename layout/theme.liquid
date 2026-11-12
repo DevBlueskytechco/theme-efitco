@@ -44,17 +44,24 @@
     {% endcomment %}
     <page-layers data-testid="page-layers" data-inbox-selector="#ShopifyChat, #dummy-chat-button-iframe"></page-layers>
 
-    <div class="header-sticky-sentinel" data-testid="header-sticky-sentinel" aria-hidden="true"></div>
+    {% # Phần tử đầu tiên nhận Tab (TE-1 AC14, foundation §3.4): trước announcement bar và header %}
+    <a class="skip-link" href="#MainContent" data-testid="skip-link">{{ 'blocks.header.skip_to_content' | t }}</a>
 
     {% block 'container', tag: 'div' %}
       {% block 'announcement-bar' -%}{%- endblock %}
     {% endblock %}
 
+    {% comment %}
+      Sentinel 1px ngay trước container header (announcement-bar.md §4): rời khung nhìn đúng lúc header
+      bắt đầu dính (sau announcement bar nếu có), assets/header-sticky.js gắn data-scrolled → bóng header.
+    {% endcomment %}
+    <div class="header-sticky-sentinel" data-testid="header-sticky-sentinel" aria-hidden="true"></div>
+
     {% block 'container', tag: 'div' %}
       {% block 'header' -%}{%- endblock %}
     {% endblock %}
 
-    <main>
+    <main id="MainContent">
       {{ content_for_layout }}
     </main>
 
