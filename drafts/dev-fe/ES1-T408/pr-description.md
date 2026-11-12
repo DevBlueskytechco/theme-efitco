@@ -20,6 +20,7 @@ Kế hoạch: drafts/techlead/ES1-T304/task-split.md §3 TS-FE8, §2 hợp đồ
 - `shopify theme check`: 0 lỗi (22 warning có sẵn ở bundle-builder, featured-product, quiz-step, testimonial-item, index*, không thuộc file của PR này).
 - `gzip -c assets/base.css | wc -c` = 41 636 (≤ 49 152); `critical.css` không đổi, 9 921 (≤ 10 240). Không có file JS trong diff.
 - `tests/e2e/ES1-T408.spec.ts`: nhóm `@static` (404 form/link, password logo/shop.name, hook gift card, không `<script>`, locale) + nhóm store (404 `/pages/khong-co` có form `/search` + `a[href="/"]` ≥ 44px, gõ Enter thì sang `/search?q=`; password context không cookie: logo/chữ nằm trên h1). Local không chạy được vì `globalSetup` cần `PREVIEW_URL`: chờ CI.
+- Lượt 2 (CI run 43233116834 đỏ spec dòng 52): `getByLabel('Search the store')` khớp cả `form[role=search][aria-labelledby]` lẫn input → strict mode. Đổi sang `getByTestId('not-found-search').getByRole('searchbox', { name: 'Search the store' })`. Markup giữ nguyên, AC không nới.
 - Gift card: `test.fixme` cho 2 test (QR ≥ 120 × 120 + 1 viewport; tắt JS vẫn thấy chữ dự phòng) vì store dev chưa có gift card phát hành (ES1-T298). Cần DevOps cấp URL qua biến `TS_GIFT_CARD_URL`. Hai test này chưa tính là đạt.
 - Password: test tự skip nếu store dev không bật mật khẩu.
 - Playwright smoke, Lighthouse 404 (≥ 96/90/98), ảnh 3 breakpoint: chờ CI.

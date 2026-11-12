@@ -55,7 +55,8 @@ test.describe('ES1-T408 store', () => {
     expect(res?.status()).toBe(404);
     const input = page.locator('main form[action$="/search"] input[type="search"][name="q"]');
     await expect(input).toBeVisible();
-    await expect(page.getByLabel('Search the store')).toBeVisible();
+    // form role=search cũng mang tên 'Search the store' (aria-labelledby) → getByLabel khớp 2; bám searchbox.
+    await expect(page.getByTestId('not-found-search').getByRole('searchbox', { name: 'Search the store' })).toBeVisible();
     const home = page.getByTestId('not-found-home');
     await expect(home).toHaveAttribute('href', '/');
     const box = await home.boundingBox();
