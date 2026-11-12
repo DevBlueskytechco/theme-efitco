@@ -691,9 +691,6 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
   // ES1-T404 (TS-FE6) bỏ custom.swatch_colors: Color không có swatch gốc thì card không có swatch → đạt. Không tự dò, URL sort riêng của test này.
   test('TC-10c AC2: swatch card chỉ lấy giá trị của option màu, không lấy option đầu (TE4_MANY_VARIANTS_HANDLE)', async ({ page }) => {
     test.skip(!ENV.many, 'Thiếu TE4_MANY_VARIANTS_HANDLE (store-data.json)');
-    // Claude Code 12/11: lỗi theme thật (bug ES1-T434-B01), bản sửa nằm ở PR #187 (ES1-T404). fixme để #198 không chặn chính PR sửa nó;
-    // PR #187 (hoặc ticket sau khi #187 merge) bỏ dòng fixme này để test chạy lại.
-    test.fixme(true, 'ES1-T434-B01: chờ PR #187 (ES1-T404) bỏ custom.swatch_colors');
     let card: Locator | null = null;
     for (let n = 1; n <= 2 && !card; n++) {
       const res = await page.goto(`${ALL}?sort_by=created-descending${n > 1 ? `&page=${n}` : ''}`);
