@@ -1,7 +1,11 @@
 // ES1-T235: lớp chuyển động (trai_nghiem.xlsx) và chữ menu con. Playwright đặt navigator.webdriver nên motion.js tắt; spec này giả lập trình duyệt thường.
 import { test, expect } from '@playwright/test';
+import { autoDeclineConsent } from './support/consent';
 
 const asUser = () => Object.defineProperty(navigator, 'webdriver', { get: () => false });
+
+// ES1-T434: banner cookie Shopify hiện muộn, che control → Decline khi nó xuất hiện.
+test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 
 test.describe('ES1-T235 trải nghiệm', () => {
   test('hiện dần: phần dưới màn hình chờ, cuộn tới thì hiện đủ', async ({ page }) => {
