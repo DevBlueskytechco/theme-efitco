@@ -221,6 +221,7 @@ test.describe('ES1-T110', () => {
     await open(page);
     await openInputs(page).first().check();
     await settled(page);
+    await expectNotChallenged(page); // ES1-T217 TC-03: kiểm màn thử thách ngay trước khi quét (Claude Code 12/11)
     const r = await new AxeBuilder({ page }).include('collection-filters').analyze();
     const bad = r.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''));
     expect(bad.map((v) => `${v.impact} ${v.id}: ${v.nodes.slice(0, 3).map((n) => n.target.join(' ')).join(' | ')}`)).toEqual([]);
