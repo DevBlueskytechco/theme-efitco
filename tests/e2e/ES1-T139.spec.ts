@@ -25,6 +25,8 @@ const title = (page: Page, n: number) => step(page, n).getByTestId('quiz-step-ti
 const option = (page: Page, tag: string) => page.locator(`[data-testid="quiz-option-input"][value="${tag}"]`);
 const panel = (page: Page) => page.locator('[data-quiz-results-panel]');
 const isResults = (url: URL) => url.pathname.includes('/collections/') && url.searchParams.get('view') === 'quiz';
+// ES1-T300: tag không có trên sản phẩm nào; kết quả lọc theo tag này luôn 0 sản phẩm.
+const EMPTY_TAG = 'es1-t300-khong-co-san-pham';
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
@@ -254,6 +256,14 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
   });
 
   test('AC3 AC-H16 bộ rỗng: text rỗng + link, status là text rỗng, focus tiêu đề, 0 console error', async ({ page }) => {
+    // ES1-T300 (gộp ES1-T302): dữ liệu demo 4b3b9a5 có 3 sản phẩm mang đủ quiz-lower + quiz-advanced + quiz-gym → bộ này không còn rỗng (đỏ run 42978078054, :256).
+    // Không dựa tổ hợp tag thật: page.route đổi đoạn tag cuối của request kết quả sang tag không tồn tại, store tự render partial 0 sản phẩm (đúng markup quiz.liquid, không tự viết HTML partial).
+    // route.continue({ url }) do trình duyệt gửi, giữ cookie, không gọi lại store từ Node (ES1-T171).
+    await page.route(isResults, (route) => {
+      const url = new URL(route.request().url());
+      url.pathname = url.pathname.replace(/\/[^/]+$/, `/${EMPTY_TAG}`);
+      return route.continue({ url: url.href });
+    });
     const errors = watchConsole(page);
     await open(page);
     await answerEmptySet(page);
