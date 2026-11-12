@@ -15,6 +15,9 @@ const HANDLE = process.env.TE4_VARIANTS_HANDLE;
 const IMPORT_MAP_ERROR = /import map is added after module script|Failed to resolve module specifier|Unable to resolve specifier|bare specifier/i;
 const PLATFORM = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i;
 
+// Asset theme: /cdn/shop/t/<id>/assets/ hoặc …/t/<id>/assets/; script Shopify chèn (/cdn/shopifycloud/…, vd webmcp) không phải module theme (CTO 12/11).
+const isThemeAsset = (src: string) => /\/t\/\d+\/assets\//.test(src) && !/\/cdn\/shopifycloud\//.test(src);
+
 const head = (liquid: string) => liquid.slice(0, liquid.indexOf('</head>'));
 const moduleTags = (src: string) => src.match(/<script\b[^>]*type="module"[^>]*>/g) ?? [];
 
@@ -62,7 +65,7 @@ const order = (page: Page) =>
     const map = all.findIndex((s) => s.getAttribute('type') === 'importmap');
     const before = map < 0 ? [] : all.slice(0, map).map((s) => (s as HTMLScriptElement).src);
     const mapsPartials = map >= 0 && all.some((s) => s.getAttribute('type') === 'importmap' && s.textContent!.includes('@shopify/partial-rendering'));
-    return { hasMap: map >= 0, mapsPartials, before, inHead: [...document.head.querySelectorAll('script[type="module"][src*="/assets/"]')].map((s) => (s as HTMLScriptElement).src) };
+    return { hasMap: map >= 0, mapsPartials, before, inHead: [...document.head.querySelectorAll('script[type="module"][src]')].map((s) => (s as HTMLScriptElement).src) };
   });
 
 const PAGES: [string, () => string | undefined][] = [
@@ -81,8 +84,8 @@ test.describe('ES1-T415 storefront', () => {
       await page.goto(url!);
       await page.waitForLoadState('load');
       const o = await order(page);
-      expect(o.inHead, 'module theme trong <head>').toEqual([]);
-      expect(o.before.filter((s) => s.includes('/assets/')), 'module theme đứng trước import map').toEqual([]);
+      expect(o.inHead.filter(isThemeAsset), 'module theme trong <head>').toEqual([]);
+      expect(o.before.filter(isThemeAsset), 'module theme đứng trước import map').toEqual([]);
       expect(errors.filter((e) => IMPORT_MAP_ERROR.test(e)), 'lỗi import map').toEqual([]);
     });
   }
