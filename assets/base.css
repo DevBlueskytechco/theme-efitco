@@ -3936,28 +3936,111 @@ product-variant-picker:not(:defined) {
   color: var(--color-foreground);
 }
 
-.product-info__description {
-  line-height: var(--line-height-body);
+/** Rich text chung (foundation §28, ES1-T403): mô tả sản phẩm, mô tả collection, page, article.
+   h4–h6 lấy cỡ, weight từ critical.css; ở đây chỉ khoảng cách */
+.rte {
   overflow-wrap: break-word;
 }
 
-.product-info__description > * + * {
+.rte > * + * {
+  margin-block-start: var(--space-4);
+}
+
+.rte :is(p, ul, ol) {
+  max-inline-size: 65ch;
+  line-height: 1.7;
+}
+
+.rte h2 {
+  font-size: var(--font-size-h2);
+}
+
+.rte h3 {
+  font-size: var(--font-size-h3);
+}
+
+.rte > h2:not(:first-child) {
+  margin-block-start: var(--space-7);
+}
+
+.rte > :is(h3, h4, h5, h6):not(:first-child) {
+  margin-block-start: var(--space-6);
+}
+
+.rte > :is(h2, h3, h4, h5, h6) + * {
   margin-block-start: var(--space-3);
 }
 
-.product-info__description :is(ul, ol) {
-  padding-inline-start: var(--space-5);
-}
-
-.product-info__description a {
+.rte a {
   color: inherit;
-  text-decoration: underline;
+  font-weight: 500;
+  text-decoration: underline 1px;
   text-underline-offset: 0.2em;
 }
 
-.product-info__description img {
-  max-inline-size: 100%;
+.rte a:hover {
+  color: var(--color-accent);
+}
+
+.rte :is(ul, ol) {
+  display: grid;
+  gap: var(--space-2);
+  padding-inline-start: var(--space-5);
+}
+
+.rte li::marker {
+  color: var(--color-muted);
+}
+
+.rte blockquote {
+  padding-inline-start: var(--space-5);
+  border-inline-start: var(--space-1) solid var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h3);
+  font-style: normal;
+  font-weight: 700;
+  line-height: var(--line-height-heading);
+}
+
+.rte blockquote :is(cite, footer) {
+  display: block;
+  margin-block-start: var(--space-3);
+  color: var(--color-muted);
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-sm);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.rte img {
+  inline-size: 100%;
   height: auto;
+  border-radius: var(--radius-card);
+}
+
+.rte figcaption {
+  margin-block-start: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.rte table {
+  display: block;
+  max-inline-size: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.rte :is(th, td) {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  text-align: start;
+}
+
+.rte hr {
+  margin-block: var(--space-7);
+  border: 0;
+  border-block-start: 1px solid var(--color-border);
 }
 
 /** Product sticky bar (TE-4 AC5, ES1-T59 D5): hidden mặc định, assets/product-form.js (BE ES1-T67)
@@ -3997,14 +4080,13 @@ product-sticky-bar {
   object-fit: cover;
 }
 
+/* Tên đủ, xuống dòng (decisions 11/11 (3)): không ellipsis */
 .product-sticky-bar__title {
   flex: 1 1 auto;
   min-inline-size: 0;
-  overflow: hidden;
   font-size: var(--font-size-sm);
   font-weight: 500;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .product-sticky-bar__buy {
@@ -5444,14 +5526,14 @@ cart-drawer {
   scroll-snap-align: start;
 }
 
-/* Figma bo 16. overflow: hidden nên aspect-ratio giữ đúng tỉ lệ dù chữ dài. Nền tối giữ chữ trắng đọc được khi chưa có ảnh */
+/* Figma bo 16, tỉ lệ 3/4. overflow: clip (không phải scroll container) nên tên dài làm card cao thêm thay vì bị cắt. Nền tối giữ chữ trắng đọc được khi chưa có ảnh */
 .article-card__link {
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   aspect-ratio: 3 / 4;
-  overflow: hidden;
+  overflow: clip;
   border-radius: calc(var(--radius-card) + var(--space-1));
   background-color: var(--color-background-dark);
   color: var(--color-background-dark-foreground);
@@ -5515,19 +5597,15 @@ cart-drawer {
   padding-block-end: var(--space-4);
 }
 
-/* Figma 1:1037: Inter 18 / 28, letter-spacing -0.18. Tối đa 3 dòng để dòng thời gian đọc không bị đẩy khỏi card thấp */
+/* Figma 1:1037: Inter 18 / 28, letter-spacing -0.18. Không cắt tên (decisions 11/11 (3)): tên dài thì card cao thêm (overflow: clip ở link) */
 .article-card__title {
-  display: -webkit-box;
   margin: 0;
-  overflow: hidden;
   font-family: var(--font-primary--family);
   font-size: var(--font-size-lg);
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: calc(28 / 18);
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  overflow-wrap: anywhere;
 }
 
 .article-card__link:hover .article-card__title {
@@ -7535,17 +7613,15 @@ video-card {
   min-inline-size: 0;
 }
 
-/* Tên 1 dòng để các thẻ cao bằng nhau. Vùng bấm phủ cả hàng sản phẩm */
+/* Tên đủ, xuống dòng (decisions 11/11 (3)). Vùng bấm phủ cả hàng sản phẩm */
 .video-card__product-title {
-  overflow: hidden;
   color: inherit;
   font-size: var(--font-size-base);
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.625;
   text-decoration: none;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .video-card__product-title::after {
@@ -7744,7 +7820,7 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
   .quiz-option__thumb { width: 40px; height: 40px; border-radius: 50%; }
   .quiz-option__label { font-size: 18px; line-height: 28px; font-weight: 700; letter-spacing: -0.18px; }
   .quiz-option__description { font-size: 14px; line-height: 22px; font-weight: 500; }
-  .quiz-option__mark { width: 24px; height: 24px; border: 1px solid var(--figma-999999); border-radius: 50%; }
+  .quiz-option__mark { width: 24px; height: 24px; border: 1px solid var(--color-muted-light); border-radius: 50%; }
   .quiz-option__input:checked ~ .quiz-option__mark { background: var(--color-accent); border-color: var(--color-accent); color: var(--figma-ffffff); }
   .quiz-option__mark .quiz-icon { width: 12px; height: 8px; }
   .quiz-step__region[data-body-region='upper'] { border-start-start-radius: var(--figma-radius-16); border-start-end-radius: var(--figma-radius-16); }
