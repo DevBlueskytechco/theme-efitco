@@ -15,6 +15,8 @@
   --sticky-top: 0px;
   --bottom-bar-height: 0px;
   --inbox-clearance: 0px;
+  /* Toast ≥ 48rem rộng 400 (layers.md §2.3 bảng dải đáy) */
+  --toast-inline-size: 25rem;
 }
 
 @media (min-width: 48rem) {
@@ -56,10 +58,13 @@ html[data-inbox] :is(#ShopifyChat, #dummy-chat-button-iframe) {
   translate: 0 calc(-1 * var(--bottom-bar-height));
 }
 
-/* Focus, link neo không nằm dưới header dính hay thanh đáy (WCAG 2.2 SC 2.4.11, layers §3) */
-html {
-  scroll-padding-block-start: calc(var(--sticky-top) + var(--space-4));
-  scroll-padding-block-end: calc(var(--bottom-bar-height) + var(--consent-height, 0px) + var(--space-4));
+/* Focus bàn phím, link neo không nằm dưới header dính hay thanh đáy (WCAG 2.2 SC 2.4.11, layers §3).
+   scroll-margin trên :focus-visible, :target thay cho scroll-padding trên html: focus() bằng script sau
+   thao tác chuột (quiz-finder.js đưa focus tiêu đề bước) không cuộn thêm, lần bấm thứ 2 của double click
+   vẫn rơi đúng chỗ (ES1-T219). :where giữ specificity 0, scroll-margin riêng của block vẫn thắng. */
+:where(:focus-visible, :target) {
+  scroll-margin-block: calc(var(--sticky-top) + var(--space-4))
+    calc(var(--bottom-bar-height) + var(--consent-height, 0px) + var(--space-4));
 }
 
 body {
@@ -107,7 +112,7 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .offer-popup
 @media (min-width: 48rem) {
   .toast-region {
     inset-inline-start: auto;
-    inline-size: min(25rem, 100% - 2 * var(--edge));
+    inline-size: min(var(--toast-inline-size), 100% - 2 * var(--edge));
   }
 }
 
@@ -3231,7 +3236,8 @@ product-media-gallery {
   align-content: center;
   overflow: hidden;
   scroll-snap-align: start;
-  /* Bấm thumbnail (anchor): html scroll-padding-block-start chừa header dính (đầu file) */
+  /* Bấm thumbnail (anchor) không để media nằm dưới header sticky */
+  scroll-margin-block-start: calc(var(--sticky-top) + var(--space-4));
   border-radius: var(--radius-card);
   background-color: var(--color-background-cream);
 }
