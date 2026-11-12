@@ -136,19 +136,24 @@ test.describe('ES1-T108 TE-6 trang collection', () => {
     expect(await columnCount(page)).toBe(1);
   });
 
+  // ES1-T417 (CTO 11/11, ES1-T178 mục N): store dev 2065 sản phẩm, sắp theo tên thì sản phẩm hết hàng TE4 (hết-hang-toan-bộ) ở vị trí > 2000 → skip từ 03/11.
+  // Duyệt với sort_by=created-descending cố định; MAIN (TE6_COLLECTION_HANDLE) không có sản phẩm hết hàng thì duyệt tiếp /collections/all.
   test('AC1 sold out: card có badge', async ({ page }) => {
-    for (let n = 1; n <= MAX_PAGES; n++) {
-      const res = await page.goto(n === 1 ? MAIN : `${MAIN}?page=${n}`);
-      if (!res || res.status() >= 400) break;
-      const cards = page.getByTestId('collection-product');
-      const badge = cards.getByTestId('product-card-badge-sold-out').first();
-      if (await badge.count()) {
-        await expect(badge).toHaveText(/\S/);
-        return;
+    const sorted = (path: string, n: number) => `${path}?sort_by=created-descending${n === 1 ? '' : `&page=${n}`}`;
+    for (const path of [...new Set([MAIN, ALL])]) {
+      for (let n = 1; n <= MAX_PAGES; n++) {
+        const res = await page.goto(sorted(path, n));
+        if (!res || res.status() >= 400) break;
+        const cards = page.getByTestId('collection-product');
+        const badge = cards.getByTestId('product-card-badge-sold-out').first();
+        if (await badge.count()) {
+          await expect(badge).toHaveText(/\S/);
+          return;
+        }
+        if ((await cards.count()) < PAGE_SIZE) break;
       }
-      if ((await cards.count()) < PAGE_SIZE) break;
     }
-    test.skip(true, `Không có sản phẩm hết hàng trong ${MAX_PAGES} trang đầu ${MAIN}`);
+    test.skip(true, `Không có sản phẩm hết hàng trong ${MAX_PAGES} trang đầu ${MAIN} và ${ALL} (sort_by=created-descending)`);
   });
 
   test('AC1 phân trang: link page 2 đúng, aria-current, Previous ở trang 2', async ({ page }) => {
