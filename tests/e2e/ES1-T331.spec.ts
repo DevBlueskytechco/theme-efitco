@@ -161,20 +161,26 @@ test.describe('ES1-T331 fixture nội dung Figma', () => {
       await expect(progress).toContainText('15%');
     });
 
+    // Markup thật (blocks/shop-the-look-row.liquid): không chọn từng món; mỗi row còn hàng có 1 <input type=hidden name=id[] data-price>
+    // (luôn vào giỏ), row hết hàng không có input. Nên không setChecked; tạm tính đối chiếu tổng data-price (cent) của các input.
     test('TC-14 shop the look có "Fits", đủ 4 món thì dòng giảm 10%, tổng = tạm tính − giảm (AC-H19)', async ({ page }, info) => {
       test.skip(info.project.name !== 'desktop', 'đo ở desktop');
       await openHome(page, 1920);
       await skipUnlessFixture(page);
       const look = page.getByTestId('shop-the-look');
       await expect(look.getByTestId('shop-the-look-note')).toContainText('Fits');
+      await expect(look.getByTestId('shop-the-look-row')).toHaveCount(4);
       const inputs = look.getByTestId('shop-the-look-row-input');
-      await expect(inputs).toHaveCount(4);
-      for (let i = 0; i < 4; i++) {
-        test.skip(!(await inputs.nth(i).isEnabled()), 'row hết hàng: AC-H19 không tính vào tổng, bậc 4 món không đạt; kiểm ở TE-12 QA');
-        await inputs.nth(i).setChecked(true, { force: true });
-      }
+      const types = await inputs.evaluateAll((els) => els.map((el) => (el as HTMLInputElement).type));
+      test.skip(types.length < 4, 'row hết hàng không có input: bậc 4 món không đạt; "row hết hàng không tính vào tổng" kiểm ở TE-12 QA');
+      // Hidden = luôn chọn; nếu sau này block đổi sang checkbox thì tick đủ 4 món.
+      for (let i = 0; i < types.length; i++) if (types[i] === 'checkbox') await inputs.nth(i).setChecked(true, { force: true });
+      const cents = await inputs.evaluateAll((els) => els.reduce((sum, el) => sum + Number(el.getAttribute('data-price')), 0));
+      await look.scrollIntoViewIfNeeded(); // data-lazy-module: bundle-form.js chỉ tải gần viewport
+      await expect(look).toHaveAttribute('data-enhanced', /.*/);
       await expect(look.getByTestId('shop-the-look-discount-row')).toContainText('10%');
       const subtotal = money(await look.getByTestId('shop-the-look-subtotal').innerText());
+      expect(subtotal, 'tạm tính = tổng data-price của row còn hàng').toBeCloseTo(cents / 100, 2);
       const off = money(await look.getByTestId('shop-the-look-discount').innerText());
       const total = money(await look.getByTestId('shop-the-look-total').innerText());
       expect(off).toBeCloseTo(subtotal * 0.1, 1);
