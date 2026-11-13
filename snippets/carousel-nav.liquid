@@ -2,7 +2,8 @@
   Next and back buttons for a horizontal list. The parent is a scroll-buttons element
   (assets/scroll-buttons.js) that also holds the list with data-scroll-track. The script
   sets data-enhanced, and data-scrollable when the list is wider than the screen; until
-  then CSS keeps the buttons invisible without changing the layout.
+  then CSS keeps the buttons invisible without changing the layout. Look comes from the
+  shared .round-button (52, foundation §6); .carousel-nav__button only keeps the hooks.
 
   @param {string} prefix - Start of the data-testid values, for example 'testimonials'
   @param {string} label_previous - Accessible name of the back button
@@ -14,7 +15,7 @@
 <div class="carousel-nav" data-testid="{{ prefix }}-nav">
   <button
     type="button"
-    class="carousel-nav__button carousel-nav__button--prev"
+    class="round-button carousel-nav__button carousel-nav__button--prev"
     aria-label="{{ label_previous | escape }}"
     data-scroll-prev
     data-testid="{{ prefix }}-prev"
@@ -23,7 +24,7 @@
   </button>
   <button
     type="button"
-    class="carousel-nav__button carousel-nav__button--next"
+    class="round-button carousel-nav__button carousel-nav__button--next"
     aria-label="{{ label_next | escape }}"
     data-scroll-next
     data-testid="{{ prefix }}-next"
