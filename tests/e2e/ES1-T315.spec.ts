@@ -1,6 +1,5 @@
-// KHÔNG CHẮC: spec chưa chạy (phiên viết không có trình duyệt, không preview, không gọi mạng) → chờ CI.
-// Thẻ <script> modal-dialog.js trong layout/theme.liquid do FE/Orchestrator thêm (scope-guard chặn dev-be ghi layout/, hỏi ES1-T452):
-// test tĩnh "layout" và test storefront fail tới khi có. Test hành vi dựng fixture bằng page.setContent (CSS + JS thật), không gọi store.
+// Thẻ <script> modal-dialog.js trong layout/theme.liquid: Orchestrator thêm ở da1f3a7 (ES1-T452).
+// Test hành vi dựng fixture bằng page.setContent (CSS + JS thật, có meta viewport như layout), không gọi store.
 // Ticket ES1-T315 TE-10-R2-BE2: assets/modal-dialog.js ≤ 2 048 B (ADR 0007 mục 5, ADR 0010; foundation §15–§16;
 // SRS TE-10 AC12, TE-3 AC10, TE-11 AC5, TE-18 AC8 phần chung: mở, Esc, scrim, nút đóng, vuốt sheet, trả focus, khoá cuộn, sự kiện).
 // Chạy: npx playwright test tests/e2e/ES1-T315.spec.ts (storefront: PREVIEW_URL=... STORE_PASSWORD=...)
@@ -61,7 +60,9 @@ async function mount(page: Page, width: number, height = 900) {
   page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
   await page.setViewportSize({ width, height });
   await page.setContent(
-    `<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}</style></head><body>${FIXTURE}<script type="module">${JS}</script></body></html>`
+    // meta viewport như snippets/meta-tags.liquid: thiếu thì Pixel 7 (isMobile) dựng layout viewport 980px,
+    // matchMedia('(min-width:48rem)') đúng ở 412 → sheet không nhận vuốt (CI run 43372602888 đỏ vì lý do này).
+    `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>${TOKENS}${CRITICAL}${BASE}</style></head><body>${FIXTURE}<script type="module">${JS}</script></body></html>`
   );
   await page.waitForFunction(() => !!customElements.get('modal-dialog'));
   await page.evaluate(() => {

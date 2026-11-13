@@ -1,4 +1,4 @@
-KHÔNG CHẮC: (1) Thẻ script `modal-dialog.js` trong `layout/theme.liquid` chưa có: scope-guard chặn dev-be ghi layout/, hỏi ES1-T452 (đề xuất Orchestrator thêm 1 dòng như ES1-T438/9b6b744). Thiếu thẻ thì 2 test fail: test tĩnh "layout" và test storefront. (2) Chưa chạy Playwright: sandbox chặn Chromium (mach port Permission denied), chạy ngoài sandbox bị từ chối. 2 test tĩnh JS/CSS pass cục bộ; test hành vi chờ CI. (3) Hợp đồng ES1-T313 không có hook riêng cho nút đóng. JS đóng lớp khi bấm `[data-modal-close]` hoặc `.close-button` nằm trong dialog. Đề nghị FE đặt `data-modal-close` cho nút đóng ở các màn mới.
+KHÔNG CHẮC: (1) Sửa lỗi CI vuốt mobile chưa kiểm được trong trình duyệt cục bộ: sandbox chặn Chromium (mach port Permission denied), chạy ngoài sandbox bị từ chối. 3 test tĩnh pass cục bộ, test hành vi chờ CI. (2) Hợp đồng ES1-T313 không có hook riêng cho nút đóng. JS đóng lớp khi bấm `[data-modal-close]` hoặc `.close-button` nằm trong dialog. Đề nghị FE đặt `data-modal-close` cho nút đóng ở các màn mới.
 
 # ES1-T315 TE-10-R2-BE2: `assets/modal-dialog.js` (`<modal-dialog>`)
 
@@ -33,6 +33,14 @@ Nguồn: ADR 0007 mục 5, ADR 0010 (trần 2 048 B, tải sẵn từ layout), t
   - Mobile: vuốt sheet (đóng, ngắn, ngang, thân đang cuộn, ≥ 48rem, drawer).
   - Storefront: define trên 4 trang, 0 lỗi console.
 - `drafts/dev-be/ES1-T315/pw-local.config.ts`: config chạy test fixture không cần globalSetup/preview.
+- `layout/theme.liquid`: thẻ `<script src="{{ 'modal-dialog.js' | asset_url }}" type="module">` sau `page-layers.js` (Orchestrator thêm ở da1f3a7, ES1-T452). Spec ES1-T415 đổi từ 3 lên 4 thẻ module.
+
+## Lượt 2: sửa CI đỏ ở mobile (run 43372602888)
+- Test lỗi: "dưới 48rem: vuốt xuống > 80px đóng…", poll timeout vì sheet không đóng.
+- Nguyên nhân nằm ở spec, JS đúng. Fixture `page.setContent` thiếu `<meta name="viewport">`. Project Pixel 7 có `isMobile` nên Chromium dựng layout viewport 980px. Khi đó `matchMedia('(min-width:48rem)')` đúng ở màn 412, và JS coi đây là dialog giữa màn nên bỏ qua vuốt.
+- Trên storefront không gặp lỗi này vì `snippets/meta-tags.liquid` có `width=device-width,initial-scale=1`.
+- Sửa: thêm meta viewport giống layout vào `mount()`. Cùng lỗi này làm 2 test vuốt còn lại (thân đang cuộn, ≥ 48rem/drawer) trước đây pass mà không kiểm được gì; giờ chúng kiểm đúng nhánh.
+- `assets/modal-dialog.js` không đổi, vẫn 2 039 B.
 
 ## Hợp đồng cho module khác và FE
 - Gọi API: `document.querySelector('modal-dialog[data-layer=cart]').open(button)` và `.close()`. Không import `modal-dialog.js` (ES1-T81).
@@ -54,7 +62,7 @@ Nguồn: ADR 0007 mục 5, ADR 0010 (trần 2 048 B, tải sẵn từ layout), t
 ## Tự kiểm tra
 - `shopify theme check`: 0 lỗi, 23 warning có sẵn, không warning nào thuộc file của PR. `.theme-check.yml` không đổi.
 - `wc -c assets/modal-dialog.js` = 2 039. `node --check` OK. Không có `console.`, `fetch`, `import`, `.style`, `innerHTML`.
-- Playwright `--list`: 30 test. Chạy cục bộ: 2 test tĩnh (JS, CSS) pass. Test layout fail, chờ ES1-T452. Test trình duyệt không chạy được vì sandbox chặn Chromium.
+- Playwright `--list`: 30 test. Chạy cục bộ: 3 test tĩnh (JS, CSS, layout) pass. Test trình duyệt không chạy được vì sandbox chặn Chromium.
 - Playwright trên preview, Lighthouse, console: chờ CI.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
