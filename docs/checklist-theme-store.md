@@ -28,8 +28,10 @@ Chạy cuối mỗi sprint trên preview develop. Fail → bug gắn mã R.
 | R4.19 | shopify-account header desktop + mobile | Bắt buộc |  |  |
 | R5.1 | Custom Liquid block (type liquid) | Bắt buộc |  |  |
 | R5.2 | JSON templates / section groups / app blocks | N/A Skeleton |  |  |
-| R6.1 | Lighthouse perf ≥ 96 desktop / 90 mobile (Shopify 60) | Bắt buộc |  |  |
-| R6.2 | Lighthouse a11y ≥ 98 (Shopify 90) | Bắt buộc |  |  |
+| R6.1 | Lighthouse perf ≥ 96 desktop / 90 mobile (Shopify 60); CI chặn merge. Nghiệm thu NFR-1: desktop ≥ 98, mobile ≥ 90, đo riêng (ES1-T301 a) | Bắt buộc |  |  |
+| R6.2 | Lighthouse a11y = 100 desktop + mobile (Shopify 90); CI chặn merge (ES1-T301 b) | Bắt buộc |  |  |
+| R6.3 | Lighthouse best-practices ≥ 78; CI chỉ cảnh báo (warn) do nền tảng Shopify (ES1-T277); nâng error sau ticket BE sửa thứ tự nạp module. Nghiệm thu NFR-1: 100 (ES1-T301 c) | Bắt buộc |  |  |
+| R6.4 | Lighthouse SEO = 100; CI chỉ cảnh báo (warn) vì store dev có password. Nghiệm thu NFR-1 đo trên demo: home, collection, product, blog, article, page (ES1-T301 d) | Bắt buộc |  |  |
 | R7.1 | lang=request.locale.iso_code; routes; content_for_header nguyên | Bắt buộc |  |  |
 | R7.2 | Product page: title, price, unit, compare_at, description, options, taxes_included, first available, callback | Bắt buộc |  |  |
 | R7.3 | Collection: title/description/image, grid không vỡ, sale badge, sort, rỗng, price_varies, paginate | Bắt buộc |  |  |

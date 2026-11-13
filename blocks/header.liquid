@@ -1,6 +1,7 @@
 {% doc %}
-  Renders the storefront header: logo or shop name, two-level main menu,
-  mobile drawer, search link, customer account entry and cart link.
+  Renders the storefront header: logo or shop name, main menu up to three
+  levels (mega panel from 80rem), mobile drawer, search link, customer
+  account entry and cart link.
   Composed directly in layout/theme.liquid so it wraps every page. All
   disclosures are <details>, so the menu and the drawer work without
   JavaScript; JS only enhances them.
@@ -31,6 +32,23 @@
     drawer from it; without JS it stays a plain link to routes.cart_url. Same
     condition as data-mode in blocks/cart-drawer.liquid.
   - Custom element host: <header-menu>, <header-drawer>, <sticky-header> (ẩn) — JS ở assets/header-menu.js, assets/header-sticky.js.
+
+  Mega menu từ 80rem (TE-22 AC1–AC3, navigation.md §2, §3; hợp đồng TE-22-R2-FE2 / TE-22-R2-BE1):
+  - Kiểu panel theo dữ liệu menu, không setting: data-mega="columns" (A, có cấp 3)
+    hoặc "tiles" (B, mọi con là collection) trên <details> cấp 1; còn lại là
+    dropdown C (ul.site-header__submenu, không data-mega).
+  - <summary> mục mega có data-layer="mega" (lớp không modal) + aria-expanded
+    do JS đồng bộ; aria-controls trỏ id HeaderSubmenu-N của vùng nội dung panel.
+  - header-mega-panel: panel trắng full bề ngang ngay dưới header, cao tối đa
+    100dvh − header, cuộn riêng. Bên trong giữ data-testid="header-submenu" +
+    class site-header__submenu cho spec cũ (TE-1, ES1-T16, ES1-T235).
+  - header-mega-column: cột A. Cột 1 = "View all …" + con không cấp 3 + nhóm đầu.
+  - header-scrim: lớp tối 50% từ đáy header, nằm trong <summary> nên khi không JS
+    bấm vào là đóng. Khi có JS mặc định pointer-events: none (rê ra trang vẫn
+    tính là rời header); JS gắn data-mega-enhanced lên root header khi tự xử lý
+    bấm scrim và rời panel thì scrim nhận bấm.
+  - data-mega-instant: JS gắn lên root header khi đổi panel từ mục cha này sang
+    mục khác để bỏ hiệu ứng mở (navigation.md §6), gỡ sau khi đổi xong.
 
   Self-contained block: callers leave the body empty.
 
@@ -109,6 +127,24 @@
                             >
                               {{- child.title | escape -}}
                             </a>
+                            {%- if child.links.size > 0 -%}
+                              {%- comment -%} Cấp 3 tại chỗ (TE-22 AC4 không JS); trượt + Back ở TE-1-R2-FE3 {%- endcomment -%}
+                              <ul class="site-header__drawer-submenu">
+                                {%- for grandchild in child.links -%}
+                                  <li>
+                                    <a
+                                      class="site-header__link"
+                                      href="{{ grandchild.url }}"
+                                      {% if grandchild.current %}
+                                        aria-current="page"
+                                      {% endif %}
+                                    >
+                                      {{- grandchild.title | escape -}}
+                                    </a>
+                                  </li>
+                                {%- endfor -%}
+                              </ul>
+                            {%- endif -%}
                           </li>
                         {% endfor %}
                       </ul>
@@ -153,36 +189,172 @@
       <nav class="site-header__nav" aria-label="{{ 'blocks.header.menu_label' | t }}" data-testid="header-menu">
         <ul class="site-header__menu">
           {% for link in menu.links %}
-            <li class="site-header__item" data-testid="header-menu-item">
+            {%- liquid
+              # Kiểu panel theo dữ liệu menu, không setting từng mục (TE-22 AC2, navigation.md §3):
+              # có con có cấp 3 → columns (A); mọi con là collection, không cấp 3 → tiles (B); còn lại dropdown (C)
+              assign mega = ''
+              if link.links.size > 0
+                assign mega = 'tiles'
+                for child in link.links
+                  if child.links.size > 0
+                    assign mega = 'columns'
+                    break
+                  endif
+                  if child.type != 'collection_link'
+                    assign mega = ''
+                  endif
+                endfor
+              endif
+            -%}
+            <li
+              class="site-header__item{% if mega != blank %} site-header__item--mega{% endif %}"
+              data-testid="header-menu-item"
+            >
               {% if link.links.size > 0 %}
-                <details>
+                <details
+                  {% if mega != blank %}
+                    data-mega="{{ mega }}"
+                  {% endif %}
+                >
                   <summary
                     class="site-header__link"
                     data-testid="header-menu-toggle"
                     aria-controls="HeaderSubmenu-{{ forloop.index }}"
+                    {% if mega != blank %}
+                      data-layer="mega"
+                    {% endif %}
                   >
                     {{ link.title | escape }}
                     {% render 'header-icon', name: 'chevron' %}
+                    {%- if mega != blank -%}
+                      <span class="site-header__scrim" data-testid="header-scrim" aria-hidden="true"></span>
+                    {%- endif -%}
                   </summary>
-                  <ul
-                    class="site-header__submenu"
-                    id="HeaderSubmenu-{{ forloop.index }}"
-                    data-testid="header-submenu"
-                  >
-                    {% for child in link.links %}
-                      <li>
-                        <a
-                          class="site-header__link"
-                          href="{{ child.url }}"
-                          {% if child.current %}
-                            aria-current="page"
-                          {% endif %}
-                        >
-                          {{- child.title | escape -}}
-                        </a>
-                      </li>
-                    {% endfor %}
-                  </ul>
+                  {%- if mega == blank -%}
+                    <ul
+                      class="site-header__submenu"
+                      id="HeaderSubmenu-{{ forloop.index }}"
+                      data-testid="header-submenu"
+                    >
+                      {% for child in link.links %}
+                        <li>
+                          <a
+                            class="site-header__link"
+                            href="{{ child.url }}"
+                            {% if child.current %}
+                              aria-current="page"
+                            {% endif %}
+                          >
+                            {{- child.title | escape -}}
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  {%- else -%}
+                    {%- liquid
+                      # "View all …" theo loại link cha, không có "View all" trần (TE-22 AC3)
+                      case link.type
+                        when 'catalog_link'
+                          assign view_all = 'blocks.header.view_all_products' | t
+                        when 'collections_link'
+                          assign view_all = 'blocks.header.view_all_collections' | t
+                        else
+                          assign link_title = link.title | escape
+                          assign view_all = 'blocks.header.view_all' | t: title: link_title
+                      endcase
+                      assign menu_index = forloop.index
+                    -%}
+                    <div class="site-header__mega" data-testid="header-mega-panel">
+                      <div
+                        class="site-header__submenu site-header__mega-inner site-header__mega-inner--{{ mega }}"
+                        id="HeaderSubmenu-{{ menu_index }}"
+                        data-testid="header-submenu"
+                      >
+                        {%- if mega == 'columns' -%}
+                          {%- comment -%} Cột 1: "View all …", con không có cấp 3, rồi nhóm đầu tiên; mỗi nhóm sau là 1 cột {%- endcomment -%}
+                          <div class="site-header__mega-column" data-testid="header-mega-column">
+                            <a class="site-header__mega-view-all" href="{{ link.url }}">
+                              {{- view_all -}}
+                              {%- render 'slideshow-icon', name: 'arrow' -%}
+                            </a>
+                            {%- assign loose_count = 0 -%}
+                            {%- for child in link.links -%}
+                              {%- if child.links.size == 0 -%}
+                                {%- assign loose_count = loose_count | plus: 1 -%}
+                              {%- endif -%}
+                            {%- endfor -%}
+                            {%- if loose_count > 0 -%}
+                              <ul class="site-header__mega-list">
+                                {%- for child in link.links -%}
+                                  {%- if child.links.size == 0 -%}
+                                    <li>
+                                      <a
+                                        class="site-header__mega-link"
+                                        href="{{ child.url }}"
+                                        {% if child.current %}
+                                          aria-current="page"
+                                        {% endif %}
+                                      >
+                                        {{- child.title | escape -}}
+                                      </a>
+                                    </li>
+                                  {%- endif -%}
+                                {%- endfor -%}
+                              </ul>
+                            {%- endif -%}
+                            {%- for child in link.links -%}
+                              {%- if child.links.size > 0 -%}
+                                {%- assign group_id = 'HeaderMega-' | append: menu_index | append: '-' | append: forloop.index -%}
+                                {%- render 'header-mega-group', link: child, id: group_id -%}
+                                {%- break -%}
+                              {%- endif -%}
+                            {%- endfor -%}
+                          </div>
+                          {%- assign first_group_seen = false -%}
+                          {%- for child in link.links -%}
+                            {%- if child.links.size > 0 -%}
+                              {%- if first_group_seen -%}
+                                {%- assign group_id = 'HeaderMega-' | append: menu_index | append: '-' | append: forloop.index -%}
+                                <div class="site-header__mega-column" data-testid="header-mega-column">
+                                  {%- render 'header-mega-group', link: child, id: group_id -%}
+                                </div>
+                              {%- endif -%}
+                              {%- assign first_group_seen = true -%}
+                            {%- endif -%}
+                          {%- endfor -%}
+                        {%- else -%}
+                          {%- comment -%} B: tiêu đề panel + "View all …" + ô collection; ảnh ô, setting bật/tắt ảnh ở TE-22-R2-FE3 {%- endcomment -%}
+                          <div class="site-header__mega-head">
+                            <p class="site-header__mega-heading" id="HeaderMega-{{ menu_index }}">
+                              {{- link.title | escape -}}
+                            </p>
+                            <a class="site-header__mega-view-all" href="{{ link.url }}">
+                              {{- view_all -}}
+                              {%- render 'slideshow-icon', name: 'arrow' -%}
+                            </a>
+                          </div>
+                          <ul class="site-header__mega-tiles" aria-labelledby="HeaderMega-{{ menu_index }}">
+                            {%- for child in link.links -%}
+                              <li>
+                                <a
+                                  class="site-header__mega-tile"
+                                  href="{{ child.url }}"
+                                  {% if child.current %}
+                                    aria-current="page"
+                                  {% endif %}
+                                >
+                                  <span class="site-header__mega-tile-title">{{- child.title | escape -}}</span>
+                                  <span class="site-header__mega-tile-count">
+                                    {{- 'blocks.level_card.products_count' | t: count: child.object.products_count -}}
+                                  </span>
+                                </a>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </div>
+                    </div>
+                  {%- endif -%}
                 </details>
               {% else %}
                 <a

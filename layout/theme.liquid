@@ -31,9 +31,6 @@
     {% render 'meta-tags' %}
 
     {{ content_for_header }}
-    <script src="{{ 'standard-events.js' | asset_url }}" type="module"></script>
-    <script src="{{ 'motion.js' | asset_url }}" type="module"></script>
-    <script src="{{ 'page-layers.js' | asset_url }}" type="module"></script>
   </head>
 
   <body>
@@ -106,5 +103,14 @@
         </div>
       {%- endfor -%}
     </template>
+
+    {% comment %}
+      ES1-T415: no module script in <head>. Shopify adds the import map for
+      @shopify/partial-rendering after content_for_header; a module requested
+      before it stops the map from applying. Modules defer, so order is safe here.
+    {% endcomment %}
+    <script src="{{ 'standard-events.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'motion.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'page-layers.js' | asset_url }}" type="module"></script>
   </body>
 </html>

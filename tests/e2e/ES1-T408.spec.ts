@@ -10,7 +10,8 @@ const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8');
 
 test.describe('ES1-T408 @static', () => {
   test('404: form tới routes.search_url có input search, link routes.root_url', () => {
-    const src = read('templates/404.liquid');
+    // ES1-T384: markup 404 chuyển sang blocks/not-found.liquid; template giữ link all products (featured-collection view_all_url).
+    const src = read('templates/404.liquid') + read('blocks/not-found.liquid');
     expect(src).toMatch(/<form[^>]*action="\{\{ routes\.search_url \}\}"/);
     expect(src).toMatch(/type="search"/);
     expect(src).toMatch(/name="q"/);
@@ -20,7 +21,7 @@ test.describe('ES1-T408 @static', () => {
   });
 
   test('password: settings.logo alt shop.name, rỗng thì shop.name', () => {
-    const src = read('templates/password.liquid');
+    const src = read('templates/password.liquid') + read('blocks/password-hero.liquid');
     expect(src).toMatch(/settings\.logo/);
     expect(src).toMatch(/alt: shop\.name/);
     expect(src).toMatch(/\{\{ shop\.name \| escape \}\}/);
