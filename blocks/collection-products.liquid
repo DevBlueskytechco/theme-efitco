@@ -15,8 +15,7 @@
   Card images: all lazy when the collection has a banner image (the banner is
   the LCP element); otherwise the first columns_desktop cards are eager.
 
-  Loads assets/product-swatch.js outside the partial, always, because the grid
-  can change from empty to filled when JavaScript applies the partial.
+  Cards need no JavaScript: swatches are indicators (TE-3 AC2, ADR 0010).
 
   Toolbar (TE-6 AC3, AC4, ES1-T103 D5, D6), outside the results partial:
   - collection-filter-open opens the dialog of blocks/collection-filters.liquid
@@ -218,8 +217,6 @@
         </div>
       {% endpaginate %}
     {% endpartial %}
-
-    <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
   </div>
 {%- endif -%}
 

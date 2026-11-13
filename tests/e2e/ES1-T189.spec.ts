@@ -121,13 +121,11 @@ test.describe('ES1-T189 tĩnh', () => {
     expect(liquid).toContain(`data-lazy-module="{{ 'collection-tabs.js' | asset_url }}"`);
   });
 
-  test('block chỉ có thẻ script lazy-module và product-swatch', ({}, ti) => {
+  // ES1-T338 (TE-3-R2-BE2, ADR 0010): product-swatch.js đã gỡ, còn đúng thẻ lazy-module.
+  test('block chỉ có thẻ script lazy-module', ({}, ti) => {
     test.skip(ti.project.name !== 'desktop', 'static, chạy 1 lần ở desktop');
     const scripts = readFileSync(LIQUID_FILE, 'utf8').match(/<script[^>]*>/g);
-    expect(scripts?.sort()).toEqual([
-      `<script src="{{ 'lazy-module.js' | asset_url }}" type="module">`,
-      `<script src="{{ 'product-swatch.js' | asset_url }}" type="module">`,
-    ]);
+    expect(scripts).toEqual([`<script src="{{ 'lazy-module.js' | asset_url }}" type="module">`]);
   });
 });
 
