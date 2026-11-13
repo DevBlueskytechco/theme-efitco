@@ -50,6 +50,7 @@ AC: foundation §2, §6, §15–§18; SRS TE-10 AC11 (toast), AC12 (dialog, draw
 - `grep -nE "z-index:\s*-?[0-9]" assets/*.css`: 0 dòng. Mục CSS mới: 0 màu literal, 0 thuộc tính vật lý, 0 `width`/`height`, bo góc chỉ qua `var(--radius-*)`.
 - Không file JS trong diff.
 - `tests/e2e/ES1-T313.spec.ts`: TC-01–TC-04 (đọc file) đạt ở local với `--config=drafts/dev-fe/ES1-T313/pw.static.config.ts`. TC-05–TC-10 (fixture `setContent` với base.css + critical.css thật: kích thước 360/768/1280, mờ 0.35, viền alert, skeleton 1:1/40%, giảm chuyển động) chờ CI vì sandbox local chặn Chromium.
+- Lượt 2 (CI run 43321053167 đỏ TC-05/06/07, ví dụ dialog M đo 702.97 thay vì 720): spec đo `boundingBox` khi transition mở (`@starting-style` scale 0.97 + translate) đang chạy ngay sau `show()`. Sửa spec: helper `openDialogs` mở dialog, chờ 2 frame rồi chờ `getAnimations({ subtree: true })` hữu hạn trong dialog xong mới đo. CSS không đổi vì kích thước thật đã đúng. Chạy lại ở local vẫn bị sandbox chặn Chromium, chờ CI.
 - Preview, Playwright đủ bộ, Lighthouse (desktop/mobile), ảnh 3 breakpoint: chờ CI. PR không đổi markup hiển thị trừ class `round-button` trên nút hàng cuộn (giá trị cũ giữ nguyên: 52, trắng, viền #E5E5E5 = `--color-border`, hover accent), nên không dự kiến lệch visual diff trang chủ.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

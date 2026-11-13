@@ -44,6 +44,19 @@ const mount = async (page: Page, width: number) => {
   await page.setContent(`<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}</style></head><body>${FIXTURE}</body></html>`);
 };
 const box = async (page: Page, id: string) => (await page.getByTestId(id).boundingBox())!;
+// Mở mọi dialog rồi chờ transition mở (opacity/translate/scale qua @starting-style) chạy xong:
+// boundingBox đo cả transform, đo giữa animation ra 702.97 thay vì 720 (CI run 43321053167).
+// Chỉ chờ animation hữu hạn trong dialog; shimmer skeleton lặp vô hạn nằm ngoài dialog.
+const openDialogs = (page: Page) =>
+  page.evaluate(async () => {
+    const dialogs = [...document.querySelectorAll('dialog')] as HTMLDialogElement[];
+    for (const d of dialogs) d.show();
+    await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
+    const running = dialogs
+      .flatMap((d) => d.getAnimations({ subtree: true }))
+      .filter((a) => a.effect?.getComputedTiming().iterations !== Infinity);
+    await Promise.allSettled(running.map((a) => a.finished));
+  });
 
 test.describe('ES1-T313 tĩnh', () => {
   test.beforeEach(({}, ti) => { test.skip(ti.project.name !== 'desktop', 'tĩnh, chạy 1 lần'); });
@@ -84,7 +97,7 @@ test.describe('ES1-T313 tĩnh', () => {
 
   test('TC-05 kích thước 1280: dialog M 720, drawer 480, nút đóng 48, toast đóng 44, tròn 52, empty icon 72', async ({ page }) => {
     await mount(page, 1280);
-    await page.evaluate(() => { for (const d of document.querySelectorAll('dialog')) (d as HTMLDialogElement).show(); });
+    await openDialogs(page);
     expect((await box(page, 'dialog')).width).toBe(720);
     expect((await box(page, 'drawer')).width).toBe(480);
     expect(await box(page, 'dialog-close')).toMatchObject({ width: 48, height: 48 });
@@ -96,7 +109,7 @@ test.describe('ES1-T313 tĩnh', () => {
 
   test('TC-06 360: dialog là bottom sheet rộng 100%, sát đáy; drawer 90%; toast rộng màn trừ 16', async ({ page }) => {
     await mount(page, 360);
-    await page.evaluate(() => { for (const d of document.querySelectorAll('dialog')) (d as HTMLDialogElement).show(); });
+    await openDialogs(page);
     const sheet = await box(page, 'dialog');
     expect(sheet.width).toBe(360);
     expect(Math.round(sheet.y + sheet.height)).toBe(900);
@@ -106,7 +119,7 @@ test.describe('ES1-T313 tĩnh', () => {
 
   test('TC-07 768: drawer 420, dialog giữa màn', async ({ page }) => {
     await mount(page, 768);
-    await page.evaluate(() => { for (const d of document.querySelectorAll('dialog')) (d as HTMLDialogElement).show(); });
+    await openDialogs(page);
     expect((await box(page, 'drawer')).width).toBe(420);
     const dialog = await box(page, 'dialog');
     expect(dialog.width).toBe(720);
