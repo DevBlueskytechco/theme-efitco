@@ -1,4 +1,4 @@
-KHÔNG CHẮC: (1) 5 test e2e cũ khẳng định header trong suốt/nền sáng/ngưỡng sentinel 80px sẽ đỏ sau PR: tests/e2e/TE-1.spec.ts TC-41, TC-42; tests/e2e/ES1-T16.spec.ts "ngưỡng đúng 80px", "trên hero: trong suốt", "lỗi mạng header-sticky.js: header trên hero không sticky". Ngoài vai FE, đã hỏi Tech Lead ES1-T439 (QA sửa trước merge hay chấp nhận đỏ tới ES1-T325). (2) Sentinel 1px theo announcement-bar.md §4 + task-split: không có bar thì bóng hiện ngay khi cuộn > 1px (header dính từ 0), AC9 "quá 80px có bóng" vẫn đúng; xác nhận ở ES1-T439 câu 2. (3) Chuỗi skip link thêm vào `locales/en.default.json` (`blocks.header.skip_to_content`) dù task-split chỉ ghi `en.default.schema.json`: AGENTS bắt chuỗi storefront qua `| t`. (4) `blocks/slideshow.liquid` `{% doc %}` còn nhắc `data-header-overlay` (chỉ chú thích, markup không gắn hook): file của TE-2-R2-FE1, để task đó sửa.
+KHÔNG CHẮC: (0) Lượt 2: comment CTO ghi `ES1-T186.spec.ts` sticky-header :187/:198/:209, nhưng 3 test đó (ngưỡng 80px, trên hero trong suốt, lỗi mạng header-sticky.js) nằm ở `tests/e2e/ES1-T16.spec.ts` đúng các dòng này; ES1-T186.spec.ts là shop-by-level, không dính header → sửa ES1-T16.spec.ts, không đụng ES1-T186.spec.ts. (1) TE-1.spec.ts TC-41/TC-42 vẫn đỏ: theo CTO 13/11 ngoài scope dev-fe, Claude Code sửa sau lượt này. (2) Sentinel 1px theo announcement-bar.md §4 + task-split: không có bar thì bóng hiện ngay khi cuộn > 1px (header dính từ 0), AC9 "quá 80px có bóng" vẫn đúng; xác nhận ở ES1-T439 câu 2. (3) Chuỗi skip link thêm vào `locales/en.default.json` (`blocks.header.skip_to_content`) dù task-split chỉ ghi `en.default.schema.json`: AGENTS bắt chuỗi storefront qua `| t`. (4) `blocks/slideshow.liquid` `{% doc %}` còn nhắc `data-header-overlay` (chỉ chú thích, markup không gắn hook): file của TE-2-R2-FE1, để task đó sửa.
 
 # ES1-T319 · TE-1-R2-FE1: header tối mọi trang, announcement bar AN1/AN2, skip link, sentinel 1px
 
@@ -31,6 +31,21 @@ AC: TE-1 AC4, AC9, AC-H29, TE-2 AC6 (+ phần skip link, focus trắng của TE-
 `locales/en.default.json`: `blocks.header.skip_to_content` "Skip to content" (gộp vào `blocks.header`).
 `locales/en.default.schema.json`: `info.announcement_text` theo spec §2; `info.sticky_header` thêm "The announcement bar scrolls away."
 
+`tests/e2e/ES1-T16.spec.ts` (lượt 2, CTO 13/11 run 43323356432; không đổi Liquid/CSS)
+- Bỏ `simulateHero` (hook `data-header-overlay`). Thêm hằng `DARK` rgb(26, 26, 26) / `WHITE` rgb(255, 255, 255) = default `background_dark_color` / `background_dark_foreground_color`, helper `sentinelTop()` đọc vị trí sentinel 1px.
+- Test 1: cuộn tới `sentinelTop + 100` thay 100px cố định (có announcement bar thì 100px chưa qua bar).
+- :187 → "ngưỡng là sentinel trước header": `sentinelTop − 1` chưa gắn `data-scrolled`, header y > 0; `sentinelTop + 2` (IO coi chạm mép là giao) gắn ngay, header y = 0, chiều cao không đổi.
+- :198 → "AC-H29: header luôn nền tối, chữ trắng ở đầu trang và khi cuộn": nền DARK, chữ WHITE ở top và sau khi `data-scrolled`.
+- :209 → "lỗi mạng header-sticky.js": không `data-header-enhanced`/`data-scrolled`; `main#MainContent` y ≥ đáy header (không chui dưới); sau cuộn 400 vẫn DARK/WHITE; `data-sticky` và cao > 480 thì header vẫn dính y = 0 (sticky là CSS).
+
+`tests/e2e/ES1-T176.spec.ts` hàng 1 Header (1:362) computed style
+- Figma: text "Shop" I1:366;2963:2083;1327:1245 fill #FFFFFF nằm trong 1:365 "Top menu" opacity 0.6 → màu thật trắng 60% trên nền 1:360 #1A1A1A = #A3A3A3. Bộ so cũ bỏ opacity cha và alpha (`rgbToHex`), không đọc `color(srgb …)` của `color-mix()` → đỏ.
+- Spec tính `inheritedOpacity` từ snapshot; node style có opacity cha < 1 thì Figma fill trộn lên `row.band`, computed `color`/`backgroundColor` chuẩn hoá về rgb đặc trên band (`color(srgb …)`, `rgb(… / a)`, `rgba()`). Chỉ hàng 1 "mục menu" có opacity cha (đã quét figma-rows.json); hàng khác so như cũ. Không sửa support/figma-compare.ts, figma-rows.json, figma-exceptions.json.
+- Thêm test "Hàng 1 Header (1:362): nền band tối, chữ trắng, slideshow nằm dưới đáy header" (AC-H29).
+- Kiểm tay logic trộn: Figma 255×0.6 + 26×0.4 = 163; `color(srgb 0.640784 …)`, `rgba(255,255,255,0.6)`, `rgb(255 255 255 / 0.6)` → rgb(163, 163, 163).
+
+`grep -rn "data-header-overlay\|has(.slideshow)" tests/`: chỉ còn TE-1.spec.ts :146, :150, :805–808 (TC-42 helper, TC-46 fixme) — phần Claude Code.
+
 ## Cho BE / QA
 
 - BE (`assets/header-sticky.js`, không sửa ở đây): sentinel vẫn `data-testid="header-sticky-sentinel"`, chỉ đổi vị trí/cao; logic IntersectionObserver giữ nguyên. Chú thích đầu file ("sentinel 80px", "header trong suốt") và `data-header-enhanced` đã lỗi thời, dọn khi BE chạm file.
@@ -42,7 +57,8 @@ AC: TE-1 AC4, AC9, AC-H29, TE-2 AC6 (+ phần skip link, focus trắng của TE-
 - `wc -c assets/critical.css`: 9 917 B ≤ 10 240 (trước 10 067). `gzip -c assets/base.css | wc -c`: 44 240 B ≤ 49 152 (trước 43 696).
 - `grep -n "header-overlay\|body:has(.slideshow)" assets/*.css`: chỉ còn `body:has(.slideshow) { background }` của trang chủ 80rem (không phải header, phần TE-2/TE-17).
 - Diff CSS: 0 màu literal, 0 z-index số, 0 thời gian rời, 0 thuộc tính vật lý; chỉ 1px/2px cho viền, gạch, outline.
-- Không file JS trong diff; không sửa tests/.
-- Preview, Playwright (smoke + TE-1, ES1-T16), Lighthouse desktop/mobile, ảnh 360/768/1280/1920 (có bar và không bar): chờ CI. 5 test cũ nêu ở KHÔNG CHẮC (1) dự kiến đỏ — chờ ES1-T439.
+- Không file JS trong diff. Lượt 2 chỉ sửa tests/e2e/ES1-T16.spec.ts, tests/e2e/ES1-T176.spec.ts.
+- `node --experimental-strip-types --check` 2 spec: OK; `playwright test --list` 2 file: 84 test, biên dịch được. Chạy thật cần PREVIEW_URL (global setup): chờ CI.
+- Preview, Playwright (smoke + TE-1, ES1-T16, ES1-T176), Lighthouse desktop/mobile, ảnh 360/768/1280/1920: chờ CI. TE-1 TC-41/42 còn đỏ tới khi Claude Code sửa.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
