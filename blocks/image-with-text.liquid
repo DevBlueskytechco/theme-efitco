@@ -7,9 +7,15 @@
   80rem and are hidden below. Accent image 3 is not rendered. Without a main image
   the storefront keeps the dark frame and the editor adds a hint inside it.
 
-  Layout banner (Figma 1:625): no main image, image_position has no effect, text
-  is centered. Accent images 1, 2 and 3 are scattered from 80rem and form a row
-  above the text below 80rem.
+  Layout banner (Figma 1:625, index-mobile-a.md §8, index-1280.md §2.5): no main
+  image, image_position has no effect, text is centered. Accent 1 sits top start,
+  accent 3 at the end a little lower, accent 2 bottom start. Below 48rem accents 1
+  and 3 form a row above the text and accent 2 is hidden (display none, lazy, so
+  it never loads); from 48rem accent 2 sits at the bottom start; from 80rem all
+  three are scattered by vw and the band is at least 50vw high. The heading keeps
+  the line breaks of the HTML (<br> in the locale sample) from 48rem.
+
+  Accent images are decorative (alt="", index-1280.md §4.3) in both layouts.
 
   Sample content (plan ES1-T169 D1): the template passes default_* from locales, a
   different set for each of the 2 uses on the home page. They have other names than
@@ -66,9 +72,9 @@
 
   if is_banner
     assign layout_class = 'image-with-text--banner full-width'
-    assign accent_1_sizes = '(min-width: 80rem) min(280px, 14.58vw), (min-width: 48rem) 200px, 30vw'
-    assign accent_2_sizes = '(min-width: 80rem) min(187px, 9.74vw), (min-width: 48rem) 200px, 30vw'
-    assign accent_3_sizes = '(min-width: 80rem) min(200px, 10.42vw), (min-width: 48rem) 200px, 30vw'
+    assign accent_1_sizes = '(min-width: 80rem) min(280px, 14.58vw), (min-width: 48rem) 160px, 112px'
+    assign accent_2_sizes = '(min-width: 80rem) min(187px, 9.74vw), 104px'
+    assign accent_3_sizes = '(min-width: 80rem) min(200px, 10.42vw), (min-width: 48rem) 128px, 88px'
   else
     assign layout_class = 'image-with-text--split full-width'
     if block.settings.image_position == 'right'
@@ -95,6 +101,7 @@
       widths: '120, 240, 360, 560',
       sizes: accent_1_sizes,
       loading: 'lazy',
+      decorative: true,
       testid: 'image-with-text-accent'
     %}
   {%- endif -%}
@@ -108,6 +115,7 @@
       widths: '120, 240, 360, 560',
       sizes: accent_2_sizes,
       loading: 'lazy',
+      decorative: true,
       testid: 'image-with-text-accent'
     %}
   {%- endif -%}
@@ -121,6 +129,7 @@
       widths: '120, 240, 360, 560',
       sizes: accent_3_sizes,
       loading: 'lazy',
+      decorative: true,
       testid: 'image-with-text-accent'
     %}
   {%- endif -%}
