@@ -1,206 +1,254 @@
 {% doc %}
-  Renders the search dialog of the header. The caller places it right after the
-  header-search-link anchor: assets/search-loader.js finds the dialog with
-  nextElementSibling and opens it with showModal(). Without JavaScript the
-  dialog stays closed and the anchor goes to the search page. Inside the dialog
-  the form is a plain GET to the search page, so search works if
-  assets/predictive-search.js fails to load.
+  Renders the search layer of the header (docs/ui-spec/predictive-search.md
+  §1–§3, §11). The caller places it right after the header-search-link anchor:
+  the anchor's nextElementSibling is <modal-dialog data-layer="search">, whose
+  first child is the <dialog>. assets/modal-dialog.js (ADR 0007) opens it with
+  showModal(), closes it on Esc or a backdrop click and returns focus to the
+  anchor. Without JavaScript the dialog stays closed and the anchor goes to the
+  search page. Inside the dialog the form is a plain GET to the search page,
+  so search works if assets/predictive-search.js fails to load.
+
+  Two styles, one markup (data-style on the dialog):
+  - popup: top band. The first row is the dark 80px bar of the header: logo
+    (from 80rem), search field, close button. The "Search" h2 is hidden.
+  - drawer: .drawer from the inline end, 90% / 420 / 480. Visible "Search" h2
+    and close button, then the field on a light background.
+
+  The clear button is a reset button: it empties the field without
+  JavaScript and CSS hides it while the placeholder shows (field empty).
 
   Option elements are the <a role="option"> themselves, never wrapped in a list
   item: an option that contains a link fails axe nested-interactive. Group
   titles are plain <div>: a heading inside a listbox fails axe
   aria-required-children.
 
-  Hooks for assets/predictive-search.js (ES1-T123 D9):
+  Hooks for assets/predictive-search.js (ES1-T130):
   - <predictive-search>: data-url, data-money-format, data-label-count (%n is
     the number), data-label-empty and data-label-all (%s is the search terms).
   - data-predictive-group: products, collections, pages, articles; hidden until
     filled. data-predictive-options: where cloned options go.
   - data-predictive-template: product, link. Inside the clones:
     data-predictive-image, data-predictive-title, data-predictive-price.
+  - Clear button: native reset; JS moves focus back to the input on the form
+    reset event.
   - Test ids: predictive-search, predictive-search-dialog,
     predictive-search-close, predictive-search-form, predictive-search-input,
-    predictive-search-submit, predictive-search-listbox,
-    predictive-search-group, predictive-search-option, predictive-search-all,
-    predictive-search-status.
+    predictive-search-submit, predictive-search-clear,
+    predictive-search-listbox, predictive-search-group,
+    predictive-search-option, predictive-search-all, predictive-search-status.
+
+  @param {string} [style] - popup (default) or drawer, from the header Search style setting
+  @param {image} [logo] - Logo shown in the popup bar from 80rem; the shop name when empty
+  @param {number} [logo_width] - Logo width in px, same as the header
 
   @example
-  {% render 'predictive-search' %}
+  {% render 'predictive-search', style: block.settings.search_style, logo: logo, logo_width: block.settings.logo_width %}
 {% enddoc %}
 
-<dialog
-  class="predictive-search-dialog"
-  scroll-lock
-  aria-label="{{ 'blocks.predictive_search.dialog_label' | t | escape }}"
-  data-testid="predictive-search-dialog"
->
-  <predictive-search
-    class="predictive-search"
-    data-testid="predictive-search"
-    data-url="{{ routes.predictive_search_url }}"
-    data-money-format="{{ shop.money_format | escape }}"
-    data-label-count="{{ 'blocks.predictive_search.count' | t: number: '%n' | escape }}"
-    data-label-empty="{{ 'blocks.predictive_search.empty' | t: terms: '%s' | escape }}"
-    data-label-all="{{ 'blocks.predictive_search.all' | t: terms: '%s' | escape }}"
+{%- liquid
+  assign search_style = style | default: 'popup'
+  if search_style != 'drawer'
+    assign search_style = 'popup'
+  endif
+-%}
+
+<modal-dialog data-layer="search">
+  <dialog
+    class="predictive-search-dialog{% if search_style == 'drawer' %} drawer drawer--end drawer--wide{% endif %}"
+    data-style="{{ search_style }}"
+    scroll-lock
+    aria-labelledby="PredictiveSearchTitle"
+    data-testid="predictive-search-dialog"
   >
-    <form
-      class="predictive-search__form"
-      action="{{ routes.search_url }}"
-      method="get"
-      role="search"
-      data-testid="predictive-search-form"
+    <predictive-search
+      class="predictive-search"
+      data-testid="predictive-search"
+      data-url="{{ routes.predictive_search_url }}"
+      data-money-format="{{ shop.money_format | escape }}"
+      data-label-count="{{ 'blocks.predictive_search.count' | t: number: '%n' | escape }}"
+      data-label-empty="{{ 'blocks.predictive_search.empty' | t: terms: '%s' | escape }}"
+      data-label-all="{{ 'blocks.predictive_search.all' | t: terms: '%s' | escape }}"
     >
-      <input type="hidden" name="type" value="product,article,page">
-      <input type="hidden" name="options[prefix]" value="last">
-
-      <label class="visually-hidden" for="PredictiveSearchInput">
-        {{- 'blocks.predictive_search.input_label' | t -}}
-      </label>
-      <input
-        class="predictive-search__input"
-        id="PredictiveSearchInput"
-        type="search"
-        name="q"
-        placeholder="{{ 'blocks.predictive_search.input_label' | t | escape }}"
-        autofocus
-        autocomplete="off"
-        role="combobox"
-        aria-expanded="false"
-        aria-controls="PredictiveSearchListbox"
-        aria-autocomplete="list"
-        data-testid="predictive-search-input"
-      >
-      <button
-        class="site-header__icon"
-        type="submit"
-        aria-label="{{ 'blocks.predictive_search.submit' | t | escape }}"
-        data-testid="predictive-search-submit"
-      >
-        {% render 'header-icon', name: 'search' %}
-      </button>
-    </form>
-
-    <div class="predictive-search__status" role="status" data-testid="predictive-search-status"></div>
-
-    <div
-      class="predictive-search__listbox"
-      id="PredictiveSearchListbox"
-      role="listbox"
-      aria-label="{{ 'blocks.predictive_search.listbox_label' | t | escape }}"
-      hidden
-      data-testid="predictive-search-listbox"
-    >
-      <div
-        role="group"
-        aria-labelledby="PredictiveSearchGroup-products"
-        hidden
-        data-predictive-group="products"
-        data-testid="predictive-search-group"
-      >
-        <div class="predictive-search__group-title" id="PredictiveSearchGroup-products">
-          {{- 'blocks.predictive_search.group_products' | t -}}
-        </div>
-        <div data-predictive-options></div>
-      </div>
-      <div
-        role="group"
-        aria-labelledby="PredictiveSearchGroup-collections"
-        hidden
-        data-predictive-group="collections"
-        data-testid="predictive-search-group"
-      >
-        <div class="predictive-search__group-title" id="PredictiveSearchGroup-collections">
-          {{- 'blocks.predictive_search.group_collections' | t -}}
-        </div>
-        <div data-predictive-options></div>
-      </div>
-      <div
-        role="group"
-        aria-labelledby="PredictiveSearchGroup-pages"
-        hidden
-        data-predictive-group="pages"
-        data-testid="predictive-search-group"
-      >
-        <div class="predictive-search__group-title" id="PredictiveSearchGroup-pages">
-          {{- 'blocks.predictive_search.group_pages' | t -}}
-        </div>
-        <div data-predictive-options></div>
-      </div>
-      <div
-        role="group"
-        aria-labelledby="PredictiveSearchGroup-articles"
-        hidden
-        data-predictive-group="articles"
-        data-testid="predictive-search-group"
-      >
-        <div class="predictive-search__group-title" id="PredictiveSearchGroup-articles">
-          {{- 'blocks.predictive_search.group_articles' | t -}}
-        </div>
-        <div data-predictive-options></div>
-      </div>
-
-      <a
-        class="predictive-search__option predictive-search__all"
-        href="{{ routes.search_url }}"
-        role="option"
-        tabindex="-1"
-        aria-selected="false"
-        data-testid="predictive-search-all"
-      >
-        {{- 'blocks.predictive_search.view_all' | t -}}
-      </a>
-    </div>
-
-    <template data-predictive-template="product">
-      <a
-        class="predictive-search__option"
-        href="{{ routes.search_url }}"
-        role="option"
-        tabindex="-1"
-        aria-selected="false"
-        data-testid="predictive-search-option"
-      >
-        <img
-          class="predictive-search__image"
-          alt=""
-          width="64"
-          height="64"
-          sizes="64px"
-          loading="lazy"
-          data-predictive-image
+      <div class="predictive-search__bar">
+        <h2
+          class="predictive-search__title {% if search_style == 'drawer' %}drawer__title{% else %}visually-hidden{% endif %}"
+          id="PredictiveSearchTitle"
         >
-        <span class="predictive-search__option-text">
-          <span data-predictive-title></span>
-          <span class="predictive-search__price" data-predictive-price></span>
-        </span>
-      </a>
-    </template>
+          {{- 'blocks.predictive_search.dialog_label' | t -}}
+        </h2>
 
-    <template data-predictive-template="link">
-      <a
-        class="predictive-search__option"
-        href="{{ routes.search_url }}"
-        role="option"
-        tabindex="-1"
-        aria-selected="false"
-        data-testid="predictive-search-option"
+        {% if search_style == 'popup' %}
+          <a
+            class="site-header__logo predictive-search__logo"
+            href="{{ routes.root_url }}"
+            {% if logo %}
+              aria-label="{{ shop.name | escape }}"
+              style="--logo-width: {{ logo_width | default: 120 }}px;"
+            {% endif %}
+          >
+            {%- if logo -%}
+              {% assign logo_render_width = logo_width | default: 120 | times: 2 %}
+              {% render 'image',
+                image: logo,
+                class: 'site-header__logo-image',
+                width: logo_render_width,
+                sizes: '240px',
+                decorative: true
+              %}
+            {%- else -%}
+              <span class="site-header__logo-text">{{ shop.name | escape }}</span>
+            {%- endif -%}
+          </a>
+        {% endif %}
+
+        <form
+          class="predictive-search__form"
+          action="{{ routes.search_url }}"
+          method="get"
+          role="search"
+          data-testid="predictive-search-form"
+        >
+          <input type="hidden" name="type" value="product,article,page">
+          <input type="hidden" name="options[prefix]" value="last">
+
+          <button
+            class="site-header__icon predictive-search__submit"
+            type="submit"
+            aria-label="{{ 'blocks.predictive_search.submit' | t | escape }}"
+            data-testid="predictive-search-submit"
+          >
+            {% render 'header-icon', name: 'search' %}
+          </button>
+          <label class="visually-hidden" for="PredictiveSearchInput">
+            {{- 'blocks.predictive_search.input_label' | t -}}
+          </label>
+          <input
+            class="predictive-search__input"
+            id="PredictiveSearchInput"
+            type="search"
+            name="q"
+            value=""
+            placeholder="{{ 'blocks.predictive_search.placeholder' | t | escape }}"
+            autofocus
+            autocomplete="off"
+            role="combobox"
+            aria-expanded="false"
+            aria-controls="PredictiveSearchListbox"
+            aria-autocomplete="list"
+            data-testid="predictive-search-input"
+          >
+          <button
+            class="site-header__icon predictive-search__clear"
+            type="reset"
+            aria-label="{{ 'blocks.predictive_search.clear' | t | escape }}"
+            data-testid="predictive-search-clear"
+          >
+            {% render 'header-icon', name: 'close' %}
+          </button>
+        </form>
+
+        <form class="predictive-search__close-form" method="dialog">
+          {% # aria-label, not hidden text: the dialog is closed (display: none) on load, so a name from hidden content is empty. %}
+          <button
+            class="close-button predictive-search__close"
+            type="submit"
+            aria-label="{{ 'blocks.predictive_search.close' | t | escape }}"
+            data-testid="predictive-search-close"
+          >
+            {% render 'header-icon', name: 'close' %}
+          </button>
+        </form>
+      </div>
+
+      <div class="predictive-search__status" role="status" data-testid="predictive-search-status"></div>
+
+      <div
+        class="predictive-search__listbox"
+        id="PredictiveSearchListbox"
+        role="listbox"
+        aria-label="{{ 'blocks.predictive_search.listbox_label' | t | escape }}"
+        hidden
+        data-testid="predictive-search-listbox"
       >
-        <span class="predictive-search__option-text">
-          <span data-predictive-title></span>
-        </span>
-      </a>
-    </template>
-  </predictive-search>
+        {%- liquid
+          assign groups = 'products,collections,pages,articles' | split: ','
+        -%}
+        {% for group in groups %}
+          <div
+            class="predictive-search__group"
+            role="group"
+            aria-labelledby="PredictiveSearchGroup-{{ group }}"
+            hidden
+            data-predictive-group="{{ group }}"
+            data-testid="predictive-search-group"
+          >
+            <div class="predictive-search__group-title" id="PredictiveSearchGroup-{{ group }}">
+              {%- case group -%}
+                {%- when 'products' -%}
+                  {{- 'blocks.predictive_search.group_products' | t -}}
+                {%- when 'collections' -%}
+                  {{- 'blocks.predictive_search.group_collections' | t -}}
+                {%- when 'pages' -%}
+                  {{- 'blocks.predictive_search.group_pages' | t -}}
+                {%- else -%}
+                  {{- 'blocks.predictive_search.group_articles' | t -}}
+              {%- endcase -%}
+            </div>
+            <div data-predictive-options></div>
+          </div>
+        {% endfor %}
 
-  <form class="predictive-search-dialog__close-form" method="dialog">
-    {% # aria-label, not hidden text: the dialog is closed (display: none) on load, so a name from hidden content is empty. %}
-    <button
-      class="site-header__icon"
-      type="submit"
-      aria-label="{{ 'blocks.predictive_search.close' | t | escape }}"
-      data-testid="predictive-search-close"
-    >
-      {% render 'header-icon', name: 'close' %}
-    </button>
-  </form>
-</dialog>
+        <a
+          class="predictive-search__option predictive-search__all"
+          href="{{ routes.search_url }}"
+          role="option"
+          tabindex="-1"
+          aria-selected="false"
+          data-testid="predictive-search-all"
+        >
+          {{- 'blocks.predictive_search.view_all' | t -}}
+        </a>
+      </div>
+
+      <template data-predictive-template="product">
+        <a
+          class="predictive-search__option"
+          href="{{ routes.search_url }}"
+          role="option"
+          tabindex="-1"
+          aria-selected="false"
+          data-testid="predictive-search-option"
+        >
+          <img
+            class="predictive-search__image"
+            alt=""
+            width="64"
+            height="64"
+            sizes="64px"
+            loading="lazy"
+            data-predictive-image
+          >
+          <span class="predictive-search__option-text">
+            <span data-predictive-title></span>
+            <span class="predictive-search__price" data-predictive-price></span>
+          </span>
+        </a>
+      </template>
+
+      <template data-predictive-template="link">
+        <a
+          class="predictive-search__option"
+          href="{{ routes.search_url }}"
+          role="option"
+          tabindex="-1"
+          aria-selected="false"
+          data-testid="predictive-search-option"
+        >
+          <span class="predictive-search__option-text">
+            <span data-predictive-title></span>
+          </span>
+        </a>
+      </template>
+    </predictive-search>
+  </dialog>
+</modal-dialog>
