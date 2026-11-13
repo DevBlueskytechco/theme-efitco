@@ -1,18 +1,30 @@
 {% doc %}
-  Collection filter form (TE-6 AC2, AC4, ES1-T103 D5, D6). Reads the global
-  `collection`. Works without JavaScript: the form submits with GET and the drawer
-  is a native popover.
+  Collection filter form (TE-6 AC2, AC4, AC9, AC10; docs/ui-spec/collection.md §5).
+  Reads the global `collection`. Works without JavaScript: the form submits with
+  GET and the drawer is a native popover.
 
-  Below 64rem the `dialog popover` is a drawer, opened by collection-filter-open
-  in blocks/collection-products.liquid. From 64rem CSS turns it into the left
-  column and hides the open and close buttons. assets/collection-filters.js (BE
-  ES1-T110, ES1-T111) upgrades the drawer to showModal; its script tag goes in
-  this block, outside the partial.
+  Below 64rem the dialog is the shared `.drawer` (90%, 420 from 48rem), opened by
+  collection-filter-open in blocks/collection-products.liquid: header 72 with the
+  "Filters" h2 and a close button 48, a body that scrolls on its own, a sticky
+  footer with Clear all (only when a filter is applied) and "Show N products".
+  From 64rem CSS turns the same dialog into the static left column: no close
+  button, no status line; the footer keeps Clear all, and the submit button only
+  without JavaScript.
+
+  Layer: `<modal-dialog data-layer="filter">` (ADR 0007, layers.md). Without
+  JavaScript the dialog opens as a popover (popovertarget on the open and close
+  buttons). With JavaScript, BE (ES1-T110, assets/modal-dialog.js) opens it with
+  showModal (remove the popover attribute or close it first: showModal throws on
+  an open popover), closes on ×, Esc and the scrim, and returns focus to
+  collection-filter-open. "Show N products" closes the drawer when BE has already
+  applied the filters. CSS reads [open] and :popover-open the same way.
 
   The form sits outside the partial so its listeners survive an update. Partial
-  collection-filters (name must match assets/collection-filters.js) wraps the
-  groups and Clear all, inside the form. The sort select in
-  blocks/collection-products.liquid joins this form through its form attribute.
+  collection-filters wraps the status line, the groups and the footer, so the
+  "N filters applied · M products" line, "N selected" in each summary, Clear all
+  and "Show M products" all update with one refresh. M is collection.products_count
+  (after filtering). The sort select in blocks/collection-products.liquid joins
+  this form through its form attribute.
 
   No filters (collection.filters is empty): the dialog stays in the page with
   `hidden`, so the form and the partial still exist and sort still submits. The
@@ -24,10 +36,12 @@
   filtering) for shopify:collection:update (ES1-T104 #6). The form is novalidate:
   a price from the URL above range_max would otherwise block a submit silently
   inside the closed drawer. BE checks min and max before fetching (ES1-T111).
+  data-enhanced on <collection-filters> (BE): from 64rem the submit button hides.
 
   Test hooks: collection-filters (root), collection-filter-drawer,
-  collection-filter-close, collection-filter-form, collection-filter-apply,
-  collection-filter-clear, and the hooks of snippets/filter-group.liquid.
+  collection-filter-close, collection-filter-form, collection-filter-status,
+  collection-filter-apply, collection-filter-clear, and the hooks of
+  snippets/filter-group.liquid.
 
   Self-contained: callers must leave the body empty.
 
@@ -58,6 +72,13 @@
         endif
       endif
     endfor
+
+    # Clear all keeps the sort order (collection.md §7)
+    assign clear_url = collection.url
+    if collection.sort_by != blank
+      assign sort_param = collection.sort_by | url_encode
+      assign clear_url = clear_url | append: '?sort_by=' | append: sort_param
+    endif
   -%}
 
   <div class="collection-filters" data-testid="collection-filters" {{ block.shopify_attributes }}>
@@ -65,62 +86,85 @@
       <div class="collection-filters__hint">{{ 'blocks.collection_filters.no_filters' | t }}</div>
     {%- endif -%}
 
-    <dialog
-      class="collection-filters__drawer"
-      id="collection-filter-drawer"
-      popover
-      scroll-lock
-      aria-labelledby="collection-filter-title"
-      data-testid="collection-filter-drawer"
-      {% if collection.filters.size == 0 %}
-        hidden
-      {% endif %}
-    >
-      <div class="collection-filters__header">
-        <h2 class="collection-filters__title" id="collection-filter-title">
-          {{- 'blocks.collection_filters.title' | t -}}
-        </h2>
-        <button
-          class="collection-filters__close"
-          type="button"
-          popovertarget="collection-filter-drawer"
-          popovertargetaction="hide"
-          aria-label="{{ 'blocks.collection_filters.close' | t | escape }}"
-          data-testid="collection-filter-close"
-        >
-          {% render 'header-icon', name: 'close' %}
-        </button>
-      </div>
-
-      <form
-        id="collection-filter-form"
-        method="get"
-        action="{{ collection.url }}"
-        novalidate
-        data-collection-id="{{ collection.id }}"
-        data-collection-handle="{{ collection.handle | escape }}"
-        data-products-count="{{ collection.all_products_count }}"
-        data-testid="collection-filter-form"
+    <modal-dialog data-layer="filter">
+      <dialog
+        class="drawer collection-filters__drawer"
+        id="collection-filter-drawer"
+        popover
+        aria-labelledby="collection-filter-title"
+        data-testid="collection-filter-drawer"
+        {% if collection.filters.size == 0 %}
+          hidden
+        {% endif %}
       >
-        {% partial 'collection-filters' %}
-          <div class="collection-filters__groups">
-            {%- for filter in collection.filters -%}
-              {% render 'filter-group', filter: filter %}
-            {%- endfor -%}
+        <div class="drawer__header collection-filters__header">
+          <h2 class="drawer__title collection-filters__title" id="collection-filter-title">
+            {{- 'blocks.collection_filters.title' | t -}}
+          </h2>
+          <button
+            class="close-button collection-filters__close"
+            type="button"
+            popovertarget="collection-filter-drawer"
+            popovertargetaction="hide"
+            aria-label="{{ 'blocks.collection_filters.close' | t | escape }}"
+            data-testid="collection-filter-close"
+          >
+            {% render 'header-icon', name: 'close' %}
+          </button>
+        </div>
 
-            {%- if active_filter_count > 0 -%}
-              <a class="collection-filters__clear" href="{{ collection.url }}" data-testid="collection-filter-clear">
-                {{- 'blocks.collection_filters.clear_all' | t -}}
-              </a>
-            {%- endif -%}
-          </div>
-        {% endpartial %}
+        <form
+          class="collection-filters__form"
+          id="collection-filter-form"
+          method="get"
+          action="{{ collection.url }}"
+          novalidate
+          data-collection-id="{{ collection.id }}"
+          data-collection-handle="{{ collection.handle | escape }}"
+          data-products-count="{{ collection.all_products_count }}"
+          data-testid="collection-filter-form"
+        >
+          {% partial 'collection-filters' %}
+            {%- liquid
+              assign products_label = 'blocks.collection_products.results_count' | t: count: collection.products_count
+              assign status_label = products_label
+              if active_filter_count > 0
+                assign filters_label = 'blocks.collection_products.filters_applied' | t: count: active_filter_count
+                assign status_label = 'blocks.collection_filters.status' | t: filters: filters_label, products: products_label
+              endif
+            -%}
+            <div class="collection-filters__panel">
+              <div class="drawer__body collection-filters__body">
+                <p class="collection-filters__status" role="status" data-testid="collection-filter-status">
+                  {{- status_label -}}
+                </p>
 
-        <button class="button collection-filters__apply" type="submit" data-testid="collection-filter-apply">
-          {{- 'blocks.collection_filters.apply' | t -}}
-        </button>
-      </form>
-    </dialog>
+                <div class="collection-filters__groups">
+                  {%- for filter in collection.filters -%}
+                    {% render 'filter-group', filter: filter %}
+                  {%- endfor -%}
+                </div>
+              </div>
+
+              <div class="drawer__footer collection-filters__footer">
+                {%- if active_filter_count > 0 -%}
+                  <a
+                    class="button button--secondary collection-filters__clear"
+                    href="{{ clear_url }}"
+                    data-testid="collection-filter-clear"
+                  >
+                    {{- 'blocks.collection_filters.clear_all' | t -}}
+                  </a>
+                {%- endif -%}
+                <button class="button collection-filters__apply" type="submit" data-testid="collection-filter-apply">
+                  {{- 'blocks.collection_filters.show_results' | t: count: collection.products_count -}}
+                </button>
+              </div>
+            </div>
+          {% endpartial %}
+        </form>
+      </dialog>
+    </modal-dialog>
   </div>
 {%- endif -%}
 
