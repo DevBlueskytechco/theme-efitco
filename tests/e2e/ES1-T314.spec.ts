@@ -149,14 +149,36 @@ test.describe('ES1-T314 lớp (layers.md §4)', () => {
 
   test('ô nhập đang focus: không bật data-layer-open (thanh đáy giữ) nhưng chặn layers:idle tới khi rời ô', async ({ page }) => {
     await openPage(page);
-    const field = page.locator('footer input[type="email"], input[type="email"]').first();
+    // CI #204: selector 'input[type=email]' chung trúng ô ẩn (app trên store dev) → focus() không ăn.
+    // Bám data-testid của footer; footer tắt bản tin thì chèn 1 ô thử hiển thị.
+    let field = page.getByTestId('footer-newsletter-email');
+    if (!(await field.isVisible())) {
+      await page.evaluate(() => document.querySelector('main')!.insertAdjacentHTML('beforeend', '<input type="email" aria-label="t" data-testid="es1-t314-field">'));
+      field = page.getByTestId('es1-t314-field');
+    }
     await field.scrollIntoViewIfNeeded();
     const idle = await countIdle(page);
-    await field.focus();
-    await expect.poll(() => page.evaluate(() => document.activeElement?.matches('input'))).toBe(true);
+    await field.click();
+    await expect(field).toBeFocused();
     await expectFlag(page, 'data-layer-open', false);
     expect(await idle()).toBe(0);
     await field.blur();
+    await expect.poll(idle).toBe(1);
+  });
+
+  test('iframe đang focus (Inbox, video): chặn layers:idle, rời iframe → layers:idle', async ({ page }) => {
+    await openPage(page);
+    await page.evaluate(() => document.querySelector('main')!.insertAdjacentHTML('beforeend', '<iframe data-testid="es1-t314-frame" title="t" srcdoc="<button>b</button>"></iframe>'));
+    const frame = page.getByTestId('es1-t314-frame');
+    await frame.scrollIntoViewIfNeeded();
+    const idle = await countIdle(page);
+    await page.frameLocator('[data-testid="es1-t314-frame"]').getByRole('button').click();
+    await expect.poll(() => page.evaluate(() => document.activeElement?.tagName)).toBe('IFRAME');
+    await expectFlag(page, 'data-layer-open', false);
+    expect(await idle()).toBe(0);
+    // Rời iframe về trang: không có focusin ở trang, chỉ window focus
+    await page.evaluate(() => (document.activeElement as HTMLElement).blur());
+    await expect.poll(() => page.evaluate(() => document.activeElement?.tagName)).toBe('BODY');
     await expect.poll(idle).toBe(1);
   });
 

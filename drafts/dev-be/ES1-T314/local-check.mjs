@@ -11,7 +11,7 @@ const errs = [];
 p.on('pageerror', (e) => errs.push(e.message));
 p.on('console', (m) => m.type() === 'error' && errs.push(m.text()));
 await p.setContent(
-  '<html><body><page-layers data-inbox-selector="#ShopifyChat, #dummy-chat-button-iframe"></page-layers><main><input id=i><button id=t data-layer=x aria-expanded=false>t</button><div data-layer=o><dialog id=nm>x</dialog></div><dialog id=m>m</dialog></main></body></html>'
+  '<html><body><page-layers data-inbox-selector="#ShopifyChat, #dummy-chat-button-iframe"></page-layers><main><input id=i><button id=t data-layer=x aria-expanded=false>t</button><div data-layer=o><dialog id=nm>x</dialog></div><dialog id=m>m</dialog><iframe id=f title=f srcdoc="<button>b</button>"></iframe></main></body></html>'
 );
 await p.addScriptTag({ content: js, type: 'module' });
 await p.waitForFunction(() => customElements.get('page-layers'));
@@ -38,6 +38,8 @@ await ev(() => document.getElementById('nm').show()); await log('nonmodal show')
 await ev(() => document.getElementById('nm').close()); await log('nonmodal close');
 await p.focus('#i'); await log('focus input');
 await ev(() => document.activeElement.blur()); await log('blur input');
+await p.frameLocator('#f').locator('button').click(); await log('focus iframe');
+await ev(() => document.activeElement.blur()); await log('leave iframe');
 await ev(() => { const d = document.createElement('div'); d.id = 'ShopifyChat'; document.body.append(d); }); await log('inbox add');
 await ev(() => { const d = document.createElement('div'); d.id = 'shopify-pc__banner'; d.style.cssText = 'position:fixed;left:0;right:0;bottom:0;height:200px'; document.body.append(d); }); await log('banner 200');
 await ev(() => { document.getElementById('shopify-pc__banner').style.height = '260px'; }); await log('banner 260');

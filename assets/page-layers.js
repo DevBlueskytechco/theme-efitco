@@ -11,8 +11,8 @@ class PageLayers extends HTMLElement {
     this.mo = new MutationObserver(this.q);
     this.mo.observe(d.body, { childList: true, subtree: true, attributeFilter: ["open", "aria-expanded"] });
     this.ro = new ResizeObserver(this.q);
-    for (const t of ["focusin", "focusout"]) d.addEventListener(t, this.q, { signal });
-    addEventListener("blur", this.q, { signal }); // iframe focus
+    // blur/focus của window: vào, rời iframe
+    for (const t of ["focusin", "focusout", "blur", "focus"]) addEventListener(t, this.q, { signal });
     d.addEventListener("visitorConsentCollected", () => ((this.collected = true), this.q()), { signal });
     this.update();
   }
