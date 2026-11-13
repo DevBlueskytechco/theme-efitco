@@ -8,14 +8,20 @@
   Logo order (ADR 0011): the block logo, then the theme logo (Theme settings,
   Logo and favicon), then the shop name as text.
 
+  Dark 80px bar on every page (TE-1 AC9, foundation §3): dark background with
+  noise, light text and icons, white focus outline. It never overlays a hero
+  or banner; there is no transparent mode and no data-header-overlay hook.
+  The current page link (aria-current="page") is white with a 2px underline.
+
   Hooks:
-  - data-header-overlay: set on the root of a hero that opens the page. The
-    header then sits transparent over the hero, with light text.
-  - data-sticky: on the root when the sticky_header setting is on.
-  - data-scrolled, data-header-enhanced: set on the root by JS. Without
-    data-header-enhanced a header over a hero does not stick.
-  - header-sticky-sentinel: 80px element in layout/theme.liquid. It sits
-    outside the sticky container so it scrolls away with the page.
+  - data-sticky: on the root when the sticky_header setting is on. Only the
+    header container sticks; the announcement bar above scrolls away.
+  - data-scrolled: set on the root by JS once the header starts to stick; CSS
+    adds the shadow only, background and height stay the same.
+  - data-header-enhanced: still set by assets/header-sticky.js, no CSS reads it.
+  - header-sticky-sentinel: 1px element in layout/theme.liquid right before
+    the header container. It leaves the viewport when the header starts to
+    stick (after the announcement bar when there is one).
   - Partial region: cart-count.
   - header-search-link: a real link to the search page, so search works without
     JavaScript. The next element sibling must stay the search dialog of
