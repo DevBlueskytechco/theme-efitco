@@ -5,6 +5,9 @@
   collections.all. Steps 2 and 3 use placeholder copy (ES1-T135 #8).
   Step 1 has 3 options, step 2 has 2, step 3 has 4. quiz-outdoor and quiz-travel
   exist only to reach 4 options. Remove this file before a real store release.
+  Results come from collection te11-quiz (store-data TE11_QUIZ_COLLECTION, CTO 11/11
+  ES1-T178 M-A); results_popup is off so ES1-T139 keeps testing the inline panel,
+  the popup is on in templates/index.liquid.
 {% endcomment %}
 
 {%- liquid
@@ -21,6 +24,8 @@
 {% block 'container', id: 'te11-quiz', tag: 'div' %}
   {% block 'quiz',
     id: 'te11-figma',
+    collection: collections['te11-quiz'],
+    results_popup: false,
     eyebrow: 'Our most-loved feature',
     heading: 'Find Your Perfect Gear',
     subheading: 'Three questions. One shortlist.',
