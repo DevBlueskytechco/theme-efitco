@@ -36,7 +36,7 @@
   in that panel), data-tab-empty (empty message). The active style follows
   aria-selected once set, otherwise aria-current.
 
-  Loads assets/product-swatch.js (ES module, BE ES1-T52) when cards render.
+  Cards need no JavaScript: swatches are indicators (TE-3 AC2, ADR 0010).
   Self-contained: callers must leave the body empty.
 
   Test hooks: data-testid="featured-collection", "featured-collection-heading",
@@ -72,7 +72,6 @@
   assign image_sizes = '(min-width: 1280px) calc(1416px / ' | append: columns | append: '), (min-width: 768px) 33vw, 50vw'
 
   assign tab_count = 0
-  assign any_products = false
   assign first_source = nil
   assign first_body = ''
   assign tab_links = ''
@@ -114,7 +113,6 @@
 
   {%- capture tab_body -%}
     {%- if tab_source.products_count > 0 -%}
-      {%- assign any_products = true -%}
       <ul class="featured-collection__grid" role="list" data-testid="featured-collection-grid">
         {%- for item in tab_source.products limit: limit -%}
           {%- liquid
@@ -265,10 +263,6 @@
           {%- endfor -%}
         </ul>
       </div>
-    {%- endif -%}
-
-    {%- if any_products -%}
-      <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
     {%- endif -%}
 
     {%- if show_view_all and view_all_in_header == false -%}

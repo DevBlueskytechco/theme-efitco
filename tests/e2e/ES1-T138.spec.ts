@@ -140,10 +140,11 @@ test.describe('ES1-T138 TE-11 kết quả quiz', () => {
     await expect(tid(page, 'quiz-results-heading')).toHaveAttribute('tabindex', '-1');
   });
 
-  test('AC3 partial nằm ngoài form, product-swatch.js nạp ngoài partial', async ({ page }) => {
+  // ES1-T338 (TE-3-R2-BE2, ADR 0010): product-swatch.js đã gỡ khỏi quiz.
+  test('AC3 partial nằm ngoài form, không nạp product-swatch.js', async ({ page }) => {
     await page.goto(TE11);
     await expect(tid(page, 'quiz-form').getByTestId('quiz-results')).toHaveCount(0);
-    await expect(tid(page, 'quiz').locator('script[src*="product-swatch"]')).toHaveCount(1);
+    await expect(tid(page, 'quiz').locator('script[src*="product-swatch"]')).toHaveCount(0);
     await expect(tid(page, 'quiz-results').locator('script')).toHaveCount(0);
   });
 
