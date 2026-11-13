@@ -4,12 +4,18 @@ KHÔNG CHẮC: (1) task-split ghi "Show N products" đọc partial `collection-f
 
 AC: SRS TE-6 AC2, AC4 (0.5 → AC9, AC10). Spec: docs/ui-spec/collection.md §5, §10, §11. Plan: drafts/techlead/ES1-T307/task-split.md (TE-6-R2-FE3).
 
+## Sửa theo CI run 43505064156 (comment CTO 14/11)
+- ES1-T109 `AC4-markup 1280` null `.x`: `.collection-filters__form` đang `display: contents` (lượt trước, để giảm byte) nên form không có box. `toBeVisible` vẫn qua, nhưng `boundingBox()` trả null. Form giờ là `display: flex; flex: 1; flex-direction: column; min-block-size: 0`: dưới 64rem thân cuộn riêng, chân dính đáy như cũ; từ 64rem form là box của cột trái, nằm trái lưới. Markup, testid giữ nguyên, AC không đổi bố cục nên không cần `spec-updates.md`.
+- TC-06 (ES1-T366) thêm assertion: form có boundingBox, mép phải form ≤ mép trái `collection-products` ở 1280.
+- Bù byte: bỏ `inline-size: 100%` thừa của `.filter-group__price-input` (đã có `flex: 1 1 auto` + `min-inline-size: 0`).
+- 44px viết thẳng (gate-reviewer): theo quy ước sẵn có của base.css (44 chỗ, không có token 44). Thêm token là việc chung, ngoài PR này.
+
 ## Sửa theo CI run 43375808007 (comment CTO 13/11)
 - ES1-T109 nojs Clear all: `clear_url` chỉ giữ `sort_by` khi khác `collection.default_sort_by`; submit không JS gửi kèm sort mặc định (select `form=`) nên Clear all giờ về `collection.url` không query. Sort người mua chọn vẫn giữ (collection.md §7).
 - AC9 nhóm > 6 (24 thay vì 6): markup đúng 6/nhóm (`at_most: 6`); lỗi ở spec: `filter({ has: more.first() })` khớp mọi nhóm có "Show N more" (4 nhóm × 6). Spec giờ lấy `.first()` trên nhóm rồi đếm trong nhóm đó.
 - TC-01 `inline-size: 28rem`: chuỗi khớp `max-inline-size: 28rem` của `.cart-drawer__dialog` (cart, ES1-T95), không phải CSS lọc; CSS 28rem của drawer lọc đã gỡ. Spec giờ quét `28rem` trong mục CSS lọc + không còn rule `.collection-filters__drawer {`.
 - AC9 store spec: chọn sort `option:not([selected])` (khác mặc định) để kiểm Clear all giữ sort.
-- base.css (gzip, `gzip -c assets/base.css | wc -c`): develop 51 217 B → nhánh 51 202 B (−15, không tăng so với develop). Cách gỡ: comment ngắn lại, `.collection-filters__hint` gộp vào rule hint có sẵn, status/currency gộp vào nhóm muted, form + panel `display: contents` thay flex column, label nhóm + label option chung 1 rule, chuyển động chevron gộp vào khối motion chung, bỏ rule `[hidden]` thừa (dialog đóng/`hidden` đã `display: none`), bỏ focus-within riêng của ô giá (input dùng `:focus-visible` chung 2px currentcolor), lỗi giá icon inline 1em. critical.css 10 014 B (không đổi trong PR này). Trần 49 152 vẫn vượt từ develop: [Q] ES1-T454.
+- base.css (gzip, `gzip -c assets/base.css | wc -c`): develop 51 217 B → nhánh 51 202 B (−15, không tăng so với develop). Cách gỡ: comment ngắn lại, `.collection-filters__hint` gộp vào rule hint có sẵn, status/currency gộp vào nhóm muted, panel `display: contents` (form đã trả về flex column ở lượt 4), label nhóm + label option chung 1 rule, chuyển động chevron gộp vào khối motion chung, bỏ rule `[hidden]` thừa (dialog đóng/`hidden` đã `display: none`), bỏ focus-within riêng của ô giá (input dùng `:focus-visible` chung 2px currentcolor), lỗi giá icon inline 1em. critical.css 10 014 B (không đổi trong PR này). Trần 49 152 vẫn vượt từ develop: [Q] ES1-T454.
 
 ## Thay đổi
 
@@ -47,7 +53,7 @@ tests/e2e/ES1-T366.spec.ts (mới)
 
 ## Tự kiểm tra
 - `shopify theme check`: 0 lỗi, 23 warning (bằng trước khi sửa, không warning mới ở file của ticket).
-- `gzip -c assets/base.css | wc -c`: develop 51 217 B → nhánh 51 202 B (không tăng). `critical.css` 10 014 B, không đổi so với develop.
+- `gzip -c assets/base.css | wc -c`: lượt 3 đo develop 51 217 B → nhánh 51 202 B. Lượt 4 thêm 4 khai báo cho form, bỏ 1. Lượt này lệnh gzip, node, python bị chặn chờ duyệt nên chưa đo lại; CI/Orchestrator đo lại giúp. `critical.css` không đổi trong PR này.
 - Kiểm tĩnh TC-01 bằng node (cùng regex spec): 0 màu literal, 0 thuộc tính vật lý, 0 z-index số, không `28rem` trong mục lọc.
 - Không file JS trong diff. Locale JSON hợp lệ, không trùng key.
 - Không đổi `blocks/collection-products.liquid`, `templates/collection.liquid` (TE-6-R2-FE2). Các test ES1-T109 vẫn khớp hook: `collection-filter-apply` là submit, `collection-filter-clear` chỉ có khi đã lọc, mọi `collection-filter-group` mở, option là `<label>` có `.filter-option__count`.

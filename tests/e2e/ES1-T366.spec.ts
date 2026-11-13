@@ -190,6 +190,12 @@ test.describe('ES1-T366 tĩnh', () => {
     await expect(page.getByTestId('collection-filter-status')).toBeHidden();
     await expect(page.getByTestId('collection-filter-apply')).toBeVisible();
     expect(await page.getByTestId('fx-header').evaluate((el) => getComputedStyle(el).borderBlockEndColor)).toBe('rgb(26, 26, 26)');
+    // Form có box và nằm bên trái lưới (ES1-T109 AC4-markup đo boundingBox; display: contents trả null)
+    const formBox = await page.getByTestId('collection-filter-form').boundingBox();
+    const gridBox = await page.getByTestId('collection-products').boundingBox();
+    expect(formBox, 'form phải có box').not.toBeNull();
+    expect(gridBox).not.toBeNull();
+    expect(formBox!.x + formBox!.width).toBeLessThanOrEqual(gridBox!.x);
 
     await mount(page, 1280, { enhanced: true });
     await expect(page.getByTestId('collection-filter-apply')).toBeHidden();
