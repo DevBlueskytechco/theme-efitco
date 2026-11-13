@@ -138,6 +138,21 @@ test.describe('ES1-T337 store', () => {
     const row = await card!.getByTestId(T.swatches).evaluate(el => ({ gap: getComputedStyle(el).columnGap, over: el.scrollWidth - el.clientWidth }));
     expect(row.gap).toBe('4px');
     expect(row.over, 'hàng chỉ báo không tràn ngang card').toBeLessThanOrEqual(0);
+
+    // TE-3 TC-54 (D7): vùng chạm ::after 44 × 44, từ 1280 rộng 36; pill ::before giữ 32 × 16; tick là phần tử con
+    const minW = (page.viewportSize()?.width ?? 0) >= 1280 ? 36 : 44;
+    for (const sw of await card!.getByTestId(T.swatch).all()) {
+      const s = await sw.evaluate(el => {
+        const a = getComputedStyle(el, '::after');
+        const b = getComputedStyle(el, '::before');
+        return { aw: parseFloat(a.width), ah: parseFloat(a.height), bw: parseFloat(b.width), bh: parseFloat(b.height) };
+      });
+      expect(s.aw).toBeGreaterThanOrEqual(minW);
+      expect(s.ah).toBeGreaterThanOrEqual(44);
+      expect(Math.round(s.bw)).toBe(32);
+      expect(Math.round(s.bh)).toBe(16);
+    }
+    await expect(card!.locator(`[data-testid="${T.swatch}"][data-selected] .product-card__swatch-tick`)).toHaveCount(1);
   });
 
   test('AC13 VP2: sản phẩm > 4 màu có 3 chỉ báo + "+N"', async ({ page }) => {

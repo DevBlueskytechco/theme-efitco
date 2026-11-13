@@ -448,9 +448,10 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .offer-popup
   opacity: 0.6;
 }
 
-/* Swatch là chỉ báo (TE-3 AC2, AC6, AC13; foundation §9): pill 32 × 16 cách 4, aria-hidden,
-   không focus, không bấm, nên không có vùng chạm 44. ≤ 4 hiện hết, > 4 hiện 3 + "+N":
-   3 × 36 + "+N" vừa card 152 ở 360. Viền trong trắng 1px, đang chọn viền accent + dấu tick (Figma 1:186). */
+/* Swatch là chỉ báo (TE-3 AC2, AC6, AC13; foundation §9): pill 32 × 16 cách 4, aria-hidden, không focus.
+   ≤ 4 hiện hết, > 4 hiện 3 + "+N": 3 × 36 + "+N" vừa card 152 ở 360.
+   Viền trong trắng 1px, đang chọn viền accent + dấu tick (Figma 1:186).
+   ::before vẽ pill (ES1-T190), ::after là vùng chạm 44 × 44 / 36 × 44 từ 80rem (TE-3 AC6 D7), trong suốt, không đổi layout. */
 .product-card__swatches {
   display: flex;
   flex-wrap: wrap;
@@ -484,7 +485,19 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .offer-popup
   box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
-.product-card__swatch[data-selected]::after {
+.product-card__swatch::after {
+  position: absolute;
+  inset: calc(50% - 22px);
+  content: '';
+}
+
+@media (min-width: 80rem) {
+  .product-card__swatch::after {
+    inset-inline: calc(50% - 18px);
+  }
+}
+
+.product-card__swatch-tick {
   position: absolute;
   inset: 0;
   background-color: var(--color-accent);

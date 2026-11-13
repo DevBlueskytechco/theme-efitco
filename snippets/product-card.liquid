@@ -325,6 +325,9 @@
               style="--swatch-color: {{ value.swatch.color }};"
             {% endif %}
           >
+            {%- if forloop.index == selected_index -%}
+              <span class="product-card__swatch-tick"></span>
+            {%- endif -%}
             <span class="visually-hidden">{{ value.name | escape }}</span>
           </span>
         {%- endif -%}
