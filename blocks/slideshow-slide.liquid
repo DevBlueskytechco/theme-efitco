@@ -16,12 +16,18 @@
   empty slide with a hint, so the merchant can still select it. Turning off the
   slide with priority removes the h1 of the page.
 
+  Layout (TE-2 AC2, AC10; index-mobile-a §2, §9.2, index-1280 §2.1): the image
+  follows the focal point set on the file (--focal-point, object-position) and
+  never animates; only the text of the first slide fades in on load (CSS).
+  The overlay applies below 80rem only. Content alignment applies from 48rem;
+  below that the content is always aligned to the start edge.
+
   Test hooks: data-testid="slideshow-slide", "slideshow-image",
   "slideshow-video", "slideshow-heading", "slideshow-button-primary",
   "slideshow-button-secondary", "slideshow-slide-placeholder".
 
   @param {string} id - Unique slide id within the template, such as 'slide-1'
-  @param {boolean} [priority] - True on the first slide only: renders the h1 and loads its image eagerly with high fetch priority. Move this parameter when reordering slides.
+  @param {boolean} [priority] - True on the first slide only: renders the h1 and loads its image eagerly with high fetch priority. Other slides render the heading as a p with the same style. Move this parameter when reordering slides.
   @param {string} [default_eyebrow] - Sample text used when the eyebrow setting is empty
   @param {string} [default_heading] - Sample heading as HTML, used when the heading setting is empty
   @param {string} [default_subheading] - Sample text used when the subheading setting is empty
@@ -40,7 +46,7 @@
     assign slide_image = slide_video.preview_image
   endif
 
-  assign heading_tag = 'h2'
+  assign heading_tag = 'p'
   assign image_loading = 'lazy'
   assign image_fetchpriority = null
 
@@ -52,7 +58,10 @@
 
   assign button_url = block.settings.button_url | default: routes.all_products_collection_url
   assign button_2_url = block.settings.button_2_url | default: routes.all_products_collection_url
-  assign image_sizes = '(min-width: 80rem) 94vw, calc(100vw - 40px)'
+  # Below 80rem the cover image fits the height, so it is wider than the frame: 3/4 at 360 (291vw), 4/3 at 768 (164vw). Capped at 1920w.
+  assign image_sizes = '(min-width: 80rem) 100vw, (min-width: 48rem) 164vw, 291vw'
+
+  assign focal_point = slide_image.presentation.focal_point
 
   assign slide_eyebrow = block.settings.eyebrow | default: default_eyebrow
   assign slide_heading = block.settings.heading | escape | default: default_heading
@@ -83,7 +92,7 @@
   role="group"
   aria-roledescription="slide"
   data-alignment="{{ block.settings.content_alignment }}"
-  style="--overlay-opacity: {{ block.settings.overlay_opacity }}%;"
+  style="--overlay-opacity: {{ block.settings.overlay_opacity }}%;{% if focal_point != blank %} --focal-point: {{ focal_point.x }}% {{ focal_point.y }}%;{% endif %}"
   data-slide-id="{{ id }}"
   data-testid="slideshow-slide"
   {{ block.shopify_attributes }}
@@ -92,8 +101,8 @@
     <div class="slideshow__media" data-testid="slideshow-image">
       {% render 'image',
         image: slide_image,
-        width: 3596,
-        widths: '360, 540, 720, 1080, 1440, 1798, 2400, 3596',
+        width: 1920,
+        widths: '720, 1080, 1440, 1600, 1920',
         sizes: image_sizes,
         loading: image_loading,
         fetchpriority: image_fetchpriority
@@ -167,7 +176,8 @@
     {
       "type": "image_picker",
       "id": "image",
-      "label": "t:labels.slide_image"
+      "label": "t:labels.slide_image",
+      "info": "t:info.slide_image"
     },
     {
       "type": "video",
@@ -183,6 +193,7 @@
       "step": 5,
       "unit": "%",
       "label": "t:labels.slide_overlay_opacity",
+      "info": "t:info.slide_overlay_opacity",
       "default": 30
     },
     {
