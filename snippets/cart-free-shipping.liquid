@@ -1,14 +1,17 @@
 {% doc %}
-  Free shipping progress (TE-5 AC3). The threshold is the free_shipping_threshold
-  theme setting, in the shop currency. Below it: progress bar and the amount
-  left. At or above it: full bar and the reached message.
+  Free shipping progress (TE-5 AC3; mini-cart-quickview.md §1). The threshold is
+  the free_shipping_threshold theme setting, in the shop currency. Below it:
+  truck icon, "Spend {amount} more to unlock free shipping" (amount bold) and a
+  6px pill progress bar in the accent color. At or above it: check icon, the
+  reached sentence and a full bar in the badge-new color (icon and copy change,
+  not only the color).
 
-  Renders nothing when the threshold is 0, when the cart is empty, or when the
-  cart currency differs from the shop currency: Liquid has no exchange rate, so
-  no amount is better than a wrong one.
+  Renders nothing when the threshold is 0 (default), when the cart is empty, or
+  when the cart currency differs from the shop currency: Liquid has no exchange
+  rate, so no amount is better than a wrong one.
 
   Test hooks: cart-free-shipping, cart-free-shipping-progress,
-  cart-free-shipping-text.
+  cart-free-shipping-text. Class cart-free-shipping--reached when reached.
 
   @param {object} cart - The cart to measure
   @param {string} context - Where it renders, 'page' or 'drawer'. Part of the text id
@@ -26,14 +29,30 @@
 -%}
 
 {%- if show_bar -%}
-  {%- assign progress_value = cart.total_price | at_most: threshold -%}
-  <div class="cart-free-shipping" data-testid="cart-free-shipping">
-    <p id="cart-free-shipping-text-{{ context }}" class="cart-free-shipping__text" data-testid="cart-free-shipping-text">
-      {%- if cart.total_price < threshold -%}
-        {%- assign remaining = threshold | minus: cart.total_price | money -%}
-        {{- 'cart.free_shipping_remaining' | t: amount: remaining -}}
+  {%- liquid
+    assign progress_value = cart.total_price | at_most: threshold
+    assign reached = true
+    if cart.total_price < threshold
+      assign reached = false
+    endif
+  -%}
+  <div
+    class="cart-free-shipping{% if reached %} cart-free-shipping--reached{% endif %}"
+    data-testid="cart-free-shipping"
+  >
+    <span class="cart-free-shipping__icon">
+      {%- if reached -%}
+        {%- render 'status-icon', name: 'success' -%}
       {%- else -%}
+        {%- render 'status-icon', name: 'truck' -%}
+      {%- endif -%}
+    </span>
+    <p id="cart-free-shipping-text-{{ context }}" class="cart-free-shipping__text" data-testid="cart-free-shipping-text">
+      {%- if reached -%}
         {{- 'cart.free_shipping_reached' | t -}}
+      {%- else -%}
+        {%- assign remaining = threshold | minus: cart.total_price | money -%}
+        {{- 'cart.free_shipping_remaining_html' | t: amount: remaining -}}
       {%- endif -%}
     </p>
     <progress

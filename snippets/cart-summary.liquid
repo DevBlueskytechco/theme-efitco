@@ -1,14 +1,19 @@
 {% doc %}
-  Cart totals and the checkout button (TE-5 AC1, AC4, AC5): subtotal, order-level
-  automatic discounts, total, tax and duty note, checkout. Renders nothing when
-  the cart is empty. Shared by blocks/cart-page.liquid and
-  blocks/cart-drawer.liquid; render it inside their partial.
+  Cart totals and the checkout button (TE-5 AC1, AC4, AC5, AC14, AC15): subtotal,
+  order-level automatic discounts (tag icon + title, "-{amount}"), total, tax
+  note, checkout. Renders nothing when the cart is empty. Shared by
+  blocks/cart-page.liquid and blocks/cart-drawer.liquid; render it inside their
+  partial.
 
-  The tax note shows only when the market price includes taxes or duties
-  (cart.taxes_included, cart.duties_included).
+  Drawer (mini-cart-quickview.md §1, cart G3): the Subtotal row and the divider
+  show only when the cart has an order-level discount, otherwise only Total.
+  Cart page: Subtotal always shows.
 
-  Test hooks: cart-subtotal, cart-discounts, cart-discount, cart-total,
-  cart-tax-note, cart-checkout.
+  The tax note always shows: taxes_included / duties_included pick the matching
+  sentence, otherwise "Taxes and shipping calculated at checkout.".
+
+  Test hooks: cart-summary, cart-subtotal, cart-discounts, cart-discount,
+  cart-total, cart-tax-note, cart-checkout.
 
   @param {object} cart - The cart to total
   @param {string} context - Where it renders, 'page' or 'drawer'. Part of the form id
@@ -18,42 +23,58 @@
 {% enddoc %}
 
 {%- if cart.item_count > 0 -%}
-  {%- assign form_id = 'cart-form-' | append: context -%}
+  {%- liquid
+    assign form_id = 'cart-form-' | append: context
+    assign has_discounts = false
+    if cart.cart_level_discount_applications.size > 0
+      assign has_discounts = true
+    endif
+    assign show_subtotal = true
+    if context == 'drawer' and has_discounts == false
+      assign show_subtotal = false
+    endif
+  -%}
 
-  <div class="cart-summary">
-    <p class="cart-summary__row">
-      <span>{{ 'cart.subtotal' | t }}</span>
-      <span data-testid="cart-subtotal">{{ cart.items_subtotal_price | money }}</span>
-    </p>
+  <div class="cart-summary" data-testid="cart-summary">
+    {%- if show_subtotal -%}
+      <p class="cart-summary__row cart-summary__row--muted">
+        <span>{{ 'cart.subtotal' | t }}</span>
+        <span data-testid="cart-subtotal">{{ cart.items_subtotal_price | money }}</span>
+      </p>
+    {%- endif -%}
 
-    {%- if cart.cart_level_discount_applications.size > 0 -%}
+    {%- if has_discounts -%}
       <ul class="cart-summary__discounts" role="list" data-testid="cart-discounts">
         {%- for discount in cart.cart_level_discount_applications -%}
           {%- assign discount_amount = discount.total_allocated_amount | money -%}
-          <li class="cart-summary__row" data-testid="cart-discount">
-            <span>{{ discount.title | escape }}</span>
+          <li class="cart-summary__row cart-summary__discount" data-testid="cart-discount">
+            <span class="cart-summary__discount-name">
+              {%- render 'status-icon', name: 'tag' -%}
+              <span class="visually-hidden">{{ 'cart.discount_label' | t }}</span>
+              {{ discount.title | escape }}
+            </span>
             <span>{{ 'cart.discount_value' | t: amount: discount_amount }}</span>
           </li>
         {%- endfor -%}
       </ul>
     {%- endif -%}
 
-    <p class="cart-summary__row cart-summary__row--total">
+    <p class="cart-summary__row cart-summary__row--total{% if show_subtotal %} cart-summary__row--divided{% endif %}">
       <span>{{ 'cart.total' | t }}</span>
-      <span data-testid="cart-total">{{ cart.total_price | money }}</span>
+      <span class="cart-summary__total" data-testid="cart-total">{{ cart.total_price | money }}</span>
     </p>
 
-    {%- if cart.taxes_included or cart.duties_included -%}
-      <p class="cart-summary__note" data-testid="cart-tax-note">
-        {%- if cart.taxes_included and cart.duties_included -%}
-          {{- 'cart.taxes_and_duties_included' | t -}}
-        {%- elsif cart.taxes_included -%}
-          {{- 'cart.taxes_included' | t -}}
-        {%- else -%}
-          {{- 'cart.duties_included' | t -}}
-        {%- endif -%}
-      </p>
-    {%- endif -%}
+    <p class="cart-summary__note" data-testid="cart-tax-note">
+      {%- if cart.taxes_included and cart.duties_included -%}
+        {{- 'cart.taxes_and_duties_included' | t -}}
+      {%- elsif cart.taxes_included -%}
+        {{- 'cart.taxes_included' | t -}}
+      {%- elsif cart.duties_included -%}
+        {{- 'cart.duties_included' | t -}}
+      {%- else -%}
+        {{- 'cart.shipping_at_checkout' | t -}}
+      {%- endif -%}
+    </p>
 
     <button
       class="button cart-summary__checkout"
@@ -63,6 +84,7 @@
       data-testid="cart-checkout"
     >
       {{- 'cart.checkout' | t -}}
+      {%- render 'slideshow-icon', name: 'arrow' -%}
     </button>
   </div>
 {%- endif -%}
