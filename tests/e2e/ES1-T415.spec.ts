@@ -31,18 +31,18 @@ test.describe('ES1-T415 tĩnh', () => {
     });
   }
 
-  test('theme.liquid: standard-events.js, motion.js, page-layers.js mỗi file 1 thẻ, nằm cuối body sau cart-drawer', () => {
+  test('theme.liquid: standard-events.js, motion.js, page-layers.js, modal-dialog.js mỗi file 1 thẻ, nằm cuối body sau cart-drawer', () => {
     const liquid = read('layout/theme.liquid');
     const drawer = liquid.indexOf("block 'cart-drawer'");
     const end = liquid.indexOf('</body>');
-    for (const name of ['standard-events', 'motion', 'page-layers']) {
+    for (const name of ['standard-events', 'motion', 'page-layers', 'modal-dialog']) {
       const re = new RegExp(`<script src="\\{\\{ '${name}\\.js' \\| asset_url \\}\\}" type="module"></script>`, 'g');
       const hits = [...liquid.matchAll(re)];
       expect(hits, `${name}.js`).toHaveLength(1);
       expect(hits[0].index!, `${name}.js sau cart-drawer`).toBeGreaterThan(drawer);
       expect(hits[0].index!, `${name}.js trước </body>`).toBeLessThan(end);
     }
-    expect(moduleTags(liquid), 'layout chỉ có 3 thẻ module (thêm page-layers.js, ES1-T314)').toHaveLength(3);
+    expect(moduleTags(liquid), 'layout chỉ có 4 thẻ module (page-layers.js ES1-T314, modal-dialog.js ES1-T452)').toHaveLength(4);
   });
 });
 
