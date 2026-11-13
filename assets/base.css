@@ -9491,6 +9491,80 @@ video-card {
   }
 }
 
+/** Form chung tối thiểu (ES1-T407): comment bài viết, page.contact. Giao diện đầy đủ: ES1-T382, ES1-T383 */
+:is(.comment-form, .contact-form) {
+  display: grid;
+  gap: var(--space-4);
+  max-inline-size: 65ch;
+}
+
+.form-field {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.form-field__label {
+  font-weight: 600;
+}
+
+.form-field__input {
+  min-block-size: calc(var(--space-1) * 11);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-muted-light);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.form-field__input:hover {
+  border-color: var(--color-foreground);
+}
+
+.form-field__input:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.form-field__input[aria-invalid='true'] {
+  border: 2px solid var(--color-sale);
+}
+
+.form-field__hint {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.form-field__error {
+  color: var(--color-sale);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.form-status {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-inline-start: var(--space-1) solid var(--color-badge-new);
+  border-radius: var(--radius-input);
+  background-color: var(--color-background-alt);
+}
+
+.form-status--error {
+  border-inline-start-color: var(--color-sale);
+}
+
+.form-status:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.form-status__title {
+  font-weight: 600;
+}
+
+.form-status ul {
+  padding-inline-start: var(--space-5);
+}
+
 /* ==== Trang chủ theo Figma 1:359, khung 1920 (CTO 07/11). Số đo lấy từ snapshot, không làm tròn. ==== */
 :root { --icon-tick: url("data:image/svg+xml,%3Csvg width=%2212%22 height=%228%22 viewBox=%220 0 12 8%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E %3Cpath d=%22M10.6295 0.213693L4.00109 6.24463L1.37053 3.84679C1.21996 3.70996 1.01576 3.6331 0.802835 3.6331C0.58991 3.6331 0.385706 3.70996 0.235145 3.84679C0.0845843 3.98362 0 4.16919 0 4.36269C0 4.4585 0.0207662 4.55338 0.0611124 4.64189C0.101459 4.73041 0.160595 4.81084 0.235145 4.87859L3.4334 7.78507C3.50773 7.85317 3.59616 7.90723 3.6936 7.94412C3.79103 7.98101 3.89554 8 4.00109 8C4.10664 8 4.21115 7.98101 4.30858 7.94412C4.40602 7.90723 4.49445 7.85317 4.56878 7.78507L11.7649 1.24549C11.9154 1.10867 12 0.923093 12 0.729593C12 0.536093 11.9154 0.350518 11.7649 0.213693C11.6143 0.0768676 11.4101 0 11.1972 0C10.9842 0 10.78 0.0768676 10.6295 0.213693Z%22 fill=%22%23000%22/%3E %3C/svg%3E "); --icon-lock: url("data:image/svg+xml,%3Csvg width=%2212%22 height=%2216%22 viewBox=%220 0 12 16%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E %3Cpath d=%22M6 1.6C4.76421 1.6 3.75 2.68183 3.75 4V6.4H10.5C11.3284 6.4 12 7.11634 12 8V14.4C12 15.2837 11.3284 16 10.5 16H1.5C0.671574 16 0 15.2837 0 14.4V8C0 7.11634 0.671573 6.4 1.5 6.4H2.25V4C2.25 1.79817 3.93579 0 6 0C8.06421 0 9.75 1.79817 9.75 4C9.75 4.44183 9.41421 4.8 9 4.8C8.58579 4.8 8.25 4.44183 8.25 4C8.25 2.68183 7.23579 1.6 6 1.6ZM1.5 8V14.4H10.5V8H1.5Z%22 fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 fill=%22%23000%22/%3E %3C/svg%3E "); }
 body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
