@@ -154,6 +154,11 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .offer-popup
   --empty-state-max: 32rem;
   --close-button-size: calc(var(--space-1) * 12);
   --round-button-size: calc(var(--space-1) * 13);
+  /* Hàng ngang (foundation §11, HD3): card tối đa 336, review 456, video 264, tiến trình cao 2 */
+  --row-card-max: 21rem;
+  --row-card-review-max: 28.5rem;
+  --row-card-video: 16.5rem;
+  --row-progress-size: 0.125rem;
 }
 
 modal-dialog {
@@ -6057,31 +6062,13 @@ cart-drawer {
   }
 }
 
-/** Collection list (TE-15, Figma 1:395): 1 hàng cuộn ngang tràn tới mép màn hình, mobile theo ES1-T174.
-   Khối chiếm cả hàng của .block-container; padding bằng đúng lề để card đầu thẳng hàng tiêu đề */
-.collection-list {
-  --collection-list-inset: calc((100% - var(--content-width)) / 2);
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-5);
-  padding-block: var(--space-7);
-}
-
+/** Collection list (TE-15, Figma 1:395): hàng ngang trên dải tối. Khung hàng, nút, tiến trình, bề card: "Hàng ngang" */
 .collection-list--placeholder {
   margin-block: var(--space-7);
   padding: var(--space-4);
   outline: 1px dashed currentcolor;
   outline-offset: -1px;
   font-size: var(--font-size-sm);
-}
-
-.collection-list__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-4);
-  padding-inline: var(--collection-list-inset);
 }
 
 /* Figma 1:397: 48 / 58, letter-spacing -0.96 */
@@ -6093,95 +6080,6 @@ cart-drawer {
   letter-spacing: -0.02em;
   line-height: calc(58 / 48);
   text-wrap: balance;
-}
-
-/* Dưới 48rem không có nút (ES1-T174), vuốt là đủ */
-.collection-list__nav {
-  display: none;
-}
-
-.collection-list__button {
-  display: flex;
-  flex: none;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  border: 0;
-  border-radius: 50%;
-  padding: 0;
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  cursor: pointer;
-}
-
-/* display ở trên thắng thuộc tính hidden mà script gắn khi hết chỗ cuộn */
-.collection-list__button[hidden] {
-  display: none;
-}
-
-.collection-list__button--next {
-  background-color: var(--color-accent);
-  color: var(--color-accent-foreground);
-}
-
-.collection-list__button:hover {
-  background-color: color-mix(in srgb, var(--color-background) 85%, var(--color-foreground));
-}
-
-.collection-list__button--next:hover {
-  background-color: color-mix(in srgb, var(--color-accent) 85%, var(--color-foreground));
-}
-
-/* Nút Back chữ tối: viền mặc định currentcolor không thấy trên band tối */
-.collection-list__button:focus-visible {
-  outline-color: var(--color-accent);
-}
-
-.collection-list__button .slideshow-icon {
-  width: calc(var(--space-1) * 5);
-  height: calc(var(--space-1) * 5);
-}
-
-/* padding-block chừa chỗ cho viền focus của link, khung cuộn cắt cả chiều dọc; margin âm giữ nguyên nhịp */
-.collection-list__track {
-  display: flex;
-  gap: var(--space-4);
-  margin-block: calc(var(--space-1) * -1);
-  padding-block: var(--space-1);
-  padding-inline: var(--collection-list-inset);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-padding-inline: var(--collection-list-inset);
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  list-style: none;
-}
-
-.collection-list__track::-webkit-scrollbar {
-  display: none;
-}
-
-.collection-list__track:focus-visible {
-  outline-offset: -2px;
-}
-
-/* Không JS không có nút: thanh cuộn là dấu hiệu còn card khác (giống slideshow) */
-@media (scripting: none) {
-  .collection-list__track {
-    scrollbar-width: thin;
-  }
-
-  .collection-list__track::-webkit-scrollbar {
-    display: block;
-  }
-}
-
-.collection-card {
-  flex: 0 0 min(70vw, 336px);
-  min-inline-size: 0;
-  text-align: start;
-  scroll-snap-align: start;
 }
 
 .collection-card--placeholder {
@@ -6223,37 +6121,6 @@ cart-drawer {
 .collection-card__link:hover .collection-card__title {
   text-decoration: underline;
   text-underline-offset: 0.1em;
-}
-
-/* visibility giữ chỗ để không layout shift khi module nâng cấp; ẩn cũng bỏ khỏi thứ tự Tab */
-@media (min-width: 48rem) {
-  .collection-list__nav {
-    display: flex;
-    flex: none;
-    gap: var(--space-2);
-    min-block-size: 52px;
-    margin-inline-start: auto;
-    visibility: hidden;
-  }
-
-  .collection-list[data-enhanced] .collection-list__nav {
-    visibility: visible;
-  }
-
-  .collection-card {
-    flex-basis: min(40vw, 336px);
-  }
-}
-
-@media (min-width: 64rem) {
-  .collection-list {
-    gap: calc(var(--space-1) * 10);
-    padding-block: var(--space-8);
-  }
-
-  .collection-list__track {
-    gap: var(--space-5);
-  }
 }
 
 /** Shop by level (TE-15, Figma 1:464): cùng band với rich-text, 1 cột dưới 48rem, 3 cột từ 48rem (ES1-T174).
@@ -6454,29 +6321,13 @@ cart-drawer {
   }
 }
 
-/** Blog posts (TE-16, Figma 1:1022): 1 hàng cuộn ngang tràn tới mép màn hình, mobile theo ES1-T174.
-   Khối chiếm cả hàng của .block-container; padding bằng đúng lề để card đầu thẳng hàng tiêu đề */
-.blog-posts {
-  --blog-posts-inset: calc((100% - var(--content-width)) / 2);
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-5);
-  padding-block: var(--space-7);
-}
-
+/** Blog posts (TE-16, Figma 1:1022). Khung hàng, nút, tiến trình, bề card, lưới tĩnh 4 bài: "Hàng ngang" */
 .blog-posts--placeholder {
   margin-block: var(--space-7);
   padding: var(--space-4);
   outline: 1px dashed currentcolor;
   outline-offset: -1px;
   font-size: var(--font-size-sm);
-}
-
-.blog-posts__header {
-  display: grid;
-  gap: var(--space-3);
-  padding-inline: var(--blog-posts-inset);
 }
 
 /* Figma 1:1024: 16 / 20, letter-spacing 0.64 */
@@ -6499,34 +6350,6 @@ cart-drawer {
   letter-spacing: -0.02em;
   line-height: calc(58 / 48);
   text-wrap: balance;
-}
-
-/* Không có nút (Figma không có, 0 JS), nên giữ thanh cuộn: chuột không có bánh ngang vẫn tới được thẻ thứ 5.
-   padding-block chừa chỗ cho viền focus của link, khung cuộn cắt cả chiều dọc; margin âm giữ nguyên nhịp */
-.blog-posts__list {
-  display: flex;
-  gap: var(--space-4);
-  margin-block: calc(var(--space-1) * -1);
-  padding-block: var(--space-1);
-  padding-inline: var(--blog-posts-inset);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-padding-inline: var(--blog-posts-inset);
-  scroll-snap-type: x mandatory;
-  scrollbar-width: thin;
-  list-style: none;
-}
-
-.blog-posts__list:focus-visible {
-  outline-offset: -2px;
-}
-
-/* 252 x 336 ở 360, 307 x 410 ở 768, 336 x 448 từ 64rem (ES1-T174) */
-.article-card {
-  flex: 0 0 min(70vw, 336px);
-  min-inline-size: 0;
-  text-align: start;
-  scroll-snap-align: start;
 }
 
 /* Figma bo 16, tỉ lệ 3/4. overflow: clip (không phải scroll container) nên tên dài làm card cao thêm thay vì bị cắt. Nền tối giữ chữ trắng đọc được khi chưa có ảnh */
@@ -6625,10 +6448,6 @@ cart-drawer {
 }
 
 @media (min-width: 48rem) {
-  .article-card {
-    flex-basis: min(40vw, 336px);
-  }
-
   .article-card__content {
     padding-inline: var(--space-5);
     padding-block-end: var(--space-5);
@@ -6636,28 +6455,12 @@ cart-drawer {
 }
 
 @media (min-width: 64rem) {
-  .blog-posts {
-    gap: calc(var(--space-1) * 10);
-    padding-block: var(--space-8);
-  }
-
   .blog-posts--placeholder {
     margin-block: var(--space-8);
   }
-
-  .blog-posts__list {
-    gap: var(--space-5);
-  }
 }
 
-/** Testimonials (TE-7, Figma 1:885): dưới 48rem cuộn ngang, 48rem 2 cột, 80rem 3 cột, đúng 4 mục 4 cột */
-.testimonials {
-  display: grid;
-  gap: var(--space-5);
-  min-inline-size: 0;
-  padding-block: var(--space-7);
-}
-
+/** Testimonials (TE-7, Figma 1:885): hàng ngang mọi mốc (HD3). Khung hàng, nút, tiến trình, bề card: "Hàng ngang" */
 .testimonials--placeholder {
   margin: 0;
   padding-inline: var(--space-4);
@@ -6665,11 +6468,6 @@ cart-drawer {
   outline-offset: -1px;
   color: var(--color-muted-light);
   font-size: var(--font-size-sm);
-}
-
-.testimonials__header {
-  display: grid;
-  gap: var(--space-3);
 }
 
 .testimonials__eyebrow {
@@ -6693,28 +6491,8 @@ cart-drawer {
   text-wrap: balance;
 }
 
-/* Tràn tới mép màn hình để lộ card kế; margin âm bằng đúng lề nên trang không cuộn ngang */
-.testimonials__list {
-  display: flex;
-  gap: var(--space-4);
-  margin-block: 0;
-  margin-inline: calc(var(--page-margin) * -1);
-  padding-block: 0;
-  padding-inline: var(--page-margin);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-padding-inline: var(--page-margin);
-  scroll-snap-type: x mandatory;
-  list-style: none;
-}
-
-.testimonials__list:focus-visible {
-  outline-offset: -2px;
-}
-
 .testimonial-item {
   display: flex;
-  flex: 0 0 85%;
   flex-direction: column;
   min-inline-size: 0;
   overflow: hidden;
@@ -6723,10 +6501,6 @@ cart-drawer {
   color: var(--color-foreground);
   text-align: start;
   scroll-snap-align: start;
-}
-
-.testimonial-item:only-child {
-  flex-basis: 100%;
 }
 
 .testimonial-item--placeholder {
@@ -6760,12 +6534,20 @@ cart-drawer {
   gap: var(--space-2);
 }
 
+/* Dưới 80rem sao xuống hàng riêng dưới tên (TE-7 AC6, index-mobile-b §4); từ 80rem tên, Verified, sao 1 hàng */
 .testimonial-item__meta {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
   gap: var(--space-1) var(--space-3);
+}
+
+@media (min-width: 80rem) {
+  .testimonial-item__meta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
 }
 
 .testimonial-item__reviewer {
@@ -6871,60 +6653,6 @@ cart-drawer {
 
 .testimonial-item__product-link:hover {
   text-decoration: underline;
-}
-
-@media (min-width: 48rem) {
-  .testimonials__list {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: var(--space-5);
-    margin-inline: 0;
-    padding-inline: 0;
-    overflow-x: visible;
-    scroll-snap-type: none;
-  }
-}
-
-@media (min-width: 64rem) {
-  .testimonials {
-    gap: calc(var(--space-1) * 10);
-    padding-block: var(--space-8);
-  }
-}
-
-@media (min-width: 80rem) {
-  .testimonials__list {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .testimonials__list:has(> :nth-child(4):last-child) {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-/* CR-8, Figma 1:885: đúng 4 mục thì 4 card 456 tràn tới mép màn hình, cuộn bằng chuột và bàn phím.
-   Khối chiếm cả hàng của .block-container; padding bằng đúng lề để card đầu thẳng hàng tiêu đề. Không dùng 100vw vì tính cả thanh cuộn.
-   Mốc 120rem nằm ngoài 3 mốc của AGENTS.md: xem KHÔNG CHẮC trong PR ES1-T179 */
-@media (min-width: 120rem) {
-  .block-container > .testimonials:has(> .testimonials__list > :nth-child(4):last-child) {
-    grid-column: 1 / -1;
-  }
-
-  .testimonials:has(> .testimonials__list > :nth-child(4):last-child) > .testimonials__header {
-    padding-inline: calc((100% - var(--content-width)) / 2);
-  }
-
-  .testimonials__list:has(> :nth-child(4):last-child) {
-    display: flex;
-    padding-inline: calc((100% - var(--content-width)) / 2);
-    overflow-x: auto;
-    scroll-padding-inline: calc((100% - var(--content-width)) / 2);
-    scroll-snap-type: x proximity;
-  }
-
-  .testimonials__list:has(> :nth-child(4):last-child) > .testimonial-item {
-    flex: 0 0 456px;
-  }
 }
 
 /** Product finder quiz (TE-11, Figma 1:506): panel 60, 2 cột từ 64rem, thẻ trắng 32.
@@ -8348,17 +8076,7 @@ featured-product[data-design-mode] .featured-product__countdown {
   }
 }
 
-/** Video carousel (TE-13, Figma 1:817): 1 hàng cuộn ngang tràn tới mép màn hình, mobile theo ES1-T154 #8.
-   Khối chiếm cả hàng của .block-container; padding bằng đúng lề để thẻ đầu thẳng hàng tiêu đề */
-.video-carousel {
-  --video-carousel-inset: calc((100% - var(--content-width)) / 2);
-
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: calc(var(--space-1) * 10);
-  padding-block: var(--space-7);
-  text-align: start;
-}
+/** Video carousel (TE-13, Figma 1:817). Khung hàng, nút, tiến trình, bề card: "Hàng ngang" */
 
 .video-carousel--placeholder {
   margin-block: var(--space-7);
@@ -8371,7 +8089,6 @@ featured-product[data-design-mode] .featured-product__countdown {
 .video-carousel__header {
   display: grid;
   gap: var(--space-5);
-  padding-inline: var(--video-carousel-inset);
 }
 
 .video-carousel__row {
@@ -8455,31 +8172,6 @@ featured-product[data-design-mode] .featured-product__countdown {
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.625;
-}
-
-/* Không có nút (ES1-T154 #8): giữ thanh cuộn để chuột vẫn cuộn được. padding-block chừa chỗ cho viền focus */
-.video-carousel__list {
-  display: flex;
-  gap: var(--space-5);
-  margin-block: calc(var(--space-1) * -1);
-  padding-block: var(--space-1);
-  padding-inline: var(--video-carousel-inset);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-padding-inline: var(--video-carousel-inset);
-  scroll-snap-type: x mandatory;
-  scrollbar-width: thin;
-  list-style: none;
-}
-
-.video-carousel__list:focus-visible {
-  outline-offset: -2px;
-}
-
-.video-card-item {
-  flex: 0 0 70vw;
-  min-inline-size: 0;
-  scroll-snap-align: start;
 }
 
 .video-card-item--placeholder {
@@ -8637,17 +8329,7 @@ video-card {
   text-decoration: underline;
 }
 
-@media (min-width: 48rem) {
-  .video-card-item {
-    flex-basis: 264px;
-  }
-}
 
-@media (min-width: 64rem) {
-  .video-carousel {
-    padding-block: var(--space-8);
-  }
-}
 
 /** Gift card template */
 /* ES1-T384, docs/ui-spec/gift-card.md: dark bar, CSS card, white panel; QR 144 x 144 (Shopify >= 120) */
@@ -9496,7 +9178,7 @@ video-card {
 body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 .site-header .site-header__svg-search { width: 20px; height: 20px; }
 .site-header__icons svg:not(.site-header__svg-search) { width: 24px; height: 24px; }
-.slideshow__arrow .slideshow-icon, .collection-list__button .slideshow-icon { flex: none; width: 52px; height: 52px; }
+.slideshow__arrow .slideshow-icon { flex: none; width: 52px; height: 52px; }
 
 
 @media (min-width: 80rem) {
@@ -9561,18 +9243,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
   /* Danh mục */
   .block-container:has(> .collection-list), .block-container:has(> .slideshow) { background: var(--figma-1a1a1a) url('noise-dark.png'); }
-  .collection-list__header { align-items: flex-start; }
-  .collection-list__heading { margin: 0; }
-  .collection-list__nav { display: flex; gap: 8px; padding-block-start: 3px; }
-  [data-testid$='-collection-list'] .collection-list__button--prev[hidden] { display: inline-flex; }
-  .collection-list__button { display: inline-flex; width: 52px; height: 52px; padding: 0; border-radius: 50%; }
-  .collection-list__button--prev { background: var(--figma-ffffff); color: var(--figma-1a1a1a); border: 1px solid var(--figma-e5e5e5); }
-  .collection-list__button--next { background: var(--color-accent); color: var(--figma-ffffff); border: 0; }
-  .collection-list__button .slideshow-icon { width: 52px; height: 52px; flex: none; }
-  .collection-list__button--prev .slideshow-icon { margin: -1px; }
-  .collection-list__track { gap: 24px; }
-  .collection-card { flex: 0 0 336px; width: 336px; }
-  .collection-card__image, .collection-card__media { aspect-ratio: 336 / 220; border-radius: var(--figma-radius-16); }
+  .collection-card__image, .collection-card__media { border-radius: var(--figma-radius-16); }
 
   /* Intro + cấp độ */
   .shop-by-level__list { gap: 24px; }
@@ -9883,11 +9554,11 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   [data-reveal='in'] { opacity: 1; translate: 0 0; transition: opacity var(--motion-slow) var(--ease-out), translate var(--motion-slow) var(--ease-out); transition-delay: calc(var(--reveal-i, 0) * 60ms); }
 
   /* Nút */
-  .button, .slideshow__arrow, .collection-list__button, .featured-collection__tab { transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
+  .button, .slideshow__arrow, .featured-collection__tab { transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
   html[data-motion] .button:hover:not(:disabled) { translate: 0 -1px; box-shadow: 0 6px 16px color-mix(in srgb, var(--color-foreground) 18%, transparent); }
   html[data-motion] .button:active:not(:disabled) { translate: 0 0; scale: 0.98; }
-  html[data-motion] .slideshow__arrow:hover, html[data-motion] .collection-list__button:hover { scale: 1.06; }
-  html[data-motion] .slideshow__arrow:active, html[data-motion] .collection-list__button:active { scale: 0.94; }
+  html[data-motion] .slideshow__arrow:hover { scale: 1.06; }
+  html[data-motion] .slideshow__arrow:active { scale: 0.94; }
   html[data-motion] .button--link:hover:not(:disabled), html[data-motion] .button--link:active:not(:disabled) { translate: none; scale: none; box-shadow: none; }
   .slideshow-icon--arrow { transition: translate var(--motion-base) var(--ease-out); }
   html[data-motion] a:hover > .slideshow-icon--arrow, html[data-motion] button:hover > .slideshow-icon--arrow { translate: 3px 0; }
@@ -9971,77 +9642,145 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 /* ==== Review CTO 09/11 (tong_hop.docx, ES1-T250): sửa 7 lỗi + hàng cuộn có nút, thanh tiến trình, chuyển động. ==== */
 
 /* 2. Nút next, back: mặc định trắng, rê chuột mới cam */
-.slideshow__arrow--prev, .slideshow__arrow--next,
-.collection-list__button--prev, .collection-list__button--next {
+.slideshow__arrow--prev, .slideshow__arrow--next {
   background: var(--figma-ffffff);
   color: var(--figma-1a1a1a);
   border: 1px solid var(--figma-e5e5e5);
 }
-.slideshow__arrow--next .slideshow-icon, .collection-list__button--next .slideshow-icon { margin: -1px; }
+.slideshow__arrow--next .slideshow-icon { margin: -1px; }
 @media (hover: hover) {
-  .slideshow__arrow:hover, .collection-list__button:hover {
+  .slideshow__arrow:hover {
     background: var(--color-accent);
     color: var(--color-accent-foreground, var(--figma-ffffff));
     border-color: var(--color-accent);
   }
 }
-.slideshow__arrow:focus-visible, .collection-list__button:focus-visible {
+.slideshow__arrow:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
-/* 3. Hàng cuộn ngang: next, back ở đầu khối, thanh tiến trình thay thanh cuộn trình duyệt */
+/* 3. Hàng ngang (TE-7-R2-FE1; foundation §11; index-1280 §0 R4, §2.2; index-mobile-a §3, -b §3, §4, §6; HD3).
+   Danh mục, review, video, blog: gốc tràn màn (.full-width), tiêu đề và card đầu thẳng mép nội dung, hàng
+   tràn tới mép phải. 100cqi = bề gốc (container), không tính thanh cuộn như 100vw. Bề card --row-card theo mốc:
+   danh mục, blog 252 / 307 / ≈271 (1280) / 336 (1920); review 272 / 307 / 360 / 456; video 252 / 264.
+   1280: (100cqi − lề − n × gap) / (n + 0.3) để lộ ≥ 25% card kế. BE gắn data-static khi hàng vừa khung:
+   ẩn nút và tiến trình (task-split §4, TE-7-R2-BE1). Không JS: hàng vẫn vuốt, cuộn bàn phím, có thanh cuộn. */
+.collection-list, .testimonials, .blog-posts, .video-carousel {
+  --row-inset: max(var(--page-margin), (100cqi - var(--page-width)) / 2 + var(--page-margin));
+  --row-gap: var(--space-4);
+  --row-card: min(70cqi, var(--row-card-max));
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  min-inline-size: 0;
+  padding-block: var(--space-7);
+  text-align: start;
+}
+.collection-list, .testimonials, .blog-posts, .video-carousel__scroller { container-type: inline-size; }
+.testimonials { --row-card: calc((100cqi - 2 * var(--row-inset)) * 0.85); }
+.video-carousel { --row-card: min(70cqi, var(--row-card-video)); }
 scroll-buttons { display: block; }
 scroll-buttons.video-carousel__scroller { display: grid; grid-template-columns: minmax(0, 1fr); gap: inherit; }
-.carousel-nav { display: none; gap: 8px; flex: none; }
-@media (min-width: 48rem) { .carousel-nav { display: flex; } }
-scroll-buttons:not([data-enhanced]) .carousel-nav,
-scroll-buttons:not([data-scrollable]) .carousel-nav { visibility: hidden; }
-/* Nút tròn 52 của hàng cuộn: .round-button (khung lớp chung, TE-10-R2-FE2). Ở đầu hoặc cuối hàng nút mờ
-   đi thay vì biến mất, cụm nút không nhảy chỗ */
-.carousel-nav .round-button[hidden], [data-testid$='-collection-list'] .collection-list__button[hidden] { display: inline-flex; opacity: 0.35; pointer-events: none; }
-.testimonials__header, .blog-posts__header { grid-template-columns: minmax(0, 1fr) auto; column-gap: var(--space-4); align-items: end; }
+.collection-list__header, .testimonials__header, .blog-posts__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3) var(--space-4);
+  align-items: end;
+}
+.collection-list__header, .testimonials__header, .blog-posts__header, .video-carousel__header { padding-inline: var(--row-inset); }
 .testimonials__header > :not(.carousel-nav), .blog-posts__header > :not(.carousel-nav) { grid-column: 1; }
-.testimonials__header > .carousel-nav, .blog-posts__header > .carousel-nav { grid-column: 2; grid-row: 1 / span 2; align-self: end; }
+.carousel-nav { display: none; grid-column: 2; grid-row: 1; gap: var(--space-2); flex: none; }
+:is(.testimonials__eyebrow, .blog-posts__eyebrow) ~ .carousel-nav { grid-row: 1 / span 2; }
 .video-carousel__row > .carousel-nav { margin-inline-start: auto; }
 .video-carousel__link + .carousel-nav { margin-inline-start: 0; }
+@media (min-width: 48rem) { .carousel-nav { display: flex; } }
+/* visibility giữ chỗ (CLS 0) và bỏ nút khỏi thứ tự Tab, cây a11y */
+scroll-buttons:not([data-enhanced]) .carousel-nav,
+scroll-buttons[data-static] .carousel-nav { visibility: hidden; }
+/* Đầu/cuối hàng: aria-disabled mờ 0.35 qua .round-button (AC mới, chờ ES1-T335). hidden của scroll-buttons.js hiện tại
+   vẫn ẩn nút (ES1-T184, T185, T220) nhưng giữ chỗ để nút kia không nhảy */
+.carousel-nav .round-button[hidden] { display: inline-flex; visibility: hidden; }
+/* Dải tối (danh mục): nút trắng viền trắng, focus trắng; tiến trình trắng 12% / thumb trắng (foundation §6, §11) */
+.block-container--dark .round-button { border-color: var(--color-background); }
+.block-container--dark .round-button:focus-visible { outline-color: var(--color-background-dark-foreground); }
 
-/* Thanh tiến trình nằm trong khoảng đệm đáy có sẵn của khối (absolute), không thêm chiều cao: trang giữ đúng
-   13300 của Figma 1:359 (ES1-T275). Cách hàng card 20px (đệm 48) và 40px từ 64rem (đệm 120 theo Figma). */
-.collection-list, .video-carousel, .testimonials, .blog-posts { position: relative; }
+.collection-list__track, .testimonials__list, .blog-posts__list, .video-carousel__list {
+  display: flex;
+  gap: var(--row-gap);
+  margin: calc(var(--space-1) * -1) 0;
+  padding-block: var(--space-1);
+  padding-inline: var(--row-inset);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--row-inset);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  list-style: none;
+}
+:is(.collection-list__track, .testimonials__list, .blog-posts__list, .video-carousel__list)::-webkit-scrollbar { display: none; }
+:is(.collection-list__track, .testimonials__list, .blog-posts__list, .video-carousel__list):focus-visible { outline-offset: -2px; }
+/* Không JS không có nút, tiến trình: thanh cuộn là dấu hiệu còn card và để chuột kéo được */
+@media (scripting: none) {
+  :is(.collection-list__track, .testimonials__list, .blog-posts__list, .video-carousel__list) { scrollbar-width: thin; }
+  :is(.collection-list__track, .testimonials__list, .blog-posts__list, .video-carousel__list)::-webkit-scrollbar { display: block; }
+}
+.collection-card, .testimonial-item, .article-card, .video-card-item {
+  flex: 0 0 var(--row-card);
+  min-inline-size: 0;
+  text-align: start;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 48rem) {
+  .collection-list, .testimonials, .blog-posts { --row-card: min(40cqi, var(--row-card-max)); }
+  .video-carousel { --row-card: var(--row-card-video); }
+}
+@media (min-width: 64rem) {
+  .collection-list, .testimonials, .blog-posts, .video-carousel { gap: calc(var(--space-1) * 10); padding-block: var(--space-8); }
+}
+@media (min-width: 80rem) {
+  .collection-list, .testimonials, .blog-posts, .video-carousel { --row-gap: var(--space-5); }
+  .collection-list, .blog-posts { --row-card: min(var(--row-card-max), (100cqi - var(--row-inset) - 4 * var(--row-gap)) / 4.3); }
+  .testimonials { --row-card: min(var(--row-card-review-max), (100cqi - var(--row-inset) - 3 * var(--row-gap)) / 3.3); }
+  /* Blog ≤ 4 bài (Liquid gắn blog-posts--grid): lưới tĩnh 4 cột 292 (1280) / 336 (1920), không nút, không tiến trình */
+  .blog-posts--grid .blog-posts__list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
+  .blog-posts--grid :is(.carousel-nav, .carousel-progress) { display: none; }
+}
+
+/* Thanh tiến trình cao 2, cách hàng 32, nằm trong đệm đáy của khối (absolute): không thêm chiều cao, không CLS */
 .carousel-progress {
   position: absolute;
-  inset-block-end: calc(var(--space-7) - 22px);
-  inset-inline: 0;
-  height: 2px;
+  inset-block-end: calc(var(--space-7) - var(--space-6) - var(--row-progress-size));
+  inset-inline: var(--row-inset);
+  height: var(--row-progress-size);
   margin: 0;
   overflow: hidden;
   border-radius: var(--figma-radius-2);
-  background: var(--figma-e5e5e5);
+  background: var(--color-border);
   visibility: hidden;
 }
 @media (min-width: 64rem) {
-  .carousel-progress { inset-block-end: 78px; }
+  .carousel-progress { inset-block-end: calc(var(--space-8) - var(--space-6) - var(--row-progress-size)); }
 }
-scroll-buttons[data-scrollable] .carousel-progress { visibility: visible; }
-.testimonials > .carousel-progress { inset-inline: max(0px, (100% - var(--content-width)) / 2); }
-.blog-posts > .carousel-progress { inset-inline: var(--blog-posts-inset); }
-.video-carousel .carousel-progress { inset-inline: var(--video-carousel-inset); }
-.collection-list > .carousel-progress { inset-inline: calc((100% - var(--content-width)) / 2); background: var(--figma-white-12); }
+/* Video: container-type của khung cuộn (contain: layout) làm khung này thành khối chứa, đáy khung = đáy card */
+.video-carousel__scroller > .carousel-progress { inset-block-end: calc(var(--space-6) * -1 - var(--row-progress-size)); }
+scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility: visible; }
 .carousel-progress__thumb {
   position: absolute;
   inset-block: 0;
   inset-inline-start: 0;
   width: calc(var(--scroll-size, 1) * 100%);
   border-radius: inherit;
-  background: var(--figma-1a1a1a);
+  background: var(--color-foreground);
   translate: calc(var(--scroll-pos, 0) * (1 / var(--scroll-size, 1) - 1) * 100%) 0;
 }
-.collection-list > .carousel-progress .carousel-progress__thumb { background: var(--figma-ffffff); }
-scroll-buttons[data-enhanced] [data-scroll-track] { scrollbar-width: none; }
-scroll-buttons[data-enhanced] [data-scroll-track]::-webkit-scrollbar { display: none; }
+.block-container--dark .carousel-progress { background: color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent); }
+.block-container--dark .carousel-progress__thumb { background: var(--color-background-dark-foreground); }
 @media (pointer: fine) {
-  scroll-buttons[data-scrollable] [data-scroll-track] { cursor: grab; }
+  scroll-buttons[data-enhanced]:not([data-static]) [data-scroll-track] { cursor: grab; }
 }
 [data-scroll-track][data-dragging] { cursor: grabbing; scroll-snap-type: none; scroll-behavior: auto; user-select: none; }
 [data-scroll-track][data-dragging] * { pointer-events: none; }

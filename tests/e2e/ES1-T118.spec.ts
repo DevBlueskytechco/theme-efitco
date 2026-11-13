@@ -90,24 +90,27 @@ test.describe('ES1-T118 TE-7 testimonials', () => {
     await expect.poll(() => list.evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
   });
 
-  test('AC1 768: 2 cột; 1280: lưới không cuộn, 3 cột, đúng 4 mục thì 4 cột', async ({ page }) => {
-    await page.setViewportSize({ width: 768, height: 900 });
-    await page.goto(TE7);
-    const figma = tid(band(page, 'te7-testimonials'), 'testimonials-list');
-    const six = tid(band(page, 'te7-testimonials-six'), 'testimonials-list');
-    expect(await columnCount(figma)).toBe(2);
-    expect(await columnCount(six)).toBe(2);
-
-    await page.setViewportSize({ width: 1280, height: 900 });
-    expect(await columnCount(figma)).toBe(4);
-    expect(await columnCount(six)).toBe(3);
-    for (const list of [figma, six]) {
-      const state = await list.evaluate((el) => ({
-        snap: getComputedStyle(el).scrollSnapType,
-        scrollable: el.scrollWidth > el.clientWidth,
-      }));
-      expect(state.scrollable).toBeFalsy();
-      expect(state.snap).toBe('none');
+  // ES1-T334: TE-7 AC1/AC6 (SRS 0.5) đổi lưới 2/3/4 cột sang hàng ngang ở mọi mốc (drafts/dev-fe/ES1-T334/spec-updates.md §1).
+  test('AC1, AC6 768 và 1280: hàng ngang, card 307 / 360, lộ ≥ 25% card kế', async ({ page }) => {
+    for (const [width, card] of [[768, 307.2], [1280, 360]] as const) {
+      await page.setViewportSize({ width, height: 900 });
+      await page.goto(TE7);
+      for (const id of ['te7-testimonials', 'te7-testimonials-six']) {
+        const list = tid(band(page, id), 'testimonials-list');
+        const state = await list.evaluate((el) => ({
+          display: getComputedStyle(el).display,
+          snap: getComputedStyle(el).scrollSnapType,
+          scrollable: el.scrollWidth > el.clientWidth,
+        }));
+        expect(state.display).toBe('flex');
+        expect(state.snap).toContain('x');
+        expect(state.scrollable).toBeTruthy();
+        const boxes = await tid(band(page, id), 'testimonial-item').evaluateAll((els) =>
+          els.map((el) => el.getBoundingClientRect()).map((r) => ({ x: r.left, w: r.width })),
+        );
+        expect(boxes[0].w).toBeCloseTo(card, 0);
+        if (width === 1280) expect(1280 - boxes[3].x, 'lộ ≥ 25% card 4').toBeGreaterThanOrEqual(card * 0.25);
+      }
     }
   });
 
