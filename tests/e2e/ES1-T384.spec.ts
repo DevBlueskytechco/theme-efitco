@@ -132,6 +132,7 @@ test.describe('ES1-T384 store', () => {
 
   test('404: axe 0 lỗi serious/critical (AC16)', async ({ page }) => {
     await page.goto('/pages/es1-t384-khong-co');
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('main').analyze();
     expect(violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? '')).map((v) => v.id)).toEqual([]);
   });
@@ -159,6 +160,7 @@ test.describe('ES1-T384 store', () => {
     }
     await expect(page.getByTestId('password-input')).toBeVisible();
     await expect(page.getByTestId('password-toggle')).toBeHidden();
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).analyze();
     expect(violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? '')).map((v) => v.id)).toEqual([]);
     await context.close();
