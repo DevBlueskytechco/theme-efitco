@@ -1,9 +1,17 @@
 {% doc %}
   Renders customer reviews: eyebrow, heading and a list of testimonial-item
-  blocks. No JavaScript: under 48rem the list scrolls sideways with scroll-snap
-  and takes keyboard focus, from 48rem it is a grid, and from 120rem exactly 4
-  reviews are 456px cards that run past the viewport edge and scroll sideways with
-  mouse and keyboard (assets/base.css).
+  blocks in one horizontal row at every width (TE-7 AC1, AC6, HD3): cards 272 at
+  360, 307 at 768, 360 at 1280 (next card shows at least 25%), 456 at 1920. The row
+  runs to the viewport edge and scrolls with scroll-snap, touch and keyboard
+  without JavaScript (assets/base.css, "Hàng ngang").
+
+  Buttons and progress line: snippets/carousel-nav, snippets/carousel-progress.
+  Hidden below 48rem, until assets/scroll-buttons.js sets data-enhanced, and when
+  the row fits (data-static, set by the script, TE-7-R2-BE1).
+
+  JavaScript hooks: custom element scroll-buttons (root), data-enhanced and
+  data-static (root), data-lazy-module (root), data-scroll-track (list),
+  data-scroll-prev, data-scroll-next, data-scroll-progress.
 
   The parent cannot read its children: the body is a rendered string, so columns
   come from CSS and adding a review means adding one line in the template. When
@@ -16,7 +24,8 @@
   it goes through escape_once.
 
   Test hooks: data-testid="testimonials", "testimonials-heading",
-  "testimonials-list", "testimonials-placeholder".
+  "testimonials-nav", "testimonials-prev", "testimonials-next",
+  "testimonials-list", "carousel-progress", "testimonials-placeholder".
 
   @param {string} [id] - Static block id, needed when a template has more than one testimonials block
   @param {string} [default_eyebrow] - Sample text used when the eyebrow setting is empty
@@ -41,7 +50,7 @@
 
 {%- if items != blank -%}
   <scroll-buttons
-    class="testimonials"
+    class="testimonials full-width"
     {% if id != blank %}
       data-testimonials-id="{{ id }}"
     {% endif %}
