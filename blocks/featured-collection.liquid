@@ -50,6 +50,7 @@
   @param {string} [default_tab_2_collection] - Collection handle for tab 2 when its setting is empty. Empty: no fallback
   @param {string} [default_tab_3_collection] - Collection handle for tab 3 when its setting is empty. Empty: no fallback
   @param {string} [default_tab_4_collection] - Collection handle for tab 4 when its setting is empty. Empty: no fallback
+  @param {string} [view_all_url] - Destination of the View all link, such as routes.all_products_collection_url on the 404 page; the label then reads "View All Products". Empty: the first tab's collection
 
   @example
   {% block 'container', id: 'home-featured-collection', tag: 'div' %}
@@ -110,12 +111,6 @@
     endif
 
     assign tab_count = tab_count | plus: 1
-
-    # The same product can sit in 2 tabs: input ids must stay unique after a clone
-    assign card_id_prefix = block.id
-    if tab_count > 1
-      assign card_id_prefix = block.id | append: '-tab-' | append: tab_count
-    endif
   -%}
 
   {%- capture tab_body -%}
@@ -135,7 +130,6 @@
             {% render 'product-card',
               product: card_product,
               variant: card_variant,
-              id_prefix: card_id_prefix,
               sizes: image_sizes,
               loading: 'lazy'
             %}
@@ -206,10 +200,16 @@
 {%- if show_view_all -%}
   {%- assign collection_title = source.title | escape -%}
   {%- capture view_all_link -%}
-    <a class="button button--secondary featured-collection__view-all" href="{{ source.url }}" data-testid="featured-collection-view-all">
-      {{- 'blocks.featured_collection.view_all' | t -}}
-      <span class="visually-hidden"> {{ 'blocks.featured_collection.view_all_suffix' | t: collection: collection_title }}</span>
-    </a>
+    {%- if view_all_url != blank -%}
+      <a class="button button--secondary featured-collection__view-all" href="{{ view_all_url }}" data-testid="featured-collection-view-all">
+        {{- 'blocks.featured_collection.view_all_products' | t -}}
+      </a>
+    {%- else -%}
+      <a class="button button--secondary featured-collection__view-all" href="{{ source.url }}" data-testid="featured-collection-view-all">
+        {{- 'blocks.featured_collection.view_all' | t -}}
+        <span class="visually-hidden"> {{ 'blocks.featured_collection.view_all_suffix' | t: collection: collection_title }}</span>
+      </a>
+    {%- endif -%}
   {%- endcapture -%}
 {%- endif -%}
 

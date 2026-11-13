@@ -106,13 +106,28 @@ h3 {
   font-size: var(--font-size-h3);
 }
 
+/* foundation §28: h4–h6 600, 20/18/16+uppercase */
+h4,
+h5,
+h6 {
+  font-family: var(--font-primary--family);
+  font-style: normal;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
 h4 {
+  font-size: calc(var(--font-size-base) * 1.25);
+}
+
+h5 {
   font-size: var(--font-size-lg);
 }
 
-h5,
 h6 {
   font-size: var(--font-size-base);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 small {
@@ -128,34 +143,70 @@ a {
   outline-offset: 2px;
 }
 
-/** Announcement bar: inline so the bar above the header paints without waiting for base.css */
+/** Announcement bar (ui-spec announcement-bar.md): nền tối + noise liền header, cao ≥ 44, không dính */
 .announcement-bar {
   display: grid;
   grid-template-columns: var(--content-grid);
-  background-color: var(--color-background-dark);
+  border-block-end: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent);
+  background: var(--color-background-dark) url('noise-dark.png');
   color: var(--color-background-dark-foreground);
   font-size: var(--font-size-sm);
-  line-height: var(--line-height-body);
+  font-weight: 500;
+  line-height: calc(var(--space-1) * 5);
   text-align: center;
 }
 
 .announcement-bar__text {
   grid-column: 2;
-  padding-block: var(--space-2);
+  padding-block: var(--space-3);
 }
 
+/* Vùng chạm 44 không tăng chiều cao bar */
 .announcement-bar__link {
   display: inline-block;
-  min-height: 24px;
+  margin-block: calc(-1 * var(--space-3));
+  padding-block: var(--space-3);
   color: inherit;
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.2em;
 }
 
-.announcement-bar--placeholder {
-  background-color: var(--color-background-alt);
-  color: var(--color-muted-light);
-  outline: 1px dashed var(--color-border);
-  outline-offset: -1px;
+.announcement-bar__link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.announcement-bar__link:focus-visible {
+  outline-color: var(--color-background-dark-foreground);
+  outline-offset: -2px;
+}
+
+.announcement-bar__link .slideshow-icon {
+  display: inline-block;
+  inline-size: var(--space-4);
+  block-size: auto;
+  margin-inline-start: var(--space-2);
+  vertical-align: middle;
+}
+
+/* Skip link: phần tử đầu tiên nhận Tab, chỉ hiện khi có focus (TE-1 AC14) */
+.skip-link {
+  position: absolute;
+  inset-block-start: var(--space-2);
+  inset-inline-start: var(--space-2);
+  z-index: var(--layer-toast);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-button);
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+  font-weight: 600;
+}
+
+.skip-link:not(:focus) {
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
 }
 
 .visually-hidden {
@@ -167,17 +218,26 @@ a {
   white-space: nowrap;
 }
 
-/** Header: mobile-first, nav ngang từ 80rem, dưới đó là drawer */
+/** Header tối mọi trang (TE-1 AC9, foundation §3): không đè ảnh, nền không đổi khi cuộn; nav ngang từ 80rem, dưới đó drawer (CSS drawer ở base.css) */
 .site-header {
-  --header-foreground: var(--color-foreground);
-  --header-on-foreground: var(--color-background);
-  --header-background: var(--color-background);
+  --header-foreground: var(--color-background-dark-foreground);
+  --header-on-foreground: var(--color-background-dark);
+  --header-background: var(--color-background-dark);
   --icon-stroke-width: 1.5;
 
   display: grid;
   grid-template-columns: var(--content-grid);
-  background-color: var(--header-background);
+  background: var(--header-background) url('noise-dark.png');
   color: var(--header-foreground);
+}
+
+/* Focus trên thanh tối: trắng (accent / dark 3.48); panel trắng bên trong giữ currentcolor */
+.site-header :focus-visible {
+  outline-color: var(--header-foreground);
+}
+
+.site-header :is(.site-header__submenu, .site-header__drawer-panel) :focus-visible {
+  outline-color: currentcolor;
 }
 
 .site-header__inner {
@@ -320,63 +380,6 @@ details[open] > .site-header__link svg {
   text-align: center;
 }
 
-/* Giữ chỗ khi summary thành backdrop fixed */
-.site-header__drawer {
-  flex: none;
-  width: 2.75rem;
-  height: 2.75rem;
-}
-
-/* Bấm backdrop là đóng, kể cả không JS */
-.site-header__drawer[open] > summary {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  background-color: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
-}
-
-.site-header__drawer[open] > summary svg {
-  visibility: hidden;
-}
-
-.site-header__drawer-panel {
-  position: fixed;
-  inset-block: 0;
-  inset-inline-start: 0;
-  z-index: 2;
-  width: min(22rem, 100vw - 3.5rem);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--space-2) var(--space-4) var(--space-6);
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-}
-
-.site-header__drawer-close {
-  display: flex;
-  margin-inline-start: auto;
-}
-
-@media (scripting: none) {
-  .site-header__drawer-close {
-    display: none;
-  }
-}
-
-.site-header__drawer-menu > li {
-  border-block-end: 1px solid var(--color-border);
-}
-
-.site-header__drawer-link {
-  justify-content: space-between;
-  font-size: var(--font-size-base);
-}
-
-.site-header__drawer-submenu {
-  padding-block-end: var(--space-2);
-  padding-inline-start: var(--space-4);
-}
-
 @media (min-width: 80rem) {
   .site-header__inner {
     gap: var(--space-5);
@@ -391,61 +394,43 @@ details[open] > .site-header__link svg {
   }
 }
 
+/* 1px trước container header: rời khung nhìn khi header bắt đầu dính; margin âm giữ bố cục */
 .header-sticky-sentinel {
-  position: absolute;
-  inset-block-start: 0;
-  width: 1px;
-  height: 80px;
+  height: 1px;
+  margin-block-end: -1px;
   pointer-events: none;
 }
 
+/* Thang z: --layer-* trong base.css (ADR 0007) */
 .block-container:has(> .site-header) {
-  z-index: 10;
+  z-index: var(--layer-header);
 }
 
+/* Announcement bar ở container trước nên cuộn đi; chỉ header dính */
 .block-container:has(> .site-header[data-sticky]) {
   position: sticky;
   inset-block-start: 0;
 }
 
-/* Hero đầu trang: đè lên hero; không JS thì không sticky */
-body:has(main > :first-child [data-header-overlay]) .block-container:has(> .site-header) {
-  margin-block-end: calc(-1 * var(--header-height));
+/* Màn thấp: header thôi dính (TE-10 AC8, layers §2.5) */
+@media (max-height: 30rem) {
+  .block-container:has(> .site-header[data-sticky]) {
+    position: relative;
+  }
 }
 
-body:has(main > :first-child [data-header-overlay]) .block-container:has(> .site-header:not([data-header-enhanced])) {
-  position: relative;
-}
-
-body:has(main > :first-child [data-header-overlay]) .site-header:not([data-scrolled]) {
-  --header-foreground: var(--color-background-dark-foreground);
-  --header-on-foreground: var(--color-background-dark);
-  --header-background: transparent;
-}
-
+/* Đã dính: giữ nền, thêm bóng, không đổi chiều cao */
 .site-header[data-scrolled] {
-  box-shadow: 0 1px var(--space-2) color-mix(in srgb, var(--color-foreground) 12%, transparent);
+  box-shadow: 0 1px var(--space-2) color-mix(in srgb, var(--color-foreground) 24%, transparent);
 }
 
 @media (prefers-reduced-motion: no-preference) {
   .site-header {
-    transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    transition: box-shadow var(--motion-base) var(--ease-out);
   }
 }
 
-/** Block container layout utilities */
-
-/**
- * Setup a grid that enables both full-width and constrained layouts
- * depending on the class of the child elements.
- *
- * By default, a minimum content margin is set on the left and right
- * sides of the container and the content is centered in the viewport
- * to not exceed the maximum page width.
- *
- * When a child element is given the `full-width` class, it will span
- * the entire viewport.
- */
+/** Block container: lưới 3 cột, con ở cột giữa, `.full-width` tràn màn */
 .block-container {
   --content-width: min(
     calc(var(--page-width) - var(--page-margin) * 2),
@@ -454,7 +439,6 @@ body:has(main > :first-child [data-header-overlay]) .site-header:not([data-scrol
   --content-margin: minmax(var(--page-margin), 1fr);
   --content-grid: var(--content-margin) var(--content-width) var(--content-margin);
 
-  /* This is required to make <img> elements work as background images */
   position: relative;
   grid-template-columns: var(--content-grid);
   display: grid;

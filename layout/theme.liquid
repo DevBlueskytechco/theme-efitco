@@ -34,17 +34,32 @@
   </head>
 
   <body>
-    <div class="header-sticky-sentinel" data-testid="header-sticky-sentinel" aria-hidden="true"></div>
+    {% comment %}
+      Đếm lớp đang mở, banner consent, nút Shopify Inbox (ADR 0007 mục 6). Thẻ script và
+      assets/page-layers.js do BE (TE-10-R2-BE1); element gắn html[data-layer-open],
+      html[data-consent] + --consent-height, html[data-inbox], phát layers:idle.
+      data-inbox-selector: KHÔNG CHẮC, BE xác nhận trên store dev; giữ trùng selector trong assets/base.css.
+    {% endcomment %}
+    <page-layers data-testid="page-layers" data-inbox-selector="#ShopifyChat, #dummy-chat-button-iframe"></page-layers>
+
+    {% # Phần tử đầu tiên nhận Tab (TE-1 AC14, foundation §3.4): trước announcement bar và header %}
+    <a class="skip-link" href="#MainContent" data-testid="skip-link">{{ 'blocks.header.skip_to_content' | t }}</a>
 
     {% block 'container', tag: 'div' %}
       {% block 'announcement-bar' -%}{%- endblock %}
     {% endblock %}
 
+    {% comment %}
+      Sentinel 1px ngay trước container header (announcement-bar.md §4): rời khung nhìn đúng lúc header
+      bắt đầu dính (sau announcement bar nếu có), assets/header-sticky.js gắn data-scrolled → bóng header.
+    {% endcomment %}
+    <div class="header-sticky-sentinel" data-testid="header-sticky-sentinel" aria-hidden="true"></div>
+
     {% block 'container', tag: 'div' %}
       {% block 'header' -%}{%- endblock %}
     {% endblock %}
 
-    <main>
+    <main id="MainContent">
       {{ content_for_layout }}
     </main>
 
@@ -56,11 +71,46 @@
     {% block 'cart-drawer' -%}{%- endblock %}
 
     {% comment %}
+      Toast chung (layers.md §2.4): chỉ dùng khi không có lớp modal mở; phản hồi trong lớp modal
+      nằm ở role="status"/role="alert" của chính lớp. JS chèn toast vào đây; toast cảnh báo, lỗi
+      mang role="alert" riêng. Kiểu toast: TE-10-R2-FE2.
+      Hợp đồng cho BE (foundation §17, TE-10 AC11): clone template[data-testid="toast-template"]
+      > [data-toast="info|success|warning|error"], điền [data-toast-title], [data-toast-text]
+      (bỏ hidden khi có mô tả), chép tiêu đề vào [data-toast-dismiss-title] để nút đóng có tên
+      "Dismiss: {tiêu đề}"; nút [data-toast-dismiss] gỡ toast. info, success tự ẩn 6 s (dừng khi
+      hover/focus); warning, error không tự ẩn; tối đa 3 toast. Gắn data-closing trước khi gỡ để
+      CSS mờ dần.
+    {% endcomment %}
+    <div class="toast-region" data-testid="toast-region" aria-live="polite"></div>
+    <template data-testid="toast-template">
+      {%- assign toast_types = 'info,success,warning,error' | split: ',' -%}
+      {%- for toast_type in toast_types -%}
+        <div
+          class="toast toast--{{ toast_type }}"
+          role="{% if toast_type == 'warning' or toast_type == 'error' %}alert{% else %}status{% endif %}"
+          data-toast="{{ toast_type }}"
+          data-testid="toast-{{ toast_type }}"
+        >
+          <span class="toast__icon">{% render 'status-icon', name: toast_type %}</span>
+          <div class="toast__body">
+            <p class="toast__title" data-toast-title></p>
+            <p class="toast__text" data-toast-text hidden></p>
+          </div>
+          <button type="button" class="close-button toast__close" data-toast-dismiss data-testid="toast-dismiss">
+            <span class="visually-hidden">{{ 'general.dismiss' | t }} <span data-toast-dismiss-title></span></span>
+            {%- render 'header-icon', name: 'close' -%}
+          </button>
+        </div>
+      {%- endfor -%}
+    </template>
+
+    {% comment %}
       ES1-T415: no module script in <head>. Shopify adds the import map for
       @shopify/partial-rendering after content_for_header; a module requested
       before it stops the map from applying. Modules defer, so order is safe here.
     {% endcomment %}
     <script src="{{ 'standard-events.js' | asset_url }}" type="module"></script>
     <script src="{{ 'motion.js' | asset_url }}" type="module"></script>
+    <script src="{{ 'page-layers.js' | asset_url }}" type="module"></script>
   </body>
 </html>

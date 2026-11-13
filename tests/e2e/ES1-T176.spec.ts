@@ -14,7 +14,47 @@ import exceptions from './support/figma-exceptions.json';
 const FIGMA = '/?view=figma';
 const SCALE = 2;
 const { thresholds, rows, dataTicket } = loadRows();
-const nodes = snapshotIndex(JSON.parse(readFileSync(resolve(ROOT, 'docs/figma/snapshot-1-359.json'), 'utf8')));
+const snapshot = JSON.parse(readFileSync(resolve(ROOT, 'docs/figma/snapshot-1-359.json'), 'utf8'));
+const nodes = snapshotIndex(snapshot);
+
+// opacity của node cha nhân dồn xuống con. Hàng 1: 1:365 "Top menu" opacity 0.6 → chữ menu trắng 60% trên nền tối 1:360 (#1A1A1A).
+type OpacityNode = { id: string; opacity?: number; children?: OpacityNode[] };
+const inheritedOpacity = new Map<string, number>();
+(function walk(node: OpacityNode, parent: number) {
+  const own = parent * (node.opacity ?? 1);
+  inheritedOpacity.set(node.id, own);
+  for (const child of node.children ?? []) walk(child, own);
+})(snapshot.document, 1);
+
+const hexToRgb = (hex: string) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+const rgbString = ([r, g, b]: number[]) => `rgb(${r}, ${g}, ${b})`;
+const over = (fg: number[], alpha: number, bg: number[]) => fg.map((v, i) => Math.round(v * alpha + bg[i] * (1 - alpha)));
+
+// Màu Figma đã trộn opacity cha lên nền band; node không có opacity cha trả nguyên (giữ cách so cũ cho các hàng khác).
+function figmaNodesFor(row: Row) {
+  const out = new Map(nodes);
+  for (const item of row.styles ?? []) {
+    const node = nodes.get(item.node);
+    const alpha = inheritedOpacity.get(item.node) ?? 1;
+    if (!node?.fill || alpha >= 1) continue;
+    const mixed = over(hexToRgb(node.fill), alpha, hexToRgb(row.band));
+    out.set(item.node, { ...node, fill: `#${mixed.map((v) => v.toString(16).padStart(2, '0')).join('')}` });
+  }
+  return out;
+}
+
+// Chuẩn hoá màu computed về rgb() đặc trên nền band khi Figma node có opacity cha:
+// color-mix() trả color(srgb r g b), rgb(… / a) có alpha; bộ so figma-compare bỏ alpha nên phải trộn trước.
+function opaqueColor(value: string, band: string) {
+  const srgb = /color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+%?))?\)/.exec(value);
+  const rgb = /rgba?\(([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)(?:[,\s/]+([\d.]+%?))?\)/.exec(value);
+  const match = srgb ?? rgb;
+  if (!match) return value;
+  const scale = srgb ? 255 : 1;
+  const channels = [match[1], match[2], match[3]].map((v) => Number(v) * scale);
+  const alpha = match[4] === undefined ? 1 : match[4].endsWith('%') ? parseFloat(match[4]) / 100 : Number(match[4]);
+  return rgbString(over(channels, alpha, hexToRgb(band)));
+}
 const content = parseContent(readFileSync(resolve(ROOT, 'drafts/ba/ES1-T173/home-content.md'), 'utf8'));
 
 type Target = { testid: string; nth?: number; text?: string; inner?: string };
@@ -171,7 +211,11 @@ async function compareStyle(page: Page, row: Row) {
       const box = el.getBoundingClientRect();
       return { fontFamily: s.fontFamily, fontWeight: s.fontWeight, fontSize: s.fontSize, lineHeight: s.lineHeight, letterSpacing: s.letterSpacing, textTransform: s.textTransform, color: s.color, backgroundColor: s.backgroundColor, borderRadius: s.borderTopLeftRadius, paddingLeft: s.paddingLeft, paddingTop: s.paddingTop, width: `${box.width}px`, height: `${box.height}px` };
     });
-    const diffs = compareStyles(nodes, item, computed, exceptions);
+    if ((inheritedOpacity.get(item.node) ?? 1) < 1) {
+      computed.color = opaqueColor(computed.color, row.band);
+      computed.backgroundColor = opaqueColor(computed.backgroundColor, row.band);
+    }
+    const diffs = compareStyles(figmaNodesFor(row), item, computed, exceptions);
     log('style', row.id, { name: item.name, node: item.node, computed, diffs });
     expect.soft(diffs, `${row.id} ${item.name} lệch Figma`).toEqual([]);
   }
@@ -257,6 +301,18 @@ test.describe('ES1-T176 so Figma', () => {
         });
       }
     }
+
+    // AC-H29: header là thanh tối (nền 1:360 dưới 1:362), không trong suốt đè slideshow; chữ trắng như fill 1:366.
+    test('Hàng 1 Header (1:362): nền band tối, chữ trắng, slideshow nằm dưới đáy header', async ({ page }) => {
+      const row = (rows as Row[]).find((item) => item.id === '1')!;
+      await openGate(page);
+      const header = page.getByTestId('header');
+      await expect(header).toHaveCSS('background-color', rgbString(hexToRgb(row.band)));
+      await expect(header).toHaveCSS('color', rgbString(hexToRgb(nodes.get('I1:366;2963:2083;1327:1245')!.fill!)));
+      const [headerBox, slideBox] = await Promise.all([boxOf(header), boxOf(page.getByTestId('slideshow-slide').first())]);
+      expect(headerBox, 'không có header').not.toBeNull();
+      if (slideBox) expect(slideBox.y, 'slideshow không được chui dưới header').toBeGreaterThanOrEqual(headerBox!.y + headerBox!.height - 0.5);
+    });
   });
 
   test.describe('So copy theo bảng ES1-T173 (AC-H2)', () => {

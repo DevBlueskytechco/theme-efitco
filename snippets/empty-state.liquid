@@ -1,0 +1,100 @@
+{% doc %}
+  Shared empty and error state for a block or page region (docs/ui-spec/foundation.md §18,
+  SRS TE-10 AC13). Callers pass translated strings (`| t`) and `routes.*` URLs; the snippet
+  has no copy of its own except the default "Try Again" label of the error kind.
+
+  kind 'empty' (default): icon 32 in a 72 circle, heading, one sentence, one primary button
+  with a specific destination, optional text link. Rendered for shoppers when a page result
+  is empty (AGENTS.md: an empty page result is content, not missing setup).
+
+  kind 'error': alert block (1px sale border, icon 24, title, how-to-fix sentence, secondary
+  "Try Again"), role="alert". Without button_url the button is a <button data-retry> for the
+  feature script to re-run its request (hook for Dev BE); with button_url it is a link, so the
+  fallback works without JavaScript (for example the `?view=quiz` page).
+
+  Hooks: data-testid="{testid}", "{testid}-heading", "{testid}-button", "{testid}-link";
+  data-retry on the error button.
+
+  @param {string} heading - Heading text, already translated
+  @param {string} [text] - One sentence that says what to do next, already translated
+  @param {string} [button_label] - Button label in Title Case; error kind defaults to "Try Again"
+  @param {string} [button_url] - Button destination from routes.*; empty kind needs it to show the button
+  @param {string} [link_label] - Optional secondary text link label
+  @param {string} [link_url] - Optional secondary text link URL from routes.*
+  @param {string} [icon] - status-icon name: 'cart', 'search', 'box' (default empty), 'error' (default error)
+  @param {string} [heading_tag] - 'h2' (default) or 'h3', to keep the page heading order
+  @param {string} [kind] - 'empty' (default) or 'error'
+  @param {string} [testid] - data-testid prefix, default 'empty-state'
+
+  @example
+  {%- assign empty_heading = 'cart.empty' | t -%}
+  {%- assign empty_button = 'cart.continue_shopping' | t -%}
+  {% render 'empty-state',
+    heading: empty_heading,
+    button_label: empty_button,
+    button_url: routes.all_products_collection_url,
+    icon: 'cart',
+    testid: 'cart-empty'
+  %}
+{% enddoc %}
+
+{%- liquid
+  assign state_kind = kind | default: 'empty'
+  assign state_testid = testid | default: 'empty-state'
+  assign state_tag = 'h2'
+  if heading_tag == 'h3'
+    assign state_tag = 'h3'
+  endif
+  if state_kind == 'error'
+    assign state_icon = icon | default: 'error'
+    assign try_again_label = 'general.try_again' | t
+    assign state_button_label = button_label | default: try_again_label
+  else
+    assign state_icon = icon | default: 'box'
+    assign state_button_label = button_label
+  endif
+-%}
+
+{%- if heading != blank -%}
+  {%- if state_kind == 'error' -%}
+    <div class="alert" role="alert" data-testid="{{ state_testid }}">
+      <span class="alert__icon">{% render 'status-icon', name: state_icon %}</span>
+      <div class="alert__body">
+        <{{ state_tag }} class="alert__title" data-testid="{{ state_testid }}-heading">{{ heading }}</{{ state_tag }}>
+        {%- if text != blank -%}
+          <p class="alert__text">{{ text }}</p>
+        {%- endif -%}
+        <div class="alert__actions">
+          {%- if button_url != blank -%}
+            <a class="button button--secondary" href="{{ button_url }}" data-testid="{{ state_testid }}-button">
+              {{- state_button_label -}}
+            </a>
+          {%- else -%}
+            <button type="button" class="button button--secondary" data-retry data-testid="{{ state_testid }}-button">
+              {{- state_button_label -}}
+            </button>
+          {%- endif -%}
+          {%- if link_label != blank and link_url != blank -%}
+            <a class="empty-state__link" href="{{ link_url }}" data-testid="{{ state_testid }}-link">{{ link_label }}</a>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  {%- else -%}
+    <div class="empty-state" data-testid="{{ state_testid }}">
+      <span class="empty-state__icon">{% render 'status-icon', name: state_icon %}</span>
+      <{{ state_tag }} class="empty-state__heading" data-testid="{{ state_testid }}-heading">{{ heading }}</{{ state_tag }}>
+      {%- if text != blank -%}
+        <p class="empty-state__text">{{ text }}</p>
+      {%- endif -%}
+      {%- if state_button_label != blank and button_url != blank -%}
+        <div class="empty-state__actions">
+          <a class="button" href="{{ button_url }}" data-testid="{{ state_testid }}-button">{{ state_button_label }}</a>
+          {%- if link_label != blank and link_url != blank -%}
+            <a class="empty-state__link" href="{{ link_url }}" data-testid="{{ state_testid }}-link">{{ link_label }}</a>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+{%- endif -%}
