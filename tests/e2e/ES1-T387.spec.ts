@@ -76,7 +76,8 @@ test.describe('ES1-T387 static', () => {
     expect(quiz.empty_cta).toBeUndefined();
   });
 
-  test('CSS: popup cũ (literal figma, px) đã xoá; mục quiz 0 màu literal, 0 z-index số; gzip ≤ 49 152', () => {
+  // Trần 49 152 chưa đạt ở develop (51 217 B, [Q] ES1-T454); CTO 13/11: PR này không được tăng base.css so với develop
+  test('CSS: popup cũ (literal figma, px) đã xoá; mục quiz 0 màu literal, 0 z-index số; gzip ≤ develop 51 217', () => {
     const css = read('assets/base.css');
     expect(css).not.toContain('.quiz__dialog-close');
     expect(css).not.toContain('quiz-results-title');
@@ -87,7 +88,8 @@ test.describe('ES1-T387 static', () => {
     expect(quizRules).not.toMatch(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(|--figma-/i);
     expect(quizRules).not.toMatch(/z-index\s*:\s*-?\d/);
     expect(quizRules).not.toMatch(/(^|[\s;{])(left|right|top|bottom|margin-left|margin-right|padding-left|padding-right)\s*:/m);
-    expect(gzipSync(css).length).toBeLessThanOrEqual(49152);
+    expect(css).not.toContain('motion-breathe');
+    expect(gzipSync(css).length).toBeLessThanOrEqual(51217);
   });
 
   test('index.te11 truyền collection te11-quiz, giữ panel dưới bước (ES1-T139)', () => {
@@ -178,6 +180,7 @@ test.describe('ES1-T387 fixture (CSS thật, không store)', () => {
 
   test('AC5 axe 0 serious trong dialog mở', async ({ page }) => {
     await fixture(page, false, 1280);
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('dialog').analyze();
     expect(violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => v.id)).toEqual([]);
   });
