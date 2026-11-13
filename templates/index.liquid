@@ -1,6 +1,7 @@
 {%- comment -%}
   Home page (ADR 0011 mục 2): composes blocks with an id and structural parameters only (tag, background, layout, order).
-  Resources (collections, products, images, videos, blog) and dates come from block settings, empty on a fresh install;
+  Resources (collections, products, images, videos, blog) and dates come from block settings, empty on a fresh install.
+  One exception: featured-collection falls back to the built-in 'all' collection (not demo content, CTO 13/11), so a store with products shows a grid;
   the store dev content lives in tests/fixtures/home-figma.json (ES1-T331). Sample copy below: TS-FE4 (ES1-T406).
 {%- endcomment -%}
 
@@ -120,7 +121,7 @@
 {% endblock %}
 
 {% block 'container', id: 'home-featured-collection', tag: 'div' %}
-  {% block 'featured-collection', id: 'featured-collection' %}{% endblock %}
+  {% block 'featured-collection', id: 'featured-collection', default_collection: 'all' %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'home-quiz', tag: 'div' %}

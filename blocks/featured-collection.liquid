@@ -5,9 +5,12 @@
   48rem (4 when the grid has exactly 4 cards), columns_desktop columns from 80rem.
   No carousel.
 
-  Source: the collection setting only, empty on a fresh install (ADR 0011 mục 2:
-  templates pass no collection). When there is no source or it has no products,
-  the editor shows placeholder cards with a hint and the storefront renders nothing.
+  Source: the collection setting; when it is empty, collections[default_collection].
+  The home page passes 'all' (Shopify's built-in catalog, not demo content; CTO
+  13/11 on ES1-T405), so a fresh install and the CI preview show products. No
+  figma-* handle is ever passed (ADR 0011 mục 2). When there is no source or it
+  has no products, the editor shows placeholder cards with a hint and the
+  storefront renders nothing.
 
   Variant items (multi-source collections, Editions Fall '26 #20, AC8): an item
   that has a parent `product` is treated as a variant. The card then gets the
@@ -46,18 +49,22 @@
   "featured-collection-tab-empty".
 
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading id. Default: block.id
+  @param {string} [default_collection] - Collection handle used when the collection setting is empty: only 'all' (built-in catalog). Empty: no fallback
   @param {string} [default_tab_2_collection] - Test templates only: collection handle for tab 2 when its setting is empty. Empty: no fallback
   @param {string} [default_tab_3_collection] - Test templates only: collection handle for tab 3 when its setting is empty. Empty: no fallback
   @param {string} [default_tab_4_collection] - Test templates only: collection handle for tab 4 when its setting is empty. Empty: no fallback
 
   @example
   {% block 'container', id: 'home-featured-collection', tag: 'div' %}
-    {% block 'featured-collection', id: 'featured-collection' %}{% endblock %}
+    {% block 'featured-collection', id: 'featured-collection', default_collection: 'all' %}{% endblock %}
   {% endblock %}
 {% enddoc %}
 
 {%- liquid
   assign source = block.settings.collection
+  if source == blank and default_collection != blank
+    assign source = collections[default_collection]
+  endif
 
   assign limit = block.settings.products_to_show
   assign columns = block.settings.columns_desktop
