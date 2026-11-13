@@ -4,16 +4,23 @@ KHÔNG CHẮC: (1) task-split ghi "Show N products" đọc partial `collection-f
 
 AC: SRS TE-6 AC2, AC4 (0.5 → AC9, AC10). Spec: docs/ui-spec/collection.md §5, §10, §11. Plan: drafts/techlead/ES1-T307/task-split.md (TE-6-R2-FE3).
 
+## Sửa theo CI run 43375808007 (comment CTO 13/11)
+- ES1-T109 nojs Clear all: `clear_url` chỉ giữ `sort_by` khi khác `collection.default_sort_by`; submit không JS gửi kèm sort mặc định (select `form=`) nên Clear all giờ về `collection.url` không query. Sort người mua chọn vẫn giữ (collection.md §7).
+- AC9 nhóm > 6 (24 thay vì 6): markup đúng 6/nhóm (`at_most: 6`); lỗi ở spec: `filter({ has: more.first() })` khớp mọi nhóm có "Show N more" (4 nhóm × 6). Spec giờ lấy `.first()` trên nhóm rồi đếm trong nhóm đó.
+- TC-01 `inline-size: 28rem`: chuỗi khớp `max-inline-size: 28rem` của `.cart-drawer__dialog` (cart, ES1-T95), không phải CSS lọc; CSS 28rem của drawer lọc đã gỡ. Spec giờ quét `28rem` trong mục CSS lọc + không còn rule `.collection-filters__drawer {`.
+- AC9 store spec: chọn sort `option:not([selected])` (khác mặc định) để kiểm Clear all giữ sort.
+- base.css (gzip, `gzip -c assets/base.css | wc -c`): develop 51 217 B → nhánh 51 202 B (−15, không tăng so với develop). Cách gỡ: comment ngắn lại, `.collection-filters__hint` gộp vào rule hint có sẵn, status/currency gộp vào nhóm muted, form + panel `display: contents` thay flex column, label nhóm + label option chung 1 rule, chuyển động chevron gộp vào khối motion chung, bỏ rule `[hidden]` thừa (dialog đóng/`hidden` đã `display: none`), bỏ focus-within riêng của ô giá (input dùng `:focus-visible` chung 2px currentcolor), lỗi giá icon inline 1em. critical.css 10 014 B (không đổi trong PR này). Trần 49 152 vẫn vượt từ develop: [Q] ES1-T454.
+
 ## Thay đổi
 
 blocks/collection-filters.liquid
 - `<modal-dialog data-layer="filter">` > `<dialog class="drawer collection-filters__drawer" popover>`: dùng `.drawer` chung của TE-10-R2-FE2 (90% ở 360, 420 từ 48rem, header 72, `.close-button` 48 "Close filters").
-- Partial `collection-filters` gồm `.drawer__body` (dòng `role="status"` "N filters applied · M products", nhóm lọc) + `.drawer__footer` dính đáy: "Clear all" secondary (chỉ khi có filter, giữ `sort_by`) + "Show M products" primary (`type="submit"`, M = `collection.products_count`).
+- Partial `collection-filters` gồm `.drawer__body` (dòng `role="status"` "N filters applied · M products", nhóm lọc) + `.drawer__footer` dính đáy: "Clear all" secondary (chỉ khi có filter, giữ `sort_by` khác mặc định) + "Show M products" primary (`type="submit"`, M = `collection.products_count`).
 - Bỏ nút "Apply" cũ và thuộc tính `scroll-lock`. Form, id, data-* cho BE giữ nguyên.
 - Từ 64rem cùng dialog là cột trái tĩnh: tiêu đề h2 gạch dưới 1px foreground, không nút đóng, không dòng status; chân giữ Clear all, nút submit chỉ hiện khi không JS (`collection-filters[data-enhanced]` ẩn).
 
 snippets/filter-group.liquid
-- Summary cao 52, "N selected" 14 muted (list, boolean), chevron 12 xoay 180° (250ms, chỉ khi không giảm chuyển động).
+- Summary cao 52, "N selected" 14 muted (list, boolean), chevron 12 xoay 180° (250ms, trong khối `prefers-reduced-motion: no-preference` chung).
 - Nhóm > 6 giá trị: 6 đầu + `<details class="filter-group__more">` lồng "Show N more" / "Show less", chữ ẩn "{nhóm} options", cao 44, mở sẵn khi giá trị ẩn đang chọn. Chạy không JS. Ngưỡng 6 là hằng trong code.
 - Giá: `<label for>` thật 14/500 trên ô, khung có tiền tố `cart.currency.symbol` `aria-hidden` (rộng theo ký hiệu), viền `--color-muted-light`, gợi ý "Highest price is {giá}" (`aria-describedby`), câu lỗi `price_invalid` + icon (`hidden` sẵn). BE bật lỗi: bỏ `hidden`, `aria-invalid="true"` + thêm id lỗi vào `aria-describedby` → CSS viền 2px `--color-sale`.
 
@@ -22,7 +29,7 @@ snippets/filter-option.liquid (mới)
 
 assets/base.css
 - `.drawer` chung nhận `:popover-open` như `[open]` (hiển thị, trượt vào, `@starting-style`), để drawer lọc không JS dùng đúng khung chung.
-- Thay toàn bộ CSS drawer lọc + nhóm lọc cũ (khung 100% / 28rem, nút đóng riêng, Apply sticky, checkbox 24) bằng mục "Lọc collection" mới: chọn → nhãn 600; đếm 0 → disabled, muted, gạch ngang; hover nhãn gạch chân; swatch chọn = vòng 2px nền + 2px accent, focus outline accent offset 4; focus checkbox outline accent.
+- Thay toàn bộ CSS drawer lọc + nhóm lọc cũ (khung 100% / 28rem, nút đóng riêng, Apply sticky, checkbox 24) bằng mục "Lọc collection" mới: chọn → nhãn 600; đếm 0 → disabled, muted, gạch ngang; hover nhãn gạch chân; swatch chọn = vòng 2px nền + 2px accent, focus outline accent offset 4; focus checkbox/ô giá dùng `:focus-visible` chung.
 - 0 literal màu, 0 thuộc tính vật lý, 0 z-index số.
 
 locales/en.default.json (`blocks.collection_filters`)
@@ -40,7 +47,8 @@ tests/e2e/ES1-T366.spec.ts (mới)
 
 ## Tự kiểm tra
 - `shopify theme check`: 0 lỗi, 23 warning (bằng trước khi sửa, không warning mới ở file của ticket).
-- `gzip -c assets/base.css | wc -c`: 47 739 → 48 344 B (≤ 49 152). `critical.css` 9 917 B, không đổi.
+- `gzip -c assets/base.css | wc -c`: develop 51 217 B → nhánh 51 202 B (không tăng). `critical.css` 10 014 B, không đổi so với develop.
+- Kiểm tĩnh TC-01 bằng node (cùng regex spec): 0 màu literal, 0 thuộc tính vật lý, 0 z-index số, không `28rem` trong mục lọc.
 - Không file JS trong diff. Locale JSON hợp lệ, không trùng key.
 - Không đổi `blocks/collection-products.liquid`, `templates/collection.liquid` (TE-6-R2-FE2). Các test ES1-T109 vẫn khớp hook: `collection-filter-apply` là submit, `collection-filter-clear` chỉ có khi đã lọc, mọi `collection-filter-group` mở, option là `<label>` có `.filter-option__count`.
 - Playwright (tĩnh + store), Lighthouse collection desktop/mobile, ảnh 360/768/1280: chờ CI. Sandbox chặn chạy Chromium ở local; global setup cần `PREVIEW_URL`.

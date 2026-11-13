@@ -114,8 +114,9 @@ test.describe('ES1-T366 tĩnh', () => {
     expect(css).not.toMatch(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(|:\s*(white|black)\b/i);
     expect(css).not.toMatch(/(^|[\s;{])(left|right|top|bottom|width|height|(margin|padding)-(left|right|top|bottom))\s*:/m);
     expect(css).not.toMatch(/z-index:\s*-?\d/);
-    // Drawer lọc dùng .drawer chung: không còn khung riêng 28rem, nút Apply ẩn khi có JS ở mọi mốc
-    expect(BASE).not.toContain('inline-size: 28rem');
+    // Drawer lọc dùng .drawer chung: không còn khung riêng 28rem (max-inline-size 28rem của cart drawer không thuộc mục này)
+    expect(css).not.toContain('28rem');
+    expect(BASE).not.toMatch(/\.collection-filters__drawer\s*\{/);
     expect(BASE).not.toMatch(/\.collection-filters__drawer:popover-open/);
     expect(BASE).toContain('.drawer:is([open], :popover-open)');
   });
@@ -251,7 +252,8 @@ test.describe('ES1-T366 store', () => {
     const input = page.locator('[data-testid="collection-filter-input"]:not(:disabled)').first();
     const name = (await input.getAttribute('name'))!;
     const value = (await input.getAttribute('value'))!;
-    const sort = await page.getByTestId('collection-sort').locator('option').nth(1).getAttribute('value');
+    // Sort khác mặc định (option không selected khi chưa có sort_by): Clear all giữ nó; sort mặc định thì bỏ (ES1-T109 nojs)
+    const sort = await page.getByTestId('collection-sort').locator('option:not([selected])').first().getAttribute('value');
     await page.goto(`${MAIN}?${encodeURIComponent(name)}=${encodeURIComponent(value)}&sort_by=${encodeURIComponent(sort!)}`);
     await expect(page.getByTestId('collection-filter-selected').first()).toHaveText(/^1 selected$/);
     const apply = page.getByTestId('collection-filter-apply');
@@ -270,9 +272,10 @@ test.describe('ES1-T366 store', () => {
     await page.goto(MAIN);
     await expectNotChallenged(page);
     test.skip(!(await hasFilters(page)), NO_FILTERS);
-    const more = page.getByTestId('collection-filter-more').first();
-    test.skip((await more.count()) === 0, 'Không có nhóm > 6 giá trị trên store dev: skip, không tính là đạt');
-    const group = page.getByTestId('collection-filter-group').filter({ has: more });
+    // Đếm trong đúng 1 nhóm: filter({ has }) với locator .first() vẫn khớp mọi nhóm có "Show N more"
+    const group = page.getByTestId('collection-filter-group').filter({ has: page.getByTestId('collection-filter-more') }).first();
+    test.skip((await group.count()) === 0, 'Không có nhóm > 6 giá trị trên store dev: skip, không tính là đạt');
+    const more = group.getByTestId('collection-filter-more');
     const visible = group.locator(':scope > .filter-group__body > .filter-group__options > li');
     expect(await visible.count()).toBe(6);
     await expect(more).toHaveText(/Show \d+ more/);

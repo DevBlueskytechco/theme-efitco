@@ -73,9 +73,10 @@
       endif
     endfor
 
-    # Clear all keeps the sort order (collection.md §7)
+    # Clear all keeps a sort order the shopper chose (collection.md §7); the
+    # default sort is dropped so the URL has no query (ES1-T109 nojs)
     assign clear_url = collection.url
-    if collection.sort_by != blank
+    if collection.sort_by != blank and collection.sort_by != collection.default_sort_by
       assign sort_param = collection.sort_by | url_encode
       assign clear_url = clear_url | append: '?sort_by=' | append: sort_param
     endif
