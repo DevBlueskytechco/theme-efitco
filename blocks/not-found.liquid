@@ -1,0 +1,143 @@
+{% doc %}
+  Main block of the 404 page (docs/ui-spec/404.md §2, TE-21 AC7, AC8): eyebrow
+  "Error 404", h1, description, search form (GET to routes.search_url, works
+  without JavaScript), primary "Back To Homepage" link and an optional row of
+  category links from a menu. Heading and text fall back to locale strings when
+  empty. The category row shows at most 6 links; collection links show their
+  product count. Empty menu: no row on the storefront, a hint in the editor.
+  The search input never takes focus on load. Self-contained: callers must
+  leave the body empty.
+
+  Test hooks: data-testid="not-found", "not-found-heading", "not-found-search",
+  "not-found-search-input", "not-found-search-submit", "not-found-home",
+  "not-found-categories", "not-found-category", "not-found-categories-placeholder".
+
+  @example
+  {% block 'container', id: 'not-found' %}
+    {% block 'not-found' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign heading = block.settings.heading | strip
+  assign text = block.settings.text | strip
+  assign menu = linklists[block.settings.category_menu]
+  assign has_categories = false
+  if block.settings.category_menu != blank and menu.links.size > 0
+    assign has_categories = true
+  endif
+-%}
+
+<div class="not-found" data-testid="not-found" {{ block.shopify_attributes }}>
+  <p class="not-found__eyebrow">{{ '404.eyebrow' | t }}</p>
+
+  <h1 class="not-found__heading" data-testid="not-found-heading">
+    {%- if heading != blank -%}
+      {{- heading | escape -}}
+    {%- else -%}
+      {{- '404.heading' | t -}}
+    {%- endif -%}
+  </h1>
+
+  <p class="not-found__text">
+    {%- if text != blank -%}
+      {{- text | escape | newline_to_br -}}
+    {%- else -%}
+      {{- '404.text' | t -}}
+    {%- endif -%}
+  </p>
+
+  {%- if block.settings.show_search -%}
+    <form
+      action="{{ routes.search_url }}"
+      method="get"
+      role="search"
+      class="not-found__search"
+      aria-labelledby="NotFoundSearchLabel"
+      data-testid="not-found-search"
+    >
+      <label id="NotFoundSearchLabel" for="NotFoundSearchInput" class="not-found__label">
+        {{- '404.search_label' | t -}}
+      </label>
+      <div class="not-found__field">
+        <input
+          id="NotFoundSearchInput"
+          class="not-found__input"
+          type="search"
+          name="q"
+          placeholder="{{ '404.search_placeholder' | t }}"
+          autocomplete="off"
+          data-testid="not-found-search-input"
+        >
+        <button
+          type="submit"
+          class="not-found__submit"
+          aria-label="{{ 'search.submit' | t }}"
+          data-testid="not-found-search-submit"
+        >
+          {%- render 'header-icon', name: 'search' -%}
+        </button>
+      </div>
+    </form>
+  {%- endif -%}
+
+  <a href="{{ routes.root_url }}" class="button not-found__home" data-testid="not-found-home">
+    {{- '404.home' | t -}}
+  </a>
+
+  {%- if has_categories -%}
+    <nav class="not-found__categories" aria-labelledby="NotFoundCategoriesLabel" data-testid="not-found-categories">
+      <p class="not-found__categories-label" id="NotFoundCategoriesLabel">{{ '404.categories' | t }}</p>
+      <ul class="not-found__category-list" role="list">
+        {%- for link in menu.links limit: 6 -%}
+          <li>
+            <a class="not-found__category" href="{{ link.url }}" data-testid="not-found-category">
+              {{- link.title | escape -}}
+              {%- if link.type == 'collection_link' and link.object.products_count != blank %}
+                <span class="not-found__category-count">
+                  {{- '404.products_count' | t: count: link.object.products_count -}}
+                </span>
+              {%- endif -%}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </nav>
+  {%- elsif request.design_mode -%}
+    <p class="not-found__placeholder" data-testid="not-found-categories-placeholder">
+      {{- 'blocks.not_found.categories_placeholder' | t -}}
+    </p>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "t:general.404",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "t:labels.heading",
+      "info": "t:info.not_found_heading"
+    },
+    {
+      "type": "textarea",
+      "id": "text",
+      "label": "t:labels.not_found_text",
+      "info": "t:info.not_found_text"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_search",
+      "label": "t:labels.not_found_show_search",
+      "default": true
+    },
+    {
+      "type": "link_list",
+      "id": "category_menu",
+      "label": "t:labels.not_found_category_menu",
+      "info": "t:info.not_found_category_menu"
+    }
+  ]
+}
+{% endschema %}
