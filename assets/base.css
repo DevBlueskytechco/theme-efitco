@@ -7489,54 +7489,26 @@ cart-drawer {
   }
 }
 
-/** Predictive search (TE-8, predictive-search.md §1–§3): <modal-dialog data-layer="search">, snippets/predictive-search.liquid.
-    popup: dải trên, hàng đầu là thanh tối 80 của header; < 48rem phủ màn, từ 48rem cao ≤ 80dvh. drawer: .drawer--end.
-    display chỉ đặt khi [open], không đặt trên listbox, group: display của tác giả thắng [hidden]. */
+/* Predictive search (TE-8): snippets/predictive-search.liquid */
 .predictive-search-dialog {
   --search-gutter: var(--space-5);
   --search-line: var(--color-muted-light);
-  --search-placeholder: var(--color-muted-light);
-  --search-focus: var(--color-accent);
-
-  text-align: start;
 }
 
 .predictive-search-dialog[data-style='popup'] {
+  --drawer-from: 0 calc(var(--space-5) * -1);
   --search-gutter: max(var(--page-margin), (100% - var(--page-width)) / 2 + var(--page-margin));
 
-  position: fixed;
-  inset-block: 0 auto;
-  inset-inline: 0;
+  inset: 0 0 auto;
   inline-size: 100%;
-  max-inline-size: none;
-  block-size: 100dvh;
-  max-block-size: none;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  border: 0;
-  box-shadow: var(--shadow-overlay);
 }
 
-.predictive-search-dialog[open] {
-  display: flex;
-  flex-direction: column;
-}
-
-.predictive-search-dialog::backdrop {
-  background: var(--overlay-scrim);
-}
-
-/* Thanh header tối: focus trắng; panel trắng và drawer: focus accent */
 .predictive-search-dialog :focus-visible {
-  outline-color: var(--search-focus);
+  outline-color: currentcolor;
 }
 
 .predictive-search {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: column;
-  min-block-size: 0;
+  display: contents;
 }
 
 .predictive-search__bar {
@@ -7548,48 +7520,33 @@ cart-drawer {
   padding: 0 var(--space-3) var(--space-4) var(--search-gutter);
 }
 
-.drawer .predictive-search__title {
-  min-block-size: calc(var(--space-1) * 18);
-  align-content: center;
+[data-style='drawer'] .predictive-search__title {
+  padding-block: var(--space-5);
 }
 
-.drawer .predictive-search__close-form {
+[data-style='drawer'] .predictive-search__close-form {
   grid-area: 1 / 2;
 }
 
 .predictive-search__form {
   grid-column: 1 / -1;
   display: flex;
-  align-items: center;
-  min-inline-size: 0;
   min-block-size: calc(var(--space-1) * 12);
   border: 1px solid var(--search-line);
   border-radius: var(--radius-input);
 }
 
-.predictive-search__form:has(.predictive-search__input:focus-visible) {
-  outline: 2px solid var(--search-focus);
-  outline-offset: -1px;
-}
-
-/* Viền focus vẽ trên khung ô (dòng trên), không vẽ lần hai trên input */
-.predictive-search__input:focus-visible {
-  outline: 0;
-}
-
 .predictive-search__input {
-  flex: 1 1 auto;
-  align-self: stretch;
+  flex: auto;
   min-inline-size: 0;
-  padding: 0;
   border: 0;
-  background: transparent;
+  background: none;
   color: inherit;
   font-size: var(--font-size-base);
 }
 
 .predictive-search__input::placeholder {
-  color: var(--search-placeholder);
+  color: var(--search-line);
   opacity: 1;
 }
 
@@ -7597,77 +7554,45 @@ cart-drawer {
   appearance: none;
 }
 
-/* Nút xoá là type="reset": chỉ hiện khi ô có chữ */
 .predictive-search__input:placeholder-shown + .predictive-search__clear,
 .predictive-search__logo {
   display: none;
 }
 
-.predictive-search-dialog[data-style='popup'] .predictive-search__bar {
+[data-style='popup'] .predictive-search__bar {
   --search-line: var(--color-muted-on-dark);
-  --search-placeholder: var(--color-muted-on-dark);
-  --search-focus: var(--color-background-dark-foreground);
 
-  display: flex;
-  gap: var(--space-3);
+  column-gap: var(--space-3);
   min-block-size: var(--header-height);
   padding: 0 var(--search-gutter);
   background: var(--color-background-dark) url('noise-dark.png');
   color: var(--color-background-dark-foreground);
 }
 
-.predictive-search-dialog[data-style='popup'] .predictive-search__form {
-  flex: 1 1 auto;
+[data-style='popup'] .predictive-search__form {
+  grid-column: 1;
 }
 
 [data-style='popup'] .predictive-search__close {
   border-color: color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent);
-  background: transparent;
+  background: none;
   color: inherit;
 }
 
-@media (hover: hover) {
-  .predictive-search-dialog[data-style='popup'] .predictive-search__form:hover {
-    --search-line: var(--color-background-dark-foreground);
-  }
-
-  [data-style='popup'] .predictive-search__close:hover {
-    background: var(--color-background-dark-foreground);
-    color: var(--color-background-dark);
-  }
+.predictive-search__status,
+.predictive-search__listbox {
+  padding-inline: var(--search-gutter);
 }
 
-/* Không dùng display: none khi rỗng: live region phải có sẵn trong cây a11y */
-.predictive-search__status {
-  flex: none;
-  padding-inline: var(--search-gutter);
+.predictive-search__status,
+.predictive-search__group-title,
+.predictive-search__price {
   color: var(--color-muted);
   font-size: var(--font-size-sm);
-}
-
-.predictive-search__status:not(:empty) {
-  padding-block: var(--space-2);
-}
-
-/* Listbox là khung cuộn: axe bỏ qua scrollable-region-focusable với popup của combobox */
-.predictive-search__listbox {
-  flex: 1 1 auto;
-  min-block-size: 0;
-  padding: var(--space-5) var(--search-gutter);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-}
-
-.predictive-search__group {
-  padding-block-end: var(--space-5);
 }
 
 .predictive-search__group-title {
-  margin-block-end: var(--space-2);
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  text-transform: uppercase;
+  margin-block: var(--space-5) var(--space-2);
 }
 
 .predictive-search__option {
@@ -7676,10 +7601,8 @@ cart-drawer {
   gap: var(--space-3);
   min-block-size: 44px;
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-input);
   font-size: var(--font-size-sm);
   text-decoration: none;
-  cursor: pointer;
 }
 
 .predictive-search__option:hover,
@@ -7688,7 +7611,7 @@ cart-drawer {
 }
 
 .predictive-search__option[aria-selected='true'] {
-  outline: 2px solid var(--color-foreground);
+  outline: 2px solid;
   outline-offset: -2px;
 }
 
@@ -7697,24 +7620,16 @@ cart-drawer {
   inline-size: 64px;
   block-size: 64px;
   border-radius: var(--radius-input);
-  background-color: var(--color-background-alt);
   object-fit: cover;
 }
 
 .predictive-search__option-text {
   display: grid;
-  gap: var(--space-1);
-  min-inline-size: 0;
   overflow-wrap: anywhere;
-}
-
-.predictive-search__price {
-  color: var(--color-muted);
 }
 
 .predictive-search__all {
   border-block-start: 1px solid var(--color-border);
-  font-weight: 500;
 }
 
 @media (min-width: 48rem) {
@@ -7726,64 +7641,23 @@ cart-drawer {
   }
 }
 
-/* Thanh tối 80 lưới 12: logo cột 1–3, ô cột 4–11, đóng cột 12 (predictive-search.md §3) */
 @media (min-width: 80rem) {
-  .predictive-search-dialog[data-style='popup'] .predictive-search__bar {
-    display: grid;
+  [data-style='popup'] .predictive-search__bar {
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: var(--space-5);
   }
 
-  .predictive-search-dialog[data-style='popup'] .predictive-search__logo {
+  [data-style='popup'] .predictive-search__logo {
     display: block;
     grid-column: 1 / 4;
   }
 
-  .predictive-search-dialog[data-style='popup'] .predictive-search__form {
+  [data-style='popup'] .predictive-search__form {
     grid-column: 4 / 12;
-    min-block-size: calc(var(--space-1) * 13);
-  }
-
-  .predictive-search-dialog[data-style='popup'] .predictive-search__input {
-    font-size: var(--font-size-lg);
   }
 
   .predictive-search__close-form {
     justify-self: end;
-  }
-
-  .predictive-search__listbox {
-    padding-block: var(--space-6);
-  }
-}
-
-/* Popup trượt 24 từ trên + mờ dần; drawer dùng chuyển động chung của .drawer */
-@media (prefers-reduced-motion: no-preference) {
-  .predictive-search-dialog[data-style='popup'],
-  .predictive-search-dialog[data-style='popup']::backdrop {
-    transition:
-      opacity var(--motion-base) var(--ease-out),
-      translate var(--motion-base) var(--ease-out),
-      overlay var(--motion-base) allow-discrete,
-      display var(--motion-base) allow-discrete;
-  }
-
-  .predictive-search-dialog[data-style='popup']:not([open]),
-  .predictive-search-dialog[data-style='popup']:not([open])::backdrop {
-    opacity: 0;
-    translate: 0 calc(var(--space-5) * -1);
-  }
-
-  @starting-style {
-    .predictive-search-dialog[data-style='popup'][open],
-    .predictive-search-dialog[data-style='popup'][open]::backdrop {
-      opacity: 0;
-      translate: 0 calc(var(--space-5) * -1);
-    }
-  }
-
-  .predictive-search__option {
-    transition: background-color var(--motion-fast) var(--ease-out);
   }
 }
 

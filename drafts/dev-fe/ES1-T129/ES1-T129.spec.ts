@@ -1,4 +1,5 @@
-// KHÔNG CHẮC: spec chưa chạy (không preview, sandbox chặn Chromium); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép đè tests/e2e/ES1-T129.spec.ts.
+// KHÔNG CHẮC: spec chưa chạy (không preview, sandbox chặn Chromium). Bản này đã chép đè tests/e2e/ES1-T129.spec.ts (lượt 3).
+// CI PR #222 đỏ vì tests/e2e/ES1-T129.spec.ts còn bản cũ (nextElementSibling testid = dialog, nay là <modal-dialog> → null).
 // Ticket ES1-T129 TE-8-FE2 (lượt 2, phạm vi ES1-T307 §3): khung search popup + biến thể drawer, <modal-dialog data-layer="search">,
 // form kính lúp đầu ô + nút xoá (docs/ui-spec/predictive-search.md §1–§3, §11; ADR 0007).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T129.spec.ts -g "AC1-markup|AC3"
@@ -25,6 +26,9 @@ const T = {
 };
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
+
+// Dung sai subpixel cho so sánh mép (boundingBox trả số lẻ như 779.99998, -0.035)
+const PX = 0.5;
 
 test.beforeEach(async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -198,7 +202,11 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     test.skip((await tid(page, T.dialog).getAttribute('data-style')) !== 'popup', 'store đang chọn drawer');
     await openDialog(page);
     const box = (await tid(page, T.dialog).boundingBox())!;
-    expect(box).toEqual({ x: 0, y: 0, width: 360, height: 780 });
+    // Số lẻ subpixel (779.99998, y -0.035): so gần đúng, 0 chữ số thập phân
+    expect(box.x).toBeCloseTo(0, 0);
+    expect(box.y).toBeCloseTo(0, 0);
+    expect(box.width).toBeCloseTo(360, 0);
+    expect(box.height).toBeCloseTo(780, 0);
 
     const bar = await tid(page, T.form).evaluate((f) => {
       const b = f.parentElement!;
@@ -217,7 +225,7 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     });
     expect(scroll.top, 'listbox phải tự cuộn').toBeGreaterThan(0);
     expect(scroll.overX).toBeLessThanOrEqual(0);
-    expect((await form.boundingBox())!.y).toBe(before.y);
+    expect((await form.boundingBox())!.y).toBeCloseTo(before.y, 0);
     const dialogOverX = await tid(page, T.dialog).evaluate((e) => e.scrollWidth - e.clientWidth);
     expect(dialogOverX).toBeLessThanOrEqual(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
@@ -228,10 +236,10 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     const input = (await tid(page, T.input).boundingBox())!;
     const clear = (await tid(page, T.clear).boundingBox())!;
     const close = (await tid(page, T.close).boundingBox())!;
-    expect(submit.x + submit.width).toBeLessThanOrEqual(input.x);
-    expect(input.x + input.width).toBeLessThanOrEqual(clear.x);
-    expect(clear.x + clear.width).toBeLessThanOrEqual(close.x);
-    expect(close.x + close.width).toBeLessThanOrEqual(360);
+    expect(submit.x + submit.width).toBeLessThanOrEqual(input.x + PX);
+    expect(input.x + input.width).toBeLessThanOrEqual(clear.x + PX);
+    expect(clear.x + clear.width).toBeLessThanOrEqual(close.x + PX);
+    expect(close.x + close.width).toBeLessThanOrEqual(360 + PX);
     expect(close.width).toBeGreaterThanOrEqual(48);
   });
 
@@ -243,10 +251,10 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     await openDialog(page);
     await fillListbox(page, 12);
     const box = (await tid(page, T.dialog).boundingBox())!;
-    expect(box.y).toBe(0);
-    expect(box.x).toBe(0);
-    expect(box.width).toBe(1280);
-    expect(box.height).toBeLessThanOrEqual(640);
+    expect(box.y).toBeCloseTo(0, 0);
+    expect(box.x).toBeCloseTo(0, 0);
+    expect(box.width).toBeCloseTo(1280, 0);
+    expect(box.height).toBeLessThanOrEqual(640 + PX);
     const scroll = await tid(page, T.listbox).evaluate((e) => e.scrollHeight - e.clientHeight);
     expect(scroll, 'listbox phải tự cuộn').toBeGreaterThan(0);
     const backdrop = await tid(page, T.dialog).evaluate((d) => getComputedStyle(d, '::backdrop').backgroundColor);
@@ -255,8 +263,8 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     const logo = (await tid(page, T.dialog).locator('.predictive-search__logo').boundingBox())!;
     const form = (await tid(page, T.form).boundingBox())!;
     const close = (await tid(page, T.close).boundingBox())!;
-    expect(logo.x + logo.width).toBeLessThanOrEqual(form.x);
-    expect(form.x + form.width).toBeLessThanOrEqual(close.x);
+    expect(logo.x + logo.width).toBeLessThanOrEqual(form.x + PX);
+    expect(form.x + form.width).toBeLessThanOrEqual(close.x + PX);
     expect(Math.abs(form.y + form.height / 2 - (close.y + close.height / 2))).toBeLessThanOrEqual(1);
   });
 
@@ -266,14 +274,14 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     await asDrawer(page);
     await openDialog(page);
     const box = (await tid(page, T.dialog).boundingBox())!;
-    expect(Math.round(box.width)).toBe(324);
-    expect(Math.round(box.x + box.width)).toBe(360);
-    expect(box.height).toBe(780);
+    expect(box.width).toBeCloseTo(324, 0);
+    expect(box.x + box.width).toBeCloseTo(360, 0);
+    expect(box.height).toBeCloseTo(780, 0);
     await expect(page.locator('#PredictiveSearchTitle')).toBeVisible();
     const title = (await page.locator('#PredictiveSearchTitle').boundingBox())!;
     const form = (await tid(page, T.form).boundingBox())!;
     const close = (await tid(page, T.close).boundingBox())!;
-    expect(form.y).toBeGreaterThanOrEqual(title.y + title.height);
+    expect(form.y + PX).toBeGreaterThanOrEqual(title.y + title.height);
     expect(close.y).toBeLessThan(form.y);
     await expectNoSeriousAxe(page);
   });
@@ -292,7 +300,8 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     const image = options.first().locator('img');
     await expect(image).toHaveAttribute('alt', '');
     const size = await image.evaluate((e) => [e.getBoundingClientRect().width, e.getBoundingClientRect().height]);
-    expect(size).toEqual([64, 64]);
+    expect(size[0]).toBeCloseTo(64, 0);
+    expect(size[1]).toBeCloseTo(64, 0);
 
     const style = (el: Element) => {
       const s = getComputedStyle(el);

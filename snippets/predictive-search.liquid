@@ -8,6 +8,10 @@
   search page. Inside the dialog the form is a plain GET to the search page,
   so search works if assets/predictive-search.js fails to load.
 
+  The dialog is a .drawer (position, backdrop, shared open/close motion in
+  assets/base.css); popup sets --drawer-from to a vertical offset so it slides
+  down. CSS never sets display on the listbox or groups, so [hidden] works.
+
   Two styles, one markup (data-style on the dialog):
   - popup: top band. The first row is the dark 80px bar of the header: logo
     (from 80rem), search field, close button. The "Search" h2 is hidden.
@@ -54,7 +58,7 @@
 
 <modal-dialog data-layer="search">
   <dialog
-    class="predictive-search-dialog{% if search_style == 'drawer' %} drawer drawer--end drawer--wide{% endif %}"
+    class="predictive-search-dialog drawer{% if search_style == 'drawer' %} drawer--end drawer--wide{% endif %}"
     data-style="{{ search_style }}"
     scroll-lock
     aria-labelledby="PredictiveSearchTitle"
@@ -163,7 +167,7 @@
       <div class="predictive-search__status" role="status" data-testid="predictive-search-status"></div>
 
       <div
-        class="predictive-search__listbox"
+        class="drawer__body predictive-search__listbox"
         id="PredictiveSearchListbox"
         role="listbox"
         aria-label="{{ 'blocks.predictive_search.listbox_label' | t | escape }}"
