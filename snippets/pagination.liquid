@@ -12,9 +12,10 @@
   Call it inside a paginate tag with window_size: 1 (at most 7 page parts), only
   from templates/ or a page block.
 
-  Test hooks: pagination, pagination-previous, pagination-next (also on the
-  disabled span), pagination-status, pagination-page, pagination-current,
-  pagination-summary.
+  Test hooks: pagination, pagination-previous, pagination-next (links only),
+  pagination-previous-disabled, pagination-next-disabled (disabled spans),
+  pagination-status, pagination-page, pagination-current (text is the bare
+  page number), pagination-summary.
 
   @param {object} paginate - The paginate object of the enclosing paginate tag
   @param {string} [label] - Translated name of the nav. Defaults to collections.pagination.label; article comments pass blog.comments_pagination_label
@@ -65,7 +66,7 @@
             role="link"
             aria-disabled="true"
             aria-label="{{ previous_label | escape }}"
-            data-testid="pagination-previous"
+            data-testid="pagination-previous-disabled"
           >
             {%- render 'slideshow-icon', name: 'previous' -%}
           </span>
@@ -90,8 +91,9 @@
           {%- else -%}
             {%- assign part_number = part.title | plus: 0 -%}
             {%- if part_number == paginate.current_page -%}
+              <span class="visually-hidden">{{ 'collections.pagination.current_prefix' | t }} </span>
+              {%- comment -%}Prefix sits outside the testid span so its text is the bare number.{%- endcomment -%}
               <span class="pagination__page" aria-current="page" data-testid="pagination-current">
-                <span class="visually-hidden">{{ 'collections.pagination.current_prefix' | t }} </span>
                 {{- part.title -}}
               </span>
             {%- else -%}
@@ -117,7 +119,7 @@
             role="link"
             aria-disabled="true"
             aria-label="{{ next_label | escape }}"
-            data-testid="pagination-next"
+            data-testid="pagination-next-disabled"
           >
             {%- render 'slideshow-icon', name: 'next' -%}
           </span>
