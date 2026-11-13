@@ -2241,6 +2241,167 @@ bundle-form {
   }
 }
 
+/** Breadcrumb, tiêu đề trang, banner trang con (TE-22-R2-FE1; foundation §3.3, §5; SRS TE-22 AC9–AC13).
+   Snippet breadcrumb + page-title. Tên dài không cắt, xuống dòng (AC10, thay "…" của §5). */
+.breadcrumb {
+  padding-block-start: var(--space-4);
+  font-size: var(--font-size-sm);
+  line-height: calc(var(--space-1) * 5);
+}
+
+.breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breadcrumb__item {
+  display: flex;
+  align-items: center;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Dấu "/" trang trí, không đọc (alt rỗng) */
+.breadcrumb__item + .breadcrumb__item::before {
+  content: '/' / '';
+  padding-inline: var(--space-2);
+  color: var(--color-muted-light);
+}
+
+.breadcrumb__link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: calc(var(--space-1) * 11);
+  color: var(--color-muted);
+  text-decoration: none;
+  text-underline-offset: 0.2em;
+  transition: color var(--motion-fast) var(--ease-out);
+}
+
+.breadcrumb__link:hover {
+  color: var(--color-foreground);
+  text-decoration: underline;
+}
+
+.breadcrumb__link:focus-visible {
+  outline-color: var(--color-accent);
+}
+
+.breadcrumb__current {
+  color: var(--color-foreground);
+  font-weight: 500;
+}
+
+/* minmax(0, 1fr): từ dài trong h1 xuống dòng thay vì nới cột (AC10, không tràn ngang ở 360) */
+.page-title {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-2);
+  padding-block: var(--space-4) var(--space-7);
+}
+
+.page-title > * {
+  margin: 0;
+}
+
+.page-title__eyebrow {
+  margin-block-end: var(--space-1);
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.page-title__meta {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Banner: thẻ bo 16 dưới header tối, không đè header. Ảnh LCP: render 'image' class page-banner__media,
+   eager + fetchpriority high (caller). Cao theo chữ, tối thiểu 280/360; ảnh phủ tuyệt đối, cover theo focal point.
+   Lớp tối gắn vào khung ảnh (::after) nên không cần var(--layer-*): nội dung positioned đứng sau trong DOM vẽ đè lên.
+   60% trên ảnh trắng: chữ trắng 4.56:1; đáy 75% ≥ 7.3:1. */
+.page-banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  position: relative;
+  min-block-size: 17.5rem;
+  margin-block-start: var(--space-4);
+  overflow: hidden;
+  border-radius: calc(var(--radius-card) + var(--space-1));
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+}
+
+.image.page-banner__media {
+  position: absolute;
+  inset: 0;
+}
+
+.image.page-banner__media > img {
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.page-banner__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--color-background-dark) 75%, transparent),
+    color-mix(in srgb, var(--color-background-dark) 60%, transparent) 50%
+  );
+}
+
+.page-banner__content {
+  position: relative;
+  align-self: end;
+  padding: var(--space-6) var(--space-5);
+}
+
+.page-banner :is(.breadcrumb__link, .breadcrumb__current, .page-title__eyebrow, .page-title__meta),
+.page-banner .breadcrumb__item + .breadcrumb__item::before {
+  color: inherit;
+}
+
+.page-banner .breadcrumb__link:focus-visible {
+  outline-color: currentcolor;
+}
+
+.page-banner .breadcrumb {
+  padding-block-start: 0;
+}
+
+.page-banner .page-title {
+  padding-block: var(--space-2) 0;
+}
+
+@media (min-width: 64rem) {
+  .breadcrumb {
+    padding-block-start: var(--space-5);
+  }
+
+  .page-title {
+    padding-block: var(--space-5) calc(var(--space-1) * 16);
+  }
+
+  .page-banner {
+    min-block-size: 22.5rem;
+    margin-block-start: var(--space-5);
+  }
+
+  .page-banner__content {
+    padding: calc(var(--space-1) * 12);
+  }
+}
+
 /** Collection page (TE-6, ES1-T103 D1–D3). Figma không có trang này: bố cục mặc định, chờ Designer ES1-T107 */
 .collection-banner {
   display: grid;
