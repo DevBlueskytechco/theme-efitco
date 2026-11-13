@@ -3692,21 +3692,23 @@ a.pagination__link:focus-visible {
   color: var(--color-background-dark-foreground);
 }
 
-/** Slideshow */
+/** Slideshow (TE-2; index-mobile-a §2, index-1280 §2.1). Header không đè hero (AC-H29) */
 slideshow-carousel {
   display: block;
 }
 
 .slideshow {
-  --slideshow-inset: var(--page-margin);
-  --slideshow-arrow-size: 44px;
-  --slideshow-arrow-gap: var(--space-4);
+  --slideshow-arrow-size: calc(var(--space-1) * 11);
 
-  padding-inline: var(--slideshow-inset);
+  container-type: inline-size;
 }
 
 .slideshow__frame {
+  --hero-inset: 0px;
+  --hero-edge: var(--page-margin);
+
   position: relative;
+  margin-inline: var(--hero-inset);
 }
 
 .slideshow__track {
@@ -3715,7 +3717,6 @@ slideshow-carousel {
   overscroll-behavior-x: contain;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
-  border-radius: var(--radius-hero);
 }
 
 .slideshow__track::-webkit-scrollbar {
@@ -3723,10 +3724,11 @@ slideshow-carousel {
 }
 
 .slideshow__track:focus-visible {
-  outline-offset: -4px;
+  outline-color: var(--color-background-dark-foreground);
+  outline-offset: calc(var(--space-1) * -1);
 }
 
-/* Không JS không có nút: thanh cuộn là dấu hiệu duy nhất còn slide khác */
+/* Không JS: thanh cuộn (AC7) */
 @media (scripting: none) {
   .slideshow__track {
     scrollbar-width: thin;
@@ -3741,8 +3743,8 @@ slideshow-carousel {
   position: relative;
   display: grid;
   flex: 0 0 100%;
-  align-items: center;
-  aspect-ratio: 4 / 5;
+  align-items: end;
+  aspect-ratio: 3 / 4;
   scroll-snap-align: start;
   scroll-snap-stop: always;
   background-color: var(--color-background-dark);
@@ -3765,26 +3767,28 @@ slideshow-carousel {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: var(--focal-point, center);
 }
 
 .slideshow__placeholder {
   fill: var(--color-muted-on-dark);
 }
 
+/* Lớp tối chỉ dưới 80rem (sổ 10/11) */
 .slideshow__overlay {
   background-color: color-mix(in srgb, var(--color-background-dark) var(--overlay-opacity), transparent);
 }
 
+/* 360: luôn căn trái (AC2) */
 .slideshow__content {
   position: relative;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-5);
-  width: 100%;
+  align-items: flex-start;
+  gap: var(--space-3);
   min-width: 0;
-  padding: calc(var(--header-height) + var(--space-5)) var(--space-4) calc(var(--slideshow-arrow-size) + var(--space-6));
-  text-align: center;
+  padding: var(--space-6) var(--hero-edge) calc(var(--space-1) * 15);
+  text-align: start;
 }
 
 .slideshow__eyebrow {
@@ -3797,6 +3801,7 @@ slideshow-carousel {
 
 .slideshow__heading {
   max-width: 100%;
+  font-family: var(--font-heading--family);
   font-size: var(--font-size-display);
   font-weight: var(--font-heading--weight-display);
   letter-spacing: -0.04em;
@@ -3806,16 +3811,21 @@ slideshow-carousel {
 }
 
 .slideshow__subheading {
-  max-width: 45.375rem;
+  max-width: 30ch;
   font-weight: 500;
   letter-spacing: -0.04em;
+  line-height: 1.625;
 }
 
 .slideshow__buttons {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
-  margin-block-start: var(--space-4);
+  margin-block-start: var(--space-3);
+}
+
+.slideshow__buttons .button {
+  min-height: calc(var(--space-1) * 12);
 }
 
 .slideshow-icon {
@@ -3832,7 +3842,7 @@ slideshow-carousel {
   scale: -1 1;
 }
 
-/* Chờ JS: mặc định ẩn hết, slideshow.js gắn data-enhanced thì mới hiện */
+/* Hiện khi JS gắn data-enhanced */
 .slideshow__controls,
 .slideshow__arrow,
 .slideshow__dots,
@@ -3842,25 +3852,22 @@ slideshow-carousel {
 
 slideshow-carousel[data-enhanced] .slideshow__controls {
   position: absolute;
-  inset-inline: var(--space-3);
-  inset-block-end: var(--space-3);
+  inset-block-end: var(--space-2);
+  inset-inline-start: calc(var(--hero-edge) - var(--space-4));
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-2);
   pointer-events: none;
 }
 
-slideshow-carousel[data-enhanced][data-multiple] .slideshow__arrow,
+slideshow-carousel[data-enhanced][data-multiple] .slideshow__dots,
 slideshow-carousel[data-enhanced][data-multiple][data-autoplay='true'] .slideshow__pause,
 slideshow-carousel[data-enhanced]:has(video) .slideshow__pause {
   display: flex;
 }
 
-slideshow-carousel[data-enhanced][data-multiple] .slideshow__dots {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
+.slideshow__dots {
+  pointer-events: auto;
 }
 
 .slideshow__arrow,
@@ -3879,42 +3886,22 @@ slideshow-carousel[data-enhanced][data-multiple] .slideshow__dots {
   pointer-events: auto;
 }
 
-.slideshow__arrow--prev {
-  order: 1;
+.slideshow__arrow .slideshow-icon {
+  margin: -1px;
 }
 
-.slideshow__dots {
-  order: 2;
-  flex: 1 1 auto;
-  min-width: 0;
-  pointer-events: auto;
-}
-
-.slideshow__pause {
-  order: 3;
-}
-
-.slideshow__arrow--next {
-  order: 4;
-  border-color: var(--color-accent);
-  background-color: var(--color-accent);
-  color: var(--color-accent-foreground);
-}
-
-.slideshow__arrow--prev:hover,
-.slideshow__arrow--next:hover,
 .slideshow__pause:hover {
   border-color: var(--color-foreground);
   background-color: var(--color-foreground);
   color: var(--color-background);
 }
 
-/* Vùng bấm 24px, chấm nhìn thấy 8px */
+/* Chạm 44, chấm 12 */
 .slideshow__dot {
   position: relative;
   flex: none;
-  width: var(--space-5);
-  height: var(--space-5);
+  width: calc(var(--space-1) * 11);
+  height: calc(var(--space-1) * 11);
   border: 0;
   padding: 0;
   background: none;
@@ -3924,7 +3911,7 @@ slideshow-carousel[data-enhanced][data-multiple] .slideshow__dots {
 
 .slideshow__dot::before {
   position: absolute;
-  inset: var(--space-2);
+  inset: var(--space-4);
   border: 1px solid currentcolor;
   border-radius: 50%;
   content: '';
@@ -3932,6 +3919,11 @@ slideshow-carousel[data-enhanced][data-multiple] .slideshow__dots {
 
 .slideshow__dot[aria-current='true']::before {
   background-color: currentcolor;
+}
+
+.slideshow__dot:focus-visible {
+  outline-color: var(--color-background-dark-foreground);
+  outline-offset: calc(var(--space-1) * -2);
 }
 
 .slideshow__pause .slideshow-icon--pause,
@@ -3943,29 +3935,28 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   display: block;
 }
 
-/* AC2: căn theo setting từ 48rem, dưới đó luôn căn giữa */
 @media (min-width: 48rem) {
   .slideshow {
-    --slideshow-arrow-size: 52px;
-    --slideshow-arrow-gap: var(--space-5);
+    --slideshow-arrow-size: calc(var(--space-1) * 13);
   }
 
   .slideshow__slide {
+    align-items: center;
     aspect-ratio: 4 / 3;
   }
 
   .slideshow__content {
-    width: min(
-      100% - (var(--slideshow-arrow-gap) + var(--slideshow-arrow-size) + var(--space-4)) * 2,
-      var(--page-width) - var(--page-margin) * 2
-    );
-    margin-inline: auto;
-    padding-inline: 0;
+    gap: var(--space-4);
+    padding-block: var(--space-6);
   }
 
-  [data-alignment='left'] > .slideshow__content {
-    align-items: flex-start;
-    text-align: start;
+  .slideshow__content > * {
+    max-width: 28rem;
+  }
+
+  [data-alignment='center'] > .slideshow__content {
+    align-items: center;
+    text-align: center;
   }
 
   [data-alignment='right'] > .slideshow__content {
@@ -3973,55 +3964,129 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
     text-align: end;
   }
 
-  .slideshow__heading {
-    max-width: 45.375rem;
-  }
-
-  /* Hai nút vào giữa cạnh hero như Figma; chấm + tạm dừng ở đáy */
   slideshow-carousel[data-enhanced] .slideshow__controls {
-    inset-block: 0;
-    inset-inline: var(--slideshow-arrow-gap);
-    align-items: flex-end;
-    justify-content: center;
-    padding-block-end: var(--space-4);
+    inset-block-end: var(--space-5);
+    inset-inline: auto var(--hero-edge);
   }
 
-  .slideshow__arrow {
-    position: absolute;
-    inset-block-start: calc(50% - var(--slideshow-arrow-size) / 2);
+  slideshow-carousel[data-enhanced][data-multiple] .slideshow__arrow {
+    display: flex;
   }
 
-  .slideshow__arrow--prev {
-    inset-inline-start: 0;
+  slideshow-carousel[data-enhanced][data-multiple] .slideshow__dots {
+    display: none;
   }
 
-  .slideshow__arrow--next {
-    inset-inline-end: 0;
-  }
-
-  .slideshow__dots {
-    flex: none;
+  .slideshow__pause {
+    order: -1;
   }
 }
 
+/* 1280 / 1920 (HD1, HD2; Figma 1:422) */
 @media (min-width: 80rem) {
-  .slideshow {
-    /* Figma: hero 1798 trên khung 1920 */
-    --slideshow-inset: max(var(--page-margin), 3.177vw);
-    --slideshow-arrow-gap: calc(var(--space-1) * 15);
+  .slideshow__frame {
+    --hero-side: max(var(--page-margin), (100cqi - var(--page-width)) / 2 + var(--page-margin));
+    /* Figma 1:422: thẻ 1798 trên 1920, lùi 61 */
+    --hero-inset: clamp(0px, var(--hero-side) - var(--space-1) * 16, 100cqi * 61 / 1920);
+    --hero-round: min(var(--hero-inset), var(--space-1) * 15);
+    --hero-edge: calc(var(--hero-side) - var(--hero-inset));
+    /* Rìa < 100: mũi tên gộp góc dưới phải; ≥ 100: hai bên */
+    --hero-corner: calc((var(--slideshow-arrow-size) + var(--space-5) * 2 - var(--hero-edge)) * 1000);
+  }
+
+  /* Bo 16 ở 1280, 24 ở 1920 */
+  .slideshow__track {
+    border-radius: calc(var(--radius-hero) + var(--space-1) + var(--hero-round) * 2 / 15);
   }
 
   .slideshow__slide {
     aspect-ratio: 1798 / 827;
   }
 
-  /* Figma: 60px dưới subheading = gap 24 + 36 */
-  .slideshow__buttons {
-    margin-block-start: calc(var(--space-1) * 9);
+  .slideshow__overlay {
+    display: none;
   }
 
-  .button {
-    min-height: 52px;
+  .slideshow__content {
+    gap: var(--space-5);
+  }
+
+  .slideshow__content > * {
+    max-width: 45.375rem;
+  }
+
+  .slideshow__heading {
+    font-size: min(var(--font-size-display), 6.25vw);
+  }
+
+  .slideshow__subheading {
+    line-height: 1.5;
+  }
+
+  .slideshow__buttons {
+    margin-block-start: calc(clamp(var(--space-1) * 12, 3.125vw, var(--space-1) * 15) - var(--space-5));
+  }
+
+  .slideshow__buttons .button {
+    gap: calc(var(--space-1) * 2.5);
+    min-inline-size: var(--figma-hero-cta-width);
+  }
+
+  slideshow-carousel[data-enhanced] .slideshow__controls {
+    inset: 0;
+  }
+
+  .slideshow__arrow {
+    position: absolute;
+    inset-block-start: clamp(
+      50% - var(--slideshow-arrow-size) / 2,
+      var(--hero-corner),
+      100% - var(--slideshow-arrow-size) - var(--space-5)
+    );
+  }
+
+  .slideshow__arrow--prev {
+    inset-inline-start: clamp(
+      var(--space-1) * 15,
+      var(--hero-corner),
+      100% - var(--slideshow-arrow-size) * 2 - var(--space-2) - var(--space-5)
+    );
+  }
+
+  .slideshow__arrow--next {
+    inset-inline-end: clamp(var(--space-5), var(--hero-corner) * -1, var(--space-1) * 15);
+  }
+
+  .slideshow__pause {
+    position: absolute;
+    inset-block-end: var(--space-5);
+    inset-inline-start: var(--hero-edge);
+  }
+}
+
+/* AC10: chỉ chữ slide 1 hiện dần, ảnh không animation */
+@media (prefers-reduced-motion: no-preference) {
+  .slideshow__slide:first-child .slideshow__content > * {
+    animation: hero-text-in var(--motion-enter) var(--ease-out) both;
+  }
+
+  .slideshow__slide:first-child .slideshow__content > :nth-child(2) {
+    animation-delay: var(--motion-stagger);
+  }
+
+  .slideshow__slide:first-child .slideshow__content > :nth-child(3) {
+    animation-delay: calc(var(--motion-stagger) * 2);
+  }
+
+  .slideshow__slide:first-child .slideshow__content > :nth-child(4) {
+    animation-delay: calc(var(--motion-stagger) * 3);
+  }
+
+  @keyframes hero-text-in {
+    from {
+      opacity: 0;
+      translate: 0 var(--space-4);
+    }
   }
 }
 
@@ -9152,29 +9217,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-header__icon svg { display: block; }
   shopify-account.site-header__icon svg, .site-header__icons a svg:not(.site-header__svg-search) { width: 24px; height: 24px; }
 
-  /* Hero */
-  .slideshow { --slideshow-inset: 61px; padding-inline: 61px; }
-  .slideshow__frame, .slideshow__track { border-radius: var(--figma-radius-24); overflow: hidden; }
-  .slideshow__slide { height: 827px; min-height: 0; aspect-ratio: auto; border-radius: var(--figma-radius-24); }
-  .slideshow__pause { position: absolute; inset-block-end: 32px; inset-inline-end: 60px; pointer-events: auto; }
-  .slideshow__buttons .button { min-width: 233px; }
-  .slideshow__overlay { display: none; }
-  .slideshow__content { position: absolute; inset: 0; display: block; max-width: none; margin: 0; padding-block: 212px 0; padding-inline: min(191px, 10.6%) 0; text-align: start; }
-  .slideshow__eyebrow { margin: 0 0 24px; font-size: 16px; line-height: 20px; font-weight: 800; letter-spacing: 0.64px; }
-  .slideshow__heading { margin: 0 0 24px; max-width: 726px; }
-  .slideshow__subheading { margin: 0 0 60px; font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: -0.64px; color: var(--figma-ffffff); }
-  .slideshow__buttons { margin: 0; }
-  .slideshow .slideshow__controls { position: absolute; inset: 0; pointer-events: none; padding: 0; margin: 0; }
-  .slideshow__arrow { position: absolute; top: 388px; width: 52px; height: 52px; padding: 0; border-radius: 50%; pointer-events: auto; }
-  .slideshow__arrow--prev { inset-inline-start: 0; background: var(--figma-ffffff); color: var(--figma-1a1a1a); border: 1px solid var(--figma-e5e5e5); }
-  .slideshow__arrow--next { inset-inline-end: 0; background: var(--color-accent); color: var(--figma-ffffff); border: 0; }
-  .slideshow__arrow .slideshow-icon { width: 52px; height: 52px; margin: -1px; }
-  .slideshow__arrow--next .slideshow-icon { margin: 0; }
-  .slideshow__dots { position: absolute; bottom: 40px; inset-inline-start: 50%; transform: translateX(-50%); display: flex; gap: 8px; pointer-events: auto; }
-  .slideshow__dot { width: 40px; height: 4px; min-width: 0; min-height: 0; padding: 0; border: 0; border-radius: var(--figma-radius-2); background: var(--figma-ffffff); opacity: 0.4; }
-  .slideshow__dot[aria-current='true'], .slideshow__dot[aria-selected='true'] { opacity: 1; background: var(--figma-ffffff); }
-  .slideshow__dot::before, .slideshow__dot::after { display: none; }
-  .slideshow.slideshow[data-autoplay='false'] .slideshow__pause, .slideshow.slideshow[data-autoplay='false'] .slideshow__dots { display: none; }
   .featured-product__description { width: calc(100% + 6px); max-width: 674px; }
   .site-footer__column:first-child li:nth-child(2) .site-footer__link { color: var(--figma-ffffff); }
   .button { font-family: var(--font-primary--family); font-size: 16px; line-height: 26px; font-weight: 600; letter-spacing: -0.16px; padding: 13px 32px; border-width: 0; border-radius: var(--figma-radius-8); gap: 8px; min-height: 52px; }
@@ -9408,7 +9450,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-header__link { gap: 5px; }
   .site-header__link svg { position: relative; top: -1px; }
   .shop-by-level__eyebrow, .featured-collection__eyebrow, .shop-the-look__eyebrow, .bundle-builder__eyebrow, .featured-product__eyebrow, .video-carousel__eyebrow, .testimonials__eyebrow, .blog-posts__eyebrow, .faq__eyebrow, .faq__stat-label, .image-with-text__eyebrow { position: relative; top: 1px; }
-  .slideshow__buttons .button { gap: 10px; }
   .rich-text__heading { position: relative; top: 2px; }
   .rich-text__heading .rich-text__inline-image { position: relative; top: -1px; }
   .rich-text__content .button { gap: 14px; }
@@ -9488,16 +9529,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .video-card:not([data-playing]) .video-card__toggle .slideshow-icon--pause, .video-card[data-playing] .video-card__toggle .slideshow-icon--play { display: none; }
 [data-quiz-title]:focus { outline: 0; }
 .faq__stat-value { font-variant-numeric: tabular-nums; }
-/* Mobile (ảnh review 15): ảnh tràn màn, không bo góc, chỉ dot chuyển slide, vùng bấm 44 x 44 */
-@media (max-width: 47.99rem) {
-  .slideshow { padding-inline: 0; }
-  .slideshow__track { border-radius: 0; }
-  slideshow-carousel[data-enhanced][data-multiple] .slideshow__arrow { display: none; }
-  slideshow-carousel[data-enhanced] .slideshow__controls { justify-content: center; inset-block-end: var(--space-1); }
-  .slideshow__dots { gap: 0; }
-  .slideshow__dot { width: 44px; height: 44px; }
-  .slideshow__dot::before { inset: 16px; }
-}
 .site-footer__invalid { display: none; margin: 0; color: var(--color-sale); font-size: var(--font-size-sm); }
 .site-footer__form[data-invalid] .site-footer__invalid { display: block; }
 .site-footer__form[data-invalid] .site-footer__note { display: none; }
@@ -9609,11 +9640,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 }
 
 /* ==== Review CTO 09/11 (tong_hop.docx, ES1-T250): sửa 7 lỗi + hàng cuộn có nút, thanh tiến trình, chuyển động. ==== */
-
-/* 1. Nội dung hero thẳng mép trái container (header, các khối dưới). % tính theo bề ngang slide. */
-@media (min-width: 80rem) {
-  .slideshow__content { padding-inline-start: max(min(191px, 10.6%), calc((100% - var(--page-width)) / 2 + var(--page-margin))); }
-}
 
 /* 2. Nút next, back: mặc định trắng, rê chuột mới cam */
 .slideshow__arrow--prev, .slideshow__arrow--next {
@@ -9818,20 +9844,6 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
 
 /* ==== Chuyển động v2 (ES1-T250): mở trang, hiện dần theo cuộn, cuộn gắn tiến trình. Chỉ transform, opacity, clip-path. ==== */
 @media (prefers-reduced-motion: no-preference) {
-  /* Hero: chữ trồi lên lần lượt, ảnh thu từ 1.12 về 1. Chạy lúc tải trang (CSS, không chờ JS) và mỗi lần đổi slide. */
-  slideshow-carousel:not([data-enhanced]) .slideshow__slide:first-child .slideshow__content > *,
-  slideshow-carousel[data-enhanced] .slideshow__slide:not([inert]) .slideshow__content > * {
-    animation: motion-rise var(--motion-reveal) var(--ease-expo) both;
-  }
-  .slideshow__content > :nth-child(2) { animation-delay: 90ms; }
-  .slideshow__content > :nth-child(3) { animation-delay: 180ms; }
-  .slideshow__content > :nth-child(4) { animation-delay: 270ms; }
-  .slideshow__content > :nth-child(5) { animation-delay: 360ms; }
-  slideshow-carousel:not([data-enhanced]) .slideshow__slide:first-child .slideshow__media :is(img, video),
-  slideshow-carousel[data-enhanced] .slideshow__slide:not([inert]) .slideshow__media :is(img, video) {
-    animation: motion-settle var(--motion-hero) var(--ease-expo) both;
-  }
-
   /* Hiện dần theo cuộn: motion.js gắn data-reveal + data-reveal-kind, --reveal-i là thứ tự trong nhóm */
   html[data-motion] [data-reveal] { transition-property: opacity, translate, scale, clip-path; transition-duration: var(--motion-reveal); transition-timing-function: var(--ease-expo); transition-delay: calc(var(--reveal-i, 0) * 80ms); }
   html[data-motion] [data-reveal='wait'] { opacity: 0; translate: 0 32px; }
@@ -9872,6 +9884,5 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
   }
 
   @keyframes motion-rise { from { opacity: 0; translate: 0 40px; } }
-  @keyframes motion-settle { from { scale: 1.12; } }
   @keyframes motion-shimmer { to { background-position: -300% 0; } }
 }
