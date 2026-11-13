@@ -952,7 +952,6 @@ modal-dialog {
 }
 
 /** Product card (TE-3, Figma 1:502): ảnh 1:1, badge, tiêu đề, giá, swatch */
-product-swatch,
 .product-card {
   display: flex;
   flex-direction: column;
@@ -1082,6 +1081,7 @@ product-swatch,
 
 .product-card__title {
   margin: 0;
+  overflow-wrap: anywhere;
   font-family: var(--font-primary--family);
   font-size: var(--font-size-base);
   font-weight: 500;
@@ -1131,72 +1131,84 @@ product-swatch,
   color: var(--color-muted);
 }
 
-/* Swatch: pill 32 × 16 (Figma) trong label 32 × 24, ::after mở vùng bấm ra 44 × 44 (AC6, D7).
-   Label có sàn --touch-target-min để space_base < 4 vẫn ≥ 24px (ES1-T58);
-   pill giữ tỉ lệ space-6 × space-4 và căn giữa label.
-   Khoảng cách lấy đủ để 2 vùng bấm 44 chỉ chạm nhau, không chồng: bước 44 thay vì 36 của Figma. */
+/* Dòng biến thể khi card nhận variant (TE-3 AC8): trong link tiêu đề, chữ phụ 14 */
+.product-card__variant {
+  display: block;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+/* Hết hàng: ảnh mờ 0.6, giá giữ (foundation §9) */
+.product-card[data-sold-out] .product-card__image,
+.product-card[data-sold-out]:hover .product-card__image-hover {
+  opacity: 0.6;
+}
+
+/* Swatch là chỉ báo (TE-3 AC2, AC6, AC13; foundation §9): pill 32 × 16 cách 4, aria-hidden, không focus.
+   ≤ 4 hiện hết, > 4 hiện 3 + "+N": 3 × 36 + "+N" vừa card 152 ở 360.
+   Viền trong trắng 1px, đang chọn viền accent + dấu tick (Figma 1:186).
+   ::before vẽ pill (ES1-T190), ::after là vùng chạm 44 × 44 / 36 × 44 từ 80rem (TE-3 AC6 D7), trong suốt, không đổi layout. */
 .product-card__swatches {
-  --swatch-hit: 44px;
-  --swatch-inline: max(var(--space-6), var(--touch-target-min));
-  --swatch-block: max(var(--space-5), var(--touch-target-min));
-  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: max(0px, calc(var(--swatch-hit) - var(--swatch-block))) max(0px, calc(var(--swatch-hit) - var(--swatch-inline)));
+  gap: var(--space-1);
   min-inline-size: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
+  pointer-events: none;
 }
 
 .product-card__swatch {
   position: relative;
-  display: block;
-  inline-size: var(--swatch-inline);
-  block-size: var(--swatch-block);
-  border-radius: var(--space-1);
-  cursor: pointer;
+  flex: none;
+  inline-size: var(--space-6);
+  block-size: var(--space-4);
 }
 
-.product-card__swatch::after {
-  position: absolute;
-  inset-block: min(0px, calc((100% - var(--swatch-hit)) / 2));
-  inset-inline: min(0px, calc((100% - var(--swatch-hit)) / 2));
-  content: '';
-}
-
+/* Hình pill vẽ ở ::before (ES1-T190 đo hình qua ::before) */
 .product-card__swatch::before {
   position: absolute;
-  inset-block: calc((100% - var(--space-4)) / 2);
-  inset-inline: calc((100% - var(--space-6)) / 2);
-  border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent);
-  border-radius: var(--space-2);
+  inset: 0;
+  border-radius: var(--radius-pill);
   background-color: var(--swatch-color, var(--color-background-cream));
   background-image: var(--swatch-image, none);
   background-position: center;
   background-size: cover;
+  box-shadow: inset 0 0 0 1px var(--color-background);
   content: '';
 }
 
-.product-card__swatch-input:checked + .product-card__swatch::before {
-  border-color: var(--color-accent);
-  box-shadow: 0 0 0 1px var(--color-accent);
+.product-card__swatch[data-selected]::before {
+  box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
-.product-card__swatch-input:focus-visible + .product-card__swatch {
-  outline: 2px solid currentcolor;
-  outline-offset: 2px;
+.product-card__swatch::after {
+  position: absolute;
+  inset: calc(50% - 22px);
+  content: '';
+}
+
+@media (min-width: 80rem) {
+  .product-card__swatch::after {
+    inset-inline: calc(50% - 18px);
+  }
+}
+
+.product-card__swatch-tick {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-accent);
+  -webkit-mask: var(--icon-tick) center / var(--space-3) var(--space-2) no-repeat;
+  mask: var(--icon-tick) center / var(--space-3) var(--space-2) no-repeat;
+  content: '';
 }
 
 .product-card__swatch-more {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: max(var(--space-5), var(--touch-target-min));
   padding-inline-start: var(--space-1);
   color: var(--color-muted);
   font-size: var(--font-size-sm);
-  text-decoration: none;
+  line-height: 1;
 }
 
 /** Featured collection (TE-3, Figma 1:490): padding 120, heading → lưới 40, lưới 2 / 3 / --columns */
@@ -8654,12 +8666,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .product-card__media { border-radius: var(--figma-radius-12); overflow: hidden; background: var(--figma-f5f5f1); }
   .product-card__badge, .product-card__rating { inset-block-start: 16px; }
   .product-card__price { margin-block-start: -4px; }
-  .product-card__swatches { display: flex; gap: 4px; margin: 0; padding: 0; border: 0; }
-  .product-card__swatch { position: relative; display: flex; align-items: center; justify-content: center; width: 32px; height: 16px; border-radius: var(--figma-radius-4); background: var(--swatch-color, transparent); border: 0; box-shadow: inset 0 0 0 1px var(--figma-ffffff); border-radius: var(--figma-radius-999); }
-  .product-card__swatch-input:checked + .product-card__swatch { box-shadow: inset 0 0 0 1px var(--color-accent); }
-  .product-card__swatch::after { inset-inline: -2px; }
-  .product-card__swatch::before { background: none; border: 0; outline: 0; }
-  .product-card__swatch-input:checked + .product-card__swatch::before { background: var(--color-accent); border: 0; outline: 0; -webkit-mask: var(--icon-tick) center / 12px 8px no-repeat; mask: var(--icon-tick) center / 12px 8px no-repeat; }
 
   /* Quiz */
   .quiz { margin-block: 0; }
@@ -8905,7 +8911,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
 /* ==== Trải nghiệm mượt (trai_nghiem.xlsx, skill ux-motion, ES1-T235). Không đổi bố cục tĩnh. ==== */
 .featured-product__seal { color: var(--figma-1a1a1a); opacity: 0.4; }
-.product-card__swatch::before { box-sizing: border-box; inset-inline: calc((100% - 32px) / 2); }
 /* Model 3D nạp xong không được nở khỏi cột gallery (TC-108) */
 .product-media__item { grid-template-columns: minmax(0, 1fr); }
 .product-media__model { position: relative; min-inline-size: 0; max-inline-size: 100%; overflow: hidden; }
@@ -8982,8 +8987,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   html[data-motion] .product-card:hover .product-card__image, .level-card__link:hover .level-card__image img, .collection-card__link:hover .collection-card__image img, .article-card:hover img, .video-card__poster:hover .video-card__poster-image img { scale: 1.04; }
   .product-card__image-hover { transition: opacity var(--motion-slow) var(--ease-out); }
   .level-card__link, .collection-card__image, .article-card, .video-card__frame { overflow: hidden; }
-  .product-card__swatch { transition: scale var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out); }
-  html[data-motion] .product-card__swatch:hover { scale: 1.08; }
   .level-card__products { transition: opacity var(--motion-base) var(--ease-out); }
   .video-card__play { transition: opacity var(--motion-base) var(--ease-out), scale var(--motion-base) var(--ease-out); }
   html[data-motion] .video-card:hover .video-card__play { scale: 1.08; }
