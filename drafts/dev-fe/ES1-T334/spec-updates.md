@@ -83,6 +83,37 @@ AC thay: TE-15 AC1 (HD3 11/11) "1280: card 271px (ảnh 271 × 177, R4 `index-12
 
 Số: `min(336, (1280 − 20 − 4 × 24) / 4.3)` = 270.70 (Figma R4 làm tròn 271; `toBeCloseTo(271, 0)` cần sai số < 0.5 nên cũng qua, nhưng ghi 270.7 cho đúng phép tính). Dòng 360 (252), 768 (307.2), 1920 (336) không đổi.
 
+## 5. tests/e2e/ES1-T191.spec.ts:95 "có bài › dưới số mặc định: hiện đúng số bài, cỡ card không đổi" (CI run 43498762210, desktop)
+
+Đang đòi: ở viewport ≥ 1024 (project desktop = Desktop Chrome 1280 × 720) 2 card 336 × 448. Đó là cỡ 1280 cũ của ES1-T191 (hàng card 336 cố định ở mọi mốc ≥ 80rem).
+
+AC thay: TE-16 AC1 (0.5, HD3 sổ 11/11; `index-1280.md` khối 14, R4) "1280 với 4 bài: lưới tĩnh 4 card 292 × 389, không nút, không thanh tiến trình; 1920 với 4 bài: 4 card 336 × 448 vừa khung, lưới tĩnh; 1280 với ≥ 5 bài: hàng ngang card 271px". AC-H27 "blog dưới 5 bài Then hiện số bài có". Template `index.te16` khối `te16-two` có `articles_to_show: 2` → Liquid gắn `blog-posts--grid` → từ 80rem lưới 4 cột: card = (1280 − 2 × 20 − 3 × 24) / 4 = 292, cao 292 × 4 / 3 = 389.3. "Cỡ card không đổi" nghĩa là 2 bài vẫn cỡ cột của lưới 4 bài (không giãn ra lấp chỗ trống), đúng ý test cũ. Dải 1024–1279 là hàng ngang (`min(40cqi, 336)`), không có cỡ cố định trong AC nên không đo ở đó.
+
+Thay đoạn đo bằng (sai số ≤ 2 px theo SRS 0.5, ES1-T309 #4):
+
+```ts
+  test('dưới số mặc định: hiện đúng số bài, cỡ card bằng lưới 4 bài (TE-16 AC1, AC-H27)', async ({ page }) => {
+    await page.goto(TE16);
+    const cards = band(page, 'te16-two').getByTestId('article-card');
+    await skipWithoutArticles(page, cards, 2);
+    await expect(cards).toHaveCount(2);
+    for (const [width, cardWidth, cardHeight] of [
+      [1280, 292, 389],
+      [1920, 336, 448],
+    ] as const) {
+      await page.setViewportSize({ width, height: 900 });
+      const list = band(page, 'te16-two').getByTestId('blog-posts-list');
+      await expect(list).toHaveCSS('display', 'grid');
+      for (const size of await sizes(cards)) {
+        expect(Math.abs(size.width - cardWidth), `${width} width`).toBeLessThanOrEqual(2);
+        expect(Math.abs(size.height - cardHeight), `${width} height`).toBeLessThanOrEqual(2);
+      }
+    }
+  });
+```
+
+Không đổi các test khác của ES1-T191: 1920 `figma-blog-posts` 5 bài vẫn hàng ngang `min(336, (1920 − 252 − 4 × 24) / 4.3)` = 336 × 448 (AC-H26); 360 252 × 336, 768 307 × 410 (TE-16 AC1).
+
 ## Không sửa
 
 - ES1-T184:178 "hidden thắng display của nút", ES1-T185:171/186/194/224, ES1-T220 (mọi test): đỏ do CSS lượt trước hiện nút `[hidden]` mờ 0.35. Đã sửa CSS: `.carousel-nav .round-button[hidden]` → `visibility: hidden` (Playwright `toBeHidden` đạt, bỏ khỏi Tab, giữ chỗ). Không đổi assertion.

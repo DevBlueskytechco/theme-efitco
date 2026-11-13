@@ -1,8 +1,16 @@
-KHÔNG CHẮC: (0) CI run 43367444316: spec ES1-T118:93, ES1-T179:209, :221, ES1-T184:136 trái AC mới (bảng dưới); dev-fe không ghi được tests/, đề xuất sửa ở `drafts/dev-fe/ES1-T334/spec-updates.md`, hỏi ES1-T456. (1) kích thước card chưa đo trên preview: số dưới đây tính tay từ CSS (100cqi, lề 20/252, gap 16/24); chờ CI + TE-17-R2-QA1. (2) `data-static` do TE-7-R2-BE1 (ES1-T335) gắn; trước khi BE xong, hàng vừa khung ẩn nút (scroll-buttons.js gắn `hidden` cả 2) nhưng thanh tiến trình vẫn hiện đầy. (3) Mặc định heading lấy chữ Figma ("Browse Categories", "Video demo", "Training Tips & Inspiration"...) giữ nguyên: sửa mặc định thuộc ES1-T304 (task-split D10), task này không thêm setting. (4) Quy ước "Hàng ngang" chưa vào AGENTS.md: hook scope-guard chặn dev-fe ghi AGENTS.md, đề xuất bullet ở cuối PR cho người quản trị.
+KHÔNG CHẮC: (0) CI run 43498762210: ES1-T191:95 (blog 2 bài, desktop 1280) còn đòi 336 × 448, trái TE-16 AC1 (1280 lưới tĩnh 292 × 389); dev-fe không ghi được tests/, đề xuất sửa ở `drafts/dev-fe/ES1-T334/spec-updates.md` §5. Spec ES1-T118, T179, T184, T313 (run 43367444316) đã áp §1–§4 ở c6da38c. (1) kích thước card chưa đo trên preview: số dưới đây tính tay từ CSS (100cqi, lề 20/252, gap 16/24); chờ CI + TE-17-R2-QA1. (2) `data-static` do TE-7-R2-BE1 (ES1-T335) gắn; trước khi BE xong, hàng vừa khung ẩn nút (scroll-buttons.js gắn `hidden` cả 2) nhưng thanh tiến trình vẫn hiện đầy. (3) Mặc định heading lấy chữ Figma ("Browse Categories", "Video demo", "Training Tips & Inspiration"...) giữ nguyên: sửa mặc định thuộc ES1-T304 (task-split D10), task này không thêm setting. (4) Quy ước "Hàng ngang" chưa vào AGENTS.md: hook scope-guard chặn dev-fe ghi AGENTS.md, đề xuất bullet ở cuối PR cho người quản trị.
 
 # ES1-T334 — TE-7-R2-FE1: hàng ngang collection-list, testimonials, video-carousel, blog-posts
 
 AC: TE-7 AC1 (+ AC6 phần bố cục), TE-15 AC1, AC-H8, AC-H9, TE-13 AC8 (phần hàng), AC-H21 (bề card), TE-16 AC1, AC-H26, AC-H27. Nguồn: `docs/ui-spec/index-1280.md` §0 R4, §2.2; `index-mobile-a.md` §3; `index-mobile-b.md` §0, §3, §4, §6; foundation §6, §11; sổ 11/11 HD3; task-split ES1-T307 §4 (hợp đồng FE/BE), §6.3.
+
+## Lượt 4 (CI PR #214 run 43498762210)
+
+| Đỏ | Nguyên nhân | Xử lý |
+|---|---|---|
+| ES1-T191:95 "dưới số mặc định: hiện đúng số bài, cỡ card không đổi" (desktop, `toEqual` lệch) | Spec cũ đòi 336 × 448 ở 1280 (hàng 336 cố định ≥ 80rem của ES1-T191). AC đổi: TE-16 AC1 (0.5, HD3, `index-1280.md` khối 14 R4) "1280 với 4 bài: lưới tĩnh 4 card 292 × 389"; AC-H27 "dưới 5 bài hiện số bài có". `te16-two` 2 bài → `blog-posts--grid` → cột lưới 4 = (1280 − 40 − 72) / 4 = 292 × 389.3 | Giữ code (card 2 bài giữ cỡ cột lưới 4 bài, không giãn). Đề xuất sửa spec: spec-updates.md §5 (đo 1280: 292 × 389, 1920: 336 × 448, sai số ≤ 2 px) |
+
+Không đổi Liquid/CSS lượt này. Các test khác của ES1-T191 (1920 5 bài 336 × 448, 360 252 × 336, 768 307 × 410) khớp CSS hiện tại.
 
 ## Lượt 3 (CI PR #214 run 43367444316)
 
