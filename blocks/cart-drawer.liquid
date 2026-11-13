@@ -1,8 +1,9 @@
 {% doc %}
-  Cart drawer (TE-5 AC1, AC2, AC4, AC6). Composed in layout/theme.liquid after
-  the footer container, with no container of its own: the dialog sits outside
-  the page flow and is not a band. Reads the global `cart` and the cart_type
-  theme setting.
+  Cart drawer (TE-5 AC1–AC4, AC8, AC10, frame AC15; mini-cart-quickview.md §1, §2).
+  Composed in layout/theme.liquid after the footer container, with no container
+  of its own: the dialog sits outside the page flow and is not a band. Reads the
+  global `cart`, the cart_type and free_shipping_threshold theme settings and
+  the block settings show_order_note and empty_cart_products.
 
   Root custom element cart-drawer always renders, so its script loads on every
   page. data-mode is 'drawer', or 'none' when cart_type is page or the template
@@ -12,17 +13,39 @@
   routes.cart_url. JavaScript opens it with showModal(). The close button uses
   form method="dialog", so it closes without JavaScript.
 
+  Layer (ADR 0007, layers.md): modal-dialog data-layer="cart" wraps the dialog;
+  the dialog uses the shared drawer frame (.drawer .drawer--end .drawer--wide:
+  90% / 420 from 48rem / 480 from 80rem, scrim 50%, slide from the inline end).
+
   Inside the dialog, in order:
-  - Head with the h2 and the close button, outside cart-items.
+  - Header 72 (.drawer__header), outside cart-items: h2 "Cart", item count pill
+    (partial cart-drawer-count, hidden when the cart is empty), "View cart" link
+    to routes.cart_url, round close button 48.
   - Custom element cart-items holds cart-items-status (role status) and
-    cart-items-error (role alert), both empty on load.
-  - Partial cart-drawer (name must match the JS): root cart-drawer-body with
-    data-item-count, then form id cart-form-drawer with free shipping, lines
-    and summary. The dialog stays outside the partial so a refresh keeps it
-    open and keeps focus.
-  - Accelerated checkout wrapper, outside the partial because Shopify's script
-    mounts the buttons and a refresh would drop them. Hidden when the cart is
-    empty; JavaScript syncs hidden from data-item-count after a refresh.
+    cart-items-error (role alert), both empty on load and first in DOM order
+    (assets/cart-items.js writes into the first role status and role alert).
+  - Body (.drawer__body, scrolls on its own), in order:
+    1. "Added to cart" region: role status wrapper, its box is hidden on load.
+       JavaScript (ES1-T98) fills data-cart-added-item with "{title} · {variant}"
+       and removes hidden after an add; sets hidden again when the drawer closes
+       or on any other cart action. It never hides on a timer.
+    2. Partial cart-drawer (name must match the JS): root cart-drawer-body with
+       data-item-count, then form id cart-form-drawer with free shipping, lines
+       (or the empty state plus up to 2 products from empty_cart_products).
+    3. Order note (show_order_note, default on): details closed on load,
+       outside the partial so a refresh keeps the typed text and the open state.
+       Textarea name note, form cart-form-drawer: Checkout posts it with the
+       form; JavaScript saves it on change (hook data-note). CSS hides it when
+       the cart is empty.
+  - Footer (.drawer__footer, dark panel, not sticky inside the body so focus is
+    never under it): partial cart-drawer-footer with snippets/cart-summary,
+    then the accelerated checkout wrapper, outside the partial because
+    Shopify's script mounts the buttons and a refresh would drop them. Hidden
+    when the cart is empty; JavaScript syncs hidden from data-item-count after
+    a refresh. CSS hides the footer when the summary is absent.
+
+  Partials refreshed together (data-partials on cart-items): cart-drawer,
+  cart-drawer-count, cart-drawer-footer, cart-count.
 
   cart-drawer hooks: data-mode, data-cart-url, data-items-src (assets/cart-items.js
   URL, imported on first open).
@@ -30,11 +53,14 @@
   data-label-updated, data-label-removed, data-label-error,
   data-label-quantity-adjusted. JavaScript sets data-enhanced (CSS hides the
   Update button) and aria-busy. Line hooks are listed in snippets/cart-lines.liquid.
-  Accelerated wrapper hook: data-cart-accelerated.
+  Other hooks: data-cart-added, data-cart-added-item, data-note (textarea),
+  data-cart-accelerated.
 
   Test hooks: cart-drawer, cart-drawer-dialog, cart-drawer-heading,
-  cart-drawer-close, cart-drawer-body, cart-drawer-accelerated, plus cart-items,
-  cart-items-status, cart-items-error, cart-form and the snippet hooks.
+  cart-drawer-count, cart-drawer-view-cart, cart-drawer-close, cart-drawer-added,
+  cart-drawer-body, cart-drawer-bestsellers, cart-drawer-note,
+  cart-drawer-note-input, cart-drawer-footer, cart-drawer-accelerated, plus
+  cart-items, cart-items-status, cart-items-error, cart-form and the snippet hooks.
 
   Self-contained: callers must leave the body empty.
 
@@ -64,82 +90,191 @@
       assign label_removed = 'cart.removed' | t
       assign label_error = 'cart.error' | t
       assign label_quantity_adjusted = 'cart.quantity_adjusted' | t
+      assign empty_collection = block.settings.empty_cart_products
+      assign empty_url = ''
+      if empty_collection != blank
+        assign empty_url = empty_collection.url
+      endif
     -%}
-    <dialog
-      id="CartDrawer"
-      class="cart-drawer__dialog"
-      scroll-lock
-      aria-labelledby="CartDrawerHeading"
-      data-testid="cart-drawer-dialog"
-    >
-      <div class="cart-drawer__head">
-        <h2 id="CartDrawerHeading" class="cart-drawer__heading" data-testid="cart-drawer-heading">
-          {{- 'cart.title' | t -}}
-        </h2>
-        <form method="dialog">
-          {% # aria-label, not hidden text: the dialog is closed (display: none) on load, so a name from hidden content is empty. %}
-          <button
-            class="cart-drawer__close"
-            aria-label="{{ 'blocks.cart_drawer.close' | t }}"
-            data-testid="cart-drawer-close"
-          >
-            {% render 'header-icon', name: 'close' %}
-          </button>
-        </form>
-      </div>
-
-      <cart-items
-        class="cart-items cart-drawer__items"
-        data-cart-change-url="{{ routes.cart_change_url }}"
-        data-cart-url="{{ routes.cart_url }}"
-        data-partials="cart-drawer cart-count"
-        data-label-updated="{{ label_updated | escape }}"
-        data-label-removed="{{ label_removed | escape }}"
-        data-label-error="{{ label_error | escape }}"
-        data-label-quantity-adjusted="{{ label_quantity_adjusted | escape }}"
-        data-testid="cart-items"
+    <modal-dialog data-layer="cart">
+      <dialog
+        id="CartDrawer"
+        class="drawer drawer--end drawer--wide cart-drawer__dialog"
+        scroll-lock
+        aria-labelledby="CartDrawerHeading"
+        data-testid="cart-drawer-dialog"
       >
-        <div class="visually-hidden" role="status" aria-live="polite" data-testid="cart-items-status"></div>
-        <div class="cart-items__error" role="alert" data-testid="cart-items-error"></div>
-
-        {% partial 'cart-drawer' %}
-          <div class="cart-drawer__body" data-item-count="{{ cart.item_count }}" data-testid="cart-drawer-body">
-            <form
-              id="cart-form-drawer"
-              class="cart-drawer__form"
-              action="{{ routes.cart_url }}"
-              method="post"
-              data-testid="cart-form"
+        <div class="drawer__header cart-drawer__head">
+          <div class="cart-drawer__title">
+            <h2 id="CartDrawerHeading" class="drawer__title" data-testid="cart-drawer-heading">
+              {{- 'cart.title' | t -}}
+            </h2>
+            {% partial 'cart-drawer-count' %}
+              <span
+                class="cart-drawer__count"
+                {% if cart.item_count == 0 %}
+                  hidden
+                {% endif %}
+                data-testid="cart-drawer-count"
+              >
+                {{- 'cart.item_count' | t: count: cart.item_count -}}
+              </span>
+            {% endpartial %}
+          </div>
+          <a class="cart-drawer__view-cart" href="{{ routes.cart_url }}" data-testid="cart-drawer-view-cart">
+            {{- 'cart.view_cart' | t -}}
+          </a>
+          <form method="dialog">
+            {% # aria-label, not hidden text: the dialog is closed (display: none) on load, so a name from hidden content is empty. %}
+            <button
+              class="close-button"
+              aria-label="{{ 'blocks.cart_drawer.close' | t }}"
+              data-testid="cart-drawer-close"
             >
-              <div class="cart-drawer__main">
-                {%- render 'cart-free-shipping', cart: cart, context: 'drawer' -%}
-                {%- render 'cart-lines', cart: cart, context: 'drawer' -%}
-              </div>
-              {%- render 'cart-summary', cart: cart, context: 'drawer' -%}
-            </form>
-          </div>
-        {% endpartial %}
+              {% render 'header-icon', name: 'close' %}
+            </button>
+          </form>
+        </div>
 
-        {%- if additional_checkout_buttons -%}
-          <div
-            class="cart-drawer__accelerated"
-            {% if cart.item_count == 0 %}
-              hidden
-            {% endif %}
-            data-cart-accelerated
-            data-testid="cart-drawer-accelerated"
-          >
-            {{- content_for_additional_checkout_buttons -}}
+        <cart-items
+          class="cart-items cart-drawer__items"
+          data-cart-change-url="{{ routes.cart_change_url }}"
+          data-cart-url="{{ routes.cart_url }}"
+          data-partials="cart-drawer cart-drawer-count cart-drawer-footer cart-count"
+          data-label-updated="{{ label_updated | escape }}"
+          data-label-removed="{{ label_removed | escape }}"
+          data-label-error="{{ label_error | escape }}"
+          data-label-quantity-adjusted="{{ label_quantity_adjusted | escape }}"
+          data-testid="cart-items"
+        >
+          <div class="visually-hidden" role="status" aria-live="polite" data-testid="cart-items-status"></div>
+          <div class="cart-items__error" role="alert" data-testid="cart-items-error"></div>
+
+          <div class="drawer__body cart-drawer__main">
+            <div class="cart-drawer__added" role="status" data-testid="cart-drawer-added">
+              <p class="cart-drawer__added-box" data-cart-added hidden>
+                <span class="cart-drawer__added-icon">{% render 'status-icon', name: 'success' %}</span>
+                <span class="cart-drawer__added-text">
+                  <strong>{{ 'cart.added' | t }}</strong>
+                  <span data-cart-added-item></span>
+                </span>
+              </p>
+            </div>
+
+            {% partial 'cart-drawer' %}
+              <div class="cart-drawer__body" data-item-count="{{ cart.item_count }}" data-testid="cart-drawer-body">
+                <form
+                  id="cart-form-drawer"
+                  class="cart-drawer__form"
+                  action="{{ routes.cart_url }}"
+                  method="post"
+                  data-testid="cart-form"
+                >
+                  {%- render 'cart-free-shipping', cart: cart, context: 'drawer' -%}
+                  {%- render 'cart-lines', cart: cart, context: 'drawer', empty_url: empty_url -%}
+                </form>
+
+                {%- if cart.item_count == 0 and empty_collection.products_count > 0 -%}
+                  <div class="cart-drawer__bestsellers" data-testid="cart-drawer-bestsellers">
+                    <h3 class="cart-drawer__bestsellers-heading">{{ 'cart.bestsellers' | t }}</h3>
+                    <ul class="cart-drawer__bestsellers-list" role="list">
+                      {%- for suggestion in empty_collection.products limit: 2 -%}
+                        <li class="cart-drawer__bestseller">
+                          <a class="cart-drawer__bestseller-media" href="{{ suggestion.url }}" tabindex="-1" aria-hidden="true">
+                            {%- if suggestion.featured_image -%}
+                              {%- render 'image',
+                                image: suggestion.featured_image,
+                                class: 'cart-drawer__bestseller-image',
+                                width: 128,
+                                height: 128,
+                                crop: 'center',
+                                widths: '64, 128',
+                                sizes: '64px',
+                                decorative: true
+                              -%}
+                            {%- else -%}
+                              <span class="cart-drawer__bestseller-image">{% render 'status-icon', name: 'box' %}</span>
+                            {%- endif -%}
+                          </a>
+                          <div class="cart-drawer__bestseller-info">
+                            <a class="cart-drawer__bestseller-title" href="{{ suggestion.url }}">{{ suggestion.title | escape }}</a>
+                            {%- render 'price', product: suggestion -%}
+                          </div>
+                        </li>
+                      {%- endfor -%}
+                    </ul>
+                  </div>
+                {%- endif -%}
+              </div>
+            {% endpartial %}
+
+            {%- if block.settings.show_order_note -%}
+              <details class="cart-drawer__note" data-testid="cart-drawer-note">
+                <summary class="cart-drawer__note-toggle">
+                  <span class="cart-drawer__note-icon">{% render 'status-icon', name: 'edit' %}</span>
+                  {{- 'cart.note_toggle' | t -}}
+                  {% render 'header-icon', name: 'chevron' %}
+                </summary>
+                <div class="cart-drawer__note-body">
+                  <label class="cart-drawer__note-label" for="CartDrawer-note">{{ 'cart.note_label' | t }}</label>
+                  <textarea
+                    id="CartDrawer-note"
+                    class="cart-drawer__note-input"
+                    name="note"
+                    rows="4"
+                    form="cart-form-drawer"
+                    aria-describedby="CartDrawer-note-hint"
+                    data-note
+                    data-testid="cart-drawer-note-input"
+                  >{{ cart.note | escape }}</textarea>
+                  <p id="CartDrawer-note-hint" class="cart-drawer__note-hint">{{ 'cart.note_hint' | t }}</p>
+                </div>
+              </details>
+            {%- endif -%}
           </div>
-        {%- endif -%}
-      </cart-items>
-    </dialog>
+
+          <div class="drawer__footer cart-drawer__footer" data-testid="cart-drawer-footer">
+            {% partial 'cart-drawer-footer' %}
+              {%- render 'cart-summary', cart: cart, context: 'drawer' -%}
+            {% endpartial %}
+
+            {%- if additional_checkout_buttons -%}
+              <div
+                class="cart-drawer__accelerated"
+                {% if cart.item_count == 0 %}
+                  hidden
+                {% endif %}
+                data-cart-accelerated
+                data-testid="cart-drawer-accelerated"
+              >
+                {{- content_for_additional_checkout_buttons -}}
+              </div>
+            {%- endif -%}
+          </div>
+        </cart-items>
+      </dialog>
+    </modal-dialog>
   {%- endif -%}
   <script src="{{ 'cart-drawer.js' | asset_url }}" type="module"></script>
 </cart-drawer>
 
 {% schema %}
 {
-  "name": "t:general.cart_drawer"
+  "name": "t:general.cart_drawer",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_order_note",
+      "label": "t:labels.show_order_note",
+      "info": "t:info.show_order_note",
+      "default": true
+    },
+    {
+      "type": "collection",
+      "id": "empty_cart_products",
+      "label": "t:labels.empty_cart_products",
+      "info": "t:info.empty_cart_products"
+    }
+  ]
 }
 {% endschema %}
