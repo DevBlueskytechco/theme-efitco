@@ -3,7 +3,7 @@
 //   TE407_BLOG_PATH     blog có ít nhất 1 bài không excerpt nhưng có content (vd /blogs/figma-blog)
 //   TE407_ARTICLE_PATH  bài thuộc blog bật comment + duyệt (moderated)
 //   TE407_CONTACT_PATH  page gán template "contact" (mặc định /pages/contact)
-// Thiếu dữ liệu → fixme (không tính đạt). hCaptcha /challenge sau submit → skip có lý do, chạy tay ghi PR.
+// Thiếu dữ liệu → fixme (không tính đạt). hCaptcha sau submit (/challenge hoặc invisible giữ submit) → skip có lý do, chạy tay ghi PR.
 import { test, expect, type Page } from '@playwright/test';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -63,10 +63,24 @@ test.describe('ES1-T407 @static', () => {
   });
 });
 
-/** Shopify có thể chuyển sang hCaptcha sau submit: skip có lý do (chạy tay, ghi PR). */
-async function skipIfCaptcha(page: Page) {
-  const path = new URL(page.url()).pathname;
-  test.skip(path.startsWith('/challenge'), 'hCaptcha /challenge chặn submit: chạy tay, ghi PR');
+/**
+ * Bấm submit rồi chờ khung chính điều hướng thật (CI #210: chờ load state của trang cũ resolve ngay,
+ * nên kiểm /challenge trên URL cũ rồi chờ phần tử của trang chưa tới → "element not found").
+ * Dùng framenavigated thay vì so URL: POST /contact có thể quay về đúng URL cũ.
+ * hCaptcha của Shopify: chuyển sang /challenge, hoặc invisible giữ submit không điều hướng → skip có lý do, chạy tay, ghi PR.
+ * Không điều hướng mà không có hCaptcha → lỗi thật của form, fail.
+ */
+async function submitAndLoad(page: Page, submit: () => Promise<unknown>) {
+  const navigated = page
+    .waitForEvent('framenavigated', { predicate: (f) => f === page.mainFrame(), timeout: 15_000 })
+    .then(() => true, () => false);
+  await submit();
+  const moved = await navigated;
+  if (moved) await page.waitForLoadState('domcontentloaded');
+  const captcha = (await page.locator('iframe[src*="hcaptcha"]').or(page.getByRole('img', { name: /hCaptcha/i })).count()) > 0;
+  test.skip(/^\/challenge/.test(new URL(page.url()).pathname) || (!moved && captcha), 'hCaptcha chặn submit tự động: chạy tay, ghi PR');
+  expect(moved, 'submit không điều hướng và không có hCaptcha').toBe(true);
+  await expectNotChallenged(page);
 }
 
 test.describe('ES1-T407 store', () => {
@@ -103,11 +117,10 @@ test.describe('ES1-T407 store', () => {
     await expectNotChallenged(page);
     await expect(page.getByTestId('article-cover').locator('img')).toHaveAttribute('fetchpriority', 'high');
     const form = page.getByTestId('comment-form');
-    await form.getByLabel('Name').fill('QA ES1-T407');
-    await form.getByLabel('Email').fill('qa+es1-t407@example.com');
-    await form.getByLabel('Comment').fill(`ES1-T407 kiểm thông báo duyệt ${Date.now()}`);
-    await Promise.all([page.waitForLoadState('load'), form.getByTestId('comment-submit').click()]);
-    await skipIfCaptcha(page);
+    await form.locator('#CommentAuthor').fill('QA ES1-T407');
+    await form.locator('#CommentEmail').fill('qa+es1-t407@example.com');
+    await form.locator('#CommentBody').fill(`ES1-T407 kiểm thông báo duyệt ${Date.now()}`);
+    await submitAndLoad(page, () => form.getByTestId('comment-submit').click());
     const status = page.getByTestId('comment-status');
     await expect(status).toHaveAttribute('role', 'status');
     await expect(status).toHaveAttribute('tabindex', '-1');
@@ -125,9 +138,8 @@ test.describe('ES1-T407 store', () => {
 
     // Thiếu email: bỏ validation trình duyệt để server trả form.errors.
     await form.evaluate((f: HTMLFormElement) => (f.noValidate = true));
-    await form.getByLabel('Message').fill('ES1-T407 thiếu email');
-    await Promise.all([page.waitForLoadState('load'), form.getByTestId('contact-submit').click()]);
-    await skipIfCaptcha(page);
+    await form.locator('#ContactBody').fill('ES1-T407 thiếu email');
+    await submitAndLoad(page, () => form.getByTestId('contact-submit').click());
     await expect(page.getByTestId('contact-errors')).toBeVisible();
     const email = page.locator('#ContactEmail');
     await expect(email).toHaveAttribute('aria-invalid', 'true');
@@ -137,9 +149,8 @@ test.describe('ES1-T407 store', () => {
 
     // Đủ trường
     const again = page.getByTestId('contact-form');
-    await again.getByLabel('Email').fill('qa+es1-t407@example.com');
-    await Promise.all([page.waitForLoadState('load'), again.getByTestId('contact-submit').click()]);
-    await skipIfCaptcha(page);
+    await again.locator('#ContactEmail').fill('qa+es1-t407@example.com');
+    await submitAndLoad(page, () => again.getByTestId('contact-submit').click());
     const status = page.getByTestId('contact-status');
     await expect(status).toHaveAttribute('role', 'status');
     await expect(status).toContainText('Thanks for contacting us');

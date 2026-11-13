@@ -12,11 +12,6 @@
     {%- if form.posted_successfully? -%}
       <div class="form-status form-status--success" role="status" tabindex="-1" data-testid="contact-status">
         <p class="form-status__title">{{ 'contact.success_title' | t }}</p>
-        <p>
-          <a href="{{ routes.all_products_collection_url }}" class="button button--secondary">
-            {{- 'contact.continue_shopping' | t -}}
-          </a>
-        </p>
       </div>
     {%- else -%}
       {%- if form.errors -%}
@@ -104,12 +99,9 @@
           aria-required="true"
           {% if body_error %}
             aria-invalid="true"
-            aria-describedby="ContactBodyError ContactBodyHint"
-          {% else %}
-            aria-describedby="ContactBodyHint"
+            aria-describedby="ContactBodyError"
           {% endif %}
         >{{ form.body }}</textarea>
-        <p id="ContactBodyHint" class="form-field__hint">{{ 'contact.message_hint' | t }}</p>
         {%- if body_error -%}
           <p id="ContactBodyError" class="form-field__error">{{ 'contact.error_body' | t }}</p>
         {%- endif -%}

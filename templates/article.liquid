@@ -77,10 +77,6 @@
         </div>
       {%- endif -%}
 
-      {%- if blog.moderated? -%}
-        <p class="form-field__hint">{{ 'blog.comment_moderated_note' | t }}</p>
-      {%- endif -%}
-
       <p class="form-field__hint">{{ 'blog.required_note' | t }}</p>
 
       {%- liquid
@@ -137,12 +133,9 @@
           aria-required="true"
           {% if email_error %}
             aria-invalid="true"
-            aria-describedby="CommentEmailError CommentEmailHint"
-          {% else %}
-            aria-describedby="CommentEmailHint"
+            aria-describedby="CommentEmailError"
           {% endif %}
         >
-        <p id="CommentEmailHint" class="form-field__hint">{{ 'blog.email_hint' | t }}</p>
         {%- if email_error -%}
           <p id="CommentEmailError" class="form-field__error">{{ 'blog.comment_error_email' | t }}</p>
         {%- endif -%}
