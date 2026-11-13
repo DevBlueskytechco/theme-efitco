@@ -14,44 +14,86 @@
   checked option. The store must have the Product tag filter on in Search and
   Discovery; ES1-T140 records how Shopify treats the repeated parameter.
 
-  Results (ES1-T132 D6): partial quiz-results is written once, here, after the
-  form, because the swatches in a card are inputs and must stay out of the form.
-  With results_view (templates/collection.quiz.liquid) the root is a plain div,
-  the block renders only the heading, the partial with up to 4 cards and the
-  empty message, and shows them. Without it the partial is empty and the panel
-  is hidden until a script applies the partial from that template.
+  Results (ES1-T132 D6, docs/ui-spec/quiz-result.md): partials quiz-results
+  (cards) and quiz-results-actions ("View All N Matches" or "Shop All
+  Equipment") are written here, after the form, because the swatches and the
+  add forms of a card must stay out of the quiz form. With results_view
+  (templates/collection.quiz.liquid, `?view=quiz`) the root is a plain div and
+  the block renders the page: eyebrow, h1 "Your Gear Shortlist", the match
+  count, the answers as pills (tag without the `quiz-` prefix), up to 4 cards
+  (in stock first, card titles h2, first image eager), the actions and the
+  empty state "No Exact Match". Without results_view both partials are empty
+  and a script applies them from that template.
+
+  results_popup (setting, default on; off in the theme editor): the results
+  open in <modal-dialog data-layer="quiz"> (dialog L from 48rem, bottom sheet
+  below, ADR 0007) instead of under the steps. Inside: close button, title,
+  answer pills, count line (role="status", spinner + "Matching your gear…"
+  while the panel has aria-busy), skeleton grid while busy, cards, empty
+  state, load error, "Added to cart" notice region, quick view slot, and a
+  footer with "Retake Quiz" + the actions partial.
+
+  Card action (inside the partial, under each card): one variant in stock is a
+  POST form to routes.cart_add_url (works without JavaScript); more variants is
+  a link "Choose Options" to the product (quick view in the dialog with
+  JavaScript, QZ2); sold out is a disabled "Sold Out". Built from
+  product.variants_count, never product.variants (ADR 0008).
 
   A tag no product uses makes Shopify redirect to the URL without that tag
   (ES1-T133 #1), which would list too many products. So fewer current_tags than
   required_tags counts as 0 results.
 
-  The empty message and its link sit outside the partial, because another
+  The empty state and its link sit outside the partial, because another
   template cannot read this block's settings. On collection.quiz the text comes
-  from the locale. Link: setting collection, otherwise the current collection,
-  otherwise all products. data-results-url uses the same value. The theme editor
-  shows the panel and the empty message so the merchant can see the text.
+  from the locale; on the home page from the setting, or the locale when the
+  setting is empty. Link "Shop All Equipment": setting collection, otherwise the
+  current collection, otherwise all products. data-results-url uses the same
+  value. The theme editor shows the panel and the empty state so the merchant
+  can see the text.
 
   When the body is empty and results_view is off, the editor shows a placeholder
   and the storefront renders nothing.
 
-  JavaScript hooks: custom element quiz-finder (root), data-enhanced,
-  data-design-mode, data-lazy-module (URL of assets/quiz-finder.js, read by
-  assets/lazy-module.js; neither renders in the theme editor or with
-  results_view), data-results-url, data-results-view, data-label-results
-  (%n stands for the count), data-quiz-submit, data-quiz-back, data-quiz-status,
-  data-quiz-results-panel, data-quiz-title (results heading, tabindex -1),
-  data-quiz-count (partial root, number of cards), data-quiz-empty; partial
-  quiz-results.
+  JavaScript hooks: custom element quiz-finder (root, id = static block id for
+  the "Retake the quiz" link), data-enhanced, data-design-mode, data-lazy-module
+  (URL of assets/quiz-finder.js, read by assets/lazy-module.js; neither renders
+  in the theme editor or with results_view), data-results-url,
+  data-results-view, data-label-results (%n stands for the count),
+  data-label-loading, data-label-added, data-label-adding, data-quiz-submit
+  (id {id}-submit), data-quiz-back, data-quiz-status, data-quiz-results-panel
+  (aria-busy while loading), data-quiz-title (results heading, tabindex -1),
+  data-quiz-count (partial root: number of cards; also data-quiz-total = all
+  matches, data-quiz-summary = count sentence, data-view-all-url),
+  data-quiz-empty, data-quiz-restart, data-quiz-dialog, data-quiz-close,
+  data-quiz-answers + template[data-quiz-answer-template]
+  ([data-quiz-answer-label]), data-quiz-results-status
+  ([data-quiz-results-status-text]), data-quiz-error (button data-retry; its
+  .empty-state__link gets the `?view=quiz` URL from the script), data-quiz-notice-region
+  + template[data-quiz-notice-template] ([data-quiz-notice-product]),
+  data-quiz-quick-view ([data-quiz-shortlist-back], [data-quiz-quick-view-body]),
+  card: data-quiz-add-form, data-quiz-add ([data-quiz-add-label]),
+  data-quiz-add-error (role="alert"), data-quiz-choose (data-product-url);
+  actions partial: data-quiz-all, data-quiz-shop-all. Partials quiz-results,
+  quiz-results-actions (fetch both in one call).
   Test hooks: data-testid="quiz", "quiz-eyebrow", "quiz-heading",
   "quiz-subheading", "quiz-note", "quiz-form", "quiz-submit", "quiz-back",
   "quiz-status", "quiz-placeholder", "quiz-results", "quiz-results-heading",
-  "quiz-results-grid", "quiz-empty", "quiz-empty-text", "quiz-empty-cta".
+  "quiz-results-grid", "quiz-empty", "quiz-empty-heading", "quiz-empty-text",
+  "quiz-empty-cta", "quiz-empty-retake", "quiz-dialog", "quiz-close",
+  "quiz-restart", "quiz-answers", "quiz-answer", "quiz-results-status",
+  "quiz-results-summary", "quiz-skeleton", "quiz-error" (+ "-heading",
+  "-button", "-link"), "quiz-notice", "quiz-added", "quiz-quick-view",
+  "quiz-quick-view-back", "quiz-results-actions", "quiz-view-all",
+  "quiz-shop-all", "quiz-card-form", "quiz-card-add", "quiz-card-error",
+  "quiz-card-choose", "quiz-card-sold-out", "quiz-page-eyebrow",
+  "quiz-page-retake", "quiz-page-retake-link".
 
   @param {string} [content] - The quiz-step blocks of this quiz. Leave empty with results_view
-  @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading id. Default: block.id
-  @param {boolean} [results_popup] - Show the results in a popup instead of under the steps. Same as the setting; default: false
-  @param {boolean} [results_view] - Render only the results, with cards from the global collection. Default: false
+  @param {string} [id] - Static block id, so this block keeps its own settings. Also the root id and the base of inner ids. Default: block.id
+  @param {boolean} [results_popup] - Show the results in a popup instead of under the steps. Same as the setting; default: true
+  @param {boolean} [results_view] - Render only the results page, with cards from the global collection. Default: false
   @param {number} [required_tags] - With results_view: tags the URL must apply, one per quiz step. Default: 3
+  @param {string} [retake_anchor] - With results_view: id of the quiz block in templates/index.liquid, for "Retake the quiz" and "Change My Answers". Default: none (home page top)
 
   @example
   {% block 'container', id: 'home-quiz', tag: 'div' %}
@@ -63,7 +105,7 @@
   {% endblock %}
 
   @example
-  {% block 'quiz', id: 'quiz-results', results_view: true, required_tags: 3 %}{% endblock %}
+  {% block 'quiz', id: 'quiz-results', results_view: true, required_tags: 3, retake_anchor: 'quiz' %}{% endblock %}
 {% enddoc %}
 
 {%- liquid
@@ -73,7 +115,10 @@
   assign subheading = block.settings.subheading
   assign note_1 = block.settings.note_1
   assign note_2 = block.settings.note_2
-  assign heading_id = id | default: block.id | append: '-heading'
+  assign quiz_id = id | default: block.id
+  assign heading_id = quiz_id | append: '-heading'
+  assign submit_id = quiz_id | append: '-submit'
+  assign status_id = quiz_id | append: '-results-status'
 
   assign results_only = false
   if results_view == true
@@ -88,18 +133,27 @@
   endunless
 
   assign root_tag = 'quiz-finder'
+  assign root_class = 'quiz'
   if results_only
     assign root_tag = 'div'
+    assign root_class = 'quiz-page'
+  elsif has_intro
+    assign root_class = 'quiz quiz--split'
   endif
 
   assign results_popup = false
   if block.settings.results_popup and results_only == false and request.design_mode == false
     assign results_popup = true
   endif
-  assign results_title_id = id | default: block.id | append: '-results-title'
+  assign results_title_id = quiz_id | append: '-results-title'
 
   assign results_url = block.settings.collection.url | default: collection.url | default: routes.all_products_collection_url
   assign results_label = 'blocks.quiz.results_count' | t: count: '%n'
+
+  assign retake_url = routes.root_url
+  if retake_anchor != blank
+    assign retake_url = routes.root_url | append: '#' | append: retake_anchor
+  endif
 
   assign empty_text = 'blocks.quiz.empty_text' | t
   unless results_only
@@ -111,10 +165,31 @@
   assign tags_needed = required_tags | default: 3
 
   assign card_count = 0
+  assign total = 0
   if results_only and applied_tags >= tags_needed
-    for item in collection.products limit: 4
-      assign card_count = card_count | plus: 1
-    endfor
+    assign card_count = collection.products.size | at_most: 4
+    assign total = collection.products_count
+  endif
+
+  # View All: the same collection filtered by every tag, without ?view=quiz (QZ3)
+  assign tag_path = ''
+  for tag in current_tags
+    assign tag_handle = tag | handleize
+    if forloop.first
+      assign tag_path = tag_handle
+    else
+      assign tag_path = tag_path | append: '+' | append: tag_handle
+    endif
+  endfor
+  assign view_all_url = collection.url | append: '/' | append: tag_path
+
+  assign summary = ''
+  if card_count > 0
+    assign summary = 'blocks.quiz.results_summary' | t: count: total, answers: tags_needed
+    if total > card_count
+      assign summary_top = 'blocks.quiz.results_top' | t: limit: card_count
+      assign summary = summary | append: ' ' | append: summary_top
+    endif
   endif
 
   # Liquid has no parentheses and reads and/or from the right, so these are separate checks
@@ -125,11 +200,19 @@
   if card_count > 0
     assign empty_hidden = true
   endif
+
+  assign empty_heading_tag = 'h3'
+  if results_only
+    assign empty_heading_tag = 'h2'
+  endif
 -%}
 
 {%- if steps != blank or results_only -%}
   <{{ root_tag }}
-    class="quiz{% if has_intro %} quiz--split{% endif %}"
+    class="{{ root_class }}"
+    {% unless results_only %}
+      id="{{ quiz_id }}"
+    {% endunless %}
     {% if request.design_mode %}
       data-design-mode
     {% endif %}
@@ -137,6 +220,9 @@
       data-results-url="{{ results_url }}"
       data-results-view="quiz"
       data-label-results="{{ results_label | escape }}"
+      data-label-loading="{{ 'blocks.quiz.loading' | t | escape }}"
+      data-label-added="{{ 'blocks.quiz.added' | t | escape }}"
+      data-label-adding="{{ 'blocks.quiz.adding' | t | escape }}"
     {% endunless %}
     {% unless results_only or request.design_mode %}
       data-lazy-module="{{ 'quiz-finder.js' | asset_url }}"
@@ -191,7 +277,7 @@
           <button class="button button--secondary quiz__back" type="button" hidden data-quiz-back data-testid="quiz-back">
             {{- 'blocks.quiz.back' | t -}}
           </button>
-          <button class="button quiz__submit" type="submit" data-quiz-submit data-testid="quiz-submit">
+          <button class="button quiz__submit" type="submit" id="{{ submit_id }}" data-quiz-submit data-testid="quiz-submit">
             {{- 'blocks.quiz.submit' | t -}}
           </button>
         </div>
@@ -201,14 +287,23 @@
 
     {%- if results_popup -%}
       {%- comment -%}
-        Popup (CTO 09/11): results open over the page instead of growing the block.
-        assets/quiz-finder.js opens it with showModal; without JavaScript the form goes to search.
+        Popup (CTO 09/11, ADR 0007): <modal-dialog> (assets/modal-dialog.js, BE) owns Esc, scrim,
+        swipe, focus return; until it ships, assets/quiz-dialog.js calls showModal on [data-quiz-dialog].
+        Without JavaScript the dialog never opens: the form goes to search.
       {%- endcomment -%}
-      <dialog class="quiz__dialog" aria-labelledby="{{ results_title_id }}" data-quiz-dialog data-testid="quiz-dialog">
-      <button type="button" class="quiz__dialog-close" aria-label="{{ 'blocks.quiz.close' | t }}" data-quiz-close data-testid="quiz-close">
-        {%- render 'quiz-icon', name: 'close' -%}
+      <modal-dialog data-layer="quiz" data-sheet-below="48rem" data-return-focus="{{ submit_id }}">
+      <dialog
+        class="dialog dialog--l quiz__dialog"
+        aria-labelledby="{{ results_title_id }}"
+        aria-describedby="{{ status_id }}"
+        data-quiz-dialog
+        data-testid="quiz-dialog"
+      >
+      <button type="button" class="close-button dialog__close" aria-label="{{ 'blocks.quiz.close' | t }}" data-quiz-close data-testid="quiz-close">
+        {%- render 'header-icon', name: 'close' -%}
       </button>
     {%- endif -%}
+
     <div
       class="quiz__results"
       {% unless results_only or request.design_mode %}
@@ -216,63 +311,275 @@
       {% endunless %}
       data-quiz-results-panel
     >
-      <h3 class="quiz__results-heading" id="{{ results_title_id }}" tabindex="-1" data-quiz-title data-testid="quiz-results-heading">
-        {{- 'blocks.quiz.results_heading' | t -}}
-      </h3>
+      {%- if results_only -%}
+        <div class="quiz-page__header">
+          <p class="quiz-page__eyebrow" data-testid="quiz-page-eyebrow">{{ 'blocks.quiz.page_eyebrow' | t }}</p>
+          <h1 class="quiz-page__title" id="{{ results_title_id }}" tabindex="-1" data-quiz-title data-testid="quiz-results-heading">
+            {{- 'blocks.quiz.results_heading' | t -}}
+          </h1>
+          {%- if summary != blank -%}
+            <p class="quiz-page__meta" data-testid="quiz-results-summary">{{ summary }}</p>
+          {%- endif -%}
+        </div>
 
-      {% partial 'quiz-results' %}
-        <div class="quiz__results-body" data-quiz-count="{{ card_count }}" data-testid="quiz-results">
-          {%- if card_count > 0 -%}
-            <ul class="quiz__results-grid" role="list" data-testid="quiz-results-grid">
-              {%- for item in collection.products limit: 4 -%}
-                {%- liquid
-                  assign card_product = item
-                  assign card_variant = nil
-                  if item.product != blank
-                    assign card_product = item.product
-                    assign card_variant = item
-                  endif
-                -%}
-                <li class="quiz__results-item">
-                  {% render 'product-card',
-                    product: card_product,
-                    variant: card_variant,
-                    sizes: '(min-width: 64rem) 25vw, 50vw',
-                    card_context: 'recommendation',
-                    heading_level: 'h4'
-                  %}
+        {%- if applied_tags > 0 -%}
+          <div class="quiz-page__answers">
+            <p class="quiz-page__answers-label" id="{{ quiz_id }}-answers">{{ 'blocks.quiz.answers_label' | t }}</p>
+            <ul class="quiz__answers" role="list" aria-labelledby="{{ quiz_id }}-answers" data-testid="quiz-answers">
+              {%- for tag in current_tags -%}
+                {%- assign tag_label = tag | remove_first: 'quiz-' | replace: '-', ' ' | capitalize -%}
+                <li class="quiz__answer" data-testid="quiz-answer">
+                  {%- render 'quiz-icon', name: 'check' -%}
+                  {{- tag_label | escape -}}
                 </li>
               {%- endfor -%}
             </ul>
-          {%- endif -%}
+            <a class="empty-state__link quiz-page__retake-link" href="{{ retake_url }}" data-testid="quiz-page-retake-link">
+              {{- 'blocks.quiz.retake_link' | t -}}
+            </a>
+          </div>
+        {%- endif -%}
+      {%- else -%}
+        <div class="quiz__results-header{% if results_popup %} dialog__header{% endif %}">
+          <h2 class="quiz__results-heading{% if results_popup %} dialog__title{% endif %}" id="{{ results_title_id }}" tabindex="-1" data-quiz-title data-testid="quiz-results-heading">
+            {{- 'blocks.quiz.results_heading' | t -}}
+          </h2>
+          <ul class="quiz__answers" role="list" aria-label="{{ 'blocks.quiz.answers_list' | t }}" data-quiz-answers data-testid="quiz-answers"></ul>
+          <template data-quiz-answer-template>
+            <li class="quiz__answer" data-testid="quiz-answer">
+              {%- render 'quiz-icon', name: 'check' -%}
+              <span data-quiz-answer-label></span>
+            </li>
+          </template>
+          <p class="quiz__results-status" id="{{ status_id }}" role="status" data-quiz-results-status data-testid="quiz-results-status">
+            <span class="quiz__loading">
+              <span class="spinner" aria-hidden="true"></span>
+              {{- 'blocks.quiz.loading' | t -}}
+            </span>
+            <span data-quiz-results-status-text></span>
+          </p>
         </div>
-      {% endpartial %}
+      {%- endif -%}
 
+      <div class="quiz__results-main{% if results_popup %} dialog__body{% endif %}">
+        {%- unless results_only -%}
+          <div class="quiz__notice-region" role="status" data-quiz-notice-region data-testid="quiz-notice"></div>
+          <template data-quiz-notice-template>
+            <div class="quiz__notice" data-testid="quiz-added">
+              <span class="quiz__notice-icon">{% render 'status-icon', name: 'success' %}</span>
+              <p class="quiz__notice-text">
+                <strong>{{ 'blocks.product_form.added_to_cart' | t }}</strong>
+                <span data-quiz-notice-product></span>
+              </p>
+              <a class="empty-state__link quiz__notice-link" href="{{ routes.cart_url }}">{{ 'blocks.quiz.view_cart' | t }}</a>
+            </div>
+          </template>
+
+          <ul class="quiz__results-grid quiz__skeleton" role="list" aria-hidden="true" data-testid="quiz-skeleton">
+            {%- for i in (1..4) -%}
+              <li class="skeleton-card">
+                <span class="skeleton skeleton--media"></span>
+                <span class="skeleton skeleton--line"></span>
+                <span class="skeleton skeleton--line skeleton--short"></span>
+                <span class="skeleton quiz__skeleton-button"></span>
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endunless -%}
+
+        {% partial 'quiz-results' %}
+          <div
+            class="quiz__results-body"
+            data-quiz-count="{{ card_count }}"
+            data-quiz-total="{{ total }}"
+            data-quiz-summary="{{ summary | escape }}"
+            data-view-all-url="{{ view_all_url }}"
+            data-testid="quiz-results"
+          >
+            {%- if card_count > 0 -%}
+              <ul class="quiz__results-grid" role="list" data-testid="quiz-results-grid">
+                {%- comment -%} In stock first, sold out only to fill up to 4 (quiz-result.md §4) {%- endcomment -%}
+                {%- assign shown = 0 -%}
+                {%- for pass in (1..2) -%}
+                  {%- for item in collection.products -%}
+                    {%- liquid
+                      if shown >= card_count
+                        break
+                      endif
+
+                      assign card_product = item
+                      assign card_variant = nil
+                      assign add_variant = item.selected_or_first_available_variant
+                      if item.product != blank
+                        assign card_product = item.product
+                        assign card_variant = item
+                        assign add_variant = item
+                      endif
+
+                      assign take = false
+                      if pass == 1 and item.available
+                        assign take = true
+                      elsif pass == 2 and item.available == false
+                        assign take = true
+                      endif
+
+                      assign card_loading = 'lazy'
+                      if shown == 0
+                        assign card_loading = 'eager'
+                      endif
+                    -%}
+                    {%- if take -%}
+                      {%- assign shown = shown | plus: 1 -%}
+                      <li class="quiz__results-item">
+                        {% render 'product-card',
+                          product: card_product,
+                          variant: card_variant,
+                          sizes: '(min-width: 80rem) 336px, (min-width: 48rem) 170px, 50vw',
+                          loading: card_loading,
+                          card_context: 'recommendation',
+                          heading_level: 'h2'
+                        %}
+                        <div class="quiz__card-action">
+                          {%- if item.available == false -%}
+                            <button type="button" class="button button--secondary quiz__card-button" disabled data-testid="quiz-card-sold-out">
+                              <span aria-hidden="true">{{ 'blocks.quiz.sold_out' | t }}</span>
+                              <span class="visually-hidden">{{ 'blocks.quiz.card_sold_out' | t: title: card_product.title }}</span>
+                            </button>
+                          {%- elsif card_variant == nil and card_product.variants_count > 1 -%}
+                            <a
+                              class="button button--secondary quiz__card-button"
+                              href="{{ card_product.url }}"
+                              data-quiz-choose
+                              data-product-url="{{ card_product.url }}"
+                              data-testid="quiz-card-choose"
+                            >
+                              <span aria-hidden="true">{{ 'blocks.quiz.choose_options' | t }}</span>
+                              <span class="visually-hidden">{{ 'blocks.quiz.card_choose' | t: title: card_product.title }}</span>
+                            </a>
+                          {%- else -%}
+                            <form class="quiz__card-form" method="post" action="{{ routes.cart_add_url }}" data-quiz-add-form data-testid="quiz-card-form">
+                              <input type="hidden" name="id" value="{{ add_variant.id }}">
+                              <input type="hidden" name="quantity" value="1">
+                              <button type="submit" class="button button--secondary quiz__card-button" data-quiz-add data-testid="quiz-card-add">
+                                {%- render 'header-icon', name: 'bag' -%}
+                                <span aria-hidden="true" data-quiz-add-label>{{ 'blocks.product_form.add_to_cart' | t }}</span>
+                                <span class="visually-hidden">{{ 'blocks.quiz.card_add' | t: title: card_product.title }}</span>
+                              </button>
+                              <p class="quiz__card-error" role="alert" data-quiz-add-error data-testid="quiz-card-error"></p>
+                            </form>
+                          {%- endif -%}
+                        </div>
+                      </li>
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </div>
+        {% endpartial %}
+
+        <div
+          class="empty-state quiz__empty"
+          {% if empty_hidden %}
+            hidden
+          {% endif %}
+          data-quiz-empty
+          data-testid="quiz-empty"
+        >
+          <span class="empty-state__icon">{% render 'status-icon', name: 'box' %}</span>
+          <{{ empty_heading_tag }} class="empty-state__heading" data-testid="quiz-empty-heading">
+            {{- 'blocks.quiz.empty_heading' | t -}}
+          </{{ empty_heading_tag }}>
+          <p class="empty-state__text quiz__empty-text" data-testid="quiz-empty-text">{{ empty_text | escape }}</p>
+          <div class="empty-state__actions">
+            {%- if results_only -%}
+              <a class="button" href="{{ retake_url }}" data-testid="quiz-empty-retake">
+                {{- 'blocks.quiz.change_answers' | t -}}
+              </a>
+            {%- endif -%}
+            <a class="button button--secondary" href="{{ results_url }}" data-testid="quiz-empty-cta">
+              {{- 'blocks.quiz.shop_all' | t -}}
+            </a>
+            {%- if results_popup -%}
+              <button type="button" class="button" data-quiz-restart data-testid="quiz-empty-retake">
+                {{- 'blocks.quiz.change_answers' | t -}}
+              </button>
+            {%- endif -%}
+          </div>
+        </div>
+
+        {%- unless results_only -%}
+          {%- assign error_heading = 'blocks.quiz.error_heading' | t -%}
+          {%- assign error_text = 'blocks.quiz.error_text' | t -%}
+          {%- assign error_link = 'blocks.quiz.error_link' | t -%}
+          <div class="quiz__error" hidden data-quiz-error>
+            {% render 'empty-state',
+              kind: 'error',
+              heading: error_heading,
+              heading_tag: 'h3',
+              text: error_text,
+              link_label: error_link,
+              link_url: results_url,
+              testid: 'quiz-error'
+            %}
+          </div>
+
+          <div class="quiz__quick-view" hidden data-quiz-quick-view data-testid="quiz-quick-view">
+            <button type="button" class="quiz__shortlist-back" data-quiz-shortlist-back data-testid="quiz-quick-view-back">
+              {%- render 'slideshow-icon', name: 'arrow' -%}
+              {{- 'blocks.quiz.back_to_list' | t -}}
+            </button>
+            <div data-quiz-quick-view-body></div>
+          </div>
+        {%- endunless -%}
+      </div>
+
+      {%- liquid
+        assign actions_class = 'quiz__results-actions-row'
+        if results_popup
+          assign actions_class = 'dialog__footer quiz__dialog-actions'
+        elsif results_only
+          assign actions_class = 'quiz-page__actions'
+        endif
+      -%}
       <div
-        class="quiz__empty"
-        {% if empty_hidden %}
+        class="{{ actions_class }}"
+        {% if results_only and card_count == 0 %}
           hidden
         {% endif %}
-        data-quiz-empty
-        data-testid="quiz-empty"
       >
-        <p class="quiz__empty-text" data-testid="quiz-empty-text">{{ empty_text | escape }}</p>
-        <a class="button button--secondary" href="{{ results_url }}" data-testid="quiz-empty-cta">
-          {{- 'blocks.quiz.empty_cta' | t -}}
-        </a>
+        {%- if results_popup -%}
+          <button type="button" class="button button--secondary" data-quiz-restart data-testid="quiz-restart">
+            {{- 'blocks.quiz.restart' | t -}}
+          </button>
+        {%- endif -%}
+        {% partial 'quiz-results-actions' %}
+          <div class="quiz__results-actions" data-testid="quiz-results-actions">
+            {%- if card_count > 0 -%}
+              {%- if total > card_count -%}
+                <a class="button" href="{{ view_all_url }}" data-quiz-all data-testid="quiz-view-all">
+                  {{- 'blocks.quiz.view_all' | t: total: total -}}
+                  {% render 'slideshow-icon', name: 'arrow' %}
+                </a>
+              {%- else -%}
+                <a class="button" href="{{ results_url }}" data-quiz-shop-all data-testid="quiz-shop-all">
+                  {{- 'blocks.quiz.shop_all' | t -}}
+                  {% render 'slideshow-icon', name: 'arrow' %}
+                </a>
+              {%- endif -%}
+            {%- endif -%}
+          </div>
+        {% endpartial %}
+        {%- if results_only -%}
+          <a class="button button--secondary" href="{{ retake_url }}" data-testid="quiz-page-retake">
+            {{- 'blocks.quiz.restart' | t -}}
+          </a>
+        {%- endif -%}
       </div>
     </div>
     {%- if results_popup -%}
-      <div class="quiz__dialog-actions">
-        <button type="button" class="button button--secondary" data-quiz-restart data-testid="quiz-restart">
-          {{- 'blocks.quiz.restart' | t -}}
-        </button>
-        <a class="button" href="{{ results_url }}" data-quiz-all data-testid="quiz-view-all">
-          {{- 'blocks.quiz.view_all' | t -}}
-          {% render 'slideshow-icon', name: 'arrow' %}
-        </a>
-      </div>
       </dialog>
+      </modal-dialog>
       <script src="{{ 'quiz-dialog.js' | asset_url }}" type="module"></script>
     {%- endif -%}
 
@@ -334,14 +641,13 @@
       "id": "results_popup",
       "label": "t:labels.quiz_results_popup",
       "info": "t:info.quiz_results_popup",
-      "default": false
+      "default": true
     },
     {
       "type": "text",
       "id": "empty_text",
       "label": "t:labels.quiz_empty_text",
-      "info": "t:info.quiz_empty_text",
-      "default": "No products match all your answers. Browse the full collection instead."
+      "info": "t:info.quiz_empty_text"
     }
   ]
 }
