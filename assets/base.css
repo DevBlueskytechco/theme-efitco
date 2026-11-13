@@ -7007,8 +7007,8 @@ cart-drawer {
   outline-offset: -1px;
 }
 
-/* Kết quả (ES1-T135 #2, #3): thẻ trắng dưới hàng 2 cột, 2 cột card, 4 cột từ 64rem.
-   Rỗng cũng trong thẻ này. Ẩn sẵn trên trang chủ, không chiếm gap của panel */
+/* Kết quả (quiz-result.md §2–§6): thẻ trắng dưới hàng 2 cột khi tắt popup; trong popup là cột flex của
+   .dialog (header, thân cuộn, chân); trang ?view=quiz (.quiz-page) không nền. Ẩn sẵn trên trang chủ */
 .quiz__results {
   display: grid;
   grid-column: 1 / -1;
@@ -7021,8 +7021,16 @@ cart-drawer {
 }
 
 .quiz__results[hidden],
-.quiz__empty[hidden] {
+.quiz__empty[hidden],
+.quiz-page__actions[hidden] {
   display: none;
+}
+
+.quiz__results-header,
+.quiz__results-main {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
 }
 
 .quiz__results-heading {
@@ -7031,36 +7039,364 @@ cart-drawer {
   line-height: calc(34 / 28);
 }
 
-/* 0 card: gốc partial rỗng không được tạo thêm một gap giữa tiêu đề và text rỗng */
-.quiz__results-body:empty {
-  display: none;
-}
-
-.quiz__results-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
+/* Pill câu trả lời: chỉ đọc, nền sand, tick accent-on-sand, 14/500, cao 32 */
+.quiz__answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+.quiz__answers:empty {
+  display: none;
+}
+
+.quiz__answer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: var(--space-6);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background-sand);
+  color: var(--color-foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.quiz__answer .quiz-icon {
+  color: var(--color-accent-on-sand);
+}
+
+/* Dòng đếm role="status": đang tải là spinner + "Matching your gear…", xong JS điền câu đếm */
+.quiz__results-status {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.quiz__loading,
+.quiz__results-main > .quiz__skeleton {
+  display: none;
+}
+
+[aria-busy='true'] .quiz__loading {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.quiz__loading .spinner {
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+}
+
+[aria-busy='true'] > .quiz__results-main > .quiz__skeleton {
+  display: grid;
+}
+
+[aria-busy='true'] :is([data-quiz-results-status-text], .quiz__results-body, .quiz__results-actions > *) {
+  display: none;
+}
+
+.quiz__skeleton-button {
+  block-size: calc(var(--space-1) * 11);
+  margin-block-start: var(--space-2);
+  border-radius: var(--radius-button);
+}
+
+/* 0 card: gốc partial rỗng không tạo thêm gap. Vùng live rỗng ra khỏi lưới (absolute), vẫn trong cây a11y */
+.quiz__results-body:empty {
+  display: none;
+}
+
+.quiz__notice-region:empty,
+.quiz__card-error:empty {
+  position: absolute;
+}
+
+.quiz__results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Nút dưới card thẳng hàng giữa các card (§4) */
 .quiz__results-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
   min-inline-size: 0;
 }
 
-.quiz__empty {
+.quiz__card-action {
+  margin-block-start: auto;
+}
+
+.quiz__card-form {
   display: grid;
-  justify-items: start;
+  gap: var(--space-2);
+}
+
+.quiz__card-button {
+  inline-size: 100%;
+  padding-inline: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.quiz__card-button svg {
+  flex: none;
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+}
+
+.quiz__card-button:disabled {
+  border-color: var(--color-border);
+  color: var(--color-muted-light);
+  cursor: not-allowed;
+}
+
+/* "Added" 3 s (BE gắn data-added): viền, chữ badge-new 4.57:1, kèm chữ nên không chỉ dựa vào màu */
+.quiz__card-button[data-added] {
+  border-color: var(--color-badge-new);
+  color: var(--color-badge-new);
+}
+
+.quiz__card-button[aria-busy='true']::after {
+  border-color: var(--color-foreground);
+  border-block-start-color: transparent;
+}
+
+@media (hover: hover) {
+  .quiz__card-button:not(:disabled, [data-added]):hover {
+    border-color: var(--color-foreground);
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+}
+
+.quiz__card-error {
+  margin: 0;
+  color: var(--color-sale);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+/* Thông báo đã thêm (2d): thanh 4px badge-new, icon 20, "View cart" 44 */
+.quiz__notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-inline-start: var(--space-1) solid var(--color-badge-new);
+  border-radius: var(--radius-card);
+}
+
+.quiz__notice-icon {
+  display: flex;
+  color: var(--color-badge-new);
+}
+
+.quiz__notice-icon svg {
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+}
+
+.quiz__notice-text {
+  display: grid;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.quiz__notice-text span {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* Quick view trong cùng dialog (2f): thay lưới, "Back to shortlist" 44 chữ 14 muted */
+.quiz__results-main:has(> .quiz__quick-view:not([hidden])) > :not(.quiz__quick-view) {
+  display: none;
+}
+
+.quiz__quick-view:not([hidden]) {
+  display: grid;
   gap: var(--space-4);
 }
 
-.quiz__empty-text {
+.quiz__shortlist-back {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--space-2);
+  min-block-size: calc(var(--space-1) * 11);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.quiz__shortlist-back .slideshow-icon {
+  scale: -1 1;
+}
+
+.quiz__shortlist-back .slideshow-icon:dir(rtl) {
+  scale: none;
+}
+
+:is(.quiz__notice-link, .quiz-page__retake-link) {
+  font-size: var(--font-size-sm);
+}
+
+:is(.quiz__shortlist-back, .quiz-page__breadcrumb a):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.quiz__results-actions {
+  display: contents;
+}
+
+.quiz__results-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.quiz__results-actions-row:not(:has(a)) {
+  display: none;
+}
+
+/* Popup: dialog L 1120 / sheet < 48rem (.dialog chung); rỗng thì về cỡ S 480 (2b) */
+.quiz__dialog:has(.quiz__empty:not([hidden])) {
+  --dialog-size: var(--dialog-s);
+}
+
+.quiz__dialog .quiz__results {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0;
+  min-block-size: 0;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.quiz__dialog .quiz__results[hidden] {
+  display: none;
+}
+
+.quiz__dialog .quiz__results-header {
+  gap: var(--space-3);
+}
+
+.quiz__dialog .empty-state {
+  padding-block: var(--space-4);
+}
+
+.quiz__dialog .empty-state__actions {
+  display: grid;
+  inline-size: 100%;
+}
+
+/* Trang ?view=quiz (§6): breadcrumb, tiêu đề trang, hàng câu trả lời, lưới, hàng nút cách lưới 48 */
+.quiz-page__breadcrumb {
+  padding-block-start: var(--space-4);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.quiz-page__breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz-page__breadcrumb li + li::before {
+  content: '/' / '';
+  margin-inline: var(--space-2);
+  color: var(--color-muted-light);
+}
+
+.quiz-page__breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: calc(var(--space-1) * 11);
+  color: inherit;
+  text-decoration: none;
+}
+
+.quiz-page__breadcrumb a:hover {
+  color: var(--color-foreground);
+  text-decoration: underline;
+}
+
+.quiz-page__breadcrumb [aria-current] {
+  color: var(--color-foreground);
+  font-weight: 500;
+}
+
+.quiz-page > .quiz__results {
+  gap: var(--space-6);
+  padding: var(--space-4) 0 var(--space-7);
+  background: none;
+}
+
+.quiz-page__header {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.quiz-page__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:is(.quiz-page__title, .quiz-page__meta, .quiz-page__answers-label) {
   margin: 0;
 }
 
-.quiz-results-title {
-  margin-block: var(--space-7) 0;
+:is(.quiz-page__meta, .quiz-page__answers-label) {
+  color: var(--color-muted);
+}
+
+.quiz-page__answers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.quiz-page__answers-label {
+  font-size: var(--font-size-sm);
+}
+
+.quiz-page .quiz__results-grid {
+  column-gap: var(--space-4);
+}
+
+.quiz-page__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
 }
 
 /* Có JS, trước khi module nạp (ES1-T132 D5): ẩn mọi thứ sau bước chưa trả lời, tránh layout shift
@@ -7082,6 +7418,18 @@ cart-drawer {
 @media (min-width: 48rem) {
   .quiz {
     padding: var(--space-7);
+  }
+
+  /* 4 cột từ 48rem: popup 154, trang 170 (quiz-result.md §3, §6); panel dưới bước từ 64rem */
+  :is(.quiz__dialog, .quiz-page) .quiz__results-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--space-4);
+  }
+
+  .quiz-page__actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--space-4);
   }
 
   .quiz__form,
@@ -7176,6 +7524,14 @@ cart-drawer {
   .quiz__results-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+  .quiz-page__breadcrumb {
+    padding-block-start: var(--space-5);
+  }
+
+  .quiz-page > .quiz__results {
+    padding-block: var(--space-5) calc(var(--space-1) * 16);
+  }
 }
 
 @media (min-width: 80rem) {
@@ -7186,6 +7542,14 @@ cart-drawer {
   .quiz--split {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-6) calc(var(--space-1) * 20);
+  }
+
+  .quiz__dialog .quiz__results-grid {
+    column-gap: var(--space-5);
+  }
+
+  .quiz-page .quiz__results-grid {
+    gap: calc(var(--space-1) * 10) var(--space-5);
   }
 }
 
@@ -9127,56 +9491,6 @@ scroll-buttons[data-enhanced] [data-scroll-track]::-webkit-scrollbar { display: 
 .shop-by-level__eyebrow, .image-with-text__eyebrow, .multicolumn__eyebrow { color: var(--color-accent); }
 .block-container--sand :is(.shop-by-level__eyebrow, .image-with-text__eyebrow, .multicolumn__eyebrow) { color: var(--color-accent-on-sand); }
 
-/* 5. Popup kết quả quiz */
-.quiz__dialog {
-  position: fixed;
-  inset: 0;
-  margin: auto;
-  width: min(1120px, calc(100% - var(--page-margin) * 2));
-  height: fit-content;
-  max-width: none;
-  max-height: min(860px, calc(100dvh - 48px));
-  padding: 48px;
-  border: 0;
-  border-radius: var(--figma-radius-24);
-  background: var(--figma-ffffff);
-  color: var(--figma-1a1a1a);
-  box-shadow: 0 32px 80px color-mix(in srgb, var(--figma-000000) 28%, transparent);
-  overscroll-behavior: contain;
-}
-.quiz__dialog::backdrop { background: color-mix(in srgb, var(--figma-1a1a1a) 62%, transparent); backdrop-filter: blur(6px); }
-.quiz__dialog .quiz__results { margin: 0; padding: 0; border: 0; background: none; }
-.quiz__dialog .quiz__results-heading { margin: 0 0 32px; padding-inline-end: 56px; font-family: var(--font-heading--family); font-size: clamp(28px, 3vw, 40px); line-height: 1.1; font-weight: var(--font-heading--weight-display); letter-spacing: -0.02em; }
-.quiz__dialog .quiz__results-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 0; list-style: none; }
-.quiz__dialog-close {
-  position: absolute;
-  inset-block-start: 24px;
-  inset-inline-end: 24px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  padding: 0;
-  border: 1px solid var(--figma-e5e5e5);
-  border-radius: 50%;
-  background: var(--figma-ffffff);
-  color: var(--figma-1a1a1a);
-  cursor: pointer;
-}
-@media (hover: hover) { .quiz__dialog-close:hover { background: var(--figma-1a1a1a); color: var(--figma-ffffff); border-color: var(--figma-1a1a1a); } }
-.quiz__dialog-close:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-.quiz__dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin-block-start: 32px; padding-block-start: 24px; border-block-start: 1px solid var(--figma-e5e5e5); }
-.quiz__dialog .quiz__results[aria-busy='true'] .quiz__results-body:empty { min-height: 320px; border-radius: var(--figma-radius-16); background: linear-gradient(90deg, var(--figma-f4f4f5) 0 25%, var(--figma-ffffff) 50%, var(--figma-f4f4f5) 75%) 0 0 / 300% 100%; }
-@media (max-width: 63.99rem) { .quiz__dialog .quiz__results-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; } }
-@media (max-width: 47.99rem) {
-  .quiz__dialog { width: 100%; max-height: 88dvh; margin: auto 0 0; inset: auto 0 0; padding: 24px 16px; border-radius: var(--figma-radius-24) var(--figma-radius-24) 0 0; }
-  .quiz__dialog-close { inset-block-start: 12px; inset-inline-end: 12px; }
-  .quiz__dialog .quiz__results-heading { margin-block-end: 20px; }
-  .quiz__dialog-actions { justify-content: stretch; }
-  .quiz__dialog-actions > * { flex: 1 1 auto; }
-}
-
 /* 7. Get 15% Off: cam như Figma 1:1148 (chữ lớn, 3.48:1 trên nền tối đạt AA chữ lớn) */
 .site-footer__newsletter-heading span { color: var(--color-accent); }
 
@@ -9211,31 +9525,16 @@ scroll-buttons[data-enhanced] [data-scroll-track]::-webkit-scrollbar { display: 
   html[data-motion] [data-lift] { translate: 0 var(--lift, 0); will-change: translate; }
 
   /* Hàng cuộn: card nổi nhẹ khi rê chuột, nút bấm có độ nảy */
-  .quiz__dialog-close { transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out), opacity var(--motion-base) var(--ease-out); }
   .carousel-progress__thumb { transition: width var(--motion-base) var(--ease-out); }
   .article-card, .video-card { transition: translate var(--motion-slow) var(--ease-expo), box-shadow var(--motion-slow) var(--ease-expo); }
   html[data-motion] .article-card:hover { translate: 0 -6px; box-shadow: 0 18px 40px color-mix(in srgb, var(--figma-000000) 18%, transparent); }
   html[data-motion] .product-card { transition: translate var(--motion-slow) var(--ease-expo); }
   html[data-motion] .product-card:hover { translate: 0 -4px; }
 
-  /* Popup quiz: nền mờ dần, hộp nổi lên; mobile trượt từ dưới */
-  .quiz__dialog { transition: opacity var(--motion-base) var(--ease-out), translate var(--motion-slow) var(--ease-expo), scale var(--motion-slow) var(--ease-expo), overlay var(--motion-base) allow-discrete, display var(--motion-base) allow-discrete; opacity: 0; translate: 0 24px; scale: 0.97; }
-  .quiz__dialog[open] { opacity: 1; translate: 0 0; scale: 1; }
-  @starting-style { .quiz__dialog[open] { opacity: 0; translate: 0 24px; scale: 0.97; } }
-  .quiz__dialog::backdrop { transition: opacity var(--motion-base) var(--ease-out), overlay var(--motion-base) allow-discrete, display var(--motion-base) allow-discrete; opacity: 0; }
-  .quiz__dialog[open]::backdrop { opacity: 1; }
-  @starting-style { .quiz__dialog[open]::backdrop { opacity: 0; } }
-  .quiz__results-item { animation: motion-rise var(--motion-slow) var(--ease-expo) both; }
-  .quiz__results-item:nth-child(2) { animation-delay: 70ms; }
-  .quiz__results-item:nth-child(3) { animation-delay: 140ms; }
-  .quiz__results-item:nth-child(4) { animation-delay: 210ms; }
-  .quiz__dialog .quiz__results[aria-busy='true'] .quiz__results-body:empty { animation: motion-shimmer 1.4s linear infinite; }
-  @media (max-width: 47.99rem) {
-    .quiz__dialog { translate: 0 100%; scale: 1; }
-    @starting-style { .quiz__dialog[open] { translate: 0 100%; scale: 1; } }
-  }
+  /* Popup quiz: card thay skeleton bằng opacity 250 (quiz-result.md §5) */
+  .quiz__dialog .quiz__results-item { animation: quiz-fade var(--motion-base) var(--ease-out) both; }
 
   @keyframes motion-rise { from { opacity: 0; translate: 0 40px; } }
   @keyframes motion-settle { from { scale: 1.12; } }
-  @keyframes motion-shimmer { to { background-position: -300% 0; } }
+  @keyframes quiz-fade { from { opacity: 0; } }
 }
