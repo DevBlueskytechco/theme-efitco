@@ -106,12 +106,6 @@
     endif
 
     assign tab_count = tab_count | plus: 1
-
-    # The same product can sit in 2 tabs: input ids must stay unique after a clone
-    assign card_id_prefix = block.id
-    if tab_count > 1
-      assign card_id_prefix = block.id | append: '-tab-' | append: tab_count
-    endif
   -%}
 
   {%- capture tab_body -%}
@@ -131,7 +125,6 @@
             {% render 'product-card',
               product: card_product,
               variant: card_variant,
-              id_prefix: card_id_prefix,
               sizes: image_sizes,
               loading: 'lazy'
             %}
