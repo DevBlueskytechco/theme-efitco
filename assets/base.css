@@ -2805,8 +2805,93 @@ a.pagination__link:focus-visible {
 /** Header placeholder: only rendered in the theme editor */
 .site-header__placeholder {
   min-width: 0;
-  color: var(--color-muted-light);
+  color: var(--color-muted-on-dark);
   font-size: var(--font-size-xs);
+}
+
+/** Header drawer dưới 80rem (chuyển từ critical.css, ES1-T319: giữ critical ≤ 10 KB; panel chỉ hiện khi mở) */
+/* Giữ chỗ khi summary thành backdrop fixed */
+.site-header__drawer {
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+}
+
+/* Bấm backdrop là đóng, kể cả không JS */
+.site-header__drawer[open] > summary {
+  position: fixed;
+  inset: 0;
+  z-index: var(--layer-content);
+  background-color: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
+}
+
+.site-header__drawer[open] > summary svg {
+  visibility: hidden;
+}
+
+.site-header__drawer-panel {
+  position: fixed;
+  inset-block: 0;
+  inset-inline-start: 0;
+  z-index: calc(var(--layer-content) + 1);
+  width: min(22rem, 100vw - 3.5rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-2) var(--space-4) var(--space-6);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.site-header__drawer-close {
+  display: flex;
+  margin-inline-start: auto;
+}
+
+@media (scripting: none) {
+  .site-header__drawer-close {
+    display: none;
+  }
+}
+
+.site-header__drawer-menu > li {
+  border-block-end: 1px solid var(--color-border);
+}
+
+.site-header__drawer-link {
+  justify-content: space-between;
+  font-size: var(--font-size-base);
+}
+
+.site-header__drawer-submenu {
+  padding-block-end: var(--space-2);
+  padding-inline-start: var(--space-4);
+}
+
+/** Announcement bar: hover, editor placeholder (phần tĩnh ở critical.css) */
+@media (prefers-reduced-motion: no-preference) {
+  .announcement-bar__link .slideshow-icon {
+    transition: translate var(--motion-fast) var(--ease-out);
+  }
+
+  /* Thắng html[data-motion] a:hover > .slideshow-icon--arrow (3px, không lật RTL) */
+  .announcement-bar .announcement-bar__link:hover > .slideshow-icon {
+    translate: var(--space-1) 0;
+  }
+
+  .announcement-bar .announcement-bar__link:dir(rtl):hover > .slideshow-icon {
+    translate: calc(-1 * var(--space-1)) 0;
+  }
+
+  .announcement-bar .announcement-bar__link:is(:active, :dir(rtl):active) > .slideshow-icon {
+    translate: none;
+  }
+}
+
+.announcement-bar--placeholder {
+  background: var(--color-background-alt);
+  color: var(--color-muted-light);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
 }
 
 /** Footer */
@@ -8445,13 +8530,7 @@ video-card {
 
 /* ==== Trang chủ theo Figma 1:359, khung 1920 (CTO 07/11). Số đo lấy từ snapshot, không làm tròn. ==== */
 :root { --icon-tick: url("data:image/svg+xml,%3Csvg width=%2212%22 height=%228%22 viewBox=%220 0 12 8%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E %3Cpath d=%22M10.6295 0.213693L4.00109 6.24463L1.37053 3.84679C1.21996 3.70996 1.01576 3.6331 0.802835 3.6331C0.58991 3.6331 0.385706 3.70996 0.235145 3.84679C0.0845843 3.98362 0 4.16919 0 4.36269C0 4.4585 0.0207662 4.55338 0.0611124 4.64189C0.101459 4.73041 0.160595 4.81084 0.235145 4.87859L3.4334 7.78507C3.50773 7.85317 3.59616 7.90723 3.6936 7.94412C3.79103 7.98101 3.89554 8 4.00109 8C4.10664 8 4.21115 7.98101 4.30858 7.94412C4.40602 7.90723 4.49445 7.85317 4.56878 7.78507L11.7649 1.24549C11.9154 1.10867 12 0.923093 12 0.729593C12 0.536093 11.9154 0.350518 11.7649 0.213693C11.6143 0.0768676 11.4101 0 11.1972 0C10.9842 0 10.78 0.0768676 10.6295 0.213693Z%22 fill=%22%23000%22/%3E %3C/svg%3E "); --icon-lock: url("data:image/svg+xml,%3Csvg width=%2212%22 height=%2216%22 viewBox=%220 0 12 16%22 fill=%22none%22 xmlns=%22http://www.w3.org/2000/svg%22%3E %3Cpath d=%22M6 1.6C4.76421 1.6 3.75 2.68183 3.75 4V6.4H10.5C11.3284 6.4 12 7.11634 12 8V14.4C12 15.2837 11.3284 16 10.5 16H1.5C0.671574 16 0 15.2837 0 14.4V8C0 7.11634 0.671573 6.4 1.5 6.4H2.25V4C2.25 1.79817 3.93579 0 6 0C8.06421 0 9.75 1.79817 9.75 4C9.75 4.44183 9.41421 4.8 9 4.8C8.58579 4.8 8.25 4.44183 8.25 4C8.25 2.68183 7.23579 1.6 6 1.6ZM1.5 8V14.4H10.5V8H1.5Z%22 fill-rule=%22evenodd%22 clip-rule=%22evenodd%22 fill=%22%23000%22/%3E %3C/svg%3E "); }
-body:has(.slideshow):not(:has([data-header-overlay])) .site-header {
-  --header-foreground: var(--figma-ffffff);
-  --header-on-foreground: var(--figma-1a1a1a);
-  --header-background: var(--figma-1a1a1a);
-}
 body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
-body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background: var(--figma-1a1a1a) url('noise-dark.png'); }
 .site-header .site-header__svg-search { width: 20px; height: 20px; }
 .site-header__icons svg:not(.site-header__svg-search) { width: 24px; height: 24px; }
 .slideshow__arrow .slideshow-icon, .collection-list__button .slideshow-icon { flex: none; width: 52px; height: 52px; }
@@ -8465,11 +8544,10 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
   .site-header__logo { position: relative; top: -1px; }
   .site-header__icons { position: relative; top: 1px; }
   .site-header__menu { gap: 40px; }
-  body:has(.slideshow) .site-header__item > .site-header__link,
-  body:has(.slideshow) .site-header__item > details > .site-header__link { color: var(--figma-white-60); }
-  body:has(.slideshow) .site-header__item > .site-header__link:hover,
-  body:has(.slideshow) .site-header__item > details > .site-header__link:hover,
-  body:has(.slideshow) .site-header__item > details[open] > .site-header__link { color: var(--figma-ffffff); }
+  /* Menu trên thanh tối mọi trang (foundation §3.2): trắng 60% (6.93:1); hover, mở, trang hiện tại trắng 100% */
+  .site-header__item > .site-header__link, .site-header__item > details > .site-header__link { color: color-mix(in srgb, var(--color-background-dark-foreground) 60%, var(--color-background-dark)); }
+  .site-header__item > .site-header__link:is(:hover, [aria-current='page']), .site-header__item > details > .site-header__link:hover,
+  .site-header__item > details[open] > .site-header__link { color: var(--color-background-dark-foreground); }
   .site-header__submenu .site-header__link { min-height: 36px; color: var(--color-foreground); letter-spacing: -0.16px; }
   .site-header__item:nth-child(1) { min-width: 51px; }
   .site-header__item:nth-child(2) { min-width: 85px; }
@@ -8857,7 +8935,8 @@ body:has(.slideshow):not(:has([data-header-overlay])) .site-header { background:
 .site-footer__form[data-invalid] .site-footer__invalid { display: block; }
 .site-footer__form[data-invalid] .site-footer__note { display: none; }
 .site-footer__form[data-invalid] .site-footer__field { border-color: var(--color-sale); }
-.site-header__link[aria-current='page'] { text-decoration: underline; text-underline-offset: 0.3em; }
+/* Trang hiện tại: gạch chân 2px, không chỉ bằng màu (foundation §3.2, 04 §3.9) */
+.site-header__link[aria-current='page'] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.45em; }
 .product-card__media { position: relative; }
 .product-card__image-hover { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
 .product-card:hover .product-card__image-hover { opacity: 1; }
