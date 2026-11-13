@@ -1,8 +1,13 @@
-KHÔNG CHẮC: (1) Spec E2E, axe, Lighthouse và ảnh 3 breakpoint chưa chạy vì phiên này không có preview: chờ CI. (2) Placeholder dùng chữ trung tính "Search products, collections, and more", không dùng "Search benches, kettlebells, mats…" của predictive-search.md §7, theo ADR 0011 #3 (locale không giữ chữ mẫu theo thương hiệu). (3) `assets/modal-dialog.js` và `assets/predictive-search.js` chưa có trên develop (BE: TE-10-R2-BE2, ES1-T130): bấm icon search vẫn sang /search, spec tự gọi `showModal()`. (4) Trần base.css 49 152 B gzip develop đã vượt (51 217, [Q] ES1-T454): PR này không tăng so với develop, chưa đưa về dưới trần.
+KHÔNG CHẮC: (1) Spec E2E, axe, Lighthouse và ảnh 3 breakpoint chưa chạy vì phiên này không có preview: chờ CI. (2) Placeholder dùng chữ trung tính "Search products, collections, and more", không dùng "Search benches, kettlebells, mats…" của predictive-search.md §7, theo ADR 0011 #3 (locale không giữ chữ mẫu theo thương hiệu). (3) `assets/modal-dialog.js` và `assets/predictive-search.js` chưa có trên develop (BE: TE-10-R2-BE2, ES1-T130): bấm icon search vẫn sang /search, spec tự gọi `showModal()`. (4) Trần base.css 49 152 B gzip develop đã vượt (50 805, [Q] ES1-T454): PR này không tăng so với develop, chưa đưa về dưới trần.
 
 # ES1-T129 TE-8-FE2 (lượt 4): khung search popup + drawer, `<modal-dialog data-layer="search">`
 
 Nguồn: drafts/techlead/ES1-T307/task-split.md §3 dòng ES1-T129; docs/ui-spec/predictive-search.md §1–§3, §11; ADR 0007; docs/srs.md#TE-8 AC1, AC3. Nhánh đã gộp origin/develop (có ES1-T327 mega menu #216, ES1-T313 `.drawer`/`.close-button`/`modal-dialog { display: contents }`).
+
+## Sửa theo CI PR #225 (run 43445954311)
+- Tên truy cập nút `predictive-search-clear`: bỏ `aria-label`, thêm `<span class="visually-hidden">` dịch từ `blocks.predictive_search.clear`. Nguyên nhân đỏ: spec kiểm tên khi ô rỗng, lúc đó nút `display: none` (`:placeholder-shown + .predictive-search__clear`) nên Playwright trả tên rỗng; spec chuyển `toHaveAccessibleName` sang sau `fill('bench')`, khi nút đã hiện.
+- Vùng chạm 24px ở ≥ 80rem: rule pixel Figma `.site-header__icon { min-width: 0; min-height: 0 }` đè cả nút trong form search. Đổi selector thành `.site-header__icon:not(form *)` → submit, xoá trong dialog giữ `min 2.75rem` (44×44) của critical.css; icon thanh header không đổi.
+- Bù byte: bỏ `font-size: var(--font-size-base)` thừa ở `.predictive-search__input` (input đã `font: inherit`, body là `--font-size-base`).
 
 ## Sửa theo CI PR #222 (run 43380118667)
 - nextElementSibling null: sau khi gộp develop (ES1-T327), `{% render 'predictive-search' %}` nằm liền sau `<a data-testid="header-search-link">` trong `.site-header__icons`; phần tử đầu của snippet là `<modal-dialog data-layer="search">`, không có comment/thẻ chen giữa.
@@ -51,7 +56,7 @@ Bảng Snippets, thêm sau `product-structured-data`:
 
 ## Tự kiểm tra
 - `shopify theme check`: 0 lỗi; 23 warning cũ của develop, không file nào của PR.
-- `gzip -c assets/base.css | wc -c`: develop 51 217 → nhánh 51 214 (không tăng). `wc -c assets/critical.css`: 10 014, bằng develop.
+- `gzip -c assets/base.css | wc -c`: develop 50 805 → nhánh 50 805 (không tăng; ES1-T454). `wc -c assets/critical.css`: 10 014, bằng develop.
 - Locale JSON hợp lệ, không trùng key. Không file JS trong diff.
 - Spec `-g "AC1-markup|AC3"` desktop + Pixel 7, TE-1 TC-19, axe khi dialog mở, Lighthouse (desktop/mobile), CLS, ảnh 360/768/1280: chờ CI.
 

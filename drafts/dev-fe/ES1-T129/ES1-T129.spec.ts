@@ -159,7 +159,6 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     await expect(input).toHaveAccessibleName(/\S/);
     await expect(tid(page, T.close)).toHaveAccessibleName(/\S/);
     await expect(tid(page, T.submit)).toHaveAccessibleName(/\S/);
-    await expect(tid(page, T.clear)).toHaveAccessibleName(/\S/);
     await expect(tid(page, T.dialog)).toHaveAccessibleName(/\S/);
     expect(await page.evaluate(() => getComputedStyle(document.documentElement).overflowY)).toBe('hidden');
     expect(errors).toEqual([]);
@@ -171,6 +170,8 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     await expect(tid(page, T.clear)).toBeHidden();
     await tid(page, T.input).fill('bench');
     await expect(tid(page, T.clear)).toBeVisible();
+    // Nút xoá display:none khi ô rỗng → tên truy cập chỉ đo được khi đã hiện
+    await expect(tid(page, T.clear)).toHaveAccessibleName(/\S/);
     const box = (await tid(page, T.clear).boundingBox())!;
     expect(box.width).toBeGreaterThanOrEqual(44);
     expect(box.height).toBeGreaterThanOrEqual(44);
