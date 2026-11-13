@@ -3687,12 +3687,7 @@ a.pagination__link:focus-visible {
   color: var(--color-background-dark-foreground);
 }
 
-/** Slideshow (TE-2 AC2, AC6, AC7, AC10; index-mobile-a §2, index-1280 §2.1, sổ 11/11 HD2)
-   < 48rem: tràn màn 3/4, không bo, chữ căn trái mép trang ở đáy, 2 chấm 44 đáy trái.
-   48rem: tràn màn 4/3, không bo, chữ giữa dọc rộng ≤ 28rem, 2 nút 52 góc dưới phải.
-   80rem: thẻ lùi --hero-inset (0 ở 1280, 60 ở 1920), chữ mép --hero-edge = lề trang − inset;
-   mũi tên gộp góc dưới phải khi rìa < 100, hai bên giữa dọc khi rìa ≥ 100 (công tắc --hero-corner).
-   Header nằm trên, không đè hero (AC-H29): nội dung không chừa chỗ cho header. */
+/** Slideshow (TE-2; index-mobile-a §2, index-1280 §2.1). Header không đè hero (AC-H29) */
 slideshow-carousel {
   display: block;
 }
@@ -3728,7 +3723,7 @@ slideshow-carousel {
   outline-offset: calc(var(--space-1) * -1);
 }
 
-/* Không JS không có nút: thanh cuộn là dấu hiệu duy nhất còn slide khác (AC7) */
+/* Không JS: thanh cuộn (AC7) */
 @media (scripting: none) {
   .slideshow__track {
     scrollbar-width: thin;
@@ -3761,7 +3756,6 @@ slideshow-carousel {
   height: 100%;
 }
 
-/* Focal point từ file ảnh (AC1, HA2): --focal-point do slideshow-slide.liquid đặt */
 .slideshow__media .image > img,
 .slideshow__media video,
 .slideshow__placeholder {
@@ -3780,7 +3774,7 @@ slideshow-carousel {
   background-color: color-mix(in srgb, var(--color-background-dark) var(--overlay-opacity), transparent);
 }
 
-/* 360: luôn căn trái mép trang, mọi setting căn lề (AC2) */
+/* 360: luôn căn trái (AC2) */
 .slideshow__content {
   position: relative;
   display: flex;
@@ -3800,7 +3794,6 @@ slideshow-carousel {
   text-transform: uppercase;
 }
 
-/* Slide 1 là h1, slide sau là p cùng kiểu (1 h1 mỗi trang) */
 .slideshow__heading {
   max-width: 100%;
   font-family: var(--font-heading--family);
@@ -3844,7 +3837,7 @@ slideshow-carousel {
   scale: -1 1;
 }
 
-/* Chờ JS: mặc định ẩn hết, slideshow.js gắn data-enhanced thì mới hiện */
+/* Hiện khi JS gắn data-enhanced */
 .slideshow__controls,
 .slideshow__arrow,
 .slideshow__dots,
@@ -3852,7 +3845,6 @@ slideshow-carousel {
   display: none;
 }
 
-/* 360: chấm đầu (12) thẳng mép trang, vùng chạm 44 lùi 16 */
 slideshow-carousel[data-enhanced] .slideshow__controls {
   position: absolute;
   inset-block-end: var(--space-2);
@@ -3899,7 +3891,7 @@ slideshow-carousel[data-enhanced]:has(video) .slideshow__pause {
   color: var(--color-background);
 }
 
-/* Vùng chạm 44, chấm nhìn thấy 12 (index-mobile-a §2) */
+/* Chạm 44, chấm 12 */
 .slideshow__dot {
   position: relative;
   flex: none;
@@ -3938,7 +3930,6 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   display: block;
 }
 
-/* 768: căn theo setting (AC2), mũi tên góc dưới phải, không chấm (AC7) */
 @media (min-width: 48rem) {
   .slideshow {
     --slideshow-arrow-size: calc(var(--space-1) * 13);
@@ -3990,16 +3981,17 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
 @media (min-width: 80rem) {
   .slideshow__frame {
     --hero-side: max(var(--page-margin), (100cqi - var(--page-width)) / 2 + var(--page-margin));
-    --hero-inset: clamp(0px, var(--hero-side) - var(--space-1) * 16, var(--space-1) * 15);
+    /* Figma 1:422: thẻ 1798 trên 1920, lùi 61 */
+    --hero-inset: clamp(0px, var(--hero-side) - var(--space-1) * 16, 100cqi * 61 / 1920);
+    --hero-round: min(var(--hero-inset), var(--space-1) * 15);
     --hero-edge: calc(var(--hero-side) - var(--hero-inset));
-
-    /* Dương khi rìa < 100 (52 + 24 × 2): mũi tên gộp góc dưới phải; âm: hai bên, cách mép thẻ 60 */
+    /* Rìa < 100: mũi tên gộp góc dưới phải; ≥ 100: hai bên */
     --hero-corner: calc((var(--slideshow-arrow-size) + var(--space-5) * 2 - var(--hero-edge)) * 1000);
   }
 
-  /* Bo 16 khi thẻ tràn mép (1280), tăng theo inset tới 24 ở 1920 */
+  /* Bo 16 ở 1280, 24 ở 1920 */
   .slideshow__track {
-    border-radius: calc(var(--radius-hero) + var(--space-1) + var(--hero-inset) * 2 / 15);
+    border-radius: calc(var(--radius-hero) + var(--space-1) + var(--hero-round) * 2 / 15);
   }
 
   .slideshow__slide {
@@ -4026,13 +4018,13 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
     line-height: 1.5;
   }
 
-  /* Câu phụ → nút: 48 ở 1280, 60 ở 1920 */
   .slideshow__buttons {
     margin-block-start: calc(clamp(var(--space-1) * 12, 3.125vw, var(--space-1) * 15) - var(--space-5));
   }
 
   .slideshow__buttons .button {
     gap: calc(var(--space-1) * 2.5);
+    min-inline-size: var(--figma-hero-cta-width);
   }
 
   slideshow-carousel[data-enhanced] .slideshow__controls {
@@ -4067,8 +4059,7 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   }
 }
 
-/* AC10, HA1: chữ hero slide 1 hiện dần lúc tải bằng CSS (không chờ cuộn, không JS), xong trước 700 ms.
-   Ảnh và lớp tối hiện ngay: không animation trên .slideshow__media, .slideshow__overlay. */
+/* AC10: chỉ chữ slide 1 hiện dần, ảnh không animation */
 @media (prefers-reduced-motion: no-preference) {
   .slideshow__slide:first-child .slideshow__content > * {
     animation: hero-text-in var(--motion-enter) var(--ease-out) both;
