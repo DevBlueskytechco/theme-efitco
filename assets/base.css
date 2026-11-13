@@ -154,6 +154,11 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .offer-popup
   --empty-state-max: 32rem;
   --close-button-size: calc(var(--space-1) * 12);
   --round-button-size: calc(var(--space-1) * 13);
+  /* Hàng ngang (foundation §11, HD3): card tối đa 336, review 456, video 264, tiến trình cao 2 */
+  --row-card-max: 21rem;
+  --row-card-review-max: 28.5rem;
+  --row-card-video: 16.5rem;
+  --row-progress-size: 0.125rem;
 }
 
 modal-dialog {
@@ -9638,7 +9643,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .collection-list, .testimonials, .blog-posts, .video-carousel {
   --row-inset: max(var(--page-margin), (100cqi - var(--page-width)) / 2 + var(--page-margin));
   --row-gap: var(--space-4);
-  --row-card: min(70cqi, 336px);
+  --row-card: min(70cqi, var(--row-card-max));
 
   position: relative;
   display: grid;
@@ -9650,7 +9655,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 }
 .collection-list, .testimonials, .blog-posts, .video-carousel__scroller { container-type: inline-size; }
 .testimonials { --row-card: calc((100cqi - 2 * var(--row-inset)) * 0.85); }
-.video-carousel { --row-card: min(70cqi, 264px); }
+.video-carousel { --row-card: min(70cqi, var(--row-card-video)); }
 scroll-buttons { display: block; }
 scroll-buttons.video-carousel__scroller { display: grid; grid-template-columns: minmax(0, 1fr); gap: inherit; }
 .collection-list__header, .testimonials__header, .blog-posts__header {
@@ -9669,8 +9674,9 @@ scroll-buttons.video-carousel__scroller { display: grid; grid-template-columns: 
 /* visibility giữ chỗ (CLS 0) và bỏ nút khỏi thứ tự Tab, cây a11y */
 scroll-buttons:not([data-enhanced]) .carousel-nav,
 scroll-buttons[data-static] .carousel-nav { visibility: hidden; }
-/* Đầu/cuối hàng: nút mờ 0.35, giữ chỗ (aria-disabled qua .round-button; hidden là cách cũ của scroll-buttons.js) */
-.carousel-nav .round-button[hidden] { display: inline-flex; opacity: 0.35; pointer-events: none; }
+/* Đầu/cuối hàng: aria-disabled mờ 0.35 qua .round-button (AC mới, chờ ES1-T335). hidden của scroll-buttons.js hiện tại
+   vẫn ẩn nút (ES1-T184, T185, T220) nhưng giữ chỗ để nút kia không nhảy */
+.carousel-nav .round-button[hidden] { display: inline-flex; visibility: hidden; }
 /* Dải tối (danh mục): nút trắng viền trắng, focus trắng; tiến trình trắng 12% / thumb trắng (foundation §6, §11) */
 .block-container--dark .round-button { border-color: var(--color-background); }
 .block-container--dark .round-button:focus-visible { outline-color: var(--color-background-dark-foreground); }
@@ -9703,16 +9709,16 @@ scroll-buttons[data-static] .carousel-nav { visibility: hidden; }
 }
 
 @media (min-width: 48rem) {
-  .collection-list, .testimonials, .blog-posts { --row-card: min(40cqi, 336px); }
-  .video-carousel { --row-card: 264px; }
+  .collection-list, .testimonials, .blog-posts { --row-card: min(40cqi, var(--row-card-max)); }
+  .video-carousel { --row-card: var(--row-card-video); }
 }
 @media (min-width: 64rem) {
   .collection-list, .testimonials, .blog-posts, .video-carousel { gap: calc(var(--space-1) * 10); padding-block: var(--space-8); }
 }
 @media (min-width: 80rem) {
   .collection-list, .testimonials, .blog-posts, .video-carousel { --row-gap: var(--space-5); }
-  .collection-list, .blog-posts { --row-card: min(336px, (100cqi - var(--row-inset) - 4 * var(--row-gap)) / 4.3); }
-  .testimonials { --row-card: min(456px, (100cqi - var(--row-inset) - 3 * var(--row-gap)) / 3.3); }
+  .collection-list, .blog-posts { --row-card: min(var(--row-card-max), (100cqi - var(--row-inset) - 4 * var(--row-gap)) / 4.3); }
+  .testimonials { --row-card: min(var(--row-card-review-max), (100cqi - var(--row-inset) - 3 * var(--row-gap)) / 3.3); }
   /* Blog ≤ 4 bài (Liquid gắn blog-posts--grid): lưới tĩnh 4 cột 292 (1280) / 336 (1920), không nút, không tiến trình */
   .blog-posts--grid .blog-posts__list { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); overflow: visible; }
   .blog-posts--grid :is(.carousel-nav, .carousel-progress) { display: none; }
@@ -9721,9 +9727,9 @@ scroll-buttons[data-static] .carousel-nav { visibility: hidden; }
 /* Thanh tiến trình cao 2, cách hàng 32, nằm trong đệm đáy của khối (absolute): không thêm chiều cao, không CLS */
 .carousel-progress {
   position: absolute;
-  inset-block-end: calc(var(--space-7) - var(--space-6) - 2px);
+  inset-block-end: calc(var(--space-7) - var(--space-6) - var(--row-progress-size));
   inset-inline: var(--row-inset);
-  height: 2px;
+  height: var(--row-progress-size);
   margin: 0;
   overflow: hidden;
   border-radius: var(--figma-radius-2);
@@ -9731,10 +9737,10 @@ scroll-buttons[data-static] .carousel-nav { visibility: hidden; }
   visibility: hidden;
 }
 @media (min-width: 64rem) {
-  .carousel-progress { inset-block-end: calc(var(--space-8) - var(--space-6) - 2px); }
+  .carousel-progress { inset-block-end: calc(var(--space-8) - var(--space-6) - var(--row-progress-size)); }
 }
 /* Video: container-type của khung cuộn (contain: layout) làm khung này thành khối chứa, đáy khung = đáy card */
-.video-carousel__scroller > .carousel-progress { inset-block-end: calc(var(--space-6) * -1 - 2px); }
+.video-carousel__scroller > .carousel-progress { inset-block-end: calc(var(--space-6) * -1 - var(--row-progress-size)); }
 scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility: visible; }
 .carousel-progress__thumb {
   position: absolute;
