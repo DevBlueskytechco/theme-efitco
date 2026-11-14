@@ -9,7 +9,7 @@ function trackErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => {
-    if (m.type() === 'error' && /header-(menu|sticky)/.test(m.location().url)) errors.push(m.text());
+    if (m.type() === 'error' && /header-(menu|sticky|drawer)/.test(m.location().url)) errors.push(m.text());
   });
   return errors;
 }
@@ -152,6 +152,8 @@ test.describe('ES1-T16 header-drawer', () => {
     const toggle = page.getByTestId('header-drawer-toggle');
     await toggle.click();
     await expect(page.getByTestId('header-drawer')).toBeVisible();
+    // ES1-T329: header-drawer.js nạp lười khi chạm nút menu; chờ define trước khi resize.
+    await page.waitForFunction(() => !!customElements.get('header-drawer'));
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.setViewportSize({ width: 412, height: 780 });
     await expect(page.getByTestId('header-drawer')).toBeHidden();
