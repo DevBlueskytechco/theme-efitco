@@ -146,10 +146,10 @@ class PredictiveSearch extends HTMLElement {
     } else if (e.key == 'Enter' && open && this.active) {
       e.preventDefault();
       this.active.click();
-    } else if (e.key == 'Escape' && open) {
-      // First Esc closes the list, the next one closes the dialog natively
+    } else if (e.key == 'Escape') {
+      // Esc 1 closes the list, Esc 2 the dialog: on type=search Chrome would clear the field
       e.preventDefault();
-      this.hide();
+      open ? this.hide() : this.closest('dialog')?.close();
     }
   }
 

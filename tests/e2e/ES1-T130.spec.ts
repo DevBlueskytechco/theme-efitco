@@ -64,7 +64,8 @@ function watchConsole(page: Page) {
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
     // Chrome tự log request hỏng do test cố ý gây (route.abort, 429 mock): log mạng của trình duyệt, không phải console.* của theme
     if (/^Failed to load resource/.test(msg.text()) && (SUGGEST.test(msg.location().url) || MODULE.test(msg.location().url))) return;
-    errors.push(msg.text());
+    // Kèm URL nguồn: CI chỉ có log, cần biết lỗi từ trang nào, file nào
+    errors.push(`${msg.text()} @ ${msg.location().url || page.url()}`);
   });
   page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
   return errors;
@@ -327,8 +328,10 @@ test.describe('ES1-T130 predictive search', () => {
     await expect(tid(page, T.input)).toHaveAttribute('aria-expanded', 'false');
     expect(await activeId(page)).toBeNull();
     await expect(tid(page, T.input)).toBeFocused();
+    // Esc 2 đóng dialog, không xoá chữ (Chrome mặc định xoá ô type=search khi Esc)
     await tid(page, T.input).press('Escape');
     await expect(tid(page, T.dialog)).toBeHidden();
+    await expect(tid(page, T.input)).toHaveValue('bench');
     await expect(tid(page, T.link)).toBeFocused();
   });
 
@@ -389,23 +392,29 @@ test.describe('ES1-T130 predictive search', () => {
       await expect(tid(page, T.input)).toHaveAttribute('aria-expanded', 'false');
       await expect(tid(page, T.listbox)).not.toHaveAttribute('aria-busy', /.*/);
       expect(hits, 'không retry').toBe(1);
+      // NFR-4: lỗi console do request gợi ý hỏng; kiểm trước khi rời trang, lỗi của trang /search thuộc spec trang search
+      expect(errors).toEqual([]);
       await Promise.all([page.waitForURL((u) => u.pathname.endsWith('/search')), tid(page, T.submit).click()]);
       expect(new URL(page.url()).searchParams.get('q')).toBe('bench');
-      expect(errors).toEqual([]);
     });
   }
 
   test('AC1 predictive-search.js lỗi tải: dialog vẫn mở, submit vẫn chạy', async ({ page }) => {
     const errors = watchConsole(page);
+    let moduleFailed = false;
+    page.on('requestfailed', (r) => MODULE.test(r.url()) && (moduleFailed = true));
     await page.route(MODULE, (route) => route.abort('failed'));
     await page.goto('/');
     await expectNotChallenged(page);
     await tid(page, T.link).click();
     await expect(tid(page, T.dialog)).toBeVisible();
+    await expect.poll(() => moduleFailed).toBe(true);
     await tid(page, T.input).fill('bench');
+    expect(await page.evaluate(() => !!customElements.get('predictive-search'))).toBe(false);
+    // Kiểm console trước khi rời trang: lỗi của trang /search thuộc spec trang search
+    expect(errors).toEqual([]);
     await Promise.all([page.waitForURL((u) => u.pathname.endsWith('/search')), tid(page, T.submit).click()]);
     expect(new URL(page.url()).searchParams.get('q')).toBe('bench');
-    expect(errors).toEqual([]);
   });
 
   test('AC1 Ctrl/Cmd click link mở tab mới, không mở dialog', async ({ page }) => {
