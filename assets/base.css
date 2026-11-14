@@ -246,6 +246,10 @@ modal-dialog {
     background: var(--color-accent);
     color: var(--color-accent-foreground);
   }
+
+  .pagination__page:hover {
+    border-color: var(--color-foreground);
+  }
 }
 
 /* Dialog: mobile-first là bottom sheet (< 48rem: rộng 100%, cao ≤ 88dvh, thanh kéo 40 × 4, bo 2 góc trên);
@@ -725,7 +729,8 @@ modal-dialog {
   }
 
   .close-button,
-  .round-button {
+  .round-button,
+  .pagination__page {
     transition:
       background-color var(--motion-base) var(--ease-out),
       color var(--motion-base) var(--ease-out),
@@ -2622,49 +2627,61 @@ collection-filters[data-enhanced] .button.collection-filters__apply {
   font-size: var(--font-size-sm);
 }
 
-/** Pagination (snippets/pagination.liquid, TE-6 AC1, AC5): chạm 44px, trang hiện tại màu accent */
 .pagination__list {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
   margin: 0;
   padding: 0;
   list-style: none;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  white-space: nowrap;
 }
 
-.pagination__link {
+.pagination__num {
+  display: none;
+}
+
+.pagination__status {
+  margin-inline: auto;
+}
+
+.pagination__page {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-block-size: 44px;
   min-inline-size: 44px;
-  padding-inline: var(--space-3);
   border: 1px solid var(--color-border);
-  border-radius: var(--radius-button);
-  color: inherit;
-  font-size: var(--font-size-sm);
+  border-radius: var(--radius-pill);
   text-decoration: none;
 }
 
-a.pagination__link:hover {
-  border-color: currentcolor;
-}
-
-a.pagination__link:focus-visible {
-  outline: 2px solid currentcolor;
-  outline-offset: 2px;
-}
-
-.pagination__link--current {
+.pagination__page[aria-current='page'] {
   border-color: var(--color-accent);
   background-color: var(--color-accent);
   color: var(--color-accent-foreground);
+  font-weight: 700;
 }
 
 .pagination__gap {
-  padding-inline: var(--space-1);
+  color: var(--color-muted);
+}
+
+@media (min-width: 48rem) {
+  .pagination__status {
+    display: none;
+  }
+
+  .pagination__num {
+    display: block;
+  }
+
+  .pagination__item {
+    margin-inline: var(--space-2);
+  }
 }
 
 /** Collections list page (TE-6 AC5, ES1-T103 D4): card 336 / 270 (Figma 1:395), lưới 2 / 3 / 4 */
