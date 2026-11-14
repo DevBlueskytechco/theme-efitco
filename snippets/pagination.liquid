@@ -1,41 +1,88 @@
 {% doc %}
-  Pagination links for a paginate object (TE-6 AC1, AC5): Previous, page parts,
-  Next. Renders only when there is more than one page. Plain links, so it works
-  without JavaScript; assets/collection-filters.js (BE) may intercept the clicks
-  and must use the server-rendered href.
+  Shared pagination for every multi-page list (SRS TE-6 AC6, docs/ui-spec/pagination.md):
+  collection, list-collections, search, blog and article comments.
 
-  Non-link parts are the current page (aria-current="page") or an ellipsis.
+  Layout: round 52 Previous / Next (.round-button), page pills 44 from 48rem,
+  "Page X of Y" below 48rem. On the first or last page the matching button stays
+  in place as <span role="link" aria-disabled="true"> with no href and no tab stop
+  (CLS 0). Renders nothing when there is only one page. Every page is a real
+  <a href>, so it works without JavaScript; BE may intercept the clicks and must
+  use the server-rendered href.
 
-  Test hooks: pagination, pagination-previous, pagination-next, pagination-page,
-  pagination-current.
+  Call it inside a paginate tag with window_size: 1 (at most 7 page parts), only
+  from templates/ or a page block.
+
+  Test hooks: pagination, pagination-previous, pagination-next (links only),
+  pagination-previous-disabled, pagination-next-disabled (disabled spans),
+  pagination-status, pagination-page, pagination-current (text is the bare
+  page number), pagination-summary.
 
   @param {object} paginate - The paginate object of the enclosing paginate tag
-  @param {string} label - Translated aria-label of the nav
+  @param {string} [label] - Translated name of the nav. Defaults to collections.pagination.label; article comments pass blog.comments_pagination_label
+  @param {string} [anchor] - Fragment added to every page URL, for example '#comments'
+  @param {string} [summary] - Translated line under the row, search only (collections.pagination.summary)
 
   @example
-  {%- assign pagination_label = 'collections.pagination.label' | t -%}
-  {% paginate collection.products by 24 %}
-    {% render 'pagination', paginate: paginate, label: pagination_label %}
+  {% paginate article.comments by 10, window_size: 1 %}
+    {%- assign comments_label = 'blog.comments_pagination_label' | t -%}
+    {% render 'pagination', paginate: paginate, label: comments_label, anchor: '#comments' %}
   {% endpaginate %}
 {% enddoc %}
 
 {%- if paginate.pages > 1 -%}
-  <nav class="pagination" aria-label="{{ label | escape }}" data-testid="pagination">
+  {%- liquid
+    assign nav_label = label
+    if nav_label == blank
+      assign nav_label = 'collections.pagination.label' | t
+    endif
+
+    assign hash = ''
+    if anchor != blank
+      assign hash = anchor
+      assign first_char = anchor | slice: 0
+      if first_char != '#'
+        assign hash = '#' | append: anchor
+      endif
+    endif
+
+    assign previous_label = 'collections.pagination.previous' | t
+    assign next_label = 'collections.pagination.next' | t
+  -%}
+  <nav class="pagination" aria-label="{{ nav_label | escape }}" data-testid="pagination">
     <ul class="pagination__list" role="list">
-      {%- if paginate.previous.is_link -%}
-        <li>
-          <a class="pagination__link" href="{{ paginate.previous.url }}" data-testid="pagination-previous">
-            {{- 'collections.pagination.previous' | t -}}
+      <li class="pagination__item pagination__item--prev">
+        {%- if paginate.previous.is_link -%}
+          <a
+            class="round-button pagination__step"
+            href="{{ paginate.previous.url }}{{ hash }}"
+            aria-label="{{ previous_label | escape }}"
+            data-testid="pagination-previous"
+          >
+            {%- render 'slideshow-icon', name: 'previous' -%}
           </a>
-        </li>
-      {%- endif -%}
+        {%- else -%}
+          <span
+            class="round-button pagination__step"
+            role="link"
+            aria-disabled="true"
+            aria-label="{{ previous_label | escape }}"
+            data-testid="pagination-previous-disabled"
+          >
+            {%- render 'slideshow-icon', name: 'previous' -%}
+          </span>
+        {%- endif -%}
+      </li>
+
+      <li class="pagination__status" data-testid="pagination-status">
+        {{- 'collections.pagination.page_of' | t: current: paginate.current_page, total: paginate.pages -}}
+      </li>
 
       {%- for part in paginate.parts -%}
-        <li>
+        <li class="pagination__num">
           {%- if part.is_link -%}
             <a
-              class="pagination__link"
-              href="{{ part.url }}"
+              class="pagination__page"
+              href="{{ part.url }}{{ hash }}"
               aria-label="{{ 'collections.pagination.page' | t: number: part.title }}"
               data-testid="pagination-page"
             >
@@ -44,7 +91,9 @@
           {%- else -%}
             {%- assign part_number = part.title | plus: 0 -%}
             {%- if part_number == paginate.current_page -%}
-              <span class="pagination__link pagination__link--current" aria-current="page" data-testid="pagination-current">
+              <span class="visually-hidden">{{ 'collections.pagination.current_prefix' | t }} </span>
+              {%- comment -%}Prefix sits outside the testid span so its text is the bare number.{%- endcomment -%}
+              <span class="pagination__page" aria-current="page" data-testid="pagination-current">
                 {{- part.title -}}
               </span>
             {%- else -%}
@@ -54,13 +103,32 @@
         </li>
       {%- endfor -%}
 
-      {%- if paginate.next.is_link -%}
-        <li>
-          <a class="pagination__link" href="{{ paginate.next.url }}" data-testid="pagination-next">
-            {{- 'collections.pagination.next' | t -}}
+      <li class="pagination__item pagination__item--next">
+        {%- if paginate.next.is_link -%}
+          <a
+            class="round-button pagination__step"
+            href="{{ paginate.next.url }}{{ hash }}"
+            aria-label="{{ next_label | escape }}"
+            data-testid="pagination-next"
+          >
+            {%- render 'slideshow-icon', name: 'next' -%}
           </a>
-        </li>
-      {%- endif -%}
+        {%- else -%}
+          <span
+            class="round-button pagination__step"
+            role="link"
+            aria-disabled="true"
+            aria-label="{{ next_label | escape }}"
+            data-testid="pagination-next-disabled"
+          >
+            {%- render 'slideshow-icon', name: 'next' -%}
+          </span>
+        {%- endif -%}
+      </li>
     </ul>
+
+    {%- if summary != blank -%}
+      <p class="pagination__summary" data-testid="pagination-summary">{{ summary | escape }}</p>
+    {%- endif -%}
   </nav>
 {%- endif -%}
