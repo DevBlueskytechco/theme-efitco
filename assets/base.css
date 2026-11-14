@@ -2870,63 +2870,52 @@ bundle-form {
   font-size: var(--font-size-xs);
 }
 
-/** Header drawer dưới 80rem (chuyển từ critical.css, ES1-T319: giữ critical ≤ 10 KB; panel chỉ hiện khi mở) */
-/* Giữ chỗ khi summary thành backdrop fixed */
-.site-header__drawer {
-  flex: none;
-  width: 2.75rem;
-  height: 2.75rem;
-}
-
-/* Bấm backdrop là đóng, kể cả không JS */
-.site-header__drawer[open] > summary {
-  position: fixed;
-  inset: 0;
-  z-index: var(--layer-content);
-  background-color: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
-}
-
-.site-header__drawer[open] > summary svg {
-  visibility: hidden;
-}
-
-.site-header__drawer-panel {
-  position: fixed;
-  inset-block: 0;
-  inset-inline-start: 0;
-  z-index: calc(var(--layer-content) + 1);
-  width: min(22rem, 100vw - 3.5rem);
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding: var(--space-2) var(--space-4) var(--space-6);
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-}
-
-.site-header__drawer-close {
-  display: flex;
-  margin-inline-start: auto;
-}
-
-@media (scripting: none) {
-  .site-header__drawer-close {
-    display: none;
-  }
-}
-
-.site-header__drawer-menu > li {
-  border-block-end: 1px solid var(--color-border);
-}
-
-.site-header__drawer-link {
-  justify-content: space-between;
-  font-size: var(--font-size-base);
-}
-
-.site-header__drawer-submenu {
-  padding-block-end: var(--space-2);
-  padding-inline-start: var(--space-4);
-}
+/** Drawer menu < 80rem trên khung .drawer (TE-1 AC2, AC3, AC10; navigation.md §5.2, §5.3; localization.md §4.4).
+   Không JS: details mở, summary là scrim, cấp 2 accordion. [data-drawer-enhanced] (BE): cấp 2 phủ drawer, trượt vào. */
+.site-header__drawer { --drawer-row: calc(var(--space-1) * 13); --drawer-tap: calc(var(--space-1) * 11); --drawer-level-from: 100%; flex: none; inline-size: var(--drawer-tap); block-size: var(--drawer-tap); }
+.site-header__drawer:dir(rtl) { --drawer-level-from: -100%; }
+.site-header:not([data-drawer-enhanced]) .site-header__drawer[open] > summary { position: fixed; inset: 0; z-index: var(--layer-scrim); background: var(--overlay-scrim); }
+.site-header__drawer[open] > summary svg { visibility: hidden; }
+.site-header:not([data-drawer-enhanced]) .site-header__drawer[open] .drawer { display: flex; flex-direction: column; z-index: var(--layer-overlay); opacity: 1; translate: none; }
+@media (scripting: none) { .site-header__drawer .drawer__header .close-button { display: none; } }
+.site-header .drawer :is(a, summary, .site-header__drawer-option):focus-visible { outline-color: var(--color-accent); outline-offset: -2px; }
+.site-header__drawer-title { font-weight: var(--font-heading--weight); }
+.site-header__drawer-body { padding-block-start: var(--space-2); }
+.site-header__drawer-menu > li { border-block-end: 1px solid var(--color-border); }
+.site-header__drawer-row, :where(.site-header__drawer-panel ul) a, .site-header__drawer-group-title { display: flex; align-items: center; gap: var(--space-2); min-block-size: var(--space-7); text-decoration: none; overflow-wrap: anywhere; }
+.site-header__drawer-row { min-block-size: var(--drawer-row); font-size: var(--font-size-lg); font-weight: 500; }
+.site-header__drawer-row svg { flex: none; inline-size: var(--space-3); margin-inline-start: auto; color: var(--color-muted); }
+details[open] > .site-header__drawer-row svg { rotate: 180deg; }
+/* Trang hiện tại: 600 + gạch chân 2px, không chỉ bằng màu (dùng chung với mega từ 80rem) */
+:is(.site-header__mega, .site-header__drawer-panel) a[aria-current='page'] { font-weight: 600; text-decoration: underline 2px; text-underline-offset: 0.45em; }
+.site-header__drawer-level { padding-block-end: var(--space-4); padding-inline-start: var(--space-4); }
+.site-header__drawer-view-all { min-block-size: var(--drawer-row); font-weight: 600; text-decoration: underline; }
+.site-header__drawer-view-all .slideshow-icon { inline-size: var(--space-4); }
+.site-header__mega-title, .site-header__drawer-group-title { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; }
+.site-header__drawer-group-title { min-block-size: var(--drawer-tap); margin-block-start: var(--space-5); }
+.site-header__drawer-footer { max-block-size: 50%; overflow-y: auto; }
+.site-header__drawer-account { display: flex; min-block-size: var(--drawer-tap); }
+.site-header__drawer-account-label { display: inline-flex; align-items: center; gap: var(--space-2); font-weight: 500; }
+.site-header__drawer-account-label svg { inline-size: var(--space-5); block-size: var(--space-5); }
+.site-header__drawer-locale { padding-inline: var(--space-3); border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); font-size: var(--font-size-base); }
+.site-header__drawer-flag { flex: none; inline-size: calc(var(--space-1) * 5); border-radius: var(--radius-pill); }
+.site-header__drawer-option { display: flex; align-items: center; gap: var(--space-2); inline-size: 100%; min-block-size: var(--space-7); padding: var(--space-1) var(--space-3); border: 0; border-radius: var(--radius-input); background: none; color: inherit; font: inherit; text-align: start; overflow-wrap: anywhere; cursor: pointer; }
+.site-header__drawer-option[aria-current] { font-weight: 600; }
+.site-header__drawer-option[aria-current], .site-header__drawer-row:active { background: var(--color-background-alt); }
+.site-header__drawer-option[aria-current]::before { content: ''; flex: none; inline-size: var(--space-4); block-size: var(--space-3); background: currentcolor; mask: var(--icon-tick) center / contain no-repeat; }
+.site-header__drawer-currency { margin-inline-start: auto; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
+@media (hover: hover) { .site-header__drawer-option:hover { background: var(--color-background-alt); } }
+/* Có JS: cấp 2 phủ cả drawer (khối chứa là .drawer fixed), cuộn riêng; đầu cấp 2 Back + × cao 72, rồi tiêu đề */
+.site-header[data-drawer-enhanced] .site-header__drawer-level { position: absolute; inset: 0; z-index: var(--layer-content); overflow-y: auto; overscroll-behavior: contain; padding: 0 var(--space-5) var(--space-5); background: var(--color-background); }
+.site-header[data-drawer-enhanced] .site-header__drawer-head { display: block; }
+.site-header[data-drawer-enhanced] .site-header__drawer-row svg, .site-header__drawer-back:dir(rtl) svg { rotate: -90deg; }
+.site-header[data-drawer-enhanced] .site-header__drawer-row:dir(rtl) svg, .site-header__drawer-back svg { rotate: 90deg; }
+.site-header__drawer-bar { display: flex; align-items: center; justify-content: space-between; min-block-size: calc(var(--space-1) * 18); margin-inline-end: calc(var(--space-3) - var(--space-5)); }
+.site-header__drawer-back { display: inline-flex; align-items: center; gap: var(--space-1); min-block-size: var(--drawer-tap); padding: 0; border: 0; background: none; color: var(--color-muted); font: inherit; font-size: var(--font-size-sm); cursor: pointer; }
+.site-header__drawer-back svg { inline-size: var(--space-3); }
+.site-header__drawer-level-title { margin-block: var(--space-4) var(--space-2); font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight-display); line-height: var(--line-height-heading); text-transform: uppercase; overflow-wrap: anywhere; }
+@media (prefers-reduced-motion: no-preference) { .site-header[data-drawer-enhanced] details[open] > .site-header__drawer-level { animation: drawer-level-in var(--motion-base) var(--ease-out); } }
+@keyframes drawer-level-in { from { translate: var(--drawer-level-from) 0; } }
 
 /** Mega menu từ 80rem (TE-22 AC1–AC3, AC7; navigation.md §5.1, §7). Panel, scrim neo vào container header:
    mục mega, nav, inner không định vị. Header giữ tối, cao 80 khi mở; panel absolute nên CLS 0. */
@@ -2974,14 +2963,6 @@ bundle-form {
     text-decoration: none;
   }
 
-  .site-header__mega-title {
-    color: var(--color-muted);
-    font-size: var(--font-size-sm);
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-
   .site-header__mega-view-all {
     font-weight: 600;
     text-decoration: underline;
@@ -2991,14 +2972,6 @@ bundle-form {
   /* Hover: chữ accent (5.01:1); dịch 4 trong khối chuyển động */
   :is(.site-header__mega-link, .site-header__mega-tile):hover {
     color: var(--color-accent);
-  }
-
-  /* Trang hiện tại: 600 + gạch chân 2px, không chỉ bằng màu */
-  .site-header__mega a[aria-current='page'] {
-    font-weight: 600;
-    text-decoration: underline;
-    text-decoration-thickness: 2px;
-    text-underline-offset: 0.45em;
   }
 
   /* B: tiêu đề panel + "View all …" một hàng, ô 5 mỗi hàng */

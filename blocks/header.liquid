@@ -35,6 +35,23 @@
     condition as data-mode in blocks/cart-drawer.liquid.
   - Custom element host: <header-menu>, <header-drawer>, <sticky-header> (ẩn) — JS ở assets/header-menu.js, assets/header-sticky.js.
 
+  Drawer dưới 80rem (TE-1 AC2, AC3, AC10; navigation.md §2, §5.2, §5.3, §6; localization.md §4.4;
+  hợp đồng TE-1-R2-FE3 / TE-1-R2-BE1):
+  - <details class="site-header__drawer"> chỉ là bản dự phòng: chưa có JS hoặc không JS thì bấm
+    summary mở details, summary thành scrim (bấm là đóng), dialog hiện bằng CSS, cấp 2 là accordion
+    <details> tại chỗ, phần đầu cấp 2 (Back, ×, tiêu đề) ẩn bằng `hidden`.
+  - data-drawer-enhanced: BE gắn lên root header khi header-drawer.js nắm drawer. Từ đó CSS không
+    dùng summary làm scrim nữa; BE mở bằng details.open = true + <modal-dialog data-layer="menu">.open(summary),
+    đóng (modal:close) thì details.open = false và đóng mọi cấp 2 (lần mở sau về cấp 1).
+    Cấp 2 (details[open] > [data-drawer-level]) phủ cả drawer, trượt vào, phần đầu cấp 2 hiện.
+  - header-drawer-level (data-drawer-level="2", role="group" + aria-labelledby tiêu đề cấp 2):
+    panel cấp 2 của mục menu có con và của hàng localization.
+  - header-drawer-back: nút Back (tên "Back to menu") trong phần đầu cấp 2; BE: details.open = false,
+    focus về summary vừa mở. × trong phần đầu cấp 2 là .close-button nên <modal-dialog> tự đóng.
+  - header-drawer-localization: <details> hàng gộp "cờ + USD / EN ›" trong chân drawer, bọc trong
+    {% form 'localization' %}; mỗi mục là nút submit nên đổi được khi không JS.
+  - header-drawer-account: <shopify-account> trong chân drawer (Sign In).
+
   Mega menu từ 80rem (TE-22 AC1–AC3, navigation.md §2, §3; hợp đồng TE-22-R2-FE2 / TE-22-R2-BE1):
   - Kiểu panel theo dữ liệu menu, không setting: data-mega="columns" (A, có cấp 3)
     hoặc "tiles" (B, mọi con là collection) trên <details> cấp 1; còn lại là
@@ -71,6 +88,16 @@
   if cart_type == 'page' or template.name == 'cart'
     assign cart_drawer_active = false
   endif
+
+  # Localization trong chân drawer: chỉ phần có > 1 mục (TE-1 AC5, localization.md §2)
+  assign show_countries = false
+  if localization.available_countries.size > 1
+    assign show_countries = true
+  endif
+  assign show_languages = false
+  if localization.available_languages.size > 1
+    assign show_languages = true
+  endif
 -%}
 
 <header
@@ -84,89 +111,266 @@
   <div class="site-header__inner">
     {% if has_menu %}
       <details class="site-header__drawer" scroll-lock>
-        <summary class="site-header__icon" data-testid="header-drawer-toggle" aria-controls="HeaderDrawer">
+        <summary
+          class="site-header__icon"
+          id="HeaderDrawerToggle"
+          data-testid="header-drawer-toggle"
+          aria-controls="HeaderDrawer"
+        >
           <span class="visually-hidden">{{ 'blocks.header.open_menu' | t }}</span>
           {% render 'header-icon', name: 'menu' %}
         </summary>
 
-        <div class="site-header__drawer-panel" id="HeaderDrawer" data-testid="header-drawer">
-          <button
-            type="button"
-            class="site-header__icon site-header__drawer-close"
-            data-testid="header-drawer-close"
-            aria-label="{{ 'blocks.header.close_menu' | t }}"
+        <modal-dialog data-layer="menu" data-return-focus="HeaderDrawerToggle">
+          <dialog
+            class="drawer site-header__drawer-panel"
+            id="HeaderDrawer"
+            aria-labelledby="HeaderDrawerTitle"
+            data-testid="header-drawer"
           >
-            {% render 'header-icon', name: 'close' %}
-          </button>
+            <div class="drawer__header">
+              <p class="drawer__title site-header__drawer-title" id="HeaderDrawerTitle">
+                {{- 'blocks.header.menu_title' | t -}}
+              </p>
+              <button
+                type="button"
+                class="close-button"
+                data-testid="header-drawer-close"
+                aria-label="{{ 'blocks.header.close_menu' | t }}"
+              >
+                {% render 'header-icon', name: 'close' %}
+              </button>
+            </div>
 
-          <nav aria-label="{{ 'blocks.header.drawer_menu_label' | t }}">
-            <ul class="site-header__drawer-menu">
-              {% for link in menu.links %}
-                <li data-testid="header-menu-item">
-                  {% if link.links.size > 0 %}
-                    <details>
-                      <summary
-                        class="site-header__link site-header__drawer-link"
-                        data-testid="header-drawer-accordion-toggle"
-                        aria-controls="HeaderDrawerSubmenu-{{ forloop.index }}"
+            <nav class="drawer__body site-header__drawer-body" aria-label="{{ 'blocks.header.drawer_menu_label' | t }}">
+              <ul class="site-header__drawer-menu">
+                {% for link in menu.links %}
+                  <li data-testid="header-menu-item">
+                    {% if link.links.size > 0 %}
+                      {%- liquid
+                        case link.type
+                          when 'catalog_link'
+                            assign view_all = 'blocks.header.view_all_products' | t
+                          when 'collections_link'
+                            assign view_all = 'blocks.header.view_all_collections' | t
+                          else
+                            assign link_title = link.title | escape
+                            assign view_all = 'blocks.header.view_all' | t: title: link_title
+                        endcase
+                        assign level_id = 'HeaderDrawerLevel-' | append: forloop.index
+                        assign drawer_index = forloop.index
+                      -%}
+                      <details>
+                        <summary
+                          class="site-header__drawer-row"
+                          data-testid="header-drawer-accordion-toggle"
+                          aria-controls="HeaderDrawerSubmenu-{{ drawer_index }}"
+                        >
+                          {{ link.title | escape }}
+                          {% render 'header-icon', name: 'chevron' %}
+                        </summary>
+                        <div
+                          class="site-header__drawer-level"
+                          role="group"
+                          aria-labelledby="{{ level_id }}"
+                          data-drawer-level="2"
+                          data-testid="header-drawer-level"
+                        >
+                          {%- assign level_title = link.title | escape -%}
+                          {%- render 'header-drawer-head', title: level_title, id: level_id -%}
+                          <ul
+                            class="site-header__drawer-submenu"
+                            id="HeaderDrawerSubmenu-{{ drawer_index }}"
+                            data-testid="header-drawer-submenu"
+                          >
+                            <li>
+                              <a class="site-header__drawer-view-all" href="{{ link.url }}">
+                                {{- view_all -}}
+                                {%- render 'slideshow-icon', name: 'arrow' -%}
+                              </a>
+                            </li>
+                            {% for child in link.links %}
+                              <li>
+                                {%- if child.links.size > 0 -%}
+                                  {%- comment -%} Nhóm cấp 3 (TE-22 AC4): tiêu đề nhóm là link, không <h*> {%- endcomment -%}
+                                  {%- assign group_id = 'HeaderDrawerGroup-' | append: drawer_index | append: '-' | append: forloop.index -%}
+                                  <a
+                                    class="site-header__drawer-group-title"
+                                    id="{{ group_id }}"
+                                    href="{{ child.url }}"
+                                    {% if child.current %}
+                                      aria-current="page"
+                                    {% endif %}
+                                  >
+                                    {{- child.title | escape -}}
+                                  </a>
+                                  <ul aria-labelledby="{{ group_id }}">
+                                    {%- for grandchild in child.links -%}
+                                      <li>
+                                        <a
+                                          href="{{ grandchild.url }}"
+                                          {% if grandchild.current %}
+                                            aria-current="page"
+                                          {% endif %}
+                                        >
+                                          {{- grandchild.title | escape -}}
+                                        </a>
+                                      </li>
+                                    {%- endfor -%}
+                                  </ul>
+                                {%- else -%}
+                                  <a
+                                    href="{{ child.url }}"
+                                    {% if child.current %}
+                                      aria-current="page"
+                                    {% endif %}
+                                  >
+                                    {{- child.title | escape -}}
+                                  </a>
+                                {%- endif -%}
+                              </li>
+                            {% endfor %}
+                          </ul>
+                        </div>
+                      </details>
+                    {% else %}
+                      <a
+                        class="site-header__drawer-row"
+                        href="{{ link.url }}"
+                        {% if link.current %}
+                          aria-current="page"
+                        {% endif %}
                       >
-                        {{ link.title | escape }}
+                        {{- link.title | escape -}}
+                      </a>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+              </ul>
+            </nav>
+
+            {%- if shop.customer_accounts_enabled or show_countries or show_languages -%}
+              <div class="drawer__footer site-header__drawer-footer">
+                {%- if shop.customer_accounts_enabled -%}
+                  <shopify-account
+                    class="site-header__drawer-account"
+                    menu="{{ block.settings.customer_account_menu }}"
+                    data-testid="header-drawer-account"
+                  >
+                    <span slot="signed-out-avatar" class="site-header__drawer-account-label">
+                      <span aria-hidden="true">{{ 'icon-account.svg' | inline_asset_content }}</span>
+                      {{- 'blocks.header.sign_in' | t -}}
+                    </span>
+                  </shopify-account>
+                {%- endif -%}
+
+                {%- if show_countries or show_languages -%}
+                  {%- liquid
+                    assign locale_code = ''
+                    if show_countries
+                      assign locale_code = localization.country.currency.iso_code
+                    endif
+                    if show_countries and show_languages
+                      assign locale_code = locale_code | append: ' / '
+                    endif
+                    if show_languages
+                      assign language_code = localization.language.iso_code | upcase
+                      assign locale_code = locale_code | append: language_code
+                    endif
+                    assign locale_title = 'blocks.footer.localization_title' | t
+                  -%}
+                  {%- form 'localization', id: 'HeaderDrawerLocalizationForm' -%}
+                    <details data-testid="header-drawer-localization">
+                      <summary
+                        class="site-header__drawer-row site-header__drawer-locale"
+                        aria-controls="HeaderDrawerLocalization"
+                      >
+                        <span class="visually-hidden">{{ 'blocks.footer.localization_label' | t }}</span>
+                        {{
+                          localization.country
+                          | image_url: width: 40
+                          | image_tag:
+                            class: 'site-header__drawer-flag',
+                            width: 20,
+                            height: 20,
+                            alt: '',
+                            loading: 'lazy'
+                        }}
+                        <span>{{ locale_code }}</span>
+                        <span class="visually-hidden">
+                          , {{ localization.country.name | escape }}, {{ localization.language.endonym_name | escape -}}
+                        </span>
                         {% render 'header-icon', name: 'chevron' %}
                       </summary>
-                      <ul
-                        class="site-header__drawer-submenu"
-                        id="HeaderDrawerSubmenu-{{ forloop.index }}"
-                        data-testid="header-drawer-submenu"
+                      <div
+                        class="site-header__drawer-level"
+                        id="HeaderDrawerLocalization"
+                        role="group"
+                        aria-labelledby="HeaderDrawerLocalizationTitle"
+                        data-drawer-level="2"
+                        data-testid="header-drawer-level"
                       >
-                        {% for child in link.links %}
-                          <li>
-                            <a
-                              class="site-header__link"
-                              href="{{ child.url }}"
-                              {% if child.current %}
-                                aria-current="page"
-                              {% endif %}
-                            >
-                              {{- child.title | escape -}}
-                            </a>
-                            {%- if child.links.size > 0 -%}
-                              {%- comment -%} Cấp 3 tại chỗ (TE-22 AC4 không JS); trượt + Back ở TE-1-R2-FE3 {%- endcomment -%}
-                              <ul class="site-header__drawer-submenu">
-                                {%- for grandchild in child.links -%}
-                                  <li>
-                                    <a
-                                      class="site-header__link"
-                                      href="{{ grandchild.url }}"
-                                      {% if grandchild.current %}
-                                        aria-current="page"
-                                      {% endif %}
-                                    >
-                                      {{- grandchild.title | escape -}}
-                                    </a>
-                                  </li>
-                                {%- endfor -%}
-                              </ul>
-                            {%- endif -%}
-                          </li>
-                        {% endfor %}
-                      </ul>
+                        {%- render 'header-drawer-head', title: locale_title, id: 'HeaderDrawerLocalizationTitle' -%}
+                        {%- if show_countries -%}
+                          <p class="site-header__drawer-group-title" id="HeaderDrawerCountryLabel">
+                            {{- 'blocks.footer.country_label' | t -}}
+                          </p>
+                          <ul class="site-header__drawer-options" aria-labelledby="HeaderDrawerCountryLabel">
+                            {%- for country in localization.available_countries -%}
+                              <li>
+                                <button
+                                  class="site-header__drawer-option"
+                                  type="submit"
+                                  name="country_code"
+                                  value="{{ country.iso_code }}"
+                                  data-testid="header-drawer-country-option"
+                                  {% if country.iso_code == localization.country.iso_code %}
+                                    aria-current="true"
+                                  {% endif %}
+                                >
+                                  <span>{{ country.name | escape }}</span>
+                                  <span class="site-header__drawer-currency">
+                                    {{- country.currency.iso_code }}
+                                    {{ country.currency.symbol -}}
+                                  </span>
+                                </button>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                        {%- if show_languages -%}
+                          <p class="site-header__drawer-group-title" id="HeaderDrawerLanguageLabel">
+                            {{- 'blocks.footer.language_label' | t -}}
+                          </p>
+                          <ul class="site-header__drawer-options" aria-labelledby="HeaderDrawerLanguageLabel">
+                            {%- for language in localization.available_languages -%}
+                              <li>
+                                <button
+                                  class="site-header__drawer-option"
+                                  type="submit"
+                                  name="language_code"
+                                  value="{{ language.iso_code }}"
+                                  lang="{{ language.iso_code }}"
+                                  dir="auto"
+                                  data-testid="header-drawer-language-option"
+                                  {% if language.iso_code == localization.language.iso_code %}
+                                    aria-current="true"
+                                  {% endif %}
+                                >
+                                  {{- language.endonym_name | escape -}}
+                                </button>
+                              </li>
+                            {%- endfor -%}
+                          </ul>
+                        {%- endif -%}
+                      </div>
                     </details>
-                  {% else %}
-                    <a
-                      class="site-header__link site-header__drawer-link"
-                      href="{{ link.url }}"
-                      {% if link.current %}
-                        aria-current="page"
-                      {% endif %}
-                    >
-                      {{- link.title | escape -}}
-                    </a>
-                  {% endif %}
-                </li>
-              {% endfor %}
-            </ul>
-          </nav>
-        </div>
+                  {%- endform -%}
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          </dialog>
+        </modal-dialog>
       </details>
     {% endif %}
 

@@ -1,0 +1,33 @@
+{% doc %}
+  Renders the top of a level 2 panel in the header drawer (TE-1 AC2, AC10;
+  navigation.md §5.3): Back (accessible name "Back to menu", 44 high) and
+  the close button (48), then the level title. The title is a <p>, never an
+  <h*>: the header comes before the page h1 (navigation.md §8).
+  The wrapper is `hidden`: without JavaScript level 2 is an accordion in
+  place and has no Back. CSS shows it once the header has
+  data-drawer-enhanced (assets/header-drawer.js, TE-1-R2-BE1).
+
+  @param {string} title - Level title, already escaped
+  @param {string} id - Unique id of the title, used by aria-labelledby on the level panel
+
+  @example
+  {% render 'header-drawer-head', title: link_title, id: 'HeaderDrawerLevel-1' %}
+{% enddoc %}
+
+<div class="site-header__drawer-head" hidden>
+  <div class="site-header__drawer-bar">
+    <button
+      type="button"
+      class="site-header__drawer-back"
+      data-testid="header-drawer-back"
+      aria-label="{{ 'blocks.header.back_label' | t }}"
+    >
+      {%- render 'header-icon', name: 'chevron' -%}
+      {{- 'blocks.header.back' | t -}}
+    </button>
+    <button type="button" class="close-button" aria-label="{{ 'blocks.header.close_menu' | t }}">
+      {%- render 'header-icon', name: 'close' -%}
+    </button>
+  </div>
+  <p class="site-header__drawer-level-title" id="{{ id }}">{{ title }}</p>
+</div>
