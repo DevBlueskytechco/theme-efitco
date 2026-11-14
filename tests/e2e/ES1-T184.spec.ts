@@ -133,7 +133,7 @@ test.describe('ES1-T184 cỡ card theo màn hình', () => {
   for (const [width, cardWidth, gap] of [
     [360, 252, 16],
     [768, 307.2, 16],
-    [1280, 336, 24],
+    [1280, 270.7, 24], // ES1-T334: TE-15 AC1 (SRS 0.5) card 271 ở 1280
     [1920, 336, 24],
   ] as const) {
     test(`${width}: card rộng ${cardWidth}, gap ${gap}, không tràn trang`, async ({ page }) => {

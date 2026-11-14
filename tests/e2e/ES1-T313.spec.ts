@@ -31,7 +31,7 @@ const FIXTURE = `
     <button type="button" class="close-button toast__close" data-testid="toast-dismiss"><span class="visually-hidden">Dismiss: Added to cart</span><svg viewBox="0 0 20 20"></svg></button>
   </div>
 </div>
-<div class="carousel-nav"><button class="round-button" data-testid="round" aria-label="Next"></button><button class="round-button" data-testid="round-hidden" hidden aria-label="Back"></button></div>
+<div class="carousel-nav"><button class="round-button" data-testid="round" aria-label="Next"></button><button class="round-button" data-testid="round-hidden" aria-disabled="true" aria-label="Back"></button></div>
 <button class="round-button" data-testid="round-plain-hidden" hidden aria-label="Back"></button>
 <div class="empty-state" data-testid="empty"><span class="empty-state__icon" data-testid="empty-icon"><svg viewBox="0 0 24 24"></svg></span><h2 class="empty-state__heading">Your cart is empty</h2></div>
 <div class="alert" role="alert" data-testid="alert"><span class="alert__icon"><svg viewBox="0 0 24 24"></svg></span><div class="alert__body"><h2 class="alert__title">Could not load</h2></div></div>
@@ -127,7 +127,7 @@ test.describe('ES1-T313 tĩnh', () => {
     expect(Math.round(dialog.x)).toBe(24);
   });
 
-  test('TC-08 nút tròn ở đầu/cuối hàng mờ 0.35, ngoài hàng cuộn [hidden] vẫn ẩn', async ({ page }) => {
+  test('TC-08 nút tròn ở đầu/cuối hàng (aria-disabled, TE-7 AC6) mờ 0.35, ngoài hàng cuộn [hidden] vẫn ẩn', async ({ page }) => {
     await mount(page, 1280);
     await expect(page.getByTestId('round-hidden')).toHaveCSS('opacity', '0.35');
     await expect(page.getByTestId('round-plain-hidden')).toBeHidden();

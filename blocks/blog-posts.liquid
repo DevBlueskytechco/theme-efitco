@@ -1,9 +1,16 @@
 {% doc %}
   Renders the Training Tips row: eyebrow, heading and a list of article cards from
   one blog (Figma 1:1022). Called once per template, so its sample text is the schema
-  default. No JavaScript: the list scrolls sideways with touch, mouse, scrollbar and
-  keyboard when it overflows, and a blog with fewer articles shows fewer cards at the
-  same size (assets/base.css).
+  default. Horizontal row (TE-16 AC1, HD3): cards 252 x 336 at 360, 307 x 410 at 768;
+  from 80rem 5 or more cards are a row of about 271 (1280) or 336 (1920) wide cards.
+  When at most 4 cards render, the root gets blog-posts--grid and from 80rem the list
+  is a static 4 column grid (292 x 389 at 1280, 336 x 448 at 1920) without buttons or
+  progress line. Scrolls with scroll-snap, touch and keyboard without JavaScript
+  (assets/base.css, "Hàng ngang").
+
+  Buttons and progress line: snippets/carousel-nav, snippets/carousel-progress.
+  Hidden below 48rem, until assets/scroll-buttons.js sets data-enhanced, and when
+  the row fits (data-static, set by the script, TE-7-R2-BE1).
 
   The blog comes from the setting, then from the handle parameter, which lets a
   template without saved settings pass a resource (templates/index.figma.liquid). A
@@ -13,8 +20,13 @@
 
   Self-contained: callers must leave the body empty.
 
+  JavaScript hooks: custom element scroll-buttons (root), data-enhanced and
+  data-static (root), data-lazy-module (root), data-scroll-track (list),
+  data-scroll-prev, data-scroll-next, data-scroll-progress.
+
   Test hooks: data-testid="blog-posts", "blog-posts-eyebrow", "blog-posts-heading",
-  "blog-posts-list", "blog-posts-placeholder"; cards are in snippets/article-card.liquid.
+  "blog-posts-nav", "blog-posts-prev", "blog-posts-next", "blog-posts-list",
+  "carousel-progress", "blog-posts-placeholder"; cards are in snippets/article-card.liquid.
 
   @param {string} [id] - Static block id, needed when a template has more than one blog-posts block
   @param {string} [handle] - Blog handle used when the blog setting is empty
@@ -31,11 +43,12 @@
     assign source = blogs[handle]
   endif
   assign article_count = source.articles_count | default: 0
+  assign shown_count = article_count | at_most: block.settings.articles_to_show
 -%}
 
 {%- if article_count > 0 -%}
   <scroll-buttons
-    class="blog-posts full-width"
+    class="blog-posts full-width{% if shown_count <= 4 %} blog-posts--grid{% endif %}"
     {% if id != blank %}
       data-blog-posts-id="{{ id }}"
     {% endif %}

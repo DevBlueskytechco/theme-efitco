@@ -25,8 +25,10 @@
     stick (after the announcement bar when there is one).
   - Partial region: cart-count.
   - header-search-link: a real link to the search page, so search works without
-    JavaScript. The next element sibling must stay the search dialog of
-    snippets/predictive-search.liquid; JS opens it from this link.
+    JavaScript. The next element sibling must stay the
+    <modal-dialog data-layer="search"> of snippets/predictive-search.liquid;
+    JS opens it from this link. The search_style setting picks popup (dark
+    top band) or drawer (inline end).
   - data-cart-link, aria-haspopup="dialog": on the cart link when the cart drawer
     is active (cart_type is drawer and the template is not cart). JS opens the
     drawer from it; without JS it stays a plain link to routes.cart_url. Same
@@ -385,7 +387,11 @@
       >
         {% render 'header-icon', name: 'search' %}
       </a>
-      {% render 'predictive-search' %}
+      {% render 'predictive-search',
+        style: block.settings.search_style,
+        logo: logo,
+        logo_width: block.settings.logo_width
+      %}
 
       {% if shop.customer_accounts_enabled %}
         <shopify-account
@@ -474,6 +480,22 @@
       "label": "t:labels.sticky_header",
       "info": "t:info.sticky_header",
       "default": true
+    },
+    {
+      "type": "select",
+      "id": "search_style",
+      "label": "t:labels.search_style",
+      "options": [
+        {
+          "value": "popup",
+          "label": "t:options.search_style.popup"
+        },
+        {
+          "value": "drawer",
+          "label": "t:options.search_style.drawer"
+        }
+      ],
+      "default": "popup"
     }
   ]
 }
