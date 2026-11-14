@@ -209,12 +209,14 @@ Snippets (`snippets/`):
 
 | Snippet | Role |
 | --- | --- |
+| `breadcrumb` | Breadcrumb trail read from the current template plus its single JSON-LD BreadcrumbList; nothing on home, cart, 404, password, gift card. |
 | `css-variables` | Outputs every design token as a CSS custom property plus `@font-face`. |
 | `header-icon` | Decorative header icons (menu, close, search, chevron). |
 | `icon-social` | Decorative social network icons for footer links. |
 | `icon-trust` | Decorative trust bar icons. |
 | `image` | Responsive image (`image_url` + `image_tag`, srcset, lazy by default). |
 | `meta-tags` | Title, description, social and canonical meta tags. |
+| `page-title` | Page title: optional eyebrow, the page's single h1, optional meta line. |
 | `price` | Price, sale and compare-at price, unit price. |
 | `product-card` | One product card: image, badge, title, price, swatches. |
 | `product-structured-data` | The single JSON-LD Product for the product page. |
