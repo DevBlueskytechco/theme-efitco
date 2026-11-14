@@ -32,7 +32,8 @@ const SNIPPET = 'snippets/predictive-search.liquid';
 const SUGGEST = /\/search\/suggest\.json/;
 const MODULE = /\/predictive-search\.js/;
 const IMAGE = /\/te130-fixture\.png/;
-const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
+// Script nền tảng Shopify (không phải theme): shopifycloud, web pixels manager (/cdn/wpm/, wpm@), trekkie, monorail, shop.app
+const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|\/cdn\/wpm\/|\/wpm@|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 // PNG 1×1 trong suốt: ảnh sản phẩm mock, không gọi CDN
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=', 'base64');
 
@@ -110,6 +111,11 @@ test.describe('ES1-T130 tĩnh', () => {
     const loader = readFileSync(LOADER, 'utf8');
     expect(loader).not.toMatch(/\/\/|\/\*/);
     expect(loader).toContain('[data-search-src]');
+    // ES1-T316: loader chỉ nghe click, chỉ import data-search-src; không đụng data-lazy-module, không nghe focus/pointer/touch
+    expect(loader.match(/addEventListener\("(\w+)"/g)).toEqual(['addEventListener("click"']);
+    expect(loader.match(/import\(/g)).toHaveLength(1);
+    expect(loader).toContain('import(a.dataset.searchSrc)');
+    expect(loader).not.toMatch(/lazy|focus|pointer|touch|IntersectionObserver/i);
   });
 
   test('AC1 header: script loader luôn có, không script predictive-search, link có data-search-src', () => {
@@ -163,6 +169,19 @@ test.describe('ES1-T130 predictive search', () => {
     await expect.poll(() => loaded.length).toBe(1);
     await page.waitForFunction(() => !!customElements.get('predictive-search'));
     expect(errors).toEqual([]);
+  });
+
+  test('AC1 focus, hover link và cuộn trang không tải predictive-search.js (chỉ click)', async ({ page }) => {
+    const loaded: string[] = [];
+    page.on('request', (r) => MODULE.test(r.url()) && loaded.push(r.url()));
+    await page.goto('/');
+    await expectNotChallenged(page);
+    await tid(page, T.link).focus();
+    if (isDesktop()) await tid(page, T.link).hover();
+    await page.evaluate(() => scrollBy(0, innerHeight * 2));
+    await page.waitForTimeout(800);
+    expect(loaded, 'predictive-search.js nạp khi chưa click').toEqual([]);
+    await expect(tid(page, T.dialog)).toBeHidden();
   });
 
   test('AC1 1 ký tự không fetch; gõ nhanh 3 ký tự chỉ 1 request sau 300ms', async ({ page }) => {
@@ -434,6 +453,7 @@ test.describe('ES1-T130 predictive search', () => {
     await openSearch(page);
     await typeAndWaitList(page, 'bench');
     await tid(page, T.input).press('ArrowDown');
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include(`[data-testid="${T.dialog}"]`).analyze();
     const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(serious.map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);

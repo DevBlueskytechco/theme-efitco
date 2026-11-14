@@ -6,7 +6,7 @@
  * https://shopify.dev/docs/api/ajax/reference/predictive-search
  * No event: shopify:search:update is for submit, filter, sort only (ES1-T124 #3).
  * https://shopify.dev/docs/api/storefront-events-and-actions/events/search-update
- * No partial: predictive_search renders only with section_id (ES1-T124 #2).
+ * No partial: predictive_search needs Section Rendering (ES1-T124 #2).
  */
 
 const PARAMS = {
@@ -112,7 +112,7 @@ class PredictiveSearch extends HTMLElement {
     this.status.textContent = n ? (d.labelCount || '').replace('%n', n) : terms(d.labelEmpty);
   }
 
-  // Template clone: textContent only, never innerHTML
+  // Template clone, textContent only
   option(node, item, i) {
     const $ = (s) => node.querySelector(`[data-predictive-${s}]`);
     const a = node.firstElementChild;

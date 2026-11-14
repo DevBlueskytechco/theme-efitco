@@ -1,4 +1,11 @@
-KHÔNG CHẮC: (1) Lượt 2 sửa theo CI run 43546641607, nhưng phiên này vẫn không có trình duyệt, `playwright --list`/`node --check` bị chặn. Nguyên nhân 2 test mobile (abort/429, module lỗi tải) chỉ suy luận, không có log CI: xem mục Lượt 2. (2) Ngân sách trang sản phẩm vượt 40 960 B do develop vượt từ trước (44 967 B); CTO 14/11 (ES1-T462) đã chấp nhận +256 B của search-loader.js. (3) `drafts/techlead/ES1-T123/task-split.md` (D5–D9) không có trên nhánh này. Làm theo body ticket, ES1-T124, ES1-T307 §3, ADR 0010, `docs/ui-spec/predictive-search.md` §4 và hợp đồng ES1-T129.
+KHÔNG CHẮC: (0) Lượt 3: test 429 desktop không có chữ lỗi console trong ticket, và ES1-T316 không chỉ ra assert nào hỏng. Hai mục này sửa theo suy luận, xem mục Lượt 3. (1) Lượt 2 sửa theo CI run 43546641607, nhưng phiên này vẫn không có trình duyệt, `playwright --list`/`node --check` bị chặn. Nguyên nhân 2 test mobile (abort/429, module lỗi tải) chỉ suy luận, không có log CI: xem mục Lượt 2.
+
+## Lượt 3 (CI run 43569875900)
+- ES1-T130 tĩnh "contract JS ↔ snippet": hai comment trong `predictive-search.js` chứa `section_id` và `innerHTML` nên khớp regex cấm. Đã viết lại hai comment, logic không đổi. `grep -E 'innerHTML|insertAdjacentHTML|partials|section_id|console\.|dispatchEvent'`: 0 dòng.
+- ES1-T217 TC-03: thêm `await expectNotChallenged(page);` ngay trước `new AxeBuilder({ page })`.
+- ES1-T130 429 desktop còn lỗi console: log mạng 429 của Chrome đã bị `watchShopPay403`/`isResource429Log` (ES1-T217) lọc. Ở nhánh lỗi, code xử lý abort và 429 như nhau (catch, rồi hide), mà abort desktop xanh. Vì vậy nguồn lỗi nhiều khả năng là script nền tảng Shopify chạy flaky trên desktop (thanh preview, web pixels manager `/cdn/wpm/`), vốn không có trong IGNORE. Sửa: IGNORE thêm `/cdn/wpm/` và `wpm@`. Lỗi console vẫn ghi kèm URL nguồn. Nếu CI còn đỏ, log sẽ chỉ ra file gây lỗi.
+- ES1-T316 "vào viewport chưa tải; focus trong element thì tải": `search-loader.js` chỉ nghe `click` trên window và chỉ `import()` `data-search-src` của link được bấm. Nó không đọc `data-lazy-module` và không nghe focus/pointer/touch. Test T316 không có click nên loader không tác động được. Đã thêm test tĩnh khoá các điều này, và thêm e2e: focus, hover link, cuộn trang không tải predictive-search.js. JS không cần sửa. Nếu T316 vẫn đỏ thì cần log assert để xem tiếp.
+- `wc -c assets/predictive-search.js`: 6 620 → 6 598. (2) Ngân sách trang sản phẩm vượt 40 960 B do develop vượt từ trước (44 967 B); CTO 14/11 (ES1-T462) đã chấp nhận +256 B của search-loader.js. (3) `drafts/techlead/ES1-T123/task-split.md` (D5–D9) không có trên nhánh này. Làm theo body ticket, ES1-T124, ES1-T307 §3, ADR 0010, `docs/ui-spec/predictive-search.md` §4 và hợp đồng ES1-T129.
 
 ## Lượt 2 (CI run 43546641607)
 - Esc 2 bước (desktop) và "đóng dialog huỷ request, mở lại giữ chữ" (desktop + mobile): Chrome xử lý Esc trên `<input type="search">` có chữ bằng cách xoá chữ và đánh dấu đã xử lý, nên dialog không đóng. `predictive-search.js`: Esc khi list đóng thì `preventDefault` và gọi `dialog.close()`. Focus về link do `close()` trả về phần tử focus trước `showModal()` (modal-dialog.open đã focus link). Chữ được giữ. Spec thêm assert `toHaveValue('bench')` sau Esc 2.
@@ -12,7 +19,7 @@ KHÔNG CHẮC: (1) Lượt 2 sửa theo CI run 43546641607, nhưng phiên này v
   - Delegate `click` trên window, sống qua render lại của editor.
   - Bỏ qua khi có Ctrl, Cmd, Shift, hoặc khi phần tử liền sau link không có `open()`, tức `modal-dialog.js` chưa nạp. Khi đó link chạy như link thường.
   - Còn lại: `preventDefault`, gọi `nextElementSibling.open(link)` của `<modal-dialog>` (ADR 0007), rồi `import(data-search-src)` và nuốt lỗi import.
-- `assets/predictive-search.js` (mới, 6 620/6 656 B): custom element `predictive-search`, guard `customElements.get`.
+- `assets/predictive-search.js` (mới, 6 598/6 656 B): custom element `predictive-search`, guard `customElements.get`.
   - Khi kết nối: dialog đang mở thì đọc giá trị đã gõ. Nghe `modal:open` để lần mở sau chạy lại gợi ý với chữ cũ.
   - `input`: trim. Dưới 2 ký tự thì huỷ timer và request, ẩn list. Từ 2 ký tự thì huỷ request cũ ngay, debounce 300 ms.
   - Gọi `GET {data-url}.json?q&resources[type]=product,collection,page,article&resources[limit]=8&resources[limit_scope]=each&resources[options][unavailable_products]=last` (ES1-T124 #1, predictive-search.md §4).
@@ -52,19 +59,19 @@ KHÔNG CHẮC: (1) Lượt 2 sửa theo CI run 43546641607, nhưng phiên này v
 - `{% doc %}` của `snippets/predictive-search.liquid` đã khớp tên file thật (`assets/predictive-search.js`, `assets/modal-dialog.js`), không sửa.
 
 ## Ngoài phạm vi
-Tab, nhóm queries, nút chân theo tab, empty/error/loading box (TE-8-R2-BE1); recent searches (TE-8-R2-BE3). Còn 36 B dưới trần 6 656 cho các task đó, nên R2-BE1 cần tách file hoặc rút gọn.
+Tab, nhóm queries, nút chân theo tab, empty/error/loading box (TE-8-R2-BE1); recent searches (TE-8-R2-BE3). Còn 58 B dưới trần 6 656 cho các task đó, nên R2-BE1 cần tách file hoặc rút gọn.
 
 ## Ngân sách JS (`wc -c`, cộng theo thẻ script; ADR 0006/0010)
 | Trang | Thành phần | develop (B) | PR (B) | Trần |
 | --- | --- | --- | --- | --- |
 | Chung mọi trang | standard-events 888 + motion 6 103 + page-layers 2 031 + modal-dialog 2 039 + header-menu 6 862 + header-sticky 1 680 + cart-drawer 3 868 (+ search-loader 256) | 23 471 | 23 727 | 19 456 (ADR 0010, develop đã vượt) |
 | Sản phẩm, tải sẵn | chung + product-media 4 407 + product-variant-picker 7 163 + product-form 6 857 + product-recommendations 3 069 | 44 967 | 45 223 | 40 960 (đã vượt trước PR) |
-| Mọi trang, sau khi bấm search | + predictive-search 6 620 | — | +6 620 | nạp theo interaction, không tính vào trần sau cuộn (ADR 0010) |
+| Mọi trang, sau khi bấm search | + predictive-search 6 598 | — | +6 598 | nạp theo interaction, không tính vào trần sau cuộn (ADR 0010) |
 
 Chưa cộng phần motion.js import động (scroll-extras, motion-scrub) và module nạp lười theo viewport.
 
 ## Tự kiểm tra
-- `wc -c`: search-loader.js 256 ≤ 256, predictive-search.js 6 620 ≤ 6 656.
+- `wc -c`: search-loader.js 256 ≤ 256, predictive-search.js 6 598 ≤ 6 656.
 - `shopify theme check`: 113 file, 0 lỗi, 23 warning cũ, không file nào của PR.
 - Không đổi locale, không đổi markup FE ngoài thẻ script, `data-search-src` (ticket chỉ định) và doc header.
 - Contract: test tĩnh trong ES1-T130.spec.ts đối chiếu tên element, hook `data-predictive-*`, `data-label-*` giữa JS và snippet.
