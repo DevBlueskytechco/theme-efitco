@@ -1,14 +1,14 @@
 /*
- * Carousel trên track scroll-snap: chuyển slide bằng track.scrollTo, vuốt để
- * trình duyệt lo. Slide đang hiện lấy từ IntersectionObserver nên nút, chấm,
- * vuốt đi chung một đường, không cần touch listener hay scroll listener.
- * Hook: xem {% doc %} của blocks/slideshow.liquid.
+ * Track scroll-snap; slide hiện lấy từ IntersectionObserver nên nút, chấm,
+ * vuốt chung một đường. Hook: {% doc %} blocks/slideshow.liquid.
+ * Autoplay chỉ từ 80rem (TE-2 AC8).
  */
 const VISIBLE_RATIO = 0.6;
-const ANNOUNCE_DELAY = 300; // chấm 1 → 5 chỉ báo slide cuối, không báo slide lướt qua
+const ANNOUNCE_DELAY = 300;
 const DEFAULT_SPEED = 5;
 
 const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+const wide = window.matchMedia("(min-width: 80rem)");
 
 class SlideshowCarousel extends HTMLElement {
   #abort;
@@ -25,9 +25,7 @@ class SlideshowCarousel extends HTMLElement {
   #videos = [];
   #active = 0;
   #hasAutoplay = false;
-  #hasPauseButton = false;
 
-  // Pause là ý người dùng; các cờ còn lại chỉ tạm giữ, không đổi icon nút
   #paused = false;
   #hovered = false;
   #focused = false;
@@ -47,7 +45,6 @@ class SlideshowCarousel extends HTMLElement {
 
     const multiple = this.#slides.length > 1;
     this.#hasAutoplay = multiple && this.dataset.autoplay === "true";
-    this.#hasPauseButton = this.#hasAutoplay || this.#videos.length > 0;
 
     this.#slides.forEach((slide, index) => {
       slide.setAttribute("aria-label", this.#slideLabel(index));
@@ -65,7 +62,6 @@ class SlideshowCarousel extends HTMLElement {
     this.#setPaused(reducedMotion.matches);
   }
 
-  // Gỡ hết để connect lại (editor render lại block) không nhân đôi chấm
   disconnectedCallback() {
     this.#abort?.abort();
     this.#slideObserver?.disconnect();
@@ -74,6 +70,7 @@ class SlideshowCarousel extends HTMLElement {
     clearTimeout(this.#announceTimer);
 
     this.#track?.setAttribute("tabindex", "0");
+    this.#pauseButton?.removeAttribute("disabled");
     this.#dots.forEach((dot) => dot.remove());
     this.#dots = [];
     this.#slides.forEach((slide) => {
@@ -114,7 +111,7 @@ class SlideshowCarousel extends HTMLElement {
     on(this.#part("next"), "click", () => this.#goTo(this.#active + 1));
     on(this.#pauseButton, "click", () => this.#setPaused(!this.#paused));
 
-    // Chỉ chuột: chạm sinh mouseenter giả, không có leave nên autoplay kẹt
+    // Chạm sinh enter giả không có leave
     const hover = (hovered) => (event) => {
       if (event.pointerType === "mouse") {
         this.#hovered = hovered;
@@ -124,7 +121,7 @@ class SlideshowCarousel extends HTMLElement {
     on(this, "pointerenter", hover(true));
     on(this, "pointerleave", hover(false));
 
-    // :focus-visible: click chuột để lại focus trên nút, autoplay sẽ không chạy lại
+    // Click chuột để lại focus trên nút
     on(this, "focusin", (event) => {
       this.#focused = event.target.matches(":focus-visible");
       this.#syncAutoplay();
@@ -137,6 +134,7 @@ class SlideshowCarousel extends HTMLElement {
     });
 
     on(document, "visibilitychange", () => this.#syncAutoplay());
+    on(wide, "change", () => this.#setPaused(this.#paused));
     on(reducedMotion, "change", () => {
       if (reducedMotion.matches) {
         this.#setPaused(true);
@@ -158,7 +156,7 @@ class SlideshowCarousel extends HTMLElement {
         if (index !== this.#active) {
           this.#setActive(index);
           this.#announce();
-          this.#stopTimer(); // tính lại từ đầu: vừa vuốt xong không bị tick đẩy đi tiếp
+          this.#stopTimer(); // vừa vuốt xong không bị tick đẩy đi tiếp
           this.#syncAutoplay();
         }
       },
@@ -190,7 +188,7 @@ class SlideshowCarousel extends HTMLElement {
   #goTo(index) {
     const total = this.#slides.length;
     const slide = this.#slides[(index + total) % total];
-    // Tính theo rect để đúng cả RTL, nơi scrollLeft âm
+    // Theo rect để đúng cả RTL, nơi scrollLeft âm
     const offset = slide.getBoundingClientRect().left - this.#track.getBoundingClientRect().left;
     this.#track.scrollTo({
       left: this.#track.scrollLeft + offset,
@@ -207,18 +205,27 @@ class SlideshowCarousel extends HTMLElement {
     }, ANNOUNCE_DELAY);
   }
 
+  #canAutoplay() {
+    return this.#hasAutoplay && wide.matches;
+  }
+
+  // Dưới 80rem không video: nút không điều khiển gì nên disabled
   #setPaused(paused) {
     this.#paused = paused;
-    if (this.#hasPauseButton) {
+    const active = this.#canAutoplay() || this.#videos.length > 0;
+    if (active) {
       this.dataset.playing = String(!paused);
-      const label = paused ? this.dataset.labelPlay : this.dataset.labelPause;
-      this.#pauseButton?.setAttribute("aria-label", label ?? "");
+    } else {
+      this.removeAttribute("data-playing");
     }
+    const label = paused || !active ? this.dataset.labelPlay : this.dataset.labelPause;
+    this.#pauseButton?.setAttribute("aria-label", label ?? "");
+    this.#pauseButton?.toggleAttribute("disabled", !active);
     this.#videos.forEach((video) => {
       if (paused) {
         video.pause();
       } else {
-        // Tiết kiệm pin có thể từ chối play(); poster vẫn hiện, không cần báo lỗi
+        // Tiết kiệm pin có thể từ chối play(); poster vẫn hiện
         video.play()?.catch(() => {});
       }
     });
@@ -227,7 +234,7 @@ class SlideshowCarousel extends HTMLElement {
 
   #syncAutoplay() {
     const running =
-      this.#hasAutoplay &&
+      this.#canAutoplay() &&
       !this.#paused &&
       !this.#hovered &&
       !this.#focused &&
