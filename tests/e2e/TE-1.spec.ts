@@ -455,6 +455,7 @@ test.describe('ES1-T23', () => {
     await expect(cart).toHaveAccessibleName(/2/);
   });
 
+  // ES1-T130: có JS thì link mở dialog search (đổi hành vi có chủ đích, TE-8 AC1); href vẫn là /search. Không JS: 'TC-19 AC3 ... không JS' ở cuối file.
   test('TC-19 AC3 search link', async ({ page }) => {
     await page.goto('/');
     const search = page.getByTestId(T.header).getByTestId(T.search);
@@ -462,8 +463,10 @@ test.describe('ES1-T23', () => {
     const target = await pathOf(page, await search.getAttribute('href'));
     expect(target).toMatch(/\/search$/);
     await expect(search).toHaveAccessibleName(/\S/);
+    const before = page.url();
     await search.click();
-    await page.waitForURL(u => u.pathname === target);
+    await expect(page.getByTestId('predictive-search-dialog')).toBeVisible();
+    expect(page.url()).toBe(before);
   });
 
   // ---------- AC4 ----------
@@ -976,6 +979,15 @@ test.describe('ES1-T23 không JS', () => {
       await acc.first().click();
       await expect(drawer.getByTestId(T.drawerSub).first().getByRole('link').first()).toBeVisible();
     }
+  });
+
+  test('TC-19 AC3 search link sang /search khi không JS', async ({ page }) => {
+    await page.goto('/');
+    const search = page.getByTestId(T.header).getByTestId(T.search);
+    const target = await pathOf(page, await search.getAttribute('href'));
+    expect(target).toMatch(/\/search$/);
+    await search.click();
+    await page.waitForURL(u => u.pathname === target);
   });
 
   test('TC-31 AC9 localization submit được khi không JS', async ({ page }) => {

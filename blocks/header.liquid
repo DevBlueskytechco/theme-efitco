@@ -29,6 +29,14 @@
     <modal-dialog data-layer="search"> of snippets/predictive-search.liquid;
     JS opens it from this link. The search_style setting picks popup (dark
     top band) or drawer (inline end).
+  - data-search-src on header-search-link: URL of assets/predictive-search.js.
+    assets/search-loader.js (always loaded, max 256 B, no comments inside)
+    listens for clicks on window, so it survives editor re-renders. Plain
+    click: preventDefault, open the next sibling <modal-dialog> with
+    open(link), then import data-search-src; a failed import is ignored and
+    the dialog stays a working GET form. Ctrl, Cmd or Shift click, or no
+    modal-dialog.js: the link works as a normal link. predictive-search.js
+    has no script tag (ADR 0006, ADR 0010: loaded on interaction).
   - data-cart-link, aria-haspopup="dialog": on the cart link when the cart drawer
     is active (cart_type is drawer and the template is not cart). JS opens the
     drawer from it; without JS it stays a plain link to routes.cart_url. Same
@@ -384,6 +392,7 @@
         data-testid="header-search-link"
         aria-label="{{ 'blocks.header.search' | t }}"
         aria-haspopup="dialog"
+        data-search-src="{{ 'predictive-search.js' | asset_url }}"
       >
         {% render 'header-icon', name: 'search' %}
       </a>
@@ -438,6 +447,7 @@
 {% if has_menu %}
   <script src="{{ 'header-menu.js' | asset_url }}" type="module"></script>
 {% endif %}
+<script src="{{ 'search-loader.js' | asset_url }}" type="module"></script>
 {% if block.settings.sticky_header %}
   <script src="{{ 'header-sticky.js' | asset_url }}" type="module"></script>
 {% endif %}
