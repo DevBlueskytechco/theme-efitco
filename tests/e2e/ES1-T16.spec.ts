@@ -1,5 +1,13 @@
+// KHÔNG CHẮC: ES1-T463 chưa chạy trên preview (máy agent không có PREVIEW_URL); chờ CI store-tests của PR. assets/header-sticky.js
+// comment đầu file còn ghi "sentinel 80px", "header trong suốt" (lỗi thời, file BE, không ảnh hưởng hành vi).
 // Ticket ES1-T16 (2727475000000129007) — TE-1 AC2, AC9: header-menu.js, header-sticky.js.
 // Bổ sung phần ES1-T5.spec.ts chưa tự động: TB-17, resize drawer, sticky, lỗi mạng sticky.
+// ES1-T463 (CTO 14/11, ES1-T439): AC thay cho bản header trong suốt + ngưỡng 80px:
+//   docs/srs.md#TE-1 AC9 (0.3) + AC-H29: header tối mọi trang, không đè hero, dính từ đầu (CSS sticky, không cần JS);
+//   docs/ui-spec/announcement-bar.md §4 (D8 task-split ES1-T307): data-scrolled gắn khi sentinel 1px trước container
+//   header ra khỏi khung: không announcement bar thì cuộn > 1px, có bar 44px thì cuộn > 44px.
+//   Đã bỏ: "trên hero: trong suốt ở đầu trang", "ngưỡng đúng 80px: 60px chưa gắn", "lỗi mạng: header trên hero không sticky".
+//   Test case: drafts/qa/ES1-T463/test-cases.md (T16-xx).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T16.spec.ts
 import { test, expect, type Page, type TestInfo } from '@playwright/test';
 
@@ -160,7 +168,7 @@ test.describe('ES1-T16 header-drawer', () => {
 });
 
 test.describe('ES1-T16 sticky-header', () => {
-  test('cuộn qua sentinel gắn data-scrolled, về đầu thì bỏ, nền tối không phải --color-background', async ({ page }) => {
+  test('T16-01 cuộn qua sentinel gắn data-scrolled, về đầu thì bỏ, nền tối không phải --color-background', async ({ page }) => {
     await page.goto('/');
     const header = page.getByTestId('header');
     test.skip((await header.getAttribute('data-sticky')) === null, 'sticky_header đang tắt');
@@ -185,31 +193,78 @@ test.describe('ES1-T16 sticky-header', () => {
     await expect(header).not.toHaveAttribute('data-scrolled');
   });
 
-  // Sentinel 1px đặt ngay trước header (thay khối 80px cũ): data-scrolled gắn đúng lúc header bắt đầu dính,
-  // sau announcement bar nếu có. Trước đó 1px header chưa dính, chưa gắn; qua sentinel thì header ở mép trên và đã gắn.
-  test('ngưỡng là sentinel trước header: chưa dính thì chưa gắn, vừa dính thì gắn ngay', async ({ page }) => {
+  // T16-03, T16-04 (ES1-T463; announcement-bar.md §4; TE-1 AC9): sentinel 1px ngay trước container header (thay khối 80px cũ).
+  // data-scrolled gắn đúng lúc header bắt đầu dính: không bar thì cuộn > 1px, có bar 44 thì cuộn > 44.
+  // Kiểm cả 2 nhánh bất kể store dev có bật bar hay không: nhánh thiếu dựng bằng DOM (gỡ bar / chèn khối 44px trước sentinel),
+  // IntersectionObserver đo lại theo vị trí mới nên không phụ thuộc dữ liệu store.
+  async function expectThreshold(page: Page, barHeight: number, label: string) {
+    const header = page.getByTestId('header');
+    await scrollTo(page, 0);
+    await expect(header, `${label}: ở đầu trang chưa gắn`).not.toHaveAttribute('data-scrolled');
+    const start = await sentinelTop(page);
+    expect(Math.abs(start - barHeight), `${label}: sentinel nằm ngay dưới bar (y ${barHeight})`).toBeLessThanOrEqual(1);
+    const headerTop = await header.evaluate(el => el.getBoundingClientRect().top + window.scrollY);
+    expect(Math.abs(headerTop - start), `${label}: header bắt đầu ngay tại sentinel, sentinel không đẩy bố cục`).toBeLessThanOrEqual(1);
+    const heightAtTop = (await header.boundingBox())!.height;
+
+    if (barHeight >= 1) {
+      await scrollTo(page, barHeight - 1);
+      await page.waitForTimeout(200); // IntersectionObserver báo bất đồng bộ
+      await expect(header, `${label}: cuộn ${barHeight - 1} chưa gắn`).not.toHaveAttribute('data-scrolled');
+      expect((await header.boundingBox())!.y, `${label}: trước ngưỡng header chưa dính`).toBeGreaterThan(0);
+    }
+
+    // +2: sentinel cao 1px, IntersectionObserver coi mép chạm khung nhìn vẫn là giao nhau
+    await scrollTo(page, barHeight + 2);
+    await expect(header, `${label}: cuộn ${barHeight + 2} phải gắn`).toHaveAttribute('data-scrolled', '');
+    const box = (await header.boundingBox())!;
+    expect(Math.abs(box.y), `${label}: đã gắn data-scrolled thì header đang dính ở mép trên`).toBeLessThanOrEqual(0.5);
+    expect(box.height, `${label}: dính chỉ thêm bóng, không đổi chiều cao`).toBeCloseTo(heightAtTop, 0);
+    await expect(header, `${label}: nền không đổi khi dính`).toHaveCSS('background-color', DARK);
+
+    await scrollTo(page, 0);
+    await expect(header, `${label}: về đầu trang thì bỏ`).not.toHaveAttribute('data-scrolled');
+  }
+
+  test('T16-03 ngưỡng sentinel 1px: không announcement bar thì gắn khi cuộn > 1px', async ({ page }) => {
     await page.goto('/');
     const header = page.getByTestId('header');
     test.skip((await header.getAttribute('data-sticky')) === null, 'sticky_header đang tắt');
-    const start = await sentinelTop(page);
-    const heightAtTop = (await header.boundingBox())!.height;
-
-    if (start >= 1) {
-      await scrollTo(page, start - 1);
-      await page.waitForTimeout(200); // IntersectionObserver báo bất đồng bộ
-      await expect(header).not.toHaveAttribute('data-scrolled');
-      expect((await header.boundingBox())!.y, 'trước sentinel header chưa dính').toBeGreaterThan(0);
-    }
-
-    // +2: IntersectionObserver coi mép chạm khung nhìn vẫn là giao nhau
-    await scrollTo(page, start + 2);
-    await expect(header).toHaveAttribute('data-scrolled', '');
-    const box = (await header.boundingBox())!;
-    expect(Math.abs(box.y), 'đã gắn data-scrolled thì header phải đang dính ở mép trên').toBeLessThanOrEqual(0.5);
-    expect(box.height, 'dính chỉ thêm bóng, không đổi chiều cao').toBeCloseTo(heightAtTop, 0);
+    test.skip((page.viewportSize()?.height ?? 0) <= 480, 'dưới 30rem cao header thôi dính (TE-10 AC8)');
+    await expect(header).toHaveAttribute('data-header-enhanced', '');
+    // Store dev có bar thì gỡ container chứa bar để dựng trường hợp không bar.
+    await page.getByTestId('announcement-bar').evaluateAll(els => els.forEach(el => (el.closest('.block-container') ?? el).remove()));
+    await expectThreshold(page, 0, 'không bar');
   });
 
-  test('AC-H29: header luôn nền tối, chữ trắng ở đầu trang và khi cuộn, không trong suốt', async ({ page }) => {
+  test('T16-04 ngưỡng sentinel 1px: có announcement bar 44px thì gắn khi cuộn > 44px', async ({ page }) => {
+    await page.goto('/');
+    const header = page.getByTestId('header');
+    test.skip((await header.getAttribute('data-sticky')) === null, 'sticky_header đang tắt');
+    test.skip((page.viewportSize()?.height ?? 0) <= 480, 'dưới 30rem cao header thôi dính (TE-10 AC8)');
+    await expect(header).toHaveAttribute('data-header-enhanced', '');
+    const bar = page.getByTestId('announcement-bar');
+    let barHeight: number;
+    if (await bar.count()) {
+      // Bar thật của store dev: cao tối thiểu 44 mọi mốc (announcement-bar.md §3), cuộn đi cùng trang.
+      const barBox = (await bar.boundingBox())!;
+      expect(barBox.height, 'announcement bar cao ≥ 44').toBeGreaterThanOrEqual(43.5);
+      // Ngưỡng = đáy bar (đang ở đầu trang): sentinel và header phải nằm ngay dưới bar.
+      barHeight = barBox.y + barBox.height;
+    } else {
+      // Store dev chưa bật bar: chèn khối 44px đúng chỗ bar (trước sentinel) để kiểm ngưỡng.
+      await page.getByTestId('header-sticky-sentinel').evaluate(el => {
+        const fake = document.createElement('div');
+        fake.style.blockSize = '44px';
+        fake.dataset.qaFakeBar = '';
+        el.before(fake);
+      });
+      barHeight = 44;
+    }
+    await expectThreshold(page, Math.round(barHeight), 'có bar');
+  });
+
+  test('T16-02 AC-H29: header luôn nền tối, chữ trắng ở đầu trang và khi cuộn, không trong suốt', async ({ page }) => {
     await page.goto('/');
     const header = page.getByTestId('header');
     await expect(header).toHaveCSS('background-color', DARK);
@@ -221,7 +276,7 @@ test.describe('ES1-T16 sticky-header', () => {
     await expect(header).toHaveCSS('color', WHITE);
   });
 
-  test('lỗi mạng header-sticky.js: main nằm dưới đáy header, header vẫn nền tối, CSS sticky vẫn chạy', async ({ page }) => {
+  test('T16-05 lỗi mạng header-sticky.js: main nằm dưới đáy header, header vẫn nền tối, CSS sticky vẫn chạy', async ({ page }) => {
     await page.route('**/header-sticky*.js*', r => r.abort());
     await page.goto('/');
     const header = page.getByTestId('header');
