@@ -1,0 +1,42 @@
+{% doc %}
+  Page title: optional eyebrow, the page's single h1, optional meta line, in
+  that DOM order (TE-22 AC13; docs/ui-spec/foundation.md §5). Every text is
+  plain and escaped here; empty eyebrow or meta renders no element, empty
+  title renders nothing. Placed after `breadcrumb` on a white band, or inside
+  `.page-banner__content` where it turns white (foundation §3.3).
+
+  Test hooks: page-title, page-title-heading.
+
+  @param {string} title - Text of the h1, for example collection.title
+  @param {string} [eyebrow] - Short line above the h1, accent uppercase
+  @param {string} [meta] - Line under the h1, for example the item count
+
+  @example
+  {% render 'breadcrumb' %}
+  {% render 'page-title', title: page.title %}
+
+  {% liquid
+    assign count_label = 'blocks.collection_products.results_count' | t: count: collection.products_count
+    render 'page-title', title: collection.title, eyebrow: block.settings.eyebrow, meta: count_label
+  %}
+
+  <div class="page-banner">
+    {% render 'image', class: 'page-banner__media', image: collection.image, sizes: '100vw', loading: 'eager', fetchpriority: 'high' %}
+    <div class="page-banner__content">
+      {% render 'breadcrumb' %}
+      {% render 'page-title', title: collection.title %}
+    </div>
+  </div>
+{% enddoc %}
+
+{%- if title != blank -%}
+  <div class="page-title" data-testid="page-title">
+    {%- if eyebrow != blank %}
+      <p class="page-title__eyebrow">{{ eyebrow | escape }}</p>
+    {%- endif %}
+    <h1 class="page-title__heading" data-testid="page-title-heading">{{ title | escape }}</h1>
+    {%- if meta != blank %}
+      <p class="page-title__meta">{{ meta | escape }}</p>
+    {%- endif %}
+  </div>
+{%- endif -%}
