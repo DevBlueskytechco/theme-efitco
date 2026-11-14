@@ -1,0 +1,74 @@
+{% doc %}
+  Renders one filter value as a native checkbox inside a label that is the whole
+  row (TE-6 AC9, docs/ui-spec/collection.md §5.2). Called only by
+  snippets/filter-group.liquid, for the first 6 values and for the values inside
+  "Show N more".
+
+  A value with count 0 that is not active is disabled (CSS strikes the label
+  through). presentation 'swatch': a 24px dot from value.swatch, with the
+  checkbox transparent on top; 'image': value.image in the same dot. The value
+  label always shows, so color is never the only cue.
+
+  Test hooks: collection-filter-option, collection-filter-input,
+  collection-filter-swatch.
+
+  @param {object} value - The filter value (filter.values item, filter.true_value or filter.false_value)
+  @param {string} [presentation] - filter.presentation: 'swatch', 'image' or blank for text
+
+  @example
+  {% render 'filter-option', value: value, presentation: filter.presentation %}
+{% enddoc %}
+
+<label class="filter-option" data-testid="collection-filter-option">
+  {%- capture option_input -%}
+    <input
+      class="filter-option__input"
+      type="checkbox"
+      name="{{ value.param_name | escape }}"
+      value="{{ value.value | escape }}"
+      {% if value.active %}
+        checked
+      {% endif %}
+      {% if value.count == 0 and value.active == false %}
+        disabled
+      {% endif %}
+      data-testid="collection-filter-input"
+    >
+  {%- endcapture -%}
+
+  {%- if presentation == 'swatch' -%}
+    <span class="filter-option__control">
+      {{- option_input -}}
+      <span
+        class="filter-option__swatch"
+        data-testid="collection-filter-swatch"
+        {% if value.swatch.image %}
+          style="--swatch-image: url({{ value.swatch.image | image_url: width: 64 }});"
+        {% elsif value.swatch.color %}
+          style="--swatch-color: {{ value.swatch.color }};"
+        {% endif %}
+      ></span>
+    </span>
+  {%- elsif presentation == 'image' and value.image -%}
+    <span class="filter-option__control">
+      {{- option_input -}}
+      <span class="filter-option__swatch" data-testid="collection-filter-swatch">
+        {%- render 'image',
+          image: value.image,
+          width: 64,
+          height: 64,
+          crop: 'center',
+          widths: '64',
+          sizes: '24px',
+          inline: true,
+          decorative: true
+        -%}
+      </span>
+    </span>
+  {%- else -%}
+    {{- option_input -}}
+  {%- endif -%}
+
+  <span class="filter-option__label">{{ value.label | escape }}</span>
+  <span class="filter-option__count">{{ value.count }}</span>
+</label>
