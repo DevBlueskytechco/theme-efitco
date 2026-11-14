@@ -1,5 +1,6 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không mở được Chrome; chờ CI).
 // Ticket ES1-T220: nút next/back tự ẩn làm focus rơi về body. Test gốc: tests/e2e/ES1-T185.spec.ts:224.
+// ES1-T335 (TE-7 AC6, sổ 10/11 câu 5): nút đầu/cuối không còn hidden mà aria-disabled="true" (mờ, giữ chỗ); focus vẫn phải rời nút tắt.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T220.spec.ts tests/e2e/ES1-T185.spec.ts
 // Nút chỉ hiện từ 48rem nên đặt viewport 1024 ở cả desktop và Pixel 7 (giống ES1-T185).
 import { readFileSync, statSync } from 'node:fs';
@@ -13,6 +14,10 @@ const track = (page: Page) => five(page).getByTestId('collection-list-track');
 const prev = (page: Page) => five(page).getByTestId('collection-list-prev');
 const next = (page: Page) => five(page).getByTestId('collection-list-next');
 const scrollLeft = (page: Page) => track(page).evaluate((el) => el.scrollLeft);
+type Button = ReturnType<typeof prev>;
+const isOff = async (button: Button) => (await button.getAttribute('aria-disabled')) === 'true';
+const off = (button: Button) => expect(button).toHaveAttribute('aria-disabled', 'true');
+const on = (button: Button) => expect(button).toHaveAttribute('aria-disabled', 'false');
 
 async function open(page: Page) {
   await page.setViewportSize({ width: 1024, height: 900 });
@@ -20,16 +25,16 @@ async function open(page: Page) {
   await expect(root(page)).toHaveAttribute('data-enhanced', '');
 }
 
-/** Cuộn đi 1 card, chờ nút back hiện. */
+/** Cuộn đi 1 card, chờ nút back bật. */
 async function leaveStart(page: Page) {
   await next(page).click();
-  await expect(prev(page)).toBeVisible();
+  await on(prev(page));
   await expect.poll(() => scrollLeft(page)).toBeGreaterThan(0);
 }
 
-/** Bấm next bằng phím tới khi nút tự ẩn. Không nhảy thẳng tới cuối: scroll-snap mandatory kéo về card gần nhất. */
+/** Bấm next bằng phím tới khi nút tự tắt. Không nhảy thẳng tới cuối: scroll-snap mandatory kéo về card gần nhất. */
 async function pressNextToEnd(page: Page) {
-  for (let i = 0; i < 20 && (await next(page).isVisible()); i += 1) {
+  for (let i = 0; i < 20 && !(await isOff(next(page))); i += 1) {
     const before = await scrollLeft(page);
     await next(page).focus();
     await page.keyboard.press('Enter');
@@ -46,36 +51,36 @@ async function pressNextToEnd(page: Page) {
 }
 
 test.describe('ES1-T220 tĩnh', () => {
-  test('trần 768 B của ES1-T185; đọc activeElement trước khi gán hidden', () => {
-    expect(statSync(JS_FILE).size).toBeLessThanOrEqual(768);
+  test('trần 1 536 B (ES1-T335); đọc activeElement trước khi gán aria-disabled', () => {
+    expect(statSync(JS_FILE).size).toBeLessThanOrEqual(1536);
     const js = readFileSync(JS_FILE, 'utf8');
     expect(js.indexOf('document.activeElement')).toBeGreaterThan(-1);
-    expect(js.indexOf('document.activeElement')).toBeLessThan(js.indexOf('.hidden'));
+    expect(js.indexOf('document.activeElement')).toBeLessThan(js.indexOf('.ariaDisabled ='));
   });
 });
 
-test.describe('ES1-T220 nút đang focus tự ẩn', () => {
-  test('back tự ẩn ở đầu: focus sang next, Enter bấm tiếp được', async ({ page }) => {
+test.describe('ES1-T220 nút đang focus tự tắt (ES1-T335: aria-disabled)', () => {
+  test('back tự tắt ở đầu: focus sang next, Enter bấm tiếp được', async ({ page }) => {
     await open(page);
     await leaveStart(page);
     await prev(page).focus();
     await page.keyboard.press('Enter');
-    await expect(prev(page)).toBeHidden();
+    await off(prev(page));
     await expect(next(page)).toBeFocused();
 
     await page.keyboard.press('Enter');
-    await expect(prev(page)).toBeVisible();
+    await on(prev(page));
     await expect(next(page)).toBeFocused();
   });
 
-  test('next tự ẩn ở cuối: focus sang back, Enter bấm tiếp được', async ({ page }) => {
+  test('next tự tắt ở cuối: focus sang back, Enter bấm tiếp được', async ({ page }) => {
     await open(page);
     await pressNextToEnd(page);
-    await expect(next(page)).toBeHidden();
+    await off(next(page));
     await expect(prev(page)).toBeFocused();
 
     await page.keyboard.press('Enter');
-    await expect(next(page)).toBeVisible();
+    await on(next(page));
     await expect(prev(page)).toBeFocused();
   });
 
@@ -85,27 +90,26 @@ test.describe('ES1-T220 nút đang focus tự ẩn', () => {
     await leaveStart(page);
     await prev(page).focus();
     await page.keyboard.press('Enter');
-    await expect(prev(page)).toBeHidden();
+    await off(prev(page));
     await expect(next(page)).toBeFocused();
   });
 
-  test('chuột: bấm back tới khi tự ẩn, focus không rơi về body', async ({ page }) => {
+  test('chuột: bấm back tới khi tự tắt, focus không rơi về body', async ({ page }) => {
     await open(page);
     await leaveStart(page);
     await prev(page).click();
-    await expect(prev(page)).toBeHidden();
+    await off(prev(page));
     await expect(next(page)).toBeFocused();
   });
 });
 
 test.describe('ES1-T220 không cướp focus', () => {
-  test('focus ở khung cuộn: nút back tự ẩn, focus giữ ở khung cuộn', async ({ page }) => {
+  test('focus ở khung cuộn: nút back tự tắt, focus giữ ở khung cuộn', async ({ page }) => {
     await open(page);
     await leaveStart(page);
     await track(page).focus();
     await track(page).evaluate((el) => el.scrollTo({ left: 0 }));
-    // Có thuộc tính hidden; trang chủ vẫn vẽ nút theo Figma 1:400 (CTO 07/11), trang khác ẩn hẳn
-    await expect(prev(page)).toHaveAttribute('hidden', '');
+    await off(prev(page));
     await expect(track(page)).toBeFocused();
   });
 
@@ -113,7 +117,7 @@ test.describe('ES1-T220 không cướp focus', () => {
     await open(page);
     await next(page).focus();
     await page.keyboard.press('Enter');
-    await expect(prev(page)).toBeVisible();
+    await on(prev(page));
     await expect(next(page)).toBeFocused();
   });
 });

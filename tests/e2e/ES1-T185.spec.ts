@@ -1,5 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không có trình duyệt và preview; CTO 06/11: e2e tắt tới khi trang chủ xong).
 // Ticket ES1-T185 TE-15-BE1: assets/scroll-buttons.js qua lazy-module (docs/srs.md AC-H8, AC-H9 phần JS; plan ES1-T169 D6).
+// ES1-T335 (TE-7 AC1, AC6; sổ 10/11 câu 5): trần 768 → 1 536 B (ADR 0010, trả lời ES1-T209); nút đầu/cuối không còn
+// hidden mà aria-disabled="true" (mờ 0.35, giữ chỗ); hàng vừa khung: data-static, CSS ẩn cả 2 nút.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T185.spec.ts tests/e2e/ES1-T184.spec.ts
 // Dùng /?view=te15 (collection all, không cần dữ liệu nhập). Nút chỉ hiện từ 48rem nên test bấm đặt viewport 1024 ở cả desktop và Pixel 7:
 // 1024 còn đủ chỗ cuộn nhiều card; 1920 chỉ cuộn được dưới 1 card vì khung cuộn chặn ở cuối.
@@ -60,8 +62,8 @@ async function pushListsFarBelow(page: Page) {
 }
 
 test.describe('ES1-T185 tĩnh', () => {
-  test('trần 768 B, không fetch, hook khớp giữa Liquid và JS', () => {
-    expect(statSync(JS_FILE).size).toBeLessThanOrEqual(768);
+  test('trần 1 536 B (ES1-T335), không fetch, hook khớp giữa Liquid và JS', () => {
+    expect(statSync(JS_FILE).size).toBeLessThanOrEqual(1536);
     const js = readFileSync(JS_FILE, 'utf8');
     expect(js).not.toMatch(/fetch|partials|console\./);
     const liquid = readFileSync(LIQUID_FILE, 'utf8');
@@ -167,36 +169,56 @@ test.describe('ES1-T185 next, back', () => {
   });
 });
 
-test.describe('ES1-T185 ẩn nút', () => {
-  test('ở đầu ẩn back, giữa hiện cả 2, ở cuối ẩn next', async ({ page }) => {
+// ES1-T335: AC cũ "ẩn nút ở đầu/cuối" đổi thành TE-7 AC6, index-1280 §2.2: nút vẫn hiện, aria-disabled="true", giữ chỗ.
+const off = (button: ReturnType<typeof prev>) => expect(button).toHaveAttribute('aria-disabled', 'true');
+const on = (button: ReturnType<typeof prev>) => expect(button).toHaveAttribute('aria-disabled', 'false');
+
+test.describe('ES1-T185 nút đầu/cuối (ES1-T335)', () => {
+  test('ở đầu back tắt, giữa bật cả 2, ở cuối next tắt; nút tắt vẫn hiện, không đổi vị trí', async ({ page }) => {
     await open(page);
-    await expect(prev(page)).toBeHidden();
-    await expect(next(page)).toBeVisible();
+    await off(prev(page));
+    await on(next(page));
+    await expect(prev(page)).toBeVisible();
+    await expect(prev(page)).toHaveCSS('opacity', '0.35');
+    await expect(root(page)).not.toHaveAttribute('data-static', '');
+    const box = await next(page).boundingBox();
 
     await next(page).click();
-    await expect(prev(page)).toBeVisible();
-    await expect(next(page)).toBeVisible();
+    await on(prev(page));
+    await on(next(page));
 
     await track(page).evaluate((el) => el.scrollTo({ left: el.scrollWidth }));
-    await expect(next(page)).toBeHidden();
-    await expect(prev(page)).toBeVisible();
+    await off(next(page));
+    await on(prev(page));
+    await expect(next(page)).toBeVisible();
+    expect(await next(page).boundingBox()).toEqual(box);
     await expect.poll(async () => Math.abs((await maxScroll(page)) - (await scrollLeft(page)))).toBeLessThanOrEqual(1);
   });
 
-  test('không tràn: 1 card ẩn cả 2 nút, vẫn đặt data-enhanced', async ({ page }) => {
+  test('bấm nút đang tắt không cuộn', async ({ page }) => {
+    await open(page);
+    await off(prev(page));
+    await prev(page).click();
+    await page.waitForTimeout(300);
+    expect(await scrollLeft(page)).toBe(0);
+  });
+
+  test('không tràn: 1 card data-static, ẩn cả 2 nút và tiến trình, vẫn đặt data-enhanced', async ({ page }) => {
     await open(page);
     const one = band(page, 'te15-one');
     await expect(one.locator('scroll-buttons')).toHaveAttribute('data-enhanced', '');
+    await expect(one.locator('scroll-buttons')).toHaveAttribute('data-static', '');
     await expect(one.getByTestId('collection-list-prev')).toBeHidden();
     await expect(one.getByTestId('collection-list-next')).toBeHidden();
+    await expect(one.getByTestId('carousel-progress')).toBeHidden();
   });
 
-  test('đổi cỡ màn hình tính lại: đang ở cuối, thu hẹp thì next hiện lại', async ({ page }) => {
+  test('đổi cỡ màn hình tính lại: đang ở cuối, thu hẹp thì next bật lại', async ({ page }) => {
     await open(page, 1920);
     await track(page).evaluate((el) => el.scrollTo({ left: el.scrollWidth }));
-    await expect(next(page)).toBeHidden();
+    await off(next(page));
     await page.setViewportSize({ width: 1024, height: 900 });
-    await expect(next(page)).toBeVisible();
+    await on(next(page));
   });
 
   test('360: nút không hiện dù đã nâng cấp, vẫn cuộn được', async ({ page }) => {
@@ -221,7 +243,7 @@ test.describe('ES1-T185 bàn phím', () => {
     await expectScrolled(page, step * 2);
   });
 
-  test('nút đang focus bị ẩn thì focus sang nút còn lại, không rơi về body', async ({ page }) => {
+  test('nút đang focus bị tắt thì focus sang nút còn lại, không rơi về body', async ({ page }) => {
     await open(page);
     const step = await cardStep(page);
 
@@ -229,7 +251,7 @@ test.describe('ES1-T185 bàn phím', () => {
     await expectScrolled(page, step);
     await prev(page).focus();
     await page.keyboard.press('Enter');
-    await expect(prev(page)).toBeHidden();
+    await off(prev(page));
     await expect(next(page)).toBeFocused();
 
     // Bấm bằng phím tới cuối: lần cuối nút next tự ẩn khi đang giữ focus. scroll-snap mandatory nên không nhảy thẳng tới sát cuối được.
@@ -240,7 +262,7 @@ test.describe('ES1-T185 bàn phím', () => {
       await page.keyboard.press('Enter');
       await expectScrolled(page, Math.min(step * i, max));
     }
-    await expect(next(page)).toBeHidden();
+    await off(next(page));
     await expect(prev(page)).toBeFocused();
   });
 });
@@ -305,7 +327,7 @@ test.describe('ES1-T185 chất lượng', () => {
     const errors = watchConsole(page);
     await open(page);
     await next(page).click();
-    await expect(prev(page)).toBeVisible();
+    await on(prev(page));
     await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).analyze();
     const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
