@@ -209,16 +209,34 @@ Snippets (`snippets/`):
 
 | Snippet | Role |
 | --- | --- |
+| `article-card` | One article card as a list item: link with image, first tag, title, reading time. |
+| `carousel-nav` | Next and back buttons for a horizontal list inside `scroll-buttons`; hidden until enhanced or when the row fits. |
+| `carousel-progress` | Thin progress line under a horizontal list; decorative, driven by `assets/scroll-buttons.js`. |
+| `cart-free-shipping` | Free shipping progress against the `free_shipping_threshold` setting. |
+| `cart-lines` | Cart line items, or the empty state when the cart has no items. |
+| `cart-summary` | Cart totals and the checkout button: subtotal, order-level discounts, note. |
 | `css-variables` | Outputs every design token as a CSS custom property plus `@font-face`. |
+| `empty-state` | Shared empty and error state for a block or page region (foundation §18). |
+| `featured-product-seal` | Decorative round seal on the featured product image. |
+| `filter-group` | One storefront filter as an open `details` group of native inputs. |
+| `filter-option` | One filter value as a native checkbox inside a full-width label. |
 | `header-icon` | Decorative header icons (menu, close, search, chevron). |
+| `header-mega-group` | One group of a mega menu column: level 2 link and its level 3 links. |
 | `icon-social` | Decorative social network icons for footer links. |
 | `icon-trust` | Decorative trust bar icons. |
 | `image` | Responsive image (`image_url` + `image_tag`, srcset, lazy by default). |
 | `meta-tags` | Title, description, social and canonical meta tags. |
+| `pagination` | Shared pagination for every multi-page list (pagination.md). |
+| `predictive-search` | Search layer of the header: dialog, combobox form, listbox groups, templates. |
 | `price` | Price, sale and compare-at price, unit price. |
 | `product-card` | One product card: image, badge, title, price, swatches. |
 | `product-structured-data` | The single JSON-LD Product for the product page. |
+| `product-variant-picker` | Variant picker built from option values (ADR 0008). |
+| `product-variant-select` | No-JS variant select (`noscript`, `name="id"`). |
+| `quiz-icon` | Decorative quiz icon; the text next to it carries the meaning. |
+| `rating-stars` | Five stars for a 0–5 rating; accessible name from the caller. |
 | `slideshow-icon` | Direction and media icons (previous, next, pause, play, arrow). |
+| `status-icon` | Decorative status icon for toasts, alerts and empty states. |
 | `variant-json` | Variant data as JSON for `assets/product-variant-picker.js`; no visible markup. |
 
 - Adding, renaming or removing a block or snippet updates these tables in the
