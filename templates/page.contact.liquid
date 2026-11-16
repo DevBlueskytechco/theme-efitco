@@ -1,0 +1,115 @@
+{% # ES1-T407 (TS-FE7): contact page, form 3 fields name/email/message (Shopify 5/7 Page, audit B#6; page.md §2, §6). Full design (breadcrumb, aside FAQ, contact-form block): TE-21-R2-FE1 (ES1-T383). No setting, no JS. %}
+{% block 'container' %}
+  <h1>{{ page.title }}</h1>
+
+  {%- if page.content != blank -%}
+    <div class="rte" data-testid="page-content">
+      {{- page.content -}}
+    </div>
+  {%- endif -%}
+
+  {% form 'contact', class: 'contact-form', data-testid: 'contact-form' %}
+    {%- if form.posted_successfully? -%}
+      <div class="form-status form-status--success" role="status" tabindex="-1" data-testid="contact-status">
+        <p class="form-status__title">{{ 'contact.success_title' | t }}</p>
+      </div>
+    {%- else -%}
+      {%- if form.errors -%}
+        <div
+          class="form-status form-status--error"
+          role="alert"
+          tabindex="-1"
+          id="ContactFormErrors"
+          data-testid="contact-errors"
+        >
+          <p class="form-status__title">{{ 'contact.errors_title' | t }}</p>
+          <ul>
+            {%- for field in form.errors -%}
+              <li>
+                {%- if field == 'form' -%}
+                  {{ form.errors.messages[field] }}
+                {%- else -%}
+                  {{ form.errors.translated_fields[field] | capitalize }} {{ form.errors.messages[field] }}
+                {%- endif -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        </div>
+      {%- endif -%}
+
+      {%- liquid
+        assign email_error = false
+        assign body_error = false
+        if form.errors contains 'email'
+          assign email_error = true
+        endif
+        if form.errors contains 'body'
+          assign body_error = true
+        endif
+      -%}
+
+      <p class="form-field__hint">{{ 'contact.required_note' | t }}</p>
+
+      <div class="form-field">
+        <label for="ContactName" class="form-field__label">{{ 'contact.name' | t }}</label>
+        <input
+          type="text"
+          name="contact[name]"
+          id="ContactName"
+          class="form-field__input"
+          value="{{ form.name }}"
+          autocomplete="name"
+        >
+      </div>
+
+      <div class="form-field">
+        <label for="ContactEmail" class="form-field__label">
+          {{- 'contact.email' | t }} <span aria-hidden="true">*</span>
+        </label>
+        <input
+          type="email"
+          name="contact[email]"
+          id="ContactEmail"
+          class="form-field__input"
+          value="{{ form.email }}"
+          autocomplete="email"
+          spellcheck="false"
+          required
+          aria-required="true"
+          {% if email_error %}
+            aria-invalid="true"
+            aria-describedby="ContactEmailError"
+          {% endif %}
+        >
+        {%- if email_error -%}
+          <p id="ContactEmailError" class="form-field__error">{{ 'contact.error_email' | t }}</p>
+        {%- endif -%}
+      </div>
+
+      <div class="form-field">
+        <label for="ContactBody" class="form-field__label">
+          {{- 'contact.message' | t }} <span aria-hidden="true">*</span>
+        </label>
+        <textarea
+          name="contact[body]"
+          id="ContactBody"
+          class="form-field__input"
+          rows="6"
+          required
+          aria-required="true"
+          {% if body_error %}
+            aria-invalid="true"
+            aria-describedby="ContactBodyError"
+          {% endif %}
+        >{{ form.body }}</textarea>
+        {%- if body_error -%}
+          <p id="ContactBodyError" class="form-field__error">{{ 'contact.error_body' | t }}</p>
+        {%- endif -%}
+      </div>
+
+      <button type="submit" class="button" data-testid="contact-submit">
+        {{- 'contact.submit' | t -}}
+      </button>
+    {%- endif -%}
+  {% endform %}
+{% endblock %}
