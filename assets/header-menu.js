@@ -1,18 +1,23 @@
 /*
  * Tăng cường menu header. Markup là <details> nên chạy đủ khi không có JS;
- * file này chỉ thêm hover, Esc, focusout, aria-expanded và focus trap drawer.
+ * file này chỉ thêm hover, Esc, focusout, aria-expanded.
  *
  * - <header-menu>: dropdown desktop (data-testid="header-menu").
- * - <header-drawer>: drawer mobile (data-testid="header-drawer").
+ * - <header-drawer>: drawer mobile (data-testid="header-drawer") ở assets/header-drawer.js,
+ *   nạp lười lần đầu chạm/focus nút menu (ADR 0010, TE-1-R2-BE1); không thêm thẻ script.
  *
- * Markup header không có thẻ custom element, nên mount() gắn 2 phần tử ẩn vào
- * header làm bộ điều khiển. Không bọc lại DOM để giữ selector
- * .block-container:has(> .site-header) trong critical.css.
+ * Host <header-menu>, <header-drawer> có sẵn trong markup (ES1-T22); mount() chỉ gắn khi thiếu.
+ * Không bọc lại DOM để giữ selector .block-container:has(> .site-header) trong critical.css.
  */
 const HOVER_DELAY = 150;
-const DESKTOP_QUERY = "(min-width: 80rem)";
 
 const summaryOf = (details) => details.querySelector(":scope > summary");
+
+/* Lỗi mạng: bỏ promise để lần chạm sau thử lại; drawer vẫn mở bằng <details>. */
+let drawerModule;
+const loadDrawer = () => {
+  drawerModule ||= import(new URL("header-drawer.js", import.meta.url)).catch(() => (drawerModule = null));
+};
 
 function syncExpanded(details) {
   summaryOf(details)?.setAttribute("aria-expanded", String(details.open));
@@ -35,12 +40,22 @@ class HeaderMenu extends HTMLElement {
     this.hidden = true;
     const header = this.closest('[data-testid="header"]');
     const nav = header?.querySelector('[data-testid="header-menu"]');
+    this.#abort = new AbortController();
+    const { signal } = this.#abort;
+
+    /* Drawer: aria-expanded có ngay lúc tải, trước khi header-drawer.js về. */
+    const toggle = header?.querySelector('[data-testid="header-drawer-toggle"]');
+    const drawer = toggle?.closest("details");
+    if (drawer) {
+      [drawer, ...drawer.querySelectorAll("details")].forEach(syncExpanded);
+      for (const type of ["pointerenter", "focusin", "touchstart"]) {
+        toggle.addEventListener(type, loadDrawer, { passive: true, signal });
+      }
+    }
     if (!nav) {
       return;
     }
 
-    this.#abort = new AbortController();
-    const { signal } = this.#abort;
     this.#menus = [...nav.querySelectorAll("details")];
     this.#menus.forEach(syncExpanded);
 
@@ -123,100 +138,6 @@ class HeaderMenu extends HTMLElement {
   }
 }
 
-class HeaderDrawer extends HTMLElement {
-  #abort;
-  #close;
-  #panel;
-  #root;
-  #toggle;
-
-  connectedCallback() {
-    this.hidden = true;
-    const header = this.closest('[data-testid="header"]');
-    this.#toggle = header?.querySelector('[data-testid="header-drawer-toggle"]');
-    this.#panel = header?.querySelector('[data-testid="header-drawer"]');
-    this.#close = header?.querySelector('[data-testid="header-drawer-close"]');
-    this.#root = this.#toggle?.closest("details");
-    if (!this.#root || !this.#panel || !this.#close) {
-      return;
-    }
-
-    this.#abort = new AbortController();
-    const { signal } = this.#abort;
-    this.#root.querySelectorAll("details").forEach(syncExpanded);
-    syncExpanded(this.#root);
-
-    this.#root.addEventListener("toggle", (event) => this.#onToggle(event.target), {
-      capture: true,
-      signal,
-    });
-    this.#close.addEventListener("click", () => this.#dismiss(), { signal });
-    document.addEventListener("keydown", (event) => this.#onKeydown(event), { signal });
-
-    const desktop = window.matchMedia(DESKTOP_QUERY);
-    desktop.addEventListener(
-      "change",
-      (event) => {
-        if (event.matches) {
-          this.#dismiss();
-        }
-      },
-      { signal },
-    );
-  }
-
-  disconnectedCallback() {
-    this.#abort?.abort();
-  }
-
-  #dismiss() {
-    this.#root.open = false;
-  }
-
-  /* Gồm cả accordion lồng; đóng bằng cách nào cũng trả focus về toggle ở đây. */
-  #onToggle(details) {
-    syncExpanded(details);
-    if (details === this.#root) {
-      (details.open ? this.#close : this.#toggle).focus();
-    }
-  }
-
-  #onKeydown(event) {
-    if (!this.#root.open) {
-      return;
-    }
-    if (event.key === "Escape") {
-      this.#dismiss();
-    } else if (event.key === "Tab") {
-      this.#trapFocus(event);
-    }
-  }
-
-  #trapFocus(event) {
-    const focusable = this.#focusable();
-    const first = focusable[0];
-    const last = focusable[focusable.length - 1];
-    const active = document.activeElement;
-    const edge = event.shiftKey ? first : last;
-
-    if (active === edge || !this.#panel.contains(active)) {
-      event.preventDefault();
-      (event.shiftKey ? last : first).focus();
-    }
-  }
-
-  /*
-   * Bỏ phần tử trong accordion đang đóng. Summary của accordion luôn hiện dù
-   * details cha của nó đóng, nên xét từ phần tử ngoài details đó.
-   */
-  #focusable() {
-    return [...this.#panel.querySelectorAll("a[href], button, summary")].filter((element) => {
-      const scope = element.matches("summary") ? element.parentElement.parentElement : element;
-      return !scope.closest("details:not([open])");
-    });
-  }
-}
-
 function mount(tag, element) {
   if (!customElements.get(tag)) {
     customElements.define(tag, element);
@@ -228,4 +149,3 @@ function mount(tag, element) {
 }
 
 mount("header-menu", HeaderMenu);
-mount("header-drawer", HeaderDrawer);
