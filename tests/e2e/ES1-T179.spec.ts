@@ -206,24 +206,28 @@ test.describe('ES1-T179 TE-17 FAQ, testimonials mặc định', () => {
     expect(last).toBeLessThanOrEqual(page.viewportSize()!.width);
   });
 
-  test('AC-H24 1280: giữ lưới 4 cột, không cuộn', async ({ page }) => {
+  // ES1-T334: TE-7 AC6 (SRS 0.5): 1280 hàng ngang card 360 (spec-updates.md §2).
+  test('AC6 1280: hàng ngang card 360, thấy 3 card + ≥ 25% card 4', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(HOME);
-    const list = tid(band(page, 'home-testimonials'), 'testimonials-list');
-    const state = await list.evaluate((el) => ({
-      columns: getComputedStyle(el).gridTemplateColumns.trim().split(/\s+/).length,
-      display: getComputedStyle(el).display,
-      scrollable: el.scrollWidth > el.clientWidth,
-    }));
-    expect(state).toEqual({ columns: 4, display: 'grid', scrollable: false });
+    const scope = band(page, 'home-testimonials');
+    const list = tid(scope, 'testimonials-list');
+    expect(await list.evaluate((el) => getComputedStyle(el).display)).toBe('flex');
+    expect(await list.evaluate((el) => el.scrollWidth > el.clientWidth)).toBeTruthy();
+    const boxes = await tid(scope, 'testimonial-item').evaluateAll((els) => els.map((el) => el.getBoundingClientRect()));
+    expect(boxes[0].width).toBeCloseTo(360, 0);
+    expect(1280 - boxes[3].left).toBeGreaterThanOrEqual(90);
   });
 
-  test('CR-8 1920: danh sách khác 4 mục vẫn là lưới', async ({ page }) => {
+  // ES1-T334: TE-7 AC1 (SRS 0.5): chỉ thành lưới khi vừa khung; 6 × 456 ở 1920 không vừa (spec-updates.md §3).
+  test('AC1 1920: 6 mục là hàng ngang cuộn được, card 456', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto(TE7);
-    const six = tid(band(page, 'te7-testimonials-six'), 'testimonials-list');
-    await expect(six).toHaveCSS('display', 'grid');
-    expect(await six.evaluate((el) => el.scrollWidth > el.clientWidth)).toBeFalsy();
+    const scope = band(page, 'te7-testimonials-six');
+    const six = tid(scope, 'testimonials-list');
+    await expect(six).toHaveCSS('display', 'flex');
+    expect(await six.evaluate((el) => el.scrollWidth > el.clientWidth)).toBeTruthy();
+    expect((await tid(scope, 'testimonial-item').first().boundingBox())!.width).toBeCloseTo(456, 0);
   });
 
   for (const width of [360, 768, 1280, 1920]) {
