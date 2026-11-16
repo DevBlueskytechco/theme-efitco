@@ -69,7 +69,10 @@ test.describe('ES1-T96 contract', () => {
     // Tên partial là rest args, lấy từ data-partials của cart-items (ES1-T98: dùng chung cho /cart), khớp {% partial %} ở block và header.
     expect(js).toContain('document.querySelector("cart-items")?.dataset.partials || "cart-count"');
     expect(js).toContain('partials.fetch(...names.split(" "), {');
-    expect(block).toContain('data-partials="cart-drawer cart-count"');
+    // ES1-T453 #1 (CTO 14/11): drawer thêm partial cart-drawer-count, cart-drawer-footer; thay "cart-drawer cart-count".
+    expect(block).toContain('data-partials="cart-drawer cart-drawer-count cart-drawer-footer cart-count"');
+    expect(block).toContain("{% partial 'cart-drawer-count' %}");
+    expect(block).toContain("{% partial 'cart-drawer-footer' %}");
     expect(block).toContain("{% partial 'cart-drawer' %}");
     expect(header).toContain("{% partial 'cart-count' %}");
     for (const hook of ['data-mode=', 'data-items-src=', 'data-cart-url=', 'data-item-count=', 'data-cart-accelerated', 'name="updates[]"']) {
@@ -104,7 +107,8 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     await expect(body.getByTestId('cart-line')).toHaveCount(state.items.length);
     await expect(body.getByTestId('cart-line-quantity')).toHaveValue(String(line!.quantity));
     await expect(tid(page, 'header-cart-count')).toHaveText(String(state.item_count));
-    await expect(body.getByTestId('cart-checkout')).toBeVisible();
+    // ES1-T453 #1 (CTO 14/11): cart-summary ở partial cart-drawer-footer, ngoài cart-drawer-body.
+    await expect(tid(page, 'cart-drawer-footer').getByTestId('cart-checkout')).toBeVisible();
 
     // Giỏ rỗng lúc tải → accelerated hidden; có hàng → hiện sau apply. Store không bật wallet thì không có wrapper.
     const wallet = tid(page, 'cart-drawer-accelerated');
