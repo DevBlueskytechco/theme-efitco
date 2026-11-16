@@ -5,8 +5,9 @@
   The caller supplies the text: the icon never carries meaning alone.
   Cart icons (TE-5, mini-cart-quickview.md §1): 'truck' free shipping, 'tag' discount,
   'trash' remove line, 'edit' order note, 'minus' and 'plus' quantity stepper.
+  'image' is the neutral no-image mark of a collection card (list-collections.md §4).
 
-  @param {string} name - Icon name: 'info', 'success', 'warning', 'error', 'cart', 'search', 'box', 'truck', 'tag', 'trash', 'edit', 'minus' or 'plus'
+  @param {string} name - Icon name: 'info', 'success', 'warning', 'error', 'cart', 'search', 'box', 'truck', 'tag', 'trash', 'edit', 'minus', 'plus' or 'image'
 
   @example
   {% render 'status-icon', name: 'success' %}
@@ -39,4 +40,6 @@
     <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5.5 12h13" /></svg>
   {%- when 'plus' -%}
     <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5.5 12h13M12 5.5v13" /></svg>
+  {%- when 'image' -%}
+    <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2.5" y="4.5" width="19" height="15" rx="1.5" /><circle cx="8.5" cy="9.5" r="1.75" /><path d="m3.5 18 5.5-5.5 4 4 3-3 5 5" /></svg>
 {%- endcase -%}
