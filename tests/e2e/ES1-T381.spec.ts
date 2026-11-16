@@ -1,4 +1,4 @@
-// KHÔNG CHẮC: spec chưa chạy (phiên dev-fe không có preview, không chạy playwright); scope-guard: dev-fe không ghi tests/ → Orchestrator/QA chép sang tests/e2e/ES1-T381.spec.ts.
+// KHÔNG CHẮC: spec chưa chạy ở phiên dev-fe (không preview, không chạy playwright); chờ CI.
 // ES1-T381 TE-20-R2-FE1: blocks/blog-articles (mới), templates/blog, snippets/article-card; AC TE-20 AC1–AC8 (SRS 0.5), blog.md B1–B3.
 // Tĩnh (không store): npx playwright test tests/e2e/ES1-T381.spec.ts -g "tĩnh"
 // Store cần dữ liệu (store-data.json hoặc env), thiếu → fixme, không tính đạt:

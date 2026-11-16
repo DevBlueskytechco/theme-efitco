@@ -1,4 +1,6 @@
 // ES1-T407 (TS-FE7): blog excerpt_or_content + ảnh responsive, article thông báo comment posted/moderated, page.contact form 3 trường.
+// ES1-T381 (TE-20-R2-FE1) sửa 2 test blog theo CTO 16/11 ("spec cũ trái AC mới: sửa spec, ghi AC thay"):
+//   AC thay: TE-20 AC1 (bài nổi bật 30 từ), AC2 (card 20 từ), AC6 (ảnh LCP: bài nổi bật, không có thì card đầu). Markup blog chuyển sang blocks/blog-articles + snippets/article-card.
 // Nhóm @static đọc file repo, không cần store. Nhóm store cần dữ liệu (store-data.json hoặc env):
 //   TE407_BLOG_PATH     blog có ít nhất 1 bài không excerpt nhưng có content (vd /blogs/figma-blog)
 //   TE407_ARTICLE_PATH  bài thuộc blog bật comment + duyệt (moderated)
@@ -13,13 +15,18 @@ import { expectNotChallenged } from './support/store-guard';
 const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8');
 
 test.describe('ES1-T407 @static', () => {
-  test('blog: excerpt_or_content | strip_html | truncatewords: 30, ảnh widths/sizes, bài đầu eager', () => {
-    const src = read('templates/blog.liquid');
-    expect(src).toContain('article.excerpt_or_content | strip_html | truncatewords: 30');
-    expect(src).not.toMatch(/\{\{ article\.excerpt \}\}/);
-    expect(src).toContain("widths: '360, 540, 720, 900, 1200'");
+  // AC thay (ES1-T381): TE-20 AC1, AC2, AC6
+  test('blog: excerpt_or_content (nổi bật 30 từ, card 20 từ), ảnh sizes, ảnh LCP eager + high, còn lại lazy', () => {
+    const src = read('blocks/blog-articles.liquid');
+    const card = read('snippets/article-card.liquid');
+    expect(src).toContain('featured.excerpt_or_content | strip_html | truncatewords: 30');
+    expect(card).toContain('article.excerpt_or_content | strip_html | truncatewords: 20');
+    for (const s of [src, card, read('templates/blog.liquid')]) expect(s).not.toMatch(/\{\{ article\.excerpt \}\}/);
+    expect(src).toContain("widths: '360, 720, 1080, 1440'");
     expect(src).toMatch(/sizes: '[^']+'/);
-    expect(src).toMatch(/if forloop\.first[\s\S]*'eager'[\s\S]*'lazy'/);
+    expect(src).toMatch(/loading: 'eager',\s*fetchpriority: 'high'/);
+    expect(src).toMatch(/if featured == nil and forloop\.first[\s\S]*'eager'/);
+    expect(card).toContain("assign card_loading = loading | default: 'lazy'");
     expect(src).toContain("render 'image'");
   });
 
@@ -88,26 +95,30 @@ test.describe('ES1-T407 store', () => {
   const ARTICLE = env('TE407_ARTICLE_PATH');
   const CONTACT = env('TE407_CONTACT_PATH') ?? '/pages/contact';
 
-  test('blog: mọi bài có content đều hiện trích đoạn, ảnh đầu eager, còn lại lazy', async ({ page }) => {
+  // AC thay (ES1-T381): TE-20 AC1, AC2, AC6. Bài nổi bật cần "Show excerpt" bật (mặc định).
+  test('blog: mọi card có content đều hiện trích đoạn, chỉ ảnh LCP eager, còn lại lazy', async ({ page }) => {
     test.fixme(!BLOG, 'thiếu TE407_BLOG_PATH (blog có bài không excerpt)');
     await page.goto(BLOG!);
     await expectNotChallenged(page);
-    const articles = page.getByTestId('blog-article');
-    const n = await articles.count();
+    const cards = page.getByTestId('blog-articles-grid').getByTestId('article-card');
+    const n = await cards.count();
     expect(n).toBeGreaterThan(0);
     for (let i = 0; i < n; i++) {
-      await expect(articles.nth(i).getByTestId('blog-article-excerpt')).not.toHaveText('');
+      await expect(cards.nth(i).getByTestId('article-card-excerpt')).not.toHaveText('');
     }
-    const imgs = page.locator('[data-testid="blog-article"] img');
+    const featured = page.getByTestId('blog-articles-featured');
+    if (await featured.count()) await expect(page.getByTestId('blog-articles-featured-excerpt')).not.toHaveText('');
+    // Bài nổi bật không ảnh: không ảnh nào eager (card vẫn lazy)
+    const lcpFirst = (await featured.count()) === 0 || (await featured.locator('img').count()) > 0;
+    const imgs = page.locator('[data-testid="blog-articles"] img');
     const count = await imgs.count();
     for (let i = 0; i < count; i++) {
       const img = imgs.nth(i);
       await expect(img).toHaveAttribute('sizes', /.+/);
-      await expect(img).toHaveAttribute('srcset', /1200w/);
+      await expect(img).toHaveAttribute('srcset', /\d+w/);
       await expect(img).toHaveAttribute('width', /\d+/);
       await expect(img).toHaveAttribute('height', /\d+/);
-      const first = (await page.locator('[data-testid="blog-article"]').first().locator('img').count()) > 0 && i === 0;
-      await expect(img).toHaveAttribute('loading', first ? 'eager' : 'lazy');
+      await expect(img).toHaveAttribute('loading', i === 0 && lcpFirst ? 'eager' : 'lazy');
     }
   });
 
