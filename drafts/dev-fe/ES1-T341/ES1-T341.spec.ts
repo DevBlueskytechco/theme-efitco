@@ -298,7 +298,10 @@ test.describe('ES1-T341 make fitness (index-mobile-a §8, index-1280 §2.5)', ()
     const m = await frame(page);
     expect(m.a1 && m.a2, 'ảnh 1 và ảnh dưới trái có hộp hiển thị').toBeTruthy();
     near(m.a1!.width, 160, 'ảnh 1');
-    if (m.a3) near(m.a3.width, 128, 'ảnh phải');
+    if (await accent(page, 3).count()) {
+      expect(m.a3, 'ảnh phải có hộp hiển thị ở 768').toBeTruthy();
+      near(m.a3!.width, 128, 'ảnh phải');
+    }
     near(m.a2!.width, 104, 'ảnh dưới trái');
     near(m.band.bottom - m.a2!.bottom, 64, 'cách đáy');
     await noOverflow(page);
