@@ -27,7 +27,7 @@ Không file JS trong diff. Không `{% partial %}`.
 
 ## Tự kiểm tra
 - `shopify theme check`: 0 lỗi; 23 warning cũ, không file nào của PR (giảm 1: OrphanedSnippet page-title nay đã được gọi).
-- base.css: thô 281 431 → 289 094 B; gzip trước/sau: chờ CI (xem KHÔNG CHẮC 1). critical.css 9 995 B không đổi.
+- base.css (node zlib.gzipSync): develop thô 281 431 B / gzip 51 936 B; nhánh trước sửa 289 094 / 53 411 B (vượt trần tạm 53 248); sau khi rút gọn comment mục mới + bỏ khai báo trùng: 288 561 / 53 120 B ≤ 53 248 (Claude Code 16/11). critical.css 9 995 B không đổi.
 - Locale: `jq` parse 2 file ok; nhóm `blog` không trùng khoá (đọc tay), 1 nhóm `blog` top-level.
 - Theme check / AGENTS: block có `{% doc %}`, schema không presets, `shopify_attributes`, placeholder chỉ `request.design_mode`, chuỗi qua `| t`, URL từ `routes`/URL đối tượng.
 - Playwright (tĩnh, fixture, store), preview, Lighthouse desktop/mobile `/blogs/<demo>/<bài>` (mục tiêu A11y/SEO/BP 100, Perf ≥ 96/90), ảnh 360/768/1280/1920: chờ CI.

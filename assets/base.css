@@ -6476,8 +6476,7 @@ cart-drawer {
   }
 }
 
-/** Blog posts (TE-16, Figma 1:1022). Khung hàng, nút, tiến trình, bề card, lưới tĩnh 4 bài: "Hàng ngang".
-   Placeholder dùng chung cho article-main, article-comments, related-articles (chỉ trong editor). */
+/** Blog posts (TE-16, Figma 1:1022). Khung hàng, nút, tiến trình, bề card, lưới tĩnh 4 bài: "Hàng ngang" */
 :is(.blog-posts--placeholder, .article-main--placeholder, .article-comments--placeholder) {
   margin-block: var(--space-7);
   padding: var(--space-4);
@@ -9349,7 +9348,7 @@ video-card {
   }
 }
 
-/** Form chung (ES1-T407; bình luận đầy đủ ES1-T382, liên hệ ES1-T383): ô nhập, lỗi theo trường, hộp trạng thái */
+/** Form chung (ES1-T407, ES1-T382, ES1-T383) */
 .contact-form {
   display: grid;
   gap: var(--space-4);
@@ -9436,8 +9435,7 @@ video-card {
 .form-status__body { display: grid; gap: var(--space-1); }
 .form-status__body > p { margin: 0; }
 
-/** Bài viết (TE-20-R2-FE2; article.md, sổ 10/11 A1–A3; SRS TE-20 AC9–AC13): ảnh bìa bo 16 không chữ, không lớp tối;
-   cột đọc 46rem cho đầu bài, nội dung, cuối bài, bình luận; bài liên quan dùng .blog-posts ("Hàng ngang"). Chữ ≥ 14. */
+/** Bài viết (ES1-T382; SRS TE-20 AC9–AC13, article.md). Bài liên quan: .blog-posts */
 .image.article-main__cover { margin-block-start: var(--space-4); aspect-ratio: 4 / 3; border-radius: calc(var(--radius-card) + var(--space-1)); background-color: var(--color-background-dark); }
 .image.article-main__cover > img { block-size: 100%; object-fit: cover; }
 .article-main__column, .article-comments { inline-size: 100%; max-inline-size: calc(var(--space-1) * 184); margin-inline: auto; }
@@ -9455,9 +9453,9 @@ video-card {
 .article-main__meta-item + .article-main__meta-item::before { content: '·' / ''; margin-inline-end: var(--space-2); color: var(--color-muted-light); }
 .article-main__end { display: grid; justify-items: start; gap: var(--space-5); margin-block-start: var(--space-7); padding-block-start: var(--space-5); border-block-start: 1px solid var(--color-border); }
 .article-main__topics { gap: var(--space-2) var(--space-3); }
-/* Tab link F§7 cao 44; link "Back to" cao 44, mũi tên lùi (icon arrow lật, RTL giữ vì rule chung đã lật) */
+/* Tab, Back to cao 44; mũi tên lật, RTL giữ */
 .article-main__topic, .article-main__back { display: inline-flex; align-items: center; gap: var(--space-3); min-block-size: calc(var(--space-1) * 11); color: var(--color-foreground); font-weight: 600; text-decoration: none; overflow-wrap: anywhere; }
-.article-main__topic, .article-main__topics-label { font-weight: 600; }
+.article-main__topics-label { font-weight: 600; }
 .article-main__topic { padding-inline: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-button); font-size: var(--font-size-sm); }
 .article-main__topic:hover { border-color: var(--color-foreground); }
 .article-main__back .slideshow-icon { flex: none; inline-size: var(--space-4); block-size: calc(var(--space-1) * 3.5); scale: -1 1; }
@@ -9469,7 +9467,6 @@ video-card {
   .article-main__back:hover .slideshow-icon { translate: calc(var(--space-1) * -1) 0; }
   .article-main__back:hover .slideshow-icon:dir(rtl) { translate: var(--space-1) 0; }
 }
-/* Bình luận: gạch trên, cách cuối bài 48 + 48 */
 .article-comments { margin-block-start: var(--space-7); padding-block: var(--space-7); border-block-start: 1px solid var(--color-border); }
 .article-comments__heading, .comment-form__title { margin: 0; }
 .comment-form__title { font-size: var(--font-size-h3); }

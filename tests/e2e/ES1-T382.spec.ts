@@ -129,7 +129,7 @@ const TOKENS = `:root{--page-width:1440px;--page-margin:20px;--font-size-xs:.812
 
 async function fixture(page: Page) {
   const longTitle = 'Supercalifragilisticexpialidociousandmoretext'.repeat(2);
-  await page.setContent(`<!doctype html><html lang="en"><head><title>fixture</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style></head>
+  await page.setContent(`<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>fixture</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style></head>
 <body><main>
 <article class="block-container"><div class="article-main">
   <div class="image article-main__cover" data-testid="article-cover"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" width="1800" height="828" alt="Cover"></div>
@@ -228,6 +228,7 @@ test.describe('ES1-T382 store', () => {
       expect(hrefs).not.toContain(new URL(page.url()).pathname);
       await expect(related.locator('h3')).toHaveCount(hrefs.length);
     }
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('main').analyze();
     expect(violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
   });
