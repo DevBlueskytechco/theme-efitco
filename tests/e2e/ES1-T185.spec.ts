@@ -198,7 +198,8 @@ test.describe('ES1-T185 nút đầu/cuối (ES1-T335)', () => {
   test('bấm nút đang tắt không cuộn', async ({ page }) => {
     await open(page);
     await off(prev(page));
-    await prev(page).click();
+    // aria-disabled="true": Playwright coi là không enabled, force để vẫn bấm chuột thật (TE-7 AC6: nút tắt bấm không cuộn).
+    await prev(page).click({ force: true });
     await page.waitForTimeout(300);
     expect(await scrollLeft(page)).toBe(0);
   });
