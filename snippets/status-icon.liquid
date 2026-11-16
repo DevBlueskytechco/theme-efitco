@@ -4,9 +4,10 @@
   comes from the parent class (.toast__icon 20, .alert__icon 24, .empty-state__icon 32).
   The caller supplies the text: the icon never carries meaning alone.
   Cart icons (TE-5, mini-cart-quickview.md §1): 'truck' free shipping, 'tag' discount,
-  'trash' remove line, 'edit' order note, 'minus' and 'plus' quantity stepper.
+  'trash' remove line, 'edit' order note, 'minus' and 'plus' quantity stepper,
+  'lock' "Secure checkout" on the cart page summary.
 
-  @param {string} name - Icon name: 'info', 'success', 'warning', 'error', 'cart', 'search', 'box', 'truck', 'tag', 'trash', 'edit', 'minus' or 'plus'
+  @param {string} name - Icon name: 'info', 'success', 'warning', 'error', 'cart', 'search', 'box', 'truck', 'tag', 'trash', 'edit', 'minus', 'plus' or 'lock'
 
   @example
   {% render 'status-icon', name: 'success' %}
@@ -39,4 +40,6 @@
     <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5.5 12h13" /></svg>
   {%- when 'plus' -%}
     <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true" focusable="false"><path d="M5.5 12h13M12 5.5v13" /></svg>
+  {%- when 'lock' -%}
+    <svg class="status-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4.75" y="10.75" width="14.5" height="10" rx="1.5" /><path d="M8 10.75V7.5a4 4 0 0 1 8 0v3.25M12 15v2" /></svg>
 {%- endcase -%}
