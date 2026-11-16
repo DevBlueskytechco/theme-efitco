@@ -1,6 +1,7 @@
 // Ticket ES1-T333 — TE-2-R2-BE1: assets/slideshow.js, TE-2 AC7–AC9 (autoplay chỉ từ 80rem, điều khiển theo mốc, a11y carousel).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T333.spec.ts
 import { test, expect, type Page } from '@playwright/test';
+import { watchShopPay403 } from './support/console-guard';
 
 const SPEED_SECONDS = 3; // min của setting autoplay_speed
 const AFTER_TICK = (SPEED_SECONDS + 2) * 1000;
@@ -15,9 +16,12 @@ const VIEWPORTS = {
 
 function trackErrors(page: Page): string[] {
   const errors: string[] = [];
+  // ES1-T171 TC-13: mọi console guard đi qua watchShopPay403 (Cloudflare, 429 tài nguyên, 403 Shop Pay). Bộ lọc /slideshow/ giữ nguyên.
+  const ignore = watchShopPay403(page);
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => {
-    if (m.type() === 'error' && /slideshow/.test(m.location().url)) errors.push(m.text());
+    if (m.type() !== 'error' || ignore(m)) return;
+    if (/slideshow/.test(m.location().url)) errors.push(m.text());
   });
   return errors;
 }
