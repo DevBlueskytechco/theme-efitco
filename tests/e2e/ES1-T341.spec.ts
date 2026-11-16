@@ -16,9 +16,13 @@ const TOL = 2;
 const WIDTHS = { mobile: 360, tablet: 768, desktop: 1280, wide: 1920 } as const;
 
 type Box = { x: number; y: number; width: number; height: number };
+// y tính theo tài liệu: mỗi lần gọi có thể cuộn trang, so y theo viewport giữa 2 lần gọi sẽ sai (ES1-T172, như ES1-T120).
 const box = async (l: Locator): Promise<Box> => {
   await l.scrollIntoViewIfNeeded();
-  const b = await l.boundingBox();
+  const b = await l.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    return r.width || r.height ? { x: r.x, y: r.y + window.scrollY, width: r.width, height: r.height } : null;
+  });
   expect(b, 'phần tử có hộp hiển thị').not.toBeNull();
   return b!;
 };
