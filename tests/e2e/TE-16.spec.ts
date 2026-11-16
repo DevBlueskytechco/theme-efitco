@@ -8,7 +8,7 @@
 import { test, expect, type Locator, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
-import { gotoStore } from './support/store-guard';
+import { expectNotChallenged, gotoStore } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 
 const FIGMA = '/?view=figma';
@@ -420,6 +420,7 @@ test.describe('TE-16 có JS, 5 bài (figma-blog)', () => {
       await gotoStore(page, path);
       const root = band(page, id);
       test.skip((await root.count()) === 0, NO_DATA);
+      await expectNotChallenged(page);
       const { violations } = await new AxeBuilder({ page }).include(`[data-testid="container-${id}"]`).analyze();
       const serious = violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
       expect(serious.map((v) => `${path} ${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
