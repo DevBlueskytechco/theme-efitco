@@ -2390,8 +2390,7 @@ bundle-form {
   }
 }
 
-/** Collection page (TE-6 AC1, AC8, AC11–AC14; collection.md §3, §4, §6–§9). Đầu trang: breadcrumb 16 → h1 8 → mô tả;
-   có ảnh: .page-banner (TE-22-R2-FE1), mô tả ngắn trên ảnh từ 48rem, dưới ảnh ở 360 và khi dài (không cắt). */
+/** Collection page (TE-6, collection.md §3–§9): mô tả ngắn nằm trên .page-banner từ 48rem, dài thì dưới ảnh */
 .collection-banner .page-title {
   padding-block: var(--space-2) 0;
 }
@@ -2426,10 +2425,9 @@ bundle-form {
   font-size: var(--font-size-sm);
 }
 
-/* <collection-filters> trong template: 1 cột; từ 64rem lưới 12 cột, cột lọc span 3, kết quả span 9 (AC8) */
+/* Từ 64rem lưới 12 cột: lọc 3, kết quả 9. --collection-bar: cao toolbar = tiêu đề "Filters" */
 .collection-layout {
   --collection-control: calc(var(--space-1) * 12);
-  /* Thanh công cụ và tiêu đề "Filters" từ 64rem: control + đệm 12 + gạch 1px (border-box) */
   --collection-bar: calc(var(--collection-control) + var(--space-3) + 1px);
 
   display: grid;
@@ -2447,7 +2445,6 @@ bundle-form {
   gap: var(--space-5);
 }
 
-/* Gap ngang 16 / dọc 24; từ 80rem 24 / 40 */
 .collection-products__grid {
   display: grid;
   grid-template-columns: repeat(var(--columns-mobile, 2), minmax(0, 1fr));
@@ -2461,14 +2458,11 @@ bundle-form {
   min-inline-size: 0;
 }
 
-/* Lưới → phân trang 48 (64 từ 80rem) = gap 24 + margin */
 .collection-products__results > .pagination {
   margin-block-start: var(--space-5);
 }
 
-/** Thanh công cụ (AC3, AC11): 360 [Filter][Sort] / số kết quả; 768 [Filter] số [Sort 240]; 64rem số [Sort 240].
-   Dưới 64rem dính dưới header tối, nền trắng, gạch 1px tràn màn. box-shadow không tạo vùng cuộn ngang:
-   bóng 1 (nền) dịch lên đúng bằng spread nên dừng ở mép dưới, bóng 2 (gạch) lộ 1px dưới nó; clip-path cắt phần trên. */
+/* Toolbar dính dưới 64rem; nền + gạch tràn màn bằng box-shadow (không cuộn ngang), clip-path cắt phần trên */
 .collection-toolbar {
   position: sticky;
   inset-block-start: var(--sticky-top);
@@ -2512,7 +2506,6 @@ bundle-form {
   display: none;
 }
 
-/* Badge tròn 24, chữ 13/700 accent-foreground trên accent 5.01:1; nút hover đảo đen thì badge nền trắng */
 .collection-toolbar__badge {
   display: block;
   min-inline-size: var(--space-5);
@@ -2526,7 +2519,8 @@ bundle-form {
   text-align: center;
 }
 
-.button.collection-toolbar__filter:hover {
+.button.collection-toolbar__filter:hover,
+.collection-chips__chip:hover {
   border-color: var(--color-foreground);
   background-color: var(--color-foreground);
   color: var(--color-background);
@@ -2538,11 +2532,23 @@ bundle-form {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .button.collection-toolbar__filter {
+  .button.collection-toolbar__filter,
+  .collection-chips__chip {
     transition:
       background-color var(--motion-fast) var(--ease-out),
       color var(--motion-fast) var(--ease-out);
   }
+
+  .collection-toolbar__select {
+    transition: border-color var(--motion-fast) var(--ease-out);
+  }
+}
+
+.collection-toolbar__results:focus-visible,
+.collection-toolbar__select:focus-visible,
+.collection-chips :focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .collection-toolbar__results {
@@ -2557,18 +2563,13 @@ bundle-form {
   font-weight: 600;
 }
 
-.collection-toolbar__results:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
 .collection-toolbar__updating {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
 }
 
-/* Sort: select gốc, nhãn "Sort by" nằm trong ô phía trên giá trị, chevron vẽ bằng viền (không ảnh) */
+/* Sort: select gốc, nhãn trong ô, chevron bằng viền */
 .collection-toolbar__sort {
   position: relative;
   grid-area: sort;
@@ -2624,24 +2625,11 @@ bundle-form {
   cursor: pointer;
 }
 
-.collection-toolbar__select:hover {
+.collection-toolbar__select:is(:hover, :focus-visible) {
   border-color: var(--color-foreground);
 }
 
-.collection-toolbar__select:focus-visible {
-  border-color: var(--color-foreground);
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .collection-toolbar__select {
-    transition: border-color var(--motion-fast) var(--ease-out);
-  }
-}
-
-/** Chip lọc đang áp (AC12, collection.md §7): pill 44 (40 từ 80rem), hover đảo đen 17.4:1, xuống dòng.
-   Chip là con đầu của kết quả: kéo lên 8 để cách thanh công cụ 16 (lưới vẫn cách 24) */
+/* Chip lọc (AC12, collection.md §7): pill 44 (40 từ 80rem); kéo lên 8 để cách toolbar 16 */
 .collection-chips {
   display: flex;
   flex-wrap: wrap;
@@ -2679,19 +2667,8 @@ bundle-form {
   margin-inline-start: var(--space-1);
 }
 
-.collection-chips__chip:hover {
-  background-color: var(--color-foreground);
-  color: var(--color-background);
-}
-
 .collection-chips__chip:hover .collection-chips__group {
   color: inherit;
-}
-
-.collection-chips__chip:focus-visible,
-.collection-chips__clear:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
 }
 
 .collection-chips__clear {
@@ -2710,15 +2687,7 @@ bundle-form {
   color: var(--color-accent);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .collection-chips__chip {
-    transition:
-      background-color var(--motion-fast) var(--ease-out),
-      color var(--motion-fast) var(--ease-out);
-  }
-}
-
-/* Thanh công cụ dính dưới 64rem (cao ≤ 104) không che phần tử đang focus trong kết quả (TE-10 AC9); bỏ từ 64rem */
+/* Toolbar dính không che phần tử đang focus (TE-10 AC9) */
 .collection-products__results :where(:focus-visible, :target) {
   scroll-margin-block-start: calc(var(--sticky-top) + var(--space-8));
 }
@@ -3139,7 +3108,7 @@ bundle-form {
     padding-block: var(--space-6) var(--space-8);
   }
 
-  /* Lưới 12 cột khớp header/footer; không có filter thì kết quả giữ cả bề ngang (AC8) */
+  /* Không có filter: kết quả cả bề ngang (AC8) */
   .collection-layout:has(.collection-filters__drawer:not([hidden])) {
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }
@@ -3156,7 +3125,7 @@ bundle-form {
     display: none;
   }
 
-  /* Không dính; cao = control + 12, cùng đường gạch foreground với tiêu đề "Filters" của cột lọc */
+  /* Không dính; gạch thẳng hàng tiêu đề "Filters" */
   .collection-toolbar,
   .collection-toolbar:has(> .collection-toolbar__filter[hidden]) {
     position: static;
