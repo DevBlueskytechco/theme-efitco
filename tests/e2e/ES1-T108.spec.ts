@@ -55,8 +55,9 @@ test.describe('ES1-T108 TE-6 trang collection', () => {
     const res = await page.goto(MAIN);
     expect(res?.status(), `HTTP ${MAIN}`).toBe(200);
     await expect(page.locator('h1')).toHaveCount(1);
-    await expect(page.getByTestId('collection-banner').getByTestId('collection-banner-title')).toBeVisible();
-    await expect(page.getByTestId('collection-banner-title')).not.toBeEmpty();
+    // AC thay (ES1-T365, TE-6 AC13 0.5): h1 qua snippets/page-title, hook collection-banner-title đã bỏ
+    await expect(page.getByTestId('collection-banner').getByTestId('page-title-heading')).toBeVisible();
+    await expect(page.getByTestId('collection-banner').getByTestId('page-title-heading')).not.toBeEmpty();
     expect(errors, errors.join('\n')).toEqual([]);
     await expectAxeClean(page, 'main');
   });
@@ -71,7 +72,8 @@ test.describe('ES1-T108 TE-6 trang collection', () => {
     expect(await img.evaluate((el) => getComputedStyle(el).objectFit)).toBe('cover');
     // Không crop server: URL ảnh không có tham số crop
     expect(await img.getAttribute('src')).not.toMatch(/crop=/);
-    await expect(page.getByTestId('collection-banner-description')).toBeVisible();
+    // ES1-T365: mô tả ngắn có 2 bản (trên ảnh ≥ 48rem, dưới ảnh < 48rem), CSS chỉ hiện 1
+    await expect(page.locator('[data-testid="collection-banner-description"]:visible')).toHaveCount(1);
 
     const eagerCards = page.getByTestId('product-card-image').and(page.locator('[loading="eager"]'));
     await expect(eagerCards).toHaveCount(0);
@@ -92,7 +94,8 @@ test.describe('ES1-T108 TE-6 trang collection', () => {
     expect(loading.slice(columns).every((v) => v === 'lazy' || v === null), label).toBe(true);
   });
 
-  test('AC1 lưới: tối đa 24 card, số kết quả, data-results-label, 2 cột ở 360, 4 cột ở 1280', async ({ page }) => {
+  // AC thay (ES1-T365, TE-6 AC8 0.5, collection.md §6): columns_desktop mặc định 3 (trước 4)
+  test('AC1 lưới: tối đa 24 card, số kết quả, data-results-label, 2 cột ở 360, 3 cột ở 1280', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await page.goto(MAIN);
     const cards = page.getByTestId('collection-product');
@@ -111,7 +114,7 @@ test.describe('ES1-T108 TE-6 trang collection', () => {
     await page.setViewportSize({ width: 768, height: 800 });
     expect(await columnCount(page), '768').toBe(3);
     await page.setViewportSize({ width: 1280, height: 800 });
-    expect(await columnCount(page), '1280').toBe(4);
+    expect(await columnCount(page), '1280').toBe(3);
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth),
       'không tràn ngang',
@@ -176,14 +179,17 @@ test.describe('ES1-T108 TE-6 trang collection', () => {
     await expectAxeClean(page, '[data-testid="pagination"]');
   });
 
-  test('AC1 rỗng: có thông báo và link tất cả sản phẩm', async ({ page }) => {
+  // AC thay (ES1-T365, TE-6 AC14 0.5, collection.md §9): empty state chung (nút Shop All Products + link Browse collections),
+  // thanh công cụ ẩn (hidden) thay vì không có số kết quả; hook collection-empty-cta đã bỏ.
+  test('AC1 rỗng: có thông báo, nút tất cả sản phẩm, link danh sách collection, toolbar ẩn', async ({ page }) => {
     test.skip(!ENV.empty, 'Thiếu TE6_EMPTY_COLLECTION_HANDLE (ES1-T105 #4)');
     const errors = watchErrors(page);
     await page.goto(`/collections/${encodeURIComponent(ENV.empty!)}`);
     await expect(page.getByTestId('collection-empty')).toBeVisible();
-    await expect(page.getByTestId('collection-empty-cta')).toHaveAttribute('href', /\/collections\/all$/);
+    await expect(page.getByTestId('collection-empty-button')).toHaveAttribute('href', /\/collections\/all$/);
+    await expect(page.getByTestId('collection-empty-link')).toHaveAttribute('href', /\/collections\/?$/);
     await expect(page.getByTestId('collection-grid')).toHaveCount(0);
-    await expect(page.getByTestId('collection-count')).toHaveCount(0);
+    await expect(page.getByTestId('collection-toolbar')).toBeHidden();
     await expect(page.getByTestId('pagination')).toHaveCount(0);
     expect(errors, errors.join('\n')).toEqual([]);
     await expectAxeClean(page, 'main');
@@ -262,7 +268,7 @@ test.describe('ES1-T108 nojs', () => {
 
   test('nojs phân trang bằng link thường, lưới và banner vẫn hiện', async ({ page }) => {
     await page.goto(MAIN);
-    await expect(page.getByTestId('collection-banner-title')).toBeVisible();
+    await expect(page.getByTestId('collection-banner').getByTestId('page-title-heading')).toBeVisible();
     await expect(page.getByTestId('collection-products')).toBeVisible();
     const next = page.getByTestId('pagination-next');
     test.skip((await next.count()) === 0, `${MAIN} không đủ 2 trang (ES1-T105 #1)`);
@@ -278,6 +284,6 @@ test.describe('ES1-T108 nojs', () => {
     test.skip((await card.count()) === 0, 'Store không có collection');
     await expect(card).toBeVisible();
     await card.click();
-    await expect(page.getByTestId('collection-banner-title')).toBeVisible();
+    await expect(page.getByTestId('collection-banner').getByTestId('page-title-heading')).toBeVisible();
   });
 });
