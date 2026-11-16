@@ -50,7 +50,10 @@
     focus về summary vừa mở. × trong phần đầu cấp 2 là .close-button nên <modal-dialog> tự đóng.
   - header-drawer-localization: <details> hàng gộp "cờ + USD / EN ›" trong chân drawer, bọc trong
     {% form 'localization' %}; mỗi mục là nút submit nên đổi được khi không JS.
-  - header-drawer-account: <shopify-account> trong chân drawer (Sign In).
+  - header-drawer-account: link gốc trong chân drawer (icon + "Sign In", đã đăng nhập "Account"),
+    tên truy cập = chữ thấy được (TE-1 AC14, WCAG 2.5.3). Không dùng <shopify-account> ở đây: nút
+    trong shadow có aria-label="Account" cố định, lệch chữ "Sign In" (axe label-content-name-mismatch).
+    AC3 đạt nhờ <shopify-account> trên thanh header (header-account).
 
   Mega menu từ 80rem (TE-22 AC1–AC3, navigation.md §2, §3; hợp đồng TE-22-R2-FE2 / TE-22-R2-BE1):
   - Kiểu panel theo dữ liệu menu, không setting: data-mega="columns" (A, có cấp 3)
@@ -252,16 +255,18 @@
             {%- if shop.customer_accounts_enabled or show_countries or show_languages -%}
               <div class="drawer__footer site-header__drawer-footer">
                 {%- if shop.customer_accounts_enabled -%}
-                  <shopify-account
+                  <a
                     class="site-header__drawer-account"
-                    menu="{{ block.settings.customer_account_menu }}"
+                    href="{% if customer %}{{ routes.account_url }}{% else %}{{ routes.account_login_url }}{% endif %}"
                     data-testid="header-drawer-account"
                   >
-                    <span slot="signed-out-avatar" class="site-header__drawer-account-label">
-                      <span aria-hidden="true">{{ 'icon-account.svg' | inline_asset_content }}</span>
+                    <span aria-hidden="true">{{ 'icon-account.svg' | inline_asset_content }}</span>
+                    {%- if customer -%}
+                      {{- 'blocks.header.account' | t -}}
+                    {%- else -%}
                       {{- 'blocks.header.sign_in' | t -}}
-                    </span>
-                  </shopify-account>
+                    {%- endif -%}
+                  </a>
                 {%- endif -%}
 
                 {%- if show_countries or show_languages -%}
