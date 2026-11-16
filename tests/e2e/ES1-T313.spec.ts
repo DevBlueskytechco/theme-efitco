@@ -84,7 +84,8 @@ test.describe('ES1-T313 tĩnh', () => {
     expect(body).toMatch(/data-testid="\{\{ state_testid \}\}-button"/);
     expect(body).not.toMatch(/href="\//);
     const locale = JSON.parse(readFileSync('locales/en.default.json', 'utf8'));
-    expect(locale.general).toEqual({ dismiss: 'Dismiss:', try_again: 'Try Again' });
+    // toMatchObject: nhóm general nhận thêm key của ticket sau (ES1-T326 general.breadcrumb)
+    expect(locale.general).toMatchObject({ dismiss: 'Dismiss:', try_again: 'Try Again' });
   });
 
   test('TC-04 template toast trong layout: 4 loại, role đúng, nút đóng có tên "Dismiss: {tiêu đề}"', () => {
