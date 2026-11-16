@@ -76,8 +76,8 @@ test.describe('ES1-T387 static', () => {
     expect(quiz.empty_cta).toBeUndefined();
   });
 
-  // Trần 49 152 chưa đạt ở develop (50 805 B sau T332, [Q] ES1-T454); CTO 13/11: PR này không được tăng base.css so với develop
-  test('CSS: popup cũ (literal figma, px) đã xoá; mục quiz 0 màu literal, 0 z-index số; gzip ≤ develop 50 805', () => {
+  // Trần 49 152 chưa đạt ở develop (50 805 B sau T332, [Q] ES1-T454; 50 102 B sau ES1-T317); CTO 13/11: PR này không được tăng base.css so với develop
+  test('CSS: popup cũ (literal figma, px) đã xoá; mục quiz 0 màu literal, 0 z-index số; gzip ≤ develop 50 102', () => {
     const css = read('assets/base.css');
     expect(css).not.toContain('.quiz__dialog-close');
     expect(css).not.toContain('quiz-results-title');
@@ -89,7 +89,7 @@ test.describe('ES1-T387 static', () => {
     expect(quizRules).not.toMatch(/z-index\s*:\s*-?\d/);
     expect(quizRules).not.toMatch(/(^|[\s;{])(left|right|top|bottom|margin-left|margin-right|padding-left|padding-right)\s*:/m);
     expect(css).not.toContain('motion-breathe');
-    expect(gzipSync(css).length).toBeLessThanOrEqual(50805);
+    expect(gzipSync(css).length).toBeLessThanOrEqual(50102);
   });
 
   test('index.te11 truyền collection te11-quiz, giữ panel dưới bước (ES1-T139)', () => {
