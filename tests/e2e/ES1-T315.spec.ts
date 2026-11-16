@@ -4,7 +4,7 @@
 // SRS TE-10 AC12, TE-3 AC10, TE-11 AC5, TE-18 AC8 phần chung: mở, Esc, scrim, nút đóng, vuốt sheet, trả focus, khoá cuộn, sự kiện).
 // Chạy: npx playwright test tests/e2e/ES1-T315.spec.ts (storefront: PREVIEW_URL=... STORE_PASSWORD=...)
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 

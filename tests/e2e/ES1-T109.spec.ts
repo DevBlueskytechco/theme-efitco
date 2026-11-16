@@ -2,7 +2,7 @@
 // Ticket ES1-T109 TE-6-FE2: form filter GET, sort, drawer popover, badge (docs/srs.md#TE-6 AC2, AC3, AC4; drafts/techlead/ES1-T103/task-split.md D5, D6, D7, D11, D12; ES1-T104).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T109.spec.ts -g "AC2-markup|AC3-markup|AC4-markup|nojs"
 // Dữ liệu (ES1-T105 chưa trả lời): thiếu TE6_* → dùng /collections/all, test cần filter skip khi trang không có collection-filter-group.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';

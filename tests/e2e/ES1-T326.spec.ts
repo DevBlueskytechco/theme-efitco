@@ -4,7 +4,7 @@
 // Snippet chưa có template gọi (TE-6-R2-FE2, TE-4-R2-FE3, TE-20/TE-21 gắn sau): trang store chỉ kiểm "không breadcrumb thì
 // không BreadcrumbList" và "có breadcrumb thì đúng 1 BreadcrumbList khớp chữ"; đủ 3 dạng do TE-22-R2-QA1 kiểm khi đã gắn.
 // Chạy: npx playwright test tests/e2e/ES1-T326.spec.ts --project=desktop
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { expectNotChallenged } from './support/store-guard';

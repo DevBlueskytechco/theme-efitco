@@ -3,7 +3,8 @@
 // - Kiểm helper (không gọi store): support/cart-mock.ts, support/store-guard.ts, quy ước spec T96, T97, T98.
 // - 1 luồng mua thật cho mỗi project: 1 phiên, /cart.js thật, thư viện partial và Shopify.actions thật. Đây là nơi duy nhất kiểm những gì mock không kiểm được.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T203.spec.ts
-import { test, expect, type BrowserContext, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type BrowserContext, type Page, type TestInfo } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { actionCartCount, CART } from './support/cart-api';
@@ -415,7 +416,7 @@ test.describe.serial('ES1-T203 luồng mua thật', () => {
     test.skip(PAGE_MODE, 'Luồng mua thật đi qua drawer; preview cart_type page chạy test riêng bên dưới');
     expect(HANDLE, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE').toBeTruthy();
     const { baseURL, storageState, viewport, userAgent, deviceScaleFactor, isMobile, hasTouch } = info.project.use;
-    context = await browser.newContext({ baseURL, storageState, viewport, userAgent, deviceScaleFactor, isMobile, hasTouch, reducedMotion: 'reduce' });
+    context = await newStoreContext(browser, { baseURL, storageState, viewport, userAgent, deviceScaleFactor, isMobile, hasTouch, reducedMotion: 'reduce' });
     page = await context.newPage();
     watch = watchStore(page);
     await page.addInitScript((type) => {

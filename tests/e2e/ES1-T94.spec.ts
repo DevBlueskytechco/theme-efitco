@@ -2,7 +2,8 @@
 // Ticket ES1-T94 TE-5-FE1: cart page (docs/srs.md#TE-5 AC1, AC3, AC4, AC5, AC6; drafts/techlead/ES1-T89/task-split.md D3, D4, D5, D6, D11, D12).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... [TE5_SHOP_COUNTRY=...] npx playwright test tests/e2e/ES1-T94.spec.ts -g "AC1|AC3|AC4|AC5|AC6|nojs"
 // Thiếu dữ liệu → skip có lý do. Automatic discount chưa có trên store dev (ES1-T91 #7) nên chỉ kiểm khi cart.js có discount.
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { clickAndLoad, expectNotChallenged, expectStoreAllowed, gotoStore } from './support/store-guard';
 import { readFileSync } from 'node:fs';
@@ -68,7 +69,7 @@ async function addToCartNoScript(page: Page, handle: string) {
 
 async function noJsPage(browser: Browser) {
   const use = test.info().project.use;
-  const context = await browser.newContext({
+  const context = await newStoreContext(browser, {
     javaScriptEnabled: false,
     storageState: 'tests/setup/state.json',
     baseURL: use.baseURL,

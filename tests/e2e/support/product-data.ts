@@ -7,7 +7,8 @@ import { expect, test, type Page } from '@playwright/test';
 import { basename } from 'node:path';
 import { getJson } from './http';
 import { record429 } from './report-429';
-import { expectJsonAllowed, expectNotChallenged } from './store-guard';
+import { expectJsonAllowed } from './store-guard';
+import { newStoreContext } from './store-noise';
 
 export type JsonResult<T> = { ok: boolean; status: number; body: T | null; challenged?: boolean };
 export type ProductVariant = { id: number; available: boolean; price: number };
@@ -81,14 +82,26 @@ export async function readCartJson<T>(page: Page): Promise<T> {
   return requireJson(await pageJson<T>(page, '/cart.js'), '/cart.js');
 }
 
+// ES1-T475: luật route của context phụ chỉ khớp document /cart của store, không khớp /cart.js (dữ liệu phải là thật).
+export const isCartDocument = (url: URL, storeOrigin: string) => url.origin === storeOrigin && url.pathname === '/cart';
+
 // Trang tắt JS: mở context phụ bật JS, chép cookie (cart, password, preview_theme_id) từ context đang test rồi fetch trong trang đó. Chỉ đọc, không đổi giỏ.
+// ES1-T475: document /cart giả, dữ liệu /cart.js thật (cùng origin, cookie từ storageState); bớt 1 document, khoảng 9 request động và khoảng 110 asset mỗi lần poll.
+// Không còn expectNotChallenged(helper) vì document là giả: store chặn thì /cart.js bị chặn, pageJson thử lại rồi requireJson fail hoặc skip như cũ.
 export async function readCartNoScript<T>(page: Page): Promise<T> {
   const context = page.context();
-  const sibling = await context.browser()!.newContext({ storageState: await context.storageState() });
+  const { userAgent, viewport, isMobile } = test.info().project.use;
+  const store = new URL(page.url()).origin;
+  const sibling = await newStoreContext(context.browser()!, {
+    storageState: await context.storageState(),
+    ...(userAgent ? { userAgent } : {}),
+    ...(viewport ? { viewport } : {}),
+    ...(isMobile !== undefined ? { isMobile } : {}),
+  });
   try {
+    await sibling.route((url) => isCartDocument(url, store), (route) => route.fulfill({ contentType: 'text/html', body: '<!doctype html><title>cart</title>' }));
     const helper = await sibling.newPage();
     await helper.goto(new URL('/cart', page.url()).toString(), { waitUntil: 'domcontentloaded' });
-    await expectNotChallenged(helper);
     return await readCartJson<T>(helper);
   } finally {
     await sibling.close();

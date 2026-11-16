@@ -8,7 +8,7 @@
 // (2) apply là bản giả theo mô tả trong AGENTS.md (giữ focus, giá trị ô nhập), không phải thư viện thật; (3) không dựng free shipping, discount, thuế;
 // (4) updateCart, getCart ghi qua Storefront API (ES1-T164), không qua /cart/*.js nên không mock được ở đây.
 // Phần (1) (2) (4) do luồng thật trong tests/e2e/ES1-T203.spec.ts kiểm.
-import { test as base, expect, type Page, type Route } from '@playwright/test';
+import { test as base, expect, type Page, type Route } from './test';
 import { createHash } from 'node:crypto';
 import { gotoStore, watchStore } from './store-guard';
 
