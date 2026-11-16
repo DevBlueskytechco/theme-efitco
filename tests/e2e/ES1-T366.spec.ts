@@ -15,7 +15,8 @@ const OPTION = readFileSync('snippets/filter-option.liquid', 'utf8');
 const LOCALE = JSON.parse(readFileSync('locales/en.default.json', 'utf8'));
 
 const START = '/** Lọc collection (TE-6 AC9, AC10';
-const END = '/** Pagination (snippets/pagination.liquid';
+// Mục pagination (ES1-T364) không còn comment đầu mục: kết thúc ở rule đầu tiên của nó.
+const END = '.pagination__list {';
 const section = () => {
   const from = BASE.indexOf(START);
   return BASE.slice(from, BASE.indexOf(END, from));
