@@ -4,11 +4,11 @@
 // Logo và ảnh newsletter là block setting của footer trong layout, preview không đặt được: phần có ảnh cần người kiểm trong editor.
 // ES1-T464: chữ footer lấy từ fixture ES1-T331 (tests/fixtures/home-figma.json, khối layout:theme footer), không hardcode.
 // newsletter_heading là inline_richtext, default rỗng (ES1-T308 #1): phần trong <em> tô accent. Store chưa áp fixture thì skip (home-fixture.ts).
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
+import { expectNotChallenged, gotoStore } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
-import { loadHomeFixture, skipUnlessFixture } from './support/home-fixture';
+import { loadHomeFixture, missingMarkers, NOT_APPLIED, SENTINELS } from './support/home-fixture';
 
 const PAGES = ['/', '/collections/all', '/cart', '/search'];
 const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
@@ -31,11 +31,25 @@ const NEWSLETTER_TEXT = stripTags(String(settings.newsletter_text ?? ''));
 const BUTTON_LABEL = norm(String(settings.newsletter_button_label ?? pending.newsletter_button_label ?? ''));
 const NOTE = footerFixture.markers?.find((marker) => marker.testid === 'footer-newsletter-note')?.text ?? '';
 
-// Sentinel fixture nằm ở /: mở / để quyết định skip, rồi mới sang trang cần đo.
-async function openWithFixture(page: Page, path: string) {
-  await page.goto('/');
-  await skipUnlessFixture(page);
-  if (path !== '/') await page.goto(path);
+// Sentinel fixture nằm ở /. Run 43864636567: mở / rồi page.goto(path) trên CÙNG trang thì lần điều hướng thứ 2 bị Cloudflare
+// thử thách (cf-mitigated, 429) 12/12 lượt desktop + mobile, còn mở thẳng path (develop, các PR khác) đều đạt. Nên: test của /
+// tự quyết định skip; trang khác đọc sentinel ở context riêng (nhớ trong worker), trang đo chỉ điều hướng 1 lần qua gotoStore.
+let homeSentinelsMissing: number | undefined;
+
+async function openWithFixture(page: Page, browser: Browser, path: string) {
+  if (path !== '/' && homeSentinelsMissing === undefined) {
+    const probe = await browser.newPage();
+    try {
+      await gotoStore(probe, '/');
+      homeSentinelsMissing = (await missingMarkers(probe, SENTINELS)).length;
+    } finally {
+      await probe.context().close();
+    }
+  }
+  await gotoStore(page, path);
+  if (path === '/') homeSentinelsMissing = (await missingMarkers(page, SENTINELS)).length;
+  // Như skipUnlessFixture: thiếu cả 2 sentinel thì skip; thiếu 1 thì chạy tiếp và fail ở assertion (fixture áp dở).
+  test.skip(homeSentinelsMissing === SENTINELS.length, NOT_APPLIED);
 }
 
 function luminance(rgb: number[]) {
@@ -82,8 +96,8 @@ async function expectFooterParts(page: Page) {
 
 test.describe('ES1-T181 TE-17 hàng 16 footer', () => {
   for (const path of PAGES) {
-    test(`AC-H28 đủ phần trên ${path}`, async ({ page }) => {
-      await openWithFixture(page, path);
+    test(`AC-H28 đủ phần trên ${path}`, async ({ page, browser }) => {
+      await openWithFixture(page, browser, path);
       await expectFooterParts(page);
     });
   }
@@ -106,9 +120,9 @@ test.describe('ES1-T181 TE-17 hàng 16 footer', () => {
   });
 
   // CTO 09/11 (tong_hop.docx #7, ES1-T250), CTO 14/11 (ES1-T437): phần <em> cam như Figma 1:1148, không nghiêng. Chữ lớn nên ngưỡng AA là 3:1.
-  test('heading 2 màu khác nhau; chữ thường từ 4.5:1, phần <em> là chữ lớn từ 3:1 trên nền footer', async ({ page }) => {
+  test('heading 2 màu khác nhau; chữ thường từ 4.5:1, phần <em> là chữ lớn từ 3:1 trên nền footer', async ({ page, browser }) => {
     test.skip(!HEADING_EM, 'fixture ES1-T331 chưa có <em> trong newsletter_heading (patch ở drafts/dev-fe/ES1-T464/home-figma.patch.md)');
-    await openWithFixture(page, '/');
+    await openWithFixture(page, browser, '/');
     test.skip(!(await footerHeadingApplied(page)), FOOTER_PENDING);
     const heading = page.getByTestId('footer-newsletter-heading');
     const em = heading.locator('em');
