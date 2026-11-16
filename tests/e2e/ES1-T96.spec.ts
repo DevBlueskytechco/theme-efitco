@@ -107,7 +107,8 @@ test.describe('ES1-T96 TE-5 cart drawer', () => {
     await expect(body.getByTestId('cart-line')).toHaveCount(state.items.length);
     await expect(body.getByTestId('cart-line-quantity')).toHaveValue(String(line!.quantity));
     await expect(tid(page, 'header-cart-count')).toHaveText(String(state.item_count));
-    await expect(body.getByTestId('cart-checkout')).toBeVisible();
+    // ES1-T453 #1 (CTO 14/11): cart-summary ở partial cart-drawer-footer, ngoài cart-drawer-body.
+    await expect(tid(page, 'cart-drawer-footer').getByTestId('cart-checkout')).toBeVisible();
 
     // Giỏ rỗng lúc tải → accelerated hidden; có hàng → hiện sau apply. Store không bật wallet thì không có wrapper.
     const wallet = tid(page, 'cart-drawer-accelerated');
