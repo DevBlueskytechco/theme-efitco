@@ -61,7 +61,7 @@ const FIXTURE = (stickyHidden: boolean) => `
   <div class="cart-items__error" role="alert" data-testid="cart-items-error"></div>
   <div class="cart-page__body" data-item-count="3" data-testid="cart-page-body">
     <p class="cart-page__count" data-testid="cart-page-count">3 items</p>
-    <a class="cart-page__continue" href="#" data-testid="cart-page-continue"><svg class="slideshow-icon slideshow-icon--arrow" width="16" height="14"></svg>Continue shopping</a>
+    <a class="empty-state__link cart-page__continue" href="#" data-testid="cart-page-continue"><svg class="slideshow-icon slideshow-icon--arrow" width="16" height="14"></svg>Continue shopping</a>
     <form id="cart-form-page" class="cart-page__form" data-testid="cart-form">
       <div class="cart-page__main" data-testid="fx-main">
         <div class="cart-lines__head" aria-hidden="true" data-testid="cart-lines-head"><span>Product</span><span>Quantity</span><span>Total</span></div>
@@ -77,7 +77,7 @@ const FIXTURE = (stickyHidden: boolean) => `
       </div>
     </form>
     <aside class="cart-sticky-checkout" aria-label="Cart total and checkout" data-testid="cart-sticky-checkout" ${stickyHidden ? 'hidden' : ''}>
-      <p class="cart-sticky-checkout__total"><span>Total</span><strong>$714.00</strong></p>
+      <p class="cart-sticky-checkout__total"><span class="cart-summary__muted">Total</span><strong class="cart-summary__total">$714.00</strong></p>
       <button class="button cart-sticky-checkout__button" type="submit" name="checkout" form="cart-form-page" data-testid="cart-sticky-checkout-button">Checkout</button>
     </aside>
   </div>

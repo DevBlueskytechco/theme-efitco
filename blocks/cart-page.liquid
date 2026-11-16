@@ -84,7 +84,7 @@
           <p class="cart-page__count" data-testid="cart-page-count">
             {{- 'cart.item_count' | t: count: cart.item_count -}}
           </p>
-          <a class="cart-page__continue" href="{{ routes.all_products_collection_url }}" data-testid="cart-page-continue">
+          <a class="empty-state__link cart-page__continue" href="{{ routes.all_products_collection_url }}" data-testid="cart-page-continue">
             {%- render 'slideshow-icon', name: 'arrow' -%}
             {{- 'cart.continue_shopping_link' | t -}}
           </a>
@@ -132,8 +132,8 @@
             hidden
           >
             <p class="cart-sticky-checkout__total">
-              <span>{{ 'cart.total' | t }}</span>
-              <strong data-testid="cart-sticky-checkout-total">{{ cart.total_price | money }}</strong>
+              <span class="cart-summary__muted">{{ 'cart.total' | t }}</span>
+              <strong class="cart-summary__total" data-testid="cart-sticky-checkout-total">{{ cart.total_price | money }}</strong>
             </p>
             <button
               class="button cart-sticky-checkout__button"
