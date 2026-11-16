@@ -122,7 +122,8 @@ test.describe('ES1-T326 tĩnh', () => {
     expect(cssText).not.toMatch(/(^|[\s;{])(left|right|top|bottom|width|height|(margin|padding)-(left|right|top|bottom))\s*:/m);
     expect(cssText).not.toMatch(/z-index|text-overflow|line-clamp/);
     expect(cssText).toMatch(/color-mix\(in srgb, var\(--color-background-dark\) 75%, transparent\),\s*color-mix\(in srgb, var\(--color-background-dark\) 60%, transparent\) 50%/);
-    expect(gzipSync(BASE).length).toBeLessThanOrEqual(49152);
+    // Trần tạm 53 248 B (CTO 14/11, ES1-T454 phương án a) tới khi dọn CSS (T317) đưa base.css về ≤ 49 152; ES1-T310 #1
+    expect(gzipSync(BASE).length).toBeLessThanOrEqual(53248);
     expect(Buffer.byteLength(CRITICAL)).toBeLessThanOrEqual(10240);
   });
 
