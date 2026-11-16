@@ -5,7 +5,8 @@
   above text below 64rem. The image_position setting swaps the columns with CSS
   order. Accent images 1 and 2 sit at the inline-end edge of the text column from
   80rem and are hidden below. Accent image 3 is not rendered. Without a main image
-  the storefront keeps the dark frame and the editor adds a hint inside it.
+  the storefront renders no media frame and the text takes the whole row; the
+  editor shows a dark frame with a hint (ES1-T405, AC-H36).
 
   Layout banner (Figma 1:625): no main image, image_position has no effect, text
   is centered. Accent images 1, 2 and 3 are scattered from 80rem and form a row
@@ -192,11 +193,10 @@
           loading: 'lazy',
           testid: 'image-with-text-image'
         %}
-      {%- else -%}
+      {%- elsif request.design_mode -%}
+        {%- comment -%} ES1-T405, AC-H36: no main image on the storefront, no empty frame; the text takes the whole row {%- endcomment -%}
         <div class="image-with-text__media image-with-text__media--empty" data-testid="image-with-text-image-placeholder">
-          {%- if request.design_mode -%}
-            <p class="image-with-text__media-hint">{{ 'blocks.image_with_text.image_placeholder' | t }}</p>
-          {%- endif -%}
+          <p class="image-with-text__media-hint">{{ 'blocks.image_with_text.image_placeholder' | t }}</p>
         </div>
       {%- endif -%}
       <div class="image-with-text__panel">

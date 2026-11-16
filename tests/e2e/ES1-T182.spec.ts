@@ -3,6 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T182.spec.ts
 // Body map bấm được và token panel: tests/e2e/ES1-T183.spec.ts.
 import { test, expect, type Page } from '@playwright/test';
+import { loadHomeFixture, NOT_APPLIED, skipUnlessFixture } from './support/home-fixture';
 
 const HOME = '/';
 const FIGMA = '/?view=figma';
@@ -66,8 +67,19 @@ test.describe('ES1-T182 TE-17-FE1c', () => {
     }
   });
 
-  test('AC-H18 / chưa cấu hình: bundle lấy collection all, bậc 10%, 15% và ghi chú', async ({ page }) => {
+  // SRS 0.5 TE-12 AC1, AC-H18, AC-H36 (ES1-T308 #1) thay D1 ES1-T169: theme chưa cấu hình không có collection
+  // (ADR 0011, ES1-T405) → storefront không có bundle builder, không khung rỗng.
+  test('AC-H36 / chưa cấu hình: không bundle builder, không khung rỗng', async ({ page }) => {
     await page.goto(HOME);
+    await expect(tid(page, 'bundle-builder')).toHaveCount(0);
+    await expect(tid(page, 'bundle-builder-placeholder')).toHaveCount(0);
+  });
+
+  // AC-H18 0.5: bậc 10%, 15% và copy chỉ có khi store dev đã cấu hình (fixture ES1-T331, hàng 9).
+  test('AC-H18 / store dev đã cấu hình (fixture): bundle bậc 10%, 15%, copy và link', async ({ page }) => {
+    test.skip(loadHomeFixture().storage.status === 'chua-xac-dinh', `${NOT_APPLIED}: chờ ES1-T428 đo nơi lưu setting static block`);
+    await page.goto(HOME);
+    await skipUnlessFixture(page);
     const root = tid(page, 'bundle-builder');
     await expect(root).toHaveCount(1);
     await expect(root).toHaveAttribute('data-tiers', '2:10,3:15');

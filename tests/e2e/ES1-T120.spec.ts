@@ -119,25 +119,19 @@ test.describe('ES1-T120 TE-7 image with text', () => {
     await expect(band(page, 'te7-iwt-left').locator('.image-with-text__accent--3')).toHaveCount(0);
   });
 
-  test('AC3 thiếu ảnh chính: giữ khung nền dark, không có ảnh hỏng', async ({ page }) => {
+  // ES1-T405 DoD "theme chưa cấu hình: không khung rỗng", SRS 0.5 AC-H36 (ES1-T308 #1) thay khung nền dark của ES1-T120:
+  // storefront thiếu ảnh chính thì không in khung media, chữ chiếm cả hàng; khung + hint chỉ có trong editor (request.design_mode).
+  test('AC3 thiếu ảnh chính: storefront không in khung rỗng, không ảnh hỏng, chữ chiếm cả hàng', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(TE7);
     const scope = band(page, 'te7-iwt-no-image');
     await expect(tid(scope, 'image-with-text-image')).toHaveCount(0);
-    const frame = tid(scope, 'image-with-text-image-placeholder');
-    await expect(frame).toBeVisible();
-    await expect(frame).toHaveText('');
-    expect((await box(frame)).height).toBeGreaterThan(0);
-    const colors = await page.evaluate(() => {
-      const frameEl = document.querySelector('[data-testid="container-te7-iwt-no-image"] [data-testid="image-with-text-image-placeholder"]')!;
-      const probe = document.createElement('div');
-      probe.style.backgroundColor = 'var(--color-background-dark)';
-      document.body.append(probe);
-      const dark = getComputedStyle(probe).backgroundColor;
-      probe.remove();
-      return { frame: getComputedStyle(frameEl).backgroundColor, dark };
-    });
-    expect(colors.frame).toBe(colors.dark);
+    await expect(tid(scope, 'image-with-text-image-placeholder')).toHaveCount(0);
+    await expect(scope.locator('.image-with-text__media')).toHaveCount(0);
+    await expect(tid(scope, 'image-with-text-heading')).toBeVisible();
+    const root = await box(tid(scope, 'image-with-text'));
+    const panel = await box(scope.locator('.image-with-text__panel'));
+    expect(Math.abs(panel.width - root.width)).toBeLessThanOrEqual(1);
   });
 
   test('AC3 banner: không ảnh chính, 3 ảnh vuông rải quanh chữ ở 1280', async ({ page }) => {

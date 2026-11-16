@@ -946,7 +946,8 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
       return { inGroup: !!a?.closest('[data-testid="product-card-swatches"]'), card: a?.closest('[data-testid="product-card"]')?.getAttribute('data-product-id') ?? null };
     });
     if (await target.getByTestId(T.swatches).count()) {
-      expect(where.inGroup, 'Tab sau tiêu đề vào nhóm swatch').toBe(true);
+      // TE-3 AC2/AC6 0.3 (ES1-T294, ES1-T337): swatch là chỉ báo aria-hidden, không phải control, không nhận focus
+      expect(where.inGroup, 'swatch là chỉ báo, không nhận focus').toBe(false);
     } else {
       expect(where.card, 'không có tab stop ẩn trong card').not.toBe(await target.getAttribute('data-product-id'));
     }
@@ -1065,9 +1066,14 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     const want = p.variants.find(v => v.available) ?? p.variants[0];
     expect(await variantIdOf(target), 'link ?variant= = selected_or_first_available_variant').toBe(want.id);
     if (await target.getByTestId(T.swatches).count()) {
-      const legend = norm(await target.getByTestId(T.swatches).locator('legend').textContent());
-      const opt = p.options.find(o => o.name === legend)!;
-      await expect(target.locator(`${SWATCH}:checked`)).toHaveAttribute('value', want.options[opt.position - 1]);
+      // TE-3 AC2/AC6/AC8 0.3 (ES1-T294, ES1-T337): swatch là chỉ báo aria-hidden, không phải radio, không legend;
+      // swatch chọn sẵn mang data-selected, tên giá trị ở .visually-hidden
+      const selected = target.locator('[data-testid="product-card-swatch"][data-selected] .visually-hidden');
+      await expect(selected, 'có đúng 1 swatch chọn sẵn').toHaveCount(1);
+      const text = norm(await selected.textContent());
+      const opt = p.options.find(o => o.values.includes(text));
+      expect(opt, `option chứa giá trị "${text}"`).toBeTruthy();
+      expect(text).toBe(want.options[opt!.position - 1]);
     }
   });
 

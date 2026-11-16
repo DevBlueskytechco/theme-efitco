@@ -13,7 +13,8 @@ test.describe('ES1-T235 trải nghiệm', () => {
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-motion', 'on');
     // ES1-T250: hiện dần theo từng phần (chữ, card, ảnh) thay vì cả khối
-    const block = page.locator('.shop-the-look h2').first();
+    // ES1-T405: shop-the-look cần dữ liệu fixture (ADR 0011); đo reveal trên FAQ (luôn render, dưới màn hình đầu, khớp 'main h2' của motion.js)
+    const block = page.locator('[data-testid="container-home-faq"] h2').first();
     await expect(block).toHaveAttribute('data-reveal', 'wait');
     await expect(block).toHaveAttribute('data-reveal-kind', 'text');
     await block.scrollIntoViewIfNeeded();
