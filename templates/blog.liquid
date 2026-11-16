@@ -1,18 +1,39 @@
+{% # ES1-T407 (TS-FE7): excerpt_or_content + responsive image (Shopify 7 Blog, 17; audit B#18, B#46). Full design: TE-20-R2-FE1 (ES1-T381). %}
 {% block 'container' %}
   <h1>{{ blog.title }}</h1>
 
   {% paginate blog.articles by 5 %}
     {% for article in blog.articles %}
-      <div>
+      <div data-testid="blog-article">
         {% if article.image %}
-          {{ article.image | image_url: width: 1000 | image_tag }}
+          {% liquid
+            if forloop.first
+              assign image_loading = 'eager'
+              assign image_priority = 'high'
+            else
+              assign image_loading = 'lazy'
+              assign image_priority = nil
+            endif
+          %}
+          {% render 'image',
+            image: article.image,
+            width: 1200,
+            widths: '360, 540, 720, 900, 1200',
+            sizes: '(min-width: 80rem) 1200px, 100vw',
+            loading: image_loading,
+            fetchpriority: image_priority,
+            decorative: true
+          %}
         {% endif %}
         <h2>
           {{ article.title | link_to: article.url }}
         </h2>
         {% assign date = article.published_at | time_tag: format: 'date' %}
         <p>{{ 'blog.article_metadata_html' | t: date: date, author: article.author }}</p>
-        <p>{{ article.excerpt }}</p>
+        {%- assign article_excerpt = article.excerpt_or_content | strip_html | truncatewords: 30 -%}
+        {%- if article_excerpt != blank -%}
+          <p data-testid="blog-article-excerpt">{{ article_excerpt }}</p>
+        {%- endif -%}
       </div>
     {% endfor %}
 
