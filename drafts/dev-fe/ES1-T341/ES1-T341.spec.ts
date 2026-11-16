@@ -25,7 +25,9 @@ const box = async (l: Locator): Promise<Box> => {
 const near = (actual: number, expected: number, label: string) => expect(Math.abs(actual - expected), `${label}: ${actual} ≈ ${expected}`).toBeLessThanOrEqual(TOL);
 const css = (l: Locator, prop: string) => l.evaluate((el, p) => getComputedStyle(el).getPropertyValue(p), prop);
 
+// Đo hình học với reducedMotion 'reduce': transition (viền hàng, reveal) không làm lệch số đo (bài học ES1-T313 TC-05, ES1-T129).
 async function openHome(page: Page, width: number) {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width, height: 900 });
   await gotoStore(page, '/');
   await expectNotChallenged(page);
@@ -211,7 +213,7 @@ test.describe('ES1-T341 shop the look (TE-12 AC5, AC9, index-1280 §2.4)', () =>
       probe.remove();
       return c;
     });
-    expect(await css(row2, 'border-top-color')).toBe(accent);
+    await expect(row2).toHaveCSS('border-top-color', accent);
     await hotspots.nth(0).focus();
     await expect(root.locator('[data-look-row="1"]')).toHaveAttribute('data-look-active', '');
     await row2.locator('.shop-the-look-row__thumb').click();
@@ -236,7 +238,7 @@ test.describe('ES1-T341 shop the look (TE-12 AC5, AC9, index-1280 §2.4)', () =>
       probe.remove();
       return c;
     });
-    expect(await css(row, 'color')).toBe(saving);
+    await expect(row).toHaveCSS('color', saving);
     await expect(root.getByTestId('shop-the-look-discount')).toHaveText(/\d/);
     const cents = (s: string) => Number(s.replace(/[^\d]/g, ''));
     const sub = cents(await root.getByTestId('shop-the-look-subtotal').innerText());
@@ -253,31 +255,52 @@ test.describe('ES1-T341 make fitness (index-mobile-a §8, index-1280 §2.5)', ()
 
   const band = (page: Page) => page.getByTestId('container-home-inspiration').getByTestId('image-with-text');
   const accent = (page: Page, n: 1 | 2 | 3) => band(page).locator(`.image-with-text__accent--${n}`);
+  type Rect = { top: number; bottom: number; left: number; width: number };
+  // Một lần evaluate: band, accent 1/2/3, khối chữ đo cùng khung, sau khi font tải xong.
+  const frame = async (page: Page) => {
+    await band(page).scrollIntoViewIfNeeded();
+    await page.evaluate(() => document.fonts.ready);
+    return band(page).evaluate((root) => {
+      const rect = (el: Element | null): Rect | null => {
+        if (!el) return null;
+        const r = el.getBoundingClientRect();
+        return r.width || r.height ? { top: r.top, bottom: r.bottom, left: r.left, width: r.width } : null;
+      };
+      return {
+        band: rect(root)!,
+        a1: rect(root.querySelector('.image-with-text__accent--1')),
+        a2: rect(root.querySelector('.image-with-text__accent--2')),
+        a3: rect(root.querySelector('.image-with-text__accent--3')),
+        content: rect(root.querySelector('[data-testid="image-with-text-content"]')),
+      };
+    });
+  };
 
   test('360: ảnh 1 112 trái, ảnh phải 88 lệch xuống 40, ảnh dưới trái ẩn; chữ dưới ảnh', async ({ page }) => {
     await openHome(page, WIDTHS.mobile);
     test.skip(!(await accent(page, 1).count()) || !(await accent(page, 3).count()), 'Store thiếu ảnh accent 1/3');
-    const a1 = await box(accent(page, 1));
-    const a3 = await box(accent(page, 3));
+    // Đo 3 hộp trong cùng một khung: 2 lần evaluate rời nhau lệch khi nội dung phía trên còn reflow.
+    const m = await frame(page);
+    expect(m.a1 && m.a3 && m.content, 'ảnh 1, ảnh phải, khối chữ có hộp hiển thị').toBeTruthy();
+    const [a1, a3, content] = [m.a1!, m.a3!, m.content!];
     near(a1.width, 112, 'ảnh 1');
     near(a3.width, 88, 'ảnh phải');
-    near(a3.y - a1.y, 40, 'lệch xuống');
-    expect(a3.x).toBeGreaterThan(a1.x);
+    near(a3.top - a1.top, 40, 'lệch xuống');
+    expect(a3.left).toBeGreaterThan(a1.left);
     if (await accent(page, 2).count()) await expect(accent(page, 2)).toBeHidden();
-    const content = await box(band(page).getByTestId('image-with-text-content'));
-    expect(content.y).toBeGreaterThanOrEqual(Math.max(a1.y + a1.height, a3.y + a3.height));
+    expect(content.top).toBeGreaterThanOrEqual(Math.max(a1.bottom, a3.bottom));
     await noOverflow(page);
   });
 
   test('768: 160 | 128 lệch 64, ảnh dưới trái 104 cách đáy 64', async ({ page }) => {
     await openHome(page, WIDTHS.tablet);
     test.skip(!(await accent(page, 2).count()), 'Store thiếu ảnh accent 2');
-    near((await box(accent(page, 1))).width, 160, 'ảnh 1');
-    if (await accent(page, 3).count()) near((await box(accent(page, 3))).width, 128, 'ảnh phải');
-    const a2 = await box(accent(page, 2));
-    const b = await box(band(page));
-    near(a2.width, 104, 'ảnh dưới trái');
-    near(b.y + b.height - (a2.y + a2.height), 64, 'cách đáy');
+    const m = await frame(page);
+    expect(m.a1 && m.a2, 'ảnh 1 và ảnh dưới trái có hộp hiển thị').toBeTruthy();
+    near(m.a1!.width, 160, 'ảnh 1');
+    if (m.a3) near(m.a3.width, 128, 'ảnh phải');
+    near(m.a2!.width, 104, 'ảnh dưới trái');
+    near(m.band.bottom - m.a2!.bottom, 64, 'cách đáy');
     await noOverflow(page);
   });
 
