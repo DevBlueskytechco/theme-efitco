@@ -1,16 +1,24 @@
 {% doc %}
-  Collection page banner (TE-6 AC1, ES1-T103 D2): collection.image, h1 with
-  collection.title, collection.description. Reads the global `collection`. No
-  settings.
+  Collection page head (TE-6 AC1, AC13; TE-22 AC9, AC11; docs/ui-spec/collection.md §4,
+  foundation §3.3, §5). Reads the global `collection`. No settings.
 
-  Uses collection.image only, never featured_image, so a product image does not
-  become the banner. The image is the LCP element: eager, high priority. It is
-  rendered without a crop and cut by CSS object-fit, because image_tag applies
-  the image focal point as object-position and a server crop would cancel it.
-  No image: text only. No description: the title only.
+  A, no image: snippets/breadcrumb → snippets/page-title (h1 collection.title) →
+  collection.description in `.rte`, max 65ch, on the white band.
+  B, collection.image: `.page-banner` card under the dark header with breadcrumb and
+  h1 on the image (dark layer 75% → 60%, white text ≥ 4.56:1 on any image). The
+  image is the page's LCP element: eager, fetchpriority high, alt="" (the h1 on it
+  already names it). Rendered without a crop: image_tag sets object-position from
+  the focal point and CSS cuts it with object-fit. Uses collection.image only, never
+  featured_image, so a product image does not become the banner.
 
-  Test hooks: collection-banner, collection-banner-title,
-  collection-banner-description, collection-banner-image.
+  Description with an image: a short one (at most 168 characters of text, about
+  3 lines of 56ch) sits on the banner from 48rem and under it below 48rem; it is
+  rendered in both places and CSS shows one (display: none, so it is read once).
+  A longer one always sits under the banner, never cut.
+
+  Test hooks: collection-banner (root), collection-banner-image,
+  collection-banner-description, and the hooks of snippets/breadcrumb and
+  snippets/page-title (page-title-heading is the h1).
 
   Empty state: no collection (block used outside the collection template) → a
   hint in the theme editor, nothing on the storefront.
@@ -29,26 +37,56 @@
       {{ 'blocks.collection_banner.placeholder' | t }}
     </div>
   {%- endif -%}
-{%- else -%}
-  {%- assign image_sizes = 'min(100vw, ' | append: settings.max_page_width | append: ')' -%}
-  <div class="collection-banner" data-testid="collection-banner" {{ block.shopify_attributes }}>
-    {%- if collection.image != blank -%}
+{%- elsif collection.image != blank -%}
+  {%- liquid
+    assign image_sizes = 'min(100vw, ' | append: settings.max_page_width | append: ')'
+    assign has_description = false
+    assign short_description = false
+    if collection.description != blank
+      assign has_description = true
+      assign description_length = collection.description | strip_html | strip | size
+      if description_length <= 168
+        assign short_description = true
+      endif
+    endif
+  -%}
+  <div class="collection-banner collection-banner--image" data-testid="collection-banner" {{ block.shopify_attributes }}>
+    <div class="page-banner">
       {% render 'image',
-        class: 'collection-banner__image',
+        class: 'page-banner__media',
         image: collection.image,
         width: 1920,
         widths: '360, 720, 1080, 1440, 1920',
         sizes: image_sizes,
         loading: 'eager',
         fetchpriority: 'high',
+        decorative: true,
         testid: 'collection-banner-image'
       %}
+      <div class="page-banner__content">
+        {% render 'breadcrumb' %}
+        {% render 'page-title', title: collection.title %}
+        {%- if short_description -%}
+          <div class="rte collection-banner__description collection-banner__description--overlay" data-testid="collection-banner-description">
+            {{- collection.description -}}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+
+    {%- if has_description -%}
+      <div
+        class="rte collection-banner__description collection-banner__description--below{% if short_description %} collection-banner__description--mobile{% endif %}"
+        data-testid="collection-banner-description"
+      >
+        {{- collection.description -}}
+      </div>
     {%- endif -%}
-
-    <h1 class="collection-banner__title" data-testid="collection-banner-title">
-      {{- collection.title | escape -}}
-    </h1>
-
+  </div>
+{%- else -%}
+  <div class="collection-banner" data-testid="collection-banner" {{ block.shopify_attributes }}>
+    {% render 'breadcrumb' %}
+    {% render 'page-title', title: collection.title %}
     {%- if collection.description != blank -%}
       <div class="rte collection-banner__description" data-testid="collection-banner-description">
         {{- collection.description -}}
