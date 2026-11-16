@@ -108,7 +108,8 @@ export function countStoreRequests(context: BrowserContext, baseURL: string | un
 export async function newStoreContext(browser: Browser, options: BrowserContextOptions = {}): Promise<BrowserContext> {
   const context = await browser.newContext(options);
   const baseURL = options.baseURL ?? test.info().project.use.baseURL;
-  await stubStoreNoise(context, baseURL);
+  // JS tắt: không gắn stub (xem support/test.ts — route chặn điều hướng POST làm huỷ view transition).
+  if (options.javaScriptEnabled !== false) await stubStoreNoise(context, baseURL);
   countStoreRequests(context, baseURL);
   return context;
 }
