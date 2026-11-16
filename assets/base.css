@@ -2262,7 +2262,12 @@ bundle-form {
   color: var(--color-muted);
   text-decoration: none;
   text-underline-offset: 0.2em;
-  transition: color var(--motion-fast) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .breadcrumb__link {
+    transition: color var(--motion-fast) var(--ease-out);
+  }
 }
 
 .breadcrumb__link:hover {
