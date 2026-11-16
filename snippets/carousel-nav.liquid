@@ -1,9 +1,12 @@
 {%- doc -%}
   Next and back buttons for a horizontal list. The parent is a scroll-buttons element
   (assets/scroll-buttons.js) that also holds the list with data-scroll-track. The script
-  sets data-enhanced, and data-scrollable when the list is wider than the screen; until
-  then CSS keeps the buttons invisible without changing the layout. Look comes from the
-  shared .round-button (52, foundation §6); .carousel-nav__button only keeps the hooks.
+  sets data-enhanced, and data-static when the row fits and has nothing to scroll
+  (TE-7-R2-BE1). Until data-enhanced, and while data-static, CSS keeps the buttons
+  invisible without changing the layout; below 48rem they are not shown. Look comes
+  from the shared .round-button (52, foundation §6); .carousel-nav__button only keeps
+  the hooks. At the start or end of the row the script marks one button
+  aria-disabled="true" (or hidden): it stays in place at opacity 0.35.
 
   @param {string} prefix - Start of the data-testid values, for example 'testimonials'
   @param {string} label_previous - Accessible name of the back button
