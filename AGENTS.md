@@ -210,6 +210,7 @@ Snippets (`snippets/`):
 | Snippet | Role |
 | --- | --- |
 | `article-card` | One article card as a list item: link with image, first tag, title, reading time. |
+| `breadcrumb` | Breadcrumb trail read from the current template plus its single JSON-LD BreadcrumbList; nothing on home, cart, 404, password, gift card. |
 | `carousel-nav` | Next and back buttons for a horizontal list inside `scroll-buttons`; hidden until enhanced or when the row fits. |
 | `carousel-progress` | Thin progress line under a horizontal list; decorative, driven by `assets/scroll-buttons.js`. |
 | `cart-free-shipping` | Free shipping progress against the `free_shipping_threshold` setting. |
@@ -226,6 +227,7 @@ Snippets (`snippets/`):
 | `icon-trust` | Decorative trust bar icons. |
 | `image` | Responsive image (`image_url` + `image_tag`, srcset, lazy by default). |
 | `meta-tags` | Title, description, social and canonical meta tags. |
+| `page-title` | Page title: optional eyebrow, the page's single h1, optional meta line. |
 | `pagination` | Shared pagination for every multi-page list (pagination.md). |
 | `predictive-search` | Search layer of the header: dialog, combobox form, listbox groups, templates. |
 | `price` | Price, sale and compare-at price, unit price. |

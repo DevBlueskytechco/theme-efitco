@@ -177,7 +177,8 @@ test.describe('ES1-T30 autoplay', () => {
     }
   });
 
-  test('bật autoplay thì tự chuyển, live region tắt báo, pause dừng hẳn, play chạy lại', async ({ page }) => {
+  test('bật autoplay thì tự chuyển, live region tắt báo, pause dừng hẳn, play chạy lại', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'TE-2 AC8: dưới 80rem không autoplay, kiểm ở ES1-T333');
     await enableAutoplay(page);
     await open(page);
     const root = page.getByTestId('slideshow');
@@ -213,8 +214,8 @@ test.describe('ES1-T30 autoplay', () => {
   });
 
   test('focus bàn phím trong block giữ, rời focus chạy lại', async ({ page }, ti) => {
-    // ES1-T300: mobile ẩn next, back (docs/design/decisions.md 07/11, base.css @media max-width 47.99rem): focus nút pause (bật autoplay thì hiện) thay cho nút ẩn.
-    const target = page.getByTestId(ti.project.name === 'mobile' ? 'slideshow-pause' : 'slideshow-next');
+    test.skip(ti.project.name === 'mobile', 'TE-2 AC8: dưới 80rem không autoplay, kiểm ở ES1-T333');
+    const target = page.getByTestId('slideshow-next');
     await enableAutoplay(page);
     await open(page);
     await expect(target).toBeVisible();
