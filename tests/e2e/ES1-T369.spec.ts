@@ -4,7 +4,7 @@
 // không gọi store. Phần cần dữ liệu store (B2B quantity rule, price break, selling plan) do ES1-T99 kiểm (mockup nếu
 // store không bật B2B, ES1-T297 #1).
 // Chạy: npx playwright test tests/e2e/ES1-T369.spec.ts
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 
