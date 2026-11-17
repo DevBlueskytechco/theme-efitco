@@ -182,6 +182,9 @@
     {% if id != blank %}
       data-image-with-text-id="{{ id }}"
     {% endif %}
+    {% if is_banner %}
+      data-motion-src="{{ 'motion-scrub.js' | asset_url }}"
+    {% endif %}
     data-testid="image-with-text"
     {{ block.shopify_attributes }}
   >
