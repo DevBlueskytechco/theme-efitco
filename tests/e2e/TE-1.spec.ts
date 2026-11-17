@@ -7,7 +7,7 @@
 //   TC-18 dùng TE1_PRODUCT_HANDLE; TC-28, TC-29, TC-31 chọn TE1_COUNTRY_TARGET, TE1_LANGUAGE_TARGET; mở nút gộp và bấm lựa chọn
 //   kiểm phần tử che trước khi click (báo tên lớp che thay vì timeout 30 s); TC-24 ghi theme id, biến font để tách lỗi môi trường và lỗi theme.
 //   Nguyên nhân từng test: drafts/qa/ES1-T434/test-cases.md.
-import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Locator, type Page, type TestInfo } from './support/test';
 import { pageJson, requireJson } from './support/product-data';
 import { env } from './support/store-data';
 import { CART, cartApi } from './support/cart-api';
@@ -416,6 +416,8 @@ test.describe('ES1-T23', () => {
     await page.goto('/');
     const { drawer } = await openDrawer(page);
     test.skip((await drawer.getByTestId(T.drawerAcc).count()) === 0, 'main-menu store dev chưa có mục cấp 2');
+    // ES1-T323: header-drawer.js nạp lười khi chạm nút menu; chờ nắm drawer (nâng cấp gập accordion mở trước đó)
+    await expect(page.getByTestId(T.header)).toHaveAttribute('data-drawer-enhanced', '');
     const acc = drawer.getByTestId(T.drawerAcc).first();
     const subId = await acc.getAttribute('aria-controls');
     expect(subId, 'accordion thiếu aria-controls').toBeTruthy();
@@ -425,8 +427,12 @@ test.describe('ES1-T23', () => {
     await expect(acc).toHaveAttribute('aria-expanded', 'true');
     await expect(sub).toBeVisible();
     expect(await sub.getByRole('link').count()).toBeGreaterThan(0);
-    await acc.click();
+    // ES1-T323 (TE-1 AC2 0.3): có JS thì cấp 2 phủ drawer, hàng cấp 1 inert; về cấp 1 bằng Back, focus về hàng vừa mở
+    const back = acc.locator('xpath=..').getByTestId('header-drawer-back');
+    await expect(back).toBeFocused();
+    await back.click();
     await expect(acc).toHaveAttribute('aria-expanded', 'false');
+    await expect(acc).toBeFocused();
     await expect(sub).toBeHidden();
   });
 
@@ -740,29 +746,36 @@ test.describe('ES1-T23', () => {
   });
 
   // ---------- AC9 ----------
-  test('TC-41 AC9 trang không hero: nền background, chữ foreground', async ({ page }) => {
-    for (const path of ['/collections/all', '/cart', '/search?q=a']) {
+  // AC-H29 (SRS 0.5, ES1-T319): header tối trên mọi trang, không còn chế độ trong suốt đè hero.
+  // Nền header #1A1A1A (Figma 1:362, như ES1-T16.spec.ts), chữ background_dark_foreground.
+  const HEADER_DARK = 'rgb(26, 26, 26)';
+
+  test('TC-41 AC9/AC-H29 mọi trang: header nền tối, chữ trắng', async ({ page }) => {
+    for (const path of ['/', '/collections/all', '/cart', '/search?q=a']) {
       await page.goto(path);
       const header = page.getByTestId(T.header);
-      await expect(header, `${path} nền`).toHaveCSS('background-color', rgb(tokens.color.background));
-      await expect(header, `${path} chữ`).toHaveCSS('color', rgb(tokens.color.foreground));
+      await expect(header, `${path} nền`).toHaveCSS('background-color', HEADER_DARK);
+      await expect(header, `${path} chữ`).toHaveCSS('color', rgb(tokens.color.background_dark_foreground));
     }
   });
 
-  test('TC-42 AC9 hero giả lập: header đè lên hero, chữ trắng; cuộn thì chữ foreground', async ({ page }) => {
+  test('TC-42 AC9/AC-H29 trang có hero: main nằm dưới đáy header, không đè; cuộn vẫn nền tối, chữ trắng', async ({ page }) => {
     await page.goto('/');
     const header = page.getByTestId(T.header);
     test.skip((await header.getAttribute('data-sticky')) === null, 'sticky_header đang tắt');
+    // Gắn data-header-overlay cũ: theme mới phải bỏ qua, header không chuyển trong suốt.
     await simulateHero(page);
+    await expect(header).toHaveCSS('background-color', HEADER_DARK);
     await expect(header).toHaveCSS('color', rgb(tokens.color.background_dark_foreground));
     await expect.poll(async () => {
       const h = (await header.boundingBox())!;
       const m = (await page.locator('main').boundingBox())!;
-      return Math.round(Math.abs(m.y - h.y));
-    }, { message: 'main phải chui dưới header' }).toBeLessThanOrEqual(1);
+      return Math.round(m.y - (h.y + h.height));
+    }, { message: 'main phải bắt đầu dưới đáy header' }).toBeGreaterThanOrEqual(-1);
     await scrollTo(page, 100);
     await expect(header).toHaveAttribute('data-scrolled', '');
-    await expect(header).toHaveCSS('color', rgb(tokens.color.foreground));
+    await expect(header).toHaveCSS('background-color', HEADER_DARK);
+    await expect(header).toHaveCSS('color', rgb(tokens.color.background_dark_foreground));
   });
 
   test('TC-43 AC9 sticky: cuộn quá 80px header dính đỉnh, có bóng', async ({ page }) => {

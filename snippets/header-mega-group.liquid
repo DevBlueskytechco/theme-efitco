@@ -1,0 +1,38 @@
+{% doc %}
+  Renders one group of a mega menu column (TE-22 AC2, panel A): the level 2
+  link as the column title, then its level 3 links in a list labelled by that
+  title. The title is a link, never an <h*>: the header comes before the page
+  h1 (navigation.md §8, TE-22 AC7). Names wrap, they are never truncated.
+
+  @param {object} link - Level 2 menu link that has child links
+  @param {string} id - Unique id for the column title, used by aria-labelledby
+
+  @example
+  {% render 'header-mega-group', link: child, id: 'HeaderMega-1-2' %}
+{% enddoc %}
+
+<a
+  class="site-header__mega-title"
+  id="{{ id }}"
+  href="{{ link.url }}"
+  {% if link.current %}
+    aria-current="page"
+  {% endif %}
+>
+  {{- link.title | escape -}}
+</a>
+<ul class="site-header__mega-list" aria-labelledby="{{ id }}">
+  {%- for grandchild in link.links -%}
+    <li>
+      <a
+        class="site-header__mega-link"
+        href="{{ grandchild.url }}"
+        {% if grandchild.current %}
+          aria-current="page"
+        {% endif %}
+      >
+        {{- grandchild.title | escape -}}
+      </a>
+    </li>
+  {%- endfor -%}
+</ul>

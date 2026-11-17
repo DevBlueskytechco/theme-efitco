@@ -1,25 +1,29 @@
 {% doc %}
   Renders the Browse Categories row: heading, back and next buttons, and a list
-  of collection-card blocks that scrolls sideways with scroll-snap, mouse, touch
-  and keyboard without JavaScript (assets/base.css). The list runs to the viewport
-  edge, so the first card lines up with the heading and the last one can be cut off.
+  of collection-card blocks that scrolls sideways with scroll-snap, touch and
+  keyboard without JavaScript (assets/base.css, "Hàng ngang"). The list runs to the
+  viewport edge, so the first card lines up with the heading and the next card shows
+  at least 25% (TE-15 AC1: 252 at 360, 307 at 768, about 271 at 1280, 336 at 1920).
 
   The parent cannot read its children: the body is a rendered string, so a shorter
   list just shows fewer cards. When no card renders, the editor shows a placeholder
   and the storefront renders nothing, so the container leaves no empty band.
 
-  The buttons stay hidden until a script sets data-enhanced on the root, and always
-  stay hidden below 48rem (ES1-T174). assets/lazy-module.js imports
-  assets/scroll-buttons.js when the block comes near the viewport (ES1-T185).
+  Buttons and progress line come from snippets/carousel-nav and
+  snippets/carousel-progress (same as testimonials, video-carousel, blog-posts).
+  They stay invisible until a script sets data-enhanced on the root, always stay
+  hidden below 48rem, and stay hidden when the row fits (data-static).
+  assets/lazy-module.js imports assets/scroll-buttons.js when the block comes near
+  the viewport (ES1-T185).
 
-  JavaScript hooks: custom element scroll-buttons (root), data-enhanced (root),
-  data-lazy-module (root, URL of assets/scroll-buttons.js), data-scroll-track (list),
-  data-scroll-prev, data-scroll-next (buttons). A script hides one button with the
-  hidden attribute.
+  JavaScript hooks (TE-7-R2-BE1): custom element scroll-buttons (root),
+  data-enhanced and data-static (root, set by the script), data-lazy-module (root,
+  URL of assets/scroll-buttons.js), data-scroll-track (list), data-scroll-prev,
+  data-scroll-next (buttons), data-scroll-progress (progress line).
 
   Test hooks: data-testid="collection-list", "collection-list-heading",
   "collection-list-nav", "collection-list-prev", "collection-list-next",
-  "collection-list-track", "collection-list-placeholder".
+  "collection-list-track", "carousel-progress", "collection-list-placeholder".
 
   @param {string} [id] - Static block id, needed when a template has more than one collection-list block
   @param {string} content - One collection-card block call per card
@@ -51,26 +55,11 @@
           {{- block.settings.heading | escape -}}
         </h2>
       {%- endif -%}
-      <div class="collection-list__nav" data-testid="collection-list-nav">
-        <button
-          type="button"
-          class="collection-list__button collection-list__button--prev"
-          aria-label="{{ 'blocks.collection_list.previous' | t }}"
-          data-scroll-prev
-          data-testid="collection-list-prev"
-        >
-          {% render 'slideshow-icon', name: 'previous' %}
-        </button>
-        <button
-          type="button"
-          class="collection-list__button collection-list__button--next"
-          aria-label="{{ 'blocks.collection_list.next' | t }}"
-          data-scroll-next
-          data-testid="collection-list-next"
-        >
-          {% render 'slideshow-icon', name: 'next' %}
-        </button>
-      </div>
+      {%- liquid
+        assign nav_previous = 'blocks.collection_list.previous' | t
+        assign nav_next = 'blocks.collection_list.next' | t
+      -%}
+      {% render 'carousel-nav', prefix: 'collection-list', label_previous: nav_previous, label_next: nav_next %}
     </div>
     {%- comment -%}
       role="list": list-style none removes the list role in Safari, and tabindex lets

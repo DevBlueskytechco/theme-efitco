@@ -249,7 +249,7 @@ Tương phản (tính tay WCAG, số từ foundation §2; L muted-light 0.147, a
 
 - Vùng chạm: nút đóng 48; thùng rác, −, +, ô số, View cart, Quick View, swatch, pill, thumbnail 64–72, Add / Choose 44; Checkout, Add To Cart 48–52. Hai nút cạnh nhau cách ≥ 8 trong cụm, cụm cách 12–16.
 - Tên: mọi nút icon có tên riêng kèm tên sản phẩm: "Remove {title}" (`cart.remove_label` có sẵn), "Decrease quantity for {title}", "Increase quantity for {title}", ô số `cart.quantity_label`; "Add" / "Choose" có phần ẩn "{title} to cart" / "options for {title}"; "Quick View" + tên; thumbnail "Show image 2 of 3"; chevron "Previous image" / "Next image"; "View Detail" + "of {title}"; ô số có `<label>` "Quantity" thật. Không có 2 link/nút cùng tên khác đích.
-- Bàn phím: drawer, dialog dùng `showModal()` (bẫy focus, Escape đóng, nền inert); mở thì focus vào nút đóng (drawer) / tiêu đề (quickview, `tabindex="-1"`); đóng thì trả focus về nút mở. Thumbnail, option là radio/nút đi bằng Tab, ←/→ trong nhóm radio.
+- Bàn phím: drawer, dialog dùng `showModal()` (bẫy focus, Escape đóng, nền inert); mở thì focus vào tiêu đề (drawer: h2 "Cart"; quickview: tiêu đề, `tabindex="-1"`), Tab tiếp theo trong drawer: "View cart" → nút đóng (CTO 17/11, ES1-T476; ADR 0007 #5; SRS TE-5 AC15); đóng thì trả focus về nút mở. Thumbnail, option là radio/nút đi bằng Tab, ←/→ trong nhóm radio.
 - Live region: `cart-items-status` (status) và `cart-items-error` (alert) có sẵn; quickview thêm 1 status + 1 alert.
 - Heading: drawer h2 → "Pairs Well With" h3; quickview h2. Không nhảy bậc.
 - Màu không đứng một mình: hết hàng có chữ "Sold out", lỗi có icon + câu, đạt freeship có câu.

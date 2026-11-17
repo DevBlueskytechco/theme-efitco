@@ -1,15 +1,18 @@
 {% doc %}
   Renders the home page carousel: a horizontal scroll-snap track that works
   without JavaScript, plus controls that stay hidden until assets/slideshow.js
-  sets data-enhanced on the root. Must sit in the first container of the
-  template so the header overlays it (TE-1 AC9).
+  sets data-enhanced on the root. Sits in the first container of the template,
+  below the header: the header never overlays the hero (AC-H29, TE-2 AC6).
 
   The parent cannot read its children: the body is a rendered string, so slide
   count and dots are left to JavaScript.
 
-  Hooks set here: slideshow-carousel, data-header-overlay, data-autoplay,
-  data-autoplay-speed (seconds), data-label-slide ([index], [total]),
-  data-label-dot ([index]), data-label-pause, data-label-play, and a template
+  Controls per breakpoint (CSS, TE-2 AC7): below 48rem dots only (44 x 44,
+  bottom start), from 48rem the two round buttons only.
+
+  Hooks set here: slideshow-carousel, data-autoplay, data-autoplay-speed
+  (seconds), data-label-slide ([index], [total]), data-label-dot ([index]),
+  data-label-pause, data-label-play, data-dots on the dot list, and a template
   element inside slideshow-dots holding one dot button.
   Hooks set by JavaScript: data-enhanced, data-multiple (2 slides or more),
   data-playing on the root, inert on inactive slides.
@@ -71,7 +74,7 @@
       >
         {% render 'slideshow-icon', name: 'next' %}
       </button>
-      <div class="slideshow__dots" data-testid="slideshow-dots">
+      <div class="slideshow__dots" data-dots data-testid="slideshow-dots">
         <template>
           <button type="button" class="slideshow__dot" data-testid="slideshow-dot"></button>
         </template>

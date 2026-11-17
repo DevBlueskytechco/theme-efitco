@@ -1,16 +1,20 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không mở được Chrome; chờ CI).
 // Ticket ES1-T219: double click giữ focus ở tiêu đề bước mới (docs/srs.md#TE-11 AC2). Test gốc: tests/e2e/ES1-T139.spec.ts:140.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T219.spec.ts
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
+import { fulfillQuizResults } from './support/quiz-results';
+import { gotoStore, watchStoreBlock } from './support/store-guard';
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
 const step = (page: Page, n: number) => page.locator(`[data-testid="quiz-step"][data-quiz-step="${n}"]`);
 const title = (page: Page, n: number) => step(page, n).getByTestId('quiz-step-title');
 const option = (page: Page, tag: string) => page.locator(`[data-testid="quiz-option-input"][value="${tag}"]`);
 const isResults = (url: URL) => url.pathname.includes('/collections/') && url.searchParams.get('view') === 'quiz';
+// Request lỗi thì quiz-finder.js submit form sang /search (fallback TE-11), trang đó cũng có thể bị chặn.
+const isQuizStore = (url: URL) => isResults(url) || url.pathname.endsWith('/search');
 
 async function open(page: Page) {
-  await page.goto('/?view=te11');
+  await gotoStore(page, '/?view=te11');
   await expect(tid(page, 'quiz')).toHaveAttribute('data-enhanced', '');
 }
 
@@ -53,7 +57,11 @@ test.describe('ES1-T219 double click giữ focus ở tiêu đề', () => {
     await expect(title(page, 2)).toBeFocused();
   });
 
+  // TE-11 AC2, AC3. ES1-T470: kiểm JS (1 request, focus), không kiểm dữ liệu store: response là partial giả (support/quiz-results.ts),
+  // bị Cloudflare chặn thì fail nêu Cloudflare. Luồng thật với store: tests/e2e/ES1-T139.spec.ts.
   test('double click lựa chọn bước cuối: 1 lựa chọn, focus tiêu đề kết quả', async ({ page }) => {
+    const store = watchStoreBlock(page, isQuizStore);
+    await fulfillQuizResults(page, 'quiz-gym');
     const sent: string[] = [];
     const hops: string[] = [];
     page.on('request', (request) => {
@@ -67,7 +75,7 @@ test.describe('ES1-T219 double click giữ focus ở tiêu đề', () => {
     await option(page, 'quiz-advanced').check();
     await step(page, 3).getByTestId('quiz-option').filter({ has: option(page, 'quiz-gym') }).dblclick();
     await expect(option(page, 'quiz-gym')).toBeChecked();
-    await expect(page.locator('[data-quiz-results-panel]')).toBeVisible();
+    await store.expect(() => expect(page.locator('[data-quiz-results-panel]')).toBeVisible());
     await expect(tid(page, 'quiz-results-heading')).toBeFocused();
     expect(sent, `mọi hop: ${hops.join(' -> ')}`).toHaveLength(1);
   });

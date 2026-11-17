@@ -4,7 +4,7 @@
 // Dữ liệu ES1-T134 trong tests/e2e/store-data.json: TE11_TAGS_READY; chưa true thì test cần card skip có lý do. Bộ lower + advanced + gym luôn rỗng: có dữ liệu thì 0 sản phẩm, chưa có thì tag không tồn tại (ES1-T133 #1).
 import { readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
@@ -430,7 +430,8 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
   test('AC3 contract: tên partial khớp Liquid, trần byte', async () => {
     expect(source('assets/quiz-finder.js')).toContain('partials.fetch("quiz-results"');
     expect(source('blocks/quiz.liquid')).toContain("{% partial 'quiz-results' %}");
-    expect(statSync(join(process.cwd(), 'assets/lazy-module.js')).size).toBeLessThanOrEqual(384);
+    // ADR 0010 (ES1-T316): lazy-module thêm data-lazy-on="interaction", trần 384 → 768
+    expect(statSync(join(process.cwd(), 'assets/lazy-module.js')).size).toBeLessThanOrEqual(768);
     expect(statSync(join(process.cwd(), 'assets/quiz-finder.js')).size).toBeLessThanOrEqual(4352);
   });
 });
