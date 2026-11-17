@@ -83,14 +83,14 @@ test.describe('ES1-T329 tĩnh: trần byte, hợp đồng markup', () => {
       expect(src, `${file} fetch tự viết`).not.toMatch(/\bfetch\(/);
     }
     expect(menu, 'header-menu.js không còn phần drawer').not.toMatch(/class HeaderDrawer/);
-    expect(menu, 'drawer nạp lười qua import() cùng thư mục asset').toMatch(/import\(new URL\("header-drawer\.js", import\.meta\.url\)\)/);
+    expect(menu, 'drawer nạp lười qua import() URL asset_url trên host (ES1-T485)').toContain('import(this.dataset.drawerSrc)');
   });
 
   test('header.liquid: 1 thẻ script header-menu.js, header-drawer.js không có thẻ (lười), hook FE2 có đủ', () => {
     const src = read(HEADER);
     expect(src.match(/<script[^>]+header-menu\.js/g) ?? []).toHaveLength(1);
     expect(src).not.toMatch(/<script[^>]+header-drawer\.js/);
-    for (const hook of ['<header-menu hidden>', '<header-drawer hidden>', 'data-mega=', 'data-layer="mega"', 'data-testid="header-scrim"', 'data-testid="header-mega-panel"', 'data-testid="header-menu-toggle"', 'data-testid="header-drawer-toggle"']) {
+    for (const hook of ['<header-menu hidden data-drawer-src=', '<header-drawer hidden>', 'data-mega=', 'data-layer="mega"', 'data-testid="header-scrim"', 'data-testid="header-mega-panel"', 'data-testid="header-menu-toggle"', 'data-testid="header-drawer-toggle"']) {
       expect(src, `thiếu hook ${hook}`).toContain(hook);
     }
   });
