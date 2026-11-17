@@ -1,7 +1,8 @@
 // ES1-T384 (TE-21-R2-FE2): 404 (AC7, AC8), password (AC9–AC12), gift card (AC13–AC15 phần markup), AC16–AC17.
 // Nhóm @static đọc file repo, không cần store. Nhóm store chạy trên PREVIEW_URL.
 // Skip/fixme vì thiếu dữ liệu (không tính là đạt): gift card phát hành (TS_GIFT_CARD_URL, ES1-T298); store chưa bật mật khẩu.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import AxeBuilder from '@axe-core/playwright';
@@ -140,7 +141,7 @@ test.describe('ES1-T384 store', () => {
   test('password: nền tối, 1 h1, logo không là link, chân trang, details (AC9, AC10)', async ({ browser }) => {
     const preview = process.env.PREVIEW_URL;
     test.skip(!preview, 'thiếu PREVIEW_URL');
-    const context = await browser.newContext();
+    const context = await newStoreContext(browser);
     const page = await context.newPage();
     const url = new URL(preview!);
     await page.goto(`${url.origin}/password${url.search}`);
@@ -169,7 +170,7 @@ test.describe('ES1-T384 store', () => {
   test('password: sai mật khẩu → details mở, lỗi, aria-invalid (AC11)', async ({ browser }) => {
     const preview = process.env.PREVIEW_URL;
     test.skip(!preview, 'thiếu PREVIEW_URL');
-    const context = await browser.newContext();
+    const context = await newStoreContext(browser);
     const page = await context.newPage();
     const url = new URL(preview!);
     await page.goto(`${url.origin}/password${url.search}`);

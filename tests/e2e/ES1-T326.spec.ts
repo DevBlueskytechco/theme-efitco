@@ -4,7 +4,7 @@
 // Snippet chưa có template gọi (TE-6-R2-FE2, TE-4-R2-FE3, TE-20/TE-21 gắn sau): trang store chỉ kiểm "không breadcrumb thì
 // không BreadcrumbList" và "có breadcrumb thì đúng 1 BreadcrumbList khớp chữ"; đủ 3 dạng do TE-22-R2-QA1 kiểm khi đã gắn.
 // Chạy: npx playwright test tests/e2e/ES1-T326.spec.ts --project=desktop
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { expectNotChallenged } from './support/store-guard';
@@ -122,8 +122,8 @@ test.describe('ES1-T326 tĩnh', () => {
     expect(cssText).not.toMatch(/(^|[\s;{])(left|right|top|bottom|width|height|(margin|padding)-(left|right|top|bottom))\s*:/m);
     expect(cssText).not.toMatch(/z-index|text-overflow|line-clamp/);
     expect(cssText).toMatch(/color-mix\(in srgb, var\(--color-background-dark\) 75%, transparent\),\s*color-mix\(in srgb, var\(--color-background-dark\) 60%, transparent\) 50%/);
-    // Trần tạm 53 248 B (CTO 14/11, ES1-T454 phương án a) tới khi dọn CSS (T317) đưa base.css về ≤ 49 152; ES1-T310 #1
-    expect(gzipSync(BASE).length).toBeLessThanOrEqual(53248);
+    // Trần tạm 57 344 B (CTO 17/11, ES1-T472 a) tới khi tách CSS theo template (ES1-T478) đưa base.css về ≤ 49 152
+    expect(gzipSync(BASE).length).toBeLessThanOrEqual(57344);
     expect(Buffer.byteLength(CRITICAL)).toBeLessThanOrEqual(10240);
   });
 

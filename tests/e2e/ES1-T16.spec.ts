@@ -9,7 +9,7 @@
 //   Đã bỏ: "trên hero: trong suốt ở đầu trang", "ngưỡng đúng 80px: 60px chưa gắn", "lỗi mạng: header trên hero không sticky".
 //   Test case: drafts/qa/ES1-T463/test-cases.md (T16-xx).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T16.spec.ts
-import { test, expect, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Page, type TestInfo } from './support/test';
 
 const isDesktop = (ti: TestInfo) => ti.project.name === 'desktop';
 

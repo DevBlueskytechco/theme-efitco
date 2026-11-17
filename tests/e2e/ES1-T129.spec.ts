@@ -5,7 +5,8 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T129.spec.ts -g "AC1-markup|AC3"
 // JS chưa có (modal-dialog.js, predictive-search.js của BE) nên test tự gọi showModal. Spec không click link khi có JS: sau BE spec vẫn đúng.
 // Đo hình học với reducedMotion 'reduce': transition mở (opacity + translate) không làm lệch boundingBox (bài học ES1-T313 TC-05).
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 
@@ -89,7 +90,7 @@ async function expectNoSeriousAxe(page: Page) {
 
 async function noJsPage(browser: Browser) {
   const use = test.info().project.use;
-  const context = await browser.newContext({
+  const context = await newStoreContext(browser, {
     javaScriptEnabled: false,
     storageState: 'tests/setup/state.json',
     baseURL: use.baseURL,
