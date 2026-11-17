@@ -9,7 +9,7 @@
 //   Đã bỏ: "trên hero: trong suốt ở đầu trang", "ngưỡng đúng 80px: 60px chưa gắn", "lỗi mạng: header trên hero không sticky".
 //   Test case: drafts/qa/ES1-T463/test-cases.md (T16-xx).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T16.spec.ts
-import { test, expect, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Page, type TestInfo } from './support/test';
 
 const isDesktop = (ti: TestInfo) => ti.project.name === 'desktop';
 
@@ -17,7 +17,7 @@ function trackErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => {
-    if (m.type() === 'error' && /header-(menu|sticky)/.test(m.location().url)) errors.push(m.text());
+    if (m.type() === 'error' && /header-(menu|sticky|drawer)/.test(m.location().url)) errors.push(m.text());
   });
   return errors;
 }
@@ -112,7 +112,8 @@ test.describe('ES1-T16 header-drawer', () => {
     const drawer = page.getByTestId('header-drawer');
     await expect(drawer).toBeVisible();
     const close = drawer.getByTestId('header-drawer-close');
-    await expect(close, 'mở drawer phải chuyển focus vào panel').toBeFocused();
+    // ES1-T323: drawer mở bằng <modal-dialog data-layer="menu"> (ADR 0007 #5) → focus vào tiêu đề "Menu" (aria-labelledby)
+    await expect(drawer.locator('#HeaderDrawerTitle'), 'mở drawer phải chuyển focus vào panel').toBeFocused();
 
     const inDrawer = () => drawer.evaluate(el => el.contains(document.activeElement));
     await page.keyboard.press('Shift+Tab');
@@ -160,6 +161,9 @@ test.describe('ES1-T16 header-drawer', () => {
     const toggle = page.getByTestId('header-drawer-toggle');
     await toggle.click();
     await expect(page.getByTestId('header-drawer')).toBeVisible();
+    // ES1-T329/ES1-T323: header-drawer.js nạp lười khi chạm nút menu; chờ define và nắm drawer (sau modal-dialog) trước khi resize.
+    await page.waitForFunction(() => !!customElements.get('header-drawer'));
+    await expect(page.getByTestId('header')).toHaveAttribute('data-drawer-enhanced', '');
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.setViewportSize({ width: 412, height: 780 });
     await expect(page.getByTestId('header-drawer')).toBeHidden();

@@ -319,7 +319,7 @@ Figma chỉ có chevron Shop, Collection (1:362). ĐỀ XUẤT theo 14 §1, 05 �
 - Header drawer 72 (tiêu đề heading 22–28, × 48 cách mép 12) · body cuộn riêng (`overscroll-behavior: contain`) · footer dính đáy (nút chính full width) · scrim `--overlay-scrim`. Nền drawer trắng (header trang tối không lặp vào drawer).
 - Cao toàn màn; mobile 90% để chạm scrim đóng. Cấp 2 trượt ngang, Back nhỏ hơn × (14 §3).
 - Mở 250ms `--ease-out`, đóng 200ms; chỉ transform + opacity. Đóng: ×, Escape, scrim; trả focus.
-- A11y: `<dialog>` + `showModal()`, `aria-labelledby`; khoá cuộn. Không JS: menu `<details>`, cart link `routes.cart_url`. Ảnh trong drawer lazy, có width/height.
+- A11y: `<dialog>` + `showModal()`, `aria-labelledby`; mở thì focus vào tiêu đề drawer (đích `aria-labelledby`), không vào × (CTO 17/11, ADR 0007 #5); ngoại lệ drawer Search: focus ô tìm (predictive-search §4, SRS TE-8 AC9); khoá cuộn. Không JS: menu `<details>`, cart link `routes.cart_url`. Ảnh trong drawer lazy, có width/height.
 
 ## 16. Dialog và bottom sheet
 
@@ -336,7 +336,7 @@ Figma chỉ có chevron Shop, Collection (1:362). ĐỀ XUẤT theo 14 §1, 05 �
 - Tiêu đề h2 heading 800 (28–40), chừa chỗ ×; popup marketing dùng Sofia 700 theo Figma 1:1148 (marketing-popups). Popup marketing < 50 từ. Hàng nút phải, cách 32, gạch trên.
 - Motion: mở 300ms fade + nhấc 24 + scale 0.97; đóng 200ms; mobile trượt từ đáy.
 - Quy tắc: một lớp một lúc, hàng đợi: popup đang hiện đóng thì popup kế mới hiện, nghỉ 3 s giữa hai popup tự mở (sổ 10/11 MK3, MK4); thẻ big offer đang mở thì popup tự mở chờ (MK5); mỗi popup tự mở tối đa 1 lần/phiên, cộng số ngày theo setting (không phải "1 popup/phiên" cho cả theme); không mở lúc tải trang (chờ thời gian/cuộn/ý định rời, sổ 09/11); không ở 404; không confirmshaming (15 §1). Chi tiết hàng đợi: marketing-popups.md §1.2; thứ tự lớp và vùng đáy: layers.md (§23).
-- A11y: `<dialog>` + `showModal()`, `aria-labelledby`, Escape, focus phần tử đầu, trả focus.
+- A11y: `<dialog>` + `showModal()`, `aria-labelledby`, Escape; mở thì focus vào tiêu đề (đích `aria-labelledby`), không vào × hay phần tử đầu (CTO 17/11, ADR 0007 #5; SRS TE-10 AC12); trả focus.
 
 ## 17. Toast
 

@@ -2,7 +2,7 @@
 // ES1-T403 TS-FE5: .rte chung, h5 ≠ h6, không cắt tên 3 chỗ, viền radio quiz ≥ 3:1 (task-split ES1-T304 D4, D5; foundation §28).
 // Chạy tĩnh (không store): npx playwright test tests/e2e/ES1-T403.spec.ts -g "tĩnh"
 // Store: PREVIEW_URL=... npx playwright test tests/e2e/ES1-T403.spec.ts. TE403_PAGE_PATH (vd /pages/rte-demo) là page có h5, h6 trong nội dung; thiếu thì test đó skip, không coi là đạt.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { env } from './support/store-data';
@@ -29,7 +29,8 @@ test.describe('ES1-T403 tĩnh', () => {
   test.beforeEach(({}, ti) => { test.skip(ti.project.name !== 'desktop', 'tĩnh, chạy 1 lần'); });
 
   test('D4 .rte bọc 4 chỗ rich text, rule cũ product-info__description đã xoá', () => {
-    expect(read('templates/article.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? article\.content/);
+    // ES1-T382: nội dung bài chuyển sang blocks/article-main.liquid (TE-20 AC10)
+    expect(read('blocks/article-main.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? article\.content/);
     expect(read('templates/page.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? page\.content/);
     expect(read('blocks/collection-banner.liquid')).toMatch(/class="rte[ "][^>]*>\s*\{\{-? collection\.description/);
     expect(read('blocks/product-info.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? product\.description/);

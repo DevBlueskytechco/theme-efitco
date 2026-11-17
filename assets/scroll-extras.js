@@ -1,13 +1,12 @@
 // Phần thêm cho hàng cuộn ngang scroll-buttons (ES1-T250), motion.js nạp khi trang có hàng này.
-// scroll-buttons.js giữ nguyên (trần 768 B, ES1-T185). File này thêm: data-scrollable khi hàng dài hơn
-// màn hình, thanh tiến trình [data-scroll-progress] (--scroll-size, --scroll-pos), kéo bằng chuột.
+// scroll-buttons.js (trần 1 536 B, ES1-T335) gắn data-static khi hàng vừa khung. File này thêm:
+// thanh tiến trình [data-scroll-progress] (--scroll-size, --scroll-pos), kéo bằng chuột.
 const rows = new WeakSet();
 
 function progress(root, t) {
   const bar = root.querySelector("[data-scroll-progress]");
   const sync = () => {
     const m = t.scrollWidth - t.clientWidth;
-    root.toggleAttribute("data-scrollable", m > 1);
     bar?.style.setProperty("--scroll-size", m > 1 ? t.clientWidth / t.scrollWidth : 1);
     bar?.style.setProperty("--scroll-pos", m > 1 ? Math.abs(t.scrollLeft) / m : 0);
   };
