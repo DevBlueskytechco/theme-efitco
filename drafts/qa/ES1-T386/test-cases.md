@@ -1,4 +1,4 @@
-KHÔNG CHẮC: (1) chưa chạy trên preview (máy QA không có PREVIEW_URL, sandbox chặn) — kết quả chờ CI store-tests, chưa báo đạt; (2) store dev chưa có gift card phát hành, hết hạn, bị tắt (ES1-T298): TC-38..TC-42, TC-44 fixme theo env, phần CSS kiểm bằng fixture ("kiểm mockup", TC-43, TC-45); (3) phần JS của AC4, AC5, AC11, AC13, AC15 là ticket BE còn Open (ES1-T474, ES1-T443, ES1-T410): test fixme gắn mã, tự chạy khi nút JS gỡ `hidden`; (4) AC16 meta description: `snippets/meta-tags.liquid` chỉ in khi `page_description` có giá trị — chưa biết Shopify có trả `page_description` cho 404/password/gift card không, TC-47 sẽ trả lời; (5) AC10 "email đã đăng ký → cùng hộp thành công" phụ thuộc phản hồi form customer của Shopify, TC-28 dùng 1 email cố định để lần chạy thứ 2 trở đi là case "đã đăng ký"; (6) AC6, AC16 điểm Lighthouse đo bằng `npx lhci autorun` (TC-17, TC-49), không trong spec Playwright.
+KHÔNG CHẮC: (1) chưa chạy trên preview (máy QA không có PREVIEW_URL, sandbox chặn) — kết quả chờ CI store-tests, chưa báo đạt; (2) store dev chưa có gift card phát hành, hết hạn, bị tắt (ES1-T298): TC-38..TC-42, TC-44 fixme theo env, phần CSS kiểm bằng fixture ("kiểm mockup", TC-43, TC-45); (3) phần JS của AC4, AC5, AC11, AC13, AC15 là ticket BE còn Open (ES1-T474, ES1-T443, ES1-T410): test fixme gắn mã, tự chạy khi nút JS gỡ `hidden`; (4) AC16 meta description: `snippets/meta-tags.liquid` chỉ in khi `page_description` có giá trị — CI run 44171510755 trả lời: 404 không có `page_description` → thiếu meta description (bug ES1-T386-B05), password/gift card đo bằng expect.soft trong cùng test; (5) AC10 "email đã đăng ký → cùng hộp thành công" phụ thuộc phản hồi form customer của Shopify, TC-28 dùng 1 email cố định để lần chạy thứ 2 trở đi là case "đã đăng ký"; (6) AC6, AC16 điểm Lighthouse đo bằng `npx lhci autorun` (TC-17, TC-49), không trong spec Playwright.
 
 # ES1-T386 — TE-21 Trang phụ: page, contact, 404, password, gift card ở 4 mốc, mọi trạng thái
 Nguồn: docs/srs.md#TE-21 AC1–AC17 (0.5; thay TE-9 AC2 0.4), bảng setting TE-21; docs/ui-spec/page.md, 404.md, password.md, gift-card.md; ticket ES1-T386, ES1-T383 (PR #243), ES1-T384 (PR #208), ES1-T407, ES1-T408; BE còn mở ES1-T410, ES1-T443, ES1-T474. Figma: không có node cho 4 màn này (ui-spec ghi "Figma: không có").
@@ -95,6 +95,8 @@ Email newsletter cố định: `qa+es1-t386@example.com` (1 khách duy nhất tr
 - ES1-T486 (B01, P3): 404 không nối predictive search — TC-20.
 - ES1-T487 (B02, P3): ảnh password `fetchpriority=high` cả dưới 64rem — TC-36.
 - ES1-T488 (B03, P3): sai mật khẩu không đưa focus vào ô — TC-32.
+- ES1-T386-B04 (B04, P2, chưa có ticket): 404 dưới 1280 LCP là `<header>` (nền noise), không phải h1 — TC-24 @360, @768.
+- ES1-T386-B05 (B05, P3, chưa có ticket): 404 thiếu meta description (`meta-tags.liquid` chỉ in khi có `page_description`) — TC-47.
 - ES1-T489 (task dev-fe): testid còn thiếu.
 
 ## KHÔNG CHẮC

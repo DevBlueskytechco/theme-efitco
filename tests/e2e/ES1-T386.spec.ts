@@ -11,7 +11,7 @@
 //   TS_GIFT_CARD_URL, TE386_GIFT_CARD_PARTIAL_URL, TE386_GIFT_CARD_EXPIRED_URL, TE386_GIFT_CARD_DISABLED_URL
 //   TE386_STORE_STATE = new | configured   (AC17, fixture TE-17-R2-QA0)
 // Phần JS do BE còn mở: ES1-T474 (contact), ES1-T443 (nút mắt password), ES1-T410 (QR, copy, print gift card) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T486, ES1-T487, ES1-T488); khi bug sửa test đỏ lại → gỡ test.fail.
+// Bug đã biết: test.fail gắn mã (ES1-T486, ES1-T487, ES1-T488, ES1-T386-B04, ES1-T386-B05); khi bug sửa test đỏ lại → gỡ test.fail.
 import { test, expect, type Browser, type BrowserContext, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -637,15 +637,25 @@ test.describe('ES1-T386 contact', () => {
 test.describe('ES1-T386 404', () => {
   test.beforeEach(({}, ti) => { desktopOnly(ti.project.name); });
 
+  // TC-24 tách riêng để bug LCP không che các kiểm khác của 404. Căn cứ: srs TE-21 AC8, AC16 "LCP: 404 là h1"; 404.md §8 "h1 … ở mọi mốc".
+  // Dưới 1280: nền noise của header (background-image 240 × 240, critical.css .site-header) là ứng viên LCP lớn hơn h1 → bug ES1-T386-B04.
   for (const width of WIDTHS) {
-    test(`TC-24 AC8/AC16, TC-18 AC7, TC-22 AC8, TC-23 AC8, TC-47 AC16 404 @${width}: LCP h1, khối chính, không popup, danh mục, sản phẩm, axe 0`, async ({ page }) => {
+    test(`TC-24 AC8/AC16 404 @${width}: LCP là h1`, async ({ page }) => {
+      test.fail(width < 1280, 'ES1-T386-B04: dưới 1280 LCP là <header> (nền noise-dark.png), không phải h1');
+      await page.setViewportSize({ width, height: VIEW_H });
+      await page.goto(MISSING);
+      await expectNotChallenged(page);
+      const paint = await lcp(page);
+      expect(paint.testids, `LCP <${paint.tag}> phải là h1`).toContain('not-found-heading');
+    });
+  }
+
+  for (const width of WIDTHS) {
+    test(`TC-18 AC7, TC-22 AC8, TC-23 AC8, TC-47 AC16 404 @${width}: khối chính, không popup, danh mục, sản phẩm, axe 0`, async ({ page }) => {
       await page.setViewportSize({ width, height: VIEW_H });
       await page.clock.install();
       const res = await page.goto(MISSING);
       await expectNotChallenged(page);
-      // TC-24: LCP đọc trước mọi thao tác
-      const paint = await lcp(page);
-      expect(paint.testids, `LCP <${paint.tag}> phải là h1`).toContain('not-found-heading');
       // TC-18
       expect(res?.status()).toBe(404);
       await expect(page.getByTestId('breadcrumb')).toHaveCount(0);
@@ -1185,22 +1195,37 @@ test.describe('ES1-T386 gift card', () => {
 test.describe('ES1-T386 chung', () => {
   test.beforeEach(({}, ti) => { desktopOnly(ti.project.name); });
 
-  test('TC-47 AC16 404, password, gift card có <title> và meta description (1280)', async ({ page, browser }) => {
+  test('TC-47 AC16 404, password, gift card có <title> (1280)', async ({ page, browser }) => {
     await openAt(page, MISSING, 1280);
     expect((await page.title()).trim(), '404 title').not.toBe('');
-    await expect(page.locator('meta[name="description"]'), '404 meta description').toHaveCount(1);
     const { context, page: pw } = await openPassword(browser, 1280);
     try {
       expect((await pw.title()).trim(), 'password title').not.toBe('');
-      await expect(pw.locator('meta[name="description"]'), 'password meta description').toHaveCount(1);
     } finally {
       await context.close();
     }
     if (GIFT.active) {
       await openGift(page, GIFT.active, 1280);
       expect((await page.title()).trim(), 'gift card title').not.toBe('');
-      await expect(page.locator('meta[name="description"]'), 'gift card meta description').toHaveCount(1);
-    } else test.info().annotations.push({ type: 'thiếu dữ liệu', description: 'ES1-T298: gift card chưa kiểm title/meta' });
+    } else test.info().annotations.push({ type: 'thiếu dữ liệu', description: 'ES1-T298: gift card chưa kiểm title' });
+  });
+
+  // snippets/meta-tags.liquid chỉ in meta description khi page_description có giá trị; 404 không có (CI run 44171510755) → bug ES1-T386-B05.
+  // 3 trang chung 1 nguyên nhân nên gộp 1 test, expect.soft để đo đủ cả 3; sửa snippet xong test báo "passed unexpectedly" → gỡ test.fail.
+  test('TC-47 AC16 404, password, gift card có meta description (1280), bug ES1-T386-B05', async ({ page, browser }) => {
+    test.fail(true, 'ES1-T386-B05: snippets/meta-tags.liquid bỏ meta description khi page_description trống (404)');
+    await openAt(page, MISSING, 1280);
+    await expect.soft(page.locator('meta[name="description"]'), '404 meta description').toHaveCount(1);
+    const { context, page: pw } = await openPassword(browser, 1280);
+    try {
+      await expect.soft(pw.locator('meta[name="description"]'), 'password meta description').toHaveCount(1);
+    } finally {
+      await context.close();
+    }
+    if (GIFT.active) {
+      await openGift(page, GIFT.active, 1280);
+      await expect.soft(page.locator('meta[name="description"]'), 'gift card meta description').toHaveCount(1);
+    } else test.info().annotations.push({ type: 'thiếu dữ liệu', description: 'ES1-T298: gift card chưa kiểm meta description' });
   });
 
   test('TC-51 AC17 theme mới cài (TE386_STORE_STATE=new): heading locale, không aside, không danh mục/sản phẩm 404, không eyebrow/ảnh password', async ({ page, browser }) => {
