@@ -4,7 +4,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-4.spec.ts [-g "AC2 |nojs"]
 // Dữ liệu: env TE4_* không rỗng, rồi tests/e2e/store-data.json (ES1-T78); thiếu → skip có lý do. Handle có dấu: so pathname sau decodeURIComponent.
 // So tiền: .js lấy bằng fetch trong trang để cùng market (ES1-T74). Nhóm nojs không chạy script trong trang: sản phẩm đọc JSON nhúng variant-json, giỏ đọc qua context phụ (ES1-T100, support/product-data.ts).
-import { test as base, expect, type Page, type Request, type Route } from '@playwright/test';
+import { test as base, expect, type Page, type Request, type Route } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { autoDeclineConsent } from './support/consent';
 import { expectNotChallenged } from './support/store-guard';

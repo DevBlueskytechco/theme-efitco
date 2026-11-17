@@ -4,7 +4,7 @@
 // Dữ liệu ES1-T134 trong tests/e2e/store-data.json: TE11_TAGS_READY; chưa true thì test cần card skip có lý do. Bộ lower + advanced + gym luôn rỗng: có dữ liệu thì 0 sản phẩm, chưa có thì tag không tồn tại (ES1-T133 #1).
 import { readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
