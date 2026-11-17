@@ -230,7 +230,7 @@ test.describe('ES1-T329 drawer nạp lười', () => {
     test.skip(isDesktop(ti), 'mobile');
   });
 
-  test('chưa chạm nút menu thì chưa tải header-drawer.js; chạm thì tải, focus vào nút đóng, Esc trả focus', async ({ page }) => {
+  test('chưa chạm nút menu thì chưa tải header-drawer.js; chạm thì tải, focus vào tiêu đề drawer, Esc trả focus', async ({ page }) => {
     const errors = watchConsole(page);
     const drawerReq = watchDrawerModule(page);
     await open(page);
@@ -244,21 +244,22 @@ test.describe('ES1-T329 drawer nạp lười', () => {
     const drawer = tid(page, 'header-drawer');
     await expect(drawer).toBeVisible();
     await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-    await expect(drawer.getByTestId('header-drawer-close')).toBeFocused();
+    // CTO chốt ES1-T471: <modal-dialog data-layer="menu"> (ES1-T323) focus vào tiêu đề drawer (aria-labelledby)
+    await expect(drawer.locator('#HeaderDrawerTitle')).toBeFocused();
     await page.keyboard.press('Escape');
     await expect(drawer).toBeHidden();
     await expect(toggle).toBeFocused();
     expect(errors).toEqual([]);
   });
 
-  test('bàn phím: focus nút menu nạp module, Enter mở, focus vào nút đóng', async ({ page }) => {
+  test('bàn phím: focus nút menu nạp module, Enter mở, focus vào tiêu đề drawer', async ({ page }) => {
     await open(page);
     const toggle = tid(page, 'header-drawer-toggle');
     test.skip((await toggle.count()) === 0, 'menu trống');
     await toggle.focus();
     await page.waitForFunction(() => !!customElements.get('header-drawer'));
     await page.keyboard.press('Enter');
-    await expect(tid(page, 'header-drawer-close')).toBeFocused();
+    await expect(tid(page, 'header-drawer').locator('#HeaderDrawerTitle')).toBeFocused();
   });
 
   test('lỗi mạng header-drawer.js: drawer vẫn mở/đóng bằng <details>, không pageerror', async ({ page }) => {
