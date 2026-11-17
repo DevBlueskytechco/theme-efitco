@@ -4,7 +4,7 @@
 // Phần tĩnh + fixture: đọc file, dựng markup như block xuất, page.setContent với critical.css + base.css thật và token mặc định
 // (space_base 4). Phần store: cần PREVIEW_URL/STORE_ORIGIN; dữ liệu thiếu (filter, banner) thì skip có lý do, không tính là đạt.
 // Chạy: npx playwright test tests/e2e/ES1-T365.spec.ts --project=desktop
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync, readdirSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
@@ -313,6 +313,7 @@ test.describe('ES1-T365 store', () => {
     await expect(page.getByTestId('collection-count')).toBeVisible();
     const label = await page.getByTestId('collection-results').getAttribute('data-results-label');
     await expect(page.getByTestId('collection-count')).toHaveText(label!);
+    await expectNotChallenged(page);
     const r = await new AxeBuilder({ page }).include('main').analyze();
     const bad = r.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? ''));
     expect(bad.map((v) => `${v.id}: ${v.nodes[0]?.target.join(' ')}`)).toEqual([]);
