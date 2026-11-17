@@ -7,7 +7,7 @@
 //   TC-18 dùng TE1_PRODUCT_HANDLE; TC-28, TC-29, TC-31 chọn TE1_COUNTRY_TARGET, TE1_LANGUAGE_TARGET; mở nút gộp và bấm lựa chọn
 //   kiểm phần tử che trước khi click (báo tên lớp che thay vì timeout 30 s); TC-24 ghi theme id, biến font để tách lỗi môi trường và lỗi theme.
 //   Nguyên nhân từng test: drafts/qa/ES1-T434/test-cases.md.
-import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Locator, type Page, type TestInfo } from './support/test';
 import { pageJson, requireJson } from './support/product-data';
 import { env } from './support/store-data';
 import { CART, cartApi } from './support/cart-api';
@@ -416,6 +416,8 @@ test.describe('ES1-T23', () => {
     await page.goto('/');
     const { drawer } = await openDrawer(page);
     test.skip((await drawer.getByTestId(T.drawerAcc).count()) === 0, 'main-menu store dev chưa có mục cấp 2');
+    // ES1-T323: header-drawer.js nạp lười khi chạm nút menu; chờ nắm drawer (nâng cấp gập accordion mở trước đó)
+    await expect(page.getByTestId(T.header)).toHaveAttribute('data-drawer-enhanced', '');
     const acc = drawer.getByTestId(T.drawerAcc).first();
     const subId = await acc.getAttribute('aria-controls');
     expect(subId, 'accordion thiếu aria-controls').toBeTruthy();
@@ -425,8 +427,12 @@ test.describe('ES1-T23', () => {
     await expect(acc).toHaveAttribute('aria-expanded', 'true');
     await expect(sub).toBeVisible();
     expect(await sub.getByRole('link').count()).toBeGreaterThan(0);
-    await acc.click();
+    // ES1-T323 (TE-1 AC2 0.3): có JS thì cấp 2 phủ drawer, hàng cấp 1 inert; về cấp 1 bằng Back, focus về hàng vừa mở
+    const back = acc.locator('xpath=..').getByTestId('header-drawer-back');
+    await expect(back).toBeFocused();
+    await back.click();
     await expect(acc).toHaveAttribute('aria-expanded', 'false');
+    await expect(acc).toBeFocused();
     await expect(sub).toBeHidden();
   });
 

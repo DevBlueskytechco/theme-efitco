@@ -2,7 +2,7 @@
 // Ticket ES1-T176 TE-17-QA2: so ảnh, so copy, đo style theo block trên /?view=figma; so thứ tự block giữa 2 template (AC-H1 đến H4, plan ES1-T169 D2, D3).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T176.spec.ts --project=desktop
 // Baseline dựng lúc chạy từ docs/figma/img, không commit. Số pixel lấy từ chính comparator của toMatchSnapshot nên khớp với kết quả assert.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import { autoDeclineConsent } from './support/consent';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -317,6 +317,11 @@ test.describe('ES1-T176 so Figma', () => {
 
   test.describe('So copy theo bảng ES1-T173 (AC-H2)', () => {
     const copyRows = (rows as Row[]).filter((row) => row.copyRow);
+    // Bảng ES1-T173 ghi copy hàng 16 vào locale; ES1-T464 chuyển heading newsletter sang setting inline_richtext default rỗng.
+    // Setting block footer ở layout chưa áp được trên preview (ES1-T428, ES1-T177): vắng heading thì không so dòng này.
+    const SETTING_COPY: Record<string, Array<{ value: string; testid: string; why: string }>> = {
+      '16': [{ value: 'Get 15% Off Your First Order', testid: 'footer-newsletter-heading', why: 'newsletter_heading default rỗng, ẩn khi rỗng (ES1-T464); setting footer chưa áp trên preview (ES1-T428/ES1-T177)' }],
+    };
     const ready = copyRows.filter((row) => !row.copyNeedsData);
 
     test('Copy mặc định của theme trên các hàng render được không cần dữ liệu Figma', async ({ page }) => {
@@ -330,6 +335,12 @@ test.describe('ES1-T176 so Figma', () => {
         await page.waitForTimeout(800); // module lazy tính số liệu panel
         const text = (await root.innerText().catch(() => '')).replace(/\s+/g, ' ').trim();
         const skip = new Set((row.copySkip ?? []).map((s: { value: string }) => s.value));
+        // Copy lấy từ setting default rỗng (ES1-T308 #1): phần tử chưa render thì bỏ qua dòng đó, ghi annotation.
+        for (const item of SETTING_COPY[row.copyRow] ?? []) {
+          if ((await root.getByTestId(item.testid).count()) > 0) continue;
+          skip.add(item.value);
+          test.info().annotations.push({ type: 'copy-setting-empty', description: `Hàng ${row.copyRow} "${item.value}": ${item.why}` });
+        }
         const missing = content[row.copyRow].filter((line) => line.kind === 'copy' && !skip.has(line.value)).map((line) => line.expected).filter((expected) => !text.includes(expected));
         report.push({ row: row.copyRow, missing });
         log('copy', row.copyRow, { missing });
