@@ -2,7 +2,7 @@
 // Ticket ES1-T190 TE-3-FE5: badge rating, badge New, mặc định 4 sản phẩm, vùng bấm swatch 44 px (D7, AC-H13, AC-H14, AC6).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T190.spec.ts
 // Dữ liệu P01, P02, P04 từ ES1-T178: thiếu thì skip có lý do. T190_NEW_SALE_HANDLE: sản phẩm vừa tag new vừa sale, không có thì test thứ tự dùng DOM.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged, expectStoreAllowed, skipIfStoreBlocked } from './support/store-guard';
 import { readFileSync } from 'node:fs';

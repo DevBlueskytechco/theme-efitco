@@ -2,7 +2,7 @@
 // Ticket ES1-T81 (bug TE-4, CI PR #67): @shopify/standard-events không resolve (không có import map) → import thẳng URL CDN.
 // Luồng AC12 (event shopify:product:select, cả tổ hợp không tồn tại) nằm ở tests/e2e/ES1-T66.spec.ts.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_VARIANTS_HANDLE=... npx playwright test tests/e2e/ES1-T81.spec.ts tests/e2e/ES1-T66.spec.ts -g "AC12|ES1-T81"
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { watchShopPay403 } from './support/console-guard';

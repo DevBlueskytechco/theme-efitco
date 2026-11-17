@@ -2,7 +2,7 @@
 // Ticket ES1-T69 TE-4-BE3: assets/product-media.js (docs/srs.md#TE-4 AC1, NFR-6; drafts/techlead/ES1-T59/task-split.md D2, D6, D9, D10).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_MEDIA_HANDLE=... TE4_VARIANTS_HANDLE=... npx playwright test tests/e2e/ES1-T69.spec.ts -g "AC1"
 // Thiếu env → tests/e2e/store-data.json (ES1-T78); vẫn thiếu → skip có lý do.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
