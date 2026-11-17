@@ -1,33 +1,48 @@
 {% doc %}
-  Cart page (TE-5 AC1, AC3, AC4, AC5). Reads the global `cart`. Works without
-  JavaScript: form post to routes.cart_url with updates[], note, Update and
-  Checkout; Remove is a link. The empty state is the AC4 message, shown in the
-  theme editor and on the storefront.
+  Cart page (TE-5 AC4, AC5, AC9, AC10, AC14, AC17, AC19; cart.md). Reads the
+  global `cart` and the block settings empty_cart_collection and
+  show_sticky_checkout. Works without JavaScript: form post to routes.cart_url
+  with updates[], note, Update and Checkout; Remove is a link. The empty state is
+  shopper content (AC19), shown in the theme editor and on the storefront.
 
-  Root h1 has tabindex -1 so JavaScript can move focus to it.
-
-  Custom element cart-items (grid from assets/base.css) holds, in order:
-  - cart-items-status (role status) and cart-items-error (role alert): live
-    regions, empty on load.
+  Custom element cart-items (one grid from assets/base.css: head row, then the
+  lines column and the summary column from 64rem) holds, in DOM order:
+  - h1 "Cart" with tabindex -1: assets/cart-items.js moves focus to it after the
+    last line is removed. Outside the partial.
+  - cart-items-status (role status, the first one in cart-items) and
+    cart-items-error (role alert): live regions, empty on load.
   - Partial cart-page (name must match the JS): root cart-page-body with
-    data-item-count, then form id cart-form-page with free shipping, lines and
-    summary.
-  - Accelerated checkout wrapper, outside the partial because Shopify's script
-    mounts the buttons and a refresh would drop them. Hidden when the cart is
-    empty; JavaScript syncs hidden from data-item-count after a refresh.
-  - Note textarea name note, outside the partial, tied by the form attribute.
-    Saved on form submit only. CSS hides it when data-item-count is 0.
+    data-item-count, then the item count and the "Continue shopping" link of
+    the head row (inside the partial so the count follows a refresh), form id
+    cart-form-page with free shipping, lines and summary, the empty cart
+    Bestsellers grid, and the sticky checkout bar.
+  - Accelerated checkout wrapper with the "or pay with" divider, outside the
+    partial because Shopify's script mounts the buttons and a refresh would drop
+    them. Hidden when the cart is empty; JavaScript syncs hidden from
+    data-item-count after a refresh.
+  - Order note (AC5, always open): label, textarea name note, hint tied with
+    aria-describedby; outside the partial, tied to the form by the form
+    attribute. Saved on form submit. CSS hides it when data-item-count is 0.
+
+  Sticky checkout bar (AC17, cart.md §3.7): aside cart-sticky-checkout renders
+  with hidden when the cart has items and show_sticky_checkout is on. Below
+  64rem JavaScript (TE-5-R2-BE1) removes hidden while the summary panel is out
+  of view and sets html[data-bottom-bar="cart"] (body padding comes from
+  --bottom-bar-height); from 64rem CSS never shows it. Its Checkout button posts
+  the same form (name checkout).
 
   cart-items hooks: data-cart-change-url, data-cart-url, data-partials,
   data-label-updated, data-label-removed, data-label-error,
-  data-label-quantity-adjusted. JavaScript sets data-enhanced (CSS hides the
-  Update button) and aria-busy. The textarea sits inside cart-items, so a
-  delegated change listener must filter on the quantity input. Line hooks are
-  listed in snippets/cart-lines.liquid.
+  data-label-quantity-adjusted, data-label-updating ("Updating cart…", AC18).
+  JavaScript sets data-enhanced (CSS hides the Update button) and aria-busy.
+  The textarea sits inside cart-items, so a delegated change listener must
+  filter on the quantity input. Line hooks are listed in snippets/cart-lines.liquid.
 
-  Test hooks: cart-page, cart-page-heading, cart-items, cart-items-status,
-  cart-items-error, cart-page-body, cart-form, cart-page-accelerated,
-  cart-page-note.
+  Test hooks: cart-page, cart-page-heading, cart-page-count,
+  cart-page-continue, cart-items, cart-items-status, cart-items-error,
+  cart-page-body, cart-form, cart-page-bestsellers, cart-sticky-checkout,
+  cart-sticky-checkout-total, cart-sticky-checkout-button,
+  cart-page-accelerated, cart-page-note, cart-page-note-hint.
 
   Self-contained: callers must leave the body empty.
 
@@ -42,11 +57,11 @@
   assign label_removed = 'cart.removed' | t
   assign label_error = 'cart.error' | t
   assign label_quantity_adjusted = 'cart.quantity_adjusted' | t
+  assign label_updating = 'cart.updating' | t
+  assign empty_collection = block.settings.empty_cart_collection
 -%}
 
 <div class="cart-page" data-testid="cart-page" {{ block.shopify_attributes }}>
-  <h1 class="cart-page__heading" tabindex="-1" data-testid="cart-page-heading">{{ 'cart.title' | t }}</h1>
-
   <cart-items
     class="cart-items cart-page__items"
     data-cart-change-url="{{ routes.cart_change_url }}"
@@ -56,13 +71,25 @@
     data-label-removed="{{ label_removed | escape }}"
     data-label-error="{{ label_error | escape }}"
     data-label-quantity-adjusted="{{ label_quantity_adjusted | escape }}"
+    data-label-updating="{{ label_updating | escape }}"
     data-testid="cart-items"
   >
+    <h1 class="cart-page__heading" tabindex="-1" data-testid="cart-page-heading">{{ 'cart.title' | t }}</h1>
     <div class="visually-hidden" role="status" aria-live="polite" data-testid="cart-items-status"></div>
     <div class="cart-items__error" role="alert" data-testid="cart-items-error"></div>
 
     {% partial 'cart-page' %}
       <div class="cart-page__body" data-item-count="{{ cart.item_count }}" data-testid="cart-page-body">
+        {%- if cart.item_count > 0 -%}
+          <p class="cart-page__count" data-testid="cart-page-count">
+            {{- 'cart.item_count' | t: count: cart.item_count -}}
+          </p>
+          <a class="empty-state__link cart-page__continue" href="{{ routes.all_products_collection_url }}" data-testid="cart-page-continue">
+            {%- render 'slideshow-icon', name: 'arrow' -%}
+            {{- 'cart.continue_shopping_link' | t -}}
+          </a>
+        {%- endif -%}
+
         <form
           id="cart-form-page"
           class="cart-page__form"
@@ -76,6 +103,50 @@
           </div>
           {%- render 'cart-summary', cart: cart, context: 'page' -%}
         </form>
+
+        {%- if cart.item_count == 0 and empty_collection.products_count > 0 -%}
+          <div class="cart-page__bestsellers" data-testid="cart-page-bestsellers">
+            <div class="featured-collection__titles">
+              <p class="featured-collection__eyebrow">{{ 'cart.empty_eyebrow' | t }}</p>
+              <h2 class="featured-collection__heading">{{ 'cart.bestsellers' | t }}</h2>
+            </div>
+            <ul class="featured-collection__grid" role="list">
+              {%- for product in empty_collection.products limit: 4 -%}
+                <li class="featured-collection__item">
+                  {%- render 'product-card',
+                    product: product,
+                    sizes: '(min-width: 80rem) 25vw, (min-width: 48rem) 33vw, 50vw',
+                    heading_level: 'h3'
+                  -%}
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+
+        {%- if cart.item_count > 0 and block.settings.show_sticky_checkout -%}
+          <aside
+            class="cart-sticky-checkout"
+            aria-label="{{ 'cart.sticky_checkout_label' | t }}"
+            data-testid="cart-sticky-checkout"
+            hidden
+          >
+            <p class="cart-sticky-checkout__total">
+              <span class="cart-summary__muted">{{ 'cart.total' | t }}</span>
+              <strong class="cart-summary__total" data-testid="cart-sticky-checkout-total">{{ cart.total_price | money }}</strong>
+            </p>
+            <button
+              class="button cart-sticky-checkout__button"
+              type="submit"
+              name="checkout"
+              form="cart-form-page"
+              data-testid="cart-sticky-checkout-button"
+            >
+              {{- 'cart.checkout' | t -}}
+              {%- render 'slideshow-icon', name: 'arrow' -%}
+            </button>
+          </aside>
+        {%- endif -%}
       </div>
     {% endpartial %}
 
@@ -88,6 +159,7 @@
         data-cart-accelerated
         data-testid="cart-page-accelerated"
       >
+        <p class="cart-page__or">{{ 'cart.express_divider' | t }}</p>
         {{- content_for_additional_checkout_buttons -}}
       </div>
     {%- endif -%}
@@ -98,10 +170,14 @@
         id="cart-note"
         class="cart-page__note-input"
         name="note"
-        rows="3"
+        rows="4"
         form="cart-form-page"
+        aria-describedby="cart-note-hint"
         data-testid="cart-page-note"
       >{{ cart.note | escape }}</textarea>
+      <p id="cart-note-hint" class="cart-page__note-hint" data-testid="cart-page-note-hint">
+        {{- 'cart.note_page_hint' | t -}}
+      </p>
     </div>
   </cart-items>
   <script src="{{ 'cart-items.js' | asset_url }}" type="module"></script>
@@ -109,6 +185,21 @@
 
 {% schema %}
 {
-  "name": "t:general.cart_page"
+  "name": "t:general.cart_page",
+  "settings": [
+    {
+      "type": "collection",
+      "id": "empty_cart_collection",
+      "label": "t:labels.empty_cart_collection",
+      "info": "t:info.empty_cart_collection"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sticky_checkout",
+      "label": "t:labels.show_sticky_checkout",
+      "info": "t:info.show_sticky_checkout",
+      "default": true
+    }
+  ]
 }
 {% endschema %}
