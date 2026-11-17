@@ -1,7 +1,11 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không có trình duyệt và preview); chờ CI.
 // Ticket ES1-T218: Back hoặc đổi đáp án khi kết quả đang tải làm quiz kẹt (docs/srs.md#TE-11 AC2, AC3). Luồng chính nằm ở tests/e2e/ES1-T139.spec.ts:301, :347; file này giữ các ca hồi quy riêng của bug: 0 pageerror, request mới chạy, thử lại sau Back, lỗi thật vẫn sang search.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T218.spec.ts
-import { test, expect, type Page } from '@playwright/test';
+// ES1-T470: 'Đổi đáp án khi đang tải', 'Back khi đang tải rồi trả lời lại' kiểm máy trạng thái JS, không kiểm dữ liệu store: response quiz-gym là partial giả (support/quiz-results.ts), 0 request kết quả tới store.
+// Request kết quả, trang /search, trang quiz bị Cloudflare chặn thì fail nêu Cloudflare (support/store-guard.ts), không thành toBeVisible.
+import { test, expect, type Page } from './support/test';
+import { fulfillQuizResults } from './support/quiz-results';
+import { gotoStore, watchStoreBlock } from './support/store-guard';
 
 const TE11 = '/?view=te11';
 
@@ -10,6 +14,8 @@ const step = (page: Page, n: number) => page.locator(`[data-testid="quiz-step"][
 const option = (page: Page, tag: string) => page.locator(`[data-testid="quiz-option-input"][value="${tag}"]`);
 const panel = (page: Page) => page.locator('[data-quiz-results-panel]');
 const isResults = (url: URL) => url.pathname.includes('/collections/') && url.searchParams.get('view') === 'quiz';
+// Request lỗi thì quiz-finder.js submit form sang /search (fallback TE-11), trang đó cũng có thể bị chặn.
+const isQuizStore = (url: URL) => isResults(url) || url.pathname.endsWith('/search');
 
 function watchPageErrors(page: Page) {
   const errors: string[] = [];
@@ -18,7 +24,7 @@ function watchPageErrors(page: Page) {
 }
 
 async function open(page: Page) {
-  await page.goto(TE11);
+  await gotoStore(page, TE11);
   await expect(tid(page, 'quiz')).toHaveAttribute('data-enhanced', '');
 }
 
@@ -65,9 +71,12 @@ test.describe('ES1-T218 quiz-finder khi kết quả đang tải', () => {
     expect(errors).toEqual([]);
   });
 
+  // TE-11 AC3: đổi đáp án bước cuối khi đang tải thì huỷ request cũ, kết quả mới hiện.
   test('Đổi đáp án khi đang tải: request mới chạy, hết aria-busy, hiện kết quả, 0 pageerror', async ({ page }) => {
     const errors = watchPageErrors(page);
+    const store = watchStoreBlock(page, isQuizStore);
     const release = await hold(page, 'quiz-home');
+    await fulfillQuizResults(page, 'quiz-gym');
     await open(page);
     await answer(page, 'quiz-home');
     await expect(panel(page)).toHaveAttribute('aria-busy', 'true');
@@ -76,16 +85,19 @@ test.describe('ES1-T218 quiz-finder khi kết quả đang tải', () => {
     await option(page, 'quiz-gym').check();
     await request;
 
-    await expect(panel(page)).toBeVisible();
+    await store.expect(() => expect(panel(page)).toBeVisible());
     await expect(panel(page)).not.toHaveAttribute('aria-busy', /./);
     await expect(tid(page, 'quiz-results')).toHaveAttribute('data-quiz-count', /^\d+$/);
     release();
     expect(errors).toEqual([]);
   });
 
+  // TE-11 AC2 (Back giữ lựa chọn cũ), AC3 (kết quả hiện, focus tiêu đề kết quả).
   test('Back khi đang tải rồi trả lời lại: vẫn ra kết quả, không kẹt', async ({ page }) => {
     const errors = watchPageErrors(page);
+    const store = watchStoreBlock(page, isQuizStore);
     const release = await hold(page, 'quiz-home');
+    await fulfillQuizResults(page, 'quiz-gym');
     await open(page);
     await answer(page, 'quiz-home');
     await expect(panel(page)).toHaveAttribute('aria-busy', 'true');
@@ -96,7 +108,7 @@ test.describe('ES1-T218 quiz-finder khi kết quả đang tải', () => {
     await expect(step(page, 3)).toHaveAttribute('data-active', '');
     await option(page, 'quiz-gym').check();
 
-    await expect(panel(page)).toBeVisible();
+    await store.expect(() => expect(panel(page)).toBeVisible());
     await expect(panel(page)).not.toHaveAttribute('aria-busy', /./);
     await expect(tid(page, 'quiz-results-heading')).toBeFocused();
     release();

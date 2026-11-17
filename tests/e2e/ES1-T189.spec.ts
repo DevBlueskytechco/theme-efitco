@@ -4,7 +4,7 @@
 // 4 tab trên /?view=figma cần figma-tab-* (ES1-T178): thiếu thì skip có lý do.
 // Tab rỗng: bảng dữ liệu không bảo đảm có collection rỗng, nên test thay nội dung template bằng đúng markup thông báo của block rồi mới chọn tab.
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged, watchTabDataRequests } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
@@ -121,13 +121,11 @@ test.describe('ES1-T189 tĩnh', () => {
     expect(liquid).toContain(`data-lazy-module="{{ 'collection-tabs.js' | asset_url }}"`);
   });
 
-  test('block chỉ có thẻ script lazy-module và product-swatch', ({}, ti) => {
+  // ES1-T338 (TE-3-R2-BE2, ADR 0010): product-swatch.js đã gỡ, còn đúng thẻ lazy-module.
+  test('block chỉ có thẻ script lazy-module', ({}, ti) => {
     test.skip(ti.project.name !== 'desktop', 'static, chạy 1 lần ở desktop');
     const scripts = readFileSync(LIQUID_FILE, 'utf8').match(/<script[^>]*>/g);
-    expect(scripts?.sort()).toEqual([
-      `<script src="{{ 'lazy-module.js' | asset_url }}" type="module">`,
-      `<script src="{{ 'product-swatch.js' | asset_url }}" type="module">`,
-    ]);
+    expect(scripts).toEqual([`<script src="{{ 'lazy-module.js' | asset_url }}" type="module">`]);
   });
 });
 

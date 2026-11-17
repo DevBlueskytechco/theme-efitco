@@ -5,10 +5,11 @@
 // (cùng 1 instance với theme vì cùng URL, ES1-T81) và dựng lại dòng hàng từ giỏ mock. Không cache HTML của store: muốn có HTML dòng hàng phải có giỏ thật, tức thêm request Cart API.
 // partials.fetch vẫn gửi 1 fetch cùng pathname, kèm ?__mock_partials, để test đếm, giữ, abort được qua page.route.
 // Giới hạn: (1) dòng hàng dựng tay theo snippets/cart-lines.liquid, cart-summary.liquid, ES1-T203 TC-14 kiểm hook khớp liquid, nhưng không kiểm Liquid render đúng;
+// drawer (ES1-T453 #1, CTO 14/11): summary dựng vào partial cart-drawer-footer, pill cart-drawer-count chỉ đổi số và hidden;
 // (2) apply là bản giả theo mô tả trong AGENTS.md (giữ focus, giá trị ô nhập), không phải thư viện thật; (3) không dựng free shipping, discount, thuế;
 // (4) updateCart, getCart ghi qua Storefront API (ES1-T164), không qua /cart/*.js nên không mock được ở đây.
 // Phần (1) (2) (4) do luồng thật trong tests/e2e/ES1-T203.spec.ts kiểm.
-import { test as base, expect, type Page, type Route } from '@playwright/test';
+import { test as base, expect, type Page, type Route } from './test';
 import { createHash } from 'node:crypto';
 import { gotoStore, watchStore } from './store-guard';
 
@@ -86,8 +87,11 @@ export function installPartials(library: { partials?: Record<string, unknown> },
   const money = (cents: number) => (cents / 100).toFixed(2);
   const body = document.querySelector('[data-testid="cart-page-body"], [data-testid="cart-drawer-body"]') as HTMLElement | null;
   const form = body?.querySelector('form') ?? null;
-  const main = form?.firstElementChild ?? null;
+  // ES1-T453 #1 (CTO 14/11): drawer bỏ .cart-drawer__main, cart-empty/cart-lines là con trực tiếp của form; trang /cart vẫn có .cart-page__main.
+  const main = (form?.querySelector(':scope > .cart-page__main') as HTMLElement | null) ?? form;
   const context = form ? form.id.replace('cart-form-', '') : '';
+  // ES1-T453 #1: summary drawer ở partial cart-drawer-footer (ngoài cart-drawer-body), trang /cart vẫn trong form.
+  const summaryHost = (context === 'drawer' ? document.querySelector('[data-testid="cart-drawer-footer"]') : form) as HTMLElement | null;
   const emptyHtml = main?.querySelector('[data-testid="cart-empty"]')?.outerHTML;
   if (body && !emptyHtml) throw new Error('Trang thật không ở trạng thái giỏ rỗng: cookie cart lọt vào context test?');
 
@@ -129,7 +133,7 @@ export function installPartials(library: { partials?: Record<string, unknown> },
     if (!cart.items.length) {
       main.querySelector('[data-testid="cart-lines"]')?.remove();
       main.querySelector('[data-testid="cart-update"]')?.remove();
-      form.querySelector('.cart-summary')?.remove();
+      summaryHost?.querySelector('.cart-summary')?.remove();
       if (!main.querySelector('[data-testid="cart-empty"]')) main.append(fragment(emptyHtml!));
       return;
     }
@@ -150,11 +154,20 @@ export function installPartials(library: { partials?: Record<string, unknown> },
       } else li = fragment(lineHtml(item, index));
       if (list!.children[index] !== li) list!.insertBefore(li, list!.children[index] ?? null);
     });
-    const summary = form.querySelector('.cart-summary');
+    const summary = summaryHost?.querySelector('.cart-summary');
     if (summary) {
       summary.querySelector('[data-testid="cart-subtotal"]')!.textContent = money(cart.items_subtotal_price);
       summary.querySelector('[data-testid="cart-total"]')!.textContent = money(cart.total_price);
-    } else form.append(fragment(summaryHtml(cart)));
+    } else if (context === 'drawer') summaryHost?.prepend(fragment(summaryHtml(cart)));
+    else form.append(fragment(summaryHtml(cart)));
+  }
+
+  // Pill số lượng ở header drawer (partial cart-drawer-count, blocks/cart-drawer.liquid): có sẵn, hidden khi giỏ rỗng.
+  function renderDrawerCount(cart: AjaxCart) {
+    const pill = document.querySelector('[data-testid="cart-drawer-count"]') as HTMLElement | null;
+    if (!pill) return;
+    pill.hidden = !cart.item_count;
+    pill.textContent = (pill.textContent ?? '').replace(/\d+/, String(cart.item_count));
   }
 
   function renderCount(cart: AjaxCart) {
@@ -181,7 +194,8 @@ export function installPartials(library: { partials?: Record<string, unknown> },
     },
     apply: async (update: { names: string[]; cart: AjaxCart }) => {
       if (update.names.includes('cart-count')) renderCount(update.cart);
-      if (update.names.includes('cart-page') || update.names.includes('cart-drawer')) renderBody(update.cart);
+      if (update.names.includes('cart-drawer-count')) renderDrawerCount(update.cart);
+      if (['cart-page', 'cart-drawer', 'cart-drawer-footer'].some((name) => update.names.includes(name))) renderBody(update.cart);
     },
     refresh: async (...names: string[]) => patched.apply(await patched.fetch(...names)),
   };
@@ -189,6 +203,7 @@ export function installPartials(library: { partials?: Record<string, unknown> },
   if (partials.fetch !== patched.fetch) throw new Error('Không thay được partials.fetch: object thư viện bị khoá');
   renderBody(initial);
   renderCount(initial);
+  renderDrawerCount(initial);
 }
 
 export class MockCart {

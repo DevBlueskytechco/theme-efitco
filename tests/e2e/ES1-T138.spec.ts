@@ -4,7 +4,8 @@
 // Dữ liệu ES1-T134 trong tests/e2e/store-data.json: TE11_TAGS_READY, TE11_TAG_FILTER_READY; chưa true thì skip có lý do.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
@@ -68,7 +69,7 @@ async function expectNoSeriousAxe(page: Page) {
 
 async function noJsPage(browser: Browser) {
   const use = test.info().project.use;
-  const context = await browser.newContext({
+  const context = await newStoreContext(browser, {
     javaScriptEnabled: false,
     storageState: 'tests/setup/state.json',
     baseURL: use.baseURL,
@@ -167,10 +168,11 @@ test.describe('ES1-T138 TE-11 kết quả quiz', () => {
     await expect(tid(page, 'quiz-results-heading')).toHaveAttribute('tabindex', '-1');
   });
 
-  test('AC3 partial nằm ngoài form, product-swatch.js nạp ngoài partial', async ({ page }) => {
+  // ES1-T338 (TE-3-R2-BE2, ADR 0010): product-swatch.js đã gỡ khỏi quiz.
+  test('AC3 partial nằm ngoài form, không nạp product-swatch.js', async ({ page }) => {
     await page.goto(TE11);
     await expect(tid(page, 'quiz-form').getByTestId('quiz-results')).toHaveCount(0);
-    await expect(tid(page, 'quiz').locator('script[src*="product-swatch"]')).toHaveCount(1);
+    await expect(tid(page, 'quiz').locator('script[src*="product-swatch"]')).toHaveCount(0);
     await expect(tid(page, 'quiz-results').locator('script')).toHaveCount(0);
   });
 

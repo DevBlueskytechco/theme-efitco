@@ -3,7 +3,7 @@
 // Card đo 336 x 448 theo snapshot và comment Designer trên ticket, không phải 300 x 448 của tiêu đề ticket và AC-H26.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T191.spec.ts
 // Blog figma-blog do ES1-T178 nhập: thiếu thì các test cần bài skip có lý do.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
@@ -92,16 +92,23 @@ test.describe('ES1-T191 rỗng', () => {
 });
 
 test.describe('ES1-T191 có bài', () => {
-  test('dưới số mặc định: hiện đúng số bài, cỡ card không đổi', async ({ page }) => {
+  // ES1-T334: TE-16 AC1 (SRS 0.5): ≤ 4 bài ở 1280 là lưới 4 cột card 292 × 389 (spec-updates.md §5).
+  test('dưới số mặc định: hiện đúng số bài, cỡ card bằng lưới 4 bài (TE-16 AC1, AC-H27)', async ({ page }) => {
     await page.goto(TE16);
     const cards = band(page, 'te16-two').getByTestId('article-card');
     await skipWithoutArticles(page, cards, 2);
     await expect(cards).toHaveCount(2);
-    if (page.viewportSize()!.width >= 1024) {
-      expect(await sizes(cards)).toEqual([
-        { width: 336, height: 448 },
-        { width: 336, height: 448 },
-      ]);
+    for (const [width, cardWidth, cardHeight] of [
+      [1280, 292, 389],
+      [1920, 336, 448],
+    ] as const) {
+      await page.setViewportSize({ width, height: 900 });
+      const list = band(page, 'te16-two').getByTestId('blog-posts-list');
+      await expect(list).toHaveCSS('display', 'grid');
+      for (const size of await sizes(cards)) {
+        expect(Math.abs(size.width - cardWidth), `${width} width`).toBeLessThanOrEqual(2);
+        expect(Math.abs(size.height - cardHeight), `${width} height`).toBeLessThanOrEqual(2);
+      }
     }
   });
 

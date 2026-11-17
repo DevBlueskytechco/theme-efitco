@@ -3,7 +3,7 @@
 // link card, ảnh, giá, badge phải theo radio swatch đang checked. assets/product-swatch.js đồng bộ lại ở window 'pageshow'.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T73.spec.ts
 // Dữ liệu: card ≥ 2 swatch trên /collections/all (5 trang đầu) hoặc TE3_SWATCH_HANDLE; không có thì skip.
-import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Locator, type Page, type TestInfo } from './support/test';
 import { watchShopPay403 } from './support/console-guard';
 import { clickAndLoad, expectLoaded, gotoStore } from './support/store-guard';
 

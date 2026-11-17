@@ -2,9 +2,10 @@
 // Test case: drafts/qa/ES1-T45/test-cases.md. Ticket xin 2 file rich-text.spec.ts + rtl.spec.ts; gộp 1 file theo quy ước tên key ticket, 2 describe.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T45.spec.ts
 // Theme chưa có locale RTL: bật RTL bằng document.documentElement.dir = 'rtl' (D6), không sửa layout.
-import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Locator, type Page, type TestInfo } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
+import { autoDeclineConsent } from './support/consent';
 import { fetchRetry429 } from './support/cart-api';
 
 const isDesktop = (ti: TestInfo) => ti.project.name === 'desktop';
@@ -67,6 +68,9 @@ const iconTranslateX = (l: Locator) =>
     const t = getComputedStyle(el).translate;
     return t === 'none' ? 0 : parseFloat(t);
   });
+
+// ES1-T434: banner cookie Shopify hiện muộn trong trang (setup không thấy), che footer/localization → Decline khi nó xuất hiện.
+test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 
 test.describe('ES1-T45 rich-text (ES1-T44, ADR 0005)', () => {
   test('TC-01 container home-intro nền sand rgb(235, 230, 224), chữ foreground sand', async ({ page }) => {

@@ -33,7 +33,7 @@ allowed=""
 case "$AGENT" in
   qa)        allowed='^(tests/|drafts/qa/)' ;;
   writer)    allowed='^(docs/merchant/|drafts/writer/)' ;;
-  dev-fe)    allowed='^(blocks/|snippets/|templates/|layout/|assets/.*\.css$|config/settings_schema\.json$|config/settings_data\.json$|locales/|drafts/dev-fe/)' ;;
+  dev-fe)    allowed='^(blocks/|snippets/|templates/|layout/|assets/.*\.css$|config/settings_schema\.json$|config/settings_data\.json$|locales/|drafts/dev-fe/|tests/e2e/ES1-T[0-9]+\.spec\.ts$)' ;;
   dev-be)    allowed='^(assets/.*\.js$|snippets/|blocks/|templates/|drafts/dev-be/|tests/)' ;;
   techlead)  allowed='^(docs/adr/|docs/architecture\.md$|CONVENTION\.md$|drafts/techlead/)' ;;
   devops)    allowed='^(\.github/|scripts/|docs/runbook|lighthouserc|playwright\.config|drafts/devops/)' ;;

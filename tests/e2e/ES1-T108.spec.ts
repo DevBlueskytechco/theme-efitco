@@ -2,7 +2,7 @@
 // Ticket ES1-T108 TE-6-FE1: trang collection + list-collections (docs/srs.md#TE-6 AC1, AC5; drafts/techlead/ES1-T103/task-split.md D2, D3, D4, D11, D12).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T108.spec.ts -g "AC1|AC5|nojs"
 // Dữ liệu (ES1-T105 chưa trả lời): thiếu TE6_* → dùng /collections/all, test cần dữ liệu riêng skip có lý do.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -217,15 +217,16 @@ test.describe('ES1-T108 TE-6 list-collections', () => {
     test.skip(count === 0, 'Store không có collection');
     expect(count).toBeLessThanOrEqual(PAGE_SIZE);
 
+    // ES1-T367 (TE-6 AC15, SRS 0.5): card là <li>, link là tên (::after phủ card), ảnh 336:220 thay 336:270.
     const first = cards.first();
     await expect(first.getByTestId('list-collections-card-title')).not.toBeEmpty();
-    expect(await first.getAttribute('href')).toMatch(/\/collections\//);
+    expect(await first.getByTestId('list-collections-card-link').getAttribute('href')).toMatch(/\/collections\//);
     await expect(first.locator('img, svg')).toHaveCount(1);
     const ratio = await first.locator('img, svg').evaluate((el) => {
       const r = el.parentElement!.getBoundingClientRect();
       return r.width / r.height;
     });
-    expect(ratio).toBeCloseTo(336 / 270, 1);
+    expect(ratio).toBeCloseTo(336 / 220, 1);
 
     expect(errors, errors.join('\n')).toEqual([]);
     await expectAxeClean(page, 'main');
@@ -282,6 +283,7 @@ test.describe('ES1-T108 nojs', () => {
     const card = page.getByTestId('list-collections-card').first();
     test.skip((await card.count()) === 0, 'Store không có collection');
     await expect(card).toBeVisible();
+    // ES1-T367: bấm giữa card (ảnh) rơi vào ::after của link tên
     await card.click();
     await expect(page.getByTestId('collection-banner-title')).toBeVisible();
   });
