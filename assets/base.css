@@ -9974,7 +9974,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-header__item > .site-header__link, .site-header__item > details > .site-header__link { color: color-mix(in srgb, var(--color-background-dark-foreground) 60%, var(--color-background-dark)); }
   .site-header__item > .site-header__link:is(:hover, [aria-current='page']), .site-header__item > details > .site-header__link:hover,
   .site-header__item > details[open] > .site-header__link { color: var(--color-background-dark-foreground); }
-  .site-header__submenu .site-header__link { min-height: 36px; color: var(--color-foreground); letter-spacing: -0.16px; }
+  /* Link dropdown C cao 40 (TE-22 AC7, navigation.md §8) */
+  .site-header__submenu .site-header__link { min-height: 40px; color: var(--color-foreground); letter-spacing: -0.16px; }
   .site-header__item:nth-child(1) { min-width: 51px; }
   .site-header__item:nth-child(2) { min-width: 85px; }
   .site-header__item:nth-child(3) { min-width: 31px; }
@@ -9984,6 +9985,10 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-header__item:nth-child(7) { min-width: 35px; }
   .site-header__link { padding: 0; font-size: 16px; line-height: 24px; font-weight: 500; letter-spacing: -0.64px; gap: 5px; min-height: 0; }
   .site-header__item:nth-child(n + 5) .site-header__link { line-height: 26px; letter-spacing: -0.16px; }
+  /* Ô bấm mục cấp 1 cao 44 (TE-22 AC7): padding-block bù bằng margin âm, chữ 24/26 giữ toạ độ Figma, li và thanh 80 không đổi.
+     Không dùng ::after định vị: summary không được thành khối chứa của scrim mega */
+  .site-header__item > .site-header__link, .site-header__item > details > .site-header__link { padding-block: 10px; margin-block: -10px; }
+  .site-header__item:nth-child(n + 5) > .site-header__link, .site-header__item:nth-child(n + 5) > details > .site-header__link { padding-block: 9px; margin-block: -9px; }
   .site-header__icon:not(form *), shopify-account.site-header__icon { min-width: 0; min-height: 0; }
   .site-header__icons > a.site-header__icon, .site-header__icons > shopify-account { margin-inline-end: 24px; }
   shopify-account.site-header__icon { width: 24px; height: 24px; }
@@ -10200,8 +10205,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   /* Tinh chỉnh ±px theo so pixel với frame Figma */
   .site-header__account-icon { display: block; width: 24px; height: 24px; }
   shopify-account::part(signed-out-avatar) { padding: 0; width: 24px; height: 24px; min-width: 0; min-height: 0; }
-  /* margin thay top: summary không thành khối chứa của scrim mega */
-  .site-header__item:nth-child(-n + 4) > .site-header__link, .site-header__item:nth-child(-n + 4) > details > .site-header__link { margin-block-start: 1px; }
+  /* margin thay top: summary không thành khối chứa của scrim mega; −10 (bù ô bấm 44) + 1 hạ chữ 1px */
+  .site-header__item:nth-child(-n + 4) > .site-header__link, .site-header__item:nth-child(-n + 4) > details > .site-header__link { margin-block-start: -9px; }
   .site-header__link svg { position: relative; inset-block-start: -1px; }
   .shop-by-level__eyebrow, .featured-collection__eyebrow, .shop-the-look__eyebrow, .bundle-builder__eyebrow, .featured-product__eyebrow, .video-carousel__eyebrow, .testimonials__eyebrow, .blog-posts__eyebrow, .faq__eyebrow, .faq__stat-label, .image-with-text__eyebrow { position: relative; inset-block-start: 1px; }
   .rich-text__heading { position: relative; inset-block-start: 2px; }
