@@ -1,4 +1,4 @@
-// <header-menu>: mega, dropdown từ 80rem (TE-22, navigation.md §6). Drawer: header-drawer.js, lười
+// <header-menu>: mega, dropdown từ 80rem (TE-22, navigation.md §6). Drawer: data-drawer-src (ES1-T485), lười
 const T = (id) => `[data-testid="${id}"]`;
 const sum = (d) => d.querySelector(":scope > summary");
 const sync = (d) => sum(d)?.setAttribute("aria-expanded", d.open);
@@ -14,9 +14,9 @@ class HeaderMenu extends HTMLElement {
     const nav = h?.querySelector(T("header-menu"));
     const { signal } = (this.ac = new AbortController());
     const on = (el, t, fn, o) => el?.addEventListener(t, fn, { signal, ...o });
-    const load = () => (drawer ||= import(new URL("header-drawer.js", import.meta.url)).catch(() => (drawer = null)));
+    const load = () => this.dataset.drawerSrc && (drawer ||= import(this.dataset.drawerSrc).catch(() => (drawer = null)));
     for (const t of ["pointerenter", "focusin", "touchstart"]) on(h?.querySelector(T("header-drawer-toggle")), t, load, { passive: true });
-    // Cả drawer, trước khi nạp header-drawer.js
+    // Cả drawer, trước khi nạp drawer
     h?.querySelectorAll("details").forEach(sync);
     if (!nav) return;
 

@@ -3,17 +3,25 @@
   order-level automatic discounts (tag icon + title, "-{amount}"), total, tax
   note, checkout. Renders nothing when the cart is empty. Shared by
   blocks/cart-page.liquid and blocks/cart-drawer.liquid; render it inside their
-  partial.
+  partial. Both sit on the dark panel (--color-background-panel, cart G3):
+  secondary text uses --panel-muted, discounts --panel-saving.
 
   Drawer (mini-cart-quickview.md §1, cart G3): the Subtotal row and the divider
   show only when the cart has an order-level discount, otherwise only Total.
-  Cart page: Subtotal always shows.
+  The drawer footer is the panel.
+
+  Cart page (cart.md §3.6, Figma 1:718; .cart-summary--page is the panel):
+  head with h2 "Order Summary" + "{n} Items" badge, Subtotal (always), order
+  discounts, Shipping "Calculated at checkout", Total, tax note, Checkout, then
+  "Secure checkout" and the shop's payment icons in full color
+  (payment_type_svg_tag). The panel never lists the products again.
 
   The tax note always shows: taxes_included / duties_included pick the matching
   sentence, otherwise "Taxes and shipping calculated at checkout.".
 
-  Test hooks: cart-summary, cart-subtotal, cart-discounts, cart-discount,
-  cart-total, cart-tax-note, cart-checkout.
+  Test hooks: cart-summary, cart-summary-heading, cart-summary-count,
+  cart-subtotal, cart-discounts, cart-discount, cart-shipping, cart-total,
+  cart-tax-note, cart-checkout, cart-secure, cart-payment-icons.
 
   @param {object} cart - The cart to total
   @param {string} context - Where it renders, 'page' or 'drawer'. Part of the form id
@@ -35,9 +43,18 @@
     endif
   -%}
 
-  <div class="cart-summary" data-testid="cart-summary">
+  <div class="cart-summary{% if context == 'page' %} cart-summary--page{% endif %}" data-testid="cart-summary">
+    {%- if context == 'page' -%}
+      <div class="cart-summary__head">
+        <h2 class="cart-summary__title" data-testid="cart-summary-heading">{{ 'cart.summary_title' | t }}</h2>
+        <span class="cart-summary__badge" data-testid="cart-summary-count">
+          {{- 'cart.item_count_badge' | t: count: cart.item_count -}}
+        </span>
+      </div>
+    {%- endif -%}
+
     {%- if show_subtotal -%}
-      <p class="cart-summary__row cart-summary__row--muted">
+      <p class="cart-summary__row{% if context == 'drawer' %} cart-summary__row--muted{% endif %}">
         <span>{{ 'cart.subtotal' | t }}</span>
         <span data-testid="cart-subtotal">{{ cart.items_subtotal_price | money }}</span>
       </p>
@@ -57,6 +74,13 @@
           </li>
         {%- endfor -%}
       </ul>
+    {%- endif -%}
+
+    {%- if context == 'page' -%}
+      <p class="cart-summary__row" data-testid="cart-shipping">
+        <span>{{ 'cart.shipping' | t }}</span>
+        <span class="cart-summary__muted">{{ 'cart.shipping_at_checkout_short' | t }}</span>
+      </p>
     {%- endif -%}
 
     <p class="cart-summary__row cart-summary__row--total{% if show_subtotal %} cart-summary__row--divided{% endif %}">
@@ -86,5 +110,21 @@
       {{- 'cart.checkout' | t -}}
       {%- render 'slideshow-icon', name: 'arrow' -%}
     </button>
+
+    {%- if context == 'page' -%}
+      <div class="cart-summary__secure" data-testid="cart-secure">
+        <p class="cart-summary__secure-text">
+          {%- render 'status-icon', name: 'lock' -%}
+          {{- 'cart.secure_checkout' | t -}}
+        </p>
+        {%- if shop.enabled_payment_types.size > 0 -%}
+          <ul class="cart-summary__payments" role="list" data-testid="cart-payment-icons">
+            {%- for type in shop.enabled_payment_types -%}
+              <li>{{ type | payment_type_svg_tag }}</li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
   </div>
 {%- endif -%}
