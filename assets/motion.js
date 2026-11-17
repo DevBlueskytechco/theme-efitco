@@ -1,6 +1,8 @@
 // Lớp trải nghiệm trang (ES1-T235, ES1-T316). Không có file này trang vẫn đủ nội dung.
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const moving = !calm && !navigator.webdriver;
+// Nạp file JS theme theo data-motion-src (asset_url có ?v=, ES1-T485)
+const lazy = (el) => el.dataset.motionSrc && import(el.dataset.motionSrc).catch(() => {});
 
 // Gọi fn(el) 1 lần khi el vào khung nhìn
 const once = (options, fn) => {
@@ -15,7 +17,7 @@ if (moving) {
   reveal();
   countUp();
   // Chữ đậm dần, ảnh trôi của khối banner: nạp khi khối cách khung nhìn 1 màn
-  const scrub = once({ rootMargin: "100% 0px" }, () => import(new URL("motion-scrub.js", import.meta.url)).catch(() => {}));
+  const scrub = once({ rootMargin: "100% 0px" }, lazy);
   document.querySelectorAll(".image-with-text--banner").forEach(scrub);
 }
 
@@ -85,7 +87,7 @@ function countUp() {
 }
 
 // Hàng cuộn ngang: tiến trình, kéo chuột (mọi chế độ), nạp khi hàng đầu gần khung nhìn
-const extras = once({ rootMargin: "200px" }, () => import(new URL("scroll-extras.js", import.meta.url)).catch(() => {}));
+const extras = once({ rootMargin: "200px" }, lazy);
 document.querySelectorAll("scroll-buttons").forEach(extras);
 
 // Số giỏ đổi thì icon nhún. Partial thay cả link nên so số trước và sau.
