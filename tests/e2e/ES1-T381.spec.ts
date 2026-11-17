@@ -6,11 +6,12 @@
 //   TE381_TAG_PATH         trang tag có bài (vd /blogs/figma-blog/tagged/diet-plans)
 //   TE381_EMPTY_TAG_PATH   trang tag không còn bài (vd /blogs/figma-blog/tagged/khong-co)
 //   TE381_PAGED_BLOG_PATH  blog có số bài > Articles per page (trang 2: ?page=2)
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { env } from './support/store-data';
 import { expectNotChallenged } from './support/store-guard';
+import { newStoreContext } from './support/store-noise';
 
 const read = (p: string) => readFileSync(p, 'utf8');
 const noComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -165,7 +166,7 @@ test.describe('ES1-T381 store', () => {
   test('AC3 không JS: lọc bằng link', async ({ browser }) => {
     const path = env('TE381_BLOG_PATH');
     test.fixme(!path, 'thiếu TE381_BLOG_PATH');
-    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const ctx = await newStoreContext(browser, { javaScriptEnabled: false });
     const page = await ctx.newPage();
     await page.goto(path!);
     const tag = page.getByRole('navigation', { name: 'Blog topics' }).getByRole('link').nth(1);
@@ -178,6 +179,7 @@ test.describe('ES1-T381 store', () => {
 
   test('axe: 0 serious/critical trên trang blog', async ({ page }) => {
     await open(page, 'TE381_BLOG_PATH', 'blog ≥ 2 bài');
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('[data-testid="blog-articles"]').analyze();
     expect(violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => `${v.id}: ${v.nodes[0]?.target}`)).toEqual([]);
   });
