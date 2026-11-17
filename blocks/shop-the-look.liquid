@@ -1,8 +1,11 @@
 {% doc %}
   Shop the look (TE-12 AC5, AC-H19, AC-H20, Figma 1:560): eyebrow, h2 heading,
   optional link, a large image with 4 hotspots, a Fits note, the product rows from
-  the body and a totals panel. One column with the image on top below 64rem, two
-  columns from 64rem. No image: the list takes the full width.
+  the body and a totals panel. Layout (index-mobile-a.md §7, index-1280.md §2.4):
+  below 48rem one column (image, Fits, rows, panel); 48rem to 64rem the image on top
+  and a 1fr | 280 grid below it with a sticky panel; from 64rem a 12-column grid,
+  image 8 columns, list 4 columns with the panel at the bottom of the image.
+  No image: the list takes the full width.
 
   Works without JavaScript: a POST form to routes.cart_add_url with one hidden input
   (name id[]) per row in stock. The rows keep their prices; the count, totals and
@@ -11,16 +14,19 @@
 
   A parent cannot read its children and Liquid cannot add them up (AGENTS.md), so
   assets/bundle-form.js sums data-price. Discounts are display only (R8): Liquid only
-  outputs data-tiers, the real price comes from an automatic discount. With a tier
-  above 0 the note always shows (AC-H19): an empty setting takes the locale text. No
-  tier above 0: no data-tiers, discount row or note.
+  outputs data-tiers, the real price comes from an automatic discount. No discount
+  note under the panel (decisions.md 07/11, AC-H19). No tier above 0: no data-tiers
+  and no discount row. The discount row uses --panel-saving with a tag icon and a
+  minus sign (foundation §2).
 
   Hooks for assets/bundle-form.js (BE ES1-T149; same contract as bundle-builder, no
   checkboxes, no progress and no line list). Rename only with a ticket comment.
   - Root: data-lazy-module (assets/lazy-module.js imports the module near the viewport),
     data-tiers, data-cart-add-url, data-cart-url, data-cart-type, data-currency,
     data-locale, data-label-count-one, data-label-count-other, data-label-discount (%p),
-    data-label-status (%n, %t), data-label-error. JS sets data-enhanced on the root.
+    data-label-status (%n, %t), data-label-error, data-label-hotspot (%t is the product
+    title of the row with the same number: JS may set it as the hotspot aria-label,
+    TE-12 AC9; without JS the hotspots are hidden). JS sets data-enhanced on the root.
   - Panel: data-bundle-live (hidden by CSS until data-enhanced, space kept; display none
     without scripting), data-bundle-count, data-bundle-subtotal, data-bundle-discount-row,
     data-bundle-discount-label, data-bundle-discount (amount without a sign, CSS adds the
@@ -32,8 +38,8 @@
   shop-the-look-link, shop-the-look-image, shop-the-look-hotspot, shop-the-look-note,
   shop-the-look-rows, shop-the-look-panel, shop-the-look-count, shop-the-look-subtotal,
   shop-the-look-discount-row, shop-the-look-discount, shop-the-look-total,
-  shop-the-look-discount-note, shop-the-look-submit, shop-the-look-status,
-  shop-the-look-error, shop-the-look-placeholder.
+  shop-the-look-submit, shop-the-look-status, shop-the-look-error,
+  shop-the-look-placeholder.
 
   Empty state: no row with a product → a hint in the theme editor, nothing on the
   storefront (ES1-T168 Q1).
@@ -82,6 +88,7 @@
   assign label_discount = 'blocks.shop_the_look.discount' | t
   assign label_status = 'blocks.shop_the_look.status' | t
   assign label_error = 'blocks.shop_the_look.error' | t
+  assign label_hotspot = 'blocks.shop_the_look.hotspot_product' | t
 -%}
 
 {%- if rows != blank -%}
@@ -100,6 +107,7 @@
     data-label-discount="{{ label_discount | escape }}"
     data-label-status="{{ label_status | escape }}"
     data-label-error="{{ label_error | escape }}"
+    data-label-hotspot="{{ label_hotspot | escape }}"
     data-lazy-module="{{ 'bundle-form.js' | asset_url }}"
     data-testid="shop-the-look"
     {{ block.shopify_attributes }}
@@ -134,7 +142,7 @@
             class: 'shop-the-look__image',
             width: 1872,
             widths: '360, 720, 936, 1200, 1872',
-            sizes: '(min-width: 120rem) 936px, (min-width: 64rem) 62vw, 100vw',
+            sizes: '(min-width: 120rem) 936px, (min-width: 64rem) 64vw, 100vw',
             loading: 'lazy'
           %}
           {%- for hotspot in (1..4) -%}
@@ -205,12 +213,15 @@
 
             {%- if tiers != blank -%}
               <div
-                class="shop-the-look__line"
+                class="shop-the-look__line shop-the-look__line--discount"
                 data-bundle-live
                 data-bundle-discount-row
                 data-testid="shop-the-look-discount-row"
               >
-                <span data-bundle-discount-label></span>
+                <span class="shop-the-look__discount-label">
+                  <svg class="shop-the-look__discount-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8Z" /><path d="M7.5 7.5h.01" /></svg>
+                  <span data-bundle-discount-label></span>
+                </span>
                 <span
                   class="shop-the-look__discount"
                   data-bundle-discount
