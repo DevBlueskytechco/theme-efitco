@@ -547,8 +547,7 @@ modal-dialog {
   background: transparent;
 }
 
-/* Alert khối (foundation §18 "Lỗi khối", TE-10 AC13): viền 1px sale, bo 12, icon 24, tiêu đề 16/600,
-   câu xử lý 14 muted, nút secondary "Try Again", role="alert". Markup: empty-state kind 'error'. */
+/* Alert khối (foundation §18, TE-10 AC13). Markup: empty-state kind 'error' */
 .alert {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
@@ -598,8 +597,7 @@ modal-dialog {
   margin-block-start: var(--space-2);
 }
 
-/* Empty state (foundation §18, TE-10 AC13): giữa khối, ≤ 512, icon 32 trong tròn 72 nền alt, h2/h3, 1 câu,
-   1 nút primary có đích cụ thể + text link phụ. Markup: snippets/empty-state.liquid. */
+/* Empty state (foundation §18, TE-10 AC13). Markup: snippets/empty-state.liquid */
 .empty-state {
   display: grid;
   justify-items: center;
@@ -2325,8 +2323,7 @@ bundle-form {
   }
 }
 
-/** Breadcrumb, tiêu đề trang, banner trang con (TE-22-R2-FE1; foundation §3.3, §5; SRS TE-22 AC9–AC13).
-   Snippet breadcrumb + page-title. Tên dài không cắt, xuống dòng (AC10, thay "…" của §5). */
+/** Breadcrumb, tiêu đề trang, banner trang con (TE-22-R2-FE1; TE-22 AC9–AC13). Tên dài xuống dòng (AC10) */
 .breadcrumb {
   padding-block-start: var(--space-4);
   font-size: var(--font-size-sm);
@@ -2412,10 +2409,7 @@ bundle-form {
   font-size: var(--font-size-sm);
 }
 
-/* Banner: thẻ bo 16 dưới header tối, không đè header. Ảnh LCP: render 'image' class page-banner__media,
-   eager + fetchpriority high (caller). Cao theo chữ, tối thiểu 280/360; ảnh phủ tuyệt đối, cover theo focal point.
-   Lớp tối gắn vào khung ảnh (::after) nên không cần var(--layer-*): nội dung positioned đứng sau trong DOM vẽ đè lên.
-   60% trên ảnh trắng: chữ trắng 4.56:1; đáy 75% ≥ 7.3:1. */
+/* Banner: lớp tối ở ::after khung ảnh, nội dung sau trong DOM vẽ đè (không cần --layer-*). Chữ trắng ≥ 4.56:1 */
 .page-banner {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -5167,8 +5161,7 @@ product-variant-picker:not(:defined) {
   color: var(--color-foreground);
 }
 
-/** Rich text chung (foundation §28, ES1-T403): mô tả sản phẩm, mô tả collection, page, article.
-   h4–h6 lấy cỡ, weight từ critical.css; ở đây chỉ khoảng cách */
+/** Rich text chung (foundation §28, ES1-T403). h4–h6 cỡ, weight ở critical.css */
 .rte {
   overflow-wrap: break-word;
 }
@@ -9801,29 +9794,36 @@ video-card {
   }
 }
 
-/** Form chung (ES1-T407, ES1-T382, ES1-T383) */
-.contact-form {
-  display: grid;
-  gap: var(--space-4);
-  max-inline-size: 65ch;
-}
-
+/** Form chung (foundation §12; ES1-T407, ES1-T382, ES1-T383). Khung form: .comment-form (article-comments), .contact-form__form (contact-form) */
 .form-field {
   display: grid;
+  align-content: start;
   gap: var(--space-2);
 }
 
 .form-field__label {
+  font-size: var(--font-size-sm);
   font-weight: 600;
 }
 
+.form-field__required {
+  color: var(--color-sale);
+}
+
 .form-field__input {
-  min-block-size: calc(var(--space-1) * 11);
-  padding: var(--space-2) var(--space-3);
+  inline-size: 100%;
+  min-block-size: calc(var(--space-1) * 12);
+  padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-muted-light);
   border-radius: var(--radius-input);
   background-color: var(--color-background);
   color: var(--color-foreground);
+  font-size: var(--font-size-base);
+}
+
+.form-field__input--textarea {
+  min-block-size: calc(var(--space-1) * 36);
+  resize: vertical;
 }
 
 .form-field__input:hover {
@@ -9831,12 +9831,20 @@ video-card {
 }
 
 .form-field__input:focus-visible {
+  border-color: var(--color-accent);
   outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+  outline-offset: -1px;
 }
 
 .form-field__input[aria-invalid='true'] {
-  border: 2px solid var(--color-sale);
+  border-color: var(--color-sale);
+  box-shadow: inset 0 0 0 1px var(--color-sale);
+}
+
+.form-field__input[readonly],
+.form-field__input:disabled {
+  border-color: var(--color-border);
+  background-color: var(--color-background-alt);
 }
 
 .form-field__hint {
@@ -9847,13 +9855,31 @@ video-card {
 /* Lỗi: chữ + icon, không chỉ bằng màu */
 .form-field__error {
   display: flex;
+  align-items: flex-start;
   gap: var(--space-2);
   color: var(--color-sale);
   font-size: var(--font-size-sm);
   font-weight: 500;
 }
 
+.form-field__error[hidden],
+.contact-form__summary[hidden] {
+  display: none;
+}
+
 :is(.form-field__error, .comment-form__note) .status-icon { flex: none; inline-size: var(--space-4); block-size: var(--space-4); margin-block-start: 0.15em; }
+
+@media (min-width: 64rem) {
+  .form-field__input:not(.form-field__input--textarea) {
+    min-block-size: calc(var(--space-1) * 13);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .form-field__input {
+    transition: border-color var(--motion-fast) var(--ease-out), box-shadow var(--motion-fast) var(--ease-out);
+  }
+}
 
 .form-status {
   display: grid;
@@ -9868,7 +9894,9 @@ video-card {
   border-inline-start-color: var(--color-sale);
 }
 
-.form-status:focus-visible {
+.form-status:focus-visible,
+.contact-form__summary:focus-visible,
+.contact-form__status:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
@@ -10606,4 +10634,226 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
 
   @keyframes motion-rise { from { opacity: 0; translate: 0 40px; } }
   @keyframes motion-shimmer { to { background-position: -300% 0; } }
+}
+
+/* Page, contact (ES1-T383; ui-spec/page.md; TE-21). Cuối file: .contact-aside .faq-item đè FAQ trang chủ */
+.page-reading {
+  inline-size: min(100%, 45rem);
+  margin-inline: auto;
+  padding-block-end: var(--space-7);
+}
+
+.page-reading__hint,
+.contact-aside.contact-aside--placeholder {
+  padding: var(--space-4) var(--space-5);
+  border: 1px dashed var(--color-muted-light);
+  border-radius: var(--radius-card);
+  background: none;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.contact {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-7);
+  padding-block-end: var(--space-7);
+}
+
+.contact__main {
+  display: grid;
+  align-content: start;
+  gap: var(--space-6);
+  min-inline-size: 0;
+}
+
+.contact-form__form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.contact-form__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2) var(--space-4);
+}
+
+.contact-form__heading,
+.contact-aside__heading {
+  font-size: var(--font-size-h3);
+}
+
+.contact-form__required,
+.contact-form__privacy {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.contact-form__link,
+.contact-aside__link {
+  color: var(--color-foreground);
+  font-weight: 500;
+  text-decoration: underline 1px;
+  text-underline-offset: 0.2em;
+}
+
+.contact-form__link:hover,
+.contact-aside__link:hover {
+  color: var(--color-accent);
+}
+
+.contact-form__fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+.alert--success {
+  border-color: var(--color-border);
+  border-inline-start: var(--space-1) solid var(--color-badge-new);
+}
+
+.alert--success .alert__icon {
+  color: var(--color-badge-new);
+}
+
+.contact-form__summary-list {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: var(--space-4);
+  padding: 0;
+  list-style: none;
+  font-size: var(--font-size-sm);
+}
+
+.contact-form__summary-list a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: calc(var(--space-1) * 11);
+}
+
+.contact-form__submit {
+  inline-size: 100%;
+  min-block-size: calc(var(--space-1) * 12);
+}
+
+.contact-form__submit .slideshow-icon {
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+}
+
+.contact-aside {
+  display: grid;
+  align-content: start;
+  gap: var(--space-5);
+  min-inline-size: 0;
+  padding: var(--space-6) var(--space-5);
+  border-radius: calc(var(--radius-card) + var(--space-1));
+  background-color: var(--color-background-alt);
+  color: var(--color-background-alt-foreground);
+}
+
+.contact-aside__header {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.contact-aside .faq-item {
+  padding-block: 0;
+  border-block-end-color: var(--color-border);
+}
+
+.contact-aside .faq-item .faq-item__summary {
+  inset-block-start: 0;
+  min-block-size: calc(var(--space-1) * 14);
+  margin-block: 0;
+  padding-block: var(--space-2);
+}
+
+.contact-aside .faq-item .faq-item__question {
+  inset-block-start: 0;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+
+/* muted: 7.68 trên alt */
+.contact-aside .faq-item .faq-item__answer {
+  inset-block-start: 0;
+  margin-block-start: 0;
+  padding-block: 0 var(--space-4);
+  padding-inline: calc(var(--space-5) + var(--space-3)) 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
+
+.contact-aside__links {
+  display: grid;
+  padding: 0;
+  list-style: none;
+}
+
+.contact-aside__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-block-size: calc(var(--space-1) * 11);
+}
+
+@media (min-width: 48rem) {
+  .contact-form__fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .contact-form__field--full {
+    grid-column: 1 / -1;
+  }
+
+  .contact-form__submit {
+    justify-self: start;
+    inline-size: auto;
+    min-inline-size: calc(var(--space-1) * 50);
+  }
+
+  .contact-aside {
+    padding: var(--space-6);
+  }
+}
+
+@media (min-width: 64rem) {
+  .page-reading,
+  .contact {
+    padding-block-end: var(--space-8);
+  }
+
+  .contact-form__submit {
+    min-block-size: calc(var(--space-1) * 13);
+  }
+}
+
+@media (min-width: 80rem) {
+  .contact {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-5);
+    align-items: start;
+  }
+
+  .contact__main {
+    grid-column: 1 / span 7;
+  }
+
+  .contact-aside {
+    grid-column: 9 / span 4;
+    position: sticky;
+    inset-block-start: calc(var(--sticky-top) + var(--space-5));
+    padding: calc(var(--space-1) * 10);
+  }
+
+  .contact-aside .faq-item .faq-item__question {
+    font-size: var(--font-size-lg);
+  }
 }
