@@ -84,7 +84,11 @@
       Header and list share one scroll-buttons box (next, back, progress). It repeats the block's
       grid, so the layout stays the same; lazy-module.js imports scroll-buttons.js near the viewport.
     {%- endcomment -%}
-    <scroll-buttons class="video-carousel__scroller" data-lazy-module="{{ 'scroll-buttons.js' | asset_url }}">
+    <scroll-buttons
+      class="video-carousel__scroller"
+      data-lazy-module="{{ 'scroll-buttons.js' | asset_url }}"
+      data-motion-src="{{ 'scroll-extras.js' | asset_url }}"
+    >
     <div class="video-carousel__header">
       <div class="video-carousel__row">
         <div class="video-carousel__title">
