@@ -5,7 +5,7 @@
 // Tab chỉ trong cấp đang hiện, vuốt về mép đóng); ADR 0007 #5 (<modal-dialog data-layer="menu">: showModal, focus tiêu đề, trả focus).
 // Hợp đồng markup FE: blocks/header.liquid {% doc %} (ES1-T320, TE-1-R2-FE3), snippets/header-drawer-head.liquid.
 // Hành vi: fixture dựng lại markup drawer của header.liquid trên origin giả https://theme.test (page.route phục vụ assets/ thật:
-// critical.css, base.css, header-menu.js, modal-dialog.js, header-drawer.js) để kiểm cả đường nạp lười import(new URL(..., import.meta.url)).
+// critical.css, base.css, header-menu.js, modal-dialog.js, header-drawer.js) để kiểm cả đường nạp lười import(data-drawer-src) (ES1-T485: URL asset_url có ?v=).
 // Storefront: trang chủ preview, mobile.
 // Chạy: npx playwright test tests/e2e/ES1-T323.spec.ts --project=mobile (storefront: PREVIEW_URL=... STORE_PASSWORD=...)
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
@@ -98,7 +98,7 @@ const FIXTURE = `<!doctype html><html lang="en"><head><meta charset="utf-8">
 <nav class="site-header__nav" aria-label="Main menu" data-testid="header-menu"><ul class="site-header__menu">
   <li class="site-header__item" data-testid="header-menu-item"><a class="site-header__link" href="#sale">Sale</a></li></ul></nav>
 </div>
-<header-menu hidden></header-menu>
+<header-menu hidden data-drawer-src="/assets/header-drawer.js?v=485"></header-menu>
 <header-drawer hidden></header-drawer>
 </header>
 <script src="/assets/header-menu.js" type="module"></script>
@@ -186,14 +186,17 @@ test.describe('ES1-T323 tĩnh', () => {
   });
 
   test('nạp lười: header-menu.js import header-drawer.js khi pointerenter/focusin/touchstart nút menu, không thẻ script riêng, không còn class drawer cũ', () => {
-    expect(MENU).toContain('import(new URL("header-drawer.js", import.meta.url))');
+    // ES1-T485: URL có ?v= từ asset_url trên host <header-menu>, không import.meta.url (CDN giữ bản cũ)
+    expect(MENU).toContain('import(this.dataset.drawerSrc)');
+    expect(MENU).not.toContain('import.meta.url');
+    expect(HEADER).toContain(`<header-menu hidden data-drawer-src="{{ 'header-drawer.js' | asset_url }}"></header-menu>`);
     expect(MENU).toMatch(/\["pointerenter", "focusin", "touchstart"\]/);
     expect(MENU).not.toMatch(/class HeaderDrawer|mount\("header-drawer"/);
     for (const dir of ['blocks', 'snippets', 'layout', 'templates']) {
       for (const file of readdirSync(dir, { withFileTypes: true, recursive: true })) {
         if (!file.isFile()) continue;
         const path = join(file.parentPath, file.name);
-        expect(readFileSync(path, 'utf8'), path).not.toMatch(/header-drawer\.js/);
+        expect(readFileSync(path, 'utf8'), path).not.toMatch(/<script[^>]+header-drawer\.js/);
       }
     }
   });
