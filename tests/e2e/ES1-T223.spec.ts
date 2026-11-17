@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không mở được Chrome; chờ CI).
 // Ticket ES1-T223: featured-product-status có nội dung sau đổi variant (docs/srs.md#TE-13 AC-H22). Test gốc: tests/e2e/ES1-T158.spec.ts:315.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T223.spec.ts
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 
 const TE13 = '/?view=te13';
 const STATES = '/?view=te13-states';

@@ -4,7 +4,8 @@
 // Dữ liệu ES1-T134 trong tests/e2e/store-data.json: TE11_TAGS_READY, TE11_TAG_FILTER_READY; chưa true thì skip có lý do.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
@@ -49,7 +50,7 @@ async function expectNoSeriousAxe(page: Page) {
 
 async function noJsPage(browser: Browser) {
   const use = test.info().project.use;
-  const context = await browser.newContext({
+  const context = await newStoreContext(browser, {
     javaScriptEnabled: false,
     storageState: 'tests/setup/state.json',
     baseURL: use.baseURL,

@@ -1,7 +1,8 @@
 // KHÔNG CHẮC: nhóm "HTTP thật" (TC-09, TC-11) chưa chạy: sandbox agent cấm mở cổng cục bộ và không mở được Chromium → chờ CI. Nhóm logic đã chạy.
 // Ticket ES1-T163: helper tests/e2e/support/cart-api.ts. Không gọi store dev (không tốn hạn mức 429).
 // Chạy: npx playwright test tests/e2e/ES1-T163.spec.ts
-import { test, expect, type APIRequestContext } from '@playwright/test';
+import { test, expect, type APIRequestContext } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { CART, MAX_TOTAL_WAIT_MS, cartApi, retryDelayMs, type CartInit } from './support/cart-api';
@@ -151,7 +152,7 @@ test.describe('ES1-T163 cartApi HTTP thật', () => {
   test.beforeEach(() => { hits = []; replies = []; });
 
   test('TC-09 truyền page: dùng page.request, chung cookie giỏ với trang', async ({ browser }) => {
-    const context = await browser.newContext({ baseURL: origin });
+    const context = await newStoreContext(browser, { baseURL: origin });
     await context.addCookies([{ name: 'cart', value: 'c1', url: origin }]);
     const page = await context.newPage();
     await cartApi(page, CART.clear);
