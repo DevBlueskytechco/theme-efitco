@@ -4,7 +4,7 @@
 // "Failed to resolve module specifier @shopify/partial-rendering" (errors-in-console, Best Practices).
 // Sửa: không thẻ script module nào trong <head> của layout; standard-events.js, motion.js dời xuống cuối <body>.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_VARIANTS_HANDLE=... npx playwright test tests/e2e/ES1-T415.spec.ts
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { watchShopPay403 } from './support/console-guard';

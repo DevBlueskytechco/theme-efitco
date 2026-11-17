@@ -3,7 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T157.spec.ts -g "AC3-markup|AC4-markup|nojs"
 // JS của BE1 ở tests/e2e/ES1-T158.spec.ts: bấm mới chạy, lỗi video. Test "0 video" chặn file module vì module clone video khi vào khung. Video Shopify cần media-dủ-loại có video (ES1-T153): thiếu thì skip có lý do.
 import { readFileSync } from 'node:fs';
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';

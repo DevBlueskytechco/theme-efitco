@@ -2,7 +2,8 @@
 // Ticket ES1-T121 TE-7-FE4: multicolumn, Custom Liquid (docs/srs.md#TE-7 AC4, AC5; drafts/techlead/ES1-T114/task-split.md D1, D2, D6, D7, D8).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T121.spec.ts -g "AC4|AC5"
 // Biến thể chạy trên /?view=te7 (templates/index.te7.liquid), mặc định schema chạy trên /.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
@@ -167,7 +168,7 @@ test.describe('ES1-T121 TE-7 multicolumn, Custom Liquid', () => {
   });
 
   test('AC4 không JS: đủ cột và link đi được', async ({ browser, baseURL }) => {
-    const context = await browser.newContext({
+    const context = await newStoreContext(browser, {
       baseURL,
       javaScriptEnabled: false,
       storageState: 'tests/setup/state.json',

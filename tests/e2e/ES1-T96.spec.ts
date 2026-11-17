@@ -67,7 +67,8 @@ test.describe('ES1-T96 contract', () => {
     expect(block).toMatch(/<cart-drawer\b/);
     expect(js).toContain('customElements.define("cart-drawer"');
     // Tên partial là rest args, lấy từ data-partials của cart-items (ES1-T98: dùng chung cho /cart), khớp {% partial %} ở block và header.
-    expect(js).toContain('document.querySelector("cart-items")?.dataset.partials || "cart-count"');
+    // ES1-T98 lượt 2: document đặt alias d.
+    expect(js).toMatch(/\b(document|d)\.querySelector\("cart-items"\)\?\.dataset\.partials \|\| "cart-count"/);
     expect(js).toContain('partials.fetch(...names.split(" "), {');
     // ES1-T453 #1 (CTO 14/11): drawer thêm partial cart-drawer-count, cart-drawer-footer; thay "cart-drawer cart-count".
     expect(block).toContain('data-partials="cart-drawer cart-drawer-count cart-drawer-footer cart-count"');

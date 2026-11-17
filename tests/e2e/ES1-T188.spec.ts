@@ -2,7 +2,7 @@
 // Ticket ES1-T188 TE-3-FE4: blocks/featured-collection, 4 tab, 3 panel trong thẻ template, không JS là link (Figma 1:490, AC-H11, AC-H12 phần markup).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T188.spec.ts
 // 4 tab trên /?view=figma cần figma-tab-* (ES1-T178): thiếu thì skip có lý do. Đổi tab bằng JS kiểm ở ES1-T189.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { visibleImagesLoaded } from './support/page-ready';

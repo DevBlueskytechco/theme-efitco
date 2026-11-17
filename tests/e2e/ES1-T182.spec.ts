@@ -2,7 +2,7 @@
 // Ticket ES1-T182 TE-17-FE1c: quiz, quiz-step, bundle-builder, featured-product theo Figma (plan ES1-T169 D1, CR-7; AC-H5, H6, H15, H18 phần markup).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T182.spec.ts
 // Body map bấm được và token panel: tests/e2e/ES1-T183.spec.ts.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 
 const HOME = '/';
 const FIGMA = '/?view=figma';
