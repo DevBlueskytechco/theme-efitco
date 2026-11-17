@@ -4,7 +4,7 @@
 // Phần lớn test mock /search/suggest.json bằng page.route để kiểm hành vi tất định (debounce, huỷ, phím, lỗi).
 // Test dữ liệu thật dùng TE8_QUERY_ALL (ES1-T125, env hoặc tests/e2e/store-data.json); thiếu thì skip có lý do.
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Page, type Request } from '@playwright/test';
+import { test, expect, type Page, type Request } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
