@@ -2,7 +2,7 @@
 // Ticket ES1-T181 TE-17-FE2: footer hàng 16 (1:1104), AC-H28. Form thành công, lỗi đã có ở TE-1 TC-32, TC-33.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T181.spec.ts
 // Logo và ảnh newsletter là block setting của footer trong layout, preview không đặt được: phần có ảnh cần người kiểm trong editor.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';

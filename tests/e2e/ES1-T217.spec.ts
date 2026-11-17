@@ -1,6 +1,6 @@
 // ES1-T217: giữ chặt các chỗ test vừa sửa để chúng không thành kẽ hở. Không gọi store.
 // Chạy: npx playwright test --config=drafts/qa/ES1-T217/pw.static.config.ts tests/e2e/ES1-T217.spec.ts
-import { test, expect, type ConsoleMessage } from '@playwright/test';
+import { test, expect, type ConsoleMessage } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readdirSync, readFileSync } from 'node:fs';
 import { isResource429Log, watchShopPay403 } from './support/console-guard';

@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy (phiên viết không có preview, chưa type-check); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép sang tests/e2e/ES1-T175.spec.ts.
 // Ticket ES1-T175 TE-17-FE0: template cổng /?view=figma, bỏ multicolumn và custom liquid khỏi trang chủ (plan ES1-T169 D2, CR-5).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T175.spec.ts
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';

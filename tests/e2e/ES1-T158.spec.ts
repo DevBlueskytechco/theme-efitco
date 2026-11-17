@@ -5,7 +5,7 @@
 // Đổi HTML bằng init script ở readystatechange đầu tiên (trước khi module chạy), không dùng route.fetch: store có thể trả trang chặn cho request lặp (plan ES1-T169 nhóm A).
 // Video: store có thể chưa có video Shopify (ES1-T153) nên đổi thẻ YouTube thành thẻ kind shopify với URL giả; play, pause của media được stub vì không có tệp thật.
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
+import { test, expect, type Locator, type Page, type Request } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { CART_GLOB, themeAdd } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';

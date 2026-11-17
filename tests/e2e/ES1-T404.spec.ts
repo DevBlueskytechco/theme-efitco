@@ -3,7 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T404.spec.ts
 // Nhóm @static đọc file repo, không cần store. Nhóm store: T404_SALE_SECOND_HANDLE (sản phẩm biến thể mặc định không sale, biến thể khác sale);
 // không đặt thì tự tìm trong /products.json, không có thì skip có lý do (không coi là đạt).
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expectNotChallenged } from './support/store-guard';
