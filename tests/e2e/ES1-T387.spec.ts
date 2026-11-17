@@ -6,10 +6,11 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { gzipSync } from 'node:zlib';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
+import { newStoreContext } from './support/store-noise';
 
 const read = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 const noComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '));
@@ -205,7 +206,7 @@ test.describe('ES1-T387 store', () => {
 
   test('AC8 nojs: trang kết quả đọc được không cần JS', async ({ browser }) => {
     const use = test.info().project.use;
-    const context = await browser.newContext({ javaScriptEnabled: false, storageState: 'tests/setup/state.json', baseURL: use.baseURL });
+    const context = await newStoreContext(browser, { javaScriptEnabled: false, storageState: 'tests/setup/state.json', baseURL: use.baseURL });
     const page = await context.newPage();
     await page.goto(NO_TAGS);
     await expect(page.locator('h1')).toHaveText('Your Gear Shortlist');
