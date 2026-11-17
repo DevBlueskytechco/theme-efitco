@@ -365,7 +365,7 @@ test.describe('ES1-T323 hành vi (fixture)', () => {
     // Panel phủ trong drawer: nằm trong hộp của drawer. Đo sau khi hết hiệu ứng trượt (TE-1 AC2 "cấp 2 trượt", base.css
     // drawer-level-in từ translate 100%): giữa chừng panel còn lệch ra ngoài mép drawer (bị overflow: hidden của drawer cắt).
     await panel.evaluate((el) => Promise.all(el.getAnimations().map((a) => a.finished)));
-    const d =(await drawerOf(page).boundingBox())!;
+    const d = (await drawerOf(page).boundingBox())!;
     const p = (await panel.boundingBox())!;
     expect(p.x).toBeGreaterThanOrEqual(d.x - 1);
     expect(p.x + p.width).toBeLessThanOrEqual(d.x + d.width + 1);
@@ -549,7 +549,7 @@ test.describe('ES1-T323 storefront', () => {
       await expect(back).toBeFocused();
       await expect(back).toHaveAccessibleName(/\S/);
       await expectNotChallenged(page);
-      const axe =await new AxeBuilder({ page }).include('[data-testid="header-drawer"]').analyze();
+      const axe = await new AxeBuilder({ page }).include('[data-testid="header-drawer"]').analyze();
       const bad = axe.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? '')).map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`);
       expect(bad, 'axe cấp 2 mở').toEqual([]);
       await back.click();
