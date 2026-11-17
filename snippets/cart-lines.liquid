@@ -11,9 +11,29 @@
   Line order (DOM = Tab order): image link (tabindex -1, aria-hidden: only the
   title takes Tab), title, options, properties, selling plan (AC10, the line
   price is already the plan price), unit price with compare-at or original price
-  struck through, unit price measurement, line discounts (tag icon), then the
-  stepper (decrease, quantity, increase), the trash icon remove link and the
-  line total. In the drawer CSS places the remove link on the title row.
+  struck through, unit price measurement, line discounts (tag icon), "Volume
+  pricing applied" (AC9), the short quantity rule (AC9), then the stepper
+  (decrease, quantity, increase), the trash icon remove link, the line total
+  (original line price struck through when a discount lowers it) and the line
+  error. Below 48rem (and always in the drawer) CSS places the remove link on
+  the title row and the stepper next to the line total; on the cart page from
+  48rem one row of 5 columns under the aria-hidden column head
+  (Product · Quantity · Total).
+
+  Quantity rule (AC9, product-shopify-features.md §5.3; B2B catalogs): only the
+  parts that apply print ("Min 6 · Increments of 6"): min above 1, a max, an
+  increment above 1. Then the quantity input gets step and max (the browser
+  checks the no-JavaScript submit), aria-describedby on the rule line, and
+  data-quantity-rule, data-quantity-min, data-quantity-max, data-quantity-step
+  for JavaScript; decrease has aria-disabled at the min, increase at the max.
+  "Volume pricing applied" prints when the variant has price breaks and the
+  cart quantity of that variant (all lines) reaches one of them.
+
+  Line error: p data-cart-line-error (id "{quantity id}-error", hidden) with a
+  warning icon and data-cart-line-error-text. With a rule it already holds the
+  rule sentence; JavaScript (TE-5-R2-BE1) removes hidden, sets aria-invalid and
+  adds the id to aria-describedby on an invalid entry, or writes the server
+  message after a 422.
 
   Price: a line with a discount shows final_price on sale + original_price
   struck through; otherwise a variant (or selling plan) compare-at price above
@@ -29,14 +49,17 @@
   JavaScript hooks: data-line-key (li), data-cart-remove (link),
   data-cart-update (button, hidden by CSS once cart-items has data-enhanced),
   data-cart-step="-1" / "1" (decrease, increase buttons, aria-controls is the
-  quantity input id).
+  quantity input id), data-quantity-rule (+ min, max, step) on the input,
+  data-cart-line-error and data-cart-line-error-text.
 
-  Test hooks: cart-lines, cart-line, cart-line-image, cart-line-title,
-  cart-line-options, cart-line-properties, cart-line-selling-plan,
-  cart-line-price, cart-line-original-price, cart-line-compare-price,
-  cart-line-unit-price, cart-line-discount, cart-line-total, cart-line-quantity,
-  cart-line-decrease, cart-line-increase, cart-line-remove, cart-update,
-  cart-empty, cart-empty-heading, cart-empty-cta, cart-empty-link.
+  Test hooks: cart-lines-head (cart page), cart-lines, cart-line,
+  cart-line-image, cart-line-title, cart-line-options, cart-line-properties,
+  cart-line-selling-plan, cart-line-price, cart-line-original-price,
+  cart-line-compare-price, cart-line-unit-price, cart-line-discount,
+  cart-line-volume, cart-line-quantity-rule, cart-line-total,
+  cart-line-quantity, cart-line-decrease, cart-line-increase, cart-line-remove,
+  cart-line-error, cart-update, cart-empty, cart-empty-heading, cart-empty-cta,
+  cart-empty-link.
 
   @param {object} cart - The cart to list
   @param {string} context - Where it renders, 'page' or 'drawer'. Part of the form id and of the input ids
@@ -71,6 +94,7 @@
       {%- else -%}
         <a class="button" href="{{ routes.all_products_collection_url }}" data-testid="cart-empty-cta">
           {{- 'cart.continue_shopping' | t -}}
+          {%- render 'slideshow-icon', name: 'arrow' -%}
         </a>
         <a class="empty-state__link" href="{{ routes.collections_url }}" data-testid="cart-empty-link">
           {{- 'cart.browse_collections' | t -}}
@@ -84,10 +108,17 @@
       assign image_widths = '72, 96, 144, 192'
       assign image_sizes = '(min-width: 48rem) 96px, 72px'
     else
-      assign image_widths = '96, 120, 192, 240'
-      assign image_sizes = '(min-width: 48rem) 120px, 96px'
+      assign image_widths = '88, 120, 176, 240'
+      assign image_sizes = '(min-width: 48rem) 120px, 88px'
     endif
   -%}
+  {%- if context == 'page' -%}
+    <div class="cart-lines__head" aria-hidden="true" data-testid="cart-lines-head">
+      <span>{{ 'cart.product_column' | t }}</span>
+      <span>{{ 'cart.quantity_column' | t }}</span>
+      <span>{{ 'cart.total' | t }}</span>
+    </div>
+  {%- endif -%}
   <ul class="cart-lines" role="list" data-testid="cart-lines">
     {%- for item in cart.items -%}
       {%- liquid
@@ -96,6 +127,24 @@
         assign compare_price = item.variant.compare_at_price
         if item.selling_plan_allocation.compare_at_price
           assign compare_price = item.selling_plan_allocation.compare_at_price
+        endif
+
+        assign rule_min = item.variant.quantity_rule.min | default: 1
+        assign rule_max = item.variant.quantity_rule.max
+        assign rule_increment = item.variant.quantity_rule.increment | default: 1
+        assign has_rule = false
+        if rule_min > 1 or rule_increment > 1 or rule_max != blank
+          assign has_rule = true
+        endif
+
+        assign volume_applied = false
+        if item.variant.quantity_price_breaks_configured?
+          assign variant_quantity = cart.items | where: 'variant_id', item.variant_id | map: 'quantity' | sum
+          for price_break in item.variant.quantity_price_breaks
+            if variant_quantity >= price_break.minimum_quantity
+              assign volume_applied = true
+            endif
+          endfor
         endif
       -%}
       <li class="cart-line" data-line-key="{{ item.key }}" data-testid="cart-line">
@@ -203,6 +252,27 @@
               {%- endfor -%}
             </ul>
           {%- endif -%}
+
+          {%- if volume_applied -%}
+            <p class="cart-line__volume" data-testid="cart-line-volume">
+              {%- render 'status-icon', name: 'tag' -%}
+              {{- 'cart.volume_pricing_applied' | t -}}
+            </p>
+          {%- endif -%}
+
+          {%- if has_rule -%}
+            <p id="{{ quantity_id }}-rule" class="cart-line__rule" data-testid="cart-line-quantity-rule">
+              {%- if rule_min > 1 -%}
+                <span>{{ 'cart.quantity_rule_min' | t: min: rule_min }}</span>
+              {%- endif -%}
+              {%- if rule_max != blank -%}
+                <span>{{ 'cart.quantity_rule_max' | t: max: rule_max }}</span>
+              {%- endif -%}
+              {%- if rule_increment > 1 -%}
+                <span>{{ 'cart.quantity_rule_increment' | t: increment: rule_increment }}</span>
+              {%- endif -%}
+            </p>
+          {%- endif -%}
         </div>
 
         <div class="cart-line__controls">
@@ -215,7 +285,7 @@
               type="button"
               aria-label="{{ 'cart.decrease_label' | t: title: line_title }}"
               aria-controls="{{ quantity_id }}"
-              {% if item.quantity <= 1 %}
+              {% if item.quantity <= rule_min %}
                 aria-disabled="true"
               {% endif %}
               data-cart-step="-1"
@@ -231,6 +301,17 @@
               name="updates[]"
               value="{{ item.quantity }}"
               min="0"
+              {% if has_rule %}
+                step="{{ rule_increment }}"
+                {% if rule_max != blank %}
+                  max="{{ rule_max }}"
+                {% endif %}
+                aria-describedby="{{ quantity_id }}-rule"
+                data-quantity-rule
+                data-quantity-min="{{ rule_min }}"
+                data-quantity-max="{{ rule_max }}"
+                data-quantity-step="{{ rule_increment }}"
+              {% endif %}
               inputmode="numeric"
               form="{{ form_id }}"
               data-testid="cart-line-quantity"
@@ -240,6 +321,9 @@
               type="button"
               aria-label="{{ 'cart.increase_label' | t: title: line_title }}"
               aria-controls="{{ quantity_id }}"
+              {% if rule_max != blank and item.quantity >= rule_max %}
+                aria-disabled="true"
+              {% endif %}
               data-cart-step="1"
               data-testid="cart-line-increase"
               hidden
@@ -261,6 +345,23 @@
         <p class="cart-line__total">
           <span class="visually-hidden">{{ 'cart.line_total' | t }}</span>
           <span data-testid="cart-line-total">{{ item.final_line_price | money }}</span>
+          {%- if item.original_line_price != item.final_line_price -%}
+            <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
+            <s class="cart-line__total-compare">{{ item.original_line_price | money }}</s>
+          {%- endif -%}
+        </p>
+
+        <p id="{{ quantity_id }}-error" class="cart-line__error" data-cart-line-error data-testid="cart-line-error" hidden>
+          {%- render 'status-icon', name: 'warning' -%}
+          <span data-cart-line-error-text>
+            {%- if has_rule -%}
+              {%- if rule_max != blank -%}
+                {{- 'cart.quantity_rule_error' | t: increment: rule_increment, min: rule_min, max: rule_max -}}
+              {%- else -%}
+                {{- 'cart.quantity_rule_error_no_max' | t: increment: rule_increment, min: rule_min -}}
+              {%- endif -%}
+            {%- endif -%}
+          </span>
         </p>
       </li>
     {%- endfor -%}
