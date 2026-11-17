@@ -4,7 +4,7 @@
 // Phần fixture: page.setContent với assets/base.css thật, không cần store. Phần store: autoplay bật bằng thuộc tính markup
 // sẵn có ngay trước connectedCallback (như ES1-T30, ES1-T333), không đổi cấu hình store.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T466.spec.ts --project=desktop
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { watchShopPay403 } from './support/console-guard';
