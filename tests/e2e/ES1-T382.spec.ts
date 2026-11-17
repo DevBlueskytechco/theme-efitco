@@ -5,7 +5,7 @@
 //   TE382_ARTICLE_PATH           bài có ảnh bìa, ≥ 1 tag, blog bật bình luận, blog ≥ 2 bài (vd /blogs/news/bai-mau)
 //   TE382_ARTICLE_NO_COVER_PATH  bài không ảnh bìa
 // hCaptcha sau submit (/challenge hoặc invisible) → skip có lý do, chạy tay ghi PR (như ES1-T407).
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { env } from './support/store-data';
