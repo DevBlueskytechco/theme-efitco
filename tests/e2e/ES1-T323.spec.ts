@@ -10,7 +10,7 @@
 // Chạy: npx playwright test tests/e2e/ES1-T323.spec.ts --project=mobile (storefront: PREVIEW_URL=... STORE_PASSWORD=...)
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
