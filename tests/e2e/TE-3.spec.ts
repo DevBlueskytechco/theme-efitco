@@ -6,7 +6,7 @@
 // Dữ liệu (không hardcode handle): TE3_SALE_HANDLE, TE3_SMALL_PRICE_HANDLE, TE3_VARIES_HANDLE, TE3_UNIT_PRICE_HANDLE,
 //   TE3_SWATCH_HANDLE, TE3_SOLD_OUT_HANDLE, TE3_BADGE_SWATCH_HANDLE (ES1-T57), TE3_AC8_VARIANT_ID, TE3_AC8_PATH. Không đặt thì tự tìm card đầu tiên có testid, không có thì skip.
 // Setting block khác mặc định: EXPECT_PRODUCTS_TO_SHOW, EXPECT_COLUMNS_DESKTOP, EXPECT_VIEW_ALL=header|bottom, EXPECT_VIEW_ALL_PATH.
-import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Locator, type Page, type TestInfo } from './support/test';
 import { getJson } from './support/http';
 import { pageJson, requireJson } from './support/product-data';
 import AxeBuilder from '@axe-core/playwright';

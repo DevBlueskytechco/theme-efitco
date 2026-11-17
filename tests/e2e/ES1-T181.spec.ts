@@ -4,7 +4,7 @@
 // Logo và ảnh newsletter là block setting của footer trong layout, preview không đặt được: phần có ảnh cần người kiểm trong editor.
 // ES1-T464: chữ footer lấy từ fixture ES1-T331 (tests/fixtures/home-figma.json, khối layout:theme footer), không hardcode.
 // newsletter_heading là inline_richtext, default rỗng (ES1-T308 #1): phần trong <em> tô accent. Store chưa áp fixture thì skip (home-fixture.ts).
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged, gotoStore } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';

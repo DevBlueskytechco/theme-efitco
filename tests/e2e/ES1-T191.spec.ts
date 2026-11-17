@@ -3,7 +3,7 @@
 // Card đo 336 x 448 theo snapshot và comment Designer trên ticket, không phải 300 x 448 của tiêu đề ticket và AC-H26.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T191.spec.ts
 // Blog figma-blog do ES1-T178 nhập: thiếu thì các test cần bài skip có lý do.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
