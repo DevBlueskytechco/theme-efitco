@@ -1,0 +1,200 @@
+{% doc %}
+  Article page body (SRS TE-20 AC9, AC10, AC14; docs/ui-spec/article.md §1–§4,
+  decisions 10/11 A1): cover image, then a 46rem reading column with the
+  breadcrumb, first tag, the page's single h1, meta, content and the article end.
+
+  Cover (A1): a card with 16 corners under the dark header, no text and no dark
+  layer over the image; 4:3 below 48rem, 16:9 from 48rem, 1798:827 from 80rem.
+  It is the page's LCP image (eager + fetchpriority high). No image, or "Show
+  cover image" off: no frame and no eager image; the h1 is the LCP element.
+
+  Meta: date in <time> ("Show date") · "By {author}" ("Show author") · reading
+  time ("Show reading time", 200 words per minute as snippets/article-card.liquid,
+  hidden when the content has no words). Content in the shared .rte class.
+  Article end: "Topics" with every tag as a link ("Show topics", hidden without
+  tags) and a "Back to {blog}" link.
+
+  One JSON-LD BlogPosting (headline, image, datePublished, author); the
+  BreadcrumbList comes from snippets/breadcrumb.liquid.
+
+  Self-contained: callers must leave the body empty. No JavaScript.
+
+  Breadcrumb and h1 come from the shared snippets breadcrumb and page-title
+  (hooks breadcrumb, page-title, page-title-heading).
+
+  Test hooks: data-testid="article-main", "article-cover", "article-main-tag",
+  "article-main-meta", "article-main-read-time",
+  "article-content", "article-main-topics", "article-main-back",
+  "article-structured-data", "article-main-placeholder".
+
+  @example
+  {% block 'container', id: 'article-main', tag: 'article' %}
+    {% block 'article-main' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign word_count = article.content | newline_to_br | strip_newlines | replace: '&nbsp;', ' ' | replace: '<', ' <' | strip_html | split: ' ' | size
+  assign read_minutes = word_count | plus: 199 | divided_by: 200
+  assign first_tag = article.tags | first
+  assign show_cover = false
+  if block.settings.show_cover_image and article.image != blank
+    assign show_cover = true
+  endif
+-%}
+
+{%- if article != blank -%}
+  <div class="article-main" data-testid="article-main" {{ block.shopify_attributes }}>
+    {%- if show_cover -%}
+      {% render 'image',
+        image: article.image,
+        class: 'article-main__cover',
+        width: 2048,
+        widths: '360, 540, 720, 1080, 1440, 2048',
+        sizes: '(min-width: 80rem) min(1416px, calc(100vw - 40px)), calc(100vw - 40px)',
+        loading: 'eager',
+        fetchpriority: 'high',
+        testid: 'article-cover'
+      %}
+    {%- endif -%}
+
+    <div class="article-main__column">
+      <header class="article-main__header">
+        {% render 'breadcrumb' %}
+        {%- if first_tag != blank -%}
+          <a
+            class="article-main__tag"
+            href="{{ blog.url }}/tagged/{{ first_tag | handleize }}"
+            data-testid="article-main-tag"
+          >
+            {{- first_tag | escape -}}
+          </a>
+        {%- endif -%}
+        {% render 'page-title', title: article.title %}
+        {%- liquid
+          assign show_date = false
+          if block.settings.show_date and article.published_at != blank
+            assign show_date = true
+          endif
+          assign show_author = false
+          if block.settings.show_author and article.author != blank
+            assign show_author = true
+          endif
+          assign show_read_time = false
+          if block.settings.show_reading_time and read_minutes > 0
+            assign show_read_time = true
+          endif
+        -%}
+        {%- if show_date or show_author or show_read_time -%}
+          <p class="article-main__meta" data-testid="article-main-meta">
+            {%- if show_date -%}
+              <span class="article-main__meta-item">{{ article.published_at | time_tag: format: 'date' }}</span>
+            {%- endif -%}
+            {%- if show_author -%}
+              <span class="article-main__meta-item">{{ 'blog.by_author' | t: author: article.author | escape }}</span>
+            {%- endif -%}
+            {%- if show_read_time -%}
+              <span class="article-main__meta-item" data-testid="article-main-read-time">
+                {{- 'blocks.blog_posts.read_time' | t: count: read_minutes -}}
+              </span>
+            {%- endif -%}
+          </p>
+        {%- endif -%}
+      </header>
+
+      {%- if article.content != blank -%}
+        <div class="rte" data-testid="article-content">
+          {{- article.content -}}
+        </div>
+      {%- endif -%}
+
+      <footer class="article-main__end">
+        {%- if block.settings.show_topics and article.tags.size > 0 -%}
+          <div class="article-main__topics" data-testid="article-main-topics">
+            <p class="article-main__topics-label" id="ArticleTopicsLabel">{{ 'blog.topics' | t }}</p>
+            <ul class="article-main__topic-list" role="list" aria-labelledby="ArticleTopicsLabel">
+              {%- for tag in article.tags -%}
+                <li>
+                  <a class="article-main__topic" href="{{ blog.url }}/tagged/{{ tag | handleize }}">{{ tag | escape }}</a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </div>
+        {%- endif -%}
+        <a class="article-main__back" href="{{ blog.url }}" data-testid="article-main-back">
+          {%- render 'slideshow-icon', name: 'arrow' -%}
+          <span class="article-main__back-label">{{ 'blog.back_to_blog' | t: blog: blog.title | escape }}</span>
+        </a>
+      </footer>
+    </div>
+
+    {%- liquid
+      assign posting_url = request.origin | append: article.url
+      assign posting_published = article.published_at | date: '%Y-%m-%dT%H:%M:%S%z'
+      assign posting_modified = article.updated_at | default: article.published_at | date: '%Y-%m-%dT%H:%M:%S%z'
+      assign posting_author = article.author | default: shop.name
+    -%}
+    <script type="application/ld+json" data-testid="article-structured-data">
+      {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": {{ article.title | json }},
+        "mainEntityOfPage": {{ posting_url | json }},
+        {%- if article.image != blank %}
+          "image": [{{ article.image | image_url: width: 1200 | prepend: 'https:' | json }}],
+        {%- endif %}
+        "datePublished": {{ posting_published | json }},
+        "dateModified": {{ posting_modified | json }},
+        "author": {
+          "@type": "Person",
+          "name": {{ posting_author | json }}
+        }
+      }
+    </script>
+  </div>
+{%- elsif request.design_mode -%}
+  <p class="article-main--placeholder" data-testid="article-main-placeholder" {{ block.shopify_attributes }}>
+    {{ 'blog.article_placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.article",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "show_cover_image",
+      "label": "t:labels.article_show_cover_image",
+      "info": "t:info.article_show_cover_image",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_author",
+      "label": "t:labels.article_show_author",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "t:labels.article_show_date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reading_time",
+      "label": "t:labels.article_show_reading_time",
+      "info": "t:info.article_show_reading_time",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_topics",
+      "label": "t:labels.article_show_topics",
+      "info": "t:info.article_show_topics",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

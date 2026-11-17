@@ -6,7 +6,12 @@
 
   Uses selected_or_first_available_variant; there is no variant picker (ES1-T146 #6).
   Sold out (product or variant unavailable, AC4): the row stays with a Sold out
-  badge and has no input, so it is not counted and not submitted (ES1-T146 #5).
+  badge, the thumbnail at 0.6 opacity, and has no input, so it is not counted and
+  not submitted (ES1-T146 #5, TE-12 AC9).
+
+  The title is the only link of the row (index-mobile-a.md §7). It is not stretched
+  over the row, because a click on the rest of the row selects the hotspot
+  (AC-H20); CSS widens its hit area to 44px without moving the layout (AC-H35).
 
   Hooks for assets/bundle-form.js (BE ES1-T149). Rename only with a ticket comment.
   - Input: data-bundle-item, data-title, data-price (cents), value is the variant id,
@@ -69,11 +74,11 @@
         {% render 'image',
           image: row_image,
           class: 'shop-the-look-row__image',
-          width: 134,
-          height: 134,
+          width: 128,
+          height: 128,
           crop: 'center',
-          widths: '67, 134',
-          sizes: '67px',
+          widths: '64, 128',
+          sizes: '64px',
           loading: 'lazy',
           decorative: true,
           testid: 'shop-the-look-row-image'
