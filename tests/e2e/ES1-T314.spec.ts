@@ -4,7 +4,8 @@
 // Ticket ES1-T314 TE-10-R2-BE1: assets/page-layers.js ≤ 2 048 B (ADR 0007 mục 6, ADR 0010; layers.md §4, §5; SRS TE-10 AC6, AC7).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T314.spec.ts
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 import { CONSENT } from './support/consent';
@@ -255,7 +256,7 @@ test.describe('ES1-T314 banner consent (TE-10 AC7, layers.md §5)', () => {
 
   test('banner thật của Shopify (context không cookie consent): hiện → cờ bật; Decline → gỡ', async ({ browser }) => {
     // Không dùng state.json (đã Decline ở global setup); vẫn cần cookie mật khẩu storefront nên đi qua trang mật khẩu bằng storageState rồi xoá cookie consent.
-    const context = await browser.newContext({ storageState: 'tests/setup/state.json', baseURL: BASE_URL });
+    const context = await newStoreContext(browser, { storageState: 'tests/setup/state.json', baseURL: BASE_URL });
     await context.clearCookies({ name: CONSENT.cookie });
     const page = await context.newPage();
     const errors = watchConsole(page);

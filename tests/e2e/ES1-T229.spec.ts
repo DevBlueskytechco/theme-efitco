@@ -3,7 +3,7 @@
 // Chạy: npx playwright test tests/e2e/ES1-T229.spec.ts
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Page } from './support/test';
 import { actionCartCount } from './support/cart-api';
 import { getJson } from './support/http';
 import { requireJson } from './support/product-data';

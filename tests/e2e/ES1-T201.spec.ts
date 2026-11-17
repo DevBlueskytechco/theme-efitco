@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: nhóm này không gọi store. DoD số test chạy thật T96, T97, T98 chỉ đo được trên CI PR (phiên QA bị chặn store dev).
 // Ticket ES1-T201 TE-10-QA3: bỏ bước clear giỏ thừa, giảm request Cart API, 429 chờ tăng dần, tổng kết skip theo spec.
 // Chạy: npx playwright test tests/e2e/ES1-T201.spec.ts
-import { test, expect, type APIRequestContext, type Page } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Page } from './support/test';
 import { existsSync, mkdtempSync, readFileSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
