@@ -6,7 +6,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T329.spec.ts
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Page, type TestInfo } from './support/test';
 import { watchShopPay403 } from './support/console-guard';
 import { expectNotChallenged } from './support/store-guard';
 
