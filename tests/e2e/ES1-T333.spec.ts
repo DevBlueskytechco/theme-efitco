@@ -1,6 +1,6 @@
 // Ticket ES1-T333 — TE-2-R2-BE1: assets/slideshow.js, TE-2 AC7–AC9 (autoplay chỉ từ 80rem, điều khiển theo mốc, a11y carousel).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T333.spec.ts
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { watchShopPay403 } from './support/console-guard';
 
 const SPEED_SECONDS = 3; // min của setting autoplay_speed

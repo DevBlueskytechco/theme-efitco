@@ -2,7 +2,7 @@
 // Ticket ES1-T120 TE-7-FE3: image with text (docs/srs.md#TE-7 AC3, AC5; drafts/techlead/ES1-T114/task-split.md D1, D2, D5, D7, D8).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T120.spec.ts -g "AC3|AC5"
 // Biến thể chạy trên /?view=te7 (templates/index.te7.liquid), mặc định schema chạy trên /.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';

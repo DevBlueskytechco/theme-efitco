@@ -7,14 +7,16 @@ import { join } from 'node:path';
 // ES1-T203: 'challenge' = 1 test gặp trang thử thách Cloudflare. Cột chỉ in khi khác 0.
 export type Kind429 = 'hit' | 'skip' | 'challenge';
 
-// Spec kiểm helper bằng 429 giả: không tính vào tổng kết.
-const SELF_TEST = /^ES1-T(100|163|171|201)\.spec\.ts$/;
+// Spec kiểm helper bằng 429 hoặc trang thử thách giả: không tính vào tổng kết. ES1-T475: thêm T217 (setContent trang thử thách giả ở mọi desktop-1).
+export const SELF_TEST = /^ES1-T(100|163|171|201|217)\.spec\.ts$/;
 const TE5 = /^ES1-T9[4-8]\.spec\.ts$/;
 
 // Biến môi trường đặt trong globalSetup được worker kế thừa.
 export function startLog429() {
   const file = join(tmpdir(), `efitco-e2e-429-${process.pid}.log`);
   writeFileSync(file, '');
+  writeFileSync(`${file}.req`, '');
+  writeFileSync(`${file}.first`, '');
   process.env.E2E_429_LOG = file;
 }
 
@@ -26,6 +28,46 @@ export function record429(kind: Kind429, spec: string) {
   } catch {
     // Tổng kết là phụ, lỗi ghi không được làm hỏng test.
   }
+  markFirst429();
+}
+
+// ES1-T477 (a): mốc lần 429 đầu của đợt chặn hiện tại, ghi ở file `${E2E_429_LOG}.first` (ms epoch): chung cho mọi worker, mọi spec của shard (globalSetup tạo 1 file/shard).
+// Số liệu ES1-T475: Cloudflare bật thử thách sau 3 lần thêm giỏ thật ở shard *-1 và giữ ~10 phút; ES1-T203 TC-20 chạy 7,1–9,6 phút sau mốc thì đỏ, ≥ 10,2 phút thì xanh.
+// 429 tới khi mốc đã quá STORE_COOLDOWN_MS là đợt chặn mới: ghi mốc mới. Spec kiểm helper (SELF_TEST) và phần kiểm helper của ES1-T203 (bỏ E2E_429_LOG) không ghi mốc.
+export const STORE_COOLDOWN_MS = 10.5 * 60_000;
+export const MAX_COOLDOWN_WAIT_MS = 5.5 * 60_000;
+
+const firstFile = () => (process.env.E2E_429_LOG ? `${process.env.E2E_429_LOG}.first` : null);
+
+// Mốc lần 429 đầu của đợt chặn gần nhất; chưa có 429 hoặc không có file → undefined.
+export function first429At(): number | undefined {
+  const file = firstFile();
+  if (!file) return undefined;
+  try {
+    const at = Number(readFileSync(file, 'utf8').trim());
+    return Number.isFinite(at) && at > 0 ? at : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function markFirst429(now = Date.now()) {
+  const file = firstFile();
+  if (!file) return;
+  const first = first429At();
+  if (first !== undefined && now - first < STORE_COOLDOWN_MS) return;
+  try {
+    writeFileSync(file, String(now));
+  } catch {
+    // Mốc là phụ: không ghi được thì cổng chờ không chờ, test chạy như trước.
+  }
+}
+
+// Thời gian cần chờ để đủ STORE_COOLDOWN_MS kể từ mốc, không quá MAX_COOLDOWN_WAIT_MS. Không có mốc hoặc đã đủ → 0.
+export function cooldownWaitMs(firstAt: number | undefined, now: number): number {
+  if (firstAt === undefined) return 0;
+  const left = firstAt + STORE_COOLDOWN_MS - now;
+  return left > 0 ? Math.min(Math.ceil(left), MAX_COOLDOWN_WAIT_MS) : 0;
 }
 
 export function summary429(log: string, ci = false): string[] {
@@ -47,14 +89,50 @@ export function summary429(log: string, ci = false): string[] {
   return lines;
 }
 
+// ES1-T475: số request mỗi spec gửi đi (support/store-noise.ts), để so trước/sau cùng mốc T149:570 và số test đỏ/skip, không chỉ đếm 429.
+// Tiền tố [req-tong-ket] không khớp regex của scripts/e2e-429-count.sh. summary429 giữ nguyên output (ES1-T201 so khớp chính xác).
+export const REQ_KINDS = ['doc', 'dyn', 'cdn', '3p', 'challenge', 'stubbed'] as const;
+export type ReqKind = (typeof REQ_KINDS)[number];
+export type ReqCounts = Record<ReqKind, number>;
+export const emptyReqCounts = (): ReqCounts => ({ doc: 0, dyn: 0, cdn: 0, '3p': 0, challenge: 0, stubbed: 0 });
+
+export function recordReq(spec: string, counts: ReqCounts) {
+  const file = process.env.E2E_429_LOG;
+  if (!file || SELF_TEST.test(spec) || REQ_KINDS.every((k) => !counts[k])) return;
+  try {
+    appendFileSync(`${file}.req`, `${spec}\t${REQ_KINDS.map((k) => counts[k]).join('\t')}\n`);
+  } catch {
+    // Tổng kết là phụ, lỗi ghi không được làm hỏng test.
+  }
+}
+
+export function summaryReq(log: string): string[] {
+  const specs = new Map<string, ReqCounts>();
+  for (const line of log.split('\n').filter(Boolean)) {
+    const [spec, ...values] = line.split('\t');
+    const row = specs.get(spec) ?? emptyReqCounts();
+    REQ_KINDS.forEach((k, i) => { row[k] += Number(values[i]) || 0; });
+    specs.set(spec, row);
+  }
+  if (!specs.size) return [];
+  const format = (r: ReqCounts) => REQ_KINDS.map((k) => `${k}=${r[k]}`).join(' ');
+  const rows = [...specs].sort(([a], [b]) => a.localeCompare(b));
+  const total = emptyReqCounts();
+  for (const [, r] of rows) for (const k of REQ_KINDS) total[k] += r[k];
+  return [...rows.map(([spec, r]) => `[req-tong-ket] ${spec} ${format(r)}`), `[req-tong-ket] tổng ${format(total)}`];
+}
+
+const readLog = (file: string) => {
+  try {
+    return readFileSync(file, 'utf8');
+  } catch {
+    return ''; // Không có file: in như không có 429, không in [req-tong-ket].
+  }
+};
+
 export function printSummary429() {
   const file = process.env.E2E_429_LOG;
   if (!file) return;
-  let log = '';
-  try {
-    log = readFileSync(file, 'utf8');
-  } catch {
-    // Không có file: in như không có 429.
-  }
-  for (const line of summary429(log, !!process.env.CI)) console.log(line);
+  for (const line of summary429(readLog(file), !!process.env.CI)) console.log(line);
+  for (const line of summaryReq(readLog(`${file}.req`))) console.log(line);
 }

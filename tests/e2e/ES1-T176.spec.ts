@@ -2,7 +2,7 @@
 // Ticket ES1-T176 TE-17-QA2: so ảnh, so copy, đo style theo block trên /?view=figma; so thứ tự block giữa 2 template (AC-H1 đến H4, plan ES1-T169 D2, D3).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T176.spec.ts --project=desktop
 // Baseline dựng lúc chạy từ docs/figma/img, không commit. Số pixel lấy từ chính comparator của toMatchSnapshot nên khớp với kết quả assert.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import { autoDeclineConsent } from './support/consent';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';

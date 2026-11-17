@@ -1,46 +1,47 @@
-KHÔNG CHẮC: (1) JS và spec chưa chạy lần nào: phiên agent không mở được trình duyệt, E2E, console, lhci chờ CI. Chưa đối chiếu được với thư viện thật. (2) Hỏi CTO ở ES1-T164, không chặn PR, đang theo mặc định: shape trả về của `getCart` (qua `createCartFromAjaxResponse`, thư viện lỗi thì JSON `/cart.js` thô) và `getCart` có `.configure` không (gọi có guard); `lines[].id` là line key Ajax, không phải GID, remove gửi quantity 0; `defaultHandler()` của `updateCart` chỉ áp thay đổi, không reload; thời điểm có `Shopify.actions` (thử ngay, sau khi nạp thư viện, ở window load). Sai mặc định thời điểm thì mọi test cần `data-actions` fail, sai reload thì test `stayed` fail. (3) Nhánh 4xx trả `cart: null` theo chữ ticket; ES1-T85 cho phép trả giỏ hiện tại hoặc null.
+KHÔNG CHẮC: (1) `cart-drawer.js` 3 910 B: đạt DoD ticket (≤ 4 096), không đạt trần ADR 0010 / task-split ES1-T307 §3 (3 072). Muốn xuống 3 072 phải bỏ ít nhất 2 hành vi đang có test hoặc AC. Đã hỏi Tech Lead ở ES1-T476, đang theo 4 096. (2) SRS TE-5 AC15 ghi "mở drawer focus vào nút đóng", nhưng `<modal-dialog>` focus h2 "Cart" vì nút đóng không có `autofocus` (markup FE). Đang giữ hành vi của modal-dialog; câu hỏi gộp trong ES1-T476. (3) Phiên agent không chạy được node, tsc, trình duyệt: JS và spec chưa chạy lần nào, cú pháp chờ CI.
 
-# ES1-T98 TE-5-BE3: override Shopify.actions + shopify:cart:lines-update khi đổi số lượng và xoá
+# ES1-T98 TE-5-BE3 (lượt 2, REQ-0002): cart drawer qua `<modal-dialog>`, "Added to cart", giữ override `Shopify.actions`
+
+Phạm vi theo task-split ES1-T307 §3 (CTO 11/11). PR #97 đóng không merge, bản này làm lại trên develop `f3fbad4`, đã có ES1-T368 markup và ES1-T315 modal-dialog.
 
 ## Thay đổi
-- `assets/cart-drawer.js` (4085/4096 B): `Shopify.actions.<action>.configure({ handler })` theo ES1-T91 #1, không gán đè. Chỉ 3 action.
-  - `openCart`: `data-mode` drawer → refresh partial rồi mở, URL không đổi, lỗi refresh → sang cart; có `.cart-page` → focus h1; còn lại → `data-cart-url`.
-  - `getCart`: luôn `GET {data-cart-url}.js`, `cache: no-store`, không giữ bản client.
-  - `updateCart`: `await defaultHandler()` rồi refresh partial, trả nguyên kết quả. Không dispatch thêm (ES1-T83). Không mở drawer: mở là việc của `openCart`.
-  - `refresh()` dùng chung cho mọi trang: tên partial lấy từ `data-partials` của `cart-items`; page mode ngoài /cart không có `cart-items` thì chỉ `cart-count`.
-  - JS đặt `data-actions` trên `cart-drawer` sau khi configure xong, để E2E chờ. Không đổi markup.
-- `assets/cart-items.js` (5625/5632 B): dispatch `CartLinesUpdateEvent` từ `cart-items` trước POST `change.js`. `action` update/remove (nhập 0 tính là remove), `context` dialog/cart, `lines: [{ id: key, quantity }]`. Promise chỉ resolve: thành công `createCartFromAjaxResponse(response)`, lỗi `cart: null` + `userErrors`. Mỗi POST 1 event; debounce và hàng đợi gộp thì gộp luôn event.
-- `tests/e2e/ES1-T98.spec.ts` (mới): contract + AC7.
-- `tests/e2e/ES1-T96.spec.ts`, `ES1-T97.spec.ts`: nâng trần 4096 và 5632 theo D10; contract tên partial của T96 đổi theo `data-partials`.
+- `assets/cart-drawer.js` (3 868 → 3 910 B)
+  - Lớp: bỏ `showModal()`, xử lý bấm backdrop và nghe `close` của dialog. Giờ gọi `<modal-dialog>.open(opener)` / `.close()` qua element API, không import tĩnh (ES1-T81, ADR 0007 #5). Nghe `modal:close` để ẩn "Added to cart" và trả focus khi opener bị gỡ hoặc disabled (ví dụ nút add bị partial biến thể thay).
+  - "Added to cart": sau khi thêm giỏ (`theme:cart:updated` có `detail.item`), mở drawer rồi ghi "{product_title} · {variant_title}" vào `[data-cart-added-item]` và gỡ `hidden` của `[data-cart-added]`. Phản hồi `{ items }` (bundle) thì nối bằng ", ". Không có timer. Ẩn khi: drawer đóng, mở bằng icon giỏ hoặc `openCart`, `cart-items` đổi giỏ xong (event `source: "cart-items"`).
+  - Theme editor: `shopify:block:select/deselect` trên chính `<cart-drawer>`. modal-dialog không bắt được vì `<cart-drawer>` là cha của nó, nên gọi `open()` / `close()` từ đây.
+  - Override giữ nguyên hành vi: `openCart.configure` (drawer: refresh rồi mở, URL không đổi; ở /cart: focus h1; chế độ page: sang `data-cart-url`). `updateCart.configure`: `defaultHandler()` → refresh partial → trả kết quả, không phát thêm event (ES1-T83). Không đụng `getCart`, vì action này không configure được (ES1-T164 #1).
+  - Thời điểm configure (ES1-T164 #4): thử ngay, rồi thử lại ở `load`. Bỏ import CDN `standard-events.js` khỏi drawer vì drawer không dispatch.
+  - Listener dùng AbortController, dọn ở `disconnectedCallback`.
+  - `<modal-dialog>` chưa define (script lỗi): `show()` ném lỗi trong `try` của `refresh()`, rơi về `location.assign(cart_url)`, không có pageerror.
+- `assets/cart-items.js`: không đổi (5 625 B). Event `shopify:cart:lines-update` update/remove đã có từ lượt 1.
+- `tests/e2e/ES1-T98.spec.ts`
+  - Contract ADR 0007: có `modal-dialog`, `.open(opener)`, `.close()`, `modal:close`; không còn `showModal`/`keydown`/`getBoundingClientRect`; hook Added to cart khớp `blocks/cart-drawer.liquid`; drawer không nạp CDN events.
+  - Describe mới "Added to cart, `<modal-dialog>`":
+    - thêm giỏ: role=status hiện tên, cart-count khớp, focus trong dialog;
+    - không tự ẩn sau 2,5 s; Esc thì ẩn và focus về nút add; mở lại bằng icon thì vẫn ẩn;
+    - đổi số lượng thì ẩn, drawer giữ mở;
+    - nút đóng phát đúng `modal:open:cart`, `modal:close:cart`; chạm scrim thì đóng (≥ 768);
+    - `openCart` không hiện box;
+    - abort `modal-dialog.js`: thêm giỏ chuyển /cart.
+- `tests/e2e/ES1-T96.spec.ts`: contract tên partial nhận cả `document` lẫn alias `d`.
 
-## Quyết định ngoài chữ ticket
-- `cart-items.js` không chờ thư viện khi ghi: thư viện chưa nạp xong thì bỏ event, POST vẫn chạy. Khác `product-form.js` (chờ tối đa 500 ms), đổi để vừa trần byte. Khách đổi số lượng ở /cart trước khi thư viện nạp xong sẽ không có event.
-- `aria-busy` của `cart-items` đổi sang `this.ariaBusy`, cùng cách với `cart-drawer`, để lấy chỗ. `res.json()` chuyển vào `try` có sẵn, cùng lý do: body không phải JSON vẫn rơi vào nhánh lỗi; body JSON `null` thì ném, `run()` bắt và báo `data-label-error`.
-- `restore()` dùng `matches("body *")` để loại cả phần tử đã gỡ lẫn `body` khi `openCart` gọi lúc không có focus.
+## Cho FE (không sửa trong PR này)
+- AC15 focus nút đóng: nếu Tech Lead chốt theo SRS thì thêm `autofocus` vào `cart-drawer-close` (ES1-T476 #2).
+- Doc `blocks/cart-drawer.liquid` ghi "the close button uses form method=dialog": vẫn đúng. modal-dialog còn bắt `.close-button`, nên hai đường cùng đóng một lần, event `close` chỉ phát 1 lần.
 
-## Giới hạn do trần byte (đã bỏ khỏi bản nháp)
-- Không cấu hình `eventTarget`: event của `updateCart` đi theo mặc định của thư viện, chưa biết phần tử nào; listener trên document được giả định vẫn nhận (spec kiểm). Docs có ví dụ trỏ `product-form`/`cart-drawer`.
-- `openCart` rồi `updateCart` ngay khi partial của `openCart` chưa về: refresh sau huỷ refresh trước, drawer không mở. Gọi `await updateCart` rồi `openCart` thì đúng.
-- `updateCart` refresh partial lỗi: nuốt lỗi, giao diện cũ tới lần refresh sau, không reload. Giỏ vẫn đổi đúng và kết quả vẫn trả về.
-- `getCart` không kiểm `res.ok`: body không phải JSON thì promise reject; 4xx có JSON sẽ đi vào `createCartFromAjaxResponse`.
-- `updateCart` ở /cart khi khách đang gõ ô số lượng chưa commit: ô bị gán lại theo server. Refresh của `updateCart` cũng không phối hợp với hàng đợi ghi của `cart-items`.
-- Rút comment cũ ở 2 file để lấy chỗ (Enter, live iterator, focus, Safari); hành vi không đổi. Cả 2 file gần sát trần, thêm logic phải gỡ bớt hoặc xin nâng trần.
-
-## Việc tồn từ ES1-T97
-- Cả ES1-T96 và ES1-T97 đã vào develop nên ngoại lệ `cart-items.js` trong `ITEMS_ASSET` (`tests/e2e/ES1-T96.spec.ts`) và consoleGuard `tests/e2e/TE-4.spec.ts` gỡ được. Chưa gỡ ở PR này vì ngoài phạm vi.
-
-## Ngân sách JS (D10, `wc -c`)
-| Trang | Tổng (B) | Trần 40 960 |
-| --- | --- | --- |
-| Sản phẩm | 40 629 | còn 331 |
-| Trang chủ | 32 207 | còn 8 753 |
-| Cart | 19 140 | còn 21 820 |
+## Ngân sách JS (`wc -c`, cộng tĩnh theo thẻ script)
+| Trang | develop | PR | Trần |
+| --- | --- | --- | --- |
+| Chung (standard-events 888, motion 6 103, page-layers 2 031, modal-dialog 2 039, header-menu 6 862, header-sticky 1 680, cart-drawer) | 23 471 | 23 513 (+42) | 19 456 (ADR 0010; header-menu, motion chưa giảm ở task riêng) |
+| /cart (chung + cart-items 5 625) | 29 096 | 29 138 | 40 960 |
+| PDP (chung + variant-picker 7 163, product-form 6 857, product-media 4 407) | 41 898 | 41 940 | 40 960 (đã vượt trên develop; giảm ở các task PDP theo ADR 0010) |
+Nếu các file khác đạt trần ADR 0010, tổng chung = 18 952 − 3 072 + 3 910 = 19 790, vượt 19 456 là 334 B (ES1-T476).
 
 ## Tự kiểm tra
-- `wc -c`: cart-drawer.js 4085 ≤ 4096, cart-items.js 5625 ≤ 5632.
-- `shopify theme check`: 67 file, 0 lỗi. `node --check` JS và `node --experimental-strip-types --check` 3 spec: ok.
-- Không đổi locale, không đổi markup.
-- Playwright `tests/e2e/ES1-T98.spec.ts -g "AC7"` desktop + Pixel 7, hồi quy ES1-T85, T96, T97, TE-4, console, pageerror, lhci: chờ CI.
-- Test `cart_type` page thật skip khi preview không đặt `EXPECT_CART_TYPE=page`; nhánh page ở preview drawer kiểm bằng flip `data-mode`.
+- `wc -c`: cart-drawer.js 3 910 ≤ 4 096 (DoD ticket), > 3 072 (ADR 0010, đã hỏi ES1-T476). cart-items.js 5 625 ≤ 5 632.
+- `shopify theme check`: 117 file, 0 lỗi. 25 warning có sẵn, không nằm ở file trong PR.
+- Không đổi markup, locale, CSS. Không console.*, không fetch tự viết trong drawer, không import tĩnh module theme.
+- `node --check`, `tsc`: phiên agent bị chặn lệnh, chờ CI.
+- Playwright `tests/e2e/ES1-T98.spec.ts` (AC7 + Added to cart) desktop + Pixel 7, hồi quy ES1-T96, T97, T95, T203, T314, T315, TE-4, console/pageerror, lhci: chờ CI.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
