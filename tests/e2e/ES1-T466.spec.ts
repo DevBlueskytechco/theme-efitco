@@ -57,8 +57,8 @@ test.describe('ES1-T466 fixture base.css', () => {
     expect(BASE).toContain("slideshow-carousel[data-enhanced] .slideshow__pause:enabled {");
     expect(BASE).not.toContain("[data-autoplay='true'] .slideshow__pause");
     expect(BASE).not.toContain(':has(video) .slideshow__pause');
-    // Trần tạm 53 248 B (CTO 14/11, ES1-T454) tới khi ES1-T317 merge
-    expect(gzipSync(BASE).length).toBeLessThanOrEqual(53248);
+    // Trần tạm 57 344 B (CTO 17/11, ES1-T472 a) tới khi ES1-T478 tách CSS theo template
+    expect(gzipSync(BASE).length).toBeLessThanOrEqual(57344);
   });
 
   for (const width of [360, 768, 1280] as const) {
