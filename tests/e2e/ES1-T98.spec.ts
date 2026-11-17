@@ -1,6 +1,7 @@
 // Ticket ES1-T98 TE-5-BE3: override Shopify.actions + CartLinesUpdateEvent khi đổi số lượng và xoá (docs/srs.md#TE-5 AC7; drafts/techlead/ES1-T89/task-split.md D9, D10; ES1-T91).
 // ES1-T203: Cart API và partial mock trong bộ nhớ (support/cart-mock.ts), trang, JS và thư viện standard-events thật, 0 request Cart API tới store.
 // getCart, updateCart ghi qua Storefront API (ES1-T164), mock Cart API không tới: các test đó nằm trong luồng thật ở ES1-T203.spec.ts.
+// Lượt 2 (REQ-0002, task-split ES1-T307 §3): drawer qua <modal-dialog> (ADR 0007), "Added to cart" role=status (TE-5 AC15).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... [EXPECT_CART_TYPE=page] npx playwright test tests/e2e/ES1-T98.spec.ts -g "AC7"
 import type { Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
@@ -144,6 +145,7 @@ test.describe('ES1-T98 contract', () => {
   test('AC7 contract: trần byte, configure 3 action, không gán đè, event trong cart-items, link doc', () => {
     const drawer = read('assets/cart-drawer.js');
     const items = read('assets/cart-items.js');
+    // DoD ticket: 4096. ADR 0010 / task-split ES1-T307 §3 ghi 3072: chờ Tech Lead ở ES1-T476.
     expect(Buffer.byteLength(drawer), 'cart-drawer.js tối đa 4096 B').toBeLessThanOrEqual(4096);
     expect(Buffer.byteLength(items), 'cart-items.js tối đa 5632 B').toBeLessThanOrEqual(5632);
     for (const action of ['openCart', 'updateCart']) expect(drawer).toMatch(new RegExp(`\\.${action}\\??\\.configure`));
@@ -153,8 +155,10 @@ test.describe('ES1-T98 contract', () => {
     // Không gán Shopify.actions.x = fn; không tự phát event trong override (ES1-T83).
     expect(drawer).not.toMatch(/actions\.\w+\s*=[^=]/);
     expect(drawer).not.toMatch(/dispatchEvent\(new E|new CartLinesUpdateEvent/);
+    // Thư viện event chỉ cần ở nơi dispatch (cart-items); drawer không nạp (ES1-T164 #4: actions thử ngay + load).
+    expect(items).toContain(`import("${CDN}")`);
+    expect(drawer).not.toContain(CDN);
     for (const js of [drawer, items]) {
-      expect(js).toContain(`import("${CDN}")`);
       expect(js).not.toMatch(/["']@shopify\/standard-events["']/);
       expect(js).not.toMatch(/\.reject\(/);
       expect(js).not.toMatch(/^import .*(\.js|\.\/)/m);
@@ -169,6 +173,124 @@ test.describe('ES1-T98 contract', () => {
     expect(write.indexOf('this.emit(key, quantity)')).toBeLessThan(write.indexOf('cartChangeUrl'));
     // Hook openCart ở /cart: h1 trong .cart-page có tabindex -1.
     expect(read('blocks/cart-page.liquid')).toMatch(/class="cart-page"[\s\S]*<h1[^>]*tabindex="-1"/);
+  });
+
+  test('ADR 0007 contract: lớp qua <modal-dialog>, không tự viết showModal/backdrop; hook Added to cart khớp markup', () => {
+    const drawer = read('assets/cart-drawer.js');
+    const block = read('blocks/cart-drawer.liquid');
+    expect(drawer).toContain('this.querySelector("modal-dialog")');
+    expect(drawer).toContain('this.modal.open(opener)');
+    expect(drawer).toContain('this.modal.close()');
+    expect(drawer).toContain('"modal:close"');
+    expect(drawer).not.toMatch(/showModal|keydown|Escape|getBoundingClientRect/);
+    expect(drawer).not.toMatch(/^import .*modal-dialog/m);
+    expect(block).toMatch(/<modal-dialog data-layer="cart">\s*<dialog/);
+    for (const hook of ['data-cart-added', 'data-cart-added-item', 'data-testid="cart-drawer-added"']) expect(block).toContain(hook);
+    expect(block).toMatch(/role="status" data-testid="cart-drawer-added"/);
+    for (const hook of ['[data-cart-added]', '[data-cart-added-item]']) expect(drawer).toContain(hook);
+  });
+});
+
+test.describe('ES1-T98 Added to cart, <modal-dialog>', () => {
+  const box = (page: Page) => tid(page, 'cart-drawer-added').locator('[data-cart-added]');
+  const boxItem = (page: Page) => tid(page, 'cart-drawer-added').locator('[data-cart-added-item]');
+
+  test.beforeEach(async ({ page }) => {
+    test.skip(PAGE_MODE, 'Preview đặt cart_type page: không có dialog');
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+  });
+
+  async function addFromProduct(page: Page, cart: MockCart) {
+    test.skip(!HANDLE, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
+    await cart.goto(`/products/${HANDLE}`);
+    await page.waitForFunction(() => ['product-form', 'cart-drawer', 'modal-dialog'].every((n) => !!customElements.get(n)));
+    const add = tid(page, 'product-form-add');
+    test.skip(await add.isDisabled(), 'Variant mặc định hết hàng');
+    await add.click();
+    await expect(dialog(page)).toBeVisible();
+    await expect(dialog(page)).not.toHaveAttribute('aria-busy', /.*/);
+    // product-form mở khoá sau khi drawer mở: chờ để opener nhận lại focus khi đóng.
+    await expect(add).toBeEnabled();
+    return add;
+  }
+
+  test('AC15 thêm giỏ: drawer modal mở, "Added to cart" + tên sản phẩm trong role=status, cart-count nhảy, focus trong dialog', async ({ page, cart }) => {
+    await addFromProduct(page, cart);
+    expect(await dialog(page).evaluate((el) => el.matches(':modal'))).toBe(true);
+    await expect(box(page)).toBeVisible();
+    // Mock add.js trả product_title "Mock product", variant_title null: không có " · ".
+    await expect(boxItem(page)).toHaveText('Mock product');
+    await expect(tid(page, 'cart-drawer-added')).toHaveAttribute('role', 'status');
+    await expect(tid(page, 'header-cart-count')).toHaveText(String(cart.state().item_count));
+    expect(await page.evaluate(() => !!document.activeElement?.closest('[data-testid="cart-drawer-dialog"]'))).toBe(true);
+  });
+
+  test('AC15 không tự ẩn theo thời gian; đóng drawer thì ẩn, mở lại bằng icon giỏ vẫn ẩn', async ({ page, cart }) => {
+    const add = await addFromProduct(page, cart);
+    await page.waitForTimeout(2500);
+    await expect(box(page)).toBeVisible();
+    await expect(dialog(page)).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(dialog(page)).toBeHidden();
+    await expect(box(page)).toBeHidden();
+    await expect(boxItem(page)).toHaveText('');
+    await expect(add).toBeFocused();
+    await tid(page, 'header-cart-link').click();
+    await expect(dialog(page)).toBeVisible();
+    await expect(box(page)).toBeHidden();
+  });
+
+  test('AC15 thao tác khác trong giỏ (đổi số lượng): ẩn "Added to cart", drawer giữ mở', async ({ page, cart }) => {
+    await addFromProduct(page, cart);
+    await expect(box(page)).toBeVisible();
+    await expect(tid(page, 'cart-items')).toHaveAttribute('data-enhanced', '', { timeout: 15_000 });
+    const [key] = await lineKeys(page);
+    await changeAndWait(page, key, '2');
+    await expect(box(page)).toBeHidden();
+    await expect(dialog(page)).toBeVisible();
+  });
+
+  test('AC15 nút đóng (.close-button, form method=dialog) và chạm scrim: đóng qua <modal-dialog>, phát modal:close, focus về nút thêm giỏ', async ({ page, cart }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as { __modal: string[] };
+      w.__modal = [];
+      for (const t of ['modal:open', 'modal:close']) document.addEventListener(t, (e) => w.__modal.push(`${t}:${(e.target as HTMLElement).dataset.layer}`));
+    });
+    const add = await addFromProduct(page, cart);
+    await tid(page, 'cart-drawer-close').click();
+    await expect(dialog(page)).toBeHidden();
+    await expect(add).toBeFocused();
+    await expect.poll(() => page.evaluate(() => (window as unknown as { __modal: string[] }).__modal)).toEqual(['modal:open:cart', 'modal:close:cart']);
+    test.skip((page.viewportSize()?.width ?? 0) < 768, 'Dưới 48rem drawer 90%: scrim 10% bên trái vẫn bấm được nhưng hẹp, đo ở desktop');
+    await add.click();
+    await expect(dialog(page)).toBeVisible();
+    await expect(dialog(page)).not.toHaveAttribute('aria-busy', /.*/);
+    await expect(box(page)).toBeVisible();
+    await page.mouse.click(5, 300);
+    await expect(dialog(page)).toBeHidden();
+    await expect(box(page)).toBeHidden();
+  });
+
+  test('AC7 openCart: không hiện "Added to cart" (chỉ sau khi thêm giỏ)', async ({ page, cart }) => {
+    cart.seed([1]);
+    await cart.goto('/');
+    await actionsReady(page);
+    await callAction(page, 'openCart');
+    await expect(dialog(page)).toBeVisible();
+    await expect(box(page)).toBeHidden();
+  });
+
+  test('modal-dialog.js không tải: thêm giỏ chuyển /cart, không pageerror', async ({ page, cart, guard }) => {
+    guard.allowNetworkLog();
+    await page.route(/\/modal-dialog\.js(\?|$)/, (route) => route.abort());
+    await cart.stubCartDocument();
+    test.skip(!HANDLE, 'Thiếu TE4_VARIANTS_HANDLE / TE4_SINGLE_HANDLE');
+    await cart.goto(`/products/${HANDLE}`);
+    await page.waitForFunction(() => !!customElements.get('cart-drawer') && !!customElements.get('product-form'));
+    const add = tid(page, 'product-form-add');
+    test.skip(await add.isDisabled(), 'Variant mặc định hết hàng');
+    await add.click();
+    await page.waitForURL(isCart);
   });
 });
 
