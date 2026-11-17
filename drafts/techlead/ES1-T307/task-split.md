@@ -5,7 +5,7 @@ KHÔNG CHẮC: (1) FE Must 165 point > sức chứa ~147 point Sprint 2–4 kể
 Nguồn: docs/srs.md 0.4, docs/design/decisions.md (10/11, 11/11), docs/ui-spec/*.md (27 file), docs/design/shopify-audit-1111/README.md, AGENTS.md, ADR 0001–0010, code develop `ce08212`; đề xuất story PO ES1-T305, BA ES1-T306; quyết định CTO: ES1-T308 (4 câu), ES1-T309 (5 câu), ES1-T310 (4 câu), comment CTO 11:28 trên ES1-T307.
 
 Lượt 2 đổi gì so với lượt 1:
-- Áp ES1-T308, T309, T310: nội dung mẫu mặc định trống (D10), CSS 1 file + trần gzip (D7), AGENTS.md variant-json CTO sửa (D4), ranh giới ES1-T304 (§2), 1 point ≈ 1,5 giờ, task 3–5 point.
+- Áp ES1-T308, T309, T310: nội dung mẫu mặc định trống (D10), CSS tách theo template + trần gzip (D7, ADR 0013 thay ES1-T310 #1), AGENTS.md variant-json CTO sửa (D4), ranh giới ES1-T304 (§2), 1 point ≈ 1,5 giờ, task 3–5 point.
 - ADR 0007–0010: Chấp nhận (CTO duyệt 11/11).
 - Story mới thống nhất: TE-19 Upsell giỏ hàng; TE-20 Blog và bài viết (gồm mở rộng); TE-21 Trang phụ: page, contact, 404, password, gift card; TE-22 Điều hướng mở rộng: menu 3 cấp, mega menu, breadcrumb. Mọi task gắn đúng story (§6).
 - Tách phần Should để cắt được độc lập: mega ảnh/sản phẩm (TE-22-R2-FE3), B2B quantity rule + volume (TE-4-R2-FE7, TE-4-R2-BE7), recent searches (TE-8-R2-BE3), TE-18; thêm upsell TE-19 (FE, BE, QA).
@@ -22,7 +22,16 @@ Tổng task mới: 86 = FE 42 task / 175 point (Must 157, Should 18), BE 27 task
 - D4 Biến thể: ADR 0008. Không `for variant in product.variants`, không JSON biến thể; tên partial theo ngữ cảnh. CTO sửa 2 ví dụ `variant-json` trong AGENTS.md cùng PR TE-4-R2-FE2 (ES1-T310 #2).
 - D5 Countdown: ADR 0009, `snippets/sale-countdown.liquid` + `<sale-countdown>`.
 - D6 JS: ADR 0010; trần từng file ghi ở DoD; `lazy-module.js` thêm `data-lazy-on="interaction"`. Không `import` tĩnh giữa module theme (ES1-T81). Thẻ `<script>` và `data-lazy-module` / `data-lazy-on` trong block do BE thêm, sửa; FE đặt thẻ host custom element và mọi hook khác.
-- D7 CSS (ES1-T310 #1): 1 file `base.css` + `critical.css` ≤ 10 240 B (AGENTS.md); task FE xoá CSS cũ phần mình thay trong cùng PR; trần `gzip -c assets/base.css | wc -c` ≤ 49 152 B (hiện 41 277); TE-10-R2-FE3 rà CSS chết cuối Sprint 4. Lhci desktop < 98 do CSS thì Tech Lead mở ADR tách CSS theo template.
+- D7 CSS (ADR 0013, CTO 17/11 ES1-T472 a; thay ES1-T310 #1):
+  - `critical.css` ≤ 10 240 B thô.
+  - `base.css` (khung, lớp, cart drawer, quick view, card, block trang chủ, thành phần dùng chung với featured-product) ≤ 49 152 B gzip.
+  - `product.css` (product), `collection.css` (collection, search, list-collections), `cart.css` (cart), `aux.css` (404, password, gift_card, page, blog, article): mỗi file ≤ 16 384 B gzip.
+  - Đo bằng Node `zlib.gzipSync`, không `gzip -9`.
+  - Nạp bằng 1 `case template.name` trong `layout/theme.liquid`. `aux.css` thêm ở `layout/password.liquid` và `templates/gift_card.liquid`. Không `preload: true` cho file template.
+  - Rule chỉ vào file template khi markup chỉ render ở nhóm đó; còn lại `base.css`.
+  - Chờ ES1-T478 merge: trần tạm `base.css` ≤ 57 344 B. ES1-T478 chạy trước mọi ticket FE mới.
+  - Task FE ghi file CSS đích + trần trong DoD; xoá CSS cũ phần mình thay trong cùng PR.
+  - File template chạm trần thì mở ADR tách tiếp, không nâng trần.
 - D8 Header tối mọi trang: bỏ `body:has(.slideshow)` (base.css 7452–7478) và `[data-header-overlay]` (critical.css 412–420); làm 1 lần ở TE-1-R2-FE1.
 - D9 Swatch card là chỉ báo (TE-3 AC2): card không còn JS; `assets/product-swatch.js` gỡ khỏi card → ES1-T248, ES1-T303 hết đối tượng.
 - D10 Nội dung mẫu (ES1-T308 #1, ES1-T309 #2, #3): theme mới cài để trống — không bậc giảm 10/15% (mặc định 0 bậc), "Get 15% Off" là setting default rỗng, không "Trusted by 10,000+", "360+", "12 Warranty months" làm default, không handle `figma-*`/ảnh/metafield demo trong `templates/index.liquid`. Phần code sửa mặc định thuộc ES1-T304. Task màn: setting chữ/claim mới đều default rỗng và khối ẩn khi rỗng; không thêm default lấy chữ Figma. Nội dung Figma chỉ cấu hình trên store dev qua fixture của TE-17-R2-QA0; AC-H1..H5, AC-H18, AC-H19, AC-H28 đo trên store dev đã cấu hình.
