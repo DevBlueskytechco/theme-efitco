@@ -212,15 +212,16 @@ test.describe('ES1-T108 TE-6 list-collections', () => {
     test.skip(count === 0, 'Store không có collection');
     expect(count).toBeLessThanOrEqual(PAGE_SIZE);
 
+    // ES1-T367 (TE-6 AC15, SRS 0.5): card là <li>, link là tên (::after phủ card), ảnh 336:220 thay 336:270.
     const first = cards.first();
     await expect(first.getByTestId('list-collections-card-title')).not.toBeEmpty();
-    expect(await first.getAttribute('href')).toMatch(/\/collections\//);
+    expect(await first.getByTestId('list-collections-card-link').getAttribute('href')).toMatch(/\/collections\//);
     await expect(first.locator('img, svg')).toHaveCount(1);
     const ratio = await first.locator('img, svg').evaluate((el) => {
       const r = el.parentElement!.getBoundingClientRect();
       return r.width / r.height;
     });
-    expect(ratio).toBeCloseTo(336 / 270, 1);
+    expect(ratio).toBeCloseTo(336 / 220, 1);
 
     expect(errors, errors.join('\n')).toEqual([]);
     await expectAxeClean(page, 'main');
@@ -277,6 +278,7 @@ test.describe('ES1-T108 nojs', () => {
     const card = page.getByTestId('list-collections-card').first();
     test.skip((await card.count()) === 0, 'Store không có collection');
     await expect(card).toBeVisible();
+    // ES1-T367: bấm giữa card (ảnh) rơi vào ::after của link tên
     await card.click();
     await expect(page.getByTestId('collection-banner-title')).toBeVisible();
   });

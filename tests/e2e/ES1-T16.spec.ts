@@ -161,7 +161,8 @@ test.describe('ES1-T16 header-drawer', () => {
     const toggle = page.getByTestId('header-drawer-toggle');
     await toggle.click();
     await expect(page.getByTestId('header-drawer')).toBeVisible();
-    // ES1-T323: header-drawer.js nạp lười khi chạm nút menu; chờ nắm drawer trước khi resize.
+    // ES1-T329/ES1-T323: header-drawer.js nạp lười khi chạm nút menu; chờ define và nắm drawer (sau modal-dialog) trước khi resize.
+    await page.waitForFunction(() => !!customElements.get('header-drawer'));
     await expect(page.getByTestId('header')).toHaveAttribute('data-drawer-enhanced', '');
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.setViewportSize({ width: 412, height: 780 });
