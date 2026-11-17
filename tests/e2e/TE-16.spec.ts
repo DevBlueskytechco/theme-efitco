@@ -5,7 +5,7 @@
 // chuyển sang đây, test "2 bài ở 1280" đổi sang 292 × 389 theo TE-16 AC1 (drafts/dev-fe/ES1-T334/spec-updates.md §5); file cũ xoá để không trùng.
 // Dữ liệu: blog figma-blog 5 bài (fixture ES1-T331, BA ES1-T173 §3.6). Bài biên (te16-edge, te16-zero) chưa có: test skip có lý do.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-16.spec.ts (project desktop + mobile Pixel 7).
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { expectNotChallenged, gotoStore } from './support/store-guard';
