@@ -52,7 +52,25 @@ async function ensureModule(page: Page) {
   await page.addScriptTag({ url: url!, type: 'module' });
   await page.waitForFunction(() => !!customElements.get('page-layers'));
 }
-async function openPage(page: Page, path = '/') {
+// Banner consent THẬT của Shopify chỉ test "banner thật" kiểm. Các test còn lại cần trang không có banner thật:
+// - store dev ở chế độ preview: query bannerQuery gửi isPreviewMode = true → Shopify vẽ #shopify-pc__banner cả với IP US
+//   (regionVisibility chỉ có nước EU) — trace CI run 44171510755;
+// - global setup không còn Decline được (log "[state] banner consent: absent" ở mọi shard; cookie _tracking_consent không còn,
+//   Shopify dùng _shopify_essential/_shopify_cmp) nên state.json không mang lựa chọn consent;
+// - banner chỉ vắng khi spec có autoDeclineConsent (T137, T176, T235, T45, TE-1, TE-4) đã chạy trước trong cùng shard (lựa chọn
+//   gắn với khách chung của state.json). Thêm spec làm --shard chia lại → T314 đỏ (PR #229, #251, #254).
+// Theme không vẽ banner (layers.md §5) → trả script privacy-banner rỗng (không abort: abort sinh lỗi console); test tự chèn
+// #shopify-pc__banner giả khi cần. Assertion giữ nguyên.
+const PRIVACY_BANNER = /\/shopifycloud\/privacy-banner\//;
+const noRealBanner = new WeakSet<Page>();
+async function withoutShopifyBanner(page: Page) {
+  if (noRealBanner.has(page)) return;
+  noRealBanner.add(page);
+  await page.route(PRIVACY_BANNER, (route) => route.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+}
+
+async function openPage(page: Page, path = '/', { realBanner = false } = {}) {
+  if (!realBanner) await withoutShopifyBanner(page);
   await page.goto(path);
   await expectNotChallenged(page);
   await ensureModule(page);
@@ -260,7 +278,7 @@ test.describe('ES1-T314 banner consent (TE-10 AC7, layers.md §5)', () => {
     await context.clearCookies({ name: CONSENT.cookie });
     const page = await context.newPage();
     const errors = watchConsole(page);
-    await openPage(page);
+    await openPage(page, '/', { realBanner: true });
     const banner = page.locator(CONSENT.banner).first();
     const shown = await banner.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true, () => false);
     test.info().annotations.push({ type: 'consent-banner-that', description: String(shown) });
