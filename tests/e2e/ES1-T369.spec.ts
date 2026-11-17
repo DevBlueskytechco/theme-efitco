@@ -180,14 +180,14 @@ test.describe('ES1-T369 hợp đồng tĩnh', () => {
     expect(keys.length).toBe(new Set(keys).size);
   });
 
-  test('CSS cart: 0 literal màu, chỉ logical, z-index qua --layer-*, base.css ≤ 53 248 B gzip', () => {
+  test('CSS cart: 0 literal màu, chỉ logical, z-index qua --layer-*, base.css ≤ 57 344 B gzip (trần tạm CTO 17/11 tới ES1-T478)', () => {
     const css = cartCss();
     expect(css.match(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/gi)).toBeNull();
     expect(css.match(/^\s*(left|right|top|bottom|width|height|(margin|padding)-(left|right|top|bottom))\s*:/gm)).toBeNull();
     expect(css.match(/z-index:\s*\d/g)).toBeNull();
     const size = gzipSync(BASE).length;
     test.info().annotations.push({ type: 'base.css gzip', description: String(size) });
-    expect(size).toBeLessThanOrEqual(53248);
+    expect(size).toBeLessThanOrEqual(57344);
   });
 });
 

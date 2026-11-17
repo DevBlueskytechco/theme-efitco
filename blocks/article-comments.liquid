@@ -1,0 +1,263 @@
+{% doc %}
+  Article comments (SRS TE-20 AC11, AC12; docs/ui-spec/article.md §1.4, §5,
+  decisions 10/11 A3): heading with the count, the comment list, shared
+  pagination (10 per page, nav "Comment pages", links to #comments) and the
+  Shopify new_comment form. Same 46rem reading column as article-main.
+
+  No settings: comments are turned on, off and moderated in Shopify admin
+  (Content > Blog posts > Manage blogs). When blog.comments_enabled? is false the
+  storefront renders nothing and the editor shows how to turn comments on.
+
+  The form works without JavaScript: Shopify posts it and reloads the article.
+  - form.errors: summary role="alert" "Check {n} fields" (tabindex -1), an error
+    with an icon under each field (aria-invalid, aria-describedby), typed text kept.
+  - form.posted_successfully?: role="status" box (tabindex -1) at the top of the
+    form, "in review" text when blog.moderated?, fields empty.
+  - blog.moderated?: note "Comments are reviewed before they appear." above the fields.
+
+  Hooks for BE (no JavaScript in this block): focus [data-testid=comment-status]
+  or #CommentFormErrors after the reload; [data-testid=comment-submit] takes
+  aria-busy while posting (.button[aria-busy] spinner already in base.css).
+  No partial.
+
+  Self-contained: callers must leave the body empty.
+
+  Test hooks: data-testid="article-comments", "article-comments-heading",
+  "article-comments-list", "article-comment", "article-comments-empty",
+  "comment-form", "comment-moderated-note", "comment-status", "comment-errors",
+  "comment-submit", "article-comments-placeholder"; pagination hooks in
+  snippets/pagination.liquid.
+
+  @example
+  {% block 'container', id: 'article-comments' %}
+    {% block 'article-comments' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- if blog.comments_enabled? and article != blank -%}
+  <div
+    class="article-comments"
+    id="comments"
+    data-testid="article-comments"
+    {{ block.shopify_attributes }}
+  >
+    <h2 class="article-comments__heading" id="ArticleCommentsHeading" data-testid="article-comments-heading">
+      {%- if article.comments_count > 0 -%}
+        {{- 'blog.comments_count' | t: count: article.comments_count -}}
+      {%- else -%}
+        {{- 'blog.article_comments' | t -}}
+      {%- endif -%}
+    </h2>
+
+    {%- if article.comments_count > 0 -%}
+      {% paginate article.comments by 10, window_size: 1 %}
+        <ol
+          class="article-comments__list"
+          role="list"
+          aria-labelledby="ArticleCommentsHeading"
+          data-testid="article-comments-list"
+        >
+          {%- for comment in article.comments -%}
+            <li class="article-comments__item" data-testid="article-comment">
+              <span class="article-comments__avatar" aria-hidden="true">
+                {{- comment.author | strip | slice: 0 | upcase | escape -}}
+              </span>
+              <p class="article-comments__head">
+                <span class="article-comments__author">{{ comment.author | escape }}</span>
+                <span class="article-comments__date">{{ comment.created_at | time_tag: format: 'date' }}</span>
+              </p>
+              <div class="article-comments__body">{{ comment.content }}</div>
+            </li>
+          {%- endfor -%}
+        </ol>
+        {%- assign comments_label = 'blog.comments_pagination_label' | t -%}
+        {% render 'pagination', paginate: paginate, label: comments_label, anchor: '#comments' %}
+      {% endpaginate %}
+    {%- else -%}
+      <p class="article-comments__empty" data-testid="article-comments-empty">{{ 'blog.no_comments' | t }}</p>
+    {%- endif -%}
+
+    {% form 'new_comment', article, class: 'comment-form', data-testid: 'comment-form' %}
+      <h2 class="comment-form__title">{{ 'blog.comment_form_title' | t }}</h2>
+
+      {%- liquid
+        assign author_error = false
+        assign email_error = false
+        assign body_error = false
+        assign form_error = false
+        assign field_errors = 0
+        if form.errors
+          for field in form.errors
+            if field == 'form'
+              assign form_error = true
+            else
+              assign field_errors = field_errors | plus: 1
+            endif
+          endfor
+          if form.errors contains 'author'
+            assign author_error = true
+          endif
+          if form.errors contains 'email'
+            assign email_error = true
+          endif
+          if form.errors contains 'body'
+            assign body_error = true
+          endif
+        endif
+
+        assign value_author = form.author
+        assign value_email = form.email
+        assign value_body = form.body
+        if form.posted_successfully?
+          assign value_author = ''
+          assign value_email = ''
+          assign value_body = ''
+        endif
+      -%}
+
+      {%- if form.posted_successfully? -%}
+        <div class="form-status form-status--success" role="status" tabindex="-1" data-testid="comment-status">
+          <span class="form-status__icon">{% render 'status-icon', name: 'success' %}</span>
+          <div class="form-status__body">
+            {%- if blog.moderated? -%}
+              <p class="form-status__title">{{ 'blog.comment_pending_title' | t }}</p>
+              <p>{{ 'blog.comment_pending_body' | t }}</p>
+            {%- else -%}
+              <p class="form-status__title">{{ 'blog.comment_posted' | t }}</p>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- if form.errors -%}
+        <div
+          class="form-status form-status--error"
+          role="alert"
+          tabindex="-1"
+          id="CommentFormErrors"
+          data-testid="comment-errors"
+        >
+          <span class="form-status__icon">{% render 'status-icon', name: 'error' %}</span>
+          <div class="form-status__body">
+            {%- if field_errors > 0 -%}
+              <p class="form-status__title">{{ 'blog.comment_errors_summary' | t: count: field_errors }}</p>
+              <p>{{ 'blog.comment_errors_hint' | t }}</p>
+            {%- else -%}
+              <p class="form-status__title">{{ 'blog.comment_errors_title' | t }}</p>
+            {%- endif -%}
+            {%- if form_error -%}
+              <p>{{ form.errors.messages['form'] }}</p>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- if blog.moderated? -%}
+        <p class="comment-form__note" data-testid="comment-moderated-note">
+          {%- render 'status-icon', name: 'info' -%}
+          <span>{{ 'blog.comment_moderated_note' | t }}</span>
+        </p>
+      {%- endif -%}
+
+      <div class="comment-form__fields">
+        <div class="form-field">
+          <label for="CommentAuthor" class="form-field__label">
+            {{- 'blog.comment_form_name' | t }} <span aria-hidden="true">*</span>
+          </label>
+          <input
+            type="text"
+            name="comment[author]"
+            id="CommentAuthor"
+            class="form-field__input"
+            value="{{ value_author }}"
+            autocomplete="name"
+            required
+            aria-required="true"
+            {% if author_error %}
+              aria-invalid="true"
+              aria-describedby="CommentAuthorError"
+            {% endif %}
+          >
+          {%- if author_error -%}
+            <p id="CommentAuthorError" class="form-field__error">
+              {%- render 'status-icon', name: 'error' -%}
+              <span>{{ 'blog.comment_error_author' | t }}</span>
+            </p>
+          {%- endif -%}
+        </div>
+
+        <div class="form-field">
+          <label for="CommentEmail" class="form-field__label">
+            {{- 'blog.comment_form_email' | t }} <span aria-hidden="true">*</span>
+          </label>
+          <input
+            type="email"
+            name="comment[email]"
+            id="CommentEmail"
+            class="form-field__input"
+            value="{{ value_email }}"
+            autocomplete="email"
+            spellcheck="false"
+            required
+            aria-required="true"
+            {% if email_error %}
+              aria-invalid="true"
+              aria-describedby="CommentEmailError CommentEmailHint"
+            {% else %}
+              aria-describedby="CommentEmailHint"
+            {% endif %}
+          >
+          {%- if email_error -%}
+            <p id="CommentEmailError" class="form-field__error">
+              {%- render 'status-icon', name: 'error' -%}
+              <span>{{ 'blog.comment_error_email' | t }}</span>
+            </p>
+          {%- endif -%}
+          <p id="CommentEmailHint" class="form-field__hint">{{ 'blog.email_hint' | t }}</p>
+        </div>
+
+        <div class="form-field comment-form__body">
+          <label for="CommentBody" class="form-field__label">
+            {{- 'blog.comment_form_body' | t }} <span aria-hidden="true">*</span>
+          </label>
+          <textarea
+            name="comment[body]"
+            id="CommentBody"
+            class="form-field__input"
+            rows="5"
+            required
+            aria-required="true"
+            {% if body_error %}
+              aria-invalid="true"
+              aria-describedby="CommentBodyError"
+            {% endif %}
+          >{{ value_body }}</textarea>
+          {%- if body_error -%}
+            <p id="CommentBodyError" class="form-field__error">
+              {%- render 'status-icon', name: 'error' -%}
+              <span>{{ 'blog.comment_error_body' | t }}</span>
+            </p>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="comment-form__actions">
+        <button type="submit" class="button" data-testid="comment-submit">
+          {{- 'blog.comment_form_submit' | t -}}
+        </button>
+        <p class="form-field__hint">{{ 'blog.required_note' | t }}</p>
+      </div>
+    {% endform %}
+  </div>
+{%- elsif request.design_mode -%}
+  <p class="article-comments--placeholder" data-testid="article-comments-placeholder" {{ block.shopify_attributes }}>
+    {{ 'blog.comments_placeholder' | t }}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.article_comments",
+  "settings": []
+}
+{% endschema %}
