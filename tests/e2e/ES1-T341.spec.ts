@@ -4,7 +4,7 @@
 // Nguồn số đo: docs/ui-spec/index-mobile-a.md §6–§8, docs/ui-spec/index-1280.md §1 khối 6–8, §2.4, §2.5. Sai số 2 px (ES1-T309 #4).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T341.spec.ts
 // Đo bố cục chỉ chạy project desktop (đổi viewport tay). Thiếu ảnh/sản phẩm trên store thì skip có lý do, không coi là đạt.
-import { test, expect, type Page, type Locator } from '@playwright/test';
+import { test, expect, type Page, type Locator } from './support/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expectNotChallenged, gotoStore } from './support/store-guard';
