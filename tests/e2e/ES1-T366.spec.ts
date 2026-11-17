@@ -2,7 +2,7 @@
 // Phần "tĩnh": đọc file + fixture page.setContent với assets/base.css thật và token mặc định (space_base 4), không gọi store.
 // Phần "store": cần collection có filter Search and Discovery (TE6_COLLECTION_HANDLE, fallback /collections/all); thiếu filter thì skip, không tính là đạt.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T366.spec.ts
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';

@@ -2,7 +2,7 @@
 // Ticket ES1-T108 TE-6-FE1: trang collection + list-collections (docs/srs.md#TE-6 AC1, AC5; drafts/techlead/ES1-T103/task-split.md D2, D3, D4, D11, D12).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T108.spec.ts -g "AC1|AC5|nojs"
 // Dữ liệu (ES1-T105 chưa trả lời): thiếu TE6_* → dùng /collections/all, test cần dữ liệu riêng skip có lý do.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
