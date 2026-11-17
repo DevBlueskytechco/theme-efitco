@@ -44,10 +44,15 @@ test.describe('ES1-T407 @static', () => {
     expect(src).toMatch(/<button type="submit"/);
   });
 
+  // ES1-T383 (TE-21 AC3): form chuyển sang blocks/contact-form.liquid, template gọi block; kiểm form trên block, .rte trên template.
   test('page.contact: tồn tại, form contact 3 trường có label thật, email + body required, success + errors', () => {
     expect(existsSync(join(process.cwd(), 'templates/page.contact.liquid'))).toBe(true);
-    const src = read('templates/page.contact.liquid');
-    expect(src).toContain("{% form 'contact'");
+    const template = read('templates/page.contact.liquid');
+    expect(template).toContain("{% block 'contact-form' %}");
+    expect(template).toContain('class="rte');
+    expect(template).not.toMatch(/\{% schema %\}|<script/);
+    const src = read('blocks/contact-form.liquid');
+    expect(src).toContain("{%- form 'contact'");
     for (const [id, name] of [['ContactName', 'contact[name]'], ['ContactEmail', 'contact[email]'], ['ContactBody', 'contact[body]']]) {
       expect(src, id).toContain(`<label for="${id}"`);
       expect(src, id).toContain(`name="${name}"`);
@@ -56,8 +61,7 @@ test.describe('ES1-T407 @static', () => {
     expect(src).toMatch(/id="ContactBody"[\s\S]*?required/);
     expect(src).toMatch(/aria-describedby="ContactEmailError"/);
     expect(src).toContain('form.posted_successfully?');
-    expect(src).toContain('class="rte"');
-    expect(src).not.toMatch(/\{% schema %\}|<script/);
+    expect(src).not.toMatch(/<script/);
   });
 
   test('locale có đủ key, không trùng nhóm', () => {
