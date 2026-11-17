@@ -206,8 +206,8 @@ test.describe('ES1-T365 tĩnh', () => {
     expect(cssText).not.toMatch(/z-index:\s*-?\d/);
     expect(cssText).not.toMatch(/\d+ms\b|\d+(\.\d+)?s\b\s*(ease|linear|;)/);
     expect(BASE).not.toMatch(/\.collection-banner__(image|title)\b|\.collection-products__(count|empty)\b/);
-    // Trần tạm 53 248 B (CTO 14/11, ES1-T454) tới khi base.css về ≤ 49 152
-    expect(gzipSync(BASE).length).toBeLessThanOrEqual(53248);
+    // Trần tạm 57 344 B (CTO 17/11, ES1-T472 a) tới khi tách CSS theo template (ES1-T478) đưa base.css về ≤ 49 152
+    expect(gzipSync(BASE).length).toBeLessThanOrEqual(57344);
     expect(Buffer.byteLength(CRITICAL)).toBeLessThanOrEqual(10240);
   });
 

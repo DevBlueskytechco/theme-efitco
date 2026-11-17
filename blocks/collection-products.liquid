@@ -53,6 +53,8 @@
   Card images: all lazy when the collection has a banner image (the banner is
   the LCP element); otherwise the first columns_desktop cards are eager.
 
+  Cards need no JavaScript: swatches are indicators (TE-3 AC2, ADR 0010).
+
   Test hooks: collection-products (root), collection-toolbar,
   collection-filter-open, collection-filter-count, collection-count,
   collection-sort, collection-sort-apply, collection-status, collection-results,
@@ -383,8 +385,6 @@
       -%}
       {% render 'empty-state', kind: 'error', heading: error_heading, text: error_text, testid: 'collection-error' %}
     </template>
-
-    <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
   </div>
 {%- endif -%}
 

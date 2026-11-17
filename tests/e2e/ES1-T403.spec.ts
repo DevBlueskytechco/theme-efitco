@@ -29,7 +29,8 @@ test.describe('ES1-T403 tĩnh', () => {
   test.beforeEach(({}, ti) => { test.skip(ti.project.name !== 'desktop', 'tĩnh, chạy 1 lần'); });
 
   test('D4 .rte bọc 4 chỗ rich text, rule cũ product-info__description đã xoá', () => {
-    expect(read('templates/article.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? article\.content/);
+    // ES1-T382: nội dung bài chuyển sang blocks/article-main.liquid (TE-20 AC10)
+    expect(read('blocks/article-main.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? article\.content/);
     expect(read('templates/page.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? page\.content/);
     expect(read('blocks/collection-banner.liquid')).toMatch(/class="rte[ "][^>]*>\s*\{\{-? collection\.description/);
     expect(read('blocks/product-info.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? product\.description/);
