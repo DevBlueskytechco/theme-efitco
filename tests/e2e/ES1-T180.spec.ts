@@ -2,7 +2,7 @@
 // Ticket ES1-T180 TE-17-FE1b: nội dung Figma mặc định cho hàng 2, 4a, 8, 13 theo D1, CR-7 (AC-H5, AC-H6).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T180.spec.ts
 // Merchant sửa trong editor (TC-H6) là bước tay; ở đây param trùng tên setting đóng vai giá trị đã lưu, trên /?view=te7.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import { gotoStore } from './support/store-guard';
 
 const HOME = '/';

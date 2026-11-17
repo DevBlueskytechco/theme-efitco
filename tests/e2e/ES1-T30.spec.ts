@@ -1,6 +1,6 @@
 // Ticket ES1-T30 (2727475000000133022) — TE-2 AC6–AC9 phần tương tác: assets/slideshow.js.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T30.spec.ts
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 
 const SPEED_SECONDS = 3; // min của setting autoplay_speed
 const AFTER_TICK = (SPEED_SECONDS + 2) * 1000;

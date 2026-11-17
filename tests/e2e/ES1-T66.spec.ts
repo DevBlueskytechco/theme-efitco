@@ -3,7 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_VARIANTS_HANDLE=... [TE4_SELLING_PLAN_HANDLE=...] npx playwright test tests/e2e/ES1-T66.spec.ts -g "AC2|AC12"
 // Thiếu env → tests/e2e/store-data.json (ES1-T78: TE4_OPTIONS_HANDLE); vẫn thiếu → skip có lý do. Partial chỉ render khi store bật agentic editor (AGENTS.md).
 // API theo ES1-T75: partials.fetch(...names, {url}) + apply; event shopify:product:select (ProductSelectEvent); product:view là <s-view-event> (ES1-T76), không thuộc spec này.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';

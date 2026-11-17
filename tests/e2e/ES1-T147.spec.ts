@@ -3,7 +3,8 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T147.spec.ts -g "AC1-markup|AC4|nojs"
 // Ca hết hàng cần sản phẩm hết hàng trong 9 món đầu của collection (te12-bundle, ES1-T144); không có thì skip có lý do.
 // BE1 (ES1-T149) chạy lại spec này: phần chỉ đúng trước khi JS nâng cấp thì kiểm data-enhanced trước.
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
@@ -42,7 +43,7 @@ async function expectNoSeriousAxe(page: Page) {
 
 async function noJsPage(browser: Browser, width?: number) {
   const use = test.info().project.use;
-  const context = await browser.newContext({
+  const context = await newStoreContext(browser, {
     javaScriptEnabled: false,
     storageState: 'tests/setup/state.json',
     baseURL: use.baseURL,

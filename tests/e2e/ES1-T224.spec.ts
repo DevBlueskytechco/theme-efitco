@@ -4,7 +4,7 @@
 // - Kiểm các helper và điều kiện chờ của ticket trên trang giả với CSS thật, không gọi store.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T224.spec.ts
 import { readFileSync } from 'node:fs';
-import { test, expect, type Page, type Response } from '@playwright/test';
+import { test, expect, type Page, type Response } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { visibleImagesLoaded } from './support/page-ready';
 import { CLOUDFLARE_BLOCKED, expectNotChallenged, expectStoreAllowed, gotoStore, isStoreRefresh, watchStore } from './support/store-guard';
@@ -49,20 +49,21 @@ test.describe('ES1-T224 axe gộp', () => {
   // Bị chặn thì thử lại chỉ thêm lần tải trang vào store đang chặn.
   test.describe.configure({ retries: 0 });
 
-  test('axe 0 serious, 0 console error trên / và /?view=figma (gộp T179, T180, T182)', async ({ page }) => {
-    const watch = watchStore(page);
-    const serious: string[] = [];
-    for (const url of ['/', '/?view=figma']) {
+  // ES1-T475: mỗi trang 1 test, mỗi test 1 lần điều hướng: lần điều hướng thứ 2 trong cùng test hay bị chặn. AC không đổi: 0 serious, 0 console error trên cả 2 trang.
+  for (const url of ['/', '/?view=figma']) {
+    test(`axe 0 serious, 0 console error trên ${url} (gộp T179, T180, T182)`, async ({ page }) => {
+      const watch = watchStore(page);
+      const serious: string[] = [];
       await gotoStore(page, url);
       await expectNotChallenged(page);
       const { violations } = await new AxeBuilder({ page }).analyze();
       for (const v of violations) {
         if (v.impact === 'serious' || v.impact === 'critical') serious.push(`${url} ${v.id}: ${v.nodes[0]?.target}`);
       }
-    }
-    expect(serious).toEqual([]);
-    await watch.finish();
-  });
+      expect(serious).toEqual([]);
+      await watch.finish();
+    });
+  }
 });
 
 test.describe('ES1-T224 quy ước spec (tĩnh)', () => {

@@ -10,7 +10,8 @@
 //   Test case: drafts/qa/ES1-T463/test-cases.md (T95-xx).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... [EXPECT_CART_TYPE=page] npx playwright test tests/e2e/ES1-T95.spec.ts
 // Mở thử bằng thuộc tính open (hành vi JS mở/đóng/focus do ES1-T96/T98 kiểm). EXPECT_CART_TYPE=page chỉ đặt khi preview có cart_type page (D12).
-import { test, expect, type APIRequestContext, type Browser, type Page } from '@playwright/test';
+import { test, expect, type APIRequestContext, type Browser, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { clickAndLoad, expectJsonAllowed, expectNotChallenged, expectStoreAllowed, gotoStore, skipIfStoreBlocked } from './support/store-guard';
 import { readFileSync } from 'node:fs';
@@ -60,7 +61,7 @@ async function expectNoSeriousAxe(page: Page) {
 
 async function noJsPage(browser: Browser) {
   const use = test.info().project.use;
-  const context = await browser.newContext({
+  const context = await newStoreContext(browser, {
     javaScriptEnabled: false,
     storageState: 'tests/setup/state.json',
     baseURL: use.baseURL,

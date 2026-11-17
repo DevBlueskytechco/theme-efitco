@@ -2,7 +2,7 @@
 // ES1-T403 TS-FE5: .rte chung, h5 ≠ h6, không cắt tên 3 chỗ, viền radio quiz ≥ 3:1 (task-split ES1-T304 D4, D5; foundation §28).
 // Chạy tĩnh (không store): npx playwright test tests/e2e/ES1-T403.spec.ts -g "tĩnh"
 // Store: PREVIEW_URL=... npx playwright test tests/e2e/ES1-T403.spec.ts. TE403_PAGE_PATH (vd /pages/rte-demo) là page có h5, h6 trong nội dung; thiếu thì test đó skip, không coi là đạt.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { env } from './support/store-data';
