@@ -3,7 +3,7 @@
 // Nguyên nhân: selectOptions đi qua tổ hợp không tồn tại → unavailable() đặt disabled + "Unavailable"; fetch của variant cuối lỗi → catch giữ nguyên.
 // Sửa: assets/product-variant-picker.js lưu nút add + tồn kho đã render (lúc load, sau mỗi apply); fetch/apply lỗi mà không do chính picker huỷ → khôi phục.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_OPTIONS_HANDLE=... npx playwright test tests/e2e/ES1-T87.spec.ts
-import { test, expect, type Page, type Route } from '@playwright/test';
+import { test, expect, type Page, type Route } from './support/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
