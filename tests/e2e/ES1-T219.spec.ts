@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không mở được Chrome; chờ CI).
 // Ticket ES1-T219: double click giữ focus ở tiêu đề bước mới (docs/srs.md#TE-11 AC2). Test gốc: tests/e2e/ES1-T139.spec.ts:140.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T219.spec.ts
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import { fulfillQuizResults } from './support/quiz-results';
 import { gotoStore, watchStoreBlock } from './support/store-guard';
 

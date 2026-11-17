@@ -6,7 +6,7 @@
 // Dùng /?view=te15 (collection all, không cần dữ liệu nhập). Nút chỉ hiện từ 48rem nên test bấm đặt viewport 1024 ở cả desktop và Pixel 7:
 // 1024 còn đủ chỗ cuộn nhiều card; 1920 chỉ cuộn được dưới 1 card vì khung cuộn chặn ở cuối.
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';

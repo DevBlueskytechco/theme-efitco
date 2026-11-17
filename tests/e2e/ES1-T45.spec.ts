@@ -2,7 +2,7 @@
 // Test case: drafts/qa/ES1-T45/test-cases.md. Ticket xin 2 file rich-text.spec.ts + rtl.spec.ts; gộp 1 file theo quy ước tên key ticket, 2 describe.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T45.spec.ts
 // Theme chưa có locale RTL: bật RTL bằng document.documentElement.dir = 'rtl' (D6), không sửa layout.
-import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Locator, type Page, type TestInfo } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { autoDeclineConsent } from './support/consent';
