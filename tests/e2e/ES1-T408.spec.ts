@@ -1,6 +1,7 @@
 // ES1-T408 (TS-FE8): 404 form search + link home, password logo/shop.name, gift card khung QR 144 + chữ dự phòng.
 // Nhóm @static đọc file repo, không cần store. Nhóm store chạy trên PREVIEW_URL.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
@@ -71,7 +72,7 @@ test.describe('ES1-T408 store', () => {
     const preview = process.env.PREVIEW_URL;
     test.skip(!preview, 'thiếu PREVIEW_URL');
     // Context mới không cookie mở khoá, giữ theme preview qua query.
-    const context = await browser.newContext();
+    const context = await newStoreContext(browser);
     const page = await context.newPage();
     const url = new URL(preview!);
     await page.goto(`${url.origin}/password${url.search}`);
@@ -105,7 +106,7 @@ test.describe('ES1-T408 store', () => {
 
   test('gift card: tắt JS vẫn thấy chữ dự phòng', async ({ browser }) => {
     test.fixme(!GIFT_CARD, 'ES1-T298: store dev chưa có gift card phát hành (TS_GIFT_CARD_URL)');
-    const context = await browser.newContext({ javaScriptEnabled: false, storageState: 'tests/setup/state.json' });
+    const context = await newStoreContext(browser, { javaScriptEnabled: false, storageState: 'tests/setup/state.json' });
     const page = await context.newPage();
     await page.goto(new URL(GIFT_CARD!, process.env.STORE_ORIGIN || new URL(process.env.PREVIEW_URL!).origin).href);
     await expect(page.getByTestId('gift-card-qr-fallback')).toBeVisible();

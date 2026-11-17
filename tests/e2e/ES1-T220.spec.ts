@@ -3,7 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T220.spec.ts tests/e2e/ES1-T185.spec.ts
 // Nút chỉ hiện từ 48rem nên đặt viewport 1024 ở cả desktop và Pixel 7 (giống ES1-T185).
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 
 const JS_FILE = 'assets/scroll-buttons.js';
 

@@ -2,7 +2,7 @@
 // Ticket ES1-T68 TE-4-BE4: assets/product-recommendations.js (docs/srs.md#TE-4 AC7; drafts/techlead/ES1-T59/task-split.md D7, D9, D10, D11).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_VARIANTS_HANDLE=... npx playwright test tests/e2e/ES1-T68.spec.ts -g "AC7"
 // Thiếu env → tests/e2e/store-data.json (ES1-T78); vẫn thiếu → skip có lý do.
-import { test, expect, type Page, type Request, type Route } from '@playwright/test';
+import { test, expect, type Page, type Request, type Route } from './support/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';

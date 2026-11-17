@@ -6,7 +6,7 @@
 //   TE407_ARTICLE_PATH  bài thuộc blog bật comment + duyệt (moderated)
 //   TE407_CONTACT_PATH  page gán template "contact" (mặc định /pages/contact)
 // Thiếu dữ liệu → fixme (không tính đạt). hCaptcha sau submit (/challenge hoặc invisible giữ submit) → skip có lý do, chạy tay ghi PR.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';

@@ -3,7 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T218.spec.ts
 // ES1-T470: 'Đổi đáp án khi đang tải', 'Back khi đang tải rồi trả lời lại' kiểm máy trạng thái JS, không kiểm dữ liệu store: response quiz-gym là partial giả (support/quiz-results.ts), 0 request kết quả tới store.
 // Request kết quả, trang /search, trang quiz bị Cloudflare chặn thì fail nêu Cloudflare (support/store-guard.ts), không thành toBeVisible.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { fulfillQuizResults } from './support/quiz-results';
 import { gotoStore, watchStoreBlock } from './support/store-guard';
 
