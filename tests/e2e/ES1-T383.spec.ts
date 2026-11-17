@@ -4,7 +4,7 @@
 //   TE383_PAGE_PATH     page dùng template mặc định có bảng rộng, ảnh, link trong đoạn (vd /pages/our-story)
 //   TE383_CONTACT_PATH  page gán template "contact" (mặc định /pages/contact; dùng chung TE407_CONTACT_PATH)
 // Validation inline khi rời trường, aria-busy lúc gửi, focus vào hộp tóm tắt (AC4, AC5 phần có JS) là việc Dev BE: chưa test ở đây.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
