@@ -4,7 +4,7 @@
 // 4 tab trên /?view=figma cần figma-tab-* (ES1-T178): thiếu thì skip có lý do.
 // Tab rỗng: bảng dữ liệu không bảo đảm có collection rỗng, nên test thay nội dung template bằng đúng markup thông báo của block rồi mới chọn tab.
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged, watchTabDataRequests } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';

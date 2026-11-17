@@ -1,7 +1,7 @@
 // ES1-T313 (TE-10-R2-FE2): khung lớp và trạng thái chung. Không gọi store: đọc file + dựng fixture bằng
 // page.setContent với assets/base.css thật và token mặc định của config/settings_schema.json (space_base 4).
 // Chạy: npx playwright test tests/e2e/ES1-T313.spec.ts --project=desktop
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
