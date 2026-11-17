@@ -673,20 +673,33 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     expect(errors, errors.join('\n')).toEqual([]);
   });
 
-  test('TC-16 AC2: hơn 5 màu thì 5 swatch + "+N" ra khỏi tab order', async ({ page }) => {
+  // ES1-T417: trước sort cố định, 5 trang đầu /collections/all không có card "+N" nên test này luôn skip và giữ assertion cũ
+  // (5 radio trong fieldset/legend, "+N" là link tabindex -1). Theo docs/srs.md#TE-3 AC2 (swatch là chỉ báo aria-hidden, link card
+  // ghi số màu) và AC13 (0.5, VP2, variant-picker.md §9: N > 4 thì 3 chỉ báo + "+{N − 3}"), snippets/product-card.liquid:172-177, 302-341.
+  test('TC-16 AC2 AC13: hơn 4 màu thì 3 chỉ báo + "+N", hàng aria-hidden không focus được, link ghi tổng N màu', async ({ page }) => {
     const card = await findCard(page, T.more);
-    test.skip(!card, `Không có sản phẩm hơn 5 màu swatch trên ${ALL}`);
+    test.skip(!card, `Không có sản phẩm hơn 4 màu swatch trên ${allPage()}`);
     const handle = await handleOf(card!);
     const p = await productJs(page, handle);
-    const legend = norm(await card!.getByTestId(T.swatches).locator('legend').textContent());
-    const option = p.options.find(o => o.name === legend);
-    expect(option, `option ${legend} trong ${handle}.js`).toBeTruthy();
-    await expect(card!.getByTestId(T.swatch)).toHaveCount(5);
+    const row = card!.getByTestId(T.swatches);
+    const swatches = row.getByTestId(T.swatch);
+    await expect(swatches).toHaveCount(3);
+    // Tên value nằm trong span visually-hidden của từng chỉ báo; option màu = option có > 4 giá trị chứa đủ các tên này.
+    const names = (await swatches.allTextContents()).map(norm);
+    const option = p.options.find(o => o.values.length > 4 && names.every(n => o.values.includes(n)));
+    expect(option, `option chứa ${names.join(', ')} và > 4 giá trị trong ${handle}.js`).toBeTruthy();
+    const total = option!.values.length;
+
+    await expect(row).toHaveAttribute('aria-hidden', 'true');
+    await expect(row.locator('a, button, input, select, textarea, [tabindex], [href]'), 'hàng chỉ báo không có control').toHaveCount(0);
     const more = card!.getByTestId(T.more);
-    await expect(more).toHaveText(`+${option!.values.length - 5}`);
-    await expect(more).toHaveAttribute('tabindex', '-1');
-    await expect(more).toHaveAttribute('aria-hidden', 'true');
-    await expect(more).toHaveAttribute('href', new RegExp(`/products/${handle}$`));
+    await expect(more).toHaveText(`+${total - 3}`);
+    await expect(card!.getByTestId(T.title)).toHaveAccessibleName(new RegExp(`, ${total} colors$`));
+
+    // AC13: 3 chỉ báo và "+N" cùng một hàng (không xuống dòng trong card).
+    const boxes = await row.locator(`[data-testid="${T.swatch}"], [data-testid="${T.more}"]`).evaluateAll(els =>
+      els.map(el => { const r = el.getBoundingClientRect(); return r.top + r.height / 2; }));
+    expect(Math.max(...boxes) - Math.min(...boxes), 'chỉ báo và +N cùng hàng').toBeLessThanOrEqual(2);
   });
 
   // ES1-T434 (bug ES1-T434-B01): docs/srs.md#TE-3 AC2 "swatch lấy từ option value của option màu".
