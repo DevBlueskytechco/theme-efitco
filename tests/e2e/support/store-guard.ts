@@ -5,7 +5,7 @@ import { expect, test, type Page, type Request, type Response } from '@playwrigh
 import { basename } from 'node:path';
 import { MAX_WAITS, retryDelayMs, skip429 } from './cart-api';
 import { isCloudflareLog, watchShopPay403 } from './console-guard';
-import { record429 } from './report-429';
+import { cooldownWaitMs, first429At, record429 } from './report-429';
 
 const IGNORE_CONSOLE = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)|status of 429/i;
 const NETWORK_LOG = /Failed to load resource/i;
@@ -222,4 +222,19 @@ export function watchStore(page: Page): StoreWatch {
       expect(errors, `console error:\n${errors.join('\n')}`).toEqual([]);
     },
   };
+}
+
+// ES1-T477 (a): cổng chờ Cloudflare trước luồng thêm giỏ thật. Shard đã ghi 429 hoặc trang thử thách (record429) thì chờ tới đủ 10,5 phút kể từ lần 429 đầu
+// của đợt chặn (support/report-429.ts), tối đa 5,5 phút; chưa bị chặn thì không chờ. Gọi ở đầu hook hoặc test: thời gian chờ cộng vào timeout của hook/test đó.
+// Không nới gì: hết chờ mà store vẫn chặn thì luồng thật vẫn fail nêu Cloudflare như trước (ES1-T203).
+export async function waitStoreCooldown(label: string): Promise<number> {
+  const first = first429At();
+  const now = Date.now();
+  const wait = cooldownWaitMs(first, now);
+  if (!wait) return 0;
+  console.log(`[429-cho] chờ ${Math.ceil(wait / 1000)}s trước ${label} (lần 429 đầu của shard cách ${Math.round((now - first!) / 1000)}s, ES1-T477 a)`);
+  const info = test.info();
+  if (info.timeout > 0) info.setTimeout(info.timeout + wait);
+  await new Promise((r) => setTimeout(r, wait));
+  return wait;
 }
