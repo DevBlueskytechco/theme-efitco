@@ -1,19 +1,23 @@
 // ES1-T475: bớt request tới store dev, nơi Cloudflare bật thử thách 429 cho IP runner sau khoảng 17 phút mỗi shard (chẩn đoán ES1-T470).
-// Chỉ trả giả (fulfill) 4 nguồn Shopify không phục vụ test, chỉ trên host store: iframe login_with_shop của <shopify-account>, preloads.js của content_for_header,
+// Chỉ trả giả (fulfill) 4 nguồn Shopify không phục vụ test, chỉ trên host store (ES1-T477 thêm nguồn thứ 5 trên shop.app, xem dưới): iframe login_with_shop của <shopify-account>, preloads.js của content_for_header,
 // monorail và /api/collect (analytics). Không abort: abort sinh log "Failed to load resource" và pageerror (đã thử khi lập kế hoạch ES1-T475).
 // Không chặn: graphql, shop-js/account.js, privacy-banner, /recommendations, checkout-web, /cdn-cgi. Không khớp theo path trên mọi host: trang giả (store.test, stub.test)
 // và route shop.app của ES1-T171 giữ nguyên. page.route của spec được ưu tiên hơn context.route nên mock của spec không bị ảnh hưởng.
+// ES1-T477: thêm iframe shop.app/pay/hop (Shop Pay nhận diện người mua) — host shop.app, khớp đúng path. Hop trả 302 về /services/login_with_shop/buyer/callback
+// của store; Playwright chỉ đưa request đầu của chuỗi redirect vào route, nên callback đi thẳng tới store dù khớp tiền tố login_with_shop (run 43885902358
+// lượt 1: callback 429 cf-mitigated trong ES1-T203 TC-20). Trả giả hop thì không có redirect, không có callback.
 // Test cần AC analytics sau này thì test.use({ stubNoise: false }) (support/test.ts).
 // Đánh đổi: context có route thì Playwright tắt HTTP cache, /cdn tải lại ở mỗi lần điều hướng; đo bằng [req-tong-ket] cuối shard (support/report-429.ts).
 import { test, type Browser, type BrowserContext, type BrowserContextOptions, type Request } from '@playwright/test';
 import { basename } from 'node:path';
 import { emptyReqCounts, recordReq, type ReqCounts, type ReqKind } from './report-429';
 
-export type NoiseKind = 'login_with_shop' | 'preloads' | 'monorail' | 'collect';
+export type NoiseKind = 'login_with_shop' | 'preloads' | 'monorail' | 'collect' | 'shop_hop';
 export type NoiseCounts = Record<NoiseKind, number>;
 
-// Khớp đầu đường dẫn cho login_with_shop, monorail; khớp đúng cho preloads.js, /api/collect. Host khác store → null.
+// Khớp đầu đường dẫn cho login_with_shop, monorail; khớp đúng cho preloads.js, /api/collect, shop.app/pay/hop. Host khác store (trừ shop.app/pay/hop) → null.
 export function noiseKind(url: URL, storeHost: string): NoiseKind | null {
+  if (url.hostname === 'shop.app') return url.pathname === '/pay/hop' ? 'shop_hop' : null;
   if (url.hostname !== storeHost) return null;
   const path = url.pathname;
   if (path.startsWith('/services/login_with_shop/')) return 'login_with_shop';
@@ -29,6 +33,7 @@ const FAKE: Record<NoiseKind, { status: number; contentType?: string; body?: str
   preloads: { status: 200, contentType: 'text/javascript', body: '' },
   monorail: { status: 204 },
   collect: { status: 204 },
+  shop_hop: { status: 200, contentType: 'text/html', body: '<!doctype html><html lang="en"><title>shop_hop</title></html>' },
 };
 
 const NOISE = new WeakMap<BrowserContext, NoiseCounts>();
@@ -55,7 +60,7 @@ export const noiseCounts = (context: BrowserContext): NoiseCounts | undefined =>
 export async function stubStoreNoise(context: BrowserContext, baseURL: string | undefined): Promise<void> {
   const storeHost = hostOf(baseURL);
   if (!storeHost || NOISE.has(context)) return;
-  const counts: NoiseCounts = { login_with_shop: 0, preloads: 0, monorail: 0, collect: 0 };
+  const counts: NoiseCounts = { login_with_shop: 0, preloads: 0, monorail: 0, collect: 0, shop_hop: 0 };
   NOISE.set(context, counts);
   await context.route(
     (url) => noiseKind(url, storeHost) !== null,
@@ -77,9 +82,9 @@ export function requestKind(request: Pick<Request, 'url' | 'resourceType'>, stor
   }
   if (!/^https?:$/.test(url.protocol)) return null;
   if (url.hostname === 'challenges.cloudflare.com') return 'challenge';
+  if (stubbed && noiseKind(url, storeHost)) return 'stubbed';
   if (url.hostname !== storeHost) return '3p';
   if (url.pathname.startsWith('/cdn-cgi/')) return 'challenge';
-  if (stubbed && noiseKind(url, storeHost)) return 'stubbed';
   if (request.resourceType() === 'document') return 'doc';
   return url.pathname.startsWith('/cdn/') ? 'cdn' : 'dyn';
 }

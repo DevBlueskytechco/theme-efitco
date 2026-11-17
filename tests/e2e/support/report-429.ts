@@ -16,6 +16,7 @@ export function startLog429() {
   const file = join(tmpdir(), `efitco-e2e-429-${process.pid}.log`);
   writeFileSync(file, '');
   writeFileSync(`${file}.req`, '');
+  writeFileSync(`${file}.first`, '');
   process.env.E2E_429_LOG = file;
 }
 
@@ -27,6 +28,46 @@ export function record429(kind: Kind429, spec: string) {
   } catch {
     // Tổng kết là phụ, lỗi ghi không được làm hỏng test.
   }
+  markFirst429();
+}
+
+// ES1-T477 (a): mốc lần 429 đầu của đợt chặn hiện tại, ghi ở file `${E2E_429_LOG}.first` (ms epoch): chung cho mọi worker, mọi spec của shard (globalSetup tạo 1 file/shard).
+// Số liệu ES1-T475: Cloudflare bật thử thách sau 3 lần thêm giỏ thật ở shard *-1 và giữ ~10 phút; ES1-T203 TC-20 chạy 7,1–9,6 phút sau mốc thì đỏ, ≥ 10,2 phút thì xanh.
+// 429 tới khi mốc đã quá STORE_COOLDOWN_MS là đợt chặn mới: ghi mốc mới. Spec kiểm helper (SELF_TEST) và phần kiểm helper của ES1-T203 (bỏ E2E_429_LOG) không ghi mốc.
+export const STORE_COOLDOWN_MS = 10.5 * 60_000;
+export const MAX_COOLDOWN_WAIT_MS = 5.5 * 60_000;
+
+const firstFile = () => (process.env.E2E_429_LOG ? `${process.env.E2E_429_LOG}.first` : null);
+
+// Mốc lần 429 đầu của đợt chặn gần nhất; chưa có 429 hoặc không có file → undefined.
+export function first429At(): number | undefined {
+  const file = firstFile();
+  if (!file) return undefined;
+  try {
+    const at = Number(readFileSync(file, 'utf8').trim());
+    return Number.isFinite(at) && at > 0 ? at : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function markFirst429(now = Date.now()) {
+  const file = firstFile();
+  if (!file) return;
+  const first = first429At();
+  if (first !== undefined && now - first < STORE_COOLDOWN_MS) return;
+  try {
+    writeFileSync(file, String(now));
+  } catch {
+    // Mốc là phụ: không ghi được thì cổng chờ không chờ, test chạy như trước.
+  }
+}
+
+// Thời gian cần chờ để đủ STORE_COOLDOWN_MS kể từ mốc, không quá MAX_COOLDOWN_WAIT_MS. Không có mốc hoặc đã đủ → 0.
+export function cooldownWaitMs(firstAt: number | undefined, now: number): number {
+  if (firstAt === undefined) return 0;
+  const left = firstAt + STORE_COOLDOWN_MS - now;
+  return left > 0 ? Math.min(Math.ceil(left), MAX_COOLDOWN_WAIT_MS) : 0;
 }
 
 export function summary429(log: string, ci = false): string[] {
