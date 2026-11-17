@@ -4,7 +4,7 @@
 //   npx playwright test tests/e2e/ES1-T67.spec.ts -g "AC5|AC6|AC8"
 // Thiếu biến → skip có lý do. Viewport 390 / 1280 đặt trong test nên chạy được cả project desktop và mobile (Pixel 7).
 // Có <cart-drawer> (TE-5) và cart type drawer → test chuyển /cart skip (drawer mở thuộc TE-5).
-import { test, expect, type Page, type Request } from '@playwright/test';
+import { test, expect, type Page, type Request } from './support/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getJson } from './support/http';

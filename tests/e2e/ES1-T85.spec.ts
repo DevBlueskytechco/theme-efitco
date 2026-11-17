@@ -2,7 +2,7 @@
 // Ticket ES1-T85 TE-4-BE5 (làm lại theo review PR #72): assets/product-form.js dispatch shopify:cart:lines-update
 // (CartLinesUpdateEvent) trước POST cart/add.js; promise luôn resolve CartLinesUpdateResult { cart, userErrors, warnings }.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_VARIANTS_HANDLE=... [TE4_SINGLE_HANDLE=...] npx playwright test tests/e2e/ES1-T85.spec.ts
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CART } from './support/cart-api';

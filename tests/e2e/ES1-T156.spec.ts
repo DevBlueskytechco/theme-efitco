@@ -3,7 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T156.spec.ts -g "AC1-markup|AC2|nojs"
 // JS của BE1 ở tests/e2e/ES1-T158.spec.ts; test trạng thái trước nâng cấp chặn file module (ES1-T158).
 import { readFileSync } from 'node:fs';
-import { test, expect, type Locator, type Page, type Response } from '@playwright/test';
+import { test, expect, type Locator, type Page, type Response } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged, expectStoreAllowed, gotoStore, skipIfStoreBlocked } from './support/store-guard';
 import { env } from './support/store-data';

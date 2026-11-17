@@ -7,7 +7,8 @@
 // Phạm vi: helper tests/e2e/support/password-unlock.ts + global setup. scripts/lhci-auth.js thuộc ticket DevOps riêng (comment CTO).
 // Nhóm "fixture" dựng 2 dạng trang bằng page.route trên host giả → không phụ thuộc #208 merge, không phụ thuộc theme live.
 // Nhóm "smoke" chạy trên store dev thật (live + preview_theme_id), context không storageState, chỉ project desktop (giảm request).
-import { test, expect, type Page, type BrowserContext } from '@playwright/test';
+import { test, expect, type Page, type BrowserContext } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { fillStorePassword, revealPasswordInput, PASSWORD_PAGE } from './support/password-unlock';
 
 const FIXTURE = 'https://pw-fixture.test';
@@ -154,7 +155,7 @@ test.describe('ES1-T442 fixture: 2 dạng trang password', () => {
   });
 
   test('TC-10 biên trang không JS: summary mở details bằng click (native), điền được', async ({ browser }) => {
-    const ctx = await browser.newContext({ javaScriptEnabled: false });
+    const ctx = await newStoreContext(browser, { javaScriptEnabled: false });
     try {
       await serve(ctx);
       const page = await ctx.newPage();
@@ -194,7 +195,7 @@ test.describe('ES1-T442 smoke store dev', () => {
     test(`TC-12 AC3 mở khoá ${t.name}: helper + submit rời /password, rồi mở PREVIEW_URL không bị đẩy về /password`, async ({ browser }, info) => {
       test.skip(info.project.name !== 'desktop', 'smoke chỉ chạy desktop để giảm request lên store dev');
       if (t.name === 'preview') test.skip(!preview().searchParams.get('preview_theme_id'), 'PREVIEW_URL không có preview_theme_id');
-      const ctx = await browser.newContext({ storageState: undefined });
+      const ctx = await newStoreContext(browser, { storageState: undefined });
       try {
         const page = await ctx.newPage();
         await page.goto(t.url());

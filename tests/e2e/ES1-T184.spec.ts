@@ -2,7 +2,7 @@
 // Ticket ES1-T184 TE-15-FE1: blocks/collection-list + collection-card, hàng 3 Figma 1:395 (AC-H8, AC-H9 phần markup). Next/back bấm được thuộc ES1-T185.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T184.spec.ts
 // /?view=te15 không cần dữ liệu nhập (collection all). 5 tên thật trên /?view=figma cần figma-cat-* (ES1-T178): thiếu thì skip có lý do.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
