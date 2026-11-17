@@ -255,6 +255,7 @@ test.describe('ES1-T383 store', () => {
     }
     const summary = page.locator('[data-testid="contact-aside"] .faq-item__summary').first();
     if (await summary.count()) expect((await summary.boundingBox())!.height).toBeGreaterThanOrEqual(56);
+    await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).include('[data-testid="contact-page"]').analyze();
     expect(violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
   });
