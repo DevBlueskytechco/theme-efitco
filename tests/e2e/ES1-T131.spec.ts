@@ -18,6 +18,9 @@ const SNIPPET = read('snippets/predictive-search.liquid');
 const PS_JS = read('assets/predictive-search.js');
 const SEARCH_BLOCK = read('blocks/search-results.liquid');
 const SETTINGS = read('config/settings_schema.json');
+// ES1-T131-B01 (drafts/qa/ES1-T131/bugs/ES1-T131-B01.md): /search còn template skeleton, ô tìm size="50" tràn ngang ở 412px →
+// Chromium mobile nới layout viewport 412 → 583 → view transition liên trang huỷ "Viewport size changed" (pageerror). Hết khi ES1-T128 thay template.
+const SEARCH_OVERFLOW_B01 = /<input[^>]*\bsize="50"/.test(read('templates/search.liquid'));
 
 const HAS = {
   searchPage: SEARCH_BLOCK !== '',
@@ -287,6 +290,10 @@ test.describe('ES1-T131 predictive (có JS)', () => {
   });
 
   test('TC-02 AC1 AC2 Enter khi chưa chọn option sang /search, q giữ trong ô của trang kết quả', async ({ page }) => {
+    test.fail(
+      !isDesktop() && SEARCH_OVERFLOW_B01,
+      'ES1-T131-B01: templates/search.liquid ô tìm size="50" tràn ngang ở 412px, view transition sang /search huỷ "Viewport size changed" (pageerror)',
+    );
     const watch = watchStore(page);
     await openOverlay(page);
     const q = Q.all ?? Q.paged;
