@@ -30,11 +30,14 @@ test.describe('ES1-T407 @static', () => {
     expect(src).toContain("render 'image'");
   });
 
+  // ES1-T382 (TE-20-R2-FE2) chuyển ảnh bìa sang blocks/article-main.liquid, bình luận sang blocks/article-comments.liquid;
+  // widths ảnh bìa đổi thành '360, 540, 720, 1080, 1440, 2048' theo article.md §7 (khung tối đa 1416, DPR 2). AC thay: TE-20 AC9, AC12.
   test('article: ảnh bìa eager + high, hộp role=status tabindex=-1 theo blog.moderated?, giữ form.errors', () => {
-    const src = read('templates/article.liquid');
-    expect(src).toContain("loading: 'eager'");
-    expect(src).toContain("fetchpriority: 'high'");
-    expect(src).toContain("widths: '360, 540, 720, 900, 1200'");
+    const cover = read('blocks/article-main.liquid');
+    expect(cover).toContain("loading: 'eager'");
+    expect(cover).toContain("fetchpriority: 'high'");
+    expect(cover).toMatch(/widths: '360, [^']*2048'/);
+    const src = read('blocks/article-comments.liquid');
     expect(src).toMatch(/form\.posted_successfully\?[\s\S]*role="status" tabindex="-1"[\s\S]*blog\.moderated\?[\s\S]*blog\.comment_pending_title[\s\S]*blog\.comment_posted/);
     expect(src).toMatch(/form\.errors/);
     expect(src).not.toContain('default_errors');
