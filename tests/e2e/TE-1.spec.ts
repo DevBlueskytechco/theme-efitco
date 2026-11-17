@@ -416,6 +416,8 @@ test.describe('ES1-T23', () => {
     await page.goto('/');
     const { drawer } = await openDrawer(page);
     test.skip((await drawer.getByTestId(T.drawerAcc).count()) === 0, 'main-menu store dev chưa có mục cấp 2');
+    // ES1-T323: header-drawer.js nạp lười khi chạm nút menu; chờ nắm drawer (nâng cấp gập accordion mở trước đó)
+    await expect(page.getByTestId(T.header)).toHaveAttribute('data-drawer-enhanced', '');
     const acc = drawer.getByTestId(T.drawerAcc).first();
     const subId = await acc.getAttribute('aria-controls');
     expect(subId, 'accordion thiếu aria-controls').toBeTruthy();
@@ -425,8 +427,12 @@ test.describe('ES1-T23', () => {
     await expect(acc).toHaveAttribute('aria-expanded', 'true');
     await expect(sub).toBeVisible();
     expect(await sub.getByRole('link').count()).toBeGreaterThan(0);
-    await acc.click();
+    // ES1-T323 (TE-1 AC2 0.3): có JS thì cấp 2 phủ drawer, hàng cấp 1 inert; về cấp 1 bằng Back, focus về hàng vừa mở
+    const back = acc.locator('xpath=..').getByTestId('header-drawer-back');
+    await expect(back).toBeFocused();
+    await back.click();
     await expect(acc).toHaveAttribute('aria-expanded', 'false');
+    await expect(acc).toBeFocused();
     await expect(sub).toBeHidden();
   });
 
