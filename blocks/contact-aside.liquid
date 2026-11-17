@@ -1,0 +1,82 @@
+{% doc %}
+  Side panel of the contact page (docs/ui-spec/page.md §2, §4; TE-21 AC3, TE-9
+  AC5): eyebrow, h2, the faq-item questions from the body as details
+  disclosures (several can be open, the first is open when the template passes
+  open: true), then links to the shipping and refund policies from
+  shop.policies. No settings and no JavaScript.
+
+  The panel is an aside named by its h2. It renders only when the body has at
+  least one question; a new install has empty questions, so the storefront
+  shows no panel. In the theme editor the empty faq-item placeholders keep the
+  panel visible so the merchant can fill the questions. A policy link shows
+  only when the shop has that policy.
+
+  Test hooks: data-testid="contact-aside", "contact-aside-heading",
+  "contact-aside-list", "contact-aside-policy", "contact-aside-placeholder".
+
+  @param {string} content - One faq-item block call per question, 1 to 10
+
+  @example
+  {% block 'contact-aside' %}
+    {% block 'faq-item', id: 'contact-faq-1', open: true %}{% endblock %}
+    {% block 'faq-item', id: 'contact-faq-2' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- liquid
+  assign items = content | strip
+  assign shipping_policy = shop.shipping_policy
+  assign refund_policy = shop.refund_policy
+-%}
+
+{%- if items != blank -%}
+  <aside
+    class="contact-aside"
+    aria-labelledby="ContactAsideHeading"
+    data-testid="contact-aside"
+    {{ block.shopify_attributes }}
+  >
+    <div class="contact-aside__header">
+      <p class="faq__eyebrow">{{ 'blocks.contact_aside.eyebrow' | t }}</p>
+      <h2 id="ContactAsideHeading" class="contact-aside__heading" data-testid="contact-aside-heading">
+        {{- 'blocks.contact_aside.heading' | t -}}
+      </h2>
+    </div>
+
+    <div class="contact-aside__list" data-testid="contact-aside-list">
+      {{ items }}
+    </div>
+
+    {%- if shipping_policy != blank or refund_policy != blank -%}
+      <ul class="contact-aside__links" role="list">
+        {%- if shipping_policy != blank -%}
+          <li>
+            <a class="contact-aside__link" href="{{ shipping_policy.url }}" data-testid="contact-aside-policy">
+              {{- shipping_policy.title | escape -}}
+              {%- render 'slideshow-icon', name: 'arrow' -%}
+            </a>
+          </li>
+        {%- endif -%}
+        {%- if refund_policy != blank -%}
+          <li>
+            <a class="contact-aside__link" href="{{ refund_policy.url }}" data-testid="contact-aside-policy">
+              {{- refund_policy.title | escape -}}
+              {%- render 'slideshow-icon', name: 'arrow' -%}
+            </a>
+          </li>
+        {%- endif -%}
+      </ul>
+    {%- endif -%}
+  </aside>
+{%- elsif request.design_mode -%}
+  <p class="contact-aside contact-aside--placeholder" data-testid="contact-aside-placeholder" {{ block.shopify_attributes }}>
+    {{- 'blocks.contact_aside.placeholder' | t -}}
+  </p>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.contact_aside",
+  "settings": []
+}
+{% endschema %}
