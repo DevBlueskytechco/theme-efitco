@@ -90,11 +90,14 @@ const FIXTURE = (stickyHidden: boolean) => `
 </cart-items>
 </div></div></main>`;
 
+// Head có meta viewport như snippets/meta-tags.liquid (thiếu thì project mobile isMobile dựng layout viewport 980 px, media query sai).
+// Chỗ header cao --header-height như trang thật: panel sticky top = --header-height + --space-4 (ui-spec cart §2), không có header
+// thì đầu hàng 3 nằm trên mốc 96 px và sticky đẩy panel xuống lệch cột dòng hàng.
 async function mount(page: Page, width: number, stickyHidden = true) {
   await page.setViewportSize({ width, height: 900 });
   await page.setContent(
-    `<!doctype html><html lang="en"><head><title>cart</title><style>${TOKENS}</style><style>${CRITICAL}</style><style>${BASE}</style>
-<style>body{margin:0}.page-width{padding-inline:var(--page-margin)}</style></head><body>${FIXTURE(stickyHidden)}</body></html>`,
+    `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>cart</title><style>${TOKENS}</style><style>${CRITICAL}</style><style>${BASE}</style>
+<style>body{margin:0}.page-width{padding-inline:var(--page-margin)}.fx-header{block-size:var(--header-height)}</style></head><body><div class="fx-header"></div>${FIXTURE(stickyHidden)}</body></html>`,
   );
 }
 const box = async (page: Page, id: string, nth = 0) => (await page.getByTestId(id).nth(nth).boundingBox())!;
@@ -255,7 +258,10 @@ test.describe('ES1-T369 bố cục (fixture, base.css thật)', () => {
     // Rule rút gọn và volume hiện trong cột thông tin.
     await expect(page.getByTestId('cart-line-quantity-rule')).toBeVisible();
     await expect(page.getByTestId('cart-line-volume')).toBeVisible();
-    await expect(page.getByTestId('cart-line-error')).toBeHidden();
+    // Mỗi dòng hàng có một lỗi dòng hidden (cart-lines.liquid): kiểm từng dòng, không dùng locator strict cho cả trang.
+    const errors = page.getByTestId('cart-line-error');
+    await expect(errors).toHaveCount(3);
+    for (const error of await errors.all()) await expect(error).toBeHidden();
     const bar = page.getByTestId('cart-sticky-checkout');
     await expect(bar).toBeVisible();
     expect(await bar.evaluate((el) => getComputedStyle(el).position)).toBe('fixed');
