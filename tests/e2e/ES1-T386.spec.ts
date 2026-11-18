@@ -11,7 +11,7 @@
 //   TS_GIFT_CARD_URL, TE386_GIFT_CARD_PARTIAL_URL, TE386_GIFT_CARD_EXPIRED_URL, TE386_GIFT_CARD_DISABLED_URL
 //   TE386_STORE_STATE = new | configured   (AC17, fixture TE-17-R2-QA0)
 // Phần JS do BE còn mở: ES1-T474 (contact), ES1-T443 (nút mắt password), ES1-T410 (QR, copy, print gift card) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T486, ES1-T487, ES1-T488, ES1-T386-B04, ES1-T386-B05); khi bug sửa test đỏ lại → gỡ test.fail.
+// Bug đã biết: test.fail gắn mã (ES1-T486, ES1-T487, ES1-T488, ES1-T386-B05; ES1-T386-B04 đã gỡ ở ES1-T494); khi bug sửa test đỏ lại → gỡ test.fail.
 import { test, expect, type Browser, type BrowserContext, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -638,10 +638,9 @@ test.describe('ES1-T386 404', () => {
   test.beforeEach(({}, ti) => { desktopOnly(ti.project.name); });
 
   // TC-24 tách riêng để bug LCP không che các kiểm khác của 404. Căn cứ: srs TE-21 AC8, AC16 "LCP: 404 là h1"; 404.md §8 "h1 … ở mọi mốc".
-  // Dưới 1280: nền noise của header (background-image 240 × 240, critical.css .site-header) là ứng viên LCP lớn hơn h1 → bug ES1-T386-B04.
+  // ES1-T386-B04 (sửa ở ES1-T494): noise header/announcement vẽ bằng border-image fill thay background-image → không còn là ứng viên LCP.
   for (const width of WIDTHS) {
     test(`TC-24 AC8/AC16 404 @${width}: LCP là h1`, async ({ page }) => {
-      test.fail(width < 1280, 'ES1-T386-B04: dưới 1280 LCP là <header> (nền noise-dark.png), không phải h1');
       await page.setViewportSize({ width, height: VIEW_H });
       await page.goto(MISSING);
       await expectNotChallenged(page);
