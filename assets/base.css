@@ -7164,7 +7164,7 @@ cart-drawer {
 }
 
 /** Blog posts (TE-16, Figma 1:1022). Khung hàng, nút, tiến trình, bề card, lưới tĩnh 4 bài: "Hàng ngang" */
-:is(.blog-posts--placeholder, .article-main--placeholder, .article-comments--placeholder) {
+:is(.blog-posts--placeholder, .blog-articles__placeholder, .article-main--placeholder, .article-comments--placeholder) {
   margin-block: var(--space-7);
   padding: var(--space-4);
   outline: 1px dashed currentcolor;
@@ -7282,11 +7282,33 @@ cart-drawer {
 }
 
 /* Figma 1:1038: 14 / 22, xám #999. Dùng chữ trắng của nền tối để đọc được trên ảnh sáng (ES1-T174 mục 4) */
-.article-card__read-time {
+.article-card__read-time,
+.article-card__meta {
   margin: 0;
   font-size: var(--font-size-sm);
   font-weight: 500;
   line-height: calc(22 / 14);
+}
+
+/* Trang blog: TE-20 AC2, blog.md §1.6 */
+.article-card__excerpt {
+  margin: 0;
+  color: color-mix(in srgb, var(--color-background-dark-foreground) 85%, transparent);
+  font-size: var(--font-size-sm);
+  line-height: calc(22 / 14);
+  overflow-wrap: anywhere;
+}
+
+.article-card__meta,
+.blog-articles__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+:is(.article-card__meta, .blog-articles__meta) > span + span::before {
+  content: '·' / '';
+  margin-inline: var(--space-2);
 }
 
 @media (min-width: 48rem) {
@@ -7297,8 +7319,265 @@ cart-drawer {
 }
 
 @media (min-width: 64rem) {
-  .blog-posts--placeholder {
+  .blog-posts--placeholder,
+  .blog-articles__placeholder {
     margin-block: var(--space-8);
+  }
+}
+
+/** Blog page (TE-20, blog.md): block blog-articles */
+.blog-articles {
+  padding-block-end: var(--space-7);
+}
+
+.blog-articles .page-title {
+  padding-block-end: var(--space-5);
+}
+
+/* Lọc chủ đề: tab F§7 */
+.blog-articles__topics {
+  margin-block-end: var(--space-6);
+}
+
+.blog-articles__topic-list {
+  display: flex;
+  gap: var(--space-2);
+  margin: 0 calc(var(--page-margin) * -1);
+  padding: 0 var(--page-margin);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--page-margin);
+  scrollbar-width: none;
+  list-style: none;
+}
+
+.blog-articles__topic-list::-webkit-scrollbar {
+  display: none;
+}
+
+.blog-articles__topic {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: calc(var(--space-1) * 11);
+  padding-inline: calc(var(--space-1) * 7);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  background-color: var(--color-background-alt);
+  color: var(--color-background-alt-foreground);
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.blog-articles__topic:is(:hover, [aria-current='page']) {
+  border-color: var(--color-foreground);
+}
+
+.blog-articles__topic[aria-current='page'] {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+/* Khung cuộn cắt viền ngoài */
+.blog-articles__topic:focus-visible {
+  outline-offset: calc(var(--space-1) * -1);
+}
+
+.blog-articles__featured {
+  position: relative;
+  display: grid;
+  gap: var(--space-5);
+  margin-block-end: var(--space-7);
+}
+
+.blog-articles__featured,
+.blog-articles__featured-media {
+  border-radius: calc(var(--radius-card) + var(--space-1));
+}
+
+.blog-articles__featured-media {
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background-color: var(--color-background-dark);
+}
+
+.blog-articles__featured-media > .image,
+.blog-articles__featured-media img {
+  block-size: 100%;
+}
+
+.blog-articles__featured-media img {
+  object-fit: cover;
+}
+
+.blog-articles__featured-body {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+.blog-articles__featured-body > * {
+  margin: 0;
+}
+
+.blog-articles__featured-tag {
+  padding: calc(var(--space-1) * 0.75) var(--space-3);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: calc(20 / 13);
+}
+
+.blog-articles__featured-title {
+  font-size: var(--font-size-h2);
+  overflow-wrap: anywhere;
+}
+
+.blog-articles__featured-link {
+  color: inherit;
+  text-decoration: none;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.12em;
+}
+
+.blog-articles__featured-link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.blog-articles__featured:hover .blog-articles__featured-link {
+  text-decoration-line: underline;
+}
+
+@supports selector(:has(a)) {
+  .blog-articles__featured-link:focus-visible {
+    outline-color: transparent;
+  }
+
+  .blog-articles__featured:has(.blog-articles__featured-link:focus-visible) {
+    outline: 2px solid var(--color-accent);
+    outline-offset: var(--space-1);
+  }
+}
+
+.blog-articles__featured-excerpt {
+  max-inline-size: 60ch;
+  color: var(--color-muted);
+}
+
+.blog-articles__meta {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: calc(22 / 14);
+}
+
+.blog-articles__meta > span + span::before {
+  color: var(--color-muted-light);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .blog-articles__topic {
+    transition: border-color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out);
+  }
+
+  .blog-articles__featured-media img {
+    transition: scale var(--motion-slow) var(--ease-out);
+  }
+
+  .blog-articles__featured:hover .blog-articles__featured-media img {
+    scale: 1.04;
+  }
+}
+
+.blog-articles__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* blog.md §6: vùng tối cao hơn cho trích đoạn */
+.blog-articles__grid .article-card__link > .article-card__image::after {
+  background-image: linear-gradient(
+    to bottom,
+    transparent 25%,
+    color-mix(in srgb, var(--color-background-dark) 80%, transparent) 55%,
+    var(--color-background-dark)
+  );
+}
+
+.blog-articles .pagination {
+  margin-block-start: var(--space-7);
+}
+
+@media (min-width: 48rem) {
+  .blog-articles__topic-list {
+    margin-inline: 0;
+    padding-inline: 0;
+    scroll-padding-inline: 0;
+  }
+
+  .blog-articles__featured {
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: var(--space-6);
+  }
+
+  .blog-articles__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .blog-articles {
+    padding-block-end: var(--space-8);
+  }
+
+  .blog-articles .page-title {
+    padding-block-end: var(--space-6);
+  }
+
+  .blog-articles__featured {
+    gap: var(--space-7);
+    margin-block-end: calc(var(--space-1) * 16);
+  }
+
+  .blog-articles__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .blog-articles .pagination {
+    margin-block-start: calc(var(--space-1) * 16);
+  }
+}
+
+@media (min-width: 80rem) {
+  .blog-articles__topics {
+    margin-block-end: calc(var(--space-1) * 10);
+  }
+
+  .blog-articles__topic {
+    min-block-size: calc(var(--space-1) * 10);
+  }
+
+  .blog-articles__featured-title {
+    font-size: var(--font-size-h1);
+    line-height: calc(58 / 48);
+  }
+
+  .blog-articles__featured-excerpt {
+    font-size: var(--font-size-lg);
+  }
+
+  .blog-articles__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: calc(var(--space-1) * 10) var(--space-5);
   }
 }
 
@@ -10794,7 +11073,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
   /* Blog */
   .blog-posts__eyebrow { color: var(--color-accent); }
-  .article-card__read-time { color: var(--figma-999999); font-weight: 500; position: relative; inset-block-start: -1px; }
+  .blog-posts .article-card__read-time { color: var(--figma-999999); font-weight: 500; position: relative; inset-block-start: -1px; }
   .article-card__title { max-width: 284px; }
 
   /* FAQ */
