@@ -8,6 +8,15 @@
   The search input never takes focus on load. Self-contained: callers must
   leave the body empty.
 
+  Predictive hand-off (TE-21 AC7, 404.md §5 typing state, ES1-T486): the search
+  form carries data-search-handoff = URL of assets/predictive-search.js. JS
+  (Dev BE) listens for input on the form's [name="q"]; at 2 or more trimmed
+  characters it copies the value into #PredictiveSearchInput of the header
+  layer <modal-dialog data-layer="search"> (snippets/predictive-search.liquid),
+  opens that layer with open(<404 input>) so focus returns here on close, then
+  imports the URL. No header layer or no JS: the form stays a plain GET to the
+  search page. Not data-search-src: assets/search-loader.js owns that name.
+
   Test hooks: data-testid="not-found", "not-found-eyebrow", "not-found-heading",
   "not-found-text", "not-found-search", "not-found-search-input",
   "not-found-search-submit", "not-found-home", "not-found-categories",
@@ -57,6 +66,7 @@
       class="not-found__search"
       aria-labelledby="NotFoundSearchLabel"
       data-testid="not-found-search"
+      data-search-handoff="{{ 'predictive-search.js' | asset_url }}"
     >
       <label id="NotFoundSearchLabel" for="NotFoundSearchInput" class="not-found__label">
         {{- '404.search_label' | t -}}
