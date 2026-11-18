@@ -258,7 +258,7 @@ const giftFixture = (inactive: boolean) => `
 </main>`;
 
 async function giftCardFixture(page: Page, inactive: boolean) {
-  await page.setContent(`<!doctype html><html lang="en"><head><title>gift card</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style></head><body class="template-gift-card">${giftFixture(inactive)}</body></html>`);
+  await page.setContent(`<!doctype html><html lang="en"><head><title>gift card</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head><body class="template-gift-card">${giftFixture(inactive)}</body></html>`);
 }
 
 test.describe('ES1-T386 kiểm mockup gift card', () => {
