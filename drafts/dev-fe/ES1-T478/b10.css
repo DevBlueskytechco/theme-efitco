@@ -1,0 +1,2253 @@
+/** Testimonials (TE-7, Figma 1:885): hàng ngang mọi mốc (HD3). Khung hàng, nút, tiến trình, bề card: "Hàng ngang" */
+.testimonials--placeholder {
+  margin: 0;
+  padding-inline: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+.testimonials__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Figma 1:893: 48 / 58, letter-spacing -0.96 */
+.testimonials__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.testimonial-item {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  text-align: start;
+  scroll-snap-align: start;
+}
+
+.testimonial-item--placeholder {
+  padding: var(--space-5);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+/* Figma 1:896: 456 / 270 */
+.testimonial-item__image img {
+  aspect-ratio: 456 / 270;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+.testimonial-item__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5);
+}
+
+/* flex 1 đẩy hàng product xuống đáy để các card cùng hàng thẳng đường kẻ */
+.testimonial-item__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Dưới 80rem sao xuống hàng riêng dưới tên (TE-7 AC6, index-mobile-b §4); từ 80rem tên, Verified, sao 1 hàng */
+.testimonial-item__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1) var(--space-3);
+}
+
+@media (min-width: 80rem) {
+  .testimonial-item__meta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.testimonial-item__reviewer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  min-inline-size: 0;
+}
+
+.testimonial-item__author {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.625;
+}
+
+.testimonial-item__verified {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-1) / 2);
+  margin: 0;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+  letter-spacing: -0.01em;
+  line-height: 1.57;
+}
+
+.testimonial-item__verified .icon-trust {
+  inline-size: 22px;
+  block-size: 22px;
+}
+
+.rating-stars {
+  display: inline-flex;
+  flex: none;
+  gap: calc(var(--space-1) / 2);
+  color: var(--color-border);
+}
+
+.rating-stars__star {
+  inline-size: 13px;
+  block-size: 13px;
+}
+
+.rating-stars__star--filled {
+  color: var(--color-rating);
+}
+
+.testimonial-item__title {
+  margin: 0;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: calc(28 / 18);
+}
+
+.testimonial-item__quote {
+  margin: 0;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+}
+
+/* Đường kẻ nằm trên hàng product: không có product thì mất cả hai */
+.testimonial-item__product {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block-start: var(--space-5);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.testimonial-item__thumb {
+  flex: none;
+  inline-size: 64px;
+  block-size: 64px;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: var(--color-background-alt);
+}
+
+.testimonial-item__thumb img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.testimonial-item__product-info {
+  min-inline-size: 0;
+}
+
+.testimonial-item__product-link {
+  color: inherit;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+  text-decoration: none;
+}
+
+.testimonial-item__product-link:hover {
+  text-decoration: underline;
+}
+
+/** Quiz (TE-11, Figma 1:506; index-mobile-a §6, index-1280 khối 6; kết quả quiz-result.md): không margin ngoài, < 48rem tràn mép */
+.quiz {
+  display: grid;
+  gap: var(--space-6);
+  padding: var(--space-7) var(--page-margin);
+  background-color: var(--color-background-panel);
+  color: var(--color-background-dark-foreground);
+}
+
+.block-container > .quiz {
+  grid-column: 1 / -1;
+}
+
+.quiz__intro {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.quiz__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin: 0;
+  padding: var(--space-1) var(--space-4);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-size: var(--font-size-sm);
+  line-height: calc(22 / 14);
+}
+
+.quiz__eyebrow::before {
+  content: "";
+  inline-size: var(--space-2);
+  block-size: var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: currentcolor;
+}
+
+/* Figma 1:514: 48 / 58, letter-spacing -0.96; 28 ở 360, 32 ở 768 */
+.quiz__heading {
+  margin: 0;
+  font-size: var(--font-size-h2);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.quiz__subheading {
+  margin: 0;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: calc(26 / 16);
+}
+
+.quiz__notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-6);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Chữ phụ panel tối (FD1, foundation §2): --panel-muted 6.56:1 */
+.quiz__note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--panel-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+.quiz-icon {
+  flex: none;
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+}
+
+/* Thẻ câu hỏi: 360 padding 24 / 16, 768 24, từ 80rem 32 (152 + 24 + 368 + 2 × 32 = 608); bo 16 */
+.quiz__form {
+  display: grid;
+  gap: var(--space-6);
+  min-inline-size: 0;
+  padding: var(--space-5) var(--space-4);
+  border-radius: calc(var(--radius-card) + var(--space-1));
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.quiz-step {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.quiz-step__legend {
+  display: block;
+  inline-size: 100%;
+  padding: 0;
+}
+
+.quiz-step__progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-block-end: var(--space-5);
+}
+
+.quiz-step__bar {
+  flex: 1;
+  block-size: var(--space-1);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--color-border);
+}
+
+.quiz-step__bar::before {
+  content: "";
+  display: block;
+  inline-size: var(--quiz-progress);
+  block-size: 100%;
+  background-color: var(--color-accent);
+}
+
+.quiz-step__count {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+  white-space: nowrap;
+}
+
+.quiz-step__title {
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: calc(34 / 28);
+}
+
+.quiz-step__subheading {
+  margin: 0;
+  margin-block-start: var(--space-1);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+.quiz-step__body {
+  display: grid;
+  gap: var(--space-5);
+  margin-block-start: var(--space-5);
+}
+
+.quiz-step__map {
+  display: none;
+}
+
+.quiz-step__options {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+/* Input phủ cả hàng, trong suốt: bấm ở đâu cũng chọn, focus vẫn nằm trên input thật. 360: cao ≥ 72 (AC4) */
+.quiz-option {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: calc(var(--space-1) * 18);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.quiz-option:has(:checked) {
+  background-color: var(--color-background-sand);
+}
+
+.quiz-option:has(:focus-visible) {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.quiz-option__input {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.quiz-option__thumb {
+  display: block;
+  flex: none;
+  inline-size: calc(var(--space-1) * 10);
+  block-size: calc(var(--space-1) * 10);
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+}
+
+.quiz-option__thumb > img {
+  display: block;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.quiz-option__text {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.quiz-option__label {
+  display: block;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: calc(26 / 18);
+}
+
+.quiz-option__description {
+  display: block;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: calc(22 / 14);
+}
+
+.quiz-option__mark {
+  display: grid;
+  flex: none;
+  place-items: center;
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+  border: 1px solid var(--color-muted-light);
+  border-radius: var(--radius-pill);
+  color: var(--color-accent-foreground);
+}
+
+.quiz-option__mark .quiz-icon {
+  visibility: hidden;
+}
+
+.quiz-option__input:checked ~ .quiz-option__mark {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+}
+
+.quiz-option__input:checked ~ .quiz-option__mark .quiz-icon {
+  visibility: visible;
+}
+
+.quiz__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.quiz__back[hidden] {
+  display: none;
+}
+
+.quiz__submit {
+  margin-inline-start: auto;
+}
+
+.quiz__submit:focus-visible {
+  outline-color: var(--color-foreground);
+}
+
+.quiz-placeholder {
+  padding: var(--space-4);
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+}
+
+.quiz__results {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: var(--space-5);
+  min-inline-size: 0;
+  padding: var(--space-4);
+  border-radius: var(--radius-card);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.quiz__results[hidden],
+.quiz__empty[hidden],
+.quiz-page__actions[hidden] {
+  display: none;
+}
+
+.quiz__results-header,
+.quiz__results-main {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+.quiz__results-heading {
+  margin: 0;
+  letter-spacing: -0.02em;
+  line-height: calc(34 / 28);
+}
+
+.quiz__answers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz__answers:empty {
+  display: none;
+}
+
+.quiz__answer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: var(--space-6);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background-sand);
+  color: var(--color-foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.quiz__answer .quiz-icon {
+  color: var(--color-accent-on-sand);
+}
+
+.quiz__results-status {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.quiz__loading,
+.quiz__results-main > .quiz__skeleton {
+  display: none;
+}
+
+[aria-busy='true'] .quiz__loading {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.quiz__loading .spinner {
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+}
+
+[aria-busy='true'] > .quiz__results-main > .quiz__skeleton {
+  display: grid;
+}
+
+[aria-busy='true'] :is([data-quiz-results-status-text], .quiz__results-body, .quiz__results-actions > *) {
+  display: none;
+}
+
+.quiz__skeleton-button {
+  block-size: calc(var(--space-1) * 11);
+  margin-block-start: var(--space-2);
+  border-radius: var(--radius-button);
+}
+
+.quiz__results-body:empty {
+  display: none;
+}
+
+.quiz__notice-region:empty,
+.quiz__card-error:empty {
+  position: absolute;
+}
+
+.quiz__results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5) var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz__results-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-inline-size: 0;
+}
+
+.quiz__card-action {
+  margin-block-start: auto;
+}
+
+.quiz__card-form {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.quiz__card-button {
+  inline-size: 100%;
+  padding-inline: var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+.quiz__card-button svg {
+  flex: none;
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+}
+
+.quiz__card-button:disabled {
+  border-color: var(--color-border);
+  color: var(--color-muted-light);
+  cursor: not-allowed;
+}
+
+.quiz__card-button[data-added] {
+  border-color: var(--color-badge-new);
+  color: var(--color-badge-new);
+}
+
+.quiz__card-button[aria-busy='true']::after {
+  border-color: var(--color-foreground);
+  border-block-start-color: transparent;
+}
+
+@media (hover: hover) {
+  .quiz__card-button:not(:disabled, [data-added]):hover {
+    border-color: var(--color-foreground);
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+}
+
+.quiz__card-error {
+  margin: 0;
+  color: var(--color-sale);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.quiz__notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-inline-start: var(--space-1) solid var(--color-badge-new);
+  border-radius: var(--radius-card);
+}
+
+.quiz__notice-icon {
+  display: flex;
+  color: var(--color-badge-new);
+}
+
+.quiz__notice-icon svg {
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+}
+
+.quiz__notice-text {
+  display: grid;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.quiz__notice-text span {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.quiz__results-main:has(> .quiz__quick-view:not([hidden])) > :not(.quiz__quick-view) {
+  display: none;
+}
+
+.quiz__quick-view:not([hidden]) {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.quiz__shortlist-back {
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--space-2);
+  min-block-size: calc(var(--space-1) * 11);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--color-muted);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.quiz__shortlist-back .slideshow-icon {
+  scale: -1 1;
+}
+
+.quiz__shortlist-back .slideshow-icon:dir(rtl) {
+  scale: none;
+}
+
+:is(.quiz__notice-link, .quiz-page__retake-link) {
+  font-size: var(--font-size-sm);
+}
+
+:is(.quiz__shortlist-back, .quiz-page__breadcrumb a):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.quiz__results-actions {
+  display: contents;
+}
+
+.quiz__results-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.quiz__results-actions-row:not(:has(a)) {
+  display: none;
+}
+
+.quiz__dialog:has(.quiz__empty:not([hidden])) {
+  --dialog-size: var(--dialog-s);
+}
+
+.quiz__dialog .quiz__results {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0;
+  min-block-size: 0;
+  padding: 0;
+  border-radius: 0;
+  background: none;
+}
+
+.quiz__dialog .quiz__results[hidden] {
+  display: none;
+}
+
+.quiz__dialog .quiz__results-header {
+  gap: var(--space-3);
+}
+
+.quiz__dialog .empty-state {
+  padding-block: var(--space-4);
+}
+
+.quiz__dialog .empty-state__actions {
+  display: grid;
+  inline-size: 100%;
+}
+
+.quiz-page__breadcrumb {
+  padding-block-start: var(--space-4);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.quiz-page__breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quiz-page__breadcrumb li + li::before {
+  content: '/' / '';
+  margin-inline: var(--space-2);
+  color: var(--color-muted-light);
+}
+
+.quiz-page__breadcrumb a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: calc(var(--space-1) * 11);
+  color: inherit;
+  text-decoration: none;
+}
+
+.quiz-page__breadcrumb a:hover {
+  color: var(--color-foreground);
+  text-decoration: underline;
+}
+
+.quiz-page__breadcrumb [aria-current] {
+  color: var(--color-foreground);
+  font-weight: 500;
+}
+
+.quiz-page > .quiz__results {
+  gap: var(--space-6);
+  padding: var(--space-4) 0 var(--space-7);
+  background: none;
+}
+
+.quiz-page__header {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.quiz-page__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+:is(.quiz-page__title, .quiz-page__meta, .quiz-page__answers-label) {
+  margin: 0;
+}
+
+:is(.quiz-page__meta, .quiz-page__answers-label) {
+  color: var(--color-muted);
+}
+
+.quiz-page__answers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.quiz-page__answers-label {
+  font-size: var(--font-size-sm);
+}
+
+.quiz-page .quiz__results-grid {
+  column-gap: var(--space-4);
+}
+
+.quiz-page__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-block-start: var(--space-4);
+}
+
+@media (scripting: enabled) {
+  .quiz:not([data-design-mode], [data-enhanced]) .quiz-step:not(:has(:checked)) ~ .quiz-step,
+  .quiz:not([data-design-mode], [data-enhanced]) .quiz-step:not(:has(:checked)) ~ .quiz__actions {
+    display: none;
+  }
+}
+
+.quiz[data-enhanced]:not([data-design-mode]) .quiz-step:not([data-active]),
+.quiz[data-enhanced]:not([data-design-mode]) .quiz__submit,
+.quiz[data-enhanced]:not([data-design-mode]) .quiz__actions:not(:has(.quiz__back:not([hidden]))) {
+  display: none;
+}
+
+/* 768: panel trong container, bo 24, padding 40 / 32 */
+@media (min-width: 48rem) {
+  .block-container > .quiz {
+    grid-column: 2;
+  }
+
+  .quiz {
+    padding: calc(var(--space-1) * 10) var(--space-6);
+    border-radius: calc(var(--radius-card) * 2);
+  }
+
+  :is(.quiz__dialog, .quiz-page) .quiz__results-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--space-4);
+  }
+
+  .quiz-page__actions {
+    flex-direction: row;
+    justify-content: center;
+    gap: var(--space-4);
+  }
+
+  .quiz__form,
+  .quiz__results {
+    padding: var(--space-5);
+  }
+
+  .quiz-step__body--map {
+    grid-template-columns: calc(var(--space-1) * 38) minmax(0, 1fr);
+  }
+
+  .quiz-step__map {
+    position: relative;
+    display: block;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background-color: var(--color-background-sand);
+  }
+
+  .image.quiz-step__map-image {
+    position: absolute;
+    inset: 0;
+    block-size: 100%;
+  }
+
+  .image.quiz-step__map-image > img {
+    block-size: 100%;
+    object-fit: contain;
+    mix-blend-mode: darken;
+  }
+
+  .quiz-step__regions {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-rows: minmax(44px, 33fr) minmax(44px, 24fr) minmax(44px, 43fr);
+  }
+
+  .quiz-step__region {
+    cursor: pointer;
+  }
+
+  .quiz-step__region[data-body-region="upper"] {
+    grid-row: 1;
+  }
+
+  .quiz-step__region[data-body-region="core"] {
+    grid-row: 2;
+  }
+
+  .quiz-step__region[data-body-region="lower"] {
+    grid-row: 3;
+  }
+
+  @media (hover: hover) {
+    .quiz-step__region:hover {
+      background-color: color-mix(in srgb, var(--color-accent) 15%, transparent);
+    }
+  }
+
+  .quiz-step__body:has([data-body-option="upper"]:checked) [data-body-region="upper"],
+  .quiz-step__body:has([data-body-option="core"]:checked) [data-body-region="core"],
+  .quiz-step__body:has([data-body-option="lower"]:checked) [data-body-region="lower"] {
+    outline: 2px solid var(--color-accent);
+    outline-offset: -2px;
+  }
+
+  .quiz-step__body:has([data-body-option="upper"]:focus-visible) [data-body-region="upper"],
+  .quiz-step__body:has([data-body-option="core"]:focus-visible) [data-body-region="core"],
+  .quiz-step__body:has([data-body-option="lower"]:focus-visible) [data-body-region="lower"] {
+    outline: 2px solid var(--color-foreground);
+    outline-offset: -2px;
+  }
+
+  .quiz-option {
+    min-block-size: calc(var(--space-1) * 20);
+    padding: var(--space-3) var(--space-5);
+  }
+}
+
+/* Thẻ giữ 608 (lựa chọn 80 cao, mô tả 1 dòng), phần co là cột giới thiệu (index-1280 khối 6) */
+@media (min-width: 64rem) {
+  .quiz--split {
+    grid-template-columns: minmax(0, 1fr) calc(var(--space-1) * 152);
+    align-items: center;
+    column-gap: var(--space-7);
+  }
+
+  .quiz__results-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .quiz-page__breadcrumb {
+    padding-block-start: var(--space-5);
+  }
+
+  .quiz-page > .quiz__results {
+    padding-block: var(--space-5) calc(var(--space-1) * 16);
+  }
+}
+
+/* 1280: panel 1240 padding 48; 1920: 1416 padding 60, cách thẻ 80 */
+@media (min-width: 80rem) {
+  .quiz {
+    padding: clamp(var(--space-7), 3.125vw, calc(var(--space-1) * 15));
+  }
+
+  .quiz--split {
+    column-gap: clamp(var(--space-7), 4.17vw, calc(var(--space-1) * 20));
+  }
+
+  .quiz__heading {
+    font-size: var(--font-size-h1);
+  }
+
+  .quiz__notes {
+    margin-block-start: calc(var(--space-1) * 7);
+  }
+
+  .quiz__form,
+  .quiz__results {
+    padding: var(--space-6);
+  }
+
+  .quiz__dialog .quiz__results-grid {
+    column-gap: var(--space-5);
+  }
+
+  .quiz-page .quiz__results-grid {
+    gap: calc(var(--space-1) * 10) var(--space-5);
+  }
+}
+
+/** Multicolumn (TE-7, không có frame Figma, ES1-T116 #7): dưới 48rem 1 cột, 48rem 2 cột, từ 64rem mọi cột 1 hàng.
+   Cha không đếm được con nên từ 64rem dùng cột tự sinh, 2-4 cột do số dòng gọi trong template */
+.multicolumn {
+  display: grid;
+  gap: var(--space-5);
+  min-inline-size: 0;
+  padding-block: var(--space-7);
+}
+
+.multicolumn--placeholder {
+  margin: 0;
+  padding-inline: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+.multicolumn__header {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.multicolumn__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Accent không đạt AA trên sand và dark (ES1-T116 #4) */
+.block-container--sand .multicolumn__eyebrow {
+  color: var(--color-muted);
+}
+
+.block-container--dark .multicolumn__eyebrow {
+  color: var(--color-muted-on-dark);
+}
+
+.multicolumn__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.multicolumn__list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6) var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.multicolumn-column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.multicolumn-column--placeholder {
+  padding: var(--space-5);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+.multicolumn-column__image {
+  border-radius: var(--radius-card);
+}
+
+.multicolumn-column__image img {
+  aspect-ratio: 3 / 2;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+/* --text-align từ container: start, center, end hợp lệ cho cả justify-content và align-self */
+.multicolumn-column__icon {
+  display: flex;
+  justify-content: var(--text-align, start);
+}
+
+.multicolumn-column__icon .icon-trust {
+  inline-size: 40px;
+  block-size: 40px;
+}
+
+.multicolumn-column__heading {
+  margin: 0;
+  font-size: var(--font-size-h3);
+  letter-spacing: -0.02em;
+  line-height: calc(34 / 28);
+}
+
+.multicolumn-column__text > * {
+  margin-block: 0;
+}
+
+.multicolumn-column__text > * + * {
+  margin-block-start: var(--space-2);
+}
+
+/* margin auto đẩy link xuống đáy để các cột cùng hàng thẳng link */
+.multicolumn-column__link {
+  display: inline-flex;
+  align-self: var(--text-align, start);
+  align-items: center;
+  gap: var(--space-2);
+  min-block-size: 44px;
+  margin-block-start: auto;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-decoration: none;
+}
+
+.multicolumn-column__link:hover .multicolumn-column__link-label {
+  text-decoration: underline;
+}
+
+.custom-liquid--placeholder {
+  margin: 0;
+  padding: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+@media (min-width: 48rem) {
+  .multicolumn__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .multicolumn {
+    gap: calc(var(--space-1) * 10);
+    padding-block: var(--space-8);
+  }
+
+  .multicolumn__list {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+  }
+}
+
+/* Predictive search (TE-8): snippets/predictive-search.liquid */
+.predictive-search-dialog {
+  --search-gutter: var(--space-5);
+  --search-line: var(--color-muted-light);
+}
+
+.predictive-search-dialog[data-style='popup'] {
+  --drawer-from: 0 calc(var(--space-5) * -1);
+  --search-gutter: max(var(--page-margin), (100% - var(--page-width)) / 2 + var(--page-margin));
+
+  inset: 0 0 auto;
+  inline-size: 100%;
+}
+
+.predictive-search-dialog :focus-visible {
+  outline-color: currentcolor;
+}
+
+.predictive-search {
+  display: contents;
+}
+
+.predictive-search__bar {
+  display: grid;
+  flex: none;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: var(--space-4);
+  padding-block: 0 var(--space-4);
+  padding-inline: var(--search-gutter) var(--space-3);
+}
+
+[data-style='drawer'] .predictive-search__title {
+  padding-block: var(--space-5);
+}
+
+[data-style='drawer'] .predictive-search__close-form {
+  grid-area: 1 / 2;
+}
+
+.predictive-search__form {
+  grid-column: 1 / -1;
+  display: flex;
+  min-block-size: calc(var(--space-1) * 12);
+  border: 1px solid var(--search-line);
+  border-radius: var(--radius-input);
+}
+
+.predictive-search__input {
+  flex: auto;
+  min-inline-size: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+}
+
+.predictive-search__input::placeholder {
+  color: var(--search-line);
+  opacity: 1;
+}
+
+.predictive-search__input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.predictive-search__input:placeholder-shown + .predictive-search__clear,
+.predictive-search__logo {
+  display: none;
+}
+
+[data-style='popup'] .predictive-search__bar {
+  --search-line: var(--color-muted-on-dark);
+
+  column-gap: var(--space-3);
+  min-block-size: var(--header-height);
+  padding: 0 var(--search-gutter);
+  background: var(--color-background-dark) url('noise-dark.png');
+  color: var(--color-background-dark-foreground);
+}
+
+[data-style='popup'] .predictive-search__form {
+  grid-column: 1;
+}
+
+[data-style='popup'] .predictive-search__close {
+  border-color: color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent);
+  background: none;
+  color: inherit;
+}
+
+.predictive-search__status,
+.predictive-search__listbox {
+  padding-inline: var(--search-gutter);
+}
+
+.predictive-search__status,
+.predictive-search__group-title,
+.predictive-search__price {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.predictive-search__group-title {
+  margin-block: var(--space-5) var(--space-2);
+}
+
+.predictive-search__option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: 44px;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--font-size-sm);
+  text-decoration: none;
+}
+
+.predictive-search__option:hover,
+.predictive-search__option[aria-selected='true'] {
+  background-color: var(--color-background-alt);
+}
+
+.predictive-search__option[aria-selected='true'] {
+  outline: 2px solid;
+  outline-offset: -2px;
+}
+
+.predictive-search__image {
+  flex: none;
+  inline-size: 64px;
+  block-size: 64px;
+  border-radius: var(--radius-input);
+  object-fit: cover;
+}
+
+.predictive-search__option-text {
+  display: grid;
+  overflow-wrap: anywhere;
+}
+
+.predictive-search__all {
+  border-block-start: 1px solid var(--color-border);
+}
+
+@media (min-width: 48rem) {
+  .predictive-search-dialog[data-style='popup'] {
+    block-size: auto;
+    max-block-size: 80dvh;
+    border-end-start-radius: var(--radius-card);
+    border-end-end-radius: var(--radius-card);
+  }
+}
+
+@media (min-width: 80rem) {
+  [data-style='popup'] .predictive-search__bar {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--space-5);
+  }
+
+  [data-style='popup'] .predictive-search__logo {
+    display: block;
+    grid-column: 1 / 4;
+  }
+
+  [data-style='popup'] .predictive-search__form {
+    grid-column: 4 / 12;
+  }
+
+  .predictive-search__close-form {
+    justify-self: end;
+  }
+}
+
+/** FAQ (TE-7, Figma 1:1057): dưới 64rem câu hỏi, ảnh, ô stat xếp dọc; từ 64rem 2 cột, ô stat đè mép dưới ảnh */
+.faq {
+  display: grid;
+  gap: calc(var(--space-1) * 10);
+  min-inline-size: 0;
+  padding-block: var(--space-7);
+}
+
+.faq--placeholder {
+  margin: 0;
+  padding-inline: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+/* 24 + padding-block 16 của câu đầu = 40 theo Figma */
+.faq__content {
+  display: grid;
+  gap: var(--space-5);
+  min-inline-size: 0;
+}
+
+.faq__header {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.faq__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Figma 1:1061: 48 / 58, letter-spacing -0.96 */
+.faq__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+/* Summary 44 + padding item 8 mỗi đầu: khoảng cách tới đường kẻ 24 theo Figma */
+.faq-item {
+  padding-block: var(--space-2);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.faq-item--placeholder {
+  margin: 0;
+  padding-inline: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+.faq-item__summary {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--space-3);
+  min-block-size: 44px;
+  padding-block: var(--space-2);
+  color: var(--color-muted);
+  list-style: none;
+  cursor: pointer;
+}
+
+.faq-item__summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item__summary:hover,
+.faq-item[open] > .faq-item__summary {
+  color: inherit;
+}
+
+/* Vẽ bằng border, không dùng background: chế độ forced-colors xoá background và làm mất icon */
+.faq-item__summary::before,
+.faq-item__summary::after {
+  content: "";
+  grid-area: 1 / 1;
+  place-self: center;
+}
+
+.faq-item__summary::before {
+  inline-size: 16px;
+  border-block-start: 2px solid currentcolor;
+}
+
+.faq-item__summary::after {
+  block-size: 16px;
+  border-inline-start: 2px solid currentcolor;
+}
+
+.faq-item[open] > .faq-item__summary::after {
+  display: none;
+}
+
+/* Figma 1:1066: 18 / 28, bold, letter-spacing -0.18 */
+.faq-item__question {
+  grid-column: 2;
+  margin: 0;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: calc(28 / 18);
+}
+
+/* Thẳng hàng với câu hỏi: cột icon 24 + gap. Figma 1:1067: 14 / 22, cách câu hỏi 12 */
+.faq-item__answer {
+  padding-block: var(--space-1) var(--space-4);
+  padding-inline-start: calc(24px + var(--space-3));
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+.faq-item__answer > * {
+  margin-block: 0;
+}
+
+.faq-item__answer > * + * {
+  margin-block-start: var(--space-2);
+}
+
+.faq__media {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.faq__image {
+  overflow: hidden;
+  border-radius: var(--radius-card);
+}
+
+/* Figma 1:1094: 509 / 542 */
+.faq__image img {
+  aspect-ratio: 509 / 542;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+/* Hai ô không đủ chỗ 10rem thì xuống dòng, mỗi ô chiếm cả hàng */
+.faq__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.faq__stat {
+  flex: 1 1 10rem;
+  min-inline-size: 0;
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  text-align: start;
+}
+
+.faq__stat--accent {
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+.faq__stat--dark {
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+}
+
+.faq__stat-label {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+.faq__stat-value {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+}
+
+.faq__stat-text {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+@media (min-width: 64rem) {
+  .faq {
+    padding-block: var(--space-8);
+  }
+
+  /* Figma: 668 + 80 + 668 */
+  .faq--with-media {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    column-gap: calc(var(--space-1) * 20);
+  }
+
+  /* Ảnh 509 / 668 của cột, sát mép cuối */
+  .faq__image {
+    inline-size: calc(509 / 668 * 100%);
+    margin-inline-start: auto;
+  }
+
+  /* Hàng ô 532 / 668 của cột, cách đáy ảnh 40 */
+  .faq__media--overlay {
+    position: relative;
+  }
+
+  .faq__media--overlay .faq__stats {
+    position: absolute;
+    inset-block-end: calc(var(--space-1) * 10);
+    inset-inline-start: 0;
+    flex-wrap: nowrap;
+    inline-size: calc(532 / 668 * 100%);
+  }
+
+  .faq__media--overlay .faq__stat {
+    flex: 0 1 calc(50% - var(--space-3) / 2);
+  }
+}
+
+/** Featured product (TE-13 AC1, AC2, Figma 1:759): 1 cột dưới 64rem, 2 cột từ 64rem. Figma không có khoảng dưới từ 64rem */
+featured-product {
+  display: block;
+}
+
+.featured-product {
+  padding-block: var(--space-7);
+}
+
+.featured-product--placeholder {
+  padding: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.featured-product__view {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.featured-product__gallery,
+.featured-product__details {
+  min-inline-size: 0;
+}
+
+.featured-product__gallery {
+  position: relative;
+  display: grid;
+  gap: var(--space-3);
+  align-content: start;
+}
+
+/* Figma 1:761: 113 x 112, 24 from the image corner; 72 x 71, 12 below 48rem (ES1-T174) */
+.featured-product__seal {
+  position: absolute;
+  inset-block-start: var(--space-3);
+  inset-inline-start: var(--space-3);
+  inline-size: 4.5rem;
+  block-size: auto;
+  color: var(--color-muted-on-dark);
+  font-family: var(--font-primary--family);
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+@media (min-width: 48rem) {
+  .featured-product__seal {
+    inset-block-start: var(--space-5);
+    inset-inline-start: var(--space-5);
+    inline-size: 7.0625rem;
+  }
+}
+
+/* Figma 1:760: 668 / 653 */
+.featured-product__media-list {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  border-radius: var(--radius-card);
+  background-color: var(--color-background-cream);
+  list-style: none;
+  scroll-snap-type: x mandatory;
+}
+
+.featured-product__media-list:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: -2px;
+}
+
+.featured-product__media-item {
+  flex: 0 0 100%;
+  min-inline-size: 0;
+  aspect-ratio: 668 / 653;
+  scroll-margin-block-start: var(--space-8);
+  scroll-snap-align: start;
+}
+
+.featured-product__media-item .image {
+  block-size: 100%;
+}
+
+.featured-product__media-item .image > img {
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.featured-product__placeholder-svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: var(--color-muted-light);
+}
+
+.featured-product__thumbnails {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featured-product__thumbnail {
+  display: block;
+  inline-size: 64px;
+  block-size: 64px;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  background-color: var(--color-background-cream);
+}
+
+.featured-product__thumbnail[aria-current='true'] {
+  border-color: currentcolor;
+}
+
+.featured-product__thumbnail:focus-visible {
+  outline: 2px solid currentcolor;
+  outline-offset: 2px;
+}
+
+.featured-product__thumbnail .image > img {
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.featured-product__details {
+  display: grid;
+  gap: var(--space-5);
+  align-content: start;
+  text-align: start;
+}
+
+.featured-product__header {
+  display: grid;
+  gap: var(--space-3);
+}
+
+/* Figma 1:771: 16 / 20, 800 */
+.featured-product__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Figma 1:772: 48 / 58 */
+.featured-product__title {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.featured-product__notice {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  outline: 1px dashed var(--color-sale);
+  outline-offset: -1px;
+  font-size: var(--font-size-sm);
+}
+
+/* R8: giữ chỗ nhưng không hiện số chưa kiểm. Chỉ hiện khi JS đã tính (data-enhanced) hoặc trong editor; không JS thì không chiếm chỗ */
+.featured-product__countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-card);
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+  visibility: hidden;
+}
+
+featured-product[data-enhanced] .featured-product__countdown,
+featured-product[data-design-mode] .featured-product__countdown {
+  visibility: visible;
+}
+
+.featured-product__countdown[hidden],
+.featured-product__countdown-unit[hidden] {
+  display: none;
+}
+
+@media (scripting: none) {
+  .featured-product__countdown {
+    display: none;
+  }
+}
+
+.featured-product__countdown-label {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.625;
+}
+
+.featured-product__countdown-units {
+  display: flex;
+  gap: var(--space-3);
+}
+
+/* Figma 1:776: 44 × 44, viền, chữ 18 / 28 700 */
+.featured-product__countdown-unit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 44px;
+  block-size: 44px;
+  padding-inline: var(--space-1);
+  border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 15%, var(--color-background-dark));
+  border-radius: var(--radius-button);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: calc(28 / 18);
+}
+
+.featured-product__summary {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.featured-product__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* Figma 1:785: pill, chữ 13 / 20 600 */
+.featured-product__discount {
+  padding-block: calc(var(--space-1) - 1px);
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-sale);
+  color: var(--color-sale-foreground);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  line-height: calc(20 / 13);
+}
+
+.featured-product__rating {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: calc(22 / 14);
+}
+
+.featured-product__rating-count {
+  margin-inline-start: var(--space-1);
+  padding-inline-start: var(--space-3);
+  border-inline-start: 1px solid var(--color-muted-light);
+  font-weight: 500;
+}
+
+.featured-product__description {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+}
+
+/* Figma 1:798: dòng lẻ nền sand, dòng chẵn trắng, viền 1px */
+.featured-product__specs {
+  inline-size: 100%;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  border-spacing: 0;
+  border-collapse: separate;
+}
+
+.featured-product__spec:nth-child(odd) {
+  background-color: var(--color-background-sand);
+  color: var(--color-background-sand-foreground);
+}
+
+.featured-product__spec-label,
+.featured-product__spec-value {
+  padding-block: var(--space-2);
+  padding-inline: var(--space-3);
+  vertical-align: baseline;
+}
+
+.featured-product__spec-label {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+  text-align: start;
+}
+
+.featured-product__spec-value {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+  text-align: end;
+}
+
+.featured-product__buy {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.featured-product__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+/* Không JS: select trong noscript chiếm trọn hàng trên 2 nút */
+.featured-product__actions noscript {
+  flex-basis: 100%;
+}
+
+.featured-product__add-wrapper,
+.featured-product__view-detail {
+  flex: 1 1 auto;
+}
+
+.featured-product__add {
+  --icon-stroke-width: 1.5;
+  inline-size: 100%;
+  min-block-size: 52px;
+}
+
+.featured-product__add svg {
+  flex: none;
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+  stroke-width: var(--icon-stroke-width);
+}
+
+.featured-product__add:disabled {
+  border-color: var(--color-border);
+  background-color: var(--color-background-alt);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+/* Figma 1:816: nền xám trùng --color-border, không viền */
+.featured-product__view-detail {
+  min-block-size: 52px;
+  border-color: transparent;
+  background-color: var(--color-border);
+  color: var(--color-foreground);
+}
+
+@media (min-width: 48rem) {
+  .featured-product__countdown {
+    flex-direction: row;
+    align-items: center;
+    gap: var(--space-4);
+    padding-block: var(--space-2);
+  }
+
+  .featured-product__add-wrapper,
+  .featured-product__view-detail {
+    flex: none;
+  }
+
+  .featured-product__spec-label,
+  .featured-product__spec-value {
+    padding-inline: var(--space-5);
+  }
+}
+
+@media (min-width: 64rem) {
+  .featured-product {
+    padding-block: var(--space-8) 0;
+  }
+
+  /* Figma 1:759: 668 + 80 + 668 */
+  .featured-product__view {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: calc(var(--space-1) * 20);
+  }
+
+  .featured-product__buy {
+    margin-block-start: var(--space-4);
+  }
+}
+
+/** Video carousel (TE-13, Figma 1:817). Khung hàng, nút, tiến trình, bề card: "Hàng ngang" */
+
+.video-carousel--placeholder {
+  margin-block: var(--space-7);
+  padding: var(--space-4);
+  outline: 1px dashed currentcolor;
+  outline-offset: -1px;
+  font-size: var(--font-size-sm);
+}
+
+.video-carousel__header {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.video-carousel__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.video-carousel__title {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.video-carousel__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Figma 1:825: 48 / 58, letter-spacing -0.96 */
+.video-carousel__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+/* Figma 1:826, đang ẩn: 18 / 28 */
+.video-carousel__link {
+  color: inherit;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: calc(28 / 18);
+  text-decoration: underline;
+}
+
+.video-carousel__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.video-carousel__stat {
+  display: grid;
+}
+
+/* Figma 1:830: 28 / 34 */
+.video-carousel__stat-value {
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h3);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(34 / 28);
+}
+
+/* Figma #808080 chỉ 3.6:1 trên nền alt, dùng muted để đạt AA (ES1-T154 #6) */
+.video-carousel__stat-label {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+.video-carousel__subheading {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+}
+
+.video-card-item--placeholder {
+  padding: var(--space-4);
+  outline: 1px dashed currentcolor;
+  outline-offset: -1px;
+  font-size: var(--font-size-sm);
+}
+
+video-card {
+  display: block;
+}
+
+/* Tỉ lệ đặt ở khung nên poster, video, iframe hay lỗi đều không đổi layout; không ảnh thì còn nền tối */
+.video-card__frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 264 / 470;
+  border-start-start-radius: var(--radius-card);
+  border-start-end-radius: var(--radius-card);
+  background-color: var(--color-background-dark);
+}
+
+.video-card__frame:only-child {
+  border-radius: var(--radius-card);
+}
+
+.video-card__poster {
+  position: absolute;
+  inset: 0;
+  z-index: var(--layer-content);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* display ở trên thắng thuộc tính hidden mà assets/video-carousel.js gắn khi video chạy */
+.video-card__poster[hidden] {
+  display: none;
+}
+
+/* Khung cắt overflow nên viền focus phải nằm trong */
+.video-card__poster:focus-visible {
+  outline-color: var(--color-accent);
+  outline-offset: -4px;
+}
+
+.image.video-card__poster-image {
+  position: absolute;
+  inset: 0;
+  block-size: 100%;
+}
+
+.image.video-card__poster-image > img {
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* Figma không có nút play, thêm vì bấm mới chạy (E6, ES1-T154 #7); cả poster là vùng bấm */
+.video-card__play {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: calc(var(--space-1) * 13);
+  block-size: calc(var(--space-1) * 13);
+  border-radius: 50%;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.video-card__play .slideshow-icon {
+  width: calc(var(--space-1) * 5);
+  height: calc(var(--space-1) * 5);
+}
+
+.video-card[data-video-error] .video-card__play {
+  display: none;
+}
+
+/* Figma 1:844: 13 / 20, cách góc 10 */
+.video-card__badge {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-end: 10px;
+  z-index: calc(var(--layer-content) + 1);
+  padding-block: 3px;
+  padding-inline: var(--space-3);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: calc(20 / 13);
+  pointer-events: none;
+}
+
+.video-card__media {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  border: 0;
+  object-fit: cover;
+}
+
+/* Figma 1:845: fill ẩn, chỉ có viền sand. Viền nằm trong padding để hàng đúng 84 */
+.video-card__product {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: calc(var(--space-3) - 1px);
+  border: 1px solid var(--color-background-sand);
+  border-end-start-radius: var(--radius-card);
+  border-end-end-radius: var(--radius-card);
+}
+
+.video-card__thumb {
+  flex: none;
+  overflow: hidden;
+  inline-size: calc(var(--space-1) * 15);
+  block-size: calc(var(--space-1) * 15);
+  border: 1px solid var(--color-background-alt);
+  border-radius: 50%;
+  background-color: var(--color-background-alt);
+}
+
+.video-card__product-info {
+  display: grid;
+  gap: var(--space-1);
+  flex: 1;
+  min-inline-size: 0;
+}
+
+/* Tên đủ, xuống dòng (decisions 11/11 (3)). Vùng bấm phủ cả hàng sản phẩm */
+.video-card__product-title {
+  color: inherit;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.video-card__product-title::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.video-card__product-title:hover {
+  text-decoration: underline;
+}
+
