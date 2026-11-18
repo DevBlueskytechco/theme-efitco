@@ -11,7 +11,7 @@
 //   TS_GIFT_CARD_URL, TE386_GIFT_CARD_PARTIAL_URL, TE386_GIFT_CARD_EXPIRED_URL, TE386_GIFT_CARD_DISABLED_URL
 //   TE386_STORE_STATE = new | configured   (AC17, fixture TE-17-R2-QA0)
 // Phần JS do BE còn mở: ES1-T474 (contact), ES1-T443 (nút mắt password), ES1-T410 (QR, copy, print gift card) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T486, ES1-T487, ES1-T488, ES1-T386-B04, ES1-T386-B05); khi bug sửa test đỏ lại → gỡ test.fail.
+// Bug đã biết: test.fail gắn mã (ES1-T486, ES1-T487, ES1-T488, ES1-T386-B04); khi bug sửa test đỏ lại → gỡ test.fail.
 import { test, expect, type Browser, type BrowserContext, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -1210,10 +1210,9 @@ test.describe('ES1-T386 chung', () => {
     } else test.info().annotations.push({ type: 'thiếu dữ liệu', description: 'ES1-T298: gift card chưa kiểm title' });
   });
 
-  // snippets/meta-tags.liquid chỉ in meta description khi page_description có giá trị; 404 không có (CI run 44171510755) → bug ES1-T386-B05.
-  // 3 trang chung 1 nguyên nhân nên gộp 1 test, expect.soft để đo đủ cả 3; sửa snippet xong test báo "passed unexpectedly" → gỡ test.fail.
+  // Bug ES1-T386-B05 (ES1-T495) đã sửa: meta-tags luôn in meta description, dự phòng shop.description → shop.name.
+  // 3 trang chung 1 nguyên nhân nên gộp 1 test, expect.soft để đo đủ cả 3.
   test('TC-47 AC16 404, password, gift card có meta description (1280), bug ES1-T386-B05', async ({ page, browser }) => {
-    test.fail(true, 'ES1-T386-B05: snippets/meta-tags.liquid bỏ meta description khi page_description trống (404)');
     await openAt(page, MISSING, 1280);
     await expect.soft(page.locator('meta[name="description"]'), '404 meta description').toHaveCount(1);
     const { context, page: pw } = await openPassword(browser, 1280);
