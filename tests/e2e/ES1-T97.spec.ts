@@ -92,8 +92,8 @@ test.describe('ES1-T97 contract', () => {
     const page = read('blocks/cart-page.liquid');
     const drawer = read('blocks/cart-drawer.liquid');
     const lines = read('snippets/cart-lines.liquid');
-    // Trần BE2 5120 B nâng lên 5632 B ở BE3 (ES1-T98, D10); ES1-T370 (stepper, rule, ghi chú, thanh checkout): trần file 8192 B (AGENTS.md).
-    expect(Buffer.byteLength(js), 'cart-items.js tối đa 8192 B').toBeLessThanOrEqual(8192);
+    // Trần BE2 5120 B nâng lên 5632 B ở BE3 (ES1-T98, D10); TE-5-R2-BE1 (ES1-T370): 7168 B theo ADR 0010, thanh checkout tách ra cart-checkout-bar.js (ES1-T490).
+    expect(Buffer.byteLength(js), 'cart-items.js tối đa 7168 B').toBeLessThanOrEqual(7168);
     expect([...page.matchAll(/<script src="\{\{ 'cart-items\.js' \| asset_url \}\}" type="module"><\/script>/g)]).toHaveLength(1);
     // Drawer nạp động qua data-items-src (ES1-T96), không có thẻ script; literal để theme check kiểm được asset (ES1-T102).
     expect(drawer).not.toMatch(/<script src="\{\{ 'cart-items\.js'/);

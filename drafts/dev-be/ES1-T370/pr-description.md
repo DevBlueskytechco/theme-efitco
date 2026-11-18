@@ -1,39 +1,45 @@
-KHÔNG CHẮC: cart-items.js 8 189 B, vượt trần 7 168 B của ADR 0010 / task-split (≤ 8 192 trần cứng AGENTS.md). Đã hỏi Tech Lead ES1-T490 (nâng trần 8 192 hoặc tách thanh checkout ra file riêng, cần thẻ host FE). Để vừa 8 192 đã bỏ: JS tự thay chữ ghi chú thuế bằng "Updating cart…", khoá −/+/xoá từng dòng (AC18), "+ aria-disabled + câu quantity_adjusted dưới dòng sau 422" (AC11, ngoài AC ticket).
+KHÔNG CHẮC: (1) bảng ADR 0010 + task-split chưa sửa trong PR: hook chặn dev-be ghi `docs/adr/`, `drafts/techlead/`; bản sửa ở `drafts/dev-be/ES1-T370/adr-0010-task-split.md`, hỏi Tech Lead ES1-T503. (2) Playwright hành vi chưa chạy được ở local (sandbox chặn Chromium); chờ CI. (3) `drafts/dev-be/ES1-T370/pw-out/` là output lần chạy local hỏng (không xoá được trong sandbox): Orchestrator đừng commit thư mục này.
 
-# ES1-T370 TE-5-R2-BE1: cart-items.js — stepper, quantity rule, ghi chú drawer, Updating, thanh checkout
+# ES1-T370 TE-5-R2-BE1: cart-items.js ≤ 7 168 B + cart-checkout-bar.js (ES1-T490 B)
 
-AC: docs/srs.md TE-5 AC2, AC5, AC8, AC9 (+ phần JS của AC11, AC17, AC18 nêu trong task-split ES1-T307 §6.6). Markup: ES1-T368 (#219), ES1-T369 (#247), lớp/dải đáy ES1-T314 + ADR 0007.
+AC: docs/srs.md TE-5 AC2, AC5, AC8, AC9 (+ phần JS của AC11, AC17, AC18 theo task-split ES1-T307). Markup: ES1-T368, ES1-T369, host `<cart-checkout-bar>` ES1-T498 (#266). Lượt 2 theo CTO 18/11: ES1-T490 phương án B, ES1-T500 C.
 
 ## Thay đổi
-`assets/cart-items.js` (5 625 → 8 189 B)
-- Stepper: bỏ `hidden` khỏi `[data-cart-step]` khi gắn `data-enhanced`; MutationObserver (childList + `hidden`) hiện lại sau mọi refresh partial, kể cả refresh của cart-drawer.js. Bấm −/+ đổi số theo `data-quantity-step`, kẹp `data-quantity-min`/`max`, debounce 300 ms dùng chung timer với ô số → 1 POST với số cuối (AC11). `aria-disabled` trên nút thì bấm không làm gì; − khoá ở min (mặc định 1), + khoá ở max (AC9).
-- Quantity rule (AC9): ô có `data-quantity-rule`, số ≠ 0 mà < min, > max hoặc không chia hết bước → hiện `[data-cart-line-error]` (câu rule Liquid đã in), `aria-invalid="true"`, `aria-describedby="<id>-rule <id>-error"`, không gửi. Gõ 0 vẫn xoá. Sửa đúng → ẩn lỗi, gửi.
-- 422 (AC2, AC9): câu `description` của Shopify vào `role="alert"`, ô về `defaultValue` (số server), không refresh. Bỏ đọc lại `/cart.js` sau 422 (defaultValue luôn là số server lần ghi cuối).
-- Ghi chú drawer (AC8): textarea `[data-note]` `change` (rời ô) → POST `{{ routes.cart_url }}/update.js` `{ note }` qua cùng hàng đợi tuần tự; lỗi → `data-label-error` trong alert, chữ giữ. Ô nằm ngoài partial nên refresh không mất chữ. Cart page không có `data-note`: lưu khi submit form (cart.md §3.5, test ES1-T97 giữ).
-- Đang cập nhật (AC18): `aria-busy` trên `cart-items`; `data-label-updating` ("Updating cart…", chỉ cart page có) vào `role="status"`, xoá nếu không có kết quả; mọi `[name="checkout"]` (panel + thanh dính) `aria-disabled="true"` trong lúc ghi dòng, submit có submitter `aria-disabled` bị chặn. Lưu ghi chú không khoá Checkout (rời ô bằng cách bấm Checkout vẫn đi checkout, form gửi kèm note).
-- Thanh checkout (AC17, ADR 0007 #2): IntersectionObserver trên `.cart-summary`; dưới 64rem và panel ngoài màn → bỏ `hidden` khỏi `.cart-sticky-checkout` + `html[data-bottom-bar="cart"]`; panel vào màn, từ 64rem, giỏ rỗng (không còn thanh), `cart-items` bị gỡ → `hidden` + gỡ thuộc tính (chỉ khi giá trị là `cart`, không đụng `product`/`bundle`). Không đo chiều cao. Theo dõi lại panel mới sau refresh.
-- disconnectedCallback: AbortController listener, ngắt MO/IO, gỡ `data-bottom-bar="cart"`.
-- Giữ nguyên: hàng đợi tuần tự, chỉ refresh bị abort, `partials.fetch(...this.dataset.partials.split(" "), { url: location.href, signal })` + `partials.apply`, CartLinesUpdateEvent (ES1-T85/T91), focus sau xoá, `theme:cart:updated`.
+`assets/cart-items.js` (develop 5 625 → 7 149 B, ≤ 7 168 ADR 0010)
+- Bỏ toàn bộ phần thanh checkout (IntersectionObserver, `data-bottom-bar`): chuyển sang `cart-checkout-bar.js`.
+- Stepper: bỏ `hidden` khỏi `[data-cart-step]`; MutationObserver (childList + `hidden`) hiện lại sau mọi refresh, kể cả refresh của cart-drawer.js. −/+ dùng `stepDown()/stepUp()` native (input có `step`/`max` của rule, step base `min="0"`): bám bước, kẹp max; kẹp min theo `data-quantity-min`. Debounce 300 ms chung với ô số → 1 POST với số cuối (AC11).
+- Quantity rule (AC9): − `aria-disabled` ở min, + ở max. Rời ô: số ≠ 0 mà < min hoặc `validity` sai (lệch bước, > max) → hiện `[data-cart-line-error]`, `aria-invalid="true"`, `aria-describedby="<id>-rule <id>-error"`, không gửi. Gõ 0 vẫn xoá. Sửa đúng → ẩn lỗi, gửi.
+- 422 (AC2, AC9): `description` của Shopify vào `role="alert"`, ô về `defaultValue` (số server), không refresh.
+- Ghi chú drawer (AC8): `[data-note]` `change` → POST `{{ routes.cart_url }}/update.js` `{ note }` cùng hàng đợi; lỗi → `data-label-error`; ô ngoài partial nên refresh không mất chữ.
+- Đang cập nhật (AC18): `aria-busy` trên `cart-items`; "Updating cart…" (`data-label-updating`) vào `role="status"`, cuối lượt ghi đè bằng kết quả (hoặc rỗng); mọi `[name="checkout"]` `aria-disabled="true"`, submit từ nút đó bị chặn. Mới (CTO "nếu còn chỗ"): dòng đang ghi `aria-busy="true"`, −/+ và xoá của dòng `aria-disabled="true"`, bấm không làm gì (link xoá không điều hướng); `finally` mở lại mọi dòng, −/+ tính lại theo số server.
+- Gọn để vừa trần: bỏ AbortController listener (cùng listener object, thêm lại không trùng), `sync` duyệt theo `items`, status viết 1 chỗ trong `finally`. Giữ: hàng đợi tuần tự, chỉ refresh bị abort, `partials.fetch(...this.dataset.partials.split(" "), { url: location.href, signal })` + `partials.apply`, `sync` sau apply (apply giữ value input), CartLinesUpdateEvent (ES1-T85/T91), focus sau xoá, `theme:cart:updated`.
+
+`assets/cart-checkout-bar.js` (mới, 998 B, ≤ 1 024)
+- `<cart-checkout-bar>` (host FE ES1-T498, trong partial `cart-page`): IntersectionObserver trên `.cart-summary--page` trong cùng vùng partial; dưới 64rem và panel ngoài màn → bỏ `hidden` aside + `html[data-bottom-bar="cart"]`; panel vào màn, ≥ 64rem (nghe `change` của matchMedia), host bị gỡ (refresh, giỏ rỗng, editor) → `hidden` + gỡ thuộc tính chỉ khi giá trị là `cart`. Không đo chiều cao (ADR 0007 #2). Guard `customElements.get`.
+
+`blocks/cart-page.liquid`: thêm `<script src="{{ 'cart-checkout-bar.js' | asset_url }}" type="module" defer></script>` cạnh script cart-items.js, ngoài partial (ES1-T500 C). Không đổi markup khác.
 
 Tests
-- Mới `tests/e2e/ES1-T370.spec.ts`: tĩnh (trần 8 192, partial, không import tĩnh/console/import.meta.url, hook Liquid khớp JS: `data-cart-step`, `data-quantity-*`, `data-cart-line-error(-text)`, `data-note` ngoài partial drawer, `data-label-updating`, `aside.cart-sticky-checkout hidden`, `name="checkout"`); hành vi trên origin giả `https://t370.test` (page.route, cart-items.js thật, thư viện partial giả qua importmap, apply thay dòng với stepper `hidden` như Liquid): −/+ hiện, − khoá ở 1, debounce 3 lần bấm → 1 POST, rule bước/min/max, ô sai không gửi + aria-invalid/describedby, gõ 0 xoá, 422, 200 bị giảm số, busy + Checkout aria-disabled chặn submit, lỗi mạng, xoá không điều hướng, ghi chú lưu khi rời ô + giữ chữ khi refresh + lỗi lưu, drawer không gắn data-bottom-bar, thanh dính 360/1280, panel mới sau refresh, gỡ element. 0 lỗi console ở các test chính.
-- Sửa `tests/e2e/ES1-T97.spec.ts`, `ES1-T98.spec.ts`: trần byte 5 632 → 8 192 (ghi chú ES1-T370). `cart-checkout` `toBeDisabled` lúc busy vẫn đúng vì Playwright tính `aria-disabled`.
+- `tests/e2e/ES1-T370.spec.ts`: trần 7 168 / 1 024; không import tĩnh, console, đo layout ở cả 2 file; cart-items.js không còn `bottomBar`/IntersectionObserver; host `<cart-checkout-bar>` bọc aside trong partial; 1 thẻ script bar ngoài partial. Fixture có host + script bar. Mới: dòng bận (aria-busy, −/+/xoá aria-disabled, bấm không gửi, không điều hướng), 422 mở lại dòng, refresh thay host + panel, 360 → 1280 → 360, gỡ host, bar 404 thì cart-items vẫn chạy. Click phần tử `aria-disabled` dùng `force` (Playwright coi là disabled).
+- `ES1-T97.spec.ts`, `ES1-T98.spec.ts`: bỏ nâng trần 8 192; trần cart-items.js 7 168 theo ADR 0010 (develop đang 5 632).
+- `drafts/dev-be/ES1-T370/pw-fixture.config.mjs`: config chạy spec fixture không cần PREVIEW_URL (`npx playwright test -c drafts/dev-be/ES1-T370/pw-fixture.config.mjs ES1-T370`).
 
 ## Byte (wc -c)
-- cart-items.js 8 189 (≤ 8 192; trần ADR 0010 7 168: KHÔNG CHẮC, ES1-T490).
-- /cart tải sẵn: standard-events 888 + motion 6 129 + header-menu 3 068 + header-sticky 1 680 + modal-dialog 2 039 + page-layers 2 031 + cart-drawer 3 910 + cart-items 8 189 = 27 934 ≤ 40 960.
-- Trang khác: cart-items.js chỉ import khi mở drawer lần đầu (data-items-src), không đổi tải sẵn.
+- cart-items.js 7 149 (≤ 7 168); cart-checkout-bar.js 998 (≤ 1 024).
+- /cart tải sẵn: standard-events 888 + motion 6 129 + header-menu 3 068 + header-sticky 1 680 + modal-dialog 2 039 + page-layers 2 031 + cart-drawer 3 910 + cart-items 7 149 + cart-checkout-bar 998 = 27 892 ≤ 40 960.
+- Trang khác: không đổi (cart-items.js chỉ import khi mở drawer; bar chỉ ở cart page).
 
-## Việc cho FE (không sửa markup trong PR này)
-- "Updating cart…" thay chỗ ghi chú thuế (cart.md §4): JS chỉ ghi vào `role="status"` ẩn; FE hiện chữ bằng CSS khi `cart-items[aria-busy='true']` (vd 1 span `cart.updating` cạnh `.cart-summary__note`).
-- Drawer chưa có `data-label-updating` → status drawer không đọc "Updating cart…" (mini-cart-quickview §6 4b).
-- Lỗi mạng: nút "Try Again" (drawer) / "Reload Cart" (cart page) và tiêu đề `cart.update_error_title` chưa có markup (AC18).
+## Việc cho FE
+- Spinner ô số dòng đang đổi (AC18): CSS trên `.cart-line[aria-busy="true"]`; −/+/xoá đã có `aria-disabled`.
+- "Updating cart…" thay chỗ ghi chú thuế (cart.md §4): JS chỉ ghi `role="status"` ẩn; FE hiện bằng CSS khi `cart-items[aria-busy="true"]`.
+- Drawer chưa có `data-label-updating`.
+- Lỗi mạng: "We couldn't update your cart" + "Reload Cart"/"Try Again" (AC18) chưa có markup.
 
 ## Tự kiểm tra
-- `shopify theme check`: 0 lỗi, 22 warning có sẵn (không file nào của ticket; PR không sửa Liquid).
-- `wc -c assets/cart-items.js` = 8 189 ≤ 8 192. Không console.*, không import tĩnh module theme, guard `customElements.get`.
-- `npx playwright test --list` 3 spec: biên dịch được (164 test). `node --check`: không chạy được trong sandbox (cần quyền).
-- Playwright (ES1-T370, ES1-T97, ES1-T98, ES1-T95, ES1-T96), Lighthouse /cart, console trên preview: chờ CI (global setup cần PREVIEW_URL).
-- Contract partial: tên `cart-page`, `cart-count`, `cart-drawer`, `cart-drawer-count`, `cart-drawer-footer` đọc từ `data-partials`, không đổi.
+- `shopify theme check`: 0 lỗi, 22 warning có sẵn ở 7 file không thuộc ticket.
+- `wc -c`: cart-items.js 7 149, cart-checkout-bar.js 998. Không console.*, không import tĩnh module theme.
+- `npx playwright test --list` (ES1-T370, T97, T98): biên dịch được, 170 test. Chạy local: 2 test tĩnh ES1-T370 pass; 20 test hành vi không khởi động được Chromium trong sandbox.
+- Playwright trên preview, Lighthouse /cart, console: chờ CI. `node --check`: sandbox không cho chạy.
+- Contract partial: `cart-page`, `cart-count` (+ drawer `cart-drawer`, `cart-drawer-count`, `cart-drawer-footer`) đọc từ `data-partials`, không đổi.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)

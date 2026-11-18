@@ -1,36 +1,32 @@
-// <cart-items> TE-5 (ES1-T370). Serial writes; only the refresh aborts. defaultValue = server.
+// <cart-items> TE-5. Serial writes. defaultValue = server qty.
 // https://shopify.dev/docs/api/storefront-events-and-actions/events/cart-lines-update (ES1-T91 #3)
 import { partials } from "@shopify/partial-rendering";
 
 const QTY = '[name="updates[]"]';
 const LINE = "[data-line-key]";
 const STEP = "[data-cart-step]";
+const CTRL = STEP + ",[data-cart-remove]";
 const keyOf = (el) => el.closest(LINE)?.dataset.lineKey;
+const minOf = (i) => +i.dataset.quantityMin || 1;
 const post = (url, body) => fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-const wide = matchMedia("(min-width: 64rem)");
 let E;
 import("https://cdn.shopify.com/storefront/standard-events.js").then((m) => (E = m.CartLinesUpdateEvent), () => {});
 
 class CartItems extends HTMLElement {
   timers = new Map();
   queue = new Map();
+  // Refreshes re-hide −/+.
+  mo = new MutationObserver(() => this.enhance());
 
   connectedCallback() {
-    const o = { signal: (this.ac = new AbortController()).signal };
-    for (const t of ["change", "click", "submit"]) this.addEventListener(t, this, o);
-    // Refreshes re-hide steppers.
-    (this.mo = new MutationObserver(() => this.enhance())).observe(this, { childList: true, subtree: true, attributeFilter: ["hidden"] });
-    this.io = new IntersectionObserver((r) => this.bar(r.at(-1).isIntersecting));
+    for (const t of ["change", "click", "submit"]) this.addEventListener(t, this);
+    this.mo.observe(this, { childList: true, subtree: true, attributeFilter: ["hidden"] });
     this.enhance();
     this.dataset.enhanced = "";
   }
 
   disconnectedCallback() {
-    this.ac.abort();
     this.mo.disconnect();
-    this.io.disconnect();
-    this.panel = null;
-    this.bar(1);
   }
 
   $(s) {
@@ -39,38 +35,24 @@ class CartItems extends HTMLElement {
 
   enhance() {
     for (const b of this.querySelectorAll(STEP + "[hidden]")) b.hidden = false;
-    const p = this.$(".cart-summary");
-    if (p == this.panel) return;
-    this.io.disconnect();
-    if ((this.panel = p)) this.io.observe(p);
-    this.bar(1);
-  }
-
-  // ADR 0007 bar: < 64rem, summary out of view.
-  bar(seen = this.seen) {
-    const b = this.$(".cart-sticky-checkout");
-    const h = document.documentElement.dataset;
-    const on = !!b && !(this.seen = seen) && !wide.matches;
-    if (b && b.hidden == on) b.hidden = !on;
-    if (on) h.bottomBar = "cart";
-    else if (h.bottomBar == "cart") delete h.bottomBar;
   }
 
   handleEvent(e) {
     const { type, target: t, submitter: s } = e;
-    // Enter: change already ran.
     if (type == "submit") return (s?.matches("[data-cart-update]") || s?.ariaDisabled == "true") && e.preventDefault();
     if ("note" in t.dataset) return type == "change" && this.add("", t.value);
     const key = keyOf(t);
-    const c = key && t.closest(type == "click" ? STEP + ",[data-cart-remove]" : QTY);
+    const c = key && t.closest(type == "click" ? CTRL : QTY);
     if (!c || e.metaKey || e.ctrlKey) return;
     if (type == "click") e.preventDefault();
     if (c.ariaDisabled == "true") return;
     clearTimeout(this.timers.get(key));
     if (c.href) return this.add(key, 0);
     const i = this.input(key);
-    const { min, max, step } = this.rule(i);
-    if (c != i) i.value = Math.min(max, Math.max(min, Math.round(((+i.value || 0) + c.dataset.cartStep * step) / step) * step));
+    if (c != i) {
+      i[c.dataset.cartStep < 0 ? "stepDown" : "stepUp"]();
+      i.value = Math.max(minOf(i), i.value);
+    }
     this.paint(i);
     this.timers.set(key, setTimeout(() => this.commit(key), 300));
   }
@@ -79,32 +61,37 @@ class CartItems extends HTMLElement {
     return this.$(`[data-line-key="${key}"] ${QTY}`);
   }
 
-  rule(i) {
-    const d = i.dataset;
-    return { min: +d.quantityMin || 1, max: +d.quantityMax || 1 / 0, step: +d.quantityStep || 1 };
-  }
-
-  // −/+ at min/max; invalid: rule error (AC9).
+  // Off: −/+ at min/max (AC9), all on busy line (AC18).
   paint(i, invalid) {
-    const { min, max } = this.rule(i);
     const l = i.closest(LINE);
     const p = l.querySelector("[data-cart-line-error]");
-    for (const b of l.querySelectorAll(STEP)) b.ariaDisabled = (b.dataset.cartStep < 0 ? i.value <= min : i.value >= max) || null;
-    if (!p || !("quantityRule" in i.dataset)) return;
+    for (const b of l.querySelectorAll(CTRL)) {
+      const s = b.dataset.cartStep;
+      b.ariaDisabled = l.ariaBusy || (s < 0 ? +i.value <= minOf(i) : s > 0 && i.max && +i.value >= +i.max) || null;
+    }
+    // Rule error: only rule inputs have step.
+    if (invalid == null || !i.step) return;
     p.hidden = !invalid;
     i.ariaInvalid = invalid || null;
-    i.setAttribute("aria-describedby", i.id + "-rule" + (invalid ? " " + p.id : ""));
+    i.setAttribute("aria-describedby", `${i.id}-rule${invalid ? " " + p.id : ""}`);
   }
 
   commit(key) {
     this.timers.delete(key);
     const i = this.input(key);
     if (!i) return;
-    const { min, max, step } = this.rule(i);
     const q = +i.value;
     if (!i.value || q < 0 || q % 1) i.value = i.defaultValue;
-    else if (q && (q < min || q > max || q % step)) return this.paint(i, true);
+    else if (q && (q < minOf(i) || !i.validity.valid)) return this.paint(i, true);
     else if (this.running || q != i.defaultValue) this.add(key, q);
+    this.paint(i, false);
+  }
+
+  // AC18: Checkout off, line busy.
+  hold(i, on) {
+    for (const b of this.querySelectorAll('[name="checkout"]')) b.ariaDisabled = on;
+    if (!i) return;
+    i.closest(LINE).ariaBusy = on;
     this.paint(i);
   }
 
@@ -118,39 +105,32 @@ class CartItems extends HTMLElement {
     this.$(`[role="${role}"]`).textContent = text;
   }
 
-  lock(on) {
-    for (const b of this.querySelectorAll('[name="checkout"]')) b.ariaDisabled = on;
-  }
-
   async run() {
     if (this.running) return;
     this.running = true;
+    this.note = "";
     const d = this.dataset;
-    const u = d.labelUpdating;
     this.ariaBusy = "true";
-    this.say("status", u);
+    this.say("status", d.labelUpdating);
     this.say("alert");
     try {
       for (const [key, q] of this.queue) {
         this.queue.delete(key);
-        // "": drawer note (AC8).
-        if (key) {
-          this.lock("true");
-          await this.write(key, q);
-        } else if (!(await post(`${d.cartUrl}/update.js`, { note: q }).catch(() => 0))?.ok) this.say("alert", d.labelError);
+        if (key) await this.write(key, q);
+        else if (!(await post(`${d.cartUrl}/update.js`, { note: q }).catch(() => 0))?.ok) this.say("alert", d.labelError);
         if (this.changed && !this.queue.size) await this.refresh();
       }
     } catch {
       this.say("alert", d.labelError);
     } finally {
-      this.lock();
-      if (u && this.$("[role=status]").textContent == u) this.say("status");
+      for (const i of this.querySelectorAll(QTY)) this.hold(i);
+      this.say("status", this.note);
       this.ariaBusy = null;
       this.running = false;
     }
   }
 
-  // Library not loaded: no event. Resolve only (ES1-T85).
+  // No library: no event (ES1-T85).
   emit(id, quantity) {
     let d;
     try {
@@ -163,8 +143,9 @@ class CartItems extends HTMLElement {
   async write(key, quantity) {
     const d = this.dataset;
     const settle = this.emit(key, quantity);
+    const i = this.input(key);
     let res, data = {};
-    this.note = "";
+    this.hold(i, "true");
     try {
       res = await post(`${d.cartChangeUrl}.js`, { id: key, quantity });
       data = await res.json();
@@ -176,20 +157,18 @@ class CartItems extends HTMLElement {
       this.note = !quantity ? d.labelRemoved : (data.items.find((i) => i.key === key)?.quantity ?? 0) < quantity ? d.labelQuantityAdjusted : d.labelUpdated;
       return settle(data);
     }
-    const text = res?.status < 500 && data.description;
-    this.say("alert", text || d.labelError);
-    settle(0, text || d.labelError);
-    const i = this.input(key);
+    const text = (res?.status < 500 && data.description) || d.labelError;
+    this.say("alert", text);
+    settle(0, text);
     if (i) i.value = i.defaultValue;
   }
 
   sync(items) {
-    for (const i of this.querySelectorAll(QTY)) {
-      const k = keyOf(i);
-      const item = items.find((x) => x.key === k);
-      if (!item) continue;
-      i.defaultValue = item.quantity;
-      if (!this.timers.has(k) && !this.queue.has(k)) i.value = item.quantity;
+    for (const { key, quantity } of items) {
+      const i = this.input(key);
+      if (!i) continue;
+      i.defaultValue = quantity;
+      if (!this.timers.has(key) && !this.queue.has(key)) i.value = quantity;
       this.paint(i);
     }
   }
@@ -208,14 +187,13 @@ class CartItems extends HTMLElement {
     this.changed = false;
     this.sync(this.items);
     const w = this.$("[data-cart-accelerated]");
-    if (w) w.hidden = this.$("[data-item-count]").dataset.itemCount === "0";
+    if (w) w.hidden = this.$("[data-item-count]").dataset.itemCount == 0;
     if (key) {
       const n = keys.indexOf(key);
       const i = this.input(key);
       if (!i) (this.input(keys[n + 1]) || this.input(keys[n - 1]) || (this.closest("dialog") ? this.$(".cart-empty a") : document.querySelector("h1")))?.focus();
       else if (a.matches(QTY) || !a.isConnected) i.focus();
     }
-    this.say("status", this.note);
     this.dispatchEvent(new CustomEvent("theme:cart:updated", { bubbles: true, detail: { source: "cart-items" } }));
   }
 }
