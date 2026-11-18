@@ -8,9 +8,11 @@
   The search input never takes focus on load. Self-contained: callers must
   leave the body empty.
 
-  Test hooks: data-testid="not-found", "not-found-heading", "not-found-search",
-  "not-found-search-input", "not-found-search-submit", "not-found-home",
-  "not-found-categories", "not-found-category", "not-found-categories-placeholder".
+  Test hooks: data-testid="not-found", "not-found-eyebrow", "not-found-heading",
+  "not-found-text", "not-found-search", "not-found-search-input",
+  "not-found-search-submit", "not-found-home", "not-found-categories",
+  "not-found-category", "not-found-category-count",
+  "not-found-categories-placeholder".
 
   @example
   {% block 'container', id: 'not-found' %}
@@ -29,7 +31,7 @@
 -%}
 
 <div class="not-found" data-testid="not-found" {{ block.shopify_attributes }}>
-  <p class="not-found__eyebrow">{{ '404.eyebrow' | t }}</p>
+  <p class="not-found__eyebrow" data-testid="not-found-eyebrow">{{ '404.eyebrow' | t }}</p>
 
   <h1 class="not-found__heading" data-testid="not-found-heading">
     {%- if heading != blank -%}
@@ -39,7 +41,7 @@
     {%- endif -%}
   </h1>
 
-  <p class="not-found__text">
+  <p class="not-found__text" data-testid="not-found-text">
     {%- if text != blank -%}
       {{- text | escape | newline_to_br -}}
     {%- else -%}
@@ -94,7 +96,7 @@
             <a class="not-found__category" href="{{ link.url }}" data-testid="not-found-category">
               {{- link.title | escape -}}
               {%- if link.type == 'collection_link' and link.object.products_count != blank %}
-                <span class="not-found__category-count">
+                <span class="not-found__category-count" data-testid="not-found-category-count">
                   {{- '404.products_count' | t: count: link.object.products_count -}}
                 </span>
               {%- endif -%}
