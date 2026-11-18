@@ -2294,8 +2294,9 @@ bundle-form {
     gap: clamp(var(--space-2), 0.625vw, var(--space-3));
   }
 
+  /* Figma 1:560: hàng 93 → cột phải 100 + 24 + 408 + 24 + 260 = 816 (ES1-T501) */
   .shop-the-look-row {
-    min-block-size: clamp(calc(var(--space-1) * 20), 4.9vw, calc(var(--space-1) * 23.5));
+    min-block-size: clamp(calc(var(--space-1) * 20), 4.9vw, calc(var(--space-1) * 23.25));
   }
 
   .shop-the-look-row__thumb {
@@ -3052,9 +3053,22 @@ bundle-form {
   }
 }
 
-/** Search page */
+/** Search page (ES1-T493): ô tìm không vượt khung, tránh nới layout viewport mobile làm huỷ view transition */
+.search-page__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-inline-size: 100%;
+}
+.search-page__input {
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  box-sizing: border-box;
+}
 .search-results {
   display: grid;
+  overflow-wrap: anywhere;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 .search-results .prev,
