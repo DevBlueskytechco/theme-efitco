@@ -287,7 +287,8 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
     const request = page.waitForRequest((r) => isResults(new URL(r.url())));
     await answerEmptySet(page);
     const url = new URL((await request).url());
-    expect(url.pathname).toMatch(/\/collections\/all\/quiz-lower\+quiz-advanced\+quiz-gym$/);
+    // ES1-T387: index.te11 lấy kết quả từ collection te11-quiz (ES1-T178 M-A), không còn collections.all.
+    expect(url.pathname).toMatch(/\/collections\/te11-quiz\/quiz-lower\+quiz-advanced\+quiz-gym$/);
     expect(url.searchParams.get('view')).toBe('quiz');
   });
 
