@@ -188,7 +188,7 @@ test.describe('ES1-T386 tĩnh', () => {
     expect(src).toMatch(/if gift_card\.expired or gift_card\.enabled == false\s*\n\s*assign inactive = true/);
     expect(src).toMatch(/unless gift_card\.expired or gift_card\.enabled == false -%\}\s*<div class="gift-card__pay">[\s\S]*?data-gift-card-qr/);
     expect(src).toMatch(/unless inactive -%\}\s*<button[\s\S]*?data-gift-card-copy/);
-    const actions = src.slice(src.indexOf('<div class="gift-card__actions">'));
+    const actions = src.slice(src.indexOf('class="gift-card__actions"'));
     const at = (s: string) => actions.indexOf(s);
     const order = [at('{%- if inactive -%}'), at('data-testid="gift-card-contact"'), at('{%- else -%}'), at('data-testid="gift-card-wallet"'), at('data-testid="gift-card-start"')];
     order.forEach((i) => expect(i).toBeGreaterThan(-1));
