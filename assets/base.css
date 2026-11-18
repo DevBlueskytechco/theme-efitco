@@ -3277,7 +3277,23 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   }
 }
 
+/* Vạch đáy: viền thật bị border-image (noise, critical.css) phủ nên vẽ bằng ::after đè lên đúng ô viền 1px (ES1-T494) */
+.announcement-bar {
+  position: relative;
+}
+
+.announcement-bar::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -1px;
+  block-size: 1px;
+  background: color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent);
+}
+
 .announcement-bar--placeholder {
+  border-image: none;
+  border-block-end-color: transparent;
   background: var(--color-background-alt);
   color: var(--color-muted-light);
   outline: 1px dashed var(--color-border);
@@ -9552,7 +9568,9 @@ video-card {
   align-items: center;
   min-block-size: var(--header-height);
   padding-inline: var(--page-margin);
-  background: var(--color-background-dark) url('noise-dark.png');
+  /* Noise bằng border-image fill như header: không thành ứng viên LCP (ES1-T494) */
+  background: var(--color-background-dark);
+  border-image: url('noise-dark.png') 0 fill/0 repeat;
   color: var(--color-background-dark-foreground);
 }
 
