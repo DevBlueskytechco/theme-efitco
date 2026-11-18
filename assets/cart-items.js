@@ -15,7 +15,7 @@ import("https://cdn.shopify.com/storefront/standard-events.js").then((m) => (E =
 class CartItems extends HTMLElement {
   timers = new Map();
   queue = new Map();
-  // Refreshes re-hide −/+.
+  // Refresh hides −/+.
   mo = new MutationObserver(() => this.enhance());
 
   connectedCallback() {
@@ -61,7 +61,7 @@ class CartItems extends HTMLElement {
     return this.$(`[data-line-key="${key}"] ${QTY}`);
   }
 
-  // Off: −/+ at min/max (AC9), all on busy line (AC18).
+  // −/+ off at min/max (AC9), busy line (AC18).
   paint(i, invalid) {
     const l = i.closest(LINE);
     const p = l.querySelector("[data-cart-line-error]");
@@ -69,7 +69,7 @@ class CartItems extends HTMLElement {
       const s = b.dataset.cartStep;
       b.ariaDisabled = l.ariaBusy || (s < 0 ? +i.value <= minOf(i) : s > 0 && i.max && +i.value >= +i.max) || null;
     }
-    // Rule error: only rule inputs have step.
+    // Rule inputs have step.
     if (invalid == null || !i.step) return;
     p.hidden = !invalid;
     i.ariaInvalid = invalid || null;
@@ -83,11 +83,11 @@ class CartItems extends HTMLElement {
     const q = +i.value;
     if (!i.value || q < 0 || q % 1) i.value = i.defaultValue;
     else if (q && (q < minOf(i) || !i.validity.valid)) return this.paint(i, true);
-    else if (this.running || q != i.defaultValue) this.add(key, q);
+    else if (this.queue.has(key) || q != (this.f?.[key] ?? i.defaultValue)) this.add(key, q);
     this.paint(i, false);
   }
 
-  // AC18: Checkout off, line busy.
+  // AC18
   hold(i, on) {
     for (const b of this.querySelectorAll('[name="checkout"]')) b.ariaDisabled = on;
     if (!i) return;
@@ -130,7 +130,7 @@ class CartItems extends HTMLElement {
     }
   }
 
-  // No library: no event (ES1-T85).
+  // No lib: no event (ES1-T85).
   emit(id, quantity) {
     let d;
     try {
@@ -146,10 +146,12 @@ class CartItems extends HTMLElement {
     const i = this.input(key);
     let res, data = {};
     this.hold(i, "true");
+    this.f = { [key]: quantity };
     try {
       res = await post(`${d.cartChangeUrl}.js`, { id: key, quantity });
       data = await res.json();
     } catch {}
+    this.f = 0;
     if (data.items) {
       this.changed = true;
       this.sync((this.items = data.items));

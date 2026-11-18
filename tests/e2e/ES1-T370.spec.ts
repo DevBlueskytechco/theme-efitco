@@ -8,6 +8,8 @@
 // Chạy: npx playwright test tests/e2e/ES1-T370.spec.ts
 import { test, expect, type Page, type Route } from './support/test';
 import { readFileSync } from 'node:fs';
+import { CART } from './support/cart-api';
+import { watchShopPay403 } from './support/console-guard';
 
 const read = (path: string) => readFileSync(path, 'utf8');
 const JS = read('assets/cart-items.js');
@@ -72,7 +74,7 @@ function documentHtml(lines: Line[], drawer: boolean) {
     </div>
     ${drawer ? '<details open data-testid="cart-drawer-note"><summary>Add order note</summary><label for="note">Order note</label><textarea id="note" name="note" form="cart-form" data-note data-testid="cart-drawer-note-input"></textarea></details>' : ''}
   </cart-items>`;
-  return `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>cart</title><link rel="icon" href="data:,">
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>cart</title><link rel="icon" href="data:,">
 <script type="importmap">{"imports":{"@shopify/partial-rendering":"${ORIGIN}/library.js"}}</script>
 <style>[hidden]{display:none!important}.fx-spacer{block-size:150vh}body{margin:0}</style></head>
 <body>${drawer ? `<dialog open data-testid="cart-drawer-dialog">${body}</dialog>` : body}
@@ -100,6 +102,8 @@ class Store {
   checkoutPosts = 0;
   next: Behaviour[] = [];
   stock: number | undefined;
+  // Asset trả 404 (lỗi tải). Xử lý trong handle: route đăng ký sau ở open() chạy trước route đăng ký trong test.
+  missing = new Set<string>();
 
   constructor(private readonly page: Page, public lines: Line[], private readonly drawer = false) {}
 
@@ -123,6 +127,7 @@ class Store {
   private async handle(route: Route) {
     const request = route.request();
     const { pathname } = new URL(request.url());
+    if (this.missing.has(pathname)) return route.fulfill({ status: 404, body: '' });
     if (pathname === '/library.js') return route.fulfill({ contentType: 'text/javascript', body: LIBRARY });
     if (pathname === '/cart-items.js') return route.fulfill({ contentType: 'text/javascript', body: JS });
     if (pathname === '/cart-checkout-bar.js') return route.fulfill({ contentType: 'text/javascript', body: BAR });
@@ -130,11 +135,11 @@ class Store {
       this.partials++;
       return this.json(route, { lines: this.lines.map(lineHtml).join(''), count: this.lines.length });
     }
-    if (pathname === '/cart/update.js') {
+    if (pathname === CART.update) {
       this.notes.push(JSON.parse(request.postData() ?? '{}').note);
       return this.json(route, { note: this.notes.at(-1), items: [] });
     }
-    if (pathname === '/cart/change.js') {
+    if (pathname === CART.change) {
       const body = JSON.parse(request.postData() ?? '{}') as { id: string; quantity: number };
       this.changes.push(body);
       const behaviour = this.next.shift();
@@ -161,7 +166,8 @@ const idle = (page: Page) => expect(tid(page, 'cart-items')).not.toHaveAttribute
 // Lỗi console, lỗi trang trong suốt test: phải 0.
 function watchErrors(page: Page) {
   const errors: string[] = [];
-  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  const ignore = watchShopPay403(page);
+  page.on('console', (m) => m.type() === 'error' && !ignore(m) && errors.push(m.text()));
   page.on('pageerror', (e) => errors.push(e.message));
   return errors;
 }
@@ -186,7 +192,7 @@ test.describe('ES1-T370 hợp đồng tĩnh', () => {
     }
     expect(JS).toContain('if (!customElements.get("cart-items")) customElements.define("cart-items", CartItems)');
     expect(BAR).toContain('if (!customElements.get("cart-checkout-bar")) customElements.define("cart-checkout-bar", CartCheckoutBar)');
-    // Đổi số chạy qua 1 hàng đợi, debounce 300 ms; ghi chú qua /cart/update.js (routes.cart_url + /update.js).
+    // Đổi số chạy qua 1 hàng đợi, debounce 300 ms; ghi chú qua CART.update (routes.cart_url + /update.js).
     expect(JS).toContain('setTimeout(() => this.commit(key), 300)');
     expect(JS).toContain('/update.js`, { note: q }');
     // Chỉ module sở hữu thanh gắn/gỡ đúng giá trị "cart" (ADR 0007 #2): cart-checkout-bar.js, không phải cart-items.js.
@@ -394,7 +400,7 @@ test.describe('ES1-T370 hành vi (fixture, cart-items.js thật)', () => {
   test('AC18 lỗi mạng: role alert data-label-error, ô về số server, hết busy', async ({ page }) => {
     const store = new Store(page, [{ key: 'a', quantity: 1 }]);
     await store.open();
-    await page.route(`${ORIGIN}/cart/change.js`, (route) => route.abort());
+    await page.route(`${ORIGIN}${CART.change}`, (route) => route.abort());
     await tid(page, 'cart-line-increase').click();
     await expect(tid(page, 'cart-items-error')).toHaveText(LABELS.error);
     await idle(page);
@@ -415,7 +421,7 @@ test.describe('ES1-T370 hành vi (fixture, cart-items.js thật)', () => {
 });
 
 test.describe('ES1-T370 AC8 ghi chú drawer', () => {
-  test('rời ô: POST /cart/update.js với note; refresh giỏ không mất chữ; không chặn Checkout', async ({ page }) => {
+  test('rời ô: POST CART.update với note; refresh giỏ không mất chữ; không chặn Checkout', async ({ page }) => {
     const errors = watchErrors(page);
     const store = new Store(page, [{ key: 'a', quantity: 1 }], true);
     await store.open();
@@ -443,7 +449,7 @@ test.describe('ES1-T370 AC8 ghi chú drawer', () => {
   test('lưu ghi chú lỗi: role alert data-label-error, chữ giữ nguyên', async ({ page }) => {
     const store = new Store(page, [{ key: 'a', quantity: 1 }], true);
     await store.open();
-    await page.route(`${ORIGIN}/cart/update.js`, (route) => route.fulfill({ status: 500, body: '' }));
+    await page.route(`${ORIGIN}${CART.update}`, (route) => route.fulfill({ status: 500, body: '' }));
     const note = tid(page, 'cart-drawer-note-input');
     await note.fill('Gift wrap');
     await note.blur();
@@ -534,8 +540,8 @@ test.describe('ES1-T370 AC17 thanh checkout dính, cart-checkout-bar.js (ADR 000
 
   test('không cart-checkout-bar.js (lỗi tải): thanh giữ hidden, không data-bottom-bar, cart-items vẫn chạy', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 640 });
-    await page.route(`${ORIGIN}/cart-checkout-bar.js`, (route) => route.fulfill({ status: 404, body: '' }));
     const store = new Store(page, [{ key: 'a', quantity: 1 }]);
+    store.missing.add('/cart-checkout-bar.js');
     await store.open();
     await page.waitForTimeout(300);
     await expect(tid(page, 'cart-sticky-checkout')).toBeHidden();
