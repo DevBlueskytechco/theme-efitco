@@ -280,8 +280,10 @@ test.describe('ES1-T314 banner consent (TE-10 AC7, layers.md §5)', () => {
     test.skip(info.project.name !== 'desktop', 'mở khoá khách mới chỉ chạy desktop để giảm request lên store dev');
     const context = await newStoreContext(browser, { storageState: undefined, baseURL: BASE_URL });
     const page = await context.newPage();
-    const errors = watchConsole(page);
     await unlockAndOpenPreview(page, process.env.PREVIEW_URL!, process.env.STORE_PASSWORD || '');
+    // Theo dõi console từ sau khi mở khoá: trang /password tự nạp font cdn.shopify.com/shopify-marketing_assets/.../ShopifySans--regular.woff
+    // trả 404 (CI run 44278220230, ngoài theme). Test này kiểm console của trang theme khi banner thật hiện / Decline.
+    const errors = watchConsole(page);
     await openPage(page, '/', { realBanner: true });
     const banner = page.locator(CONSENT.banner).first();
     const shown = await banner.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true, () => false);
