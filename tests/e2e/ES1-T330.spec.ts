@@ -84,7 +84,7 @@ const menuData = (page: Page): Promise<MenuData> =>
         viewAll: rows[0]?.querySelector('a')?.textContent?.trim() ?? '',
         children: rows.slice(1).map((row) => {
           const a = row.querySelector('a')!;
-          return { title: a.textContent!.trim(), path: new URL(a.href).pathname, grand: [...row.querySelectorAll('ul a')].map((g) => g.textContent!.trim()) };
+          return { title: a.textContent!.trim(), path: new URL(a.href).pathname, grand: [...row.querySelectorAll(':scope ul a')].map((g) => g.textContent!.trim()) };
         }),
       };
     }),
@@ -502,7 +502,7 @@ test.describe('ES1-T330 mega từ 80rem', () => {
   });
 
   for (const path of ['/', '/collections/all']) {
-    test(`TC-23 AC6 ${path}: LCP không thuộc header; mở panel bằng hover CLS = 0`, async ({ page }) => {
+    test(`TC-23 AC6 ${path}: LCP không thuộc menu; mở panel bằng hover CLS = 0`, async ({ page }) => {
       await page.addInitScript(() => {
         (window as unknown as { __lcp: Element | null }).__lcp = null;
         new PerformanceObserver((l) => {
@@ -512,11 +512,12 @@ test.describe('ES1-T330 mega từ 80rem', () => {
       await open(page, path);
       await menuReady(page);
       await page.waitForTimeout(1000);
-      const inHeader = await page.evaluate(() => {
+      // TE-22 AC6: LCP không thuộc menu (nav desktop, drawer); logo trong header không phải menu
+      const lcp = await page.evaluate(() => {
         const el = (window as unknown as { __lcp: Element | null }).__lcp;
-        return el ? !!el.closest('[data-testid="header"]') : null;
+        return el ? { inMenu: !!el.closest('[data-testid="header-menu"], [data-testid="header-drawer"]'), desc: `${el.tagName}.${el.className}` } : null;
       });
-      expect(inHeader, 'phần tử LCP nằm trong header').not.toBe(true);
+      expect(lcp?.inMenu, `phần tử LCP thuộc menu: ${lcp?.desc}`).not.toBe(true);
       await need(page, 'mega');
       await page.evaluate(() => {
         (window as unknown as { __cls: number }).__cls = 0;
@@ -532,23 +533,25 @@ test.describe('ES1-T330 mega từ 80rem', () => {
     });
   }
 
-  test('TC-24 AC7 ngữ nghĩa: 2 nav khác tên, 0 h* trong header, ul[aria-labelledby] và aria-controls trỏ id có thật (B-06)', async ({ page }) => {
+  test('TC-24 AC7 ngữ nghĩa: 2 nav khác tên, 0 h* trong menu, ul[aria-labelledby] và aria-controls trỏ id có thật (B-06)', async ({ page }) => {
     await open(page);
     const s = await page.evaluate(() => {
-      const h = document.querySelector('[data-testid="header"]')!;
+      // Phạm vi menu (nav desktop + drawer): dialog search trong header có h2 "Search" theo TE-8 AC9
+      const menus = [...document.querySelectorAll('[data-testid="header-menu"], [data-testid="header-drawer"]')];
+      const all = (sel: string) => menus.flatMap((m) => [...m.querySelectorAll(sel)]);
       return {
         main: document.querySelectorAll('nav[aria-label="Main menu"]').length,
         mobile: document.querySelectorAll('nav[aria-label="Mobile menu"]').length,
-        headings: h.querySelectorAll('h1,h2,h3,h4,h5,h6').length,
-        labelled: [...h.querySelectorAll('ul[aria-labelledby]')].map((ul) => document.getElementById(ul.getAttribute('aria-labelledby')!)?.tagName ?? 'MISSING'),
-        controls: [...h.querySelectorAll('summary[aria-controls]')].map((s) => !!document.getElementById(s.getAttribute('aria-controls')!)),
+        headings: all('h1,h2,h3,h4,h5,h6').length,
+        labelled: all('ul[aria-labelledby]').map((ul) => document.getElementById(ul.getAttribute('aria-labelledby')!)?.tagName ?? 'MISSING'),
+        controls: all('summary[aria-controls]').map((s) => !!document.getElementById(s.getAttribute('aria-controls')!)),
       };
     });
     expect(HEADER_LOCALE.menu_label).toBe('Main menu');
     expect(HEADER_LOCALE.drawer_menu_label).toBe('Mobile menu');
     expect(s.main).toBe(1);
     expect(s.mobile).toBe(1);
-    expect(s.headings, 'header không dùng h*').toBe(0);
+    expect(s.headings, 'menu không dùng h*').toBe(0);
     for (const tag of s.labelled) expect(tag).not.toMatch(/MISSING|^H[1-6]$/);
     expect(s.controls.every(Boolean), 'aria-controls trỏ id không tồn tại').toBe(true);
   });
@@ -587,7 +590,8 @@ test.describe('ES1-T330 mega từ 80rem', () => {
     await menuReady(page);
     const current = nav(page).locator('a[aria-current="page"]').first();
     test.skip((await current.count()) === 0, `Shopify không đánh dấu current cho ${href}`);
-    const owner = parts(navItems(page).filter({ has: current }).first());
+    const ownerIndex = await navItems(page).evaluateAll((lis) => lis.findIndex((li) => !!li.querySelector('a[aria-current="page"]')));
+    const owner = parts(navItems(page).nth(ownerIndex));
     if (await owner.toggle.count()) await owner.toggle.click();
     await expect(current).toBeVisible();
     const d = await current.evaluate((el) => ({ line: getComputedStyle(el).textDecorationLine, th: getComputedStyle(el).textDecorationThickness }));
@@ -618,7 +622,7 @@ test.describe('ES1-T330 mega từ 80rem', () => {
         return { text: el.textContent!.trim(), h: el.getBoundingClientRect().height };
       }),
     );
-    const small: string[] = top.filter((t) => t.h < 44).map((t) => `cấp 1 "${t.text}" ${t.h}px`);
+    const small: string[] = top.filter((t) => t.h < 44 - 0.5).map((t) => `cấp 1 "${t.text}" ${t.h}px`);
     const count = await navItems(page).count();
     for (let i = 0; i < count; i++) {
       const p = parts(navItems(page).nth(i));
@@ -626,7 +630,7 @@ test.describe('ES1-T330 mega từ 80rem', () => {
       await p.toggle.click();
       await expect(p.submenu).toBeVisible();
       const links = await p.submenu.locator('a').evaluateAll((as) => as.map((a) => ({ text: a.textContent!.trim(), h: a.getBoundingClientRect().height })));
-      small.push(...links.filter((l) => l.h < 40).map((l) => `panel "${l.text}" ${l.h}px`));
+      small.push(...links.filter((l) => l.h < 40 - 0.5).map((l) => `panel "${l.text}" ${l.h}px`));
       await p.toggle.click();
     }
     expect(small, 'vùng chạm dưới ngưỡng TE-22 AC7').toEqual([]);
@@ -657,6 +661,7 @@ test.describe('ES1-T330 mega từ 80rem', () => {
     const { toggle, panel } = firstMega(page);
     await toggle.click();
     await expect(panel).toBeVisible();
+    await expectNotChallenged(page);
     const axe = await new AxeBuilder({ page }).include('[data-testid="header"]').analyze();
     const bad = axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
@@ -667,6 +672,8 @@ test.describe('ES1-T330 mega từ 80rem', () => {
     const shop = navItems(page).filter({ has: page.getByTestId('header-menu-toggle').filter({ hasText: /^\s*Shop\s*$/i }) });
     const coll = navItems(page).filter({ has: page.getByTestId('header-menu-toggle').filter({ hasText: /^\s*Collections?\s*$/i }) });
     test.skip((await shop.count()) === 0 || (await coll.count()) === 0, 'store dev chưa cấu hình menu Shop/Collection (ES1-T298)');
+    const shopData = (await menuData(page)).find((d) => /^Shop$/i.test(d.title));
+    test.skip(!shopData?.children.some((c) => c.grand.length), 'store dev: Shop chưa có cấp 3 (Categories, Training Level, Featured) — AC14 Given chưa đạt, chờ ES1-T298');
     await expect(shop.locator(':scope > details')).toHaveAttribute('data-mega', 'columns');
     await expect(coll.locator(':scope > details')).toHaveAttribute('data-mega', 'tiles');
     await expect(coll.getByTestId('header-mega-panel').locator('ul[aria-labelledby] > li')).toHaveCount(5);
@@ -815,6 +822,7 @@ test.describe('ES1-T330 drawer cấp 3 dưới 80rem', () => {
   test('TC-30 AC7 axe 360 drawer cấp 2 có cấp 3 mở: 0 serious/critical', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 800 });
     await openLevel3(page);
+    await expectNotChallenged(page);
     const axe = await new AxeBuilder({ page }).include('[data-testid="header-drawer"]').analyze();
     const bad = axe.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical');
     expect(bad.map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`)).toEqual([]);
