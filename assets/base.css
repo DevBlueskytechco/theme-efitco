@@ -3052,9 +3052,22 @@ bundle-form {
   }
 }
 
-/** Search page */
+/** Search page (ES1-T493): ô tìm không vượt khung, tránh nới layout viewport mobile làm huỷ view transition */
+.search-page__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-inline-size: 100%;
+}
+.search-page__input {
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  box-sizing: border-box;
+}
 .search-results {
   display: grid;
+  overflow-wrap: anywhere;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 .search-results .prev,
