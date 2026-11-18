@@ -30,8 +30,8 @@
   show_sticky_checkout is on, the aside with hidden. The host sits inside the
   cart-page partial, so a refresh replaces it and runs connectedCallback again.
   The host has no CSS: the aside is position fixed, the host is an empty grid
-  item of zero size. assets/cart-checkout-bar.js (BE, ES1-T370), loaded by its
-  own script tag outside the partial, owns the bar: below 64rem it watches the
+  item of zero size. assets/cart-checkout-bar.js (BE, ES1-T370), whose script tag BE adds next to cart-items.js
+  (outside the partial) in ES1-T370, owns the bar: below 64rem it watches the
   summary panel (.cart-summary--page) with an IntersectionObserver, removes
   hidden on the aside while the panel is out of view and sets
   html[data-bottom-bar="cart"] (body padding comes from --bottom-bar-height),
@@ -193,7 +193,6 @@
     </div>
   </cart-items>
   <script src="{{ 'cart-items.js' | asset_url }}" type="module"></script>
-  <script src="{{ 'cart-checkout-bar.js' | asset_url }}" type="module" defer></script>
 </div>
 
 {% schema %}
