@@ -22,6 +22,8 @@ function watchConsole(page: Page) {
   page.on('console', (msg) => {
     if (msg.type() !== 'error' || isShopPay403(msg)) return;
     if (IGNORE_CONSOLE.some((r) => r.test(msg.text()) || r.test(msg.location().url))) return;
+    // Chính response 404 của tài liệu trang 404 (như smoke.spec.ts), chỉ đúng URL MISSING; 404 tài nguyên khác vẫn tính.
+    if (/status of 404/.test(msg.text()) && msg.location().url.split(/[?#]/)[0].endsWith(MISSING)) return;
     errors.push(`${msg.text()} @ ${msg.location().url}`);
   });
   page.on('pageerror', (err) => errors.push(`pageerror: ${err.message}`));
@@ -49,7 +51,8 @@ test.describe('ES1-T496 tĩnh', () => {
     const branch = src.slice(src.indexOf('{%- if block.settings.show_search -%}'), src.indexOf('{%- endif -%}', src.indexOf('</form>')));
     expect(branch).toContain(`<script src="{{ 'search-handoff.js' | asset_url }}" type="module"></script>`);
     expect(branch).toContain(`data-search-handoff="{{ 'predictive-search.js' | asset_url }}"`);
-    expect(src).not.toMatch(/autofocus|data-search-src/);
+    // Bỏ {% doc %} (FE ES1-T486 đã merge ghi "Not data-search-src" để giải thích) — chỉ kiểm markup.
+    expect(src.replace(/\{% doc %\}[\s\S]*?\{% enddoc %\}/, '')).not.toMatch(/autofocus|data-search-src/);
     expect(read('templates/404.liquid')).not.toMatch(/<script/);
   });
 
