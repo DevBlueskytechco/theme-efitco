@@ -51,3 +51,23 @@ export async function fillStorePassword(page: Page, password: string): Promise<R
   if (state !== 'absent') await page.locator(PASSWORD_PAGE.input).first().fill(password);
   return state;
 }
+
+// ES1-T492: luồng khách mới đầy đủ (global setup, ES1-T314 "banner thật"): /password → điền, submit, chờ rời /password → mở PREVIEW_URL
+// để phiên giữ theme preview. Vẫn ở /password thì ném lỗi môi trường (STORE_PASSWORD).
+export async function unlockAndOpenPreview(page: Page, previewUrl: string, password: string): Promise<RevealResult> {
+  const origin = new URL(previewUrl).origin;
+  await page.goto(`${origin}/password`);
+  const state = await fillStorePassword(page, password);
+  if (state !== 'absent') {
+    // Chờ POST /password xong và Shopify chuyển hướng ra khỏi /password — nếu không cookie mở khoá chưa được ghi
+    await Promise.all([
+      page.waitForURL((u) => !u.pathname.startsWith('/password'), { timeout: 30_000 }),
+      page.locator(PASSWORD_PAGE.form).evaluate((f: HTMLFormElement) => f.submit()),
+    ]);
+  }
+  await page.goto(previewUrl);
+  if (new URL(page.url()).pathname.startsWith('/password')) {
+    throw new Error('Không mở khoá được store: kiểm STORE_PASSWORD (secret GitHub / .env)');
+  }
+  return state;
+}

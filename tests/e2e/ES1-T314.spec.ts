@@ -9,6 +9,7 @@ import { newStoreContext } from './support/store-noise';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 import { CONSENT } from './support/consent';
+import { unlockAndOpenPreview } from './support/password-unlock';
 
 const JS_FILE = 'assets/page-layers.js';
 const LAYOUT = 'layout/theme.liquid';
@@ -55,10 +56,10 @@ async function ensureModule(page: Page) {
 // Banner consent THẬT của Shopify chỉ test "banner thật" kiểm. Các test còn lại cần trang không có banner thật:
 // - store dev ở chế độ preview: query bannerQuery gửi isPreviewMode = true → Shopify vẽ #shopify-pc__banner cả với IP US
 //   (regionVisibility chỉ có nước EU) — trace CI run 44171510755;
-// - global setup không còn Decline được (log "[state] banner consent: absent" ở mọi shard; cookie _tracking_consent không còn,
-//   Shopify dùng _shopify_essential/_shopify_cmp) nên state.json không mang lựa chọn consent;
-// - banner chỉ vắng khi spec có autoDeclineConsent (T137, T176, T235, T45, TE-1, TE-4) đã chạy trước trong cùng shard (lựa chọn
-//   gắn với khách chung của state.json). Thêm spec làm --shard chia lại → T314 đỏ (PR #229, #251, #254).
+// - ES1-T492: global setup ghi "từ chối" bằng customerPrivacy.setTrackingConsent và kiểm lại bằng context mới (log "[state] consent kiểm lại");
+//   trước ES1-T492 setup log "absent" ở mọi shard, banner chỉ vắng khi spec có autoDeclineConsent chạy trước cùng shard → đỏ theo thứ tự
+//   shard (PR #229, #251, #254, ES1-T491);
+// - vẫn chặn script banner ở đây để test lớp không phụ thuộc kết quả setup (setup chỉ cảnh báo, không fail).
 // Theme không vẽ banner (layers.md §5) → trả script privacy-banner rỗng (không abort: abort sinh lỗi console); test tự chèn
 // #shopify-pc__banner giả khi cần. Assertion giữ nguyên.
 const PRIVACY_BANNER = /\/shopifycloud\/privacy-banner\//;
@@ -272,12 +273,15 @@ test.describe('ES1-T314 banner consent (TE-10 AC7, layers.md §5)', () => {
     await expectFlag(page, 'data-consent', false);
   });
 
-  test('banner thật của Shopify (context không cookie consent): hiện → cờ bật; Decline → gỡ', async ({ browser }) => {
-    // Không dùng state.json (đã Decline ở global setup); vẫn cần cookie mật khẩu storefront nên đi qua trang mật khẩu bằng storageState rồi xoá cookie consent.
-    const context = await newStoreContext(browser, { storageState: 'tests/setup/state.json', baseURL: BASE_URL });
-    await context.clearCookies({ name: CONSENT.cookie });
+  test('banner thật của Shopify (khách mới, chưa chọn consent): hiện → cờ bật; Decline → gỡ', async ({ browser }, info) => {
+    // ES1-T492: state.json mang lựa chọn "từ chối" (global setup) và Shopify không còn cookie _tracking_consent để xoá
+    // (clearCookies cũ vô tác dụng, đã gỡ). Khách mới: context không storageState, tự mở khoá /password rồi mở PREVIEW_URL.
+    test.skip(!process.env.PREVIEW_URL, 'cần PREVIEW_URL');
+    test.skip(info.project.name !== 'desktop', 'mở khoá khách mới chỉ chạy desktop để giảm request lên store dev');
+    const context = await newStoreContext(browser, { storageState: undefined, baseURL: BASE_URL });
     const page = await context.newPage();
     const errors = watchConsole(page);
+    await unlockAndOpenPreview(page, process.env.PREVIEW_URL!, process.env.STORE_PASSWORD || '');
     await openPage(page, '/', { realBanner: true });
     const banner = page.locator(CONSENT.banner).first();
     const shown = await banner.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true, () => false);
