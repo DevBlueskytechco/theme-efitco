@@ -673,10 +673,11 @@ test.describe('ES1-T330 mega từ 80rem', () => {
     const coll = navItems(page).filter({ has: page.getByTestId('header-menu-toggle').filter({ hasText: /^\s*Collections?\s*$/i }) });
     test.skip((await shop.count()) === 0 || (await coll.count()) === 0, 'store dev chưa cấu hình menu Shop/Collection (ES1-T298)');
     const shopData = (await menuData(page)).find((d) => /^Shop$/i.test(d.title));
-    test.skip(!shopData?.children.some((c) => c.grand.length), 'store dev: Shop chưa có cấp 3 (Categories, Training Level, Featured) — AC14 Given chưa đạt, chờ ES1-T298');
-    await expect(shop.locator(':scope > details')).toHaveAttribute('data-mega', 'columns');
     await expect(coll.locator(':scope > details')).toHaveAttribute('data-mega', 'tiles');
     await expect(coll.getByTestId('header-mega-panel').locator('ul[aria-labelledby] > li')).toHaveCount(5);
+    // Shop kiểu A cần store có cấp 3 (AC14 Given, ES1-T298); chưa có thì chỉ bỏ phần Shop, giữ kiểm Collection.
+    test.skip(!shopData?.children.some((c) => c.grand.length), 'store dev: Shop chưa có cấp 3 (Categories, Training Level, Featured) — AC14 Given chưa đạt, chờ ES1-T298');
+    await expect(shop.locator(':scope > details')).toHaveAttribute('data-mega', 'columns');
     if (FE3) await expect(shop.getByTestId('header-mega-promo')).toHaveCount(1);
   });
 
