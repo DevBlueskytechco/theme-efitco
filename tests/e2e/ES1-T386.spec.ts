@@ -962,7 +962,6 @@ test.describe('ES1-T386 password', () => {
   });
 
   test('TC-32 AC11 sai mật khẩu: focus vào ô mật khẩu sau khi tải lại (bug ES1-T488)', async ({ browser }) => {
-    test.fail(true, 'ES1-T488: không có cơ chế focus #PasswordInput khi form.errors');
     const { context, page } = await openPassword(browser, 1280);
     try {
       await submitWrongPassword(page);
