@@ -59,6 +59,13 @@
   When the body is empty and results_view is off, the editor shows a placeholder
   and the storefront renders nothing.
 
+  Intro text (ES1-T308 #1, ES1-T465): eyebrow, heading, subheading, note_1 and
+  note_2 have empty defaults, so a quiz added in the editor shows no intro text.
+  Each part is hidden while it is empty. The home templates pass the Figma copy
+  from locales as default_* (same pattern as quiz-step): a value the merchant
+  saved wins, field by field, and clearing it brings the sample back. Text from
+  the t filter may already be escaped, so it goes through escape_once.
+
   JavaScript hooks: custom element quiz-finder (root, id = static block id for
   the "Retake the quiz" link), data-enhanced, data-design-mode, data-lazy-module
   (URL of assets/quiz-finder.js, read by assets/lazy-module.js; neither renders
@@ -99,10 +106,16 @@
   @param {boolean} [results_view] - Render only the results page, with cards from the global collection. Default: false
   @param {number} [required_tags] - With results_view: tags the URL must apply, one per quiz step. Default: 3
   @param {string} [retake_anchor] - With results_view: id of the quiz block in templates/index.liquid, for "Retake the quiz" and "Change My Answers". Default: none (home page top)
+  @param {string} [default_eyebrow] - Sample eyebrow used when the eyebrow setting is empty
+  @param {string} [default_heading] - Sample heading used when the heading setting is empty
+  @param {string} [default_subheading] - Sample subheading used when the subheading setting is empty
+  @param {string} [default_note_1] - Sample first note used when the note_1 setting is empty
+  @param {string} [default_note_2] - Sample second note used when the note_2 setting is empty
 
   @example
+  {% assign quiz_heading = 'blocks.quiz.default_heading' | t %}
   {% block 'container', id: 'home-quiz', tag: 'div' %}
-    {% block 'quiz', id: 'quiz' %}
+    {% block 'quiz', id: 'quiz', default_heading: quiz_heading %}
       {% block 'quiz-step', id: 'quiz-step-1', step: 1, total: 3 %}{% endblock %}
       {% block 'quiz-step', id: 'quiz-step-2', step: 2, total: 3 %}{% endblock %}
       {% block 'quiz-step', id: 'quiz-step-3', step: 3, total: 3 %}{% endblock %}
@@ -115,11 +128,11 @@
 
 {%- liquid
   assign steps = content | strip
-  assign eyebrow = block.settings.eyebrow
-  assign heading = block.settings.heading
-  assign subheading = block.settings.subheading
-  assign note_1 = block.settings.note_1
-  assign note_2 = block.settings.note_2
+  assign eyebrow = block.settings.eyebrow | default: default_eyebrow
+  assign heading = block.settings.heading | default: default_heading
+  assign subheading = block.settings.subheading | default: default_subheading
+  assign note_1 = block.settings.note_1 | default: default_note_1
+  assign note_2 = block.settings.note_2 | default: default_note_2
   assign quiz_id = id | default: block.id
   assign heading_id = quiz_id | append: '-heading'
   assign submit_id = quiz_id | append: '-submit'
@@ -238,26 +251,26 @@
     {%- if has_intro -%}
       <div class="quiz__intro">
         {%- if eyebrow != blank -%}
-          <p class="quiz__eyebrow" data-testid="quiz-eyebrow">{{ eyebrow | escape }}</p>
+          <p class="quiz__eyebrow" data-testid="quiz-eyebrow">{{ eyebrow | escape_once }}</p>
         {%- endif -%}
         {%- if heading != blank -%}
-          <h2 class="quiz__heading" id="{{ heading_id }}" data-testid="quiz-heading">{{ heading | escape }}</h2>
+          <h2 class="quiz__heading" id="{{ heading_id }}" data-testid="quiz-heading">{{ heading | escape_once }}</h2>
         {%- endif -%}
         {%- if subheading != blank -%}
-          <p class="quiz__subheading" data-testid="quiz-subheading">{{ subheading | escape }}</p>
+          <p class="quiz__subheading" data-testid="quiz-subheading">{{ subheading | escape_once }}</p>
         {%- endif -%}
         {%- if note_1 != blank or note_2 != blank -%}
           <ul class="quiz__notes" role="list">
             {%- if note_1 != blank -%}
               <li class="quiz__note" data-testid="quiz-note">
                 {%- render 'quiz-icon', name: 'clock' -%}
-                {{- note_1 | escape -}}
+                {{- note_1 | escape_once -}}
               </li>
             {%- endif -%}
             {%- if note_2 != blank -%}
               <li class="quiz__note" data-testid="quiz-note">
                 {%- render 'quiz-icon', name: 'badge' -%}
-                {{- note_2 | escape -}}
+                {{- note_2 | escape_once -}}
               </li>
             {%- endif -%}
           </ul>
@@ -606,33 +619,31 @@
       "type": "text",
       "id": "eyebrow",
       "label": "t:labels.eyebrow",
-      "default": "Our most-loved feature"
+      "info": "t:info.quiz_intro_text"
     },
     {
       "type": "text",
       "id": "heading",
       "label": "t:labels.heading",
-      "default": "Find Your Perfect Gear"
+      "info": "t:info.quiz_intro_text"
     },
     {
       "type": "text",
       "id": "subheading",
       "label": "t:labels.quiz_subheading",
-      "default": "Two questions. One shortlist."
+      "info": "t:info.quiz_intro_text"
     },
     {
       "type": "text",
       "id": "note_1",
       "label": "t:labels.quiz_note_1",
-      "info": "t:info.quiz_note",
-      "default": "20 seconds"
+      "info": "t:info.quiz_note"
     },
     {
       "type": "text",
       "id": "note_2",
       "label": "t:labels.quiz_note_2",
-      "info": "t:info.quiz_note",
-      "default": "No sign-up required"
+      "info": "t:info.quiz_note"
     },
     {
       "type": "collection",
