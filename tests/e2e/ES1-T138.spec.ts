@@ -160,8 +160,8 @@ test.describe('ES1-T138 TE-11 kết quả quiz', () => {
     await page.goto(TE11);
     const quiz = tid(page, 'quiz');
     await expect(quiz).toHaveJSProperty('tagName', 'QUIZ-FINDER');
-    // ES1-T417: index.te11.liquid truyền collection TE11_QUIZ_COLLECTION ở TE-11-R2-FE1 (ES1-T387); trước đó là all
-    await expect(quiz).toHaveAttribute('data-results-url', new RegExp(`/collections/(all${QUIZ ? `|${escapeRe(encodeURIComponent(QUIZ))}` : ''})$`));
+    // ES1-T387: index.te11 truyền collection te11-quiz (ES1-T178 M-A).
+    await expect(quiz).toHaveAttribute('data-results-url', /\/collections\/te11-quiz$/);
     await expect(quiz).toHaveAttribute('data-results-view', 'quiz');
     await expect(quiz).toHaveAttribute('data-label-results', /%n/);
     await expect(tid(page, 'quiz-empty-cta')).toHaveAttribute('href', (await quiz.getAttribute('data-results-url'))!);
