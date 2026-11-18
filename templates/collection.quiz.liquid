@@ -1,5 +1,10 @@
-{% # TE-11 quiz results, opened with /collections/{handle}/{tag}+{tag}+{tag}?view=quiz (drafts/techlead/ES1-T132/task-split.md D3, D6). assets/quiz-finder.js fetches partial quiz-results from here, and the URL also works as a page of its own. required_tags is the number of steps of the quiz in templates/index.liquid. %}
+{% # TE-11 quiz results page (docs/ui-spec/quiz-result.md §6, SRS TE-11 AC8, AC10), opened with /collections/{handle}/{tag}+{tag}+{tag}?view=quiz (drafts/techlead/ES1-T132/task-split.md D3, D6). assets/quiz-finder.js fetches partials quiz-results and quiz-results-actions from here, and the URL also works as a page of its own (shared link, load error in the popup, no JavaScript). required_tags is the number of steps and retake_anchor the id of the quiz block in templates/index.liquid. %}
 {% block 'container', id: 'quiz-results' %}
-  <h1 class="quiz-results-title">{{ collection.title | escape }}</h1>
-  {% block 'quiz', id: 'quiz-results', results_view: true, required_tags: 3 %}{% endblock %}
+  <nav class="quiz-page__breadcrumb" aria-label="{{ 'blocks.quiz.breadcrumb' | t }}">
+    <ol role="list">
+      <li><a href="{{ routes.root_url }}">{{ 'blocks.quiz.breadcrumb_home' | t }}</a></li>
+      <li><span aria-current="page">{{ 'blocks.quiz.results_heading' | t }}</span></li>
+    </ol>
+  </nav>
+  {% block 'quiz', id: 'quiz-results', results_view: true, required_tags: 3, retake_anchor: 'quiz' %}{% endblock %}
 {% endblock %}
