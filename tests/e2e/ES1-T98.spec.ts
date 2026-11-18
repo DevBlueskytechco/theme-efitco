@@ -147,7 +147,8 @@ test.describe('ES1-T98 contract', () => {
     const items = read('assets/cart-items.js');
     // DoD ticket: 4096. ADR 0010 / task-split ES1-T307 §3 ghi 3072: chờ Tech Lead ở ES1-T476.
     expect(Buffer.byteLength(drawer), 'cart-drawer.js tối đa 4096 B').toBeLessThanOrEqual(4096);
-    expect(Buffer.byteLength(items), 'cart-items.js tối đa 5632 B').toBeLessThanOrEqual(5632);
+    // ES1-T370 (TE-5-R2-BE1): trần 7168 B theo ADR 0010.
+    expect(Buffer.byteLength(items), 'cart-items.js tối đa 7168 B').toBeLessThanOrEqual(7168);
     for (const action of ['openCart', 'updateCart']) expect(drawer).toMatch(new RegExp(`\\.${action}\\??\\.configure`));
     expect([...drawer.matchAll(/\ba\.(\w+)\??\.configure\b/g)].map((m) => m[1]).sort()).toEqual(['openCart', 'updateCart']);
     // getCart không configure được: gọi configure là TypeError (docs, ES1-T164).
