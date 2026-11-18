@@ -41,12 +41,13 @@ C. Trần mỗi file giữ 8 192 B. Bảng trần dưới đây ghi vào DoD c�
 | | bundle-form (gồm bundle bar 360) | 7 168 | lười: viewport |
 | | sale-countdown, video-carousel, scroll-buttons (1 536), scroll-extras, collection-tabs | ≤ 8 192 mỗi file | lười: viewport |
 | Collection, search | collection-filters | 8 192 | collection-filters / search |
-| Cart | cart-items (gồm checkout bar) | 7 168 | cart-page |
+| Cart | cart-items | 7 168 | cart-page |
+| | cart-checkout-bar (thanh checkout dưới 64rem, `<cart-checkout-bar>`; tách khỏi cart-items, CTO 18/11 ES1-T490 B) | 1 024 | cart-page |
 | Lười theo tương tác, mọi trang | quick-view 6 144; predictive-search 6 656; localization-picker 4 096; popup-queue 1 536 tải sẵn + popup-forms 4 096 lười | — | khi bấm / khi điều kiện popup đủ |
 
 - `assets/lazy-module.js` nhận thêm `data-lazy-on="interaction"` (nạp khi `pointerenter`, `focusin`, `touchstart` đầu tiên trong element) bên cạnh mặc định viewport; trần 768 B.
 - JS nạp theo tương tác không tính vào trần sau cuộn (ADR 0006 đo cuộn hết trang và mở search, không bấm), nhưng mỗi file vẫn ≤ 8 192 B.
-- Ước sau phân bổ: chung 18 952; PDP 38 408 tải sẵn; trang chủ ≈ 32 131 tải sẵn (chung + slideshow 8 057 + lazy-module 379 + popup-queue 1 536 + scroll-extras 3 207 do `motion.js` import lúc tải), ≈ 48 651 sau cuộn; collection ≈ 27 523; cart ≈ 26 120.
+- Ước sau phân bổ: chung 18 952; PDP 38 408 tải sẵn; trang chủ ≈ 32 131 tải sẵn (chung + slideshow 8 057 + lazy-module 379 + popup-queue 1 536 + scroll-extras 3 207 do `motion.js` import lúc tải), ≈ 48 651 sau cuộn; collection ≈ 27 523; cart ≈ 27 144 (+ 1 024 trần cart-checkout-bar, ES1-T490 B; đo ES1-T370: 27 892).
 
 ## Hệ quả
 - Tốt: PDP về dưới 40 960; trang chủ sau cuộn về dưới 65 536 kể cả khi thêm `page-layers`, `modal-dialog`, `sale-countdown`, popup; có chỗ cho quick view, popup.
