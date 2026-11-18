@@ -726,7 +726,6 @@ test.describe('ES1-T386 404', () => {
   });
 
   test('TC-20 AC7 gõ ≥ 2 ký tự vào ô tìm 404 → gợi ý predictive như TE-8 AC1 (bug ES1-T486)', async ({ page }) => {
-    test.fail(true, 'ES1-T486: ô tìm 404 chưa nối predictive search');
     await openAt(page, MISSING, 1280);
     const suggest = page.waitForRequest(/\/search\/suggest/, { timeout: 5_000 });
     await page.getByTestId('not-found-search-input').pressSequentially('du', { delay: 50 });
