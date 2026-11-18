@@ -137,6 +137,9 @@ test.describe('ES1-T341 shop the look (TE-12 AC5, AC9, index-1280 §2.4)', () =>
       await openHome(page, width);
       const { root, image } = parts(page);
       test.skip(!(await root.count()) || !(await image.count()), 'Shop the look chưa có ảnh trên store');
+      // Đo sau bundle-form.js: trước đó dòng Total rỗng làm cột phải thấp hơn, ảnh ≥ 64rem kéo theo cột phải (ES1-T501)
+      await root.scrollIntoViewIfNeeded();
+      await expect(root).toHaveAttribute('data-enhanced', '', { timeout: 10000 });
       const b = await box(image);
       near(b.width, w, 'rộng ảnh');
       near(b.height, h, 'cao ảnh');
@@ -171,8 +174,10 @@ test.describe('ES1-T341 shop the look (TE-12 AC5, AC9, index-1280 §2.4)', () =>
 
   test('1280: cột phải 397, Fits 84, hàng 80, ảnh hàng 56, hàng cách 8, đáy panel = đáy ảnh', async ({ page }) => {
     await openHome(page, WIDTHS.desktop);
-    const { image, rows, panel, note } = parts(page);
+    const { root, image, rows, panel, note } = parts(page);
     test.skip(!(await image.count()) || (await rows.count()) < 2, 'Shop the look thiếu ảnh hoặc < 2 hàng');
+    await root.scrollIntoViewIfNeeded();
+    await expect(root).toHaveAttribute('data-enhanced', '', { timeout: 10000 });
     const img = await box(image);
     const p = await box(panel);
     near(p.width, 397, 'rộng cột phải');

@@ -144,6 +144,11 @@
   assign why_body = 'blocks.image_with_text.why_text_html' | t
   assign why_button_label = 'blocks.image_with_text.why_button_label' | t
 
+  assign quiz_eyebrow = 'blocks.quiz.default_eyebrow' | t
+  assign quiz_heading = 'blocks.quiz.default_heading' | t
+  assign quiz_subheading = 'blocks.quiz.default_subheading' | t
+  assign quiz_note_1 = 'blocks.quiz.default_note_1' | t
+  assign quiz_note_2 = 'blocks.quiz.default_note_2' | t
   assign s1_question = 'blocks.quiz_step.s1_question' | t
   assign s1_hint = 'blocks.quiz_step.s1_hint' | t
   assign s1_option_1_label = 'blocks.quiz_step.s1_option_1_label' | t
@@ -267,7 +272,14 @@
 {% endblock %}
 
 {% block 'container', id: 'figma-quiz', tag: 'div' %}
-  {% block 'quiz', id: 'figma-quiz' %}
+  {% block 'quiz',
+    id: 'figma-quiz',
+    default_eyebrow: quiz_eyebrow,
+    default_heading: quiz_heading,
+    default_subheading: quiz_subheading,
+    default_note_1: quiz_note_1,
+    default_note_2: quiz_note_2
+  %}
     {% block 'quiz-step',
       id: 'figma-quiz-step-1',
       step: 1,
