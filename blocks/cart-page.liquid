@@ -24,12 +24,21 @@
     aria-describedby; outside the partial, tied to the form by the form
     attribute. Saved on form submit. CSS hides it when data-item-count is 0.
 
-  Sticky checkout bar (AC17, cart.md §3.7): aside cart-sticky-checkout renders
-  with hidden when the cart has items and show_sticky_checkout is on. Below
-  64rem JavaScript (TE-5-R2-BE1) removes hidden while the summary panel is out
-  of view and sets html[data-bottom-bar="cart"] (body padding comes from
-  --bottom-bar-height); from 64rem CSS never shows it. Its Checkout button posts
-  the same form (name checkout).
+  Sticky checkout bar (AC17, cart.md §3.7; ES1-T490 option B): custom element
+  cart-checkout-bar (test hook cart-checkout-bar) is the host and wraps aside
+  cart-sticky-checkout; both render only when the cart has items and
+  show_sticky_checkout is on, the aside with hidden. The host sits inside the
+  cart-page partial, so a refresh replaces it and runs connectedCallback again.
+  The host has no CSS: the aside is position fixed, the host is an empty grid
+  item of zero size. assets/cart-checkout-bar.js (BE, ES1-T370), whose script tag BE adds next to cart-items.js
+  (outside the partial) in ES1-T370, owns the bar: below 64rem it watches the
+  summary panel (.cart-summary--page) with an IntersectionObserver, removes
+  hidden on the aside while the panel is out of view and sets
+  html[data-bottom-bar="cart"] (body padding comes from --bottom-bar-height),
+  then restores hidden and removes the attribute when the panel is in view or
+  the host disconnects. From 64rem CSS never shows the bar. Its Checkout button
+  posts the same form (name checkout), so it works without JavaScript.
+  assets/cart-items.js does not handle the bar.
 
   cart-items hooks: data-cart-change-url, data-cart-url, data-partials,
   data-label-updated, data-label-removed, data-label-error,
@@ -40,7 +49,8 @@
 
   Test hooks: cart-page, cart-page-heading, cart-page-count,
   cart-page-continue, cart-items, cart-items-status, cart-items-error,
-  cart-page-body, cart-form, cart-page-bestsellers, cart-sticky-checkout,
+  cart-page-body, cart-form, cart-page-bestsellers, cart-checkout-bar,
+  cart-sticky-checkout,
   cart-sticky-checkout-total, cart-sticky-checkout-button,
   cart-page-accelerated, cart-page-note, cart-page-note-hint.
 
@@ -125,27 +135,29 @@
         {%- endif -%}
 
         {%- if cart.item_count > 0 and block.settings.show_sticky_checkout -%}
-          <aside
-            class="cart-sticky-checkout"
-            aria-label="{{ 'cart.sticky_checkout_label' | t }}"
-            data-testid="cart-sticky-checkout"
-            hidden
-          >
-            <p class="cart-sticky-checkout__total">
-              <span class="cart-summary__muted">{{ 'cart.total' | t }}</span>
-              <strong class="cart-summary__total" data-testid="cart-sticky-checkout-total">{{ cart.total_price | money }}</strong>
-            </p>
-            <button
-              class="button cart-sticky-checkout__button"
-              type="submit"
-              name="checkout"
-              form="cart-form-page"
-              data-testid="cart-sticky-checkout-button"
+          <cart-checkout-bar data-testid="cart-checkout-bar">
+            <aside
+              class="cart-sticky-checkout"
+              aria-label="{{ 'cart.sticky_checkout_label' | t }}"
+              data-testid="cart-sticky-checkout"
+              hidden
             >
-              {{- 'cart.checkout' | t -}}
-              {%- render 'slideshow-icon', name: 'arrow' -%}
-            </button>
-          </aside>
+              <p class="cart-sticky-checkout__total">
+                <span class="cart-summary__muted">{{ 'cart.total' | t }}</span>
+                <strong class="cart-summary__total" data-testid="cart-sticky-checkout-total">{{ cart.total_price | money }}</strong>
+              </p>
+              <button
+                class="button cart-sticky-checkout__button"
+                type="submit"
+                name="checkout"
+                form="cart-form-page"
+                data-testid="cart-sticky-checkout-button"
+              >
+                {{- 'cart.checkout' | t -}}
+                {%- render 'slideshow-icon', name: 'arrow' -%}
+              </button>
+            </aside>
+          </cart-checkout-bar>
         {%- endif -%}
       </div>
     {% endpartial %}
