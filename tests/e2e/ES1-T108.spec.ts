@@ -67,7 +67,14 @@ test.describe('ES1-T108 TE-6 trang collection', () => {
     const img = page.getByTestId('collection-banner-image').locator('img');
     await expect(img).toHaveAttribute('loading', 'eager');
     await expect(img).toHaveAttribute('fetchpriority', 'high');
-    await expect(img).toHaveAttribute('style', /object-position/);
+    // collection.image là Image riêng (cdn/shop/collections), admin không đặt được focal point cho ảnh collection
+    // (kiểm 18/11). image_tag tự in style object-position khi ảnh có focal point, không có thì không in style.
+    // Nên: có style thì phải là object-position; Liquid render qua image_tag, không truyền height/crop (crop server huỷ focal).
+    const style = await img.getAttribute('style');
+    if (style) expect(style).toMatch(/object-position/);
+    const banner = readFileSync(join(process.cwd(), 'blocks/collection-banner.liquid'), 'utf8').replace(/{%-?\s*doc[\s\S]*?enddoc\s*-?%}/, '');
+    expect(banner).toMatch(/render 'image'/);
+    expect(banner).not.toMatch(/\b(crop|height):/);
     expect(await img.evaluate((el) => getComputedStyle(el).objectFit)).toBe('cover');
     // Không crop server: URL ảnh không có tham số crop
     expect(await img.getAttribute('src')).not.toMatch(/crop=/);
