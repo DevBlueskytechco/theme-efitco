@@ -10,6 +10,8 @@ import { gzipSync } from 'node:zlib';
 
 const read = (path: string) => readFileSync(path, 'utf8');
 const BASE = read('assets/base.css');
+// ES1-T478 (ADR 0013): phần riêng trang /cart ở assets/cart.css, nạp sau base.css; cart-lines/summary dùng chung ở base.css
+const CART = read('assets/cart.css');
 const CRITICAL = read('assets/critical.css');
 const PAGE = read('blocks/cart-page.liquid');
 const LINES = read('snippets/cart-lines.liquid');
@@ -18,7 +20,7 @@ const LOCALE = JSON.parse(read('locales/en.default.json'));
 const SCHEMA_LOCALE = JSON.parse(read('locales/en.default.schema.json'));
 
 const schemaOf = (liquid: string) => JSON.parse(liquid.split('{% schema %}')[1].split('{% endschema %}')[0]);
-const cartCss = () => BASE.slice(BASE.indexOf('/** Cart (TE-5'), BASE.indexOf('/** Image with text (TE-7'));
+const cartCss = () => BASE.slice(BASE.indexOf('/** Cart (TE-5'), BASE.indexOf('/** Image with text (TE-7')) + CART;
 
 const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:120px;
 --page-margin:20px;--page-width:91rem;--header-height:80px;--radius-input:8px;--radius-button:4px;--radius-card:12px;--radius-pill:999px;
@@ -96,7 +98,7 @@ const FIXTURE = (stickyHidden: boolean) => `
 async function mount(page: Page, width: number, stickyHidden = true) {
   await page.setViewportSize({ width, height: 900 });
   await page.setContent(
-    `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>cart</title><style>${TOKENS}</style><style>${CRITICAL}</style><style>${BASE}</style>
+    `<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>cart</title><style>${TOKENS}</style><style>${CRITICAL}</style><style>${BASE}</style><style>${CART}</style>
 <style>body{margin:0}.page-width{padding-inline:var(--page-margin)}.fx-header{block-size:var(--header-height)}</style></head><body><div class="fx-header"></div>${FIXTURE(stickyHidden)}</body></html>`,
   );
 }
@@ -180,14 +182,15 @@ test.describe('ES1-T369 hợp đồng tĩnh', () => {
     expect(keys.length).toBe(new Set(keys).size);
   });
 
-  test('CSS cart: 0 literal màu, chỉ logical, z-index qua --layer-*, base.css ≤ 57 344 B gzip (trần tạm CTO 17/11 tới ES1-T478)', () => {
+  test('CSS cart: 0 literal màu, chỉ logical, z-index qua --layer-*, base.css ≤ 49 152 B gzip, cart.css ≤ 16 384 B gzip (ES1-T472 a, ES1-T478)', () => {
     const css = cartCss();
     expect(css.match(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/gi)).toBeNull();
     expect(css.match(/^\s*(left|right|top|bottom|width|height|(margin|padding)-(left|right|top|bottom))\s*:/gm)).toBeNull();
     expect(css.match(/z-index:\s*\d/g)).toBeNull();
     const size = gzipSync(BASE).length;
     test.info().annotations.push({ type: 'base.css gzip', description: String(size) });
-    expect(size).toBeLessThanOrEqual(57344);
+    expect(size).toBeLessThanOrEqual(49152);
+    expect(gzipSync(CART).length).toBeLessThanOrEqual(16384);
   });
 });
 
