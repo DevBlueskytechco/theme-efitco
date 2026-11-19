@@ -1,0 +1,266 @@
+/** product.css (ADR 0013, ES1-T478): chỉ nạp khi template.name là product (layout/theme.liquid). Trần ≤ 16 384 B gzip.
+   Ở base.css (featured-product trang chủ, quick view dùng chung): .product, product-media, variant picker, product-form,
+   sale-countdown. Nạp sau base.css. */
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-sticky-bar {
+    transition:
+      opacity var(--motion-base) var(--ease-out),
+      translate var(--motion-base) var(--ease-out),
+      visibility var(--motion-base);
+  }
+}
+
+/** Product info (TE-4 AC3, AC9, AC10, ES1-T59 D3): mặc định kỹ thuật, ghi chú text-sm muted (ES1-T61 #6) */
+.product-info,
+.product-info__view {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.product-info--placeholder {
+  padding: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.product-info__vendor {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.product-info__title {
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h2);
+  font-style: var(--font-heading--style);
+  font-weight: var(--font-heading--weight);
+  line-height: var(--line-height-heading);
+  overflow-wrap: anywhere;
+}
+
+.product-info__vendor + .product-info__title {
+  margin-block-start: calc(var(--space-2) - var(--space-4));
+}
+
+.product-info__price {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.product-info__price .price {
+  font-size: var(--font-size-lg);
+}
+
+.product-info__notes {
+  display: grid;
+  gap: var(--space-1);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-body);
+}
+
+.product-info__note a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.product-info__note a:hover {
+  color: var(--color-foreground);
+}
+
+/** Product sticky bar (TE-4 AC5, ES1-T59 D5): hidden mặc định, assets/product-form.js (BE ES1-T67)
+   bỏ hidden + gắn data-sticky-bar-visible lên html. Chỉ dưới 48rem, fixed nên không gây CLS */
+product-sticky-bar {
+  display: block;
+}
+
+.product-sticky-bar {
+  position: fixed;
+  inset-inline: 0;
+  inset-block-end: 0;
+  z-index: var(--layer-bottom-bar);
+  padding: var(--space-3) var(--page-margin);
+  padding-block-end: max(var(--space-3), env(safe-area-inset-bottom));
+  border-block-start: 1px solid var(--color-border);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.product-sticky-bar[hidden] {
+  display: none;
+}
+
+.product-sticky-bar__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.product-sticky-bar__image {
+  flex: none;
+  inline-size: 48px;
+  block-size: 48px;
+  border-radius: var(--radius-input);
+  background-color: var(--color-background-cream);
+  object-fit: cover;
+}
+
+/* Tên đủ, xuống dòng (decisions 11/11 (3)): không ellipsis */
+.product-sticky-bar__title {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.product-sticky-bar__buy {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Giữ đủ giá gạch / đơn giá (nhãn ẩn cho screen reader đi kèm), chữ nhỏ, đơn giá xuống dòng */
+.product-sticky-bar__price .price {
+  justify-content: flex-end;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-body);
+  text-align: end;
+  white-space: nowrap;
+}
+
+.product-sticky-bar__add {
+  padding-inline: var(--space-4);
+  white-space: nowrap;
+}
+
+.product-sticky-bar__add:disabled {
+  border-color: var(--color-border);
+  background-color: var(--color-background-alt);
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+/* product-form.js gắn disabled + aria-busy cùng lúc khi thêm vào giỏ: chữ ẩn sau spinner như .button[aria-busy] ở base.css
+   (file này nạp sau base.css nên :disabled phía trên sẽ thắng nếu thiếu rule này) */
+.product-sticky-bar__add[aria-busy='true'] {
+  color: transparent;
+}
+
+/* Padding đáy body: chung theo --bottom-bar-height (đầu file, ADR 0007) */
+@media (min-width: 48rem) {
+  .product-sticky-bar {
+    display: none;
+  }
+}
+
+/** Product recommendations (TE-4 AC7, ES1-T59 D7, ES1-T61 #7): hidden tới khi
+   assets/product-recommendations.js (BE ES1-T68) có kết quả. Heading như
+   featured-collection, lưới 2 cột / tối đa 3 từ 48rem / --columns từ 80rem,
+   card dùng lại .product-card (không swatch) */
+product-recommendations {
+  display: block;
+}
+
+.product-recommendations {
+  display: grid;
+  gap: var(--space-5);
+  padding-block: var(--space-7);
+}
+
+.product-recommendations[hidden] {
+  display: none;
+}
+
+.product-recommendations__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.product-recommendations__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-recommendations__list:empty {
+  display: none;
+}
+
+.product-recommendations__item {
+  min-inline-size: 0;
+}
+
+/* Nhãn screen reader theo snippets/price.liquid, đổi bằng class price--on-sale (JS gắn) */
+.product-recommendations .price:not(.price--on-sale) .price__label-sale,
+.product-recommendations .price:not(.price--on-sale) .price__compare-group,
+.product-recommendations .price--on-sale .price__label-regular {
+  display: none;
+}
+
+.product-recommendations .price--on-sale .price__current {
+  color: var(--color-sale);
+}
+
+.product-recommendations__placeholder {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.product-recommendations__hint {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.product-recommendations__placeholder-media {
+  display: block;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background-color: var(--color-background-cream);
+  color: var(--color-muted-light);
+}
+
+.product-recommendations__placeholder-svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: currentcolor;
+}
+
+@media (min-width: 48rem) {
+  .product-recommendations__list {
+    grid-template-columns: repeat(var(--columns-tablet, 3), minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .product-recommendations {
+    gap: calc(var(--space-1) * 10);
+    padding-block: var(--space-8);
+  }
+}
+
+@media (min-width: 80rem) {
+  .product-recommendations__list {
+    grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+}

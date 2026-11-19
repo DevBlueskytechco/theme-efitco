@@ -65,7 +65,8 @@ test.describe('ES1-T381 tĩnh', () => {
   });
 
   test('CSS: không line-clamp/ellipsis ở tiêu đề, trích đoạn; override #999 chỉ ở .blog-posts', () => {
-    const css = noComments(read('assets/base.css'));
+    // ES1-T478 (ADR 0013): CSS trang blog ở assets/aux.css; .blog-posts (trang chủ) ở base.css
+    const css = noComments(read('assets/base.css') + read('assets/aux.css'));
     for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
       if (/article-card__(title|excerpt)|blog-articles__featured-(title|excerpt)/.test(rule[1])) {
         expect(rule[2], rule[1]).not.toMatch(/line-clamp|text-overflow:\s*ellipsis/);
