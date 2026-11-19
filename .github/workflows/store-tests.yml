@@ -25,6 +25,9 @@ jobs:
       STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
       BENCH_PRODUCT: ${{ vars.BENCH_PRODUCT }}
       BENCH_COLLECTION: ${{ vars.BENCH_COLLECTION }}
+      # TE-20 AC6, AC14 (ES1-T508): blog + bài đầu của figma-blog (A1, drafts/claude-code/ES1-T178/created-data.md)
+      BENCH_BLOG: ${{ vars.BENCH_BLOG || 'figma-blog' }}
+      BENCH_ARTICLE: ${{ vars.BENCH_ARTICLE || 'figma-stretch-after-training' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -36,6 +39,9 @@ jobs:
           URLS=(--collect.url="${STORE_ORIGIN}/?${Q}")
           [ -n "$BENCH_PRODUCT" ] && URLS+=(--collect.url="${STORE_ORIGIN}/products/${BENCH_PRODUCT}?${Q}")
           [ -n "$BENCH_COLLECTION" ] && URLS+=(--collect.url="${STORE_ORIGIN}/collections/${BENCH_COLLECTION}?${Q}")
+          [ -n "$BENCH_BLOG" ] && URLS+=(--collect.url="${STORE_ORIGIN}/blogs/${BENCH_BLOG}?${Q}")
+          [ -n "$BENCH_BLOG" ] && [ -n "$BENCH_ARTICLE" ] && URLS+=(--collect.url="${STORE_ORIGIN}/blogs/${BENCH_BLOG}/${BENCH_ARTICLE}?${Q}")
+          printf '%s\n' "${URLS[@]}"
           FAIL=0
           npx lhci autorun --config=lighthouserc.json "${URLS[@]}" || FAIL=1
           mkdir -p lh-out && cp .lighthouseci/lhr-*.json lh-out/ 2>/dev/null || true
