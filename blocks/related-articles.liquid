@@ -86,7 +86,7 @@
               break
             endif
             if post.id != article.id and post.tags contains first_tag
-              render 'article-card', article: post
+              render 'article-card', article: post, id_prefix: block.id
               assign rendered = rendered | plus: 1
             endif
           endfor
@@ -102,7 +102,7 @@
           if first_tag != blank and post.tags contains first_tag
             continue
           endif
-          render 'article-card', article: post
+          render 'article-card', article: post, id_prefix: block.id
           assign rendered = rendered | plus: 1
         endfor
       -%}

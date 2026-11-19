@@ -18,6 +18,13 @@
   dot drawn by CSS, either part can be off); without it the line is the reading
   time only, as on the home page.
 
+  Link name (TE-20 AC2, ES1-T506): the link wraps the whole card, so it points
+  aria-labelledby at the title; its accessible name is the title only, not the
+  tag, excerpt or meta. The title id is "{id_prefix}-article-{article.id}";
+  blog-articles and related-articles pass block.id so the same article in two
+  blocks never repeats an id. The home row (blog-posts) keeps the call with no
+  parameters (AC8) and gets the default prefix.
+
   Test hooks: data-testid="article-card", "article-card-link", "article-card-image",
   "article-card-tag", "article-card-title", "article-card-excerpt",
   "article-card-meta", "article-card-date", "article-card-read-time".
@@ -30,14 +37,16 @@
   @param {string} [sizes] - The sizes attribute of the image. Default: the home page row
   @param {string} [loading] - 'lazy' (default) or 'eager' for the LCP card
   @param {string} [fetchpriority] - 'high' with loading 'eager' for the LCP card
+  @param {string} [id_prefix] - Prefix of the title id, the caller's block.id. Default: 'article-card'
 
   @example
   {% for post in blog.articles limit: 5 %}
-    {% render 'article-card', article: post %}
+    {% render 'article-card', article: post, id_prefix: block.id %}
   {% endfor %}
 
   {% render 'article-card',
     article: post,
+    id_prefix: block.id,
     heading_tag: 'h2',
     show_date: true,
     show_excerpt: true,
@@ -59,6 +68,7 @@
   endif
   assign card_sizes = sizes | default: '(min-width: 64rem) 336px, (min-width: 48rem) 40vw, 70vw'
   assign card_loading = loading | default: 'lazy'
+  assign card_title_id = id_prefix | default: 'article-card' | append: '-article-' | append: article.id
 
   assign card_excerpt = ''
   if show_excerpt
@@ -67,7 +77,12 @@
 -%}
 
 <li class="article-card" data-testid="article-card">
-  <a class="article-card__link" href="{{ article.url }}" data-testid="article-card-link">
+  <a
+    class="article-card__link"
+    href="{{ article.url }}"
+    aria-labelledby="{{ card_title_id }}"
+    data-testid="article-card-link"
+  >
     {%- if article.image != blank -%}
       {% render 'image',
         image: article.image,
@@ -85,7 +100,7 @@
       <p class="article-card__tag" data-testid="article-card-tag">{{ article_tag | escape }}</p>
     {%- endif -%}
     <div class="article-card__content">
-      <{{ card_heading }} class="article-card__title" data-testid="article-card-title">
+      <{{ card_heading }} class="article-card__title" id="{{ card_title_id }}" data-testid="article-card-title">
         {{- article.title | escape -}}
       </{{ card_heading }}>
       {%- if card_excerpt != blank -%}

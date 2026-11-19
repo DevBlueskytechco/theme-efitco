@@ -5,7 +5,7 @@
   title renders nothing. Placed after `breadcrumb` on a white band, or inside
   `.page-banner__content` where it turns white (foundation §3.3).
 
-  Test hooks: page-title, page-title-heading.
+  Test hooks: page-title, page-title-eyebrow, page-title-heading, page-title-meta.
 
   @param {string} title - Text of the h1, for example collection.title
   @param {string} [eyebrow] - Short line above the h1, accent uppercase
@@ -32,11 +32,11 @@
 {%- if title != blank -%}
   <div class="page-title" data-testid="page-title">
     {%- if eyebrow != blank %}
-      <p class="page-title__eyebrow">{{ eyebrow | escape }}</p>
+      <p class="page-title__eyebrow" data-testid="page-title-eyebrow">{{ eyebrow | escape }}</p>
     {%- endif %}
     <h1 class="page-title__heading" data-testid="page-title-heading">{{ title | escape }}</h1>
     {%- if meta != blank %}
-      <p class="page-title__meta">{{ meta | escape }}</p>
+      <p class="page-title__meta" data-testid="page-title-meta">{{ meta | escape }}</p>
     {%- endif %}
   </div>
 {%- endif -%}

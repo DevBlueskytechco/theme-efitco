@@ -223,7 +223,7 @@
                 assign card_loading = 'eager'
                 assign card_priority = 'high'
               endif
-              render 'article-card', article: post, heading_tag: 'h2', show_date: block.settings.show_date, show_read_time: block.settings.show_reading_time, show_excerpt: true, sizes: card_sizes, loading: card_loading, fetchpriority: card_priority
+              render 'article-card', article: post, id_prefix: block.id, heading_tag: 'h2', show_date: block.settings.show_date, show_read_time: block.settings.show_reading_time, show_excerpt: true, sizes: card_sizes, loading: card_loading, fetchpriority: card_priority
             endfor
           -%}
         </ul>
