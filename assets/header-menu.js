@@ -1,4 +1,4 @@
-// <header-menu>: mega, dropdown từ 80rem (TE-22, navigation.md §6). Drawer: data-drawer-src (ES1-T485), lười
+// <header-menu>: mega/dropdown từ 80rem (TE-22). Drawer nạp lười: data-drawer-src
 const T = (id) => `[data-testid="${id}"]`;
 const sum = (d) => d.querySelector(":scope > summary");
 const sync = (d) => sum(d)?.setAttribute("aria-expanded", d.open);
@@ -16,15 +16,19 @@ class HeaderMenu extends HTMLElement {
     const on = (el, t, fn, o) => el?.addEventListener(t, fn, { signal, ...o });
     const load = () => this.dataset.drawerSrc && (drawer ||= import(this.dataset.drawerSrc).catch(() => (drawer = null)));
     for (const t of ["pointerenter", "focusin", "touchstart"]) on(h?.querySelector(T("header-drawer-toggle")), t, load, { passive: true });
-    // Cả drawer, trước khi nạp drawer
     h?.querySelectorAll("details").forEach(sync);
     if (!nav) return;
 
     this.menus = [...nav.querySelectorAll("details")];
-    // Scrim nhận chuột: bấm đóng, rê lên = rời header
     h.toggleAttribute("data-mega-enhanced", true);
     on(nav, "toggle", (e) => this.toggled(e.target), { capture: true });
     on(nav, "focusout", (e) => this.focusOut(e));
+    // ES1-T509: bấm huỷ timer hover; bấm đóng thì hover bỏ qua mục
+    on(nav, "click", ({ target: t }) => {
+      clearTimeout(this.t);
+      const d = t.closest("summary")?.parentNode;
+      this.x = !t.closest(T("header-scrim")) && d?.open && d;
+    });
     on(document, "keydown", (e) => e.key == "Escape" && (clearTimeout(this.t), this.opened().forEach(close)));
     on(h, "pointerover", ({ target, pointerType }) => {
       const item = target.closest(T("header-menu-item"));
@@ -43,7 +47,6 @@ class HeaderMenu extends HTMLElement {
     return this.menus.filter((m) => m.open && m != x);
   }
 
-  // Gỡ data-mega-instant khi đóng hết; gỡ sớm: animation chạy lại
   toggled(d) {
     sync(d);
     const rest = this.opened(d);
@@ -51,9 +54,9 @@ class HeaderMenu extends HTMLElement {
     else if (!rest.length) this.h.removeAttribute("data-mega-instant");
   }
 
-  // Chỉ chuột (cảm ứng: pointerover trước click). d null = rời, trừ khi đang Tab
   hover(type, d) {
-    if (type != "mouse") return;
+    if (type != "mouse" || (d && d == this.x)) return;
+    this.x = null;
     clearTimeout(this.t);
     this.t = setTimeout(() => {
       if (!d) return this.opened().filter((m) => !m.querySelector(":focus-visible")).forEach(close);
@@ -62,7 +65,7 @@ class HeaderMenu extends HTMLElement {
     }, 150);
   }
 
-  // Tab ra ngoài: đóng. r null: bấm chỗ không focus, Safari
+  // Tab ra ngoài thì đóng; r null (Safari) thì xét :hover
   focusOut({ target, relatedTarget: r }) {
     const d = target.closest("details");
     if (d?.open && !d.contains(r) && document.hasFocus() && (r || !d.matches(":hover"))) d.open = false;
