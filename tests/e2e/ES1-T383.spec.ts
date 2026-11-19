@@ -41,7 +41,7 @@ const CONTACT_FIXTURE = `
 </div></section>`;
 
 async function fixture(page: Page, body: string) {
-  await page.setContent(`<!doctype html><html lang="en"><head><title>contact</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style></head><body><main>${body}</main></body></html>`);
+  await page.setContent(`<!doctype html><html lang="en"><head><title>contact</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head><body><main>${body}</main></body></html>`);
 }
 
 const box = async (page: Page, selector: string) => (await page.locator(selector).first().boundingBox())!;
