@@ -4,7 +4,7 @@
 // Spec viết theo đích sau khi FE/BE2 chuyển bộ chọn sang `?option_values=`. Trang hoặc JS còn JSON danh sách biến thể
 // (`script[data-product-variants]`, snippets/variant-json.liquid) → test.fixme có lý do, CI không đỏ trước khi chuyển xong.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... [TE4_OPTIONS_HANDLE=...] [TE4_MANY_VARIANTS_HANDLE=demo-many-variants] npx playwright test tests/e2e/ES1-T347.spec.ts
-import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
+import { test, expect, type Locator, type Page, type Request } from './support/test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
