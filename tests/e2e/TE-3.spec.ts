@@ -2,15 +2,19 @@
 // Ticket ES1-T53 (2727475000000142027): TE-3-QA1, E2E featured collection + product card, docs/srs.md#TE-3 AC1–AC8 + quy tắc Hết hàng.
 // Gộp và thay tests/e2e/ES1-T50.spec.ts, ES1-T51.spec.ts, ES1-T52.spec.ts. Test case: drafts/qa/ES1-T53/test-cases.md (tên test bắt đầu bằng ID TC).
 // ES1-T74: mọi .js / products.json lấy bằng fetch trong trang (inPageJson), cùng market/tiền với card; market runner ghi vào annotation "market" + stdout. Xem drafts/qa/ES1-T74/test-cases.md.
+// ES1-T441 (theo ES1-T337, docs/srs.md#TE-3 AC2, AC6, AC8, AC13): swatch card là chỉ báo <div aria-hidden> gồm <span data-selected>, không radio.
+//   Viết lại: TC-10/11, TC-15, TC-16, TC-51, TC-52, TC-54, TC-55, TC-56, TC-70, TC-71, B-01, B-02. Thêm TC-18. Bỏ (hành vi đã gỡ, ES1-T338 xoá product-swatch.js):
+//   TC-12, TC-13, TC-14, TC-17, TC-33, TC-72, B-03. Phần static, sold out, AC8 dòng biến thể ở tests/e2e/ES1-T441.spec.ts. Test case: drafts/qa/ES1-T441/test-cases.md.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-3.spec.ts
 // Dữ liệu (không hardcode handle): TE3_SALE_HANDLE, TE3_SMALL_PRICE_HANDLE, TE3_VARIES_HANDLE, TE3_UNIT_PRICE_HANDLE,
-//   TE3_SWATCH_HANDLE, TE3_SOLD_OUT_HANDLE, TE3_BADGE_SWATCH_HANDLE (ES1-T57), TE3_AC8_VARIANT_ID, TE3_AC8_PATH. Không đặt thì tự tìm card đầu tiên có testid, không có thì skip.
+//   TE3_SWATCH_HANDLE, T337_MANY_COLORS_HANDLE (ES1-T441, > 4 giá trị có swatch gốc), TE3_SOLD_OUT_HANDLE, TE3_AC8_VARIANT_ID, TE3_AC8_PATH.
+//   Không đặt thì tự tìm card đầu tiên có testid, không có thì skip. (TE3_BADGE_SWATCH_HANDLE của TC-17 không còn dùng, ES1-T441.)
 // Setting block khác mặc định: EXPECT_PRODUCTS_TO_SHOW, EXPECT_COLUMNS_DESKTOP, EXPECT_VIEW_ALL=header|bottom, EXPECT_VIEW_ALL_PATH.
 import { test, expect, type Locator, type Page, type TestInfo } from './support/test';
 import { getJson } from './support/http';
 import { pageJson, requireJson } from './support/product-data';
 import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged } from './support/store-guard';
+import { clickAndLoad, expectLoaded, expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { watchShopPay403 } from './support/console-guard';
@@ -50,7 +54,11 @@ const MAX_PAGES = 5;
 // ngoài MAX_PAGES trang đầu → test skip từ 03/11. Mọi lần đọc /collections/all để tìm dữ liệu dùng sort_by=created-descending cố định.
 const SORT = 'sort_by=created-descending';
 const allPage = (n = 1) => (n === 1 ? `${ALL}?${SORT}` : `${ALL}?${SORT}&page=${n}`);
-const SWATCH = 'input[type="radio"][data-variant-id]';
+// ES1-T441: phần tử của bản radio cũ, hàng chỉ báo không được có.
+const LEGACY = 'input, label, fieldset, legend, product-swatch, a, button, select, textarea, [tabindex], [href]';
+const SELECTED = `[data-testid="${T.swatch}"][data-selected]`;
+const TWO_SWATCHES = `[data-testid="${T.swatch}"] + [data-testid="${T.swatch}"]`;
+const AC13_WIDTHS = [360, 768, 1280, 1920] as const;
 
 const ENV = {
   sale: process.env.TE3_SALE_HANDLE,
@@ -58,7 +66,9 @@ const ENV = {
   varies: process.env.TE3_VARIES_HANDLE,
   unit: process.env.TE3_UNIT_PRICE_HANDLE,
   swatch: env('TE3_SWATCH_HANDLE'), // ES1-T434: đọc cả store-data.json
-  // ES1-T434: demo-many-variants (ES1-T298 D3: Weight × Pack × Color, 304 biến thể, metafield custom.swatch_colors) không dùng cho nhóm TC radio.
+  // ES1-T441: sản phẩm > 4 giá trị có swatch gốc (TE-3 AC13); thiếu thì tự dò card có "+N".
+  manyColors: env('T337_MANY_COLORS_HANDLE', 'TE3_MANY_COLORS_HANDLE'),
+  // ES1-T434: demo-many-variants (ES1-T298 D3: Weight × Pack × Color, 304 biến thể) không dùng khi tự dò card swatch.
   many: env('TE4_MANY_VARIANTS_HANDLE'),
   soldOut: process.env.TE3_SOLD_OUT_HANDLE,
   ac8Variant: process.env.TE3_AC8_VARIANT_ID,
@@ -131,14 +141,6 @@ function trackErrors(page: Page): string[] {
     if (!IGNORE_CONSOLE.some(r => r.test(text))) errors.push(text);
   });
   return errors;
-}
-
-function trackDocuments(page: Page): string[] {
-  const docs: string[] = [];
-  page.on('request', r => {
-    if (r.resourceType() === 'document' && r.frame() === page.mainFrame()) docs.push(r.url());
-  });
-  return docs;
 }
 
 function blockSchema(): { presets?: unknown; settings: Array<Record<string, unknown> & { id?: string; type: string }> } {
@@ -267,136 +269,62 @@ async function requireCard(page: Page, testid: string | null, handle: string | u
   return card!;
 }
 
-async function waitSwatchDefined(page: Page) {
-  await page.waitForFunction(() => customElements.get('product-swatch') !== undefined);
-}
-
-// Card có ≥ 2 radio swatch trên path (env TE3_SWATCH_HANDLE ưu tiên trên /collections/all).
-// ES1-T434: PR #191 TC-10 đỏ vì card swatch đầu tiên là demo-many-variants (mới nhất): snippet chọn option Weight (40 giá trị)
-// thay vì Color, swatch thứ 5 không có --swatch-color. Lỗi theme đó kiểm riêng ở TC-10c; nhóm TC radio bỏ sản phẩm này khi tự dò.
+// Card có ≥ 2 chỉ báo swatch trên path (env TE3_SWATCH_HANDLE ưu tiên).
+// ES1-T434: PR #191 TC-10 đỏ vì card swatch đầu tiên là demo-many-variants (mới nhất); khi tự dò bỏ sản phẩm này, lỗi riêng kiểm ở TC-10c.
 function withoutMany(page: Page, cards: Locator): Locator {
   return ENV.many ? cards.filter({ hasNot: page.locator(`a[data-testid="${T.title}"][href*="/products/${ENV.many}"]`) }) : cards;
 }
 
 async function swatchCard(page: Page, path: string): Promise<Locator | null> {
-  const twoRadios = page.locator(`[data-testid="${T.swatches}"] ${SWATCH}:nth-of-type(2)`);
+  const two = page.locator(TWO_SWATCHES);
   if (path === ALL) {
     if (ENV.swatch) {
       const card = await findCard(page, null, ENV.swatch);
-      if (!card || !(await card.locator(SWATCH).nth(1).count())) return null;
+      if (!card || (await card.getByTestId(T.swatch).count()) < 2) return null;
       return card;
     }
     // findCard dừng ở trang có card swatch đầu tiên; lấy card swatch đầu trên trang đó, trừ TE4_MANY_VARIANTS_HANDLE (ES1-T434).
     if (!(await findCard(page, T.swatches))) return null;
-    const card = withoutMany(page, page.getByTestId(T.collection).getByTestId(T.card)).filter({ has: twoRadios }).first();
+    const card = withoutMany(page, page.getByTestId(T.collection).getByTestId(T.card)).filter({ has: two }).first();
     if (!(await card.count())) return null;
     await card.scrollIntoViewIfNeeded();
     return card;
   }
   const cards = await cardsOn(page, path);
-  const card = (ENV.swatch ? byHandle(page, cards, ENV.swatch) : withoutMany(page, cards)).filter({ has: twoRadios }).first();
+  const card = (ENV.swatch ? byHandle(page, cards, ENV.swatch) : withoutMany(page, cards)).filter({ has: two }).first();
   if (!(await card.count())) return null;
   await card.scrollIntoViewIfNeeded();
   return card;
 }
 
-async function checkedIndex(card: Locator): Promise<number> {
-  return card.locator(SWATCH).evaluateAll(els => els.findIndex(e => (e as HTMLInputElement).checked));
+// Tên giá trị nằm trong span visually-hidden của từng chỉ báo.
+async function swatchNames(card: Locator): Promise<string[]> {
+  return (await card.getByTestId(T.swatch).allTextContents()).map(norm);
 }
 
-async function pick(card: Locator, index: number, ti: TestInfo) {
-  const label = card.getByTestId(T.swatch).nth(index);
-  if (isMobile(ti)) await label.tap();
-  else await label.click();
+// Option của chỉ báo = option > 1 giá trị chứa đủ các tên đang hiện (snippet: option đầu mà mọi giá trị có swatch gốc).
+function swatchOption(p: JsProduct, names: string[]) {
+  const option = p.options.find(o => o.values.length > 1 && names.every(n => o.values.includes(n)));
+  expect(option, `${p.handle}.js có option chứa ${names.join(', ')}`).toBeTruthy();
+  return option!;
 }
 
-async function priceText(card: Locator) {
-  return norm(await card.locator('[data-card-price]').textContent());
+async function selectedName(card: Locator): Promise<string> {
+  const sel = card.locator(SELECTED);
+  await expect(sel, 'đúng 1 chỉ báo data-selected').toHaveCount(1);
+  return norm(await sel.textContent());
 }
 
-// Sau khi chọn `target`: ảnh, link, giá theo variant mới; URL trang giữ nguyên; không request document mới.
-// Link "+N" (product-card-swatch-more) không so: chờ ES1-T55.
-async function expectSwapped(page: Page, card: Locator, target: Locator, ctx: { pageUrl: string; docs: string[]; docsBefore: number; priceBefore: string }) {
-  const data = await target.evaluate(el => ({ ...(el as HTMLInputElement).dataset }));
-  await expect(target).toBeChecked();
-
-  const title = card.getByTestId(T.title);
-  await expect(title).toHaveAttribute('href', data.variantUrl!);
-  await expect(title).toHaveAttribute('href', new RegExp(`[?&]variant=${data.variantId}\\b`));
-  const hrefs = await card
-    .locator('a[data-card-link]')
-    .evaluateAll(els => els.filter(a => a.getAttribute('data-testid') !== 'product-card-swatch-more').map(a => a.getAttribute('href')));
-  expect(new Set(hrefs), 'link ảnh + tiêu đề cùng trỏ variant mới').toEqual(new Set([data.variantUrl]));
-
-  const img = card.locator('img[data-card-image]');
-  if (data.imageSrc && (await img.count())) {
-    await expect(img).toHaveAttribute('src', data.imageSrc);
-    await expect(img).toHaveAttribute('alt', data.imageAlt ?? '');
-    const want = new URL(data.imageSrc, ctx.pageUrl).pathname;
-    await expect
-      .poll(async () => {
-        const cur = await img.evaluate(i => (i as HTMLImageElement).currentSrc);
-        return cur ? new URL(cur, ctx.pageUrl).pathname : '';
-      }, { message: 'currentSrc theo variant mới' })
-      .toBe(want);
-  }
-
-  const tpl = card.locator(`template[data-price-for="${data.variantId}"]`);
-  if (await tpl.count()) {
-    const want = norm(await tpl.evaluate(t => (t as HTMLTemplateElement).content.textContent));
-    await expect.poll(() => priceText(card), { message: 'giá theo template của variant' }).toBe(want);
-  } else {
-    expect(await priceText(card), 'không price_varies: giá giữ nguyên').toBe(ctx.priceBefore);
-  }
-
-  await expectBadge(card, target);
-
-  expect(page.url(), 'URL trang giữ nguyên').toBe(ctx.pageUrl);
-  expect(ctx.docs.slice(ctx.docsBefore), 'không request document mới').toEqual([]);
-}
-
-const BADGE_TESTID: Record<string, string> = { sale: T.sale, sold_out: T.soldOut, none: 'product-card-badge' };
-
-// ES1-T57: [data-card-badge] theo data-badge / data-badge-label của radio đang chọn. Radio không có data-badge thì bỏ qua.
-async function expectBadge(card: Locator, target: Locator) {
-  const want = await target.getAttribute('data-badge');
-  if (!want) return;
-  const label = norm(await target.getAttribute('data-badge-label'));
-  const badge = card.locator('[data-card-badge]');
-  await expect(badge, 'luôn có đúng 1 [data-card-badge]').toHaveCount(1);
-  await expect(badge, 'data-badge theo radio').toHaveAttribute('data-badge', want);
-  await expect(badge, 'data-testid theo badge').toHaveAttribute('data-testid', BADGE_TESTID[want] ?? 'product-card-badge');
-  if (want === 'none') {
-    await expect(badge, 'none thì hidden').toBeHidden();
-    await expect(badge).toHaveText('');
-  } else {
-    await expect(badge, `${want} thì hiện`).toBeVisible();
-    await expect(badge).toHaveText(label);
-  }
-}
-
-// Card có 2 radio swatch khác data-badge (vd 1 màu sale, 1 màu không / hết hàng). Env TE3_BADGE_SWATCH_HANDLE ưu tiên.
-async function badgeSwatchCard(page: Page): Promise<Locator | null> {
-  const handle = process.env.TE3_BADGE_SWATCH_HANDLE;
-  for (let n = 1; n <= MAX_PAGES; n++) {
-    const res = await page.goto(allPage(n)); // ES1-T417: sort_by=created-descending
-    if (!res || res.status() >= 400) return null;
-    const cards = page.getByTestId(T.collection).getByTestId(T.card);
-    const count = await cards.count();
-    if (!count) return null;
-    const scope = handle ? byHandle(page, cards, handle) : cards;
-    const idx = await scope.evaluateAll((els, sel) => els.findIndex(el => {
-      const kinds = new Set([...el.querySelectorAll(sel)].map(r => r.getAttribute('data-badge')).filter(Boolean));
-      return kinds.size > 1;
-    }), SWATCH);
-    if (idx >= 0) {
-      const card = scope.nth(idx);
-      await card.scrollIntoViewIfNeeded();
-      return card;
-    }
-    if ((handle && (await scope.count())) || count < PAGE_SIZE) return null;
-  }
-  return null;
+// Màu đã tính của một biến CSS, để so với computed color của phần tử.
+async function cssColor(page: Page, variable: string): Promise<string> {
+  return page.evaluate((v) => {
+    const probe = document.createElement('span');
+    probe.style.color = `var(${v})`;
+    document.body.append(probe);
+    const c = getComputedStyle(probe).color;
+    probe.remove();
+    return c;
+  }, variable);
 }
 
 async function axeBad(page: Page, include: string) {
@@ -484,98 +412,66 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     await expect(img).toHaveAttribute('height', /^\d+$/);
   });
 
-  // AC2
+  // AC2 (0.3, foundation §9) + AC13 (0.5, VP2). ES1-T441: thay bản radio trong fieldset/legend (trái AC2 0.3) bằng chỉ báo ES1-T337.
   for (const path of PAGES) {
-    test(`TC-10 TC-11 AC2: swatch là radio trong fieldset, 2–5, 1 checked, có màu/ảnh, có hook (${path})`, async ({ page }) => {
+    test(`TC-10 TC-11 AC2 AC13: swatch là chỉ báo aria-hidden, không control, ≤ 4 hoặc 3 + "+N", 1 data-selected, có màu/ảnh (${path})`, async ({ page }) => {
       const card = await swatchCard(page, path);
-      test.skip(!card, `Không có card ≥ 2 swatch trên ${path}`);
-      const group = card!.getByTestId(T.swatches);
-      expect(await group.evaluate(el => el.tagName)).toBe('FIELDSET');
-      const legend = group.locator('legend');
-      await expect(legend).toHaveCount(1);
-      expect(norm(await legend.textContent()).length).toBeGreaterThan(0);
+      test.skip(!card, `Không có card ≥ 2 swatch trên ${path}; đặt TE3_SWATCH_HANDLE`);
+      const row = card!.getByTestId(T.swatches);
+      expect(await row.evaluate(el => el.tagName), 'hàng chỉ báo là DIV, không FIELDSET').toBe('DIV');
+      await expect(row).toHaveAttribute('aria-hidden', 'true');
+      await expect(row.locator(LEGACY), 'không radio, label, legend, product-swatch, link, phần tử focus được').toHaveCount(0);
+      expect(await row.evaluate(el => getComputedStyle(el).pointerEvents), 'không bấm được').toBe('none');
+      await expect(card!.getByRole('radio'), 'card không có radio').toHaveCount(0);
 
-      const radios = group.locator('input[type="radio"]');
-      const n = await radios.count();
-      expect(n).toBeGreaterThanOrEqual(2);
-      expect(n).toBeLessThanOrEqual(5);
-      await expect(group.getByTestId(T.swatch)).toHaveCount(n);
-      await expect(group.locator('input[type="radio"]:checked')).toHaveCount(1);
-      expect(await radios.evaluateAll(els => new Set(els.map(e => (e as HTMLInputElement).name)).size), 'cùng name').toBe(1);
+      const swatches = row.getByTestId(T.swatch);
+      const n = await swatches.count();
+      if (await row.getByTestId(T.more).count()) {
+        expect(n, 'có "+N" thì đúng 3 chỉ báo').toBe(3);
+      } else {
+        expect(n).toBeGreaterThanOrEqual(2);
+        expect(n, 'không "+N" thì ≤ 4 chỉ báo').toBeLessThanOrEqual(4);
+      }
+      await expect(row.locator(SELECTED)).toHaveCount(1);
       for (let i = 0; i < n; i++) {
-        await expect(radios.nth(i)).toHaveAttribute('data-variant-id', /^\d+$/);
-        await expect(radios.nth(i)).toHaveAttribute('data-variant-url', /[?&]variant=\d+/);
-        await expect(group.getByTestId(T.swatch).nth(i), 'swatch.color hoặc swatch.image').toHaveAttribute('style', /--swatch-(color|image):/);
+        await expect(swatches.nth(i), 'swatch.color hoặc swatch.image').toHaveAttribute('style', /--swatch-(color|image):/);
+        expect(norm(await swatches.nth(i).textContent()).length, 'chỉ báo có tên value ẩn').toBeGreaterThan(0);
       }
       await expect(card!.locator('img[data-card-image], [data-testid="product-card-placeholder-image"]')).toHaveCount(1);
       await expect(card!.locator('[data-card-price]')).toHaveCount(1);
     });
 
-    // ES1-T300: bỏ (lỗi thời). docs/srs.md TE-3 AC2 bản 0.3 (D9, ES1-T294): swatch card là chỉ báo aria-hidden, không bấm được; chọn màu qua Quick View (AC9).
-    // ES1-T306 đề xuất bỏ TC-12, TC-33. Đỏ ở run 42978078054 (TE-3.spec.ts:492) do lỗi alt khi hover rồi click (ES1-T303), hành vi sẽ bị gỡ theo AC2 0.3.
-    test.skip(`TC-12 TC-33 AC2: chọn swatch đổi ảnh, link ?variant=, giá, không reload, 0 console error (${path})`, async ({ page }, ti) => {
-      const errors = trackErrors(page);
-      const docs = trackDocuments(page);
-      const card = await swatchCard(page, path);
-      test.skip(!card, `Không có card ≥ 2 swatch trên ${path}`);
-      await waitSwatchDefined(page);
-      const ctx = { pageUrl: page.url(), docs, docsBefore: docs.length, priceBefore: await priceText(card!) };
+    // ES1-T441: TC-12, TC-33 (bấm swatch đổi ảnh/giá) và TC-13 (Tab vào nhóm radio, ArrowRight) bỏ: AC2 0.3 swatch không bấm được,
+    // ES1-T338 đã xoá product-swatch.js. Hành vi thay thế: TC-18 (bấm không làm gì), TC-51/TC-52 (Tab rời card, không dừng trong hàng chỉ báo).
 
-      const idx = (await checkedIndex(card!)) === 1 ? 0 : 1;
-      const img = card!.locator('img[data-card-image]');
-      const hasImg = (await img.count()) > 0;
-      const dims = () => img.evaluate(i => [i.getAttribute('width'), i.getAttribute('height')]);
-      const size = hasImg ? await dims() : null;
-      const box = hasImg ? await img.boundingBox() : null;
+    test(`TC-52 AC2 AC6: mọi hàng chỉ báo trên trang aria-hidden, 0 phần tử nhận focus, Tab không dừng trong hàng (${path})`, async ({ page }) => {
+      const cards = await cardsOn(page, path);
+      const rows = cards.getByTestId(T.swatches);
+      const n = await rows.count();
+      test.skip(n === 0, `Không có card có swatch trên ${path}`);
+      for (let i = 0; i < n; i++) await expect(rows.nth(i)).toHaveAttribute('aria-hidden', 'true');
+      const focusable = await page.evaluate(() =>
+        [...document.querySelectorAll('[data-testid="product-card-swatches"] *')].filter(el => (el as HTMLElement).tabIndex >= 0).length);
+      expect(focusable, 'phần tử tabIndex ≥ 0 trong hàng chỉ báo').toBe(0);
 
-      const target = card!.locator(SWATCH).nth(idx);
-      const vid = await target.getAttribute('data-variant-id');
-      const hasTemplate = (await card!.locator(`template[data-price-for="${vid}"]`).count()) > 0;
-      await pick(card!, idx, ti);
-      await expectSwapped(page, card!, target, ctx);
-      if (hasTemplate) await expect(card!.locator(`[data-card-price] [data-testid="${T.range}"]`), 'TC-33: khoảng giá thay bằng giá variant').toHaveCount(0);
-
-      if (hasImg) {
-        expect(await dims(), 'giữ width/height').toEqual(size);
-        expect((await img.boundingBox())!.height, 'khung ảnh không đổi cao').toBeCloseTo(box!.height, 0);
+      // Tab qua tối đa 3 card có swatch: không lần nào focus nằm trong hàng chỉ báo.
+      const withRow = cards.filter({ has: page.getByTestId(T.swatches) });
+      const steps = Math.min(await withRow.count(), 3) * 3;
+      await withRow.first().getByTestId(T.title).focus();
+      for (let i = 0; i < steps; i++) {
+        await page.keyboard.press('Tab');
+        const inRow = await page.evaluate(() => !!document.activeElement?.closest('[data-testid="product-card-swatches"]'));
+        expect(inRow, `Tab lần ${i + 1} vào hàng chỉ báo`).toBe(false);
       }
-      expect(errors, errors.join('\n')).toEqual([]);
     });
 
-    test(`TC-13 AC2: Tab vào nhóm swatch, ArrowRight đổi variant, focus giữ (${path})`, async ({ page }) => {
-      const docs = trackDocuments(page);
-      const card = await swatchCard(page, path);
-      test.skip(!card, `Không có card ≥ 2 swatch trên ${path}`);
-      await waitSwatchDefined(page);
-      const ctx = { pageUrl: page.url(), docs, docsBefore: docs.length, priceBefore: await priceText(card!) };
-
-      const radios = card!.locator(SWATCH);
-      const n = await radios.count();
-      const from = Math.max(0, await checkedIndex(card!));
-      const title = card!.getByTestId(T.title);
-      await title.focus();
-      await page.keyboard.press('Shift+Tab');
-      await page.keyboard.press('Tab');
-      await expect(title).toBeFocused();
-      await page.keyboard.press('Tab');
-      await expect(radios.nth(from), 'Tab sau tiêu đề vào radio đang chọn').toBeFocused();
-
-      await page.keyboard.press('ArrowRight');
-      const target = radios.nth((from + 1) % n);
-      await expectSwapped(page, card!, target, ctx);
-      await expect(target, 'focus không mất sau khi đổi').toBeFocused();
-    });
-
-    test(`TC-55 AC6: axe 0 serious/critical trong vùng TE-3 trước và sau đổi swatch (${path})`, async ({ page }, ti) => {
+    // ES1-T441: chỉ chạy axe 1 lần, không còn trạng thái "sau đổi swatch".
+    test(`TC-55 AC6: axe 0 serious/critical trong vùng TE-3 (${path})`, async ({ page }) => {
       const cards = await cardsOn(page, path);
       await expect(cards.first()).toBeVisible();
-      expect(await axeBad(page, scopeOf(path)), 'trước đổi swatch').toEqual([]);
-
-      const card = await swatchCard(page, path);
-      test.skip(!card, `Không có card ≥ 2 swatch trên ${path}: chỉ kiểm được trước đổi`);
-      await waitSwatchDefined(page);
-      await pick(card!, (await checkedIndex(card!)) === 1 ? 0 : 1, ti);
-      expect(await axeBad(page, scopeOf(path)), 'sau đổi swatch').toEqual([]);
+      const rows = await cards.getByTestId(T.swatches).count();
+      test.info().annotations.push({ type: 'TC-55', description: `${rows} hàng chỉ báo swatch trong vùng ${path}` });
+      expect(await axeBad(page, scopeOf(path))).toEqual([]);
     });
 
     test(`B-05 B-07 AC2: 0 console error khi tải, không id trùng (${path})`, async ({ page }) => {
@@ -591,116 +487,106 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     });
   }
 
-  test('TC-14 AC2: card gỡ khỏi DOM rồi gắn lại vẫn đổi swatch, 0 lỗi', async ({ page }, ti) => {
+  // ES1-T441: TC-14 (gỡ/gắn lại card rồi đổi swatch) bỏ: không còn JS trên card.
+
+  // ES1-T441: thay cho TC-12. AC2 0.3: swatch "không bấm được"; điểm giữa chỉ báo không trúng control nào, bấm/chạm không đổi gì.
+  test('TC-18 AC2: bấm hoặc chạm chỉ báo swatch chưa chọn không mở trang, không đổi chọn, link, ảnh; 0 lỗi', async ({ page }, ti) => {
     const errors = trackErrors(page);
-    const docs = trackDocuments(page);
     const card = await swatchCard(page, ALL);
-    test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}`);
-    await waitSwatchDefined(page);
-    await card!.evaluate(el => {
-      const parent = el.parentElement!;
-      const next = el.nextSibling;
-      el.remove();
-      parent.insertBefore(el, next);
-    });
-    const ctx = { pageUrl: page.url(), docs, docsBefore: docs.length, priceBefore: await priceText(card!) };
-    const idx = (await checkedIndex(card!)) === 1 ? 0 : 1;
-    await pick(card!, idx, ti);
-    await expectSwapped(page, card!, card!.locator(SWATCH).nth(idx), ctx);
+    test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}; đặt TE3_SWATCH_HANDLE`);
+    const title = card!.getByTestId(T.title);
+    const before = {
+      url: page.url(),
+      href: await title.getAttribute('href'),
+      selected: await selectedName(card!),
+      src: (await card!.getByTestId(T.image).count()) ? await card!.getByTestId(T.image).getAttribute('src') : null,
+    };
+    const target = card!.locator(`[data-testid="${T.swatch}"]:not([data-selected])`).first();
+    const box = await target.boundingBox();
+    expect(box, 'chỉ báo chưa chọn có kích thước').not.toBeNull();
+    const x = box!.x + box!.width / 2;
+    const y = box!.y + box!.height / 2;
+    const hit = await page.evaluate(([px, py]) => {
+      const el = document.elementFromPoint(px, py);
+      return el?.closest('a, button, input, label, select, [tabindex], [role="radio"]')?.outerHTML.slice(0, 120) ?? null;
+    }, [x, y]);
+    expect(hit, 'điểm giữa chỉ báo không trúng control').toBeNull();
+
+    if (isMobile(ti)) await page.touchscreen.tap(x, y);
+    else await page.mouse.click(x, y);
+    await page.waitForLoadState('domcontentloaded');
+    expect(page.url(), 'URL giữ nguyên').toBe(before.url);
+    await expect(title).toHaveAttribute('href', before.href!);
+    expect(await selectedName(card!), 'chỉ báo đang chọn không đổi').toBe(before.selected);
+    if (before.src) await expect(card!.getByTestId(T.image)).toHaveAttribute('src', before.src);
     expect(errors, errors.join('\n')).toEqual([]);
   });
 
-  test('TC-15 AC2: Back từ trang sản phẩm, link card khớp radio đang chọn', async ({ page }, ti) => {
+  // ES1-T441 (thay bản radio, ES1-T73): Back từ trang sản phẩm, card render lại đúng như lúc tải (không có trạng thái khách đổi).
+  test('TC-15 AC2 AC8: Back từ trang sản phẩm, link card và chỉ báo đang chọn giữ như lúc tải', async ({ page }) => {
     const card = await swatchCard(page, ALL);
-    test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}`);
-    await waitSwatchDefined(page);
+    test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}; đặt TE3_SWATCH_HANDLE`);
     const productId = await card!.getAttribute('data-product-id');
-    await pick(card!, (await checkedIndex(card!)) === 1 ? 0 : 1, ti);
-    await card!.getByTestId(T.title).click();
+    const href = await card!.getByTestId(T.title).getAttribute('href');
+    const selected = await selectedName(card!);
+    // ES1-T229: điều hướng qua store-guard, bị Cloudflare chặn thì fail nêu rõ, không thành "không khớp".
+    await clickAndLoad(page, () => card!.getByTestId(T.title).click());
     await page.waitForURL(/\/products\//);
-    await page.goBack();
-    await waitSwatchDefined(page);
+    await expectLoaded(page, await page.goBack());
     const again = page.getByTestId(T.collection).locator(`[data-testid="${T.card}"][data-product-id="${productId}"]`).first();
     await expect(again).toBeVisible();
-    const checked = again.locator(`${SWATCH}:checked`);
-    await expect(checked).toHaveCount(1);
-    const want = await checked.getAttribute('data-variant-url');
-    await expect(again.getByTestId(T.title), 'href tiêu đề = variant của radio đang checked').toHaveAttribute('href', want!);
+    await expect(again.getByTestId(T.title), 'href tiêu đề như lúc tải').toHaveAttribute('href', href!);
+    expect(await selectedName(again), 'chỉ báo đang chọn như lúc tải').toBe(selected);
+    await expect(again.getByTestId(T.swatches)).toHaveAttribute('aria-hidden', 'true');
   });
 
-  // ES1-T57: badge sale / Sold out đổi theo swatch, không fetch; đối chiếu /products/<handle>.js.
-  test('TC-17 AC2 AC3: đổi swatch thì badge sale / Sold out theo variant, chọn lại thì về như cũ', async ({ page }, ti) => {
-    const errors = trackErrors(page);
-    const card = await badgeSwatchCard(page);
-    test.skip(!card, `Không có card có 2 swatch khác badge (sale / sold out / none) trong ${MAX_PAGES} trang đầu ${ALL}; đặt TE3_BADGE_SWATCH_HANDLE`);
-    await waitSwatchDefined(page);
-    const p = await productJs(page, await handleOf(card!));
+  // ES1-T441: TC-17 (đổi swatch thì badge đổi theo variant, ES1-T57) bỏ: không còn đổi swatch trên card. Badge theo variant card kiểm ở TC-20–TC-25, TC-80.
 
-    const radios = card!.locator(SWATCH);
-    const from = Math.max(0, await checkedIndex(card!));
-    const kinds = await radios.evaluateAll(els => els.map(e => e.getAttribute('data-badge')));
-    const to = kinds.findIndex(k => k && k !== kinds[from]);
-    expect(to, 'có radio khác badge').toBeGreaterThanOrEqual(0);
-    const before = await card!.locator('[data-card-badge]').evaluate(el => ({ badge: el.getAttribute('data-badge'), text: el.textContent }));
+  // ES1-T441 (ticket: TC-16 còn kỳ vọng 5 swatch + legend + "+N" là link tabindex -1). docs/srs.md#TE-3 AC13 (0.5, VP2, variant-picker.md §9):
+  // N > 4 thì 3 chỉ báo + "+{N − 3}" 14px --color-muted, tên link ghi tổng N, hàng không tràn card 152 ở 360; kiểm ở 360/768/1280/1920.
+  // "+N" là span trong hàng aria-hidden, không phải link. Dữ liệu: T337_MANY_COLORS_HANDLE (sản phẩm > 4 giá trị có swatch gốc), thiếu thì tự dò.
+  for (const width of AC13_WIDTHS) {
+    test(`TC-16 AC2 AC13: ${width}px hơn 4 màu thì 3 chỉ báo + "+N" (span), không tràn card, link ghi tổng N màu`, async ({ page }, ti) => {
+      test.skip(isMobile(ti), 'Đổi viewport ở project desktop');
+      await page.setViewportSize({ width, height: 900 });
+      const card = await requireCard(page, T.more, ENV.manyColors, 'sản phẩm > 4 giá trị có swatch gốc (T337_MANY_COLORS_HANDLE)');
+      const handle = await handleOf(card);
+      const p = await productJs(page, handle);
+      const row = card.getByTestId(T.swatches);
+      const swatches = row.getByTestId(T.swatch);
+      await expect(swatches).toHaveCount(3);
+      const option = swatchOption(p, await swatchNames(card));
+      const total = option.values.length;
+      expect(total, `${handle}: option ${option.name} > 4 giá trị`).toBeGreaterThan(4);
 
-    await pick(card!, to, ti);
-    const target = radios.nth(to);
-    await expect(target).toBeChecked();
-    await expectBadge(card!, target);
+      await expect(row).toHaveAttribute('aria-hidden', 'true');
+      await expect(row.locator(LEGACY), 'hàng chỉ báo không có control').toHaveCount(0);
+      const more = row.getByTestId(T.more);
+      await expect(more).toHaveText(`+${total - 3}`);
+      expect(await more.evaluate(el => el.tagName), '"+N" là SPAN, không phải link').toBe('SPAN');
+      const style = await more.evaluate(el => ({ size: getComputedStyle(el).fontSize, color: getComputedStyle(el).color }));
+      expect(style.size, '"+N" 14px').toBe('14px');
+      expect(style.color, '"+N" màu --color-muted').toBe(await cssColor(page, '--color-muted'));
+      await expect(card.getByTestId(T.title)).toHaveAccessibleName(new RegExp(`, ${total} colors$`));
+      await expect(row.locator(SELECTED), 'chỉ báo variant card luôn hiện (AC8)').toHaveCount(1);
 
-    // Quy tắc snippet: sold_out khi product hoặc variant hết hàng; sale khi compare_at > price, -N% (N = 0 thì Sale).
-    const vid = Number(await target.getAttribute('data-variant-id'));
-    const variant = p.variants.find(x => x.id === vid);
-    expect(variant, `variant ${vid} trong .js`).toBeTruthy();
-    const badge = card!.locator('[data-card-badge]');
-    if (!p.available || !variant!.available) {
-      await expect(badge).toHaveAttribute('data-testid', T.soldOut);
-      await expect(badge).toHaveText('Sold out');
-      await expect(card!.getByTestId(T.sale), 'hết hàng thì không badge sale').toHaveCount(0);
-    } else if ((variant!.compare_at_price ?? 0) > variant!.price) {
-      await expect(badge).toHaveAttribute('data-testid', T.sale);
-      await expect(badge).toHaveText(badgeText(salePercent(variant!.compare_at_price!, variant!.price)));
-      await expect(card!.getByTestId(T.soldOut)).toHaveCount(0);
-    } else {
-      await expect(badge).toBeHidden();
-      await expect(card!.getByTestId(T.sale)).toHaveCount(0);
-      await expect(card!.getByTestId(T.soldOut)).toHaveCount(0);
-    }
-
-    await pick(card!, from, ti);
-    await expect(badge).toHaveAttribute('data-badge', before.badge ?? 'none');
-    await expect(badge).toHaveText(norm(before.text));
-    expect(errors, errors.join('\n')).toEqual([]);
-  });
-
-  // ES1-T417: trước sort cố định, 5 trang đầu /collections/all không có card "+N" nên test này luôn skip và giữ assertion cũ
-  // (5 radio trong fieldset/legend, "+N" là link tabindex -1). Theo docs/srs.md#TE-3 AC2 (swatch là chỉ báo aria-hidden, link card
-  // ghi số màu) và AC13 (0.5, VP2, variant-picker.md §9: N > 4 thì 3 chỉ báo + "+{N − 3}"), snippets/product-card.liquid:172-177, 302-341.
-  test('TC-16 AC2 AC13: hơn 4 màu thì 3 chỉ báo + "+N", hàng aria-hidden không focus được, link ghi tổng N màu', async ({ page }) => {
-    const card = await findCard(page, T.more);
-    test.skip(!card, `Không có sản phẩm hơn 4 màu swatch trên ${allPage()}`);
-    const handle = await handleOf(card!);
-    const p = await productJs(page, handle);
-    const row = card!.getByTestId(T.swatches);
-    const swatches = row.getByTestId(T.swatch);
-    await expect(swatches).toHaveCount(3);
-    // Tên value nằm trong span visually-hidden của từng chỉ báo; option màu = option có > 4 giá trị chứa đủ các tên này.
-    const names = (await swatches.allTextContents()).map(norm);
-    const option = p.options.find(o => o.values.length > 4 && names.every(n => o.values.includes(n)));
-    expect(option, `option chứa ${names.join(', ')} và > 4 giá trị trong ${handle}.js`).toBeTruthy();
-    const total = option!.values.length;
-
-    await expect(row).toHaveAttribute('aria-hidden', 'true');
-    await expect(row.locator('a, button, input, select, textarea, [tabindex], [href]'), 'hàng chỉ báo không có control').toHaveCount(0);
-    const more = card!.getByTestId(T.more);
-    await expect(more).toHaveText(`+${total - 3}`);
-    await expect(card!.getByTestId(T.title)).toHaveAccessibleName(new RegExp(`, ${total} colors$`));
-
-    // AC13: 3 chỉ báo và "+N" cùng một hàng (không xuống dòng trong card).
-    const boxes = await row.locator(`[data-testid="${T.swatch}"], [data-testid="${T.more}"]`).evaluateAll(els =>
-      els.map(el => { const r = el.getBoundingClientRect(); return r.top + r.height / 2; }));
-    expect(Math.max(...boxes) - Math.min(...boxes), 'chỉ báo và +N cùng hàng').toBeLessThanOrEqual(2);
-  });
+      // 3 chỉ báo và "+N" cùng một hàng, không vượt mép phải card.
+      const geo = await row.evaluate((el) => {
+        const card = el.closest('[data-testid="product-card"]')!.getBoundingClientRect();
+        const items = [...el.querySelectorAll('[data-testid="product-card-swatch"], [data-testid="product-card-swatch-more"]')].map(n => n.getBoundingClientRect());
+        return {
+          spread: Math.max(...items.map(r => r.top + r.height / 2)) - Math.min(...items.map(r => r.top + r.height / 2)),
+          overRight: Math.max(...items.map(r => r.right)) - card.right,
+          overRow: el.scrollWidth - el.clientWidth,
+          cardWidth: card.width,
+        };
+      });
+      expect(geo.spread, 'chỉ báo và +N cùng hàng').toBeLessThanOrEqual(2);
+      expect(geo.overRight, 'không vượt mép phải card').toBeLessThanOrEqual(0.5);
+      expect(geo.overRow, 'hàng không tràn ngang').toBeLessThanOrEqual(0);
+      test.info().annotations.push({ type: 'TC-16', description: `${width}px card rộng ${Math.round(geo.cardWidth)}px (${handle})` });
+    });
+  }
 
   // ES1-T434 (bug ES1-T434-B01): docs/srs.md#TE-3 AC2 "swatch lấy từ option value của option màu".
   // demo-many-variants: Weight (40 giá trị) × Pack × Color (Black, Gray, Red, Blue), metafield custom.swatch_colors 4 màu, không swatch gốc.
@@ -941,10 +827,13 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     });
   }
 
-  test('TC-51 AC6: Tab tới tiêu đề có focus thấy được, Tab tiếp vào swatch hoặc ra khỏi card', async ({ page }) => {
+  // ES1-T441 (ticket: TC-51 còn kỳ vọng Tab sau tiêu đề vào nhóm swatch). docs/srs.md#TE-3 AC6 0.3: swatch không nhận focus → Tab rời card.
+  // AC9: nếu card có nút Quick View thì đó là tab stop duy nhất được phép sau tiêu đề trong card (button), sau đó rời card.
+  test('TC-51 AC6: Tab tới tiêu đề có focus thấy được, Tab tiếp không vào hàng swatch và rời card', async ({ page }) => {
     const cards = await cardsOn(page, HOME);
     const card = cards.filter({ has: page.getByTestId(T.swatches) }).first();
     const target = (await card.count()) ? card : cards.first();
+    test.info().annotations.push({ type: 'TC-51', description: (await card.count()) ? 'card có swatch' : 'trang chủ không có card swatch: đo card đầu' });
     const title = target.getByTestId(T.title);
     await title.focus();
     await page.keyboard.press('Shift+Tab');
@@ -957,48 +846,59 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     expect(ring.style).not.toBe('none');
     expect(ring.width).toBeGreaterThanOrEqual(2);
 
-    await page.keyboard.press('Tab');
-    const where = await page.evaluate(() => {
-      const a = document.activeElement;
-      return { inGroup: !!a?.closest('[data-testid="product-card-swatches"]'), card: a?.closest('[data-testid="product-card"]')?.getAttribute('data-product-id') ?? null };
-    });
-    if (await target.getByTestId(T.swatches).count()) {
-      expect(where.inGroup, 'Tab sau tiêu đề vào nhóm swatch').toBe(true);
-    } else {
-      expect(where.card, 'không có tab stop ẩn trong card').not.toBe(await target.getAttribute('data-product-id'));
+    const productId = await target.getAttribute('data-product-id');
+    for (let i = 0; i < 3; i++) {
+      await page.keyboard.press('Tab');
+      const where = await page.evaluate(() => {
+        const a = document.activeElement;
+        return {
+          inRow: !!a?.closest('[data-testid="product-card-swatches"]'),
+          card: a?.closest('[data-testid="product-card"]')?.getAttribute('data-product-id') ?? null,
+          tag: a?.tagName ?? '',
+        };
+      });
+      expect(where.inRow, 'Tab sau tiêu đề không vào hàng swatch').toBe(false);
+      if (where.card !== productId) return; // đã rời card
+      expect(where.tag, 'tab stop trong card sau tiêu đề chỉ có thể là nút Quick View (AC9)').toBe('BUTTON');
     }
+    throw new Error('Tab 3 lần vẫn chưa rời card');
   });
 
-  test('TC-52 AC6: radio focus bằng keyboard có viền trên label', async ({ page }) => {
-    const card = await swatchCard(page, HOME) ?? (await swatchCard(page, ALL));
-    test.skip(!card, 'Không có card ≥ 2 swatch');
-    const title = card!.getByTestId(T.title);
-    await title.focus();
-    await page.keyboard.press('Tab');
-    const label = card!.locator(`input:focus-visible + [data-testid="${T.swatch}"]`);
-    await expect(label).toHaveCount(1);
-    expect(await label.evaluate(el => getComputedStyle(el).outlineStyle)).not.toBe('none');
-  });
+  // ES1-T441: TC-52 cũ (radio focus-visible có viền) bỏ; TC-52 mới ở vòng PAGES phía trên.
+
+  // ES1-T441: docs/srs.md#TE-3 AC6 0.3: swatch giữ 32 × 16 cách 4, không phải control nên không có yêu cầu vùng chạm (bỏ vùng bấm 44px D7).
+  for (const width of AC13_WIDTHS) {
+    test(`TC-54 AC6: ${width}px chỉ báo swatch 32 × 16 cách 4, không đo vùng chạm (${ALL})`, async ({ page }, ti) => {
+      test.skip(isMobile(ti), 'Đổi viewport ở project desktop');
+      await page.setViewportSize({ width, height: 900 });
+      const card = await swatchCard(page, ALL);
+      test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}; đặt TE3_SWATCH_HANDLE`);
+      for (const sw of await card!.getByTestId(T.swatch).all()) {
+        const s = await sw.evaluate(el => {
+          const r = el.getBoundingClientRect();
+          const pill = getComputedStyle(el, '::before');
+          return { w: r.width, h: r.height, pw: parseFloat(pill.width), ph: parseFloat(pill.height) };
+        });
+        expect(Math.round(s.w), 'chỉ báo rộng 32').toBe(32);
+        expect(Math.round(s.h), 'chỉ báo cao 16').toBe(16);
+        expect(Math.round(s.pw), 'hình pill rộng 32').toBe(32);
+        expect(Math.round(s.ph), 'hình pill cao 16').toBe(16);
+      }
+      expect(await card!.getByTestId(T.swatches).evaluate(el => getComputedStyle(el).columnGap), 'cách 4').toBe('4px');
+    });
+  }
 
   for (const path of PAGES) {
-    test(`TC-54 AC6: vùng bấm swatch ≥ 44px (D7), tiêu đề ≥ 24px hoặc đủ khoảng cách (${path})`, async ({ page }) => {
-      const cards = await cardsOn(page, path);
-      for (const sw of await cards.getByTestId(T.swatch).all()) {
-        // Vùng bấm là ::after của label, hình swatch giữ cỡ Figma; đo chi tiết ở ES1-T190
-        const hit = await sw.evaluate(el => {
-          const s = getComputedStyle(el, '::after');
-          return { width: parseFloat(s.width), height: parseFloat(s.height) };
-        });
-        expect(hit.width, 'vùng bấm swatch rộng').toBeGreaterThanOrEqual((page.viewportSize()?.width ?? 0) >= 1280 ? 36 : 44);
-        expect(hit.height, 'vùng bấm swatch cao').toBeGreaterThanOrEqual(44);
-      }
+    test(`TC-54 AC6: tiêu đề ≥ 24px hoặc đủ khoảng cách, nút Xem tất cả ≥ 24px (${path})`, async ({ page }) => {
+      await cardsOn(page, path);
       const view = page.getByTestId(T.viewAll);
       if (await view.count()) expect((await view.boundingBox())!.height).toBeGreaterThanOrEqual(24);
 
       const failing = await page.evaluate((scope) => {
         const root = document.querySelector(scope);
         if (!root) return ['không có vùng'];
-        const targets = [...root.querySelectorAll('[data-testid="product-card-title"], [data-testid="product-card-swatch"]')]
+        // ES1-T441: chỉ báo swatch không phải target (AC6 0.3), chỉ so giữa các link tiêu đề.
+        const targets = [...root.querySelectorAll('[data-testid="product-card-title"]')]
           .map(el => ({ el, r: el.getBoundingClientRect() }))
           .filter(t => t.r.width > 0 && t.r.height > 0);
         const small = (r: DOMRect) => r.width < 24 || r.height < 24;
@@ -1021,19 +921,18 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     });
   }
 
-  test('TC-56 AC6: tên truy cập: 1 link tiêu đề, nhóm màu có tên, radio có tên value', async ({ page }) => {
+  // ES1-T441: docs/srs.md#TE-3 AC2 0.3 (tên link có thêm số màu), AC6. Không còn group/legend/radio.
+  test('TC-56 AC2 AC6: tên truy cập: 1 link, tên = tiêu đề + ", N colors"; không group, không radio trong card', async ({ page }) => {
     const card = await swatchCard(page, ALL);
-    test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}`);
+    test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}; đặt TE3_SWATCH_HANDLE`);
     const p = await productJs(page, await handleOf(card!));
+    const total = swatchOption(p, await swatchNames(card!)).values.length;
     const links = card!.getByRole('link');
-    await expect(links, 'link ảnh và +N aria-hidden').toHaveCount(1);
-    await expect(links.first()).toHaveAccessibleName(p.title);
-    const legend = norm(await card!.getByTestId(T.swatches).locator('legend').textContent());
-    await expect(card!.getByRole('group', { name: legend })).toHaveCount(1);
-    const values = p.options.find(o => o.name === legend)?.values ?? [];
-    const radios = card!.getByRole('radio');
-    const n = await radios.count();
-    for (let i = 0; i < n; i++) await expect(radios.nth(i)).toHaveAccessibleName(values[i]);
+    await expect(links, 'link ảnh aria-hidden, chỉ còn link tiêu đề').toHaveCount(1);
+    await expect(links.first()).toHaveAccessibleName(`${p.title}, ${total} colors`);
+    await expect(card!.getByRole('group')).toHaveCount(0);
+    await expect(card!.getByRole('radio')).toHaveCount(0);
+    await expect(card!.getByRole('radiogroup')).toHaveCount(0);
   });
 
   // AC7
@@ -1074,7 +973,8 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
   });
 
   // AC8
-  test('TC-70 AC8: phần tử product dùng variant còn hàng đầu tiên, swatch chọn sẵn đúng value', async ({ page }) => {
+  // ES1-T441: "swatch chọn sẵn" = chỉ báo data-selected (không còn radio checked, không legend).
+  test('TC-70 AC8: phần tử product dùng variant còn hàng đầu tiên, chỉ báo data-selected đúng value', async ({ page }) => {
     const cards = await cardsOn(page, HOME);
     const card = (ENV.swatch ? byHandle(page, cards, ENV.swatch) : cards.filter({ has: page.getByTestId(T.swatches) })).first();
     const target = (await card.count()) ? card : cards.first();
@@ -1082,9 +982,8 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     const want = p.variants.find(v => v.available) ?? p.variants[0];
     expect(await variantIdOf(target), 'link ?variant= = selected_or_first_available_variant').toBe(want.id);
     if (await target.getByTestId(T.swatches).count()) {
-      const legend = norm(await target.getByTestId(T.swatches).locator('legend').textContent());
-      const opt = p.options.find(o => o.name === legend)!;
-      await expect(target.locator(`${SWATCH}:checked`)).toHaveAttribute('value', want.options[opt.position - 1]);
+      const opt = swatchOption(p, await swatchNames(target));
+      expect(await selectedName(target), `data-selected = ${opt.name} của variant card`).toBe(want.options[opt.position - 1]);
     }
   });
 
@@ -1106,57 +1005,25 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     await expect(card.getByTestId(T.range), 'card variant không hiện khoảng giá').toHaveCount(0);
     expect(toCents(money(await card.getByTestId(T.regular).textContent()))).toBe(v.price);
     if (await card.getByTestId(T.swatches).count()) {
-      const legend = norm(await card.getByTestId(T.swatches).locator('legend').textContent());
-      const opt = p.options.find(o => o.name === legend)!;
-      await expect(card.locator(`${SWATCH}:checked`)).toHaveAttribute('value', v.options[opt.position - 1]);
+      const opt = swatchOption(p, await swatchNames(card));
+      expect(await selectedName(card), `data-selected = ${opt.name} của variant ${id}`).toBe(v.options[opt.position - 1]);
+      await expect(card.getByTestId(T.swatches), 'chỉ báo, không bấm').toHaveAttribute('aria-hidden', 'true');
     }
   });
 
-  test('TC-72 AC8: card variant đổi swatch rồi chọn lại giữ ?variant= ban đầu', async ({ page }, ti) => {
-    test.skip(!ENV.ac8Variant, 'Chưa có collection đa nguồn chứa variant trên store dev (ES1-T48 #6): AC8 N/A');
-    await page.goto(ENV.ac8Path);
-    const id = ENV.ac8Variant!;
-    const card = page.getByTestId(T.card).filter({ has: page.locator(`a[data-testid="${T.title}"][href*="variant=${id}"]`) }).first();
-    test.skip((await card.locator(SWATCH).count()) < 2, 'Card variant không có ≥ 2 swatch');
-    await waitSwatchDefined(page);
-    const from = await checkedIndex(card);
-    await pick(card, from === 0 ? 1 : 0, ti);
-    await pick(card, from, ti);
-    await expect(card.getByTestId(T.title)).toHaveAttribute('href', new RegExp(`[?&]variant=${id}\\b`));
-  });
+  // ES1-T441: TC-72 (card variant đổi swatch rồi chọn lại) bỏ: AC8 0.3 "chỉ báo, không bấm".
 
-  // Biên
-  test('B-02 AC2: chặn product-swatch.js thì card vẫn dùng được, radio vẫn chọn được', async ({ page }) => {
-    await page.route('**/product-swatch*.js*', r => r.abort());
+  // Biên. ES1-T441: B-02 cũ (chặn product-swatch.js, radio vẫn chọn) và B-03 (offline đổi swatch) bỏ; ES1-T338 xoá product-swatch.js (ADR 0010).
+  test('B-02 AC2: trang có card swatch không tải product-swatch.js, không có <product-swatch>', async ({ page }) => {
+    const swatchJs: string[] = [];
+    page.on('request', r => { if (/product-swatch[^/]*\.js/.test(r.url())) swatchJs.push(r.url()); });
     const card = await swatchCard(page, ALL);
-    test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}`);
-    const title = card!.getByTestId(T.title);
-    const href = await title.getAttribute('href');
-    const img = card!.locator('img[data-card-image]');
-    const src = (await img.count()) ? await img.getAttribute('src') : null;
-    const idx = (await checkedIndex(card!)) === 1 ? 0 : 1;
-    await card!.getByTestId(T.swatch).nth(idx).click();
-    await expect(card!.locator(SWATCH).nth(idx)).toBeChecked();
-    await expect(title).toHaveAttribute('href', href!);
-    if (src) await expect(img).toHaveAttribute('src', src);
+    test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}; đặt TE3_SWATCH_HANDLE`);
+    await page.waitForLoadState('load');
+    expect(swatchJs, 'request product-swatch*.js').toEqual([]);
+    await expect(page.locator('product-swatch')).toHaveCount(0);
+    await expect(card!.getByTestId(T.title)).toBeVisible();
     await expect(card!.getByTestId(T.price)).toBeVisible();
-  });
-
-  test('B-03 AC2: offline sau khi tải, đổi swatch vẫn chạy (không cần mạng)', async ({ page, context }) => {
-    const card = await swatchCard(page, ALL);
-    test.skip(!card, `Không có card ≥ 2 swatch trên ${ALL}`);
-    await waitSwatchDefined(page);
-    const idx = (await checkedIndex(card!)) === 1 ? 0 : 1;
-    const target = card!.locator(SWATCH).nth(idx);
-    const url = await target.getAttribute('data-variant-url');
-    await context.setOffline(true);
-    try {
-      await card!.getByTestId(T.swatch).nth(idx).click();
-      await expect(target).toBeChecked();
-      await expect(card!.getByTestId(T.title)).toHaveAttribute('href', url!);
-    } finally {
-      await context.setOffline(false);
-    }
   });
 
   test('B-06 AC6: sản phẩm không ảnh có placeholder SVG, tiêu đề và giá vẫn hiện', async ({ page }) => {
@@ -1172,20 +1039,19 @@ test.describe('ES1-T53 TE-3 không JS (NFR-4)', () => {
   test.use({ javaScriptEnabled: false });
 
   // Chỉ assertion locator, không evaluate trong trang.
-  test('B-01 AC2: tắt JS, card render đủ, radio đổi, link giữ variant mặc định', async ({ page }) => {
+  // ES1-T441: không còn radio để đổi; không JS card vẫn đủ: 1 link, hàng chỉ báo aria-hidden, 1 data-selected, link có ?variant=.
+  test('B-01 AC2 AC12: tắt JS, card render đủ, hàng chỉ báo như khi có JS, card là link tới trang sản phẩm', async ({ page }) => {
     await page.goto(allPage()); // ES1-T417: sort_by=created-descending
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     test.skip((await cards.count()) === 0, `${ALL} không có sản phẩm`);
     await expect(cards.first().getByTestId(T.title)).toBeVisible();
     await expect(cards.first().getByTestId(T.price)).toBeVisible();
-    const card = (ENV.swatch ? byHandle(page, cards, ENV.swatch) : cards.filter({ has: page.locator(`[data-testid="${T.swatches}"] ${SWATCH}:nth-of-type(2)`) })).first();
+    const card = (ENV.swatch ? byHandle(page, cards, ENV.swatch) : cards.filter({ has: page.locator(TWO_SWATCHES) })).first();
     test.skip((await card.count()) === 0, `Không có card ≥ 2 swatch trên trang đầu ${ALL}`);
-    const title = card.getByTestId(T.title);
-    const href = await title.getAttribute('href');
-    const radios = card.locator(SWATCH);
-    const idx = (await radios.nth(1).isChecked()) ? 0 : 1;
-    await card.getByTestId(T.swatch).nth(idx).click();
-    await expect(radios.nth(idx)).toBeChecked();
-    await expect(title).toHaveAttribute('href', href!);
+    await expect(card.getByTestId(T.title)).toHaveAttribute('href', /\/products\/[^?#]+(\?variant=\d+)?$/);
+    await expect(card.getByRole('link')).toHaveCount(1);
+    await expect(card.getByTestId(T.swatches)).toHaveAttribute('aria-hidden', 'true');
+    await expect(card.getByTestId(T.swatches).locator(LEGACY)).toHaveCount(0);
+    await expect(card.locator(SELECTED)).toHaveCount(1);
   });
 });
