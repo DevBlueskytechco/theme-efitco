@@ -129,8 +129,10 @@ test.describe('ES1-T171 quy ước spec (tĩnh)', () => {
     for (const value of bad) expect(HARDCODED_RADIUS.test(`  border-radius: ${value};`), value).toBe(true);
   });
 
-  test('TC-11 base.css thật không có bo góc hardcode', () => {
-    const lines = readFileSync('assets/base.css', 'utf8').split('\n').filter((l) => HARDCODED_RADIUS.test(l));
+  test('TC-11 base.css và CSS theo template (ES1-T478) không có bo góc hardcode', () => {
+    const lines = ['base', 'product', 'collection', 'cart', 'aux']
+      .flatMap((f) => readFileSync(`assets/${f}.css`, 'utf8').split('\n'))
+      .filter((l) => HARDCODED_RADIUS.test(l));
     expect(lines).toEqual([]);
   });
 

@@ -7,7 +7,7 @@ Skeleton Theme `a7a655e79b21e68316c228dc7e437b0b32550888`, block-first: `templat
 - `layout/theme.liquid`: header/footer trong container block, `<main>` content_for_layout, meta-tags, css-variables, critical.css inline, base.css.
 - `blocks/`: 16 block trang chủ (docs/figma-inventory.md) + header, footer, container, custom-liquid, product-*, cart-*, collection-*, search-*. Mỗi block tự đủ: doc, schema, shopify_attributes.
 - `snippets/`: `image`, `css-variables`, `meta-tags`, `product-card`, `price`, `badge`, `icon`, `variant-json`.
-- `assets/`: `base.css`, `critical.css`, mỗi tính năng JS 1 file ES module ≤ 8 KB: `product-form.js`, `product-swatch.js`, `cart-drawer.js`, `collection-filters.js`, `predictive-search.js`, `header-menu.js`, `accordion.js`.
+- `assets/`: `critical.css` (inline), `base.css` (khung + trang chủ), CSS theo template nạp theo `template.name` (`product.css`, `collection.css`, `cart.css`, `aux.css`; ADR 0013), mỗi tính năng JS 1 file ES module ≤ 8 KB: `product-form.js`, `product-swatch.js`, `cart-drawer.js`, `collection-filters.js`, `predictive-search.js`, `header-menu.js`, `accordion.js`.
 - `templates/`: 12 template Liquid của Skeleton, mỗi cái compose block.
 - `config/settings_schema.json`: theme_info, Typography, Layout, Colors (6 màu từ tokens.json), Cart, Social, Favicon. `settings_data.json`: preset mặc định.
 
