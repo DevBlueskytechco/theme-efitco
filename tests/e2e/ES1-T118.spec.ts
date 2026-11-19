@@ -7,6 +7,7 @@ import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
+import { skipUnlessFixture } from './support/home-fixture';
 
 const TE7 = '/?view=te7';
 const HOME = '/';
@@ -214,13 +215,21 @@ test.describe('ES1-T118 TE-7 testimonials', () => {
     // ES1-T405, ADR 0011, E9, SRS 0.5 AC5/AC-H36: Verified chỉ theo setting verified, mặc định tắt
     // (thay kỳ vọng 4 theo home_demo; template không bật hộ)
     await expect(tid(home, 'testimonial-verified')).toHaveCount(0);
-    await expect(tid(home, 'testimonial-product')).toHaveCount(4); // trang chủ đã nối dữ liệu (CTO 07/11)
-    await expect(tid(home, 'testimonial-image')).toHaveCount(4);
     const text = await home.innerText();
     expect(text.toLowerCase()).not.toContain('lorem');
     expect(text).not.toContain('Customer name');
     expect(text).not.toContain('Add a');
     await expectNoSeriousAxe(page);
     expect(errors).toEqual([]);
+  });
+
+  // ES1-T405 (ADR 0011 mục 2): index.liquid không truyền tài nguyên; theme chưa cấu hình không in khối, không khung rỗng.
+  // Kỳ vọng "đã nối dữ liệu" (CTO 07/11) chỉ còn khi store dev đã áp fixture ES1-T331 (sentinel support/home-fixture.ts).
+  test('AC5 trang chủ đã nối dữ liệu (CTO 07/11, fixture): 4 review có ảnh và sản phẩm', async ({ page }) => {
+    await page.goto(HOME);
+    await skipUnlessFixture(page);
+    const home = band(page, 'home-testimonials');
+    await expect(tid(home, 'testimonial-product')).toHaveCount(4);
+    await expect(tid(home, 'testimonial-image')).toHaveCount(4);
   });
 });

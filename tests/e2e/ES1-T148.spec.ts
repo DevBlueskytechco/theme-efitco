@@ -9,6 +9,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 import { readCartNoScript } from './support/product-data';
+import { fixtureApplied, skipUnlessFixture } from './support/home-fixture';
 
 const TE12 = '/?view=te12';
 const HOME = '/';
@@ -215,9 +216,20 @@ test.describe('ES1-T148 TE-12 shop the look', () => {
     await expect(partial.locator('[data-hotspot="4"]')).toBeHidden();
   });
 
-  test('AC5-markup trang chủ đã nối dữ liệu (CTO 07/11): có shop the look, không placeholder', async ({ page }) => {
+  // ES1-T405 (ADR 0011 mục 2): index.liquid không truyền tài nguyên; theme chưa cấu hình không in khối, không khung rỗng.
+  // Kỳ vọng "đã nối dữ liệu" (CTO 07/11) chỉ còn khi store dev đã áp fixture ES1-T331 (sentinel support/home-fixture.ts).
+  test('AC5-markup trang chủ chưa cấu hình: không shop the look, không khung rỗng', async ({ page }) => {
+    await page.goto(HOME);
+    test.skip(await fixtureApplied(page), 'store dev đã áp fixture ES1-T331: khối có dữ liệu, kiểm ở test fixture');
+    await expect(page.getByTestId('shop-the-look')).toHaveCount(0);
+    await expect(page.getByTestId('container-home-shop-the-look')).toHaveCount(0);
+    await expect(page.getByTestId('shop-the-look-placeholder')).toHaveCount(0);
+  });
+
+  test('AC5-markup trang chủ đã nối dữ liệu (CTO 07/11, fixture): có shop the look, không placeholder', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
+    await skipUnlessFixture(page);
     await expect(page.getByTestId('shop-the-look')).toHaveCount(1);
     await expect(page.getByTestId('container-home-shop-the-look')).toHaveCount(1);
     await expect(page.getByTestId('shop-the-look-placeholder')).toHaveCount(0);

@@ -3,7 +3,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T182.spec.ts
 // Body map bấm được và token panel: tests/e2e/ES1-T183.spec.ts.
 import { test, expect, type Page } from './support/test';
-import { loadHomeFixture, NOT_APPLIED, skipUnlessFixture } from './support/home-fixture';
+import { fixtureApplied, loadHomeFixture, NOT_APPLIED, skipUnlessFixture } from './support/home-fixture';
 
 const HOME = '/';
 const FIGMA = '/?view=figma';
@@ -95,8 +95,19 @@ test.describe('ES1-T182 TE-17-FE1c', () => {
     expect(items).toBeLessThanOrEqual(9);
   });
 
-  test('D1 / đã nối dữ liệu (CTO 07/11): có featured product, không placeholder', async ({ page }) => {
+  // ES1-T405 (ADR 0011 mục 2): index.liquid không truyền tài nguyên; theme chưa cấu hình không in khối, không khung rỗng.
+  // Kỳ vọng "đã nối dữ liệu" (CTO 07/11) chỉ còn khi store dev đã áp fixture ES1-T331 (sentinel support/home-fixture.ts).
+  test('D1 / chưa cấu hình: không featured product, không khung rỗng', async ({ page }) => {
     await page.goto(HOME);
+    test.skip(await fixtureApplied(page), 'store dev đã áp fixture ES1-T331: khối có dữ liệu, kiểm ở test fixture');
+    await expect(tid(page, 'featured-product')).toHaveCount(0);
+    await expect(tid(page, 'featured-product-placeholder')).toHaveCount(0);
+    await expect(tid(page, 'container-home-featured-product')).toHaveCount(0);
+  });
+
+  test('D1 / đã nối dữ liệu (CTO 07/11, fixture): có featured product, không placeholder', async ({ page }) => {
+    await page.goto(HOME);
+    await skipUnlessFixture(page);
     await expect(tid(page, 'featured-product')).toHaveCount(1);
     await expect(tid(page, 'featured-product-placeholder')).toHaveCount(0);
     await expect(tid(page, 'container-home-featured-product')).toHaveCount(1);
