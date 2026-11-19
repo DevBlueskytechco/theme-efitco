@@ -1,11 +1,13 @@
 {%- doc -%}
   Thin progress line under a horizontal list, in place of the browser scrollbar.
   assets/scroll-buttons.js sets --scroll-size and --scroll-pos on it. Decorative only:
-  the list itself stays keyboard scrollable.
+  the list itself stays keyboard scrollable. Hidden until the script sets
+  data-enhanced on the scroll-buttons root, and hidden again when the row fits
+  (data-static, TE-7-R2-BE1).
 
   @example
   {% render 'carousel-progress' %}
 {%- enddoc -%}
-<div class="carousel-progress" aria-hidden="true" data-scroll-progress>
+<div class="carousel-progress" aria-hidden="true" data-scroll-progress data-testid="carousel-progress">
   <span class="carousel-progress__thumb"></span>
 </div>

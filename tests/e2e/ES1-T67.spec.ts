@@ -4,7 +4,7 @@
 //   npx playwright test tests/e2e/ES1-T67.spec.ts -g "AC5|AC6|AC8"
 // Thiếu biến → skip có lý do. Viewport 390 / 1280 đặt trong test nên chạy được cả project desktop và mobile (Pixel 7).
 // Có <cart-drawer> (TE-5) và cart type drawer → test chuyển /cart skip (drawer mở thuộc TE-5).
-import { test, expect, type Page, type Request } from '@playwright/test';
+import { test, expect, type Page, type Request } from './support/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { getJson } from './support/http';
@@ -120,7 +120,9 @@ test.describe('ES1-T67 TE-4 product form + sticky bar', () => {
     expect(STICKY_LIQUID).toMatch(/<product-sticky-bar[\s\S]*?\bhidden\b/);
     expect(STICKY_LIQUID).toContain('form="{{ form_id }}"');
     // Ngưỡng media khớp base.css (sticky chỉ dưới 48rem).
-    expect(readFileSync(join(ROOT, 'assets/base.css'), 'utf8')).toContain('@media (max-width: 47.99rem)');
+    // TE-4 AC5: sticky chỉ dưới 48rem; chuỗi max-width 47.99rem cũ chỉ khớp CSS popup quiz đã xoá ở ES1-T387 (CTO 13/11),
+    // assertion nay bám rule của .product-sticky-bar.
+    expect(readFileSync(join(ROOT, 'assets/base.css'), 'utf8')).toMatch(/@media \(min-width: 48rem\) \{\s*\.product-sticky-bar \{\s*display: none;/);
     expect(JS).toContain('"(max-width: 47.99rem)"');
     expect(JS).not.toMatch(/addEventListener\(\s*"scroll"/);
   });

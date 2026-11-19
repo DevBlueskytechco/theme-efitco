@@ -1,6 +1,7 @@
 // Ticket ES1-T100: helper tests/e2e/support/product-data.ts. Chạy với server HTTP cục bộ, không gọi store dev (không tốn hạn mức 429).
 // Chạy: npx playwright test tests/e2e/ES1-T100.spec.ts
-import { test, expect, type Browser } from '@playwright/test';
+import { test, expect, type Browser } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { createServer, type Server } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { readdirSync, readFileSync } from 'node:fs';
@@ -41,7 +42,7 @@ test.afterAll(() => new Promise((r) => server.close(r)));
 test.beforeEach(() => { hits = {}; fail429 = {}; });
 
 async function newPage(browser: Browser, javaScriptEnabled = true) {
-  const context = await browser.newContext({ baseURL: origin, javaScriptEnabled });
+  const context = await newStoreContext(browser, { baseURL: origin, javaScriptEnabled });
   return { context, page: await context.newPage() };
 }
 

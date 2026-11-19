@@ -144,7 +144,7 @@ Desktop:
 - Không JS: bấm trigger mở panel, bấm lại đóng; scrim là phần của `<summary>` như drawer hiện tại nên bấm vào cũng đóng.
 
 Drawer:
-- Mở: chạm nút menu; focus vào nút đóng (code). Khoá cuộn trang (`scroll-lock`).
+- Mở: chạm nút menu; focus vào tiêu đề "Menu" (đích `aria-labelledby` của drawer), Tab lần 1 tới nút đóng (CTO 17/11, ES1-T471; ADR 0007 #5, `assets/modal-dialog.js`; SRS TE-1 AC2). Khoá cuộn trang (`scroll-lock`).
 - Cấp 2: chạm hàng có ›; panel cấp 2 trượt vào, focus vào Back. Back: về cấp 1, focus về hàng vừa mở.
 - Đóng: ×, chạm scrim, Esc (ở bất kỳ cấp nào đóng cả drawer), vuốt sang trái trên drawer (ĐỀ XUẤT, 15 §1 "mobile hỗ trợ vuốt", BE làm nếu còn ngân sách). Đóng thì focus về nút menu, lần mở sau về cấp 1.
 - Tab bẫy trong drawer (code `#trapFocus`), chỉ tính phần tử của cấp đang hiện.

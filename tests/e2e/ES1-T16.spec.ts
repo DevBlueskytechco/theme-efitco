@@ -1,7 +1,15 @@
+// KHÔNG CHẮC: ES1-T463 chưa chạy trên preview (máy agent không có PREVIEW_URL); chờ CI store-tests của PR. assets/header-sticky.js
+// comment đầu file còn ghi "sentinel 80px", "header trong suốt" (lỗi thời, file BE, không ảnh hưởng hành vi).
 // Ticket ES1-T16 (2727475000000129007) — TE-1 AC2, AC9: header-menu.js, header-sticky.js.
 // Bổ sung phần ES1-T5.spec.ts chưa tự động: TB-17, resize drawer, sticky, lỗi mạng sticky.
+// ES1-T463 (CTO 14/11, ES1-T439): AC thay cho bản header trong suốt + ngưỡng 80px:
+//   docs/srs.md#TE-1 AC9 (0.3) + AC-H29: header tối mọi trang, không đè hero, dính từ đầu (CSS sticky, không cần JS);
+//   docs/ui-spec/announcement-bar.md §4 (D8 task-split ES1-T307): data-scrolled gắn khi sentinel 1px trước container
+//   header ra khỏi khung: không announcement bar thì cuộn > 1px, có bar 44px thì cuộn > 44px.
+//   Đã bỏ: "trên hero: trong suốt ở đầu trang", "ngưỡng đúng 80px: 60px chưa gắn", "lỗi mạng: header trên hero không sticky".
+//   Test case: drafts/qa/ES1-T463/test-cases.md (T16-xx).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T16.spec.ts
-import { test, expect, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Page, type TestInfo } from './support/test';
 
 const isDesktop = (ti: TestInfo) => ti.project.name === 'desktop';
 
@@ -9,22 +17,23 @@ function trackErrors(page: Page): string[] {
   const errors: string[] = [];
   page.on('pageerror', e => errors.push(e.message));
   page.on('console', m => {
-    if (m.type() === 'error' && /header-(menu|sticky)/.test(m.location().url)) errors.push(m.text());
+    if (m.type() === 'error' && /header-(menu|sticky|drawer)/.test(m.location().url)) errors.push(m.text());
   });
   return errors;
 }
 
-// Hero TE-2 chưa merge: giả lập hook data-header-overlay trong con đầu của main.
-async function simulateHero(page: Page) {
-  await page.evaluate(() => {
-    const hook = document.createElement('div');
-    hook.setAttribute('data-header-overlay', '');
-    document.querySelector('main')?.firstElementChild?.append(hook);
-  });
-}
+// AC-H29 (SRS 0.5), TE-2 AC6: header là thanh tối mọi trang, không trong suốt, không đè hero.
+// Nền, chữ theo setting mặc định background_dark_color #1A1A1A, background_dark_foreground_color #FFFFFF (Figma 1:362 trên 1:360).
+const DARK = 'rgb(26, 26, 26)';
+const WHITE = 'rgb(255, 255, 255)';
 
 async function scrollTo(page: Page, y: number) {
   await page.evaluate(top => window.scrollTo({ top, behavior: 'instant' }), y);
+}
+
+// Vị trí sentinel 1px (layout/theme.liquid, ngay trước container header) tính theo tài liệu: header bắt đầu dính khi cuộn tới đây.
+async function sentinelTop(page: Page) {
+  return page.getByTestId('header-sticky-sentinel').evaluate(el => el.getBoundingClientRect().top + window.scrollY);
 }
 
 async function firstParent(page: Page) {
@@ -103,7 +112,8 @@ test.describe('ES1-T16 header-drawer', () => {
     const drawer = page.getByTestId('header-drawer');
     await expect(drawer).toBeVisible();
     const close = drawer.getByTestId('header-drawer-close');
-    await expect(close, 'mở drawer phải chuyển focus vào panel').toBeFocused();
+    // ES1-T323: drawer mở bằng <modal-dialog data-layer="menu"> (ADR 0007 #5) → focus vào tiêu đề "Menu" (aria-labelledby)
+    await expect(drawer.locator('#HeaderDrawerTitle'), 'mở drawer phải chuyển focus vào panel').toBeFocused();
 
     const inDrawer = () => drawer.evaluate(el => el.contains(document.activeElement));
     await page.keyboard.press('Shift+Tab');
@@ -151,6 +161,9 @@ test.describe('ES1-T16 header-drawer', () => {
     const toggle = page.getByTestId('header-drawer-toggle');
     await toggle.click();
     await expect(page.getByTestId('header-drawer')).toBeVisible();
+    // ES1-T329/ES1-T323: header-drawer.js nạp lười khi chạm nút menu; chờ define và nắm drawer (sau modal-dialog) trước khi resize.
+    await page.waitForFunction(() => !!customElements.get('header-drawer'));
+    await expect(page.getByTestId('header')).toHaveAttribute('data-drawer-enhanced', '');
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.setViewportSize({ width: 412, height: 780 });
     await expect(page.getByTestId('header-drawer')).toBeHidden();
@@ -159,14 +172,14 @@ test.describe('ES1-T16 header-drawer', () => {
 });
 
 test.describe('ES1-T16 sticky-header', () => {
-  test('cuộn quá 80px gắn data-scrolled, về đầu thì bỏ, nền là --color-background', async ({ page }) => {
+  test('T16-01 cuộn qua sentinel gắn data-scrolled, về đầu thì bỏ, nền tối không phải --color-background', async ({ page }) => {
     await page.goto('/');
     const header = page.getByTestId('header');
     test.skip((await header.getAttribute('data-sticky')) === null, 'sticky_header đang tắt');
     await expect(header).toHaveAttribute('data-header-enhanced', '');
     await expect(header).not.toHaveAttribute('data-scrolled');
 
-    await scrollTo(page, 100);
+    await scrollTo(page, (await sentinelTop(page)) + 100);
     await expect(header).toHaveAttribute('data-scrolled', '');
     const background = await page.evaluate(() => {
       const probe = document.createElement('div');
@@ -176,44 +189,115 @@ test.describe('ES1-T16 sticky-header', () => {
       probe.remove();
       return value;
     });
-    // Trang chủ: nền tối như Figma 1:362 (CTO 07/11), không dùng --color-background
-    expect(background).not.toBe('rgb(26, 26, 26)');
-    await expect(header).toHaveCSS('background-color', 'rgb(26, 26, 26)');
+    // Mọi trang: nền tối như Figma 1:362 (CTO 07/11, AC-H29), không dùng --color-background
+    expect(background).not.toBe(DARK);
+    await expect(header).toHaveCSS('background-color', DARK);
 
     await scrollTo(page, 0);
     await expect(header).not.toHaveAttribute('data-scrolled');
   });
 
-  test('ngưỡng đúng 80px: 60px chưa gắn, 100px có gắn', async ({ page }) => {
+  // T16-03, T16-04 (ES1-T463; announcement-bar.md §4; TE-1 AC9): sentinel 1px ngay trước container header (thay khối 80px cũ).
+  // data-scrolled gắn đúng lúc header bắt đầu dính: không bar thì cuộn > 1px, có bar 44 thì cuộn > 44.
+  // Kiểm cả 2 nhánh bất kể store dev có bật bar hay không: nhánh thiếu dựng bằng DOM (gỡ bar / chèn khối 44px trước sentinel),
+  // IntersectionObserver đo lại theo vị trí mới nên không phụ thuộc dữ liệu store.
+  async function expectThreshold(page: Page, barHeight: number, label: string) {
+    const header = page.getByTestId('header');
+    await scrollTo(page, 0);
+    await expect(header, `${label}: ở đầu trang chưa gắn`).not.toHaveAttribute('data-scrolled');
+    const start = await sentinelTop(page);
+    expect(Math.abs(start - barHeight), `${label}: sentinel nằm ngay dưới bar (y ${barHeight})`).toBeLessThanOrEqual(1);
+    const headerTop = await header.evaluate(el => el.getBoundingClientRect().top + window.scrollY);
+    expect(Math.abs(headerTop - start), `${label}: header bắt đầu ngay tại sentinel, sentinel không đẩy bố cục`).toBeLessThanOrEqual(1);
+    const heightAtTop = (await header.boundingBox())!.height;
+
+    if (barHeight >= 1) {
+      await scrollTo(page, barHeight - 1);
+      await page.waitForTimeout(200); // IntersectionObserver báo bất đồng bộ
+      await expect(header, `${label}: cuộn ${barHeight - 1} chưa gắn`).not.toHaveAttribute('data-scrolled');
+      expect((await header.boundingBox())!.y, `${label}: trước ngưỡng header chưa dính`).toBeGreaterThan(0);
+    }
+
+    // +2: sentinel cao 1px, IntersectionObserver coi mép chạm khung nhìn vẫn là giao nhau
+    await scrollTo(page, barHeight + 2);
+    await expect(header, `${label}: cuộn ${barHeight + 2} phải gắn`).toHaveAttribute('data-scrolled', '');
+    const box = (await header.boundingBox())!;
+    expect(Math.abs(box.y), `${label}: đã gắn data-scrolled thì header đang dính ở mép trên`).toBeLessThanOrEqual(0.5);
+    expect(box.height, `${label}: dính chỉ thêm bóng, không đổi chiều cao`).toBeCloseTo(heightAtTop, 0);
+    await expect(header, `${label}: nền không đổi khi dính`).toHaveCSS('background-color', DARK);
+
+    await scrollTo(page, 0);
+    await expect(header, `${label}: về đầu trang thì bỏ`).not.toHaveAttribute('data-scrolled');
+  }
+
+  test('T16-03 ngưỡng sentinel 1px: không announcement bar thì gắn khi cuộn > 1px', async ({ page }) => {
     await page.goto('/');
     const header = page.getByTestId('header');
     test.skip((await header.getAttribute('data-sticky')) === null, 'sticky_header đang tắt');
-    await scrollTo(page, 60);
-    await page.waitForTimeout(200); // IntersectionObserver báo bất đồng bộ
-    await expect(header).not.toHaveAttribute('data-scrolled');
-    await scrollTo(page, 100);
-    await expect(header).toHaveAttribute('data-scrolled', '');
+    test.skip((page.viewportSize()?.height ?? 0) <= 480, 'dưới 30rem cao header thôi dính (TE-10 AC8)');
+    await expect(header).toHaveAttribute('data-header-enhanced', '');
+    // Store dev có bar thì gỡ container chứa bar để dựng trường hợp không bar.
+    await page.getByTestId('announcement-bar').evaluateAll(els => els.forEach(el => (el.closest('.block-container') ?? el).remove()));
+    await expectThreshold(page, 0, 'không bar');
   });
 
-  test('trên hero: trong suốt ở đầu trang, cuộn thì nền đặc', async ({ page }) => {
+  test('T16-04 ngưỡng sentinel 1px: có announcement bar 44px thì gắn khi cuộn > 44px', async ({ page }) => {
     await page.goto('/');
     const header = page.getByTestId('header');
     test.skip((await header.getAttribute('data-sticky')) === null, 'sticky_header đang tắt');
-    await simulateHero(page);
-    await expect(header).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
-    await scrollTo(page, 100);
-    await expect(header).toHaveAttribute('data-scrolled', '');
-    await expect(header).not.toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+    test.skip((page.viewportSize()?.height ?? 0) <= 480, 'dưới 30rem cao header thôi dính (TE-10 AC8)');
+    await expect(header).toHaveAttribute('data-header-enhanced', '');
+    const bar = page.getByTestId('announcement-bar');
+    let barHeight: number;
+    if (await bar.count()) {
+      // Bar thật của store dev: cao tối thiểu 44 mọi mốc (announcement-bar.md §3), cuộn đi cùng trang.
+      const barBox = (await bar.boundingBox())!;
+      expect(barBox.height, 'announcement bar cao ≥ 44').toBeGreaterThanOrEqual(43.5);
+      // Ngưỡng = đáy bar (đang ở đầu trang): sentinel và header phải nằm ngay dưới bar.
+      barHeight = barBox.y + barBox.height;
+    } else {
+      // Store dev chưa bật bar: chèn khối 44px đúng chỗ bar (trước sentinel) để kiểm ngưỡng.
+      await page.getByTestId('header-sticky-sentinel').evaluate(el => {
+        const fake = document.createElement('div');
+        fake.style.blockSize = '44px';
+        fake.dataset.qaFakeBar = '';
+        el.before(fake);
+      });
+      barHeight = 44;
+    }
+    await expectThreshold(page, Math.round(barHeight), 'có bar');
   });
 
-  test('lỗi mạng header-sticky.js: header trên hero không sticky, không có chữ trắng trên nền trắng', async ({ page }) => {
+  test('T16-02 AC-H29: header luôn nền tối, chữ trắng ở đầu trang và khi cuộn, không trong suốt', async ({ page }) => {
+    await page.goto('/');
+    const header = page.getByTestId('header');
+    await expect(header).toHaveCSS('background-color', DARK);
+    await expect(header).toHaveCSS('color', WHITE);
+    test.skip((await header.getAttribute('data-sticky')) === null, 'sticky_header đang tắt: phần khi cuộn không áp');
+    await scrollTo(page, (await sentinelTop(page)) + 100);
+    await expect(header).toHaveAttribute('data-scrolled', '');
+    await expect(header).toHaveCSS('background-color', DARK);
+    await expect(header).toHaveCSS('color', WHITE);
+  });
+
+  test('T16-05 lỗi mạng header-sticky.js: main nằm dưới đáy header, header vẫn nền tối, CSS sticky vẫn chạy', async ({ page }) => {
     await page.route('**/header-sticky*.js*', r => r.abort());
     await page.goto('/');
     const header = page.getByTestId('header');
     await expect(header).not.toHaveAttribute('data-header-enhanced');
-    await simulateHero(page);
+
+    // AC-H29, TE-2 AC6: không đè hero, nội dung đầu main bắt đầu ngay dưới header (cao 80 từ 80rem).
+    const headerBox = (await header.boundingBox())!;
+    const mainBox = (await page.locator('main#MainContent').boundingBox())!;
+    expect(mainBox.y, 'main không được chui dưới header').toBeGreaterThanOrEqual(headerBox.y + headerBox.height - 0.5);
+
     await scrollTo(page, 400);
-    const box = await header.boundingBox();
-    expect(box!.y + box!.height, 'header trong suốt không được dính khi không có JS').toBeLessThanOrEqual(0);
+    await expect(header).not.toHaveAttribute('data-scrolled');
+    await expect(header).toHaveCSS('background-color', DARK);
+    await expect(header).toHaveCSS('color', WHITE);
+    if ((await header.getAttribute('data-sticky')) !== null && (page.viewportSize()?.height ?? 0) > 480) {
+      // position: sticky là CSS (critical.css), không cần JS; JS chỉ thêm bóng
+      expect(Math.abs((await header.boundingBox())!.y), 'không JS header vẫn dính').toBeLessThanOrEqual(0.5);
+    }
   });
 });

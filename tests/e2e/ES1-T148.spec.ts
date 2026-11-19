@@ -3,7 +3,8 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T148.spec.ts -g "AC5-markup|AC4|AC-H19|AC-H20|nojs"
 // Handle sản phẩm viết cứng trong templates/index.te12.liquid, lấy từ tests/e2e/store-data.json.
 // BE1 (ES1-T149) chạy lại spec này: phần chỉ đúng trước khi JS nâng cấp nằm trong nhóm nojs.
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
@@ -42,7 +43,7 @@ async function expectNoSeriousAxe(page: Page) {
 
 async function noJsPage(browser: Browser) {
   const use = test.info().project.use;
-  const context = await browser.newContext({
+  const context = await newStoreContext(browser, {
     javaScriptEnabled: false,
     storageState: 'tests/setup/state.json',
     baseURL: use.baseURL,
