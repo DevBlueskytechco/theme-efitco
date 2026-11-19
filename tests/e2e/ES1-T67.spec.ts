@@ -122,7 +122,8 @@ test.describe('ES1-T67 TE-4 product form + sticky bar', () => {
     // Ngưỡng media khớp base.css (sticky chỉ dưới 48rem).
     // TE-4 AC5: sticky chỉ dưới 48rem; chuỗi max-width 47.99rem cũ chỉ khớp CSS popup quiz đã xoá ở ES1-T387 (CTO 13/11),
     // assertion nay bám rule của .product-sticky-bar.
-    expect(readFileSync(join(ROOT, 'assets/base.css'), 'utf8')).toMatch(/@media \(min-width: 48rem\) \{\s*\.product-sticky-bar \{\s*display: none;/);
+    // ES1-T478 (ADR 0013): CSS sticky bar PDP ở assets/product.css
+    expect(readFileSync(join(ROOT, 'assets/product.css'), 'utf8')).toMatch(/@media \(min-width: 48rem\) \{\s*\.product-sticky-bar \{\s*display: none;/);
     expect(JS).toContain('"(max-width: 47.99rem)"');
     expect(JS).not.toMatch(/addEventListener\(\s*"scroll"/);
   });

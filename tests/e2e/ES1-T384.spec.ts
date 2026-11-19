@@ -79,9 +79,10 @@ test.describe('ES1-T384 @static', () => {
     expect(raw.match(/^ {2}"password":/gm)).toHaveLength(1);
   });
 
-  test('base.css: hết rule cũ ES1-T408, QR 144 qua token', () => {
-    const css = read('assets/base.css');
-    expect(css).not.toMatch(/\.not-found__actions|\.template-gift-card main/);
+  test('base.css, aux.css: hết rule cũ ES1-T408, QR 144 qua token', () => {
+    // ES1-T478 (ADR 0013): CSS 404, gift card, password ở assets/aux.css
+    const css = read('assets/aux.css');
+    for (const file of [read('assets/base.css'), css]) expect(file).not.toMatch(/\.not-found__actions|\.template-gift-card main/);
     expect(css).toMatch(/\.gift-card__qr \{[\s\S]*?inline-size: calc\(var\(--space-7\) \* 3\)/);
   });
 });
