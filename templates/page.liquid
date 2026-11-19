@@ -1,5 +1,15 @@
-{% block 'container' %}
-  <h1>{{ page.title }}</h1>
+{% # TE-21 AC1, AC2 (ES1-T383; docs/ui-spec/page.md §1, §2, §4, §5): breadcrumb, h1, page.content in the shared .rte, reading column 720 centered from 48rem. Images in the content load lazy. Empty content: only the h1; the editor shows a hint. %}
+{% block 'container', id: 'page' %}
+  <div class="page-reading" data-testid="page">
+    {% render 'breadcrumb' %}
+    {% render 'page-title', title: page.title %}
 
-  {{ page.content }}
+    {%- if page.content != blank -%}
+      <div class="rte" data-testid="page-content">
+        {{- page.content | replace: '<img ', '<img loading="lazy" decoding="async" ' -}}
+      </div>
+    {%- elsif request.design_mode -%}
+      <p class="page-reading__hint" data-testid="page-empty-hint">{{ 'page.empty_hint' | t }}</p>
+    {%- endif -%}
+  </div>
 {% endblock %}

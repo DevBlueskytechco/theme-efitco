@@ -1,7 +1,7 @@
 // Ticket ES1-T171 TE-10-QA2: kiểm chính các helper và quy ước dùng để dựng lại CI xanh. Không gọi store dev (không tốn hạn mức 429).
 // Trình duyệt thật chỉ mở trang giả qua page.route.
 // Chạy: npx playwright test tests/e2e/ES1-T171.spec.ts
-import { test, expect, type APIRequestContext, type ConsoleMessage, type Page } from '@playwright/test';
+import { test, expect, type APIRequestContext, type ConsoleMessage, type Page } from './support/test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { fetchRetry429 } from './support/cart-api';
@@ -129,8 +129,10 @@ test.describe('ES1-T171 quy ước spec (tĩnh)', () => {
     for (const value of bad) expect(HARDCODED_RADIUS.test(`  border-radius: ${value};`), value).toBe(true);
   });
 
-  test('TC-11 base.css thật không có bo góc hardcode', () => {
-    const lines = readFileSync('assets/base.css', 'utf8').split('\n').filter((l) => HARDCODED_RADIUS.test(l));
+  test('TC-11 base.css và CSS theo template (ES1-T478) không có bo góc hardcode', () => {
+    const lines = ['base', 'product', 'collection', 'cart', 'aux']
+      .flatMap((f) => readFileSync(`assets/${f}.css`, 'utf8').split('\n'))
+      .filter((l) => HARDCODED_RADIUS.test(l));
     expect(lines).toEqual([]);
   });
 

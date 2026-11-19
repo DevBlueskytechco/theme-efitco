@@ -5,6 +5,9 @@
   collections.all. Steps 2 and 3 use placeholder copy (ES1-T135 #8).
   Step 1 has 3 options, step 2 has 2, step 3 has 4. quiz-outdoor and quiz-travel
   exist only to reach 4 options. Remove this file before a real store release.
+  Results come from collection te11-quiz (store-data TE11_QUIZ_COLLECTION, CTO 11/11
+  ES1-T178 M-A); results_popup is off so ES1-T139 keeps testing the inline panel,
+  the popup is on in templates/index.liquid.
 {% endcomment %}
 
 {%- liquid
@@ -21,11 +24,13 @@
 {% block 'container', id: 'te11-quiz', tag: 'div' %}
   {% block 'quiz',
     id: 'te11-figma',
-    eyebrow: 'Our most-loved feature',
-    heading: 'Find Your Perfect Gear',
-    subheading: 'Three questions. One shortlist.',
-    note_1: '20 seconds',
-    note_2: 'No sign-up required'
+    collection: collections['te11-quiz'],
+    results_popup: false,
+    default_eyebrow: 'Our most-loved feature',
+    default_heading: 'Find Your Perfect Gear',
+    default_subheading: 'Three questions. One shortlist.',
+    default_note_1: '20 seconds',
+    default_note_2: 'No sign-up required'
   %}
     {% block 'quiz-step',
       id: 'te11-step-1',
@@ -78,7 +83,7 @@
 
 {% comment %} One valid option only: the step and the quiz render nothing. {% endcomment %}
 {% block 'container', id: 'te11-quiz-hidden', tag: 'div' %}
-  {% block 'quiz', id: 'te11-hidden', heading: 'Hidden quiz' %}
+  {% block 'quiz', id: 'te11-hidden', default_heading: 'Hidden quiz' %}
     {% block 'quiz-step',
       id: 'te11-hidden-step',
       step: 1,

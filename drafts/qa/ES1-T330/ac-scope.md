@@ -1,0 +1,19 @@
+# ES1-T330 — AC trong phạm vi (trích docs/srs.md#TE-22 bản 0.5, #TE-1 AC2, AC7)
+Dùng cho `ac_coverage.py`. Mã ghép story để không lẫn TE-22 AC2 với TE-1 AC2.
+
+- AC-TE22-1 (TE-22 AC1) Given main-menu có mục cha có con When từ 80rem rê chuột 150 ms, hoặc bấm, Enter, Space trên trigger Then panel mở ngay dưới header 80px, header giữ tối; mục mở trắng 100% + chevron 180°, aria-expanded true; scrim 50% từ đáy header. Rê sang mục cha khác đổi nội dung không chạy lại hiệu ứng; rê sang mục không con thì đóng. Đóng: rời header và panel 150 ms, Esc (focus về trigger), bấm scrim, bấm lại trigger, Tab ra; không bẫy focus. Cảm ứng từ 80rem chạm mở/đóng. Không JS bấm mở, bấm lại đóng.
+- AC-TE22-2 (TE-22 AC2) Kiểu panel theo dữ liệu: A cột link (View all đầu cột 1, con không cấp 3 sau View all, ≤ 3 cột có card, ≤ 4 cột không card, cột 5 xuống hàng); B ô collection 5 ô một hàng, 6–10 xuống hàng 2; C dropdown. Panel cao tối đa 100dvh − 80, cuộn riêng; không cắt link.
+- AC-TE22-3 (TE-22 AC3) Nhãn "View all …" theo loại link cha: catalog "View all products"; collections "View all collections"; khác "View all {tên mục}"; không "View all" trần.
+- AC-TE22-4 (TE-22 AC4) Dưới 80rem, cấp 2 drawer: tiêu đề cấp 2, hàng View all 52, nhóm cấp 3 (tiêu đề nhóm link 44, link cấp 3 48); kiểu B hàng 72 ảnh 56; card cuối cấp 2. Không JS accordion details hiện đủ cấp 2, cấp 3.
+- AC-TE22-5 (TE-22 AC5, Should, TE-22-R2-FE3 — CẮT R1 ES1-T328) Card sản phẩm nổi bật; setting trống không card, cột giãn; tắt ảnh thì B thành C; collection không ảnh nền cream + icon; 0 sản phẩm "0 Products".
+- AC-TE22-6 (TE-22 AC6) Tải trang: panel, drawer đóng; ảnh menu lazy, có width/height, không tải trước khi mở, không eager; mọi link menu là a href trong HTML khi đóng; LCP không thuộc menu; CLS mở menu = 0.
+- AC-TE22-7 (TE-22 AC7) nav "Main menu" và "Mobile menu" khác tên; tiêu đề cột/nhóm không h*, ul aria-labelledby trỏ tiêu đề; thứ tự Tab trigger → link panel → card → mục cha kế; panel đóng link không nhận focus; aria-current + gạch chân 2px; focus thanh tối outline trắng 2px; vùng chạm mục menu 44, link panel ≥ 40; reduced motion không translate, không scale.
+- AC-TE22-8 (TE-22 AC8) Menu trống: theme editor có chữ placeholder; storefront không menu, không nút menu, logo trái, icon phải.
+- AC-TE22-9 (TE-22 AC9) Breadcrumb nav aria-label Breadcrumb + ol ở collection, sản phẩm (trong collection và qua /products/), blog, tag, bài viết, page, search, list-collections, ?view=quiz; mục cuối span aria-current; link từ routes.*, cao 44, chữ 14, màu muted; không có ở trang chủ, cart, 404, password, gift card.
+- AC-TE22-10 (TE-22 AC10) Mục cuối > 22 ký tự (< 48rem) hoặc > 48 ký tự (≥ 48rem) hiện đủ, không "…", xuống dòng, không tràn ngang ở 360/768/1280/1920; h1 đủ tên; JSON-LD tên đầy đủ.
+- AC-TE22-11 (TE-22 AC11) Collection có ảnh banner: thẻ bo 16, cách header 16 (24 từ 64rem), cao ≥ 280 (360 từ 64rem); breadcrumb, eyebrow, h1 trắng trên lớp tối 75% → 60%; ≥ 4.5:1 cả khi ảnh trắng; ảnh eager + fetchpriority high.
+- AC-TE22-12 (TE-22 AC12) Đúng 1 JSON-LD BreadcrumbList khớp số mục, thứ tự, tên, URL; Rich Results Test 0 lỗi; trang không breadcrumb không có BreadcrumbList.
+- AC-TE22-13 (TE-22 AC13) Trang có tiêu đề (collection, blog, page, article): eyebrow → h1 → meta; đúng 1 h1.
+- AC-TE22-14 (TE-22 AC14) Theme mới cài: "Featured product in menu" trống, không handle figma-* trong code header, menu mặc định main-menu. Store dev đã cấu hình menu 3 cấp: Shop kiểu A có card, Collection kiểu B 5 ô ảnh.
+- AC-TE1-2 (TE-1 AC2, phần dưới 80rem + cấp 3) Dưới 80rem có JS: cấp 2 trượt trong drawer, Back "Back to menu" ≥ 44, focus Back; Back về cấp 1, focus về mục vừa mở. Không JS: accordion details tại chỗ. Cấp 3 theo TE-22 AC4. Mở drawer focus tiêu đề "Menu".
+- AC-TE1-7 (TE-1 AC7) Mọi trang: html lang = request.locale.iso_code; meta-tags có title, description, canonical, og, twitter, page_image (phần breadcrumb SEO chuyển sang TE-22 AC9, AC12).

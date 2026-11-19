@@ -1,23 +1,37 @@
+// TE-7 AC1: data-static when the row fits; ends aria-disabled; RTL ok
 customElements.get("scroll-buttons") || customElements.define("scroll-buttons", class extends HTMLElement {
-connectedCallback() {
-const [t, p, n] = ["track", "prev", "next"].map(h => this.querySelector(`[data-scroll-${h}]`))
-const s = () => {
-const a = document.activeElement, x = t.scrollLeft;
-[p.hidden, n.hidden] = [x < 1, x > t.scrollWidth - t.clientWidth - 1]
-if (a.hidden) (n.hidden ? p : n).focus()
-};
-const g = d => () => t.scrollBy({
-left: d * (t.children[1].offsetLeft - t.children[0].offsetLeft),
-behavior: matchMedia("(prefers-reduced-motion)").matches ? "auto" : "smooth"
-});
-p.onclick = g(-1)
-n.onclick = g(1)
-t.onscroll = s;
-(this.r = new ResizeObserver(s)).observe(t)
-s()
-this.dataset.enhanced = ""
-}
-disconnectedCallback() {
-this.r.disconnect()
-}
+  connectedCallback() {
+    const [t, p, n] = ["track", "prev", "next"].map((h) => this.querySelector(`[data-scroll-${h}]`));
+    if (!(t && p && n)) return;
+    const signal = (this.ac = new AbortController()).signal;
+    let f = 0;
+    const sync = () => {
+      f = 0;
+      const a = document.activeElement, max = t.scrollWidth - t.clientWidth, x = Math.abs(t.scrollLeft);
+      const [s, e] = [x < 1, x > max - 1];
+      this.toggleAttribute("data-static", max < 1);
+      p.ariaDisabled = s;
+      n.ariaDisabled = e;
+      // move focus off a dead button
+      if ((a == p && s) || (a == n && e)) (max < 1 ? t : a == p ? n : p).focus();
+    };
+    const queue = () => (f ||= requestAnimationFrame(sync));
+    const go = (d, b) => () => {
+      const [c, k] = t.children;
+      if (k && b.ariaDisabled != "true") t.scrollBy({
+        left: d * (k.offsetLeft - c.offsetLeft),
+        behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      });
+    };
+    p.addEventListener("click", go(-1, p), { signal });
+    n.addEventListener("click", go(1, n), { signal });
+    t.addEventListener("scroll", queue, { signal, passive: true });
+    (this.ro = new ResizeObserver(queue)).observe(t);
+    sync();
+    this.dataset.enhanced = "";
+  }
+  disconnectedCallback() {
+    this.ac?.abort();
+    this.ro?.disconnect();
+  }
 });

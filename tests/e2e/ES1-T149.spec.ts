@@ -2,7 +2,7 @@
 // Ticket ES1-T149 TE-12-BE1: assets/bundle-form.js (docs/srs.md#TE-12 AC1, AC2, AC3, AC5, AC-H18, AC-H19, AC-H20; drafts/techlead/ES1-T141/task-split.md D4–D8, D10, D11).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T149.spec.ts -g "AC1|AC2|AC3|AC5"
 // 3 nhóm: tĩnh; panel và hotspot (không gọi Cart API); thêm giỏ bằng cart-mock (0 request Cart API tới store); 1 luồng thật cho mỗi project (add thật, 422 thật).
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { CART, themeAdd } from './support/cart-api';

@@ -1,0 +1,28 @@
+{% # TE-21 AC3–AC6 (ES1-T383; docs/ui-spec/page.md §1, §2, §4, §6): breadcrumb, h1, intro (page.content in .rte), contact-form block, contact-aside block with 5 faq-item questions. DOM order = visual order at every width. %}
+{% # New install: the questions are empty, so the storefront has no aside (TE-21 AC17); the merchant fills them in the editor. No JavaScript is required. %}
+{% block 'container', id: 'page-contact' %}
+  {% render 'breadcrumb' %}
+  {% render 'page-title', title: page.title %}
+
+  <div class="contact" data-testid="contact-page">
+    <div class="contact__main">
+      {%- if page.content != blank -%}
+        <div class="rte contact__intro" data-testid="page-content">
+          {{- page.content | replace: '<img ', '<img loading="lazy" decoding="async" ' -}}
+        </div>
+      {%- elsif request.design_mode -%}
+        <p class="page-reading__hint contact__intro" data-testid="page-empty-hint">{{ 'page.empty_hint' | t }}</p>
+      {%- endif -%}
+
+      {% block 'contact-form' %}{% endblock %}
+    </div>
+
+    {% block 'contact-aside' %}
+      {% block 'faq-item', id: 'contact-faq-1', open: true %}{% endblock %}
+      {% block 'faq-item', id: 'contact-faq-2' %}{% endblock %}
+      {% block 'faq-item', id: 'contact-faq-3' %}{% endblock %}
+      {% block 'faq-item', id: 'contact-faq-4' %}{% endblock %}
+      {% block 'faq-item', id: 'contact-faq-5' %}{% endblock %}
+    {% endblock %}
+  </div>
+{% endblock %}

@@ -4,7 +4,7 @@
 // Dữ liệu ES1-T134 trong tests/e2e/store-data.json: TE11_TAGS_READY; chưa true thì test cần card skip có lý do. Bộ lower + advanced + gym luôn rỗng: có dữ liệu thì 0 sản phẩm, chưa có thì tag không tồn tại (ES1-T133 #1).
 import { readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
@@ -17,6 +17,13 @@ const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\
 
 const storeData = () => JSON.parse(readFileSync(join(process.cwd(), 'tests/e2e/store-data.json'), 'utf8')) as Record<string, unknown>;
 const tagsReady = () => env('TE11_TAGS_READY') === 'true' || storeData().TE11_TAGS_READY === true;
+// ES1-T417 (CTO 11/11, ES1-T178 mục M phương án A): kết quả có dữ liệu đọc collection riêng TE11_QUIZ_COLLECTION (store-data.json, 'te11-quiz'),
+// 7 sản phẩm gắn tag; upper+beginner+home = 5 sp. Block trang chủ còn trỏ /collections/all tới khi ES1-T387 truyền collection:
+// test có dữ liệu đổi đoạn collection của request kết quả bằng page.route, không phụ thuộc FE.
+const QUIZ = env('TE11_QUIZ_COLLECTION');
+const QUIZ_PATH = QUIZ ? `/collections/${encodeURIComponent(QUIZ)}` : undefined;
+const quizReady = () => tagsReady() && !!QUIZ;
+const QUIZ_SKIP = 'TE11_TAGS_READY chưa true hoặc thiếu TE11_QUIZ_COLLECTION (ES1-T134, ES1-T178, ES1-T417)';
 const source = (path: string) => readFileSync(join(process.cwd(), path), 'utf8');
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
@@ -101,7 +108,7 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
     page.on('request', (request) => {
       if (/\/(quiz-finder|lazy-module)\.js/.test(request.url())) loaded.push(request.url());
     });
-    await page.goto('/collections/all?view=quiz');
+    await page.goto(`${QUIZ_PATH ?? '/collections/all'}?view=quiz`); // ES1-T417
     await page.waitForLoadState('load');
     await expect(tid(page, 'quiz')).not.toHaveAttribute('data-lazy-module', /./);
     expect(loaded).toEqual([]);
@@ -287,7 +294,8 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
     const request = page.waitForRequest((r) => isResults(new URL(r.url())));
     await answerEmptySet(page);
     const url = new URL((await request).url());
-    expect(url.pathname).toMatch(/\/collections\/all\/quiz-lower\+quiz-advanced\+quiz-gym$/);
+    // ES1-T387: index.te11 lấy kết quả từ collection te11-quiz (ES1-T178 M-A), không còn collections.all.
+    expect(url.pathname).toMatch(/\/collections\/te11-quiz\/quiz-lower\+quiz-advanced\+quiz-gym$/);
     expect(url.searchParams.get('view')).toBe('quiz');
   });
 
@@ -399,7 +407,13 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
   });
 
   test('AC3 có dữ liệu: tối đa 4 card, status từ data-label-results, swatch trong card chạy sau apply', async ({ page }) => {
-    test.skip(!tagsReady(), 'TE11_TAGS_READY chưa true (ES1-T134)');
+    test.skip(!quizReady(), QUIZ_SKIP);
+    // ES1-T417: request kết quả đi sang collection riêng (5 sp mang đủ 3 tag → 4 card); route.continue do trình duyệt gửi, giữ cookie (ES1-T171)
+    await page.route(isResults, (route) => {
+      const url = new URL(route.request().url());
+      url.pathname = url.pathname.replace(/^\/collections\/[^/]+\//, `${QUIZ_PATH}/`);
+      return route.continue({ url: url.href });
+    });
     const errors = watchConsole(page);
     await open(page);
     await option(page, 'quiz-upper').check();
@@ -430,7 +444,8 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
   test('AC3 contract: tên partial khớp Liquid, trần byte', async () => {
     expect(source('assets/quiz-finder.js')).toContain('partials.fetch("quiz-results"');
     expect(source('blocks/quiz.liquid')).toContain("{% partial 'quiz-results' %}");
-    expect(statSync(join(process.cwd(), 'assets/lazy-module.js')).size).toBeLessThanOrEqual(384);
+    // ADR 0010 (ES1-T316): lazy-module thêm data-lazy-on="interaction", trần 384 → 768
+    expect(statSync(join(process.cwd(), 'assets/lazy-module.js')).size).toBeLessThanOrEqual(768);
     expect(statSync(join(process.cwd(), 'assets/quiz-finder.js')).size).toBeLessThanOrEqual(4352);
   });
 });

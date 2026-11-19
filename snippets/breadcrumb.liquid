@@ -1,0 +1,135 @@
+{% doc %}
+  Breadcrumb trail plus its single JSON-LD BreadcrumbList (TE-22 AC9, AC10,
+  AC12; docs/ui-spec/foundation.md §5). The trail is read from the current
+  template, so callers only place the snippet under the header:
+
+  - collection: Home / Collections / {collection}
+  - collection.quiz (`?view=quiz`): Home / {title}
+  - list-collections: Home / Collections
+  - product: Home / {collection} / {product} when opened from a collection,
+    otherwise Home / {product}
+  - blog: Home / {blog}; tag page: Home / {blog} / {tags}
+  - article: Home / {blog} / {article}
+  - page: Home / {page}
+  - search: Home / Search
+  - any other template (index, cart, 404, password, gift_card, customers):
+    renders nothing, and no BreadcrumbList.
+
+  Every link but the last comes from `routes.*` or the object URL; the last
+  item is a `<span aria-current="page">`, never cut (full name, wraps). The
+  JSON-LD is built from the same variables, so names, order and URLs match
+  the visible trail; the last item has no `item` URL because it is not a link.
+  Inside `.page-banner` the trail turns white (assets/base.css).
+
+  Test hooks: breadcrumb, breadcrumb-current, breadcrumb-structured-data.
+
+  @param {string} [title] - Overrides the name of the last item, for example the quiz result heading on `?view=quiz`
+
+  @example
+  {% render 'breadcrumb' %}
+  {% liquid
+    assign quiz_heading = 'blocks.quiz.results_heading' | t
+    render 'breadcrumb', title: quiz_heading
+  %}
+{% enddoc %}
+
+{%- liquid
+  assign current_title = ''
+  assign middle_title = ''
+  assign middle_url = ''
+  assign has_trail = true
+
+  case template.name
+    when 'collection'
+      assign current_title = collection.title
+      unless template.suffix == 'quiz'
+        assign middle_title = 'collections.title' | t
+        assign middle_url = routes.collections_url
+      endunless
+    when 'list-collections'
+      assign current_title = 'collections.title' | t
+    when 'product'
+      assign current_title = product.title
+      if collection != blank
+        assign middle_title = collection.title
+        assign middle_url = collection.url
+      endif
+    when 'blog'
+      assign current_title = blog.title
+      if current_tags != blank
+        assign middle_title = blog.title
+        assign middle_url = blog.url
+        assign current_title = current_tags | join: ', '
+      endif
+    when 'article'
+      assign middle_title = blog.title
+      assign middle_url = blog.url
+      assign current_title = article.title
+    when 'page'
+      assign current_title = page.title
+    when 'search'
+      assign current_title = 'search.title' | t
+    else
+      assign has_trail = false
+  endcase
+
+  if title != blank
+    assign current_title = title
+  endif
+
+  assign home_title = 'general.breadcrumb.home' | t
+  assign origin_root = request.origin | append: routes.root_url
+  assign middle_item = request.origin | append: middle_url
+  assign current_position = 2
+  if middle_title != blank
+    assign current_position = 3
+  endif
+-%}
+
+{%- if has_trail and current_title != blank -%}
+  <nav class="breadcrumb" aria-label="{{ 'general.breadcrumb.label' | t }}" data-testid="breadcrumb">
+    <ol class="breadcrumb__list">
+      <li class="breadcrumb__item">
+        <a class="breadcrumb__link" href="{{ routes.root_url }}">{{ home_title | escape }}</a>
+      </li>
+      {%- if middle_title != blank %}
+        <li class="breadcrumb__item">
+          <a class="breadcrumb__link" href="{{ middle_url }}">{{ middle_title | escape }}</a>
+        </li>
+      {%- endif %}
+      <li class="breadcrumb__item">
+        <span class="breadcrumb__current" aria-current="page" data-testid="breadcrumb-current">
+          {{- current_title | escape -}}
+        </span>
+      </li>
+    </ol>
+  </nav>
+
+  <script type="application/ld+json" data-testid="breadcrumb-structured-data">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": {{ home_title | json }},
+          "item": {{ origin_root | json }}
+        },
+        {%- if middle_title != blank %}
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": {{ middle_title | json }},
+            "item": {{ middle_item | json }}
+          },
+        {%- endif %}
+        {
+          "@type": "ListItem",
+          "position": {{ current_position }},
+          "name": {{ current_title | json }}
+        }
+      ]
+    }
+  </script>
+{%- endif -%}

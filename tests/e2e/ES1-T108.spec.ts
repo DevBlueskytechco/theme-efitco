@@ -2,7 +2,7 @@
 // Ticket ES1-T108 TE-6-FE1: trang collection + list-collections (docs/srs.md#TE-6 AC1, AC5; drafts/techlead/ES1-T103/task-split.md D2, D3, D4, D11, D12).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T108.spec.ts -g "AC1|AC5|nojs"
 // Dữ liệu (ES1-T105 chưa trả lời): thiếu TE6_* → dùng /collections/all, test cần dữ liệu riêng skip có lý do.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
@@ -67,7 +67,14 @@ test.describe('ES1-T108 TE-6 trang collection', () => {
     const img = page.getByTestId('collection-banner-image').locator('img');
     await expect(img).toHaveAttribute('loading', 'eager');
     await expect(img).toHaveAttribute('fetchpriority', 'high');
-    await expect(img).toHaveAttribute('style', /object-position/);
+    // collection.image là Image riêng (cdn/shop/collections), admin không đặt được focal point cho ảnh collection
+    // (kiểm 18/11). image_tag tự in style object-position khi ảnh có focal point, không có thì không in style.
+    // Nên: có style thì phải là object-position; Liquid render qua image_tag, không truyền height/crop (crop server huỷ focal).
+    const style = await img.getAttribute('style');
+    if (style) expect(style).toMatch(/object-position/);
+    const banner = readFileSync(join(process.cwd(), 'blocks/collection-banner.liquid'), 'utf8').replace(/{%-?\s*doc[\s\S]*?enddoc\s*-?%}/, '');
+    expect(banner).toMatch(/render 'image'/);
+    expect(banner).not.toMatch(/\b(crop|height):/);
     expect(await img.evaluate((el) => getComputedStyle(el).objectFit)).toBe('cover');
     // Không crop server: URL ảnh không có tham số crop
     expect(await img.getAttribute('src')).not.toMatch(/crop=/);
@@ -136,19 +143,24 @@ test.describe('ES1-T108 TE-6 trang collection', () => {
     expect(await columnCount(page)).toBe(1);
   });
 
+  // ES1-T417 (CTO 11/11, ES1-T178 mục N): store dev 2065 sản phẩm, sắp theo tên thì sản phẩm hết hàng TE4 (hết-hang-toan-bộ) ở vị trí > 2000 → skip từ 03/11.
+  // Duyệt với sort_by=created-descending cố định; MAIN (TE6_COLLECTION_HANDLE) không có sản phẩm hết hàng thì duyệt tiếp /collections/all.
   test('AC1 sold out: card có badge', async ({ page }) => {
-    for (let n = 1; n <= MAX_PAGES; n++) {
-      const res = await page.goto(n === 1 ? MAIN : `${MAIN}?page=${n}`);
-      if (!res || res.status() >= 400) break;
-      const cards = page.getByTestId('collection-product');
-      const badge = cards.getByTestId('product-card-badge-sold-out').first();
-      if (await badge.count()) {
-        await expect(badge).toHaveText(/\S/);
-        return;
+    const sorted = (path: string, n: number) => `${path}?sort_by=created-descending${n === 1 ? '' : `&page=${n}`}`;
+    for (const path of [...new Set([MAIN, ALL])]) {
+      for (let n = 1; n <= MAX_PAGES; n++) {
+        const res = await page.goto(sorted(path, n));
+        if (!res || res.status() >= 400) break;
+        const cards = page.getByTestId('collection-product');
+        const badge = cards.getByTestId('product-card-badge-sold-out').first();
+        if (await badge.count()) {
+          await expect(badge).toHaveText(/\S/);
+          return;
+        }
+        if ((await cards.count()) < PAGE_SIZE) break;
       }
-      if ((await cards.count()) < PAGE_SIZE) break;
     }
-    test.skip(true, `Không có sản phẩm hết hàng trong ${MAX_PAGES} trang đầu ${MAIN}`);
+    test.skip(true, `Không có sản phẩm hết hàng trong ${MAX_PAGES} trang đầu ${MAIN} và ${ALL} (sort_by=created-descending)`);
   });
 
   test('AC1 phân trang: link page 2 đúng, aria-current, Previous ở trang 2', async ({ page }) => {
@@ -212,15 +224,16 @@ test.describe('ES1-T108 TE-6 list-collections', () => {
     test.skip(count === 0, 'Store không có collection');
     expect(count).toBeLessThanOrEqual(PAGE_SIZE);
 
+    // ES1-T367 (TE-6 AC15, SRS 0.5): card là <li>, link là tên (::after phủ card), ảnh 336:220 thay 336:270.
     const first = cards.first();
     await expect(first.getByTestId('list-collections-card-title')).not.toBeEmpty();
-    expect(await first.getAttribute('href')).toMatch(/\/collections\//);
+    expect(await first.getByTestId('list-collections-card-link').getAttribute('href')).toMatch(/\/collections\//);
     await expect(first.locator('img, svg')).toHaveCount(1);
     const ratio = await first.locator('img, svg').evaluate((el) => {
       const r = el.parentElement!.getBoundingClientRect();
       return r.width / r.height;
     });
-    expect(ratio).toBeCloseTo(336 / 270, 1);
+    expect(ratio).toBeCloseTo(336 / 220, 1);
 
     expect(errors, errors.join('\n')).toEqual([]);
     await expectAxeClean(page, 'main');
@@ -277,6 +290,7 @@ test.describe('ES1-T108 nojs', () => {
     const card = page.getByTestId('list-collections-card').first();
     test.skip((await card.count()) === 0, 'Store không có collection');
     await expect(card).toBeVisible();
+    // ES1-T367: bấm giữa card (ảnh) rơi vào ::after của link tên
     await card.click();
     await expect(page.getByTestId('collection-banner-title')).toBeVisible();
   });

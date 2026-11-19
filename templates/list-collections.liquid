@@ -1,40 +1,70 @@
-{% # TE-6 AC5 (drafts/techlead/ES1-T103/task-split.md D4). Test hooks: list-collections, list-collections-card, list-collections-card-title, and the hooks of snippets/pagination.liquid. %}
+{% # TE-6 AC5, AC15 (SRS 0.5), docs/ui-spec/list-collections.md. Breadcrumb Home / Collections, h1 + "{n} collections", cards in the .collection-card language of blocks/collection-card.liquid (one title link stretched over the card), shared pagination 24 per page. Test hooks: list-collections, list-collections-grid, list-collections-card, list-collections-card-image, list-collections-card-title, list-collections-card-link, list-collections-card-meta, list-collections-empty(-heading, -button), plus the hooks of snippets/breadcrumb, page-title and pagination. %}
 {% block 'container', id: 'list-collections' %}
-  {%- assign pagination_label = 'collections.pagination.label' | t -%}
   <div class="list-collections" data-testid="list-collections">
-    <h1 class="list-collections__title">{{ 'collections.title' | t }}</h1>
+    {% render 'breadcrumb' %}
 
-    {% paginate collections by 24 %}
+    {% paginate collections by 24, window_size: 1 %}
+      {%- liquid
+        assign page_heading = 'collections.title' | t
+        assign count_label = ''
+        if paginate.items > 0
+          assign count_label = 'collections.count' | t: count: paginate.items
+        endif
+        render 'page-title', title: page_heading, meta: count_label
+      -%}
+
       {%- if paginate.items == 0 -%}
-        <p class="list-collections__empty">{{ 'collections.empty' | t }}</p>
+        {%- liquid
+          assign empty_heading = 'collections.empty_heading' | t
+          assign empty_text = 'collections.empty' | t
+          assign empty_button = 'collections.empty_cta' | t
+          render 'empty-state', heading: empty_heading, text: empty_text, button_label: empty_button, button_url: routes.all_products_collection_url, testid: 'list-collections-empty'
+        -%}
       {%- else -%}
-        <ul class="list-collections__grid" role="list">
+        <ul class="list-collections__grid" role="list" data-testid="list-collections-grid">
           {%- for item in collections -%}
-            <li class="list-collections__item">
-              <a class="list-collections__card" href="{{ item.url }}" data-testid="list-collections-card">
-                {%- if item.featured_image != blank -%}
-                  {% render 'image',
-                    class: 'list-collections__image',
-                    image: item.featured_image,
-                    width: 720,
-                    widths: '360, 720',
-                    sizes: '(min-width: 80rem) 25vw, (min-width: 48rem) 33vw, 50vw',
-                    decorative: true
-                  %}
-                {%- else -%}
-                  <span class="list-collections__placeholder" aria-hidden="true">
-                    {{- 'collection-1' | placeholder_svg_tag: 'list-collections__placeholder-svg' -}}
-                  </span>
-                {%- endif -%}
-                <h2 class="list-collections__card-title" data-testid="list-collections-card-title">
+            {%- liquid
+              # LCP (list-collections.md §6): the first row (up to 4 cards) loads eager, only card 1 gets fetchpriority high
+              # nil, not '': an empty string is truthy and snippets/image would print fetchpriority=""
+              assign image_loading = 'lazy'
+              assign image_priority = nil
+              if forloop.index <= 4
+                assign image_loading = 'eager'
+              endif
+              if forloop.first
+                assign image_priority = 'high'
+              endif
+              assign products_label = 'collections.products_count' | t: count: item.products_count
+            -%}
+            <li class="collection-card" data-testid="list-collections-card">
+              {%- if item.featured_image != blank -%}
+                {% render 'image',
+                  image: item.featured_image,
+                  class: 'collection-card__image',
+                  width: 672,
+                  widths: '180, 360, 504, 672',
+                  sizes: '(min-width: 80rem) min(23vw, 336px), (min-width: 48rem) 31vw, 46vw',
+                  loading: image_loading,
+                  fetchpriority: image_priority,
+                  decorative: true,
+                  testid: 'list-collections-card-image'
+                %}
+              {%- else -%}
+                <div class="collection-card__image collection-card__image--empty" data-testid="list-collections-card-image">
+                  {%- render 'status-icon', name: 'image' -%}
+                </div>
+              {%- endif -%}
+              <h2 class="collection-card__title" data-testid="list-collections-card-title">
+                <a class="collection-card__link" href="{{ item.url }}" data-testid="list-collections-card-link">
                   {{- item.title | escape -}}
-                </h2>
-              </a>
+                </a>
+              </h2>
+              <p class="collection-card__meta" data-testid="list-collections-card-meta">{{ products_label }}</p>
             </li>
           {%- endfor -%}
         </ul>
 
-        {% render 'pagination', paginate: paginate, label: pagination_label %}
+        {% render 'pagination', paginate: paginate %}
       {%- endif -%}
     {% endpaginate %}
   </div>

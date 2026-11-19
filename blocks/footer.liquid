@@ -1,6 +1,7 @@
 {% doc %}
   Renders the theme's storefront footer: newsletter band (optional image,
-  heading, text, form, note), logo, description, footer menu, social
+  heading with italic words in the accent color, text, form, note), logo,
+  description, footer menu, social
   links, Follow on Shop, trust bar, wordmark, localization, payment icons,
   and copyright line. Works without JavaScript. Composed directly in
   layout/theme.liquid so it appears on every page.
@@ -8,7 +9,8 @@
   Social URLs are global settings (config/settings_schema.json, Social
   group); everything else is a block setting. Text settings default to empty
   (ADR 0011): an empty heading, text, description or trust item is not
-  rendered. The submit button uses the button label setting, then the
+  rendered. The newsletter heading is rich text: italic words show in the
+  accent color. The submit button uses the button label setting, then the
   "Subscribe" locale string. Payment icons come only from
   shop.enabled_payment_types, full color. Logo order (ADR 0011): the block
   logo, then the theme logo (Theme settings, Logo and favicon), then the shop
@@ -84,7 +86,7 @@
       <div class="site-footer__newsletter">
         {%- if newsletter_heading != blank -%}
           <h2 class="site-footer__newsletter-heading" data-testid="footer-newsletter-heading">
-            {{- newsletter_heading | escape -}}
+            {{- block.settings.newsletter_heading -}}
           </h2>
         {%- endif -%}
         {%- if newsletter_text != blank -%}
@@ -261,7 +263,7 @@
           {%- assign trust_icon_key = 'trust_icon_' | append: index -%}
           {%- assign trust_text = block.settings[trust_key] | strip -%}
           {%- if trust_text != blank -%}
-            <li class="site-footer__trust-item">
+            <li class="site-footer__trust-item" data-testid="footer-trust-item">
               {%- render 'icon-trust', icon: block.settings[trust_icon_key] -%}
               <span>{{ trust_text | escape }}</span>
             </li>
@@ -420,10 +422,10 @@
       "info": "t:info.newsletter_image"
     },
     {
-      "type": "text",
+      "type": "inline_richtext",
       "id": "newsletter_heading",
       "label": "t:labels.newsletter_heading",
-      "info": "t:info.footer_hide_empty"
+      "info": "t:info.newsletter_heading"
     },
     {
       "type": "inline_richtext",

@@ -2,7 +2,10 @@
   TE-13 test template, opened with /?view=te13 (drafts/techlead/ES1-T142/task-split.md D11,
   plan ES1-T169 D4): one featured product with several variants, so its partials stay
   unique, plus the video carousel cases. Other countdown and stock states:
-  templates/index.te13-states.liquid.
+  templates/index.te13-states.liquid. Product te13-featured (compare-at price, rating
+  and spec metafields): templates/index.te13-featured.liquid (ES1-T435). Band A always
+  uses the variants product: a second featured product here would switch the picker
+  from partials to JSON (ES1-T169 D4).
   A branch preview has no block settings, so this file sets them through block
   parameters and uses Figma copy. Handles come from tests/e2e/store-data.json.
   The YouTube and Vimeo ids are public test videos, used when the test product has no
@@ -11,10 +14,8 @@
 {% endcomment %}
 
 {%- liquid
-  assign te13_featured = all_products['te13-featured']
-  if te13_featured == blank
-    assign te13_featured = all_products['variant-co-ảnh-rieng']
-  endif
+  # ES1-T435: TE4_VARIANTS_HANDLE only (own image per variant, one variant sold out)
+  assign te13_variants = all_products['variant-co-ảnh-rieng']
   assign te13_sale = all_products['sale-gia-nhỏ']
   assign te13_single = all_products['sản-phẩm-chỉ-1-variant']
 
@@ -43,7 +44,7 @@
 {% block 'container', id: 'te13-a', tag: 'div' %}
   {% block 'featured-product',
     id: 'te13-featured-a',
-    product: te13_featured,
+    product: te13_variants,
     eyebrow: 'Featured Product · Free Weights',
     countdown_end: te13_future,
     spec_1_label: 'Weight range',
@@ -82,7 +83,7 @@
       id: 'te13-video-2',
       video_id: 'aqz-KE-bpKQ',
       video_host: 'youtube',
-      product: te13_featured,
+      product: te13_variants,
       badge: 'Dumbbells'
     %}{% endblock %}
     {% block 'video-card',
@@ -99,7 +100,7 @@
       poster: te13_sale.featured_image
     %}{% endblock %}
     {% block 'video-card', id: 'te13-video-6', video_id: 'aqz-KE-bpKQ', video_host: 'youtube', product: te13_sale %}{% endblock %}
-    {% block 'video-card', id: 'te13-video-7', video_id: '1084537', video_host: 'vimeo', product: te13_featured %}{% endblock %}
+    {% block 'video-card', id: 'te13-video-7', video_id: '1084537', video_host: 'vimeo', product: te13_variants %}{% endblock %}
     {% block 'video-card', id: 'te13-video-8', video_id: '1084537', video_host: 'vimeo', product: te13_single %}{% endblock %}
   {% endblock %}
 {% endblock %}
