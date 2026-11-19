@@ -3,9 +3,9 @@
 // watchStore gộp console guard của T96, T97, T98 và luồng thật; ghi số 429, trang thử thách vào [429-tong-ket].
 import { expect, test, type Page, type Request, type Response } from '@playwright/test';
 import { basename } from 'node:path';
-import { MAX_WAITS, retryDelayMs } from './cart-api';
+import { MAX_WAITS, retryDelayMs, skip429 } from './cart-api';
 import { isCloudflareLog, watchShopPay403 } from './console-guard';
-import { record429 } from './report-429';
+import { cooldownWaitMs, first429At, record429 } from './report-429';
 
 const IGNORE_CONSOLE = /shopifycloud|monorail|web-pixels|trekkie|shop\.app|shopifysvc\.com|cdn\.shopify\.com\/s\/(trekkie|javascripts)|status of 429/i;
 const NETWORK_LOG = /Failed to load resource/i;
@@ -136,6 +136,52 @@ export async function gotoStore(page: Page, path: string, options: { waitUntil?:
   }
 }
 
+// ES1-T470: request theme tự gửi hoặc trang theme tự điều hướng tới (partial quiz, fallback form sang /search) không qua gotoStore.
+// Response khớp `match` bị 429 thì ghi [429-tong-ket]; assertion cần store hỏng thì báo Cloudflare trước, không để thành toBeVisible khó hiểu.
+// Gọi ở đầu test, trước khi mở trang. Lỗi khác (assertion, timeout) ném lại nguyên vẹn, không nới gì.
+export function watchStoreBlock(page: Page, match: (url: URL) => boolean) {
+  const spec = specName();
+  let blocked: Response | undefined;
+  page.on('response', (res) => {
+    if (!match(new URL(res.url()))) return;
+    if (res.status() === 429) record429('hit', spec);
+    if (isChallengeResponse(res) || res.status() === 429) blocked ??= res;
+  });
+  const check = async () => {
+    if (blocked) expectStoreAllowed(blocked);
+    await expectNotChallenged(page);
+  };
+  return {
+    check,
+    expect: async (assertion: () => Promise<unknown>) => {
+      await check();
+      try {
+        await assertion();
+      } catch (error) {
+        await check();
+        throw error;
+      }
+    },
+  };
+}
+
+// ES1-T300 (CTO 11/11 mục 4): luồng thêm giỏ thật (POST /cart/add) mà store dev chặn (Cloudflare cf-mitigated hoặc 429 sau khi đã thử lại)
+// thì skip có lý do, không fail gate. Chỉ dùng cho test được CTO cho phép (ES1-T156 nojs POST, ES1-T158 AC-H22; CTO 11/11 16:12: ES1-T95 :106 :138, ES1-T190 :216); test khác giữ quy tắc ES1-T203 (fail rõ).
+// Skip ghi vào [429-tong-ket] (record429 'skip') và log [cartApi], nên không im lặng. Lỗi khác (assertion, timeout) ném lại nguyên vẹn.
+export const isStoreBlockedError = (error: unknown) => {
+  const message = error instanceof Error ? error.message : String(error);
+  return message.includes(CLOUDFLARE_BLOCKED) || /store trả 429/.test(message);
+};
+
+export async function skipIfStoreBlocked<T>(reason: string, flow: () => Promise<T>): Promise<T> {
+  try {
+    return await flow();
+  } catch (error) {
+    if (isStoreBlockedError(error)) skip429(`${reason}: ${(error as Error).message.split('\n')[0]}`);
+    throw error;
+  }
+}
+
 export type StoreWatch = {
   allowNetworkLog: () => void;
   // Gọi cuối test: bị chặn thì fail nêu Cloudflare trước, sau đó mới tới console error.
@@ -176,4 +222,19 @@ export function watchStore(page: Page): StoreWatch {
       expect(errors, `console error:\n${errors.join('\n')}`).toEqual([]);
     },
   };
+}
+
+// ES1-T477 (a): cổng chờ Cloudflare trước luồng thêm giỏ thật. Shard đã ghi 429 hoặc trang thử thách (record429) thì chờ tới đủ 10,5 phút kể từ lần 429 đầu
+// của đợt chặn (support/report-429.ts), tối đa 5,5 phút; chưa bị chặn thì không chờ. Gọi ở đầu hook hoặc test: thời gian chờ cộng vào timeout của hook/test đó.
+// Không nới gì: hết chờ mà store vẫn chặn thì luồng thật vẫn fail nêu Cloudflare như trước (ES1-T203).
+export async function waitStoreCooldown(label: string): Promise<number> {
+  const first = first429At();
+  const now = Date.now();
+  const wait = cooldownWaitMs(first, now);
+  if (!wait) return 0;
+  console.log(`[429-cho] chờ ${Math.ceil(wait / 1000)}s trước ${label} (lần 429 đầu của shard cách ${Math.round((now - first!) / 1000)}s, ES1-T477 a)`);
+  const info = test.info();
+  if (info.timeout > 0) info.setTimeout(info.timeout + wait);
+  await new Promise((r) => setTimeout(r, wait));
+  return wait;
 }

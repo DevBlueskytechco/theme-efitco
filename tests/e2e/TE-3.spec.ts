@@ -6,7 +6,7 @@
 // Dữ liệu (không hardcode handle): TE3_SALE_HANDLE, TE3_SMALL_PRICE_HANDLE, TE3_VARIES_HANDLE, TE3_UNIT_PRICE_HANDLE,
 //   TE3_SWATCH_HANDLE, TE3_SOLD_OUT_HANDLE, TE3_BADGE_SWATCH_HANDLE (ES1-T57), TE3_AC8_VARIANT_ID, TE3_AC8_PATH. Không đặt thì tự tìm card đầu tiên có testid, không có thì skip.
 // Setting block khác mặc định: EXPECT_PRODUCTS_TO_SHOW, EXPECT_COLUMNS_DESKTOP, EXPECT_VIEW_ALL=header|bottom, EXPECT_VIEW_ALL_PATH.
-import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Locator, type Page, type TestInfo } from './support/test';
 import { getJson } from './support/http';
 import { pageJson, requireJson } from './support/product-data';
 import AxeBuilder from '@axe-core/playwright';
@@ -14,6 +14,8 @@ import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { watchShopPay403 } from './support/console-guard';
+// ES1-T434: handle cố định đọc qua store-data (env → tests/e2e/store-data.json), xem drafts/qa/ES1-T434/test-cases.md.
+import { env } from './support/store-data';
 
 const T = {
   container: 'container-home-featured-collection',
@@ -44,6 +46,10 @@ const ALL = '/collections/all';
 const PAGES = [HOME, ALL] as const;
 const PAGE_SIZE = 20; // templates/collection.liquid paginate by 20
 const MAX_PAGES = 5;
+// ES1-T417 (CTO 11/11, ES1-T178 mục N): store dev 2065 sản phẩm, thứ tự mặc định theo tên đẩy sản phẩm TE4 ra vị trí > 2000,
+// ngoài MAX_PAGES trang đầu → test skip từ 03/11. Mọi lần đọc /collections/all để tìm dữ liệu dùng sort_by=created-descending cố định.
+const SORT = 'sort_by=created-descending';
+const allPage = (n = 1) => (n === 1 ? `${ALL}?${SORT}` : `${ALL}?${SORT}&page=${n}`);
 const SWATCH = 'input[type="radio"][data-variant-id]';
 
 const ENV = {
@@ -51,7 +57,9 @@ const ENV = {
   small: process.env.TE3_SMALL_PRICE_HANDLE,
   varies: process.env.TE3_VARIES_HANDLE,
   unit: process.env.TE3_UNIT_PRICE_HANDLE,
-  swatch: process.env.TE3_SWATCH_HANDLE,
+  swatch: env('TE3_SWATCH_HANDLE'), // ES1-T434: đọc cả store-data.json
+  // ES1-T434: demo-many-variants (ES1-T298 D3: Weight × Pack × Color, 304 biến thể, metafield custom.swatch_colors) không dùng cho nhóm TC radio.
+  many: env('TE4_MANY_VARIANTS_HANDLE'),
   soldOut: process.env.TE3_SOLD_OUT_HANDLE,
   ac8Variant: process.env.TE3_AC8_VARIANT_ID,
   ac8Path: process.env.TE3_AC8_PATH || HOME,
@@ -218,7 +226,7 @@ async function openHome(page: Page): Promise<Locator> {
 
 async function cardsOn(page: Page, path: string): Promise<Locator> {
   if (path === HOME) return (await openHome(page)).getByTestId(T.card);
-  const res = await page.goto(path);
+  const res = await page.goto(path === ALL ? allPage() : path); // ES1-T417: trang đầu theo sort cố định
   expect(res?.status(), `HTTP ${path}`).toBeLessThan(400);
   const cards = page.getByTestId(T.collection).getByTestId(T.card);
   test.skip((await cards.count()) === 0, `${path} không có sản phẩm`);
@@ -234,7 +242,7 @@ function byHandle(page: Page, cards: Locator, handle: string): Locator {
 // không có handle → card đầu tiên có testid. Trả null khi không có.
 async function findCard(page: Page, testid: string | null, handle?: string, without?: string): Promise<Locator | null> {
   for (let n = 1; n <= MAX_PAGES; n++) {
-    const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
+    const res = await page.goto(allPage(n)); // ES1-T417: sort_by=created-descending
     if (!res || res.status() >= 400) return null;
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     const count = await cards.count();
@@ -264,15 +272,29 @@ async function waitSwatchDefined(page: Page) {
 }
 
 // Card có ≥ 2 radio swatch trên path (env TE3_SWATCH_HANDLE ưu tiên trên /collections/all).
+// ES1-T434: PR #191 TC-10 đỏ vì card swatch đầu tiên là demo-many-variants (mới nhất): snippet chọn option Weight (40 giá trị)
+// thay vì Color, swatch thứ 5 không có --swatch-color. Lỗi theme đó kiểm riêng ở TC-10c; nhóm TC radio bỏ sản phẩm này khi tự dò.
+function withoutMany(page: Page, cards: Locator): Locator {
+  return ENV.many ? cards.filter({ hasNot: page.locator(`a[data-testid="${T.title}"][href*="/products/${ENV.many}"]`) }) : cards;
+}
+
 async function swatchCard(page: Page, path: string): Promise<Locator | null> {
   const twoRadios = page.locator(`[data-testid="${T.swatches}"] ${SWATCH}:nth-of-type(2)`);
   if (path === ALL) {
-    const card = await findCard(page, ENV.swatch ? null : T.swatches, ENV.swatch);
-    if (!card || !(await card.locator(SWATCH).nth(1).count())) return null;
+    if (ENV.swatch) {
+      const card = await findCard(page, null, ENV.swatch);
+      if (!card || !(await card.locator(SWATCH).nth(1).count())) return null;
+      return card;
+    }
+    // findCard dừng ở trang có card swatch đầu tiên; lấy card swatch đầu trên trang đó, trừ TE4_MANY_VARIANTS_HANDLE (ES1-T434).
+    if (!(await findCard(page, T.swatches))) return null;
+    const card = withoutMany(page, page.getByTestId(T.collection).getByTestId(T.card)).filter({ has: twoRadios }).first();
+    if (!(await card.count())) return null;
+    await card.scrollIntoViewIfNeeded();
     return card;
   }
   const cards = await cardsOn(page, path);
-  const card = (ENV.swatch ? byHandle(page, cards, ENV.swatch) : cards).filter({ has: twoRadios }).first();
+  const card = (ENV.swatch ? byHandle(page, cards, ENV.swatch) : withoutMany(page, cards)).filter({ has: twoRadios }).first();
   if (!(await card.count())) return null;
   await card.scrollIntoViewIfNeeded();
   return card;
@@ -357,7 +379,7 @@ async function expectBadge(card: Locator, target: Locator) {
 async function badgeSwatchCard(page: Page): Promise<Locator | null> {
   const handle = process.env.TE3_BADGE_SWATCH_HANDLE;
   for (let n = 1; n <= MAX_PAGES; n++) {
-    const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
+    const res = await page.goto(allPage(n)); // ES1-T417: sort_by=created-descending
     if (!res || res.status() >= 400) return null;
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     const count = await cards.count();
@@ -489,7 +511,9 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
       await expect(card!.locator('[data-card-price]')).toHaveCount(1);
     });
 
-    test(`TC-12 TC-33 AC2: chọn swatch đổi ảnh, link ?variant=, giá, không reload, 0 console error (${path})`, async ({ page }, ti) => {
+    // ES1-T300: bỏ (lỗi thời). docs/srs.md TE-3 AC2 bản 0.3 (D9, ES1-T294): swatch card là chỉ báo aria-hidden, không bấm được; chọn màu qua Quick View (AC9).
+    // ES1-T306 đề xuất bỏ TC-12, TC-33. Đỏ ở run 42978078054 (TE-3.spec.ts:492) do lỗi alt khi hover rồi click (ES1-T303), hành vi sẽ bị gỡ theo AC2 0.3.
+    test.skip(`TC-12 TC-33 AC2: chọn swatch đổi ảnh, link ?variant=, giá, không reload, 0 console error (${path})`, async ({ page }, ti) => {
       const errors = trackErrors(page);
       const docs = trackDocuments(page);
       const card = await swatchCard(page, path);
@@ -649,20 +673,55 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     expect(errors, errors.join('\n')).toEqual([]);
   });
 
-  test('TC-16 AC2: hơn 5 màu thì 5 swatch + "+N" ra khỏi tab order', async ({ page }) => {
+  // ES1-T417: trước sort cố định, 5 trang đầu /collections/all không có card "+N" nên test này luôn skip và giữ assertion cũ
+  // (5 radio trong fieldset/legend, "+N" là link tabindex -1). Theo docs/srs.md#TE-3 AC2 (swatch là chỉ báo aria-hidden, link card
+  // ghi số màu) và AC13 (0.5, VP2, variant-picker.md §9: N > 4 thì 3 chỉ báo + "+{N − 3}"), snippets/product-card.liquid:172-177, 302-341.
+  test('TC-16 AC2 AC13: hơn 4 màu thì 3 chỉ báo + "+N", hàng aria-hidden không focus được, link ghi tổng N màu', async ({ page }) => {
     const card = await findCard(page, T.more);
-    test.skip(!card, `Không có sản phẩm hơn 5 màu swatch trên ${ALL}`);
+    test.skip(!card, `Không có sản phẩm hơn 4 màu swatch trên ${allPage()}`);
     const handle = await handleOf(card!);
     const p = await productJs(page, handle);
-    const legend = norm(await card!.getByTestId(T.swatches).locator('legend').textContent());
-    const option = p.options.find(o => o.name === legend);
-    expect(option, `option ${legend} trong ${handle}.js`).toBeTruthy();
-    await expect(card!.getByTestId(T.swatch)).toHaveCount(5);
+    const row = card!.getByTestId(T.swatches);
+    const swatches = row.getByTestId(T.swatch);
+    await expect(swatches).toHaveCount(3);
+    // Tên value nằm trong span visually-hidden của từng chỉ báo; option màu = option có > 4 giá trị chứa đủ các tên này.
+    const names = (await swatches.allTextContents()).map(norm);
+    const option = p.options.find(o => o.values.length > 4 && names.every(n => o.values.includes(n)));
+    expect(option, `option chứa ${names.join(', ')} và > 4 giá trị trong ${handle}.js`).toBeTruthy();
+    const total = option!.values.length;
+
+    await expect(row).toHaveAttribute('aria-hidden', 'true');
+    await expect(row.locator('a, button, input, select, textarea, [tabindex], [href]'), 'hàng chỉ báo không có control').toHaveCount(0);
     const more = card!.getByTestId(T.more);
-    await expect(more).toHaveText(`+${option!.values.length - 5}`);
-    await expect(more).toHaveAttribute('tabindex', '-1');
-    await expect(more).toHaveAttribute('aria-hidden', 'true');
-    await expect(more).toHaveAttribute('href', new RegExp(`/products/${handle}$`));
+    await expect(more).toHaveText(`+${total - 3}`);
+    await expect(card!.getByTestId(T.title)).toHaveAccessibleName(new RegExp(`, ${total} colors$`));
+
+    // AC13: 3 chỉ báo và "+N" cùng một hàng (không xuống dòng trong card).
+    const boxes = await row.locator(`[data-testid="${T.swatch}"], [data-testid="${T.more}"]`).evaluateAll(els =>
+      els.map(el => { const r = el.getBoundingClientRect(); return r.top + r.height / 2; }));
+    expect(Math.max(...boxes) - Math.min(...boxes), 'chỉ báo và +N cùng hàng').toBeLessThanOrEqual(2);
+  });
+
+  // ES1-T434 (bug ES1-T434-B01): docs/srs.md#TE-3 AC2 "swatch lấy từ option value của option màu".
+  // demo-many-variants: Weight (40 giá trị) × Pack × Color (Black, Gray, Red, Blue), metafield custom.swatch_colors 4 màu, không swatch gốc.
+  // product-card.liquid:131-141 lấy option đầu có > 1 giá trị khi có metafield → swatch là Weight → test ĐỎ CÓ CHỦ ĐÍCH tới khi
+  // ES1-T404 (TS-FE6) bỏ custom.swatch_colors: Color không có swatch gốc thì card không có swatch → đạt. Không tự dò, URL sort riêng của test này.
+  test('TC-10c AC2: swatch card chỉ lấy giá trị của option màu, không lấy option đầu (TE4_MANY_VARIANTS_HANDLE)', async ({ page }) => {
+    test.skip(!ENV.many, 'Thiếu TE4_MANY_VARIANTS_HANDLE (store-data.json)');
+    let card: Locator | null = null;
+    for (let n = 1; n <= 2 && !card; n++) {
+      const res = await page.goto(`${ALL}?sort_by=created-descending${n > 1 ? `&page=${n}` : ''}`);
+      expect(res?.status(), `HTTP ${ALL}`).toBeLessThan(400);
+      const found = byHandle(page, page.getByTestId(T.collection).getByTestId(T.card), ENV.many!);
+      if (await found.count()) card = found.first();
+    }
+    test.skip(!card, `Không thấy ${ENV.many} trong 2 trang đầu ${ALL}?sort_by=created-descending`);
+    const p = await productJs(page, ENV.many!);
+    const color = p.options.find(o => /colou?r/i.test(o.name));
+    expect(color, `dữ liệu store: ${ENV.many}.js không có option Color (ES1-T298 D3)`).toBeTruthy();
+    const names = await card!.getByTestId(T.swatch).evaluateAll(els => els.map(el => (el.textContent ?? '').replace(/\s+/g, ' ').trim()));
+    const wrong = names.filter(name => !color!.values.includes(name));
+    expect(wrong, `swatch card ${ENV.many} lấy giá trị ngoài option ${color!.name} (${color!.values.join(', ')}): product-card.liquid:134-141`).toEqual([]);
   });
 
   // AC3
@@ -1114,7 +1173,7 @@ test.describe('ES1-T53 TE-3 không JS (NFR-4)', () => {
 
   // Chỉ assertion locator, không evaluate trong trang.
   test('B-01 AC2: tắt JS, card render đủ, radio đổi, link giữ variant mặc định', async ({ page }) => {
-    await page.goto(ALL);
+    await page.goto(allPage()); // ES1-T417: sort_by=created-descending
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     test.skip((await cards.count()) === 0, `${ALL} không có sản phẩm`);
     await expect(cards.first().getByTestId(T.title)).toBeVisible();

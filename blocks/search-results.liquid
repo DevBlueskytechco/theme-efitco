@@ -28,8 +28,7 @@
   Otherwise: no results for the terms and a link to all products. search.terms
   is escaped before it goes into a key ending in _html (ES1-T124 #5).
 
-  Loads assets/product-swatch.js outside the partial, always, because the
-  product group can appear when JavaScript applies the partial.
+  No script: product-card swatches are indicators only (ES1-T338, ADR 0010).
 
   Test hooks: search-results (root), search-results-toolbar,
   search-results-count, search-results-group (with data-object-type),
@@ -180,7 +179,6 @@
                           <li class="collection-products__item" data-testid="search-results-product">
                             {% render 'product-card',
                               product: result,
-                              id_prefix: 'search',
                               sizes: image_sizes,
                               loading: card_loading,
                               heading_level: 'h3',
@@ -239,8 +237,6 @@
         </div>
       {% endpaginate %}
     {% endpartial %}
-
-    <script src="{{ 'product-swatch.js' | asset_url }}" type="module"></script>
   </div>
 {%- endif -%}
 

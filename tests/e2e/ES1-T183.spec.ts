@@ -2,7 +2,8 @@
 // Ticket ES1-T183 TE-11-FE3: body map bấm được (CR-10, AC-H17 phần markup), token panel #393942 (CR-9), copy 1:515 + 1:532 (AC-H15).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T183.spec.ts
 // Chạy được cả sau ES1-T139: mỗi test bấm vùng mở trang mới vì bước đổi sau khi chọn, input ẩn vẫn giữ checked.
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
@@ -50,7 +51,7 @@ async function openWithMap(page: Page, width: number) {
 
 async function noJsPage(browser: Browser, width: number) {
   const use = test.info().project.use;
-  const context = await browser.newContext({
+  const context = await newStoreContext(browser, {
     javaScriptEnabled: false,
     storageState: 'tests/setup/state.json',
     baseURL: use.baseURL,

@@ -2,7 +2,7 @@
 // Ticket ES1-T184 TE-15-FE1: blocks/collection-list + collection-card, hàng 3 Figma 1:395 (AC-H8, AC-H9 phần markup). Next/back bấm được thuộc ES1-T185.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T184.spec.ts
 // /?view=te15 không cần dữ liệu nhập (collection all). 5 tên thật trên /?view=figma cần figma-cat-* (ES1-T178): thiếu thì skip có lý do.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
@@ -133,7 +133,7 @@ test.describe('ES1-T184 cỡ card theo màn hình', () => {
   for (const [width, cardWidth, gap] of [
     [360, 252, 16],
     [768, 307.2, 16],
-    [1280, 336, 24],
+    [1280, 270.7, 24], // ES1-T334: TE-15 AC1 (SRS 0.5) card 271 ở 1280
     [1920, 336, 24],
   ] as const) {
     test(`${width}: card rộng ${cardWidth}, gap ${gap}, không tràn trang`, async ({ page }) => {

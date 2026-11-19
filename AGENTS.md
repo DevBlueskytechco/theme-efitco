@@ -209,16 +209,36 @@ Snippets (`snippets/`):
 
 | Snippet | Role |
 | --- | --- |
+| `article-card` | One article card as a list item: link with image, first tag, title, reading time. |
+| `breadcrumb` | Breadcrumb trail read from the current template plus its single JSON-LD BreadcrumbList; nothing on home, cart, 404, password, gift card. |
+| `carousel-nav` | Next and back buttons for a horizontal list inside `scroll-buttons`; hidden until enhanced or when the row fits. |
+| `carousel-progress` | Thin progress line under a horizontal list; decorative, driven by `assets/scroll-buttons.js`. |
+| `cart-free-shipping` | Free shipping progress against the `free_shipping_threshold` setting. |
+| `cart-lines` | Cart line items, or the empty state when the cart has no items. |
+| `cart-summary` | Cart totals and the checkout button: subtotal, order-level discounts, note. |
 | `css-variables` | Outputs every design token as a CSS custom property plus `@font-face`. |
+| `empty-state` | Shared empty and error state for a block or page region (foundation §18). |
+| `featured-product-seal` | Decorative round seal on the featured product image. |
+| `filter-group` | One storefront filter as an open `details` group of native inputs. |
+| `filter-option` | One filter value as a native checkbox inside a full-width label. |
 | `header-icon` | Decorative header icons (menu, close, search, chevron). |
+| `header-mega-group` | One group of a mega menu column: level 2 link and its level 3 links. |
 | `icon-social` | Decorative social network icons for footer links. |
 | `icon-trust` | Decorative trust bar icons. |
 | `image` | Responsive image (`image_url` + `image_tag`, srcset, lazy by default). |
 | `meta-tags` | Title, description, social and canonical meta tags. |
+| `page-title` | Page title: optional eyebrow, the page's single h1, optional meta line. |
+| `pagination` | Shared pagination for every multi-page list (pagination.md). |
+| `predictive-search` | Search layer of the header: dialog, combobox form, listbox groups, templates. |
 | `price` | Price, sale and compare-at price, unit price. |
 | `product-card` | One product card: image, badge, title, price, swatches. |
 | `product-structured-data` | The single JSON-LD Product for the product page. |
+| `product-variant-picker` | Variant picker built from option values (ADR 0008). |
+| `product-variant-select` | No-JS variant select (`noscript`, `name="id"`). |
+| `quiz-icon` | Decorative quiz icon; the text next to it carries the meaning. |
+| `rating-stars` | Five stars for a 0–5 rating; accessible name from the caller. |
 | `slideshow-icon` | Direction and media icons (previous, next, pause, play, arrow). |
+| `status-icon` | Decorative status icon for toasts, alerts and empty states. |
 | `variant-json` | Variant data as JSON for `assets/product-variant-picker.js`; no visible markup. |
 
 - Adding, renaming or removing a block or snippet updates these tables in the
@@ -341,13 +361,28 @@ Accessibility for blocks and snippets:
   `blocks/container.liquid` maps them to `start` / `center` / `end` for CSS.
   Why: labels stay familiar for merchants while CSS stays direction-neutral.
 - `assets/critical.css` holds above-the-fold styles (layout, header, hero,
-  buttons) and stays at most 10 KB (10 240 B); everything else goes in
-  `assets/base.css`. Both load from `layout/theme.liquid` (ADR 0003).
-  Why: a small critical file keeps first render and LCP fast.
+  buttons) and stays at most 10 KB (10 240 B). Shared and home page styles go
+  in `assets/base.css` (at most 49 152 B gzip). Styles used only by one page
+  group go in that group's file, loaded by `template.name` in
+  `layout/theme.liquid` (ADR 0013):
+  `assets/product.css` (`product`), `assets/collection.css` (`collection`,
+  `search`, `list-collections`), `assets/cart.css` (`cart`), `assets/aux.css`
+  (`404`, `password`, `gift_card`, `page`, `blog`, `article`); each at most
+  16 384 B gzip (Node `zlib.gzipSync`). `layout/password.liquid` and
+  `templates/gift_card.liquid` load `aux.css` themselves.
+  Why: every rule in `base.css` ships on every page; page-only rules should not
+  slow the home page.
+- A rule goes in a page group file only if every markup that outputs its class
+  renders only on that group's templates. Markup on the home page or on two or
+  more groups (product card, cart drawer, quick view, featured product media,
+  variant picker, product form, countdown) stays in `base.css`. When unsure,
+  use `base.css`. Do not add `preload: true` to page group files.
+  Why: quick view and drawers render on other templates through partials, so
+  their CSS must already be on the page.
 - Because the theme does not use `{% stylesheet %}`, Shopify CSS subsetting
   does not apply; keep selectors scoped to the block class
   (`.rich-text__heading`) and remove CSS when you remove markup.
-  Why: every rule ships on every page.
+  Why: every rule ships on every page that loads its file.
 - Images: only the LCP image of each page loads `loading="eager"` with
   `fetchpriority="high"`: the first hero slide on the home page
   (`priority: true` on the first `slideshow-slide`), the banner on a
@@ -474,8 +509,10 @@ Accessibility for blocks and snippets:
   Why: a duplicate key silently overrides the first one and the string is
   lost.
 - Copy is American English; labels and setting names are sentence case
-  without `&`; standard commerce strings ("Add to cart", "Sold out",
-  "Checkout") keep Shopify wording. CTA voice is in `DESIGN.md`.
+  without `&`; standard commerce strings ("Sold out", "Checkout") keep
+  Shopify wording, except the add-to-cart button, which reads "Add To Cart"
+  (Title Case as in Figma, `docs/design/decisions.md` 07/11). CTA voice is
+  in `DESIGN.md`.
   Why: one voice across the theme, and commerce words match checkout.
 - Visually hidden text and `aria-label` values are translated too.
   Why: screen reader users get the same language as the page.
@@ -491,7 +528,7 @@ Accessibility for blocks and snippets:
 | Add a theme-wide setting | Add to `config/settings_schema.json` in the right group; read `settings.<id>` | Social group used by `blocks/footer.liquid` |
 | Add or change a color, font, spacing or radius | Setting → `snippets/css-variables.liquid` → `var(--*)` in CSS → `DESIGN.md`; never a literal in CSS | `background_sand_color` → `--color-background-sand` |
 | Change a band background | Set `background:` on the template's `container` call | `{% block 'container', id: 'home-intro', background: 'sand' %}` in `templates/index.liquid` |
-| Add styles | Block-scoped classes in `assets/base.css`; above-the-fold only in `assets/critical.css` (at most 10 KB); logical properties | `.button--link` in `assets/base.css` |
+| Add styles | Block-scoped classes in `assets/base.css` if shared or on the home page, else in the page group file (`product.css`, `collection.css`, `cart.css`, `aux.css`); above-the-fold only in `assets/critical.css` (at most 10 KB); logical properties | `.button--link` in `assets/base.css`, `.cart-page__summary` in `assets/cart.css` |
 | Add an icon | Add a named case to the matching icon snippet; `aria-hidden`, `currentColor` | `snippets/slideshow-icon.liquid`, `snippets/header-icon.liquid` |
 | Add an image | `{% render 'image' %}`; eager + high priority only for the page's LCP image (first hero slide, collection banner or first card row) | `snippets/image.liquid`, `blocks/slideshow-slide.liquid` (`priority`) |
 | Add a string | Key under `blocks.<block_name>` in `locales/en.default.json`, literal `\| t` call | `blocks.announcement_bar.*` used in `blocks/announcement-bar.liquid` |

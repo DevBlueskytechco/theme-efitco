@@ -2,7 +2,7 @@
 // Ticket ES1-T186 TE-15-FE2: blocks/shop-by-level + level-card, hàng 4b Figma 1:464 (AC-H10).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T186.spec.ts
 // /?view=te15 dùng collection all nên không cần dữ liệu nhập. 3 tên thật trên /?view=figma cần figma-level-* (ES1-T178): thiếu thì skip có lý do.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';

@@ -1,0 +1,642 @@
+/** collection.css (ADR 0013, ES1-T478): chỉ nạp khi template.name là collection, search, list-collections (layout/theme.liquid).
+   Trần ≤ 16 384 B gzip. Chỉ rule mà markup chỉ render ở các template này; dùng chung (product-card, collection-card,
+   pagination, breadcrumb, page-title, drawer) ở base.css. Nạp sau base.css. */
+
+/** Collection page (TE-6, ES1-T103 D1–D3). Figma không có trang này: bố cục mặc định, chờ Designer ES1-T107 */
+.collection-banner {
+  display: grid;
+  gap: var(--space-5);
+  padding-block-start: var(--space-7);
+}
+
+/* 2 class để thắng .image > img phía dưới. Không đặt object-position: image_tag gắn inline theo focal point */
+.image.collection-banner__image {
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius-hero);
+  background-color: var(--color-background-cream);
+}
+
+.image.collection-banner__image > img {
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.collection-banner__title {
+  margin: 0;
+}
+
+.collection-banner__description {
+  max-inline-size: 65ch;
+}
+
+.collection-banner__hint,
+.collection-products__hint,
+.collection-filters__hint {
+  padding: var(--space-3) var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+/* <collection-filters> trong template */
+.collection-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  column-gap: var(--space-5);
+  padding-block: var(--space-5) var(--space-7);
+}
+
+.collection-products {
+  min-inline-size: 0;
+}
+
+.collection-products__results {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.collection-products__count {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.collection-products__grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns-mobile, 2), minmax(0, 1fr));
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.collection-products__item {
+  min-inline-size: 0;
+}
+
+.collection-products__empty {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-5);
+  padding-block: var(--space-7);
+  text-align: center;
+}
+
+.collection-products__empty-text {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+/** Thanh công cụ collection (TE-6 AC3, AC4, ES1-T103 D5): nút Filter + badge, sort canh cuối */
+.collection-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  margin-block-end: var(--space-5);
+}
+
+/* 2 class để thắng .button */
+.button.collection-toolbar__filter {
+  position: relative;
+  padding-inline: var(--space-4);
+}
+
+.button.collection-toolbar__filter[hidden] {
+  display: none;
+}
+
+.collection-toolbar__count:empty {
+  display: none;
+}
+
+.collection-toolbar__badge {
+  display: block;
+  min-inline-size: var(--space-5);
+  padding-inline: var(--space-1);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+  font-size: var(--font-size-xs);
+  line-height: var(--space-5);
+  text-align: center;
+}
+
+.collection-toolbar__sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  margin-inline-start: auto;
+  min-inline-size: 0;
+  font-size: var(--font-size-sm);
+}
+
+.collection-toolbar__select {
+  min-block-size: 44px;
+  max-inline-size: 100%;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-border);
+}
+
+/** Lọc collection (TE-6 AC9, AC10; collection.md §5): .drawer chung, từ 64rem là cột trái */
+.collection-filters__form {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-block-size: 0;
+}
+
+.collection-filters__panel {
+  display: contents;
+}
+
+.collection-filters__status {
+  margin: 0 0 var(--space-2);
+}
+
+.collection-filters__footer {
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.collection-filters__footer > .button {
+  padding-inline: var(--space-4);
+}
+
+.collection-filters__apply:only-child {
+  grid-column: 1 / -1;
+}
+
+.filter-group {
+  --icon-stroke-width: 1.5;
+
+  border-block-end: 1px solid var(--color-border);
+}
+
+.filter-group__summary,
+.filter-group__more-toggle {
+  list-style: none;
+  cursor: pointer;
+}
+
+.filter-group__summary::-webkit-details-marker,
+.filter-group__more-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.filter-group__summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: calc(var(--space-1) * 13);
+  font-weight: 600;
+}
+
+.filter-group__label,
+.filter-option__label {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.collection-filters__status,
+.filter-group__selected,
+.filter-option__count,
+.filter-group__currency,
+.filter-group__price-hint {
+  flex: none;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.filter-group__selected {
+  font-weight: 500;
+}
+
+.filter-group__summary svg {
+  flex: none;
+  inline-size: var(--space-3);
+  block-size: auto;
+}
+
+.filter-group[open] > .filter-group__summary svg {
+  rotate: 180deg;
+}
+
+.filter-group__body {
+  padding-block-end: var(--space-4);
+}
+
+.filter-group__options {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.filter-group__more-toggle {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.filter-group__more[open] .filter-group__more-show,
+.filter-group__more:not([open]) .filter-group__more-hide {
+  display: none;
+}
+
+.filter-group__price {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-3);
+}
+
+.filter-group__price-field {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.filter-group__price-label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+.filter-group__money {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  min-block-size: 44px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-muted-light);
+  border-radius: var(--radius-input);
+  background-color: var(--color-background);
+}
+
+.filter-group__money:has([aria-invalid='true']) {
+  border: 2px solid var(--color-sale);
+}
+
+.filter-group__price-input {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font-size: var(--font-size-base);
+}
+
+.filter-group__price-hint,
+.filter-group__price-error {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
+.filter-group__price-error {
+  color: var(--color-sale);
+  font-size: var(--font-size-sm);
+}
+
+.filter-group__price-error svg {
+  inline-size: 1em;
+  margin-inline-end: var(--space-1);
+  vertical-align: -0.125em;
+}
+
+.filter-option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: 44px;
+  cursor: pointer;
+}
+
+.filter-option:has(:checked) .filter-option__label {
+  font-weight: 600;
+}
+
+.filter-option:has(:disabled) {
+  color: var(--color-muted);
+  cursor: not-allowed;
+}
+
+.filter-option:has(:disabled) .filter-option__label {
+  text-decoration: line-through;
+}
+
+.filter-option:hover:not(:has(:disabled)) .filter-option__label {
+  text-decoration: underline;
+}
+
+.filter-option__input {
+  flex: none;
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+  margin: 0;
+  accent-color: var(--color-accent);
+  cursor: inherit;
+}
+
+.filter-option__control {
+  display: grid;
+  flex: none;
+  inline-size: var(--touch-target-min);
+  block-size: var(--touch-target-min);
+}
+
+.filter-option__control > * {
+  grid-area: 1 / 1;
+}
+
+.filter-option__control > .filter-option__input {
+  z-index: var(--layer-content);
+  inline-size: 100%;
+  block-size: 100%;
+  opacity: 0;
+}
+
+.filter-option__swatch {
+  display: block;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent);
+  border-radius: var(--radius-pill);
+  background-color: var(--swatch-color, var(--color-background-cream));
+  background-image: var(--swatch-image, none);
+  background-position: center;
+  background-size: cover;
+}
+
+.filter-option__swatch > .image,
+.filter-option__swatch .image > img {
+  display: block;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.filter-option__input:checked + .filter-option__swatch {
+  box-shadow: 0 0 0 2px var(--color-background), 0 0 0 4px var(--color-accent);
+}
+
+.filter-option__input:focus-visible + .filter-option__swatch {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+
+.filter-option__input:disabled + .filter-option__swatch {
+  opacity: 0.4;
+}
+
+/** List collections (TE-6 AC15), card: .collection-card */
+.list-collections {
+  padding-block-end: var(--space-7);
+}
+
+.list-collections .page-title {
+  padding-block-end: var(--space-6);
+}
+
+.list-collections__grid {
+  --collection-card-gap: var(--space-3);
+  --collection-card-title: var(--font-size-lg);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-6) var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.list-collections .collection-card__link:focus-visible::after {
+  outline-color: var(--color-accent);
+  outline-offset: 4px;
+}
+
+.list-collections .pagination {
+  margin-block-start: var(--space-7);
+}
+
+@media (min-width: 48rem) {
+  .image.collection-banner__image {
+    aspect-ratio: 16 / 5;
+  }
+
+  .collection-products__grid {
+    grid-template-columns: repeat(var(--columns-tablet, 3), minmax(0, 1fr));
+  }
+
+  .list-collections__grid {
+    --collection-card-title: var(--font-size-h3);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 64rem) {
+  .collection-layout {
+    padding-block-end: var(--space-8);
+  }
+
+  /* Không có filter thì lưới giữ cả bề ngang */
+  .collection-layout:has(.collection-filters__drawer:not([hidden])) {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  }
+
+  .button.collection-toolbar__filter {
+    display: none;
+  }
+
+  .collection-filters__drawer.drawer:not([hidden]) {
+    position: static;
+    display: block;
+    inline-size: auto;
+    block-size: auto;
+    overflow: visible;
+    background: none;
+    box-shadow: none;
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+
+  .collection-filters__header {
+    min-block-size: 0;
+    padding: var(--space-3) 0;
+    border-block-end-color: var(--color-foreground);
+  }
+
+  .collection-filters__close,
+  .collection-filters__status,
+  collection-filters[data-enhanced] .collection-filters__apply,
+  collection-filters[data-enhanced] .collection-filters__footer:not(:has(.collection-filters__clear)) {
+    display: none;
+  }
+
+  .collection-filters__body {
+    padding: 0;
+    overflow: visible;
+  }
+
+  .collection-filters__footer {
+    display: flex;
+    flex-wrap: wrap;
+    padding-inline: 0;
+    border: 0;
+  }
+
+  .list-collections {
+    padding-block-end: var(--space-8);
+  }
+
+  .list-collections .page-title {
+    padding-block-end: var(--space-7);
+  }
+
+  .list-collections .pagination {
+    margin-block-start: calc(var(--space-1) * 16);
+  }
+}
+
+@media (min-width: 80rem) {
+  .collection-products__grid {
+    grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  .list-collections__grid {
+    --collection-card-gap: var(--space-4);
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: calc(var(--space-1) * 10) var(--space-5);
+  }
+}
+
+/** Trang search (TE-8 AC2, ES1-T123 D1, D2). Thanh công cụ, lưới card, drawer filter, rỗng dùng lại class TE-6.
+   Bố cục theo mặc định ES1-T127 #4, #5 (Figma không có frame trang search) */
+.search-header {
+  display: grid;
+  gap: var(--space-4);
+  padding-block-start: var(--space-6);
+}
+
+.search-header__title {
+  margin: 0;
+}
+
+/* ES1-T493: ô tìm không vượt khung, tránh nới layout viewport mobile làm huỷ view transition */
+.search-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  max-inline-size: min(40rem, 100%);
+}
+
+.search-form__input {
+  flex: 1 1 12rem;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  box-sizing: border-box;
+  min-block-size: 44px;
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .search-form__input {
+    transition: border-color var(--motion-fast) var(--ease-out);
+  }
+}
+
+.search-form__input::placeholder {
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+.search-form__input:focus-visible {
+  border-color: var(--color-foreground);
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.search-form__submit {
+  flex: none;
+}
+
+.search-results {
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.search-results__results {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.search-results__group {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.search-results__group-heading {
+  margin: 0;
+  font-size: var(--font-size-h3);
+}
+
+.search-results__list {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Article, page: hàng chữ, article có ảnh nhỏ 6rem ở đầu hàng */
+.search-results__entry {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  padding-block: var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+}
+
+.search-results__entry:first-child {
+  border-block-start: 1px solid var(--color-border);
+}
+
+/* 2 class để thắng .image nằm sau trong file */
+.image.search-results__entry-image {
+  flex: none;
+  inline-size: 6rem;
+  aspect-ratio: 1;
+  border-radius: var(--radius-input);
+  overflow: hidden;
+}
+
+.search-results__entry-body {
+  display: grid;
+  gap: var(--space-2);
+  min-inline-size: 0;
+}
+
+.search-results__entry-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+/* Vùng chạm 44: link 1 dòng chữ lg chưa đủ cao */
+.search-results__entry-link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+
+.search-results__entry-text {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}

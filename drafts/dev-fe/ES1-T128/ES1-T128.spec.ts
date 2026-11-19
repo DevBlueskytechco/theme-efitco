@@ -2,7 +2,8 @@
 // Ticket ES1-T128 TE-8-FE1: trang search nhóm theo object_type, paginate 24, filter + sort dùng chung TE-6, 0 kết quả (docs/srs.md#TE-8 AC2, AC3; drafts/techlead/ES1-T123/task-split.md D1–D4, D9; ES1-T124 #4 #5).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T128.spec.ts -g "AC2|AC3|nojs"
 // Dữ liệu: ES1-T125 chưa có TE8_* → q mặc định 'a' (như TE-1), từ khoá 0 kết quả mặc định là chuỗi ngẫu nhiên. Test cần filter / trang 2 skip có lý do.
-import { test, expect, type Page } from '@playwright/test';
+// ES1-T475 TC-05: test/expect lấy từ support/test (fixture chặn nhiễu store), không từ @playwright/test
+import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';

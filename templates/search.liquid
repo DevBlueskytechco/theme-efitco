@@ -46,6 +46,12 @@
     assign encoded_types = current_types | url_encode
     assign encoded_prefix = search_prefix | url_encode
     assign clear_url = routes.search_url | append: '?q=' | append: encoded_terms | append: '&type=' | append: encoded_types | append: '&options%5Bprefix%5D=' | append: encoded_prefix
+
+    # Clear all keeps a sort order the shopper chose, same rule as the collection page (collection.md §7)
+    if search.sort_by != blank and search.sort_by != search.default_sort_by
+      assign sort_param = search.sort_by | url_encode
+      assign clear_url = clear_url | append: '&sort_by=' | append: sort_param
+    endif
   -%}
 
   {% block 'container', id: 'search-main' %}
@@ -54,7 +60,7 @@
       data-results-partial="search-results"
       data-label-price-invalid="{{ 'blocks.collection_filters.price_invalid' | t | escape }}"
     >
-      {% block 'collection-filters', filters: search.filters, action_url: routes.search_url, clear_url: clear_url %}
+      {% block 'collection-filters', filters: search.filters, action_url: routes.search_url, clear_url: clear_url, results_count: search.results_count %}
         <input type="hidden" name="q" value="{{ search.terms | escape }}">
         <input type="hidden" name="type" value="{{ current_types | escape }}">
         <input type="hidden" name="options[prefix]" value="{{ search_prefix }}">

@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: chưa chạy cục bộ (không node_modules, npm bị chặn) → chờ CI. Chưa có handle cho TE4_PICKUP_HANDLE, TE4_TAX_INCLUDED_COUNTRY (hỏi CTO).
 // Ticket ES1-T78: spec TE-4 lấy handle từ tests/e2e/store-data.json khi CI thiếu env TE4_*. Test cases: drafts/qa/ES1-T78/test-cases.md.
 // Không mở trình duyệt: chỉ kiểm helper tests/e2e/support/store-data.ts và dữ liệu. Test hành vi nằm ở TE-4.spec.ts (gộp từ spec dev ES1-T62..T69).
-import { test, expect } from '@playwright/test';
+import { test, expect } from './support/test';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
