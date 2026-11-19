@@ -37,3 +37,9 @@ collection-filters 4929 B, dưới mức D10 7168 B cho cả BE1 + BE2. Còn 223
 - Test đổi nhanh giữ request 1 s bằng page.route để chắc request cũ bị huỷ; nếu Playwright không phát requestfailed cho request bị huỷ khi đang giữ route thì assert số request huỷ đỏ giả, kết quả cuối vẫn được kiểm riêng.
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+## Cập nhật 19/11: khớp drawer `<modal-dialog data-layer="filter">` của develop (ES1-T366, ADR 0007)
+- Nút `collection-filter-open`: khi `modal-dialog.js` đã nâng cấp, JS gỡ `popover` khỏi `#collection-filter-drawer` rồi gọi `modal-dialog.open(nút)` (showModal); không có modal-dialog.js thì popover gốc vẫn chạy. × / Esc / scrim do modal-dialog.js đóng, focus về nút Filter (dialog trả focus gốc).
+- "Show N products" (submit): đã áp (URL = trạng thái đang hiện) thì chỉ đóng, không request; request cùng URL đang chạy thì chờ nó; chưa áp thì áp rồi đóng; lỗi thì tải cả trang như cũ. Số N và dòng status nằm trong partial `collection-filters`, cập nhật cùng lượt.
+- Trang không có drawer/form: click, submit, pageshow không lỗi (test tĩnh AC4 contract).
+- `wc -c assets/collection-filters.js`: 6135 (trần 8 192 theo drafts/techlead/ES1-T307/task-split.md §3, gộp ES1-T111). Spec đổi mốc 5248 → 8192 theo bảng §3; assert "Apply ẩn khi có JS" chỉ còn từ 64rem (dưới 64rem nút là "Show N products" ở chân drawer).

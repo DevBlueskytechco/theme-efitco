@@ -106,10 +106,56 @@ test.describe('ES1-T110', () => {
     await expect(page.getByTestId('collection-status')).toHaveText((await label(page))!);
     await expect(page.locator(`[data-testid="collection-filter-input"][name="${name}"][value="${value}"]`).first()).toBeChecked();
     await expect(page.getByTestId('collection-filter-clear')).toBeVisible();
-    // Nút Apply ẩn khi có JS
-    await expect(page.getByTestId('collection-filter-apply')).toBeHidden();
+    // Có JS: từ 64rem nút submit ẩn; dưới 64rem "Show N products" ở chân drawer (blocks/collection-filters.liquid, ES1-T366)
+    if (page.viewportSize()!.width >= 1024) await expect(page.getByTestId('collection-filter-apply')).toBeHidden();
+    else await expect(page.getByTestId('collection-filter-apply')).toHaveText(/^Show \d+ products?$/);
     // Đổi filter không đổi focus về lưới
     expect(await page.evaluate(() => document.activeElement?.matches('[data-results-label]'))).toBe(false);
+    expect(errors, errors.join('\n')).toEqual([]);
+  });
+
+  test('AC4 360 drawer modal-dialog: mở bằng showModal, "Show N products" áp rồi đóng, focus về nút Filter', async ({ page }) => {
+    const errors = watchErrors(page);
+    await page.setViewportSize({ width: 360, height: 800 });
+    await page.goto(MAIN);
+    test.skip(!(await hasFilters(page)), NO_FILTERS);
+    await expectNotChallenged(page);
+    await expect(root(page)).toHaveAttribute('data-enhanced', '');
+    await page.waitForFunction(() => !!customElements.get('modal-dialog'));
+    const drawer = page.getByTestId('collection-filter-drawer');
+    const opener = page.getByTestId('collection-filter-open');
+    await opener.click();
+    await expect(drawer).toBeVisible();
+    // Modal (ADR 0007): dialog[open] trong top layer, không còn popover
+    expect(await drawer.evaluate((d) => (d as HTMLDialogElement).open && d.matches(':modal') && !d.hasAttribute('popover'))).toBe(true);
+    await mark(page);
+
+    // Tick: BE áp ngay qua partial, drawer vẫn mở, nút chân cập nhật số
+    const before = await page.getByTestId('collection-filter-apply').textContent();
+    await openInputs(page).first().check();
+    await settled(page);
+    await expect(drawer).toBeVisible();
+    await expect(page.getByTestId('collection-filter-apply')).toHaveText(/^Show \d+ products?$/);
+    const n = (await label(page))!.replace(/\D/g, '');
+    await expect(page.getByTestId('collection-filter-apply')).toContainText(n);
+    expect(before, 'trước khi lọc').toMatch(/^Show \d+ products?$/);
+
+    // "Show N products": đã áp nên chỉ đóng, không request mới, không navigate
+    let partialsAfter = 0;
+    const path = new URL(page.url()).pathname;
+    page.on('request', (r) => isPartial(path)(r) && partialsAfter++);
+    await page.getByTestId('collection-filter-apply').click();
+    await expect(drawer).toBeHidden();
+    await expect(opener).toBeFocused();
+    expect(partialsAfter).toBe(0);
+    expect(await marked(page), 'không navigate').toBe(true);
+
+    // Mở lại, đóng bằng Esc: focus về nút Filter
+    await opener.click();
+    await expect(drawer).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+    await expect(opener).toBeFocused();
     expect(errors, errors.join('\n')).toEqual([]);
   });
 
@@ -342,15 +388,86 @@ test.describe('ES1-T110 contract', () => {
   const filters = readFileSync(join(process.cwd(), 'blocks/collection-filters.liquid'), 'utf8');
   const products = readFileSync(join(process.cwd(), 'blocks/collection-products.liquid'), 'utf8');
 
-  test('AC2 contract: 3 tên partial khớp Liquid, bundle tối đa 5248 B, script ngoài partial', () => {
+  // Trần 8 192 B: drafts/techlead/ES1-T307/task-split.md §3 dòng ES1-T110 (gộp T111), CTO 11/11; thay 5248 của bản cũ.
+  test('AC2 contract: 3 tên partial khớp Liquid, file tối đa 8192 B, script ngoài partial', () => {
     for (const [name, liquid] of [['collection-products', products], ['collection-filters', filters], ['collection-filter-count', products]] as const) {
       expect(js).toContain(`"${name}"`);
       expect(liquid).toContain(`{% partial '${name}' %}`);
     }
-    expect(Buffer.byteLength(js)).toBeLessThanOrEqual(5248);
+    expect(Buffer.byteLength(js)).toBeLessThanOrEqual(8192);
     const script = filters.indexOf("'collection-filters.js' | asset_url");
     expect(script).toBeGreaterThan(filters.indexOf('{% endpartial %}'));
     expect(js).not.toMatch(/pushState/);
     expect(js).toMatch(/customElements\.get\("collection-filters"\)/);
+  });
+
+  test('AC4 contract: drawer qua <modal-dialog>, hook id khớp Liquid, không lỗi khi trang không có drawer', async ({ page }) => {
+    expect(filters).toMatch(/<modal-dialog data-layer="filter">\s*<dialog[^>]*id="collection-filter-drawer"/);
+    expect(products).toContain('data-testid="collection-filter-open"');
+    expect(js).toContain('"collection-filter-drawer"');
+    expect(js).toContain('collection-filter-open');
+    // Trang không có drawer / form (search chưa có filter): click, submit không lỗi
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    const body = js.replace(/^import .*$/m, 'const partials = { fetch: () => Promise.reject(0), apply: () => {} };').replace(/https:\/\/cdn\.shopify\.com[^"]*/, 'data:text/javascript,');
+    await page.setContent('<collection-filters><button data-testid="collection-filter-open">F</button><a data-testid="collection-filter-clear">x</a></collection-filters>');
+    await page.addScriptTag({ content: body, type: 'module' });
+    await expect(page.locator('collection-filters')).toHaveAttribute('data-enhanced', '');
+    await page.getByTestId('collection-filter-open').click();
+    await page.evaluate(() => window.dispatchEvent(new PageTransitionEvent('pageshow', { persisted: false })));
+    expect(errors).toEqual([]);
+  });
+
+  test('AC4 tĩnh: nút Filter mở modal, "Show N products" chờ áp xong rồi đóng, focus về nút Filter', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    const modal = readFileSync(join(process.cwd(), 'assets/modal-dialog.js'), 'utf8');
+    // partials giả: apply ghi lại nhãn kết quả như server (rỗng = chưa áp)
+    const body = js
+      .replace(/^import .*$/m, 'const partials = { fetch: () => (window.__f = (window.__f || 0) + 1, Promise.resolve({})), apply: async () => document.querySelector("[data-results-label]").setAttribute("data-results-label", "3 products") };')
+      .replace(/https:\/\/cdn\.shopify\.com[^"]*/, 'data:text/javascript,');
+    await page.setViewportSize({ width: 360, height: 800 });
+    // Trang có origin thật: JS dựng URL từ location.pathname
+    const FIX = 'http://fixture.test/collections/x';
+    await page.route(FIX, (r) => r.fulfill({ contentType: 'text/html', body: `<!doctype html><body><collection-filters>
+      <modal-dialog data-layer="filter"><dialog id="collection-filter-drawer" popover aria-labelledby="t"><h2 id="t">Filters</h2>
+        <button class="close-button" type="button" popovertarget="collection-filter-drawer" popovertargetaction="hide" data-testid="collection-filter-close">x</button>
+        <form id="collection-filter-form" novalidate><input type="checkbox" name="filter.v.a" value="1" data-testid="in"><button type="submit" data-testid="collection-filter-apply">Show 3 products</button></form>
+      </dialog></modal-dialog>
+      <button type="button" popovertarget="collection-filter-drawer" data-testid="collection-filter-open">Filter</button>
+      <div data-results-label="3 products"></div><div role="status" data-testid="collection-status"></div>
+    </collection-filters></body>` }));
+    await page.goto(FIX);
+    await page.addScriptTag({ content: modal, type: 'module' });
+    await page.addScriptTag({ content: body, type: 'module' });
+    await expect(page.locator('collection-filters')).toHaveAttribute('data-enhanced', '');
+    const drawer = page.locator('#collection-filter-drawer');
+    const opener = page.getByTestId('collection-filter-open');
+
+    await opener.click();
+    expect(await drawer.evaluate((d) => d.matches(':modal') && !d.hasAttribute('popover'))).toBe(true);
+    // Đã áp (URL = trạng thái đang hiện): chỉ đóng, không fetch
+    await page.getByTestId('collection-filter-apply').click();
+    await expect(drawer).toBeHidden();
+    await expect(opener).toBeFocused();
+    expect(await page.evaluate(() => (window as unknown as { __f?: number }).__f ?? 0)).toBe(0);
+
+    // Áp đang chạy / chưa áp: fetch đúng 1 lần rồi mới đóng; × và Esc vẫn đóng
+    await opener.click();
+    await page.getByTestId('in').evaluate((el) => ((el as HTMLInputElement).checked = true));
+    await page.getByTestId('collection-filter-apply').click();
+    await expect(drawer).toBeHidden();
+    await expect(opener).toBeFocused();
+    expect(await page.evaluate(() => (window as unknown as { __f?: number }).__f)).toBe(1);
+    expect(new URL(page.url()).search).toBe('?filter.v.a=1');
+    await expect(page.getByTestId('collection-status')).toHaveText('3 products');
+    await opener.click();
+    await page.getByTestId('collection-filter-close').click();
+    await expect(drawer).toBeHidden();
+    await opener.click();
+    await page.keyboard.press('Escape');
+    await expect(drawer).toBeHidden();
+    await expect(opener).toBeFocused();
+    expect(errors).toEqual([]);
   });
 });

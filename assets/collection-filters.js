@@ -6,6 +6,7 @@ const PAGES = T("pagination");
 const LINK = `${PAGES} a[href],a${T("collection-filter-clear")},a${T("collection-empty-clear")}`;
 const RESULTS = "[data-results-label]";
 const GROUP = "details[data-filter-param]";
+const OPEN = T("collection-filter-open");
 const events = import("https://cdn.shopify.com/storefront/standard-events.js").catch(() => null);
 
 class CollectionFilters extends HTMLElement {
@@ -29,6 +30,28 @@ class CollectionFilters extends HTMLElement {
 		return document.getElementById("collection-filter-form");
 	}
 
+	get dlg() {
+		return document.getElementById("collection-filter-drawer");
+	}
+
+	// Drawer via <modal-dialog> (ADR 0007): showModal throws on an open popover,
+	// so drop the attribute. Without modal-dialog.js the popover stays.
+	show(o) {
+		const g = this.dlg;
+		const m = g?.parentElement;
+		if (!m?.open || g.hidden) return;
+		g.removeAttribute("popover");
+		m.open(o);
+		return 1;
+	}
+
+	// Native close returns focus to collection-filter-open (focused by open()).
+	hide() {
+		const g = this.dlg;
+		if (g?.open) g.close();
+		else if (g?.matches(":popover-open")) g.hidePopover();
+	}
+
 	handleEvent(e) {
 		const { type, target: t } = e;
 		const f = this.form;
@@ -41,8 +64,13 @@ class CollectionFilters extends HTMLElement {
 		} else if (type == "submit") {
 			if (t != f) return;
 			e.preventDefault();
-			this.go(this.url(), 0, 1);
+			// "Show N products": close once the filters are applied (collection-filters.liquid).
+			const u = this.url();
+			const p = this.hasAttribute("aria-busy") ? (u == this.want ? this.p : this.go(u, 0, 1)) : u == this.shown || this.go(u, 0, 1);
+			Promise.resolve(p).then((ok) => ok && this.hide());
 		} else {
+			const o = t.closest?.(OPEN);
+			if (o && !e.defaultPrevented && this.show(o)) return e.preventDefault();
 			const a = t.closest?.(LINK);
 			if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
 			e.preventDefault();
@@ -57,7 +85,13 @@ class CollectionFilters extends HTMLElement {
 		return u.href;
 	}
 
-	async go(url, page, emit) {
+	go(url, page, emit) {
+		this.want = url;
+		return (this.p = this.run(url, page, emit));
+	}
+
+	// Resolves 1 once applied; undefined when aborted or on the full-page fallback.
+	async run(url, page, emit) {
 		this.ctrl?.abort();
 		const c = (this.ctrl = new AbortController());
 		const done = emit && this.emit(url);
@@ -85,6 +119,7 @@ class CollectionFilters extends HTMLElement {
 				r.focus({ preventScroll: true });
 			}
 			if (done) done({ productsCount: +(r.dataset.resultsCount ?? label.replace(/\D/g, "")) });
+			return 1;
 		} catch {
 			if (!c.signal.aborted) location.assign(url);
 		} finally {
@@ -111,7 +146,7 @@ class CollectionFilters extends HTMLElement {
 		if (!d?.collectionHandle) return;
 		let done;
 		const result = new Promise((r) => (done = r));
-		// productFilters is optional and left out: over the 5248 B budget.
+		// productFilters is optional and left out (ES1-T249; add under TE-6 if needed).
 		const s = new URL(url).searchParams.get("sort_by")?.split("-")[0];
 		const sortKey = s == "best" ? "BEST_SELLING" : s?.toUpperCase();
 		const collection = { id: d.collectionId ? `gid://shopify/Collection/${d.collectionId}` : null, handle: d.collectionHandle, productsCount: +d.productsCount || 0 };
