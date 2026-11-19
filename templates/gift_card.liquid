@@ -1,6 +1,7 @@
 {% layout none %}
 {% # ES1-T384 (TE-21 AC13 to AC15, R7.9; docs/ui-spec/gift-card.md): own document, printed and shared outside the storefront layout. %}
 {% # JS hooks for TS-BE1 (ES1-T410), no script here: data-gift-card-qr (QR frame), data-gift-card-copy, data-gift-card-print, data-gift-card-status. %}
+{% # ES1-T489 test hooks: data-testid gift-card-heading, gift-card-pill, gift-card-amount, gift-card-initial, gift-card-expires, gift-card-actions (plus logo, card, balance, alert, code, copy, qr, wallet, start, print, contact). %}
 
 {%- liquid
   assign inactive = false
@@ -49,7 +50,7 @@
     <main class="gift-card">
       <div class="gift-card__intro">
         <p class="gift-card__eyebrow">{{ 'gift_card.card' | t }}</p>
-        <h1 class="gift-card__title">{{ 'gift_card.title' | t: shop: shop_name }}</h1>
+        <h1 class="gift-card__title" data-testid="gift-card-heading">{{ 'gift_card.title' | t: shop: shop_name }}</h1>
         <p class="gift-card__lead">{{ 'gift_card.use_at_checkout' | t }}</p>
       </div>
 
@@ -65,7 +66,7 @@
             {%- else -%}
               <span class="gift-card__card-name">{{ shop_name }}</span>
             {%- endif -%}
-            <span class="gift-card__pill">
+            <span class="gift-card__pill" data-testid="gift-card-pill">
               {%- if inactive -%}
                 {{- 'gift_card.expired_label' | t -}}
               {%- else -%}
@@ -75,9 +76,9 @@
           </div>
           <p class="gift-card__balance" data-testid="gift-card-balance">
             <span class="gift-card__balance-label">{{ 'gift_card.balance' | t }}</span>
-            {% if inactive %}<s class="gift-card__amount">{{ balance }}</s>{% else %}<span class="gift-card__amount">{{ balance }}</span>{% endif %}
+            {% if inactive %}<s class="gift-card__amount" data-testid="gift-card-amount">{{ balance }}</s>{% else %}<span class="gift-card__amount" data-testid="gift-card-amount">{{ balance }}</span>{% endif %}
             {%- if gift_card.balance < gift_card.initial_value %}
-              <span class="gift-card__initial">{{ 'gift_card.of_initial' | t: value: initial_value }}</span>
+              <span class="gift-card__initial" data-testid="gift-card-initial">{{ 'gift_card.of_initial' | t: value: initial_value }}</span>
             {%- endif -%}
           </p>
         </div>
@@ -148,14 +149,14 @@
             </div>
             {%- if gift_card.expires_on -%}
               {%- assign expires_on = gift_card.expires_on | date: '%B %e, %Y' -%}
-              <div>
+              <div data-testid="gift-card-expires">
                 <dt>{{ 'gift_card.expires_label' | t }}</dt>
                 <dd>{{ expires_on }}</dd>
               </div>
             {%- endif -%}
           </dl>
 
-          <div class="gift-card__actions">
+          <div class="gift-card__actions" data-testid="gift-card-actions">
             {%- if inactive -%}
               <a
                 class="button button--secondary"

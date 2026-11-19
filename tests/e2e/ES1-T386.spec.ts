@@ -188,7 +188,7 @@ test.describe('ES1-T386 tĩnh', () => {
     expect(src).toMatch(/if gift_card\.expired or gift_card\.enabled == false\s*\n\s*assign inactive = true/);
     expect(src).toMatch(/unless gift_card\.expired or gift_card\.enabled == false -%\}\s*<div class="gift-card__pay">[\s\S]*?data-gift-card-qr/);
     expect(src).toMatch(/unless inactive -%\}\s*<button[\s\S]*?data-gift-card-copy/);
-    const actions = src.slice(src.indexOf('<div class="gift-card__actions">'));
+    const actions = src.slice(src.indexOf('class="gift-card__actions"'));
     const at = (s: string) => actions.indexOf(s);
     const order = [at('{%- if inactive -%}'), at('data-testid="gift-card-contact"'), at('{%- else -%}'), at('data-testid="gift-card-wallet"'), at('data-testid="gift-card-start"')];
     order.forEach((i) => expect(i).toBeGreaterThan(-1));
@@ -726,7 +726,6 @@ test.describe('ES1-T386 404', () => {
   });
 
   test('TC-20 AC7 gõ ≥ 2 ký tự vào ô tìm 404 → gợi ý predictive như TE-8 AC1 (bug ES1-T486)', async ({ page }) => {
-    test.fail(true, 'ES1-T486: ô tìm 404 chưa nối predictive search');
     await openAt(page, MISSING, 1280);
     const suggest = page.waitForRequest(/\/search\/suggest/, { timeout: 5_000 });
     await page.getByTestId('not-found-search-input').pressSequentially('du', { delay: 50 });
