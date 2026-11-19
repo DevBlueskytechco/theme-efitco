@@ -26,6 +26,20 @@
     {% # Load and preload the critical CSS %}
     {{ 'critical.css' | asset_url | stylesheet_tag: preload: true }}
     {{ 'base.css' | asset_url | stylesheet_tag }}
+    {% comment %}
+      CSS riêng theo nhóm trang (ADR 0013, ES1-T478): mỗi file ≤ 16 384 B gzip, nạp sau base.css, không preload.
+      gift_card (layout none) và password (layout/password.liquid) tự nạp aux.css.
+    {% endcomment %}
+    {%- case template.name -%}
+      {%- when 'product' -%}
+        {{ 'product.css' | asset_url | stylesheet_tag }}
+      {%- when 'collection', 'search', 'list-collections' -%}
+        {{ 'collection.css' | asset_url | stylesheet_tag }}
+      {%- when 'cart' -%}
+        {{ 'cart.css' | asset_url | stylesheet_tag }}
+      {%- when '404', 'page', 'blog', 'article', 'password' -%}
+        {{ 'aux.css' | asset_url | stylesheet_tag }}
+    {%- endcase %}
 
     {% # Social, title, etc. %}
     {% render 'meta-tags' %}

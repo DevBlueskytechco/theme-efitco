@@ -4,10 +4,12 @@
 // Ticket ES1-T314 TE-10-R2-BE1: assets/page-layers.js ≤ 2 048 B (ADR 0007 mục 6, ADR 0010; layers.md §4, §5; SRS TE-10 AC6, AC7).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T314.spec.ts
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 import { CONSENT } from './support/consent';
+import { unlockAndOpenPreview } from './support/password-unlock';
 
 const JS_FILE = 'assets/page-layers.js';
 const LAYOUT = 'layout/theme.liquid';
@@ -51,7 +53,25 @@ async function ensureModule(page: Page) {
   await page.addScriptTag({ url: url!, type: 'module' });
   await page.waitForFunction(() => !!customElements.get('page-layers'));
 }
-async function openPage(page: Page, path = '/') {
+// Banner consent THẬT của Shopify chỉ test "banner thật" kiểm. Các test còn lại cần trang không có banner thật:
+// - store dev ở chế độ preview: query bannerQuery gửi isPreviewMode = true → Shopify vẽ #shopify-pc__banner cả với IP US
+//   (regionVisibility chỉ có nước EU) — trace CI run 44171510755;
+// - ES1-T492: global setup ghi "từ chối" bằng customerPrivacy.setTrackingConsent và kiểm lại bằng context mới (log "[state] consent kiểm lại");
+//   trước ES1-T492 setup log "absent" ở mọi shard, banner chỉ vắng khi spec có autoDeclineConsent chạy trước cùng shard → đỏ theo thứ tự
+//   shard (PR #229, #251, #254, ES1-T491);
+// - vẫn chặn script banner ở đây để test lớp không phụ thuộc kết quả setup (setup chỉ cảnh báo, không fail).
+// Theme không vẽ banner (layers.md §5) → trả script privacy-banner rỗng (không abort: abort sinh lỗi console); test tự chèn
+// #shopify-pc__banner giả khi cần. Assertion giữ nguyên.
+const PRIVACY_BANNER = /\/shopifycloud\/privacy-banner\//;
+const noRealBanner = new WeakSet<Page>();
+async function withoutShopifyBanner(page: Page) {
+  if (noRealBanner.has(page)) return;
+  noRealBanner.add(page);
+  await page.route(PRIVACY_BANNER, (route) => route.fulfill({ status: 200, contentType: 'text/javascript', body: '' }));
+}
+
+async function openPage(page: Page, path = '/', { realBanner = false } = {}) {
+  if (!realBanner) await withoutShopifyBanner(page);
   await page.goto(path);
   await expectNotChallenged(page);
   await ensureModule(page);
@@ -253,13 +273,18 @@ test.describe('ES1-T314 banner consent (TE-10 AC7, layers.md §5)', () => {
     await expectFlag(page, 'data-consent', false);
   });
 
-  test('banner thật của Shopify (context không cookie consent): hiện → cờ bật; Decline → gỡ', async ({ browser }) => {
-    // Không dùng state.json (đã Decline ở global setup); vẫn cần cookie mật khẩu storefront nên đi qua trang mật khẩu bằng storageState rồi xoá cookie consent.
-    const context = await browser.newContext({ storageState: 'tests/setup/state.json', baseURL: BASE_URL });
-    await context.clearCookies({ name: CONSENT.cookie });
+  test('banner thật của Shopify (khách mới, chưa chọn consent): hiện → cờ bật; Decline → gỡ', async ({ browser }, info) => {
+    // ES1-T492: state.json mang lựa chọn "từ chối" (global setup) và Shopify không còn cookie _tracking_consent để xoá
+    // (clearCookies cũ vô tác dụng, đã gỡ). Khách mới: context không storageState, tự mở khoá /password rồi mở PREVIEW_URL.
+    test.skip(!process.env.PREVIEW_URL, 'cần PREVIEW_URL');
+    test.skip(info.project.name !== 'desktop', 'mở khoá khách mới chỉ chạy desktop để giảm request lên store dev');
+    const context = await newStoreContext(browser, { storageState: undefined, baseURL: BASE_URL });
     const page = await context.newPage();
+    await unlockAndOpenPreview(page, process.env.PREVIEW_URL!, process.env.STORE_PASSWORD || '');
+    // Theo dõi console từ sau khi mở khoá: trang /password tự nạp font cdn.shopify.com/shopify-marketing_assets/.../ShopifySans--regular.woff
+    // trả 404 (CI run 44278220230, ngoài theme). Test này kiểm console của trang theme khi banner thật hiện / Decline.
     const errors = watchConsole(page);
-    await openPage(page);
+    await openPage(page, '/', { realBanner: true });
     const banner = page.locator(CONSENT.banner).first();
     const shown = await banner.waitFor({ state: 'visible', timeout: 15_000 }).then(() => true, () => false);
     test.info().annotations.push({ type: 'consent-banner-that', description: String(shown) });

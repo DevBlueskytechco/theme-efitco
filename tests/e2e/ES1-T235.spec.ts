@@ -1,5 +1,6 @@
 // ES1-T235: lớp chuyển động (trai_nghiem.xlsx) và chữ menu con. Playwright đặt navigator.webdriver nên motion.js tắt; spec này giả lập trình duyệt thường.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { autoDeclineConsent } from './support/consent';
 
 const asUser = () => Object.defineProperty(navigator, 'webdriver', { get: () => false });
@@ -32,7 +33,7 @@ test.describe('ES1-T235 trải nghiệm', () => {
   });
 
   test('prefers-reduced-motion: không bật chuyển động, nội dung hiện ngay', async ({ browser }) => {
-    const context = await browser.newContext({ reducedMotion: 'reduce', storageState: 'tests/setup/state.json', baseURL: process.env.STORE_ORIGIN });
+    const context = await newStoreContext(browser, { reducedMotion: 'reduce', storageState: 'tests/setup/state.json', baseURL: process.env.STORE_ORIGIN });
     const page = await context.newPage();
     await page.addInitScript(asUser);
     await page.goto(new URL(process.env.PREVIEW_URL!).pathname + new URL(process.env.PREVIEW_URL!).search);

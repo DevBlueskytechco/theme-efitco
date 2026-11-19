@@ -2,7 +2,7 @@
 // Ticket ES1-T179 TE-17-FE1a: nội dung Figma mặc định cho FAQ, testimonials theo D1, CR-8 (AC-H5, AC-H6, AC-H24, AC-H25).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T179.spec.ts
 // Merchant sửa trong editor (TC-H6) là bước tay; ở đây param trùng tên setting đóng vai giá trị đã lưu, trên /?view=te7.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 
 const HOME = '/';
 const FIGMA = '/?view=figma';

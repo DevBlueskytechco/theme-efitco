@@ -1,7 +1,7 @@
 {% doc %}
-  Renders one card of the collection-list block as a list item: a link to the
-  collection with its image and title. Self-contained: callers must leave the body
-  empty.
+  Renders one card of the collection-list block as a list item: the collection
+  image and a title that links to the collection. Self-contained: callers must
+  leave the body empty.
 
   The collection comes from the setting, then from the handle parameter, which lets
   a template without saved settings pass a resource (templates/index.figma.liquid).
@@ -11,7 +11,13 @@
   text: the card only renders with a collection, and a sample title would label the
   merchant's collection with the wrong name. The image comes from the setting, then
   from the collection, and is decorative because the title already names the link.
-  Without any image the card keeps its frame so the row stays aligned.
+  Without any image the card keeps its 336:220 frame with a neutral image icon so
+  the row stays aligned (CLS 0).
+
+  One link per card (list-collections.md §1, §4): the title link stretches over the
+  whole card with ::after, so the image is clickable and the focus outline frames
+  the card. templates/list-collections.liquid renders the same markup and classes,
+  so both pages share one set of .collection-card rules in assets/base.css.
 
   When there is no collection, the editor shows a placeholder and the storefront
   renders nothing.
@@ -42,23 +48,27 @@
     data-testid="collection-card"
     {{ block.shopify_attributes }}
   >
-    <a class="collection-card__link" href="{{ card_collection.url }}" data-testid="collection-card-link">
-      {%- if card_image != blank -%}
-        {% render 'image',
-          image: card_image,
-          class: 'collection-card__image',
-          width: 672,
-          widths: '252, 336, 504, 672',
-          sizes: '(min-width: 48rem) min(40vw, 336px), min(70vw, 336px)',
-          loading: 'lazy',
-          decorative: true,
-          testid: 'collection-card-image'
-        %}
-      {%- else -%}
-        <div class="collection-card__image" data-testid="collection-card-image"></div>
-      {%- endif -%}
-      <h3 class="collection-card__title" data-testid="collection-card-title">{{ card_title | escape }}</h3>
-    </a>
+    {%- if card_image != blank -%}
+      {% render 'image',
+        image: card_image,
+        class: 'collection-card__image',
+        width: 672,
+        widths: '252, 336, 504, 672',
+        sizes: '(min-width: 48rem) min(40vw, 336px), min(70vw, 336px)',
+        loading: 'lazy',
+        decorative: true,
+        testid: 'collection-card-image'
+      %}
+    {%- else -%}
+      <div class="collection-card__image collection-card__image--empty" data-testid="collection-card-image">
+        {%- render 'status-icon', name: 'image' -%}
+      </div>
+    {%- endif -%}
+    <h3 class="collection-card__title" data-testid="collection-card-title">
+      <a class="collection-card__link" href="{{ card_collection.url }}" data-testid="collection-card-link">
+        {{- card_title | escape -}}
+      </a>
+    </h3>
   </li>
 {%- elsif request.design_mode -%}
   <li

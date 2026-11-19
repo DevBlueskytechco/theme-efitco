@@ -2,7 +2,7 @@
 // Ticket ES1-T120 TE-7-FE3: image with text (docs/srs.md#TE-7 AC3, AC5; drafts/techlead/ES1-T114/task-split.md D1, D2, D5, D7, D8).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T120.spec.ts -g "AC3|AC5"
 // Biến thể chạy trên /?view=te7 (templates/index.te7.liquid), mặc định schema chạy trên /.
-import { test, expect, type Locator, type Page } from '@playwright/test';
+import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
@@ -156,20 +156,25 @@ test.describe('ES1-T120 TE-7 image with text', () => {
     await expect(tid(scope, 'image-with-text-heading')).toHaveCSS('text-align', 'center');
   });
 
-  test('AC3 banner 360: 3 ảnh thành hàng trên chữ, không tràn ngang', async ({ page }) => {
+  // AC cũ "3 ảnh thành hàng" thay bằng TE-7 AC7 (SRS 0.5) + index-mobile-a §8, CTO 10/11 §13.
+  // Thứ tự DOM: nth(0) = accent_1 (trên trái), nth(1) = accent_2 (dưới trái, ẩn ở 360), nth(2) = accent_3 (phải).
+  test('AC3 banner 360 (TE-7 AC7, index-mobile-a §8): ảnh 1 trái, ảnh phải lệch xuống 40, ảnh dưới trái ẩn, chữ dưới ảnh, không tràn ngang', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 });
     await page.goto(TE7);
     const scope = band(page, 'te7-iwt-banner');
     const accents = tid(scope, 'image-with-text-accent');
     await expect(accents).toHaveCount(3);
+    // Không gọi box() trên ảnh ẩn: scrollIntoViewIfNeeded chờ phần tử hiện tới hết timeout.
+    await expect(accents.nth(1)).toBeHidden();
     const first = await box(accents.nth(0));
-    const second = await box(accents.nth(1));
     const third = await box(accents.nth(2));
-    expect(Math.abs(first.y - second.y)).toBeLessThanOrEqual(1);
-    expect(Math.abs(first.y - third.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(first.width - 112)).toBeLessThanOrEqual(2);
+    expect(Math.abs(third.width - 88)).toBeLessThanOrEqual(2);
+    expect(Math.abs(third.y - first.y - 40)).toBeLessThanOrEqual(2);
+    expect(third.x).toBeGreaterThan(first.x);
     expect(third.x + third.width).toBeLessThanOrEqual(360);
     const content = await box(tid(scope, 'image-with-text-content'));
-    expect(first.y + first.height).toBeLessThanOrEqual(content.y + 1);
+    expect(Math.max(first.y + first.height, third.y + third.height)).toBeLessThanOrEqual(content.y + 1);
     await expectNoPageOverflow(page);
   });
 

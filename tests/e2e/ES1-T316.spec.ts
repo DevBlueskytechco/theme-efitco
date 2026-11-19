@@ -3,7 +3,8 @@
 // lazy-module.js ≤ 768 B + data-lazy-on="interaction". AC: AC-H31, TE-2 AC10, ADR 0006/0010.
 // Playwright đặt navigator.webdriver nên motion.js tắt chuyển động; test chuyển động giả lập trình duyệt thường (như ES1-T235).
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
 import { watchShopPay403 } from './support/console-guard';
 
 const asUser = () => Object.defineProperty(navigator, 'webdriver', { get: () => false });
@@ -82,13 +83,14 @@ test.describe('ES1-T316 tĩnh', () => {
 
   test('motion-scrub, scroll-extras chỉ nạp động từ motion.js, không thêm thẻ script', () => {
     const motion = readFileSync('assets/motion.js', 'utf8');
-    expect(motion).toContain('import(new URL("motion-scrub.js", import.meta.url))');
-    expect(motion).toContain('import(new URL("scroll-extras.js", import.meta.url))');
+    // ES1-T485: URL lấy từ data-motion-src (asset_url có ?v=) của chính phần tử, không import.meta.url
+    expect(motion).toContain('import(el.dataset.motionSrc)');
+    expect(motion).not.toContain('import.meta.url');
     const theme = readFileSync('layout/theme.liquid', 'utf8');
     expect(theme.match(/'motion\.js'/g)).toHaveLength(1);
     for (const dir of ['layout', 'blocks', 'snippets', 'templates']) {
       for (const file of readdirSync(dir)) {
-        expect(readFileSync(`${dir}/${file}`, 'utf8'), `${dir}/${file}`).not.toMatch(/motion-scrub\.js|'scroll-extras\.js'/);
+        expect(readFileSync(`${dir}/${file}`, 'utf8'), `${dir}/${file}`).not.toMatch(/<script[^>]+(motion-scrub|scroll-extras)\.js/);
       }
     }
   });
@@ -200,7 +202,7 @@ test.describe('ES1-T316 motion', () => {
   });
 
   test('scroll-extras.js tải khi hàng cuộn ngang tới gần, cả khi giảm chuyển động', async ({ browser }) => {
-    const context = await browser.newContext({ reducedMotion: 'reduce', storageState: 'tests/setup/state.json', baseURL: process.env.STORE_ORIGIN || (process.env.PREVIEW_URL ? new URL(process.env.PREVIEW_URL).origin : undefined) });
+    const context = await newStoreContext(browser, { reducedMotion: 'reduce', storageState: 'tests/setup/state.json', baseURL: process.env.STORE_ORIGIN || (process.env.PREVIEW_URL ? new URL(process.env.PREVIEW_URL).origin : undefined) });
     const page = await context.newPage();
     const loaded = watchAssets(page);
     await page.goto('/');

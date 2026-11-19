@@ -1,10 +1,12 @@
 // ES1-T407 (TS-FE7): blog excerpt_or_content + ảnh responsive, article thông báo comment posted/moderated, page.contact form 3 trường.
+// ES1-T381 (TE-20-R2-FE1) sửa 2 test blog theo CTO 16/11 ("spec cũ trái AC mới: sửa spec, ghi AC thay"):
+//   AC thay: TE-20 AC1 (bài nổi bật 30 từ), AC2 (card 20 từ), AC6 (ảnh LCP: bài nổi bật, không có thì card đầu). Markup blog chuyển sang blocks/blog-articles + snippets/article-card.
 // Nhóm @static đọc file repo, không cần store. Nhóm store cần dữ liệu (store-data.json hoặc env):
 //   TE407_BLOG_PATH     blog có ít nhất 1 bài không excerpt nhưng có content (vd /blogs/figma-blog)
 //   TE407_ARTICLE_PATH  bài thuộc blog bật comment + duyệt (moderated)
 //   TE407_CONTACT_PATH  page gán template "contact" (mặc định /pages/contact)
 // Thiếu dữ liệu → fixme (không tính đạt). hCaptcha sau submit (/challenge hoặc invisible giữ submit) → skip có lý do, chạy tay ghi PR.
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
@@ -13,31 +15,44 @@ import { expectNotChallenged } from './support/store-guard';
 const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8');
 
 test.describe('ES1-T407 @static', () => {
-  test('blog: excerpt_or_content | strip_html | truncatewords: 30, ảnh widths/sizes, bài đầu eager', () => {
-    const src = read('templates/blog.liquid');
-    expect(src).toContain('article.excerpt_or_content | strip_html | truncatewords: 30');
-    expect(src).not.toMatch(/\{\{ article\.excerpt \}\}/);
-    expect(src).toContain("widths: '360, 540, 720, 900, 1200'");
+  // AC thay (ES1-T381): TE-20 AC1, AC2, AC6
+  test('blog: excerpt_or_content (nổi bật 30 từ, card 20 từ), ảnh sizes, ảnh LCP eager + high, còn lại lazy', () => {
+    const src = read('blocks/blog-articles.liquid');
+    const card = read('snippets/article-card.liquid');
+    expect(src).toContain('featured.excerpt_or_content | strip_html | truncatewords: 30');
+    expect(card).toContain('article.excerpt_or_content | strip_html | truncatewords: 20');
+    for (const s of [src, card, read('templates/blog.liquid')]) expect(s).not.toMatch(/\{\{ article\.excerpt \}\}/);
+    expect(src).toContain("widths: '360, 720, 1080, 1440'");
     expect(src).toMatch(/sizes: '[^']+'/);
-    expect(src).toMatch(/if forloop\.first[\s\S]*'eager'[\s\S]*'lazy'/);
+    expect(src).toMatch(/loading: 'eager',\s*fetchpriority: 'high'/);
+    expect(src).toMatch(/if featured == nil and forloop\.first[\s\S]*'eager'/);
+    expect(card).toContain("assign card_loading = loading | default: 'lazy'");
     expect(src).toContain("render 'image'");
   });
 
+  // ES1-T382 (TE-20-R2-FE2) chuyển ảnh bìa sang blocks/article-main.liquid, bình luận sang blocks/article-comments.liquid;
+  // widths ảnh bìa đổi thành '360, 540, 720, 1080, 1440, 2048' theo article.md §7 (khung tối đa 1416, DPR 2). AC thay: TE-20 AC9, AC12.
   test('article: ảnh bìa eager + high, hộp role=status tabindex=-1 theo blog.moderated?, giữ form.errors', () => {
-    const src = read('templates/article.liquid');
-    expect(src).toContain("loading: 'eager'");
-    expect(src).toContain("fetchpriority: 'high'");
-    expect(src).toContain("widths: '360, 540, 720, 900, 1200'");
+    const cover = read('blocks/article-main.liquid');
+    expect(cover).toContain("loading: 'eager'");
+    expect(cover).toContain("fetchpriority: 'high'");
+    expect(cover).toMatch(/widths: '360, [^']*2048'/);
+    const src = read('blocks/article-comments.liquid');
     expect(src).toMatch(/form\.posted_successfully\?[\s\S]*role="status" tabindex="-1"[\s\S]*blog\.moderated\?[\s\S]*blog\.comment_pending_title[\s\S]*blog\.comment_posted/);
     expect(src).toMatch(/form\.errors/);
     expect(src).not.toContain('default_errors');
     expect(src).toMatch(/<button type="submit"/);
   });
 
+  // ES1-T383 (TE-21 AC3): form chuyển sang blocks/contact-form.liquid, template gọi block; kiểm form trên block, .rte trên template.
   test('page.contact: tồn tại, form contact 3 trường có label thật, email + body required, success + errors', () => {
     expect(existsSync(join(process.cwd(), 'templates/page.contact.liquid'))).toBe(true);
-    const src = read('templates/page.contact.liquid');
-    expect(src).toContain("{% form 'contact'");
+    const template = read('templates/page.contact.liquid');
+    expect(template).toContain("{% block 'contact-form' %}");
+    expect(template).toContain('class="rte');
+    expect(template).not.toMatch(/\{% schema %\}|<script/);
+    const src = read('blocks/contact-form.liquid');
+    expect(src).toContain("{%- form 'contact'");
     for (const [id, name] of [['ContactName', 'contact[name]'], ['ContactEmail', 'contact[email]'], ['ContactBody', 'contact[body]']]) {
       expect(src, id).toContain(`<label for="${id}"`);
       expect(src, id).toContain(`name="${name}"`);
@@ -46,8 +61,7 @@ test.describe('ES1-T407 @static', () => {
     expect(src).toMatch(/id="ContactBody"[\s\S]*?required/);
     expect(src).toMatch(/aria-describedby="ContactEmailError"/);
     expect(src).toContain('form.posted_successfully?');
-    expect(src).toContain('class="rte"');
-    expect(src).not.toMatch(/\{% schema %\}|<script/);
+    expect(src).not.toMatch(/<script/);
   });
 
   test('locale có đủ key, không trùng nhóm', () => {
@@ -88,26 +102,30 @@ test.describe('ES1-T407 store', () => {
   const ARTICLE = env('TE407_ARTICLE_PATH');
   const CONTACT = env('TE407_CONTACT_PATH') ?? '/pages/contact';
 
-  test('blog: mọi bài có content đều hiện trích đoạn, ảnh đầu eager, còn lại lazy', async ({ page }) => {
+  // AC thay (ES1-T381): TE-20 AC1, AC2, AC6. Bài nổi bật cần "Show excerpt" bật (mặc định).
+  test('blog: mọi card có content đều hiện trích đoạn, chỉ ảnh LCP eager, còn lại lazy', async ({ page }) => {
     test.fixme(!BLOG, 'thiếu TE407_BLOG_PATH (blog có bài không excerpt)');
     await page.goto(BLOG!);
     await expectNotChallenged(page);
-    const articles = page.getByTestId('blog-article');
-    const n = await articles.count();
+    const cards = page.getByTestId('blog-articles-grid').getByTestId('article-card');
+    const n = await cards.count();
     expect(n).toBeGreaterThan(0);
     for (let i = 0; i < n; i++) {
-      await expect(articles.nth(i).getByTestId('blog-article-excerpt')).not.toHaveText('');
+      await expect(cards.nth(i).getByTestId('article-card-excerpt')).not.toHaveText('');
     }
-    const imgs = page.locator('[data-testid="blog-article"] img');
+    const featured = page.getByTestId('blog-articles-featured');
+    if (await featured.count()) await expect(page.getByTestId('blog-articles-featured-excerpt')).not.toHaveText('');
+    // Bài nổi bật không ảnh: không ảnh nào eager (card vẫn lazy)
+    const lcpFirst = (await featured.count()) === 0 || (await featured.locator('img').count()) > 0;
+    const imgs = page.locator('[data-testid="blog-articles"] img');
     const count = await imgs.count();
     for (let i = 0; i < count; i++) {
       const img = imgs.nth(i);
       await expect(img).toHaveAttribute('sizes', /.+/);
-      await expect(img).toHaveAttribute('srcset', /1200w/);
+      await expect(img).toHaveAttribute('srcset', /\d+w/);
       await expect(img).toHaveAttribute('width', /\d+/);
       await expect(img).toHaveAttribute('height', /\d+/);
-      const first = (await page.locator('[data-testid="blog-article"]').first().locator('img').count()) > 0 && i === 0;
-      await expect(img).toHaveAttribute('loading', first ? 'eager' : 'lazy');
+      await expect(img).toHaveAttribute('loading', i === 0 && lcpFirst ? 'eager' : 'lazy');
     }
   });
 

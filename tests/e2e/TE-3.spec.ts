@@ -6,7 +6,7 @@
 // Dữ liệu (không hardcode handle): TE3_SALE_HANDLE, TE3_SMALL_PRICE_HANDLE, TE3_VARIES_HANDLE, TE3_UNIT_PRICE_HANDLE,
 //   TE3_SWATCH_HANDLE, TE3_SOLD_OUT_HANDLE, TE3_BADGE_SWATCH_HANDLE (ES1-T57), TE3_AC8_VARIANT_ID, TE3_AC8_PATH. Không đặt thì tự tìm card đầu tiên có testid, không có thì skip.
 // Setting block khác mặc định: EXPECT_PRODUCTS_TO_SHOW, EXPECT_COLUMNS_DESKTOP, EXPECT_VIEW_ALL=header|bottom, EXPECT_VIEW_ALL_PATH.
-import { test, expect, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { test, expect, type Locator, type Page, type TestInfo } from './support/test';
 import { getJson } from './support/http';
 import { pageJson, requireJson } from './support/product-data';
 import AxeBuilder from '@axe-core/playwright';
@@ -46,6 +46,10 @@ const ALL = '/collections/all';
 const PAGES = [HOME, ALL] as const;
 const PAGE_SIZE = 20; // templates/collection.liquid paginate by 20
 const MAX_PAGES = 5;
+// ES1-T417 (CTO 11/11, ES1-T178 mục N): store dev 2065 sản phẩm, thứ tự mặc định theo tên đẩy sản phẩm TE4 ra vị trí > 2000,
+// ngoài MAX_PAGES trang đầu → test skip từ 03/11. Mọi lần đọc /collections/all để tìm dữ liệu dùng sort_by=created-descending cố định.
+const SORT = 'sort_by=created-descending';
+const allPage = (n = 1) => (n === 1 ? `${ALL}?${SORT}` : `${ALL}?${SORT}&page=${n}`);
 const SWATCH = 'input[type="radio"][data-variant-id]';
 
 const ENV = {
@@ -222,7 +226,7 @@ async function openHome(page: Page): Promise<Locator> {
 
 async function cardsOn(page: Page, path: string): Promise<Locator> {
   if (path === HOME) return (await openHome(page)).getByTestId(T.card);
-  const res = await page.goto(path);
+  const res = await page.goto(path === ALL ? allPage() : path); // ES1-T417: trang đầu theo sort cố định
   expect(res?.status(), `HTTP ${path}`).toBeLessThan(400);
   const cards = page.getByTestId(T.collection).getByTestId(T.card);
   test.skip((await cards.count()) === 0, `${path} không có sản phẩm`);
@@ -238,7 +242,7 @@ function byHandle(page: Page, cards: Locator, handle: string): Locator {
 // không có handle → card đầu tiên có testid. Trả null khi không có.
 async function findCard(page: Page, testid: string | null, handle?: string, without?: string): Promise<Locator | null> {
   for (let n = 1; n <= MAX_PAGES; n++) {
-    const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
+    const res = await page.goto(allPage(n)); // ES1-T417: sort_by=created-descending
     if (!res || res.status() >= 400) return null;
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     const count = await cards.count();
@@ -375,7 +379,7 @@ async function expectBadge(card: Locator, target: Locator) {
 async function badgeSwatchCard(page: Page): Promise<Locator | null> {
   const handle = process.env.TE3_BADGE_SWATCH_HANDLE;
   for (let n = 1; n <= MAX_PAGES; n++) {
-    const res = await page.goto(n === 1 ? ALL : `${ALL}?page=${n}`);
+    const res = await page.goto(allPage(n)); // ES1-T417: sort_by=created-descending
     if (!res || res.status() >= 400) return null;
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     const count = await cards.count();
@@ -669,20 +673,33 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     expect(errors, errors.join('\n')).toEqual([]);
   });
 
-  test('TC-16 AC2: hơn 5 màu thì 5 swatch + "+N" ra khỏi tab order', async ({ page }) => {
+  // ES1-T417: trước sort cố định, 5 trang đầu /collections/all không có card "+N" nên test này luôn skip và giữ assertion cũ
+  // (5 radio trong fieldset/legend, "+N" là link tabindex -1). Theo docs/srs.md#TE-3 AC2 (swatch là chỉ báo aria-hidden, link card
+  // ghi số màu) và AC13 (0.5, VP2, variant-picker.md §9: N > 4 thì 3 chỉ báo + "+{N − 3}"), snippets/product-card.liquid:172-177, 302-341.
+  test('TC-16 AC2 AC13: hơn 4 màu thì 3 chỉ báo + "+N", hàng aria-hidden không focus được, link ghi tổng N màu', async ({ page }) => {
     const card = await findCard(page, T.more);
-    test.skip(!card, `Không có sản phẩm hơn 5 màu swatch trên ${ALL}`);
+    test.skip(!card, `Không có sản phẩm hơn 4 màu swatch trên ${allPage()}`);
     const handle = await handleOf(card!);
     const p = await productJs(page, handle);
-    const legend = norm(await card!.getByTestId(T.swatches).locator('legend').textContent());
-    const option = p.options.find(o => o.name === legend);
-    expect(option, `option ${legend} trong ${handle}.js`).toBeTruthy();
-    await expect(card!.getByTestId(T.swatch)).toHaveCount(5);
+    const row = card!.getByTestId(T.swatches);
+    const swatches = row.getByTestId(T.swatch);
+    await expect(swatches).toHaveCount(3);
+    // Tên value nằm trong span visually-hidden của từng chỉ báo; option màu = option có > 4 giá trị chứa đủ các tên này.
+    const names = (await swatches.allTextContents()).map(norm);
+    const option = p.options.find(o => o.values.length > 4 && names.every(n => o.values.includes(n)));
+    expect(option, `option chứa ${names.join(', ')} và > 4 giá trị trong ${handle}.js`).toBeTruthy();
+    const total = option!.values.length;
+
+    await expect(row).toHaveAttribute('aria-hidden', 'true');
+    await expect(row.locator('a, button, input, select, textarea, [tabindex], [href]'), 'hàng chỉ báo không có control').toHaveCount(0);
     const more = card!.getByTestId(T.more);
-    await expect(more).toHaveText(`+${option!.values.length - 5}`);
-    await expect(more).toHaveAttribute('tabindex', '-1');
-    await expect(more).toHaveAttribute('aria-hidden', 'true');
-    await expect(more).toHaveAttribute('href', new RegExp(`/products/${handle}$`));
+    await expect(more).toHaveText(`+${total - 3}`);
+    await expect(card!.getByTestId(T.title)).toHaveAccessibleName(new RegExp(`, ${total} colors$`));
+
+    // AC13: 3 chỉ báo và "+N" cùng một hàng (không xuống dòng trong card).
+    const boxes = await row.locator(`[data-testid="${T.swatch}"], [data-testid="${T.more}"]`).evaluateAll(els =>
+      els.map(el => { const r = el.getBoundingClientRect(); return r.top + r.height / 2; }));
+    expect(Math.max(...boxes) - Math.min(...boxes), 'chỉ báo và +N cùng hàng').toBeLessThanOrEqual(2);
   });
 
   // ES1-T434 (bug ES1-T434-B01): docs/srs.md#TE-3 AC2 "swatch lấy từ option value của option màu".
@@ -1162,7 +1179,7 @@ test.describe('ES1-T53 TE-3 không JS (NFR-4)', () => {
 
   // Chỉ assertion locator, không evaluate trong trang.
   test('B-01 AC2: tắt JS, card render đủ, radio đổi, link giữ variant mặc định', async ({ page }) => {
-    await page.goto(ALL);
+    await page.goto(allPage()); // ES1-T417: sort_by=created-descending
     const cards = page.getByTestId(T.collection).getByTestId(T.card);
     test.skip((await cards.count()) === 0, `${ALL} không có sản phẩm`);
     await expect(cards.first().getByTestId(T.title)).toBeVisible();

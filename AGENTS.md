@@ -361,13 +361,28 @@ Accessibility for blocks and snippets:
   `blocks/container.liquid` maps them to `start` / `center` / `end` for CSS.
   Why: labels stay familiar for merchants while CSS stays direction-neutral.
 - `assets/critical.css` holds above-the-fold styles (layout, header, hero,
-  buttons) and stays at most 10 KB (10 240 B); everything else goes in
-  `assets/base.css`. Both load from `layout/theme.liquid` (ADR 0003).
-  Why: a small critical file keeps first render and LCP fast.
+  buttons) and stays at most 10 KB (10 240 B). Shared and home page styles go
+  in `assets/base.css` (at most 49 152 B gzip). Styles used only by one page
+  group go in that group's file, loaded by `template.name` in
+  `layout/theme.liquid` (ADR 0013):
+  `assets/product.css` (`product`), `assets/collection.css` (`collection`,
+  `search`, `list-collections`), `assets/cart.css` (`cart`), `assets/aux.css`
+  (`404`, `password`, `gift_card`, `page`, `blog`, `article`); each at most
+  16 384 B gzip (Node `zlib.gzipSync`). `layout/password.liquid` and
+  `templates/gift_card.liquid` load `aux.css` themselves.
+  Why: every rule in `base.css` ships on every page; page-only rules should not
+  slow the home page.
+- A rule goes in a page group file only if every markup that outputs its class
+  renders only on that group's templates. Markup on the home page or on two or
+  more groups (product card, cart drawer, quick view, featured product media,
+  variant picker, product form, countdown) stays in `base.css`. When unsure,
+  use `base.css`. Do not add `preload: true` to page group files.
+  Why: quick view and drawers render on other templates through partials, so
+  their CSS must already be on the page.
 - Because the theme does not use `{% stylesheet %}`, Shopify CSS subsetting
   does not apply; keep selectors scoped to the block class
   (`.rich-text__heading`) and remove CSS when you remove markup.
-  Why: every rule ships on every page.
+  Why: every rule ships on every page that loads its file.
 - Images: only the LCP image of each page loads `loading="eager"` with
   `fetchpriority="high"`: the first hero slide on the home page
   (`priority: true` on the first `slideshow-slide`), the banner on a
@@ -513,7 +528,7 @@ Accessibility for blocks and snippets:
 | Add a theme-wide setting | Add to `config/settings_schema.json` in the right group; read `settings.<id>` | Social group used by `blocks/footer.liquid` |
 | Add or change a color, font, spacing or radius | Setting → `snippets/css-variables.liquid` → `var(--*)` in CSS → `DESIGN.md`; never a literal in CSS | `background_sand_color` → `--color-background-sand` |
 | Change a band background | Set `background:` on the template's `container` call | `{% block 'container', id: 'home-intro', background: 'sand' %}` in `templates/index.liquid` |
-| Add styles | Block-scoped classes in `assets/base.css`; above-the-fold only in `assets/critical.css` (at most 10 KB); logical properties | `.button--link` in `assets/base.css` |
+| Add styles | Block-scoped classes in `assets/base.css` if shared or on the home page, else in the page group file (`product.css`, `collection.css`, `cart.css`, `aux.css`); above-the-fold only in `assets/critical.css` (at most 10 KB); logical properties | `.button--link` in `assets/base.css`, `.cart-page__summary` in `assets/cart.css` |
 | Add an icon | Add a named case to the matching icon snippet; `aria-hidden`, `currentColor` | `snippets/slideshow-icon.liquid`, `snippets/header-icon.liquid` |
 | Add an image | `{% render 'image' %}`; eager + high priority only for the page's LCP image (first hero slide, collection banner or first card row) | `snippets/image.liquid`, `blocks/slideshow-slide.liquid` (`priority`) |
 | Add a string | Key under `blocks.<block_name>` in `locales/en.default.json`, literal `\| t` call | `blocks.announcement_bar.*` used in `blocks/announcement-bar.liquid` |

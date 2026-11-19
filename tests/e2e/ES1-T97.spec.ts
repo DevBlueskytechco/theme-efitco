@@ -92,8 +92,8 @@ test.describe('ES1-T97 contract', () => {
     const page = read('blocks/cart-page.liquid');
     const drawer = read('blocks/cart-drawer.liquid');
     const lines = read('snippets/cart-lines.liquid');
-    // Trần BE2 5120 B nâng lên 5632 B ở BE3 (ES1-T98, D10).
-    expect(Buffer.byteLength(js), 'cart-items.js tối đa 5632 B').toBeLessThanOrEqual(5632);
+    // Trần BE2 5120 B nâng lên 5632 B ở BE3 (ES1-T98, D10); TE-5-R2-BE1 (ES1-T370): 7168 B theo ADR 0010, thanh checkout tách ra cart-checkout-bar.js (ES1-T490).
+    expect(Buffer.byteLength(js), 'cart-items.js tối đa 7168 B').toBeLessThanOrEqual(7168);
     expect([...page.matchAll(/<script src="\{\{ 'cart-items\.js' \| asset_url \}\}" type="module"><\/script>/g)]).toHaveLength(1);
     // Drawer nạp động qua data-items-src (ES1-T96), không có thẻ script; literal để theme check kiểm được asset (ES1-T102).
     expect(drawer).not.toMatch(/<script src="\{\{ 'cart-items\.js'/);
@@ -101,15 +101,19 @@ test.describe('ES1-T97 contract', () => {
     expect(drawer).not.toContain('items_asset');
     expect(page).toContain('data-partials="cart-page cart-count"');
     expect(page).toContain("{% partial 'cart-page' %}");
-    expect(drawer).toContain('data-partials="cart-drawer cart-count"');
+    // ES1-T453 #1 (CTO 14/11): drawer thêm partial cart-drawer-count, cart-drawer-footer; thay "cart-drawer cart-count".
+    expect(drawer).toContain('data-partials="cart-drawer cart-drawer-count cart-drawer-footer cart-count"');
     expect(drawer).toContain("{% partial 'cart-drawer' %}");
     expect(read('blocks/header.liquid')).toContain("{% partial 'cart-count' %}");
     expect(js).toContain('partials.fetch(...this.dataset.partials.split(" "), { url: location.href, signal })');
     expect(js).toContain('customElements.define("cart-items"');
     expect(js).not.toMatch(/^import .*(\.js|\.\/)/m);
-    for (const hook of ['data-line-key=', 'data-cart-remove', 'data-cart-update', 'name="updates[]"', 'class="cart-empty"']) {
+    for (const hook of ['data-line-key=', 'data-cart-remove', 'data-cart-update', 'name="updates[]"']) {
       expect(lines, `thiếu ${hook}`).toContain(hook);
     }
+    // ES1-T368 empty state (foundation §18, TE-5 AC19) dùng chung .empty-state, thay literal 'class="cart-empty"'.
+    // Lớp cart-empty vẫn bắt buộc: hook JS là .cart-empty a (cart-items.js).
+    expect(lines, 'thiếu .cart-empty').toMatch(/class="[^"]*\bcart-empty\b/);
     for (const block of [page, drawer]) {
       for (const hook of ['data-cart-change-url=', 'data-cart-url=', 'data-label-updated=', 'data-label-removed=', 'data-label-error=', 'data-label-quantity-adjusted=', 'data-item-count=', 'data-cart-accelerated', 'role="status"', 'role="alert"']) {
         expect(block, `thiếu ${hook}`).toContain(hook);
