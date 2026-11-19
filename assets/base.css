@@ -6143,7 +6143,7 @@ cart-drawer {
 .article-card__link::after {
   content: '';
   position: absolute;
-  z-index: 1;
+  z-index: var(--layer-content);
   inset: 0;
   border-radius: var(--article-card-radius);
 }
@@ -6161,7 +6161,7 @@ cart-drawer {
 /* 2 class để thắng .image */
 .article-card__frame > .article-card__image {
   position: absolute;
-  z-index: -1;
+  z-index: calc(var(--layer-content) * -1);
   inset: 0;
   width: 100%;
   height: 100%;
@@ -6210,7 +6210,7 @@ cart-drawer {
   padding-block-end: var(--space-4);
 }
 
-/* Figma 1:1037: Inter 18 / 28, letter-spacing -0.18. Không cắt tên (decisions 11/11 (3)): tên dài thì card cao thêm (overflow: clip ở link) */
+/* Figma 1:1037: Inter 18 / 28, letter-spacing -0.18. Không cắt tên (decisions 11/11 (3)): tên dài thì card cao thêm (overflow: clip ở .article-card__frame) */
 .article-card__title {
   margin: 0;
   font-family: var(--font-primary--family);
