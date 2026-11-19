@@ -1,6 +1,6 @@
 // ES1-T217: giữ chặt các chỗ test vừa sửa để chúng không thành kẽ hở. Không gọi store.
 // Chạy: npx playwright test --config=drafts/qa/ES1-T217/pw.static.config.ts tests/e2e/ES1-T217.spec.ts
-import { test, expect, type ConsoleMessage } from '@playwright/test';
+import { test, expect, type ConsoleMessage } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readdirSync, readFileSync } from 'node:fs';
 import { isResource429Log, watchShopPay403 } from './support/console-guard';
@@ -40,14 +40,19 @@ test.describe('ES1-T217 tĩnh', () => {
     expect(missing).toEqual([]);
   });
 
-  test('TC-04 toàn base.css: 0 màu literal ngoài comment, bù cho việc T94, T95, T184, T186 chỉ quét mục của mình', () => {
-    const css = readFileSync('assets/base.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-    expect(css.match(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/gi)).toBeNull();
+  // ES1-T478 (ADR 0013): base.css + CSS theo template (product, collection, cart, aux)
+  const SITE_CSS = () =>
+    ['base', 'product', 'collection', 'cart', 'aux']
+      .map((f) => readFileSync(`assets/${f}.css`, 'utf8'))
+      .join('\n')
+      .replace(/\/\*[\s\S]*?\*\//g, '');
+
+  test('TC-04 toàn base.css và CSS theo template: 0 màu literal ngoài comment, bù cho việc T94, T95, T184, T186 chỉ quét mục của mình', () => {
+    expect(SITE_CSS().match(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/gi)).toBeNull();
   });
 
-  test('TC-05 toàn base.css: 0 margin, padding vật lý ngoài comment', () => {
-    const css = readFileSync('assets/base.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
-    expect(css.match(/(^|[\s;{])(margin|padding)-(left|right|top|bottom)\s*:/g)).toBeNull();
+  test('TC-05 toàn base.css và CSS theo template: 0 margin, padding vật lý ngoài comment', () => {
+    expect(SITE_CSS().match(/(^|[\s;{])(margin|padding)-(left|right|top|bottom)\s*:/g)).toBeNull();
   });
 
   test('TC-06 mốc cắt của T94, T95, T184, T186 có trong base.css, đúng thứ tự', () => {

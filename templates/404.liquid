@@ -1,11 +1,14 @@
-{% block 'container' %}
-  <h1>{{ '404.title' | t }}</h1>
+{% # ES1-T384 (TE-21 AC7, AC8; docs/ui-spec/404.md): main block + optional bestseller grid. No breadcrumb, no popup. %}
+{% # Bestsellers stay hidden until the merchant picks a collection; View All Products goes to routes.all_products_collection_url. %}
+{% block 'container', id: 'not-found' %}
+  {% block 'not-found' %}{% endblock %}
+{% endblock %}
 
-  <p>
-    {{ '404.not_found' | t }}
-  </p>
-
-  <a href="{{ routes.all_products_collection_url }}">
-    {{ '404.back_to_shopping' | t }}
-  </a>
+{% block 'container', id: 'not-found-products', tag: 'div' %}
+  {% block 'featured-collection',
+    id: 'not-found-products',
+    show_view_all: true,
+    view_all_position: 'header',
+    view_all_url: routes.all_products_collection_url
+  %}{% endblock %}
 {% endblock %}

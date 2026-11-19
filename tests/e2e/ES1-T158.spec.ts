@@ -5,12 +5,12 @@
 // Đổi HTML bằng init script ở readystatechange đầu tiên (trước khi module chạy), không dùng route.fetch: store có thể trả trang chặn cho request lặp (plan ES1-T169 nhóm A).
 // Video: store có thể chưa có video Shopify (ES1-T153) nên đổi thẻ YouTube thành thẻ kind shopify với URL giả; play, pause của media được stub vì không có tệp thật.
 import { readFileSync, statSync } from 'node:fs';
-import { test, expect, type Locator, type Page, type Request } from '@playwright/test';
+import { test, expect, type Locator, type Page, type Request } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { CART_GLOB, themeAdd } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
 import { readCartJson } from './support/product-data';
-import { gotoStore, watchStore, expectNotChallenged } from './support/store-guard';
+import { gotoStore, watchStore, expectNotChallenged, skipIfStoreBlocked } from './support/store-guard';
 
 const TE13 = '/?view=te13';
 const STATES = '/?view=te13-states';
@@ -360,6 +360,8 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
   });
 
   test('AC2 AC-H22 thêm giỏ thật đúng variant, số giỏ tăng', async ({ page }) => {
+    // ES1-T300 (CTO 11/11 mục 4): run 42805384493, 42978078054 đỏ ở đây do 'bị Cloudflare chặn (cf-mitigated, status 429)' tại /?view=te13 = môi trường store dev → skip có lý do, không fail gate.
+    await skipIfStoreBlocked('ES1-T300: store dev chặn luồng thêm giỏ thật /?view=te13 (môi trường)', async () => {
     const watch = watchStore(page);
     await gotoStore(page, TE13);
     const scope = band(page, 'te13-a');
@@ -382,6 +384,7 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
     if (await page.getByTestId('cart-drawer-dialog').count()) await expect(page.getByTestId('cart-drawer-dialog')).toBeVisible();
     await expect(page.getByTestId('header-cart-count')).toHaveText('1');
     await watch.finish();
+    });
   });
 
   test('AC2 lỗi 422 hiện trong vùng alert, nút bật lại', async ({ page }) => {

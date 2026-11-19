@@ -1,101 +1,134 @@
-// Lớp trải nghiệm trang (trai_nghiem.xlsx, ES1-T235). Không có file này trang vẫn đủ nội dung.
-const auto = navigator.webdriver;
+// Lớp trải nghiệm trang (ES1-T235, ES1-T316). Không có file này trang vẫn đủ nội dung.
 const calm = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const moving = !calm && !navigator.webdriver;
+// Nạp file JS theme theo data-motion-src (asset_url có ?v=, ES1-T485)
+const lazy = (el) => el.dataset.motionSrc && import(el.dataset.motionSrc).catch(() => {});
 
-if (!calm && !auto) {
+// Gọi fn(el) 1 lần khi el vào khung nhìn
+const once = (options, fn) => {
+  const io = new IntersectionObserver((entries) => {
+    for (const { isIntersecting, target } of entries) if (isIntersecting) io.unobserve(target), fn(target);
+  }, options);
+  return (el) => io.observe(el);
+};
+
+if (moving) {
   document.documentElement.dataset.motion = "on";
-  const items = [...document.querySelectorAll("main > .block-container > *, .shop-by-level__list > *, .featured-collection__grid > *")].filter(
-    (e) => !e.matches(".slideshow") && !e.querySelector("[data-reveal]") && e.getBoundingClientRect().top > innerHeight,
-  );
-  const io = new IntersectionObserver(
-    (seen) => {
-      for (const { isIntersecting, target } of seen) {
-        if (!isIntersecting) continue;
-        io.unobserve(target);
-        target.dataset.reveal = "in";
-        target.addEventListener("transitionend", () => target.removeAttribute("data-reveal"), { once: true });
-      }
-    },
-    { rootMargin: "0px 0px -8% 0px" },
-  );
-  for (const e of items) {
+  reveal();
+  countUp();
+  // Chữ đậm dần, ảnh trôi của khối banner: nạp khi khối cách khung nhìn 1 màn
+  const scrub = once({ rootMargin: "100% 0px" }, lazy);
+  document.querySelectorAll(".image-with-text--banner").forEach(scrub);
+}
+
+/**
+ * Hiện dần khi cuộn tới (ES1-T250): text, card (cả hàng), media (clip-path); --reveal-i là thứ tự trong khối.
+ * Bỏ qua màn đầu và hero: chữ hero do CSS, ảnh hero hiện ngay (TE-2 AC10).
+ */
+function reveal() {
+  const kinds = {
+    text: "main :is(h2, [class*='__eyebrow'], [class*='__subheading'], .image-with-text__body, .image-with-text__content > .button, .rich-text__content > *, .video-carousel__stats, .faq__stats, .featured-collection__tabs)",
+    card: "main :is(.collection-list__track, .shop-by-level__list, .featured-collection__grid, .video-carousel__list, .testimonials__list, .blog-posts__list, .bundle-builder__list, .faq__list, .multicolumn__list) > *",
+    media: "main :is(.featured-product__media, .shop-the-look__media, .faq__media, .image-with-text--split .image-with-text__media, .quiz__form, .bundle-builder__summary), .site-footer__newsletter-image",
+  };
+  const skip = ".slideshow, [data-quiz-dialog], .image-with-text--banner .image-with-text__accent";
+  // Đọc hết vị trí rồi mới ghi, tránh layout lại từng phần tử
+  const items = new Map();
+  for (const [kind, sel] of Object.entries(kinds)) {
+    for (const e of document.querySelectorAll(sel)) {
+      if (!items.has(e) && !e.closest(skip) && e.getBoundingClientRect().top >= innerHeight) items.set(e, kind);
+    }
+  }
+  const show = (e) => {
+    e.dataset.reveal = "in";
+    // Gỡ khi xong để hover của card không dính transition reveal
+    setTimeout(() => {
+      e.removeAttribute("data-reveal");
+      e.removeAttribute("data-reveal-kind");
+    }, 1600 + 80 * e.style.getPropertyValue("--reveal-i"));
+  };
+  const groups = new Map();
+  const order = new Map();
+  const watch = once({ rootMargin: "0px 0px -10% 0px" }, (el) => groups.get(el).forEach(show));
+  for (const [e, kind] of items) {
+    const box = kind === "card" ? e.parentElement : e.closest(".block-container, footer") ?? document.body;
+    const i = order.get(box) ?? 0;
+    order.set(box, i + 1);
     e.dataset.reveal = "wait";
-    e.style.setProperty("--reveal-i", Math.min([...e.parentElement.children].indexOf(e), 3));
-    io.observe(e);
+    e.dataset.revealKind = kind;
+    e.style.setProperty("--reveal-i", Math.min(i, 5));
+    const key = kind === "card" ? box : e;
+    if (!groups.has(key)) groups.set(key, []), watch(key);
+    groups.get(key).push(e);
   }
 }
 
-// Số thống kê chạy từ 0 khi cuộn tới. Giữ chữ kèm theo ("360+"), giữ nguyên chữ không có số.
-if (!calm && !auto) {
-  const stats = new IntersectionObserver(
-    (seen) => {
-      for (const { isIntersecting, target } of seen) {
-        if (!isIntersecting) continue;
-        stats.unobserve(target);
-        const { before, end, after, text } = target.motionCount;
-        const start = performance.now();
-        const step = (now) => {
-          const t = Math.min((now - start) / 1400, 1);
-          target.firstChild.data = t < 1 ? before + Math.round(end * (1 - (1 - t) ** 3)) + after : text;
-          if (t < 1) requestAnimationFrame(step);
-          else target.removeAttribute("aria-label");
-        };
-        requestAnimationFrame(step);
-      }
-    },
-    { threshold: 0.6 },
-  );
+// Số thống kê chạy từ 0 khi cuộn tới, giữ chữ kèm ("360+"); không có số thì giữ nguyên
+function countUp() {
+  const run = once({ threshold: 0.6 }, (el) => {
+    const [text, before, end, after] = el.motionCount;
+    const start = performance.now();
+    const step = (now) => {
+      const t = Math.min((now - start) / 1400, 1);
+      el.firstChild.data = t < 1 ? before + Math.round(end * (1 - (1 - t) ** 3)) + after : text;
+      if (t < 1) requestAnimationFrame(step);
+      else el.removeAttribute("aria-label");
+    };
+    requestAnimationFrame(step);
+  });
   for (const el of document.querySelectorAll(".faq__stat-value")) {
-    const text = el.textContent.trim();
-    const m = text.match(/^(\D*)(\d+)(\D*)$/);
+    const m = el.textContent.trim().match(/^(\D*)(\d+)(\D*)$/);
     if (!m || !el.firstChild) continue;
-    el.motionCount = { before: m[1], end: +m[2], after: m[3], text };
-    el.setAttribute("aria-label", text);
+    el.motionCount = m;
+    el.setAttribute("aria-label", m[0]);
     el.textContent = m[1] + 0 + m[3];
-    stats.observe(el);
+    run(el);
   }
 }
 
-// Số giỏ đổi: icon nhún. Partial thay cả link nên so số trước và sau.
-const count = () => document.querySelector('[data-testid="header-cart-count"]')?.textContent.trim() ?? "0";
+// Hàng cuộn ngang: tiến trình, kéo chuột (mọi chế độ), nạp khi hàng đầu gần khung nhìn
+const extras = once({ rootMargin: "200px" }, lazy);
+document.querySelectorAll("scroll-buttons").forEach(extras);
+
+// Số giỏ đổi thì icon nhún. Partial thay cả link nên so số trước và sau.
 const icons = document.querySelector(".site-header__icons");
 if (icons && !calm) {
+  const count = () => icons.querySelector('[data-testid="header-cart-count"]')?.textContent.trim() ?? "0";
   let last = count();
   new MutationObserver(() => {
     const now = count();
     if (now === last) return;
     last = now;
-    document.querySelector('[data-testid="header-cart-link"]')?.setAttribute("data-bump", "");
+    icons.querySelector('[data-testid="header-cart-link"]')?.setAttribute("data-bump", "");
   }).observe(icons, { childList: true, subtree: true });
 }
 
-// Bản tin: dùng 1 thông báo của theme, không bubble trình duyệt. Không JS thì trình duyệt vẫn kiểm tra.
+// Bản tin: thông báo của theme thay bubble trình duyệt; không JS thì trình duyệt tự kiểm
 const news = document.querySelector("#footer-newsletter");
-if (news) {
+const email = news?.querySelector('input[type="email"]');
+if (email) {
   news.noValidate = true;
-  const input = news.querySelector('input[type="email"]');
-  const mark = () => news.toggleAttribute("data-invalid", !input.validity.valid);
+  const mark = () => {
+    const bad = !email.validity.valid;
+    news.toggleAttribute("data-invalid", bad);
+    bad ? email.setAttribute("aria-invalid", "true") : email.removeAttribute("aria-invalid");
+  };
   news.addEventListener("submit", (e) => {
-    if (input.validity.valid) return;
+    if (email.validity.valid) return;
     e.preventDefault();
     mark();
-    input.setAttribute("aria-invalid", "true");
-    input.focus();
+    email.focus();
   });
-  input.addEventListener("input", () => {
-    if (!news.hasAttribute("data-invalid")) return;
-    mark();
-    if (input.validity.valid) input.removeAttribute("aria-invalid");
-  });
+  email.addEventListener("input", () => news.hasAttribute("data-invalid") && mark());
 }
 
-// Chọn tiền tệ, ngôn ngữ: bấm ra ngoài hoặc Esc thì đóng.
+// Chọn nước, ngôn ngữ ở footer: bấm ra ngoài hoặc Esc thì đóng.
 const disclosure = document.querySelector(".site-footer__disclosure");
 if (disclosure) {
-  document.addEventListener("pointerdown", (e) => {
+  addEventListener("pointerdown", (e) => {
     if (disclosure.open && !disclosure.contains(e.target)) disclosure.open = false;
   });
-  document.addEventListener("keydown", (e) => {
+  addEventListener("keydown", (e) => {
     if (e.key !== "Escape" || !disclosure.open) return;
     disclosure.open = false;
     disclosure.querySelector("summary")?.focus();

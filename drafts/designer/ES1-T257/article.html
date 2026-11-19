@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How to stretch properly after training – Efitco</title>
+<meta name="description" content="A short cool-down routine for the muscles you just worked, and how long to hold each stretch.">
+<link rel="stylesheet" href="../_kit/kit.css">
+<style>
+  /* Riêng trang bài viết (ES1-T257). Spec: docs/ui-spec/article.md */
+
+  /* Ảnh bìa (LCP), vòng 3: thẻ bo 16 NẰM DƯỚI header tối, trong container (khung .page-banner foundation §3.3,
+     tỉ lệ hero Figma 1:361 1798/827 từ 80rem). Không chữ đè ảnh → không lớp tối, ảnh giữ màu thật */
+  .article-cover { width: var(--content-width); margin: var(--space-4) auto 0; aspect-ratio: 4 / 3; overflow: hidden; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-dark); }
+  .article-cover img { width: 100%; height: 100%; object-fit: cover; }
+  @media (min-width: 48rem) { .article-cover { aspect-ratio: 16 / 9; } }
+  @media (min-width: 64rem) { .article-cover { margin-block-start: var(--space-5); } }
+  @media (min-width: 80rem) { .article-cover { aspect-ratio: 1798 / 827; } }
+
+  /* Cột đọc */
+  .article-column { width: min(100%, 46rem); margin-inline: auto; }
+  .article-header { display: grid; justify-items: start; gap: var(--space-3); padding-block: var(--space-2) var(--space-6); }
+  .article-header .breadcrumb { padding-block-start: var(--space-3); }
+  .article-header h1 { margin-block-start: var(--space-1); }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); line-height: calc(22 / 14); }
+  .meta > span + span::before { content: '·'; margin-inline-end: var(--space-2); color: var(--color-muted-light); }
+  .tag-link { position: relative; text-decoration: none; }
+  .tag-link::after { content: ''; position: absolute; inset: -8px -4px; } /* vùng chạm 44 */
+  .tag-link:hover { background: color-mix(in srgb, var(--color-accent) 88%, var(--color-foreground)); }
+  @media (min-width: 64rem) { .article-header { padding-block: var(--space-4) var(--space-7); } }
+
+  /* Nội dung bài (article.content, RTE) */
+  .rte { font-size: var(--font-size-base); line-height: 1.7; }
+  .rte > * + * { margin-block-start: var(--space-5); }
+  .rte h2 { margin-block-start: var(--space-7); font-size: var(--font-size-h2); }
+  .rte h3 { margin-block-start: var(--space-6); font-size: var(--font-size-h3); }
+  .rte h2 + *, .rte h3 + * { margin-block-start: var(--space-4); }
+  .rte ul, .rte ol { padding-inline-start: var(--space-5); }
+  .rte li + li { margin-block-start: var(--space-2); }
+  .rte li::marker { color: var(--color-accent); }
+  .rte a { font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
+  .rte a:hover { color: var(--color-accent); }
+  .rte blockquote { margin-inline: 0; padding-inline-start: var(--space-5); border-inline-start: 4px solid var(--color-accent); font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: -0.02em; line-height: 1.25; }
+  .rte strong { font-weight: 600; }
+  @media (min-width: 64rem) { .rte { font-size: var(--font-size-lg); } }
+
+  .article-end { display: grid; gap: var(--space-5); margin-block-start: var(--space-7); padding-block-start: var(--space-5); border-block-start: 1px solid var(--color-border); }
+  .article-topics { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+  .article-topics > span { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; }
+  .article-topics .tab { text-decoration: none; }
+  .back-link { display: inline-flex; align-items: center; gap: var(--space-3); min-height: 44px; font-weight: 600; text-decoration: none; justify-self: start; }
+  .back-link svg { width: 20px; height: 16px; scale: -1 1; transition: translate var(--motion-base) var(--ease-out); }
+  .back-link:hover span { text-decoration: underline; text-underline-offset: 0.2em; }
+  .back-link:hover svg { translate: calc(var(--space-1) * -1) 0; }
+
+  /* Bình luận */
+  .comments { margin-block-start: var(--space-7); padding-block-start: var(--space-7); border-block-start: 1px solid var(--color-border); }
+  .comment-form .field { align-content: start; }
+  .comments > h2 { font-size: var(--font-size-h2); }
+  .comment-list { margin: var(--space-5) 0 0; padding: 0; list-style: none; border-block-start: 1px solid var(--color-border); }
+  .comment { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: var(--space-2) var(--space-4); padding-block: var(--space-5); border-block-end: 1px solid var(--color-border); }
+  .comment__avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--color-background-alt); font-weight: 600; }
+  .comment__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3); }
+  .comment__author { font-weight: 600; }
+  .comment__date { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .comment__body { grid-column: 2; color: var(--color-foreground); }
+  .comments__none { margin-block-start: var(--space-4); color: var(--color-muted); }
+  .comment-form { display: grid; gap: var(--space-5); margin-block-start: var(--space-7); }
+  .comment-form h2 { font-size: var(--font-size-h3); }
+  .comment-form__note { display: flex; gap: var(--space-2); align-items: flex-start; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .comment-form__note svg { flex: none; width: 16px; height: 16px; margin-block-start: 2px; }
+  .comment-form__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+  .comment-form__required { color: var(--color-muted); font-size: var(--font-size-sm); }
+  @media (max-width: 47.99rem) { .comment-form__actions .button { width: 100%; } }
+  /* Phân trang bình luận: khối chung docs/ui-spec/pagination.md (ES1-T287); dưới danh sách, cách 24 */
+  .comments .pagination { margin-block-start: var(--space-5); }
+  .pagination__list { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+  .pagination__step { text-decoration: none; }
+  .pagination__step[aria-disabled='true'] { cursor: default; }
+  .pagination__item--prev { margin-inline-end: var(--space-2); }
+  .pagination__item--next { margin-inline-start: var(--space-2); }
+  .pagination__page { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
+  a.pagination__page:hover, .pagination__page.is-hover { border-color: var(--color-foreground); }
+  .pagination__page:focus-visible, .pagination__page.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+  .pagination__page[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
+  .pagination__gap { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 44px; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .pagination__status { font-size: var(--font-size-sm); font-weight: 500; white-space: nowrap; }
+  :dir(rtl) .pagination__step svg { scale: -1 1; }
+  @media (max-width: 47.99rem) { .pagination__num { display: none; } .pagination__list { justify-content: space-between; } .pagination__item--prev, .pagination__item--next { margin: 0; } }
+  @media (min-width: 48rem) { .pagination__status { display: none; } }
+
+  /* Bài liên quan: hàng ngang (sổ quyết định 09/11) */
+  .related { margin-block-start: var(--section-gap); padding-block-end: var(--section-gap); }
+  .related .card-row > li { display: flex; }
+  .related .article-card { flex: 1; }
+  /* Card Figma 1:1022: padding 24 từ 48rem (1:1030, như base.css); meta chữ trắng như code ES1-T174 */
+  .related .article-card__meta { color: var(--color-background-dark-foreground); }
+  .related .article-card__meta span + span::before { content: '·'; margin-inline: var(--space-2); }
+  @media (min-width: 48rem) { .related .article-card__content { padding: 0 var(--space-5) var(--space-5); } }
+  .related h2 { font-size: var(--font-size-h1); line-height: calc(58 / 48); }
+  /* 1280+: 3 card vừa khung, không tràn → ẩn nút và thanh tiến trình (như AC-H9) */
+  @media (min-width: 80rem) { .related .carousel-nav, .related .carousel-progress { display: none; } }
+
+  .demo-states { padding-block: var(--space-7); }
+  .demo-stage > .demo-plain-header { position: relative; }
+  .demo-stage .site-header__inner { width: auto; padding-inline: var(--space-5); }
+</style></head>
+<body>
+<svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
+  <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
+  <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 5.8v5M10 14.2v.1"/></g></symbol>
+  <symbol id="i-info" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="10" cy="10" r="8.2"/><path d="M10 9v5M10 5.8v.1"/></g></symbol>
+  <symbol id="i-check" viewBox="0 0 20 20"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="8.2"/><path d="m6.3 10.2 2.5 2.5 5-5"/></g></symbol>
+  <symbol id="i-send" viewBox="0 0 20 20"><path d="M18.3 1.7 1.7 8.3l7 3 3 7 6.6-16.6ZM8.7 11.3l4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></symbol>
+  <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
+  <symbol id="i-tiktok" viewBox="0 0 28 28"><path d="M16 4v13.5a4.2 4.2 0 1 1-4.2-4.2M16 4c.4 3 2.4 5 5.5 5.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="20" height="20" rx="5"/><circle cx="14" cy="14" r="4.5"/><circle cx="19.6" cy="8.4" r=".6" fill="currentColor"/></g></symbol>
+  <symbol id="i-youtube" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3" y="6.5" width="22" height="15" rx="4"/><path d="m12 11 5 3-5 3v-6Z"/></g></symbol>
+  <symbol id="i-facebook" viewBox="0 0 28 28"><path d="M16.5 4.5h-2a4 4 0 0 0-4 4v3H8v3.5h2.5v8.5H14V15h3l.5-3.5H14V9a1 1 0 0 1 1-1h2V4.5Z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
+  <symbol id="i-shield" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M14 3 5 6.5v6.8c0 5.4 3.8 10 9 11.7 5.2-1.7 9-6.3 9-11.7V6.5L14 3Z"/><path d="m10 14 3 3 5-6"/></g></symbol>
+  <symbol id="i-truck" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 6.5h14v13h-14zM16.5 11h5l4 4.5v4h-9z"/><circle cx="7.5" cy="20.5" r="2.2"/><circle cx="20.5" cy="20.5" r="2.2"/></g></symbol>
+  <symbol id="i-award" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><circle cx="14" cy="11" r="7.5"/><path d="m9.5 17-2 8 6.5-3 6.5 3-2-8"/><path d="m14 7.3 1.2 2.4 2.6.4-1.9 1.8.5 2.6-2.4-1.2-2.4 1.2.5-2.6-1.9-1.8 2.6-.4L14 7.3Z"/></g></symbol>
+  <symbol id="i-refresh" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a10 10 0 0 1 17.3-5.3L24 9.5M24 4v5.5h-5.5M24 16a10 10 0 0 1-17.3 5.3L4 18.5M4 24v-5.5h5.5"/></g></symbol>
+  <symbol id="i-logo" viewBox="0 0 100 30"><g fill="currentColor"><path d="M69.2 25.1a6.2 6.2 0 1 1 4.3-10.7l3.1-3.2a10.7 10.7 0 1 0 0 15.3l-3.1-3.2a6.1 6.1 0 0 1-4.3 1.8Z"/><path d="M4.9 17.9h13.2v-4.2H4.9V6.4H19V2.2H0v27.2h19.1v-4.1H4.9v-7.4Z"/><path d="M30.5.9c-1.2 0-2.3.3-3.2.7-1 .4-1.7 1.1-2.3 2-.6 1-.8 2.1-.8 3.5V9h-3v3.7h3v16.7h4.8V12.7h5.3V9h-5.3V7.4c0-.8.2-1.4.6-1.8.3-.5 1-.7 1.8-.7l1 .1.8.2 1-3.7-1.4-.4a12 12 0 0 0-2.3-.2Z"/><path d="M41.8 9H37v20.4h4.8V9Z"/><path d="m54.9 25.6-.9.1c-.4 0-.7-.1-1-.2-.4-.1-.7-.4-.9-.7-.2-.4-.3-.8-.3-1.5V12.7H57V9h-5.1V4.1h-4.8V9h-2.9v3.7h2.9v11.4c0 1.2.3 2.3.8 3.2.6.8 1.3 1.5 2.3 1.9 1 .4 2 .5 3.2.5.7 0 1.3-.1 1.7-.2l1.1-.3-.8-3.8-.5.2Z"/><path d="M88.5 8.3a10.7 10.7 0 1 0 0 21.3 10.7 10.7 0 0 0 0-21.3Zm0 16.9a6.2 6.2 0 1 1 0-12.5 6.2 6.2 0 0 1 0 12.5Z"/><path d="M97.7 11.1A11 11 0 0 0 95.4 9c.8-1 1.8-2.7 1.4-3.7-.2-.5-1.4-2.1-8.3-2.1-6.8 0-8 1.6-8.2 2.1-.5 1 .6 2.7 1.4 3.7-.9.6-1.7 1.3-2.3 2.1-1-1.2-3.2-4.2-2-7 .6-1.4 1.8-2.4 3.6-3C82.8.3 85.3 0 88.5 0h.1c6.3 0 9.9 1.4 11 4 1.2 2.9-.9 5.8-1.9 7.1Z"/><circle cx="39.3" cy="3.6" r="2.8"/></g></symbol>
+</svg>
+
+<a class="visually-hidden" href="#main">Skip to content</a>
+
+<!-- Header vòng 3: thanh tối #1A1A1A + noise, cao 80, KHÔNG đè ảnh bìa (sổ 10/11, Figma 1:362, foundation §3) -->
+<header class="site-header">
+  <div class="site-header__inner">
+    <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+    <a class="site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+    <nav class="site-header__nav" aria-label="Main">
+      <ul class="site-header__menu">
+        <li><a class="site-header__link" href="#">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
+        <li><a class="site-header__link" href="#">Sale</a></li>
+        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#" aria-current="page">Blog</a></li>
+        <li><a class="site-header__link" href="#">Contact</a></li>
+        <li><a class="site-header__link" href="#">Help</a></li>
+      </ul>
+    </nav>
+    <div class="site-header__icons">
+      <a class="site-header__icon site-header__icon--search" href="#" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Account"><svg aria-hidden="true"><use href="#i-user"/></svg></a>
+      <a class="site-header__icon" href="#" aria-label="Cart, 2 items"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a>
+    </div>
+  </div>
+</header>
+
+<main id="main" data-testid="article-page">
+  <article>
+    <div class="article-cover" data-testid="article-cover">
+      <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg?width=1800" alt="Athlete resting on a bench after a training session" width="1800" height="828" fetchpriority="high">
+    </div>
+
+    <div class="container">
+      <div class="article-column">
+        <header class="article-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb">
+            <ol><li><a href="#">Home</a></li><li><a href="#">Training Tips &amp; Inspiration</a></li><li><span aria-current="page">How to stretch properly after training</span></li></ol>
+          </nav>
+          <a class="badge badge--tag tag-link" href="#">Exercises</a>
+          <h1>How to stretch properly after training</h1>
+          <p class="meta"><span><time datetime="2026-11-05">Nov 5, 2026</time></span><span>By Efitco Team</span><span>2 min read</span></p>
+        </header>
+
+        <!-- KHÔNG CHẮC: demo-data chưa có article.content; đoạn dưới chỉ là mẫu định dạng RTE (ES1-T266) -->
+        <div class="rte" data-testid="article-content">
+          <p><strong>A short cool-down helps your muscles relax and keeps you moving well for the next session.</strong> Five to ten minutes is enough when you stretch the muscles you just worked.</p>
+          <h2>When to stretch</h2>
+          <p>Stretch right after your last set, while your muscles are still warm. Breathe slowly and stop at mild tension, never at pain.</p>
+          <h2>Hold each stretch for 30 seconds</h2>
+          <ul>
+            <li>Hamstrings: sit with one leg straight and reach for your toes.</li>
+            <li>Hip flexors: kneel on a training mat and push your hips forward.</li>
+            <li>Chest and shoulders: place a forearm on a rack upright and turn away.</li>
+          </ul>
+          <blockquote>Consistency beats intensity. Stretch a little after every session.</blockquote>
+          <p>Add a recovery roller on rest days to work through tight spots in your calves and upper back.</p>
+        </div>
+
+        <div class="article-end">
+          <div class="article-topics"><span>Topics</span><a class="tab" href="#">Exercises</a></div>
+          <a class="back-link" href="#"><svg aria-hidden="true"><use href="#i-arrow"/></svg><span>Back to Training Tips &amp; Inspiration</span></a>
+        </div>
+
+        <!-- Bình luận: chỉ khi blog.comments_enabled? -->
+        <section class="comments" id="comments" aria-labelledby="comments-title" data-testid="article-comments">
+          <h2 id="comments-title">2 Comments</h2>
+          <ol class="comment-list">
+            <li class="comment">
+              <span class="comment__avatar" aria-hidden="true">M</span>
+              <p class="comment__head"><span class="comment__author">Minh T.</span><time class="comment__date" datetime="2026-11-06">Nov 6, 2026</time></p>
+              <p class="comment__body">The hip flexor stretch helps a lot after squat day. Thanks for the clear steps.</p>
+            </li>
+            <li class="comment">
+              <span class="comment__avatar" aria-hidden="true">J</span>
+              <p class="comment__head"><span class="comment__author">Jordan P.</span><time class="comment__date" datetime="2026-11-07">Nov 7, 2026</time></p>
+              <p class="comment__body">Do you stretch before training too, or only after?</p>
+            </li>
+          </ol>
+
+          <form class="comment-form" action="#" method="post" novalidate data-testid="comment-form">
+            <h2>Add a comment</h2>
+            <p class="comment-form__note"><svg aria-hidden="true"><use href="#i-info"/></svg>Comments are reviewed before they appear.</p>
+            <div class="form-grid form-grid--2">
+              <div class="field"><label class="field__label" for="c-name">Name <span class="req" aria-hidden="true">*</span></label><input class="field__input" id="c-name" name="comment[author]" type="text" autocomplete="name" required></div>
+              <div class="field"><label class="field__label" for="c-email">Email <span class="req" aria-hidden="true">*</span></label><input class="field__input" id="c-email" name="comment[email]" type="email" autocomplete="email" aria-describedby="c-email-hint" required><p class="field__hint" id="c-email-hint">Not published.</p></div>
+              <div class="field span-all"><label class="field__label" for="c-body">Comment <span class="req" aria-hidden="true">*</span></label><textarea class="field__input" id="c-body" name="comment[body]" required></textarea></div>
+            </div>
+            <div class="comment-form__actions">
+              <button class="button" type="submit">Post Comment</button>
+              <span class="comment-form__required" aria-hidden="true">* Required</span>
+            </div>
+          </form>
+        </section>
+      </div>
+    </div>
+  </article>
+
+  <!-- Bài liên quan: cùng tag trước, thiếu thì bài mới nhất; bỏ bài đang xem -->
+  <section class="related container" aria-labelledby="related-title" data-testid="related-articles">
+    <div class="section-header section-header--split">
+      <p class="eyebrow">From the Efitco blog</p>
+      <h2 id="related-title">More Training Tips</h2>
+      <div class="carousel-nav">
+        <button class="round-button" type="button" aria-label="Previous articles" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
+        <button class="round-button" type="button" aria-label="Next articles"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
+      </div>
+    </div>
+    <ul class="card-row" aria-label="More training tips">
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960" loading="lazy"><span class="badge badge--tag">Featured</span><div class="article-card__content"><h3 class="article-card__title">Set up a perfect home gym in just 15m²</h3><p class="article-card__meta"><span><time datetime="2026-11-04">Nov 4, 2026</time></span><span>5 min read</span></p></div></a></li>
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960" loading="lazy"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__meta"><span><time datetime="2026-11-02">Nov 2, 2026</time></span><span>7 min read</span></p></div></a></li>
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=720" alt="" width="720" height="960" loading="lazy"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>5 min read</span></p></div></a></li>
+    </ul>
+    <div class="carousel-progress" aria-hidden="true"><span class="carousel-progress__thumb" style="--size: 77%"></span></div>
+  </section>
+</main>
+
+<!-- Footer vòng 3 (Figma 1:1104, foundation §4): newsletter · panel dải rộng · hàng cuối có wordmark -->
+<footer class="site-footer">
+  <div class="container site-footer__band">
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
+    <div class="site-footer__newsletter">
+      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
+    </div>
+    <form class="site-footer__form" onsubmit="return false" novalidate>
+      <label class="visually-hidden" for="nl-email">Email</label>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
+    </form>
+  </div>
+  <div class="site-footer__panel">
+    <div class="site-footer__top">
+      <div class="site-footer__brand">
+        <svg class="site-footer__logo" viewBox="0 0 100 30" role="img" aria-label="Efitco"><use href="#i-logo"/></svg>
+        <p>Efitco provides premium fitness accessories dedicated to supporting your journey as you conquer every health and bodybuilding goal with confidence.</p>
+        <ul class="site-footer__social">
+          <li><a href="#" aria-label="Efitco on TikTok"><svg aria-hidden="true"><use href="#i-tiktok"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Instagram"><svg aria-hidden="true"><use href="#i-instagram"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on YouTube"><svg aria-hidden="true"><use href="#i-youtube"/></svg></a></li>
+          <li><a href="#" aria-label="Efitco on Facebook"><svg aria-hidden="true"><use href="#i-facebook"/></svg></a></li>
+        </ul>
+        <a class="shop-follow" href="#">Follow on <b>shop</b></a>
+      </div>
+      <div class="site-footer__menus">
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+      </div>
+    </div>
+    <ul class="site-footer__trust">
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+    </ul>
+  </div>
+  <div class="container site-footer__bottom">
+    <p>© 2026 Efitco, Powered by Shopify</p>
+    <p class="site-footer__wordmark" aria-hidden="true">Efitco</p>
+    <div class="site-footer__end">
+      <button class="site-footer__locale" type="button" aria-label="Currency and language: USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg>USD / EN <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <ul class="payment-icons" aria-label="Payment methods"><li class="pi--disc">DISC</li><li class="pi--mc">MC</li><li class="pi--dc">DC</li><li class="pi--amex">AMEX</li><li class="pi--pp">PP</li></ul>
+    </div>
+  </div>
+</footer>
+
+<!-- ===================== TRẠNG THÁI (chỉ mockup) ===================== -->
+<div class="demo-states container" aria-label="Page states">
+
+  <section class="demo-block">
+    <h2>Trạng thái: bài không có ảnh bìa</h2>
+    <p class="demo-note">Không ảnh bìa (hoặc tắt "Show cover image"): header tối giữ nguyên (sổ 10/11, chỉ 1 biến thể), cột đọc bắt đầu ngay dưới header. LCP là h1, không ảnh eager nào.</p>
+    <div class="demo-stage" style="min-height: 0; background: var(--color-background)">
+      <header class="site-header demo-plain-header">
+        <div class="site-header__inner">
+          <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu, sample"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
+          <a class="site-header__logo" href="#" aria-label="Efitco home, sample"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
+          <div class="site-header__icons" style="margin-inline-start: auto"><a class="site-header__icon site-header__icon--search" href="#" aria-label="Search, sample"><svg aria-hidden="true"><use href="#i-search"/></svg></a><a class="site-header__icon" href="#" aria-label="Cart, 2 items, sample"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a></div>
+        </div>
+      </header>
+      <div class="article-column" style="padding-inline: var(--space-4)">
+        <div class="article-header">
+          <nav class="breadcrumb" aria-label="Breadcrumb, no cover sample"><ol><li><a href="#">Home</a></li><li><a href="#">Training Tips &amp; Inspiration</a></li><li><span aria-current="page">Rubber vs urethane: which plates last longer</span></li></ol></nav>
+          <a class="badge badge--tag tag-link" href="#">Diet plans</a>
+          <p class="h1" style="font-family: var(--font-heading--family); font-weight: var(--font-heading--weight); letter-spacing: -0.02em; text-wrap: balance">Rubber vs urethane: which plates last longer</p>
+          <p class="meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>By Efitco Team</span><span>5 min read</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo-block">
+    <div class="article-column">
+      <h2>Trạng thái: chưa có bình luận</h2>
+      <p class="demo-note">article.comments_count = 0: tiêu đề "Comments", một câu mời, form ngay dưới.</p>
+      <p class="h2" style="font-family: var(--font-heading--family); font-weight: var(--font-heading--weight)">Comments</p>
+      <p class="comments__none">No comments yet. Share how you cool down after training.</p>
+    </div>
+  </section>
+
+  <section class="demo-block">
+    <div class="article-column comments" style="margin: 0; padding: 0; border: 0">
+      <h2>Trạng thái: phân trang bình luận (&gt; 10 bình luận)</h2>
+      <p class="demo-note">10 / trang, snippet pagination chung (docs/ui-spec/pagination.md): nav "Comment pages", link ?page=N#comments, nằm dưới danh sách, trên form. Trang 1: Previous giữ chỗ mờ 0.35 + aria-disabled; trang cuối: Next như vậy. Danh sách bình luận minh hoạ (demo-data không có bình luận, ES1-T267).</p>
+      <ol class="comment-list">
+        <li class="comment">
+          <span class="comment__avatar" aria-hidden="true">A</span>
+          <p class="comment__head"><span class="comment__author">Alex R.</span><time class="comment__date" datetime="2026-11-08">Nov 8, 2026</time></p>
+          <p class="comment__body">Holding each stretch for 30 seconds made a real difference for me.</p>
+        </li>
+      </ol>
+      <nav class="pagination" aria-label="Comment pages, first page sample">
+        <ul class="pagination__list" role="list">
+          <li class="pagination__item--prev"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></span></li>
+          <li class="pagination__status">Page 1 of 3</li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>1</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#comments" aria-label="Page 2">2</a></li>
+          <li class="pagination__num"><a class="pagination__page" href="#comments" aria-label="Page 3">3</a></li>
+          <li class="pagination__item--next"><a class="round-button pagination__step" href="#comments" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
+        </ul>
+      </nav>
+      <nav class="pagination" aria-label="Comment pages, last page sample">
+        <ul class="pagination__list" role="list">
+          <li class="pagination__item--prev"><a class="round-button pagination__step" href="#comments" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
+          <li class="pagination__status">Page 3 of 3</li>
+          <li class="pagination__num"><a class="pagination__page" href="#comments" aria-label="Page 1">1</a></li>
+          <li class="pagination__num"><a class="pagination__page" href="#comments" aria-label="Page 2">2</a></li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>3</span></li>
+          <li class="pagination__item--next"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></span></li>
+        </ul>
+      </nav>
+    </div>
+  </section>
+
+  <section class="demo-block">
+    <div class="article-column">
+      <h2>Trạng thái: bình luận chờ duyệt (gửi thành công, blog.moderated?)</h2>
+      <p class="demo-note">Sau POST trang tải lại về #comments; hộp thành công role="status" đầu form, focus vào hộp; ô nhập rỗng. Blog không duyệt: "Your comment is posted." và bình luận hiện cuối danh sách.</p>
+      <div class="comment-form" style="margin: 0">
+        <div class="form-message form-message--success" role="status" tabindex="-1"><svg aria-hidden="true"><use href="#i-check"/></svg><div><strong>Thanks, your comment is in review</strong>It appears here once a moderator approves it.</div></div>
+        <div class="form-grid form-grid--2">
+          <div class="field"><label class="field__label" for="s-name">Name <span class="req" aria-hidden="true">*</span></label><input class="field__input" id="s-name" type="text" autocomplete="name" required></div>
+          <div class="field"><label class="field__label" for="s-email">Email <span class="req" aria-hidden="true">*</span></label><input class="field__input" id="s-email" type="email" autocomplete="email" required></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo-block">
+    <div class="article-column">
+      <h2>Trạng thái: lỗi gửi bình luận</h2>
+      <p class="demo-note">form.errors: hộp tóm tắt role="alert" đầu form + lỗi inline dưới từng trường (aria-invalid, aria-describedby); focus vào hộp tóm tắt; giữ chữ đã nhập. Không dùng default_errors.</p>
+      <div class="comment-form" style="margin: 0">
+        <div class="form-message form-message--error" role="alert" tabindex="-1"><svg aria-hidden="true"><use href="#i-alert"/></svg><div><strong>Check 2 fields</strong>Fix the fields below, then post again.</div></div>
+        <div class="form-grid form-grid--2">
+          <div class="field"><label class="field__label" for="e-name">Name <span class="req" aria-hidden="true">*</span></label><input class="field__input" id="e-name" type="text" autocomplete="name" value="Minh T." required></div>
+          <div class="field"><label class="field__label" for="e-email">Email <span class="req" aria-hidden="true">*</span></label><input class="field__input" id="e-email" type="email" autocomplete="email" value="minh.tran.example.com" aria-invalid="true" aria-describedby="e-email-err" required><p class="field__error" id="e-email-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Enter an email like name@example.com.</p></div>
+          <div class="field span-all"><label class="field__label" for="e-body">Comment <span class="req" aria-hidden="true">*</span></label><textarea class="field__input" id="e-body" aria-invalid="true" aria-describedby="e-body-err" required></textarea><p class="field__error" id="e-body-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Write a comment before posting.</p></div>
+        </div>
+        <div class="comment-form__actions"><button class="button" type="button">Post Comment</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo-block">
+    <div class="article-column">
+      <h2>Trạng thái: đang gửi · hover · focus · lỗi mạng</h2>
+      <p class="demo-note">Đang gửi: aria-busy, spinner, bề rộng giữ nguyên, không bấm lại (05 §5; cần JS nhỏ, không JS thì form gửi thường). Lỗi mạng/captcha: toast error (foundation §17).</p>
+      <div class="demo-row">
+        <button class="button" type="button" aria-busy="true">Post Comment<span class="visually-hidden">, posting</span></button>
+        <button class="button is-hover" type="button">Post Comment</button>
+        <button class="button is-focus" type="button">Post Comment</button>
+        <input class="field__input is-focus" style="max-width: 16rem" type="text" aria-label="Name, focus sample" value="Minh T.">
+      </div>
+      <div class="alert" role="alert" style="margin-block-start: var(--space-5)">
+        <svg aria-hidden="true"><use href="#i-alert"/></svg>
+        <div class="alert__body"><strong>Couldn't post your comment</strong><p>Check your connection, then post again. Your text is kept.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="demo-block">
+    <h2>Trạng thái: bài liên quan đang tải · thiếu bài</h2>
+    <p class="demo-note">Bài liên quan render từ server (không tải riêng). Skeleton chỉ dùng nếu BE tải muộn hàng này. Blog chỉ có 1 bài: không render khối. 1–2 bài: hiện số có, ẩn nút và thanh tiến trình.</p>
+    <ul class="card-row" aria-busy="true" aria-label="Loading related articles">
+      <li><span class="skeleton" style="display:block; aspect-ratio: 3 / 4; border-radius: calc(var(--radius-card) + var(--space-1))"></span></li>
+      <li><span class="skeleton" style="display:block; aspect-ratio: 3 / 4; border-radius: calc(var(--radius-card) + var(--space-1))"></span></li>
+      <li><span class="skeleton" style="display:block; aspect-ratio: 3 / 4; border-radius: calc(var(--radius-card) + var(--space-1))"></span></li>
+    </ul>
+  </section>
+</div>
+</body>
+</html>

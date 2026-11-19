@@ -5,6 +5,7 @@ tools: Read, Grep, Glob, Edit, Write, Bash, mcp__ticket__get, mcp__ticket__list,
 model: opus
 skills:
   - ux-motion
+  - dev-be-knowledge
   - skeleton-structure
   - js-partials
   - cart-variant-logic

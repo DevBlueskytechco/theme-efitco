@@ -1,10 +1,14 @@
 {% doc %}
   Renders a one-line announcement above the header, with an optional link
-  wrapping the text. Composed in layout/theme.liquid in its own container
-  so it appears on every page. Hidden by default: when the text setting is
-  empty nothing is rendered on the storefront; in the theme editor a
-  placeholder explains how to turn it on. Self-contained: callers must
-  leave the body empty.
+  wrapping the whole sentence plus a decorative arrow. Composed in
+  layout/theme.liquid in its own container so it appears on every page that
+  uses that layout (not password, not gift card). Dark band with the same
+  noise as the header, at least 44px tall, scrolls away: only the header
+  sticks. No close button, no rotation, no color setting
+  (docs/ui-spec/announcement-bar.md, TE-1 AC4).
+  Hidden by default: when the text setting is empty nothing is rendered on
+  the storefront; in the theme editor a placeholder explains how to turn it
+  on. Self-contained: callers must leave the body empty.
 
   Test hooks: data-testid="announcement-bar", "announcement-bar-link",
   "announcement-bar-placeholder" (editor only).
@@ -31,6 +35,7 @@
       {%- if announcement_link != blank -%}
         <a class="announcement-bar__link" href="{{ announcement_link }}" data-testid="announcement-bar-link">
           {{- announcement_text | escape -}}
+          {%- render 'slideshow-icon', name: 'arrow' -%}
         </a>
       {%- else -%}
         {{- announcement_text | escape -}}

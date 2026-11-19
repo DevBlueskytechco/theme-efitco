@@ -2,7 +2,9 @@
 // Ticket ES1-T137 TE-11-FE1: quiz markup + CSS (docs/srs.md#TE-11 AC1, AC4; drafts/techlead/ES1-T132/task-split.md D1, D2, D4, D5, D7, D9).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T137.spec.ts -g "AC1|AC4|nojs"
 // ES1-T139: test chỉ đúng trước khi JS nâng cấp thì gọi withoutModule, vì quiz ở đầu ?view=te11 nên module nạp ngay.
-import { test, expect, type Browser, type Page } from '@playwright/test';
+import { test, expect, type Browser, type Page } from './support/test';
+import { newStoreContext } from './support/store-noise';
+import { autoDeclineConsent } from './support/consent';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
@@ -38,7 +40,7 @@ async function expectNoSeriousAxe(page: Page) {
 
 async function noJsPage(browser: Browser, width?: number) {
   const use = test.info().project.use;
-  const context = await browser.newContext({
+  const context = await newStoreContext(browser, {
     javaScriptEnabled: false,
     storageState: 'tests/setup/state.json',
     baseURL: use.baseURL,
@@ -48,6 +50,9 @@ async function noJsPage(browser: Browser, width?: number) {
   });
   return { context, page: await context.newPage() };
 }
+
+// ES1-T434: banner cookie Shopify hiện muộn, che control → Decline khi nó xuất hiện.
+test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 
 test.describe('ES1-T137 TE-11 quiz', () => {
   test('AC1 ?view=te11 trả template kiểm thử, không phải trang chủ thường', async ({ page }) => {

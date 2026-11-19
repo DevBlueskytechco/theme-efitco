@@ -1,0 +1,48 @@
+{% comment %}
+  TE-13 test template, opened with /?view=te13-featured (ES1-T435, CTO 12/11 on ES1-T426):
+  product te13-featured only (compare-at price, reviews.rating 4.9/341, spec metafields
+  1, 2, 4), so specs that need it never share a band with the variants product of
+  templates/index.te13.liquid. One featured product on the page: the picker stays on
+  partials, like /?view=te13.
+  No fallback product: while te13-featured is not published, band F renders nothing and
+  the specs skip on data (TE13_METAFIELDS_READY), never on another product.
+  data-product-handle on te13-meta tells the spec which product rendered.
+  A branch preview has no block settings, so this file sets them through block
+  parameters and uses Figma copy. Remove this file before a real store release.
+{% endcomment %}
+
+{%- liquid
+  assign te13_featured = all_products['te13-featured']
+
+  assign te13_now = 'now' | date: '%s' | plus: 0
+  assign te13_future_epoch = te13_now | plus: 172800
+  assign te13_future = te13_future_epoch | date: '%Y-%m-%d %H:%M'
+
+  # data-end expected on band F: the future time with its seconds dropped
+  assign te13_seconds = te13_future_epoch | modulo: 60
+  assign te13_expected_end = te13_future_epoch | minus: te13_seconds
+-%}
+
+{% block 'container', id: 'te13-title' %}
+  <h1 class="visually-hidden">{{ shop.name }}</h1>
+  <div
+    hidden
+    data-testid="te13-meta"
+    data-expected-end="{{ te13_expected_end }}"
+    data-product-handle="{{ te13_featured.handle }}"
+  ></div>
+{% endblock %}
+
+{% comment %} F: Figma 1:759, te13-featured, in date, on sale: countdown, discount, rating, specs. {% endcomment %}
+{% block 'container', id: 'te13-f', tag: 'div' %}
+  {% block 'featured-product',
+    id: 'te13-featured-f',
+    product: te13_featured,
+    eyebrow: 'Featured Product · Free Weights',
+    countdown_end: te13_future,
+    spec_1_label: 'Weight range',
+    spec_2_label: 'Footprint',
+    spec_3_label: 'Materials',
+    spec_4_label: 'Assembly'
+  %}{% endblock %}
+{% endblock %}

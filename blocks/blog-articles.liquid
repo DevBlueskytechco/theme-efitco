@@ -1,0 +1,292 @@
+{% doc %}
+  Blog page body (TE-20 AC1–AC7, docs/ui-spec/blog.md): breadcrumb, page title,
+  topic nav, featured article, card grid, pagination, empty states. Reads the
+  global `blog` and `current_tags`; the blog comes from the template, so there
+  is no blog setting.
+
+  Order: breadcrumb (snippets/breadcrumb) → eyebrow, h1 blog.title, article
+  count (snippets/page-title) → topic nav → featured article → grid of
+  snippets/article-card (h2, date, excerpt) → snippets/pagination.
+
+  - Topic nav: real links, "All" to blog.url and one per blog.all_tags to
+    {blog.url}/tagged/{tag}; the page being viewed has aria-current="page", no
+    tab roles. Hidden when the setting is off or the blog has no tags. Works
+    without JavaScript (page reload).
+  - Featured article: the newest article, on page 1 with no tag and the
+    setting on, when the page has at least 2 articles. Image 4/3, first tag,
+    h2 link (the only link, ::after covers the block), excerpt_or_content 30
+    words ("Show excerpt"), date · reading time.
+  - LCP (AC6): the featured image is the only eager + fetchpriority high image;
+    without a featured article the first card image is. Every other image is lazy.
+  - Pagination: articles_per_page per page, links end with #blog-grid.
+  - Empty blog: no nav, no count, empty state with "Explore Equipment" (all
+    products) and "Back to homepage". Tag with no article: nav kept, empty
+    state with "View All Articles" (blog.url). Shown to shoppers: an empty page
+    result is content (AGENTS.md).
+  - No blog (block used outside the blog template): editor hint, nothing on
+    the storefront.
+
+  No JavaScript. Hooks for a later partial (BE, blog.md §4 loading and error):
+  #blog-grid on the grid, data-testid below.
+
+  Test hooks: blog-articles, blog-articles-topics, blog-articles-topic,
+  blog-articles-featured, blog-articles-featured-link,
+  blog-articles-featured-excerpt, blog-articles-featured-meta, blog-articles-grid,
+  blog-articles-empty (+ -heading, -button, -link), blog-articles-placeholder;
+  cards: snippets/article-card.liquid; pagination: snippets/pagination.liquid.
+
+  Self-contained: callers must leave the body empty.
+
+  @example
+  {% block 'container', id: 'blog-main' %}
+    {% block 'blog-articles' %}{% endblock %}
+  {% endblock %}
+{% enddoc %}
+
+{%- if blog == blank -%}
+  {%- if request.design_mode -%}
+    <p class="blog-articles__placeholder" data-testid="blog-articles-placeholder" {{ block.shopify_attributes }}>
+      {{- 'blog.placeholder' | t -}}
+    </p>
+  {%- endif -%}
+{%- else -%}
+  <div class="blog-articles" data-testid="blog-articles" {{ block.shopify_attributes }}>
+    {% render 'breadcrumb' %}
+
+    {% paginate blog.articles by block.settings.articles_per_page, window_size: 1 %}
+      {%- liquid
+        # Tags are matched by handle, so the URL form and the stored name give the same
+        # result; the name shown comes from blog.all_tags when it matches.
+        assign is_tag_page = false
+        assign tag_handles = ','
+        assign tag_names = ''
+        if current_tags != blank
+          assign is_tag_page = true
+          for current_tag in current_tags
+            assign current_handle = current_tag | handle
+            assign tag_handles = tag_handles | append: current_handle | append: ','
+          endfor
+          for tag in blog.all_tags
+            assign tag_handle = tag | handle
+            assign tag_key = ',' | append: tag_handle | append: ','
+            if tag_handles contains tag_key
+              if tag_names != blank
+                assign tag_names = tag_names | append: ', '
+              endif
+              assign tag_names = tag_names | append: tag
+            endif
+          endfor
+          if tag_names == blank
+            assign tag_names = current_tags | join: ', '
+          endif
+        endif
+
+        assign count_label = ''
+        if paginate.items > 0
+          if is_tag_page
+            assign count_label = 'blog.tagged_count' | t: count: paginate.items, tag: tag_names
+          else
+            assign count_label = 'blog.articles_count' | t: count: paginate.items
+          endif
+        endif
+
+        assign featured = nil
+        if block.settings.feature_newest and is_tag_page == false and paginate.current_page == 1 and paginate.items > 1
+          assign featured = blog.articles.first
+        endif
+
+        assign card_sizes = '(min-width: 80rem) 336px, (min-width: 64rem) 33vw, (min-width: 48rem) 50vw, 100vw'
+      -%}
+
+      {% render 'page-title', title: blog.title, eyebrow: block.settings.eyebrow, meta: count_label %}
+
+      {%- if block.settings.show_topic_filter and blog.all_tags.size > 0 -%}
+        {%- if paginate.items > 0 or is_tag_page -%}
+          <nav class="blog-articles__topics" aria-label="{{ 'blog.topics_label' | t }}" data-testid="blog-articles-topics">
+            <ul class="blog-articles__topic-list" role="list">
+              <li>
+                <a
+                  class="blog-articles__topic"
+                  href="{{ blog.url }}"
+                  data-testid="blog-articles-topic"
+                  {% unless is_tag_page %}
+                    aria-current="page"
+                  {% endunless %}
+                >
+                  {{- 'blog.all_topics' | t -}}
+                </a>
+              </li>
+              {%- for tag in blog.all_tags -%}
+                {%- liquid
+                  assign tag_handle = tag | handle
+                  assign tag_key = ',' | append: tag_handle | append: ','
+                -%}
+                <li>
+                  <a
+                    class="blog-articles__topic"
+                    href="{{ blog.url }}/tagged/{{ tag_handle }}"
+                    data-testid="blog-articles-topic"
+                    {% if tag_handles contains tag_key %}
+                      aria-current="page"
+                    {% endif %}
+                  >
+                    {{- tag | escape -}}
+                  </a>
+                </li>
+              {%- endfor -%}
+            </ul>
+          </nav>
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if paginate.items == 0 -%}
+        {%- liquid
+          if is_tag_page
+            assign empty_heading = 'blog.empty_tag_heading' | t
+            assign empty_text = 'blog.empty_tag_text' | t
+            assign empty_button = 'blog.empty_tag_button' | t
+            render 'empty-state', heading: empty_heading, text: empty_text, button_label: empty_button, button_url: blog.url, icon: 'tag', testid: 'blog-articles-empty'
+          else
+            assign empty_heading = 'blog.empty_heading' | t
+            assign empty_text = 'blog.empty_text' | t
+            assign empty_button = 'blog.empty_button' | t
+            assign empty_link = 'blog.empty_link' | t
+            render 'empty-state', heading: empty_heading, text: empty_text, button_label: empty_button, button_url: routes.all_products_collection_url, link_label: empty_link, link_url: routes.root_url, icon: 'article', testid: 'blog-articles-empty'
+          endif
+        -%}
+      {%- else -%}
+        {%- if featured != nil -%}
+          {%- liquid
+            assign featured_tag = featured.tags | first
+            assign featured_words = featured.content | newline_to_br | strip_newlines | replace: '&nbsp;', ' ' | replace: '<', ' <' | strip_html | split: ' ' | size
+            assign featured_minutes = featured_words | plus: 199 | divided_by: 200
+            unless block.settings.show_reading_time
+              assign featured_minutes = 0
+            endunless
+            assign featured_excerpt = ''
+            if block.settings.show_excerpt
+              assign featured_excerpt = featured.excerpt_or_content | strip_html | truncatewords: 30
+            endif
+          -%}
+          <article class="blog-articles__featured" data-testid="blog-articles-featured">
+            <div class="blog-articles__featured-media">
+              {%- if featured.image != blank -%}
+                {% render 'image',
+                  image: featured.image,
+                  width: 1440,
+                  widths: '360, 720, 1080, 1440',
+                  sizes: '(min-width: 48rem) 58vw, 100vw',
+                  loading: 'eager',
+                  fetchpriority: 'high',
+                  decorative: true
+                %}
+              {%- endif -%}
+            </div>
+            <div class="blog-articles__featured-body">
+              {%- if featured_tag != blank -%}
+                <p class="blog-articles__featured-tag">{{ featured_tag | escape }}</p>
+              {%- endif -%}
+              <h2 class="blog-articles__featured-title">
+                <a class="blog-articles__featured-link" href="{{ featured.url }}" data-testid="blog-articles-featured-link">
+                  {{- featured.title | escape -}}
+                </a>
+              </h2>
+              {%- if featured_excerpt != blank -%}
+                <p class="blog-articles__featured-excerpt" data-testid="blog-articles-featured-excerpt">
+                  {{- featured_excerpt -}}
+                </p>
+              {%- endif -%}
+              {%- if block.settings.show_date or featured_minutes > 0 -%}
+                <p class="blog-articles__meta" data-testid="blog-articles-featured-meta">
+                  {%- if block.settings.show_date -%}
+                    <span>{{ featured.published_at | time_tag: format: 'date' }}</span>
+                  {%- endif -%}
+                  {%- if featured_minutes > 0 -%}
+                    <span>{{ 'blocks.blog_posts.read_time' | t: count: featured_minutes }}</span>
+                  {%- endif -%}
+                </p>
+              {%- endif -%}
+            </div>
+          </article>
+        {%- endif -%}
+
+        <ul class="blog-articles__grid" id="blog-grid" role="list" data-testid="blog-articles-grid">
+          {%- liquid
+            assign grid_offset = 0
+            if featured != nil
+              assign grid_offset = 1
+            endif
+            for post in blog.articles offset: grid_offset
+              assign card_loading = 'lazy'
+              assign card_priority = nil
+              if featured == nil and forloop.first
+                assign card_loading = 'eager'
+                assign card_priority = 'high'
+              endif
+              render 'article-card', article: post, heading_tag: 'h2', show_date: block.settings.show_date, show_read_time: block.settings.show_reading_time, show_excerpt: true, sizes: card_sizes, loading: card_loading, fetchpriority: card_priority
+            endfor
+          -%}
+        </ul>
+
+        {% render 'pagination', paginate: paginate, anchor: '#blog-grid' %}
+      {%- endif -%}
+    {% endpaginate %}
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "t:general.blog_articles",
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "t:labels.eyebrow",
+      "info": "t:info.blog_articles_eyebrow"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_topic_filter",
+      "label": "t:labels.blog_articles_show_topic_filter",
+      "info": "t:info.blog_articles_show_topic_filter",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "feature_newest",
+      "label": "t:labels.blog_articles_feature_newest",
+      "info": "t:info.blog_articles_feature_newest",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "articles_per_page",
+      "label": "t:labels.blog_articles_per_page",
+      "min": 6,
+      "max": 24,
+      "step": 3,
+      "default": 9
+    },
+    {
+      "type": "checkbox",
+      "id": "show_excerpt",
+      "label": "t:labels.show_excerpt",
+      "info": "t:info.blog_articles_show_excerpt",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_date",
+      "label": "t:labels.show_date",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_reading_time",
+      "label": "t:labels.show_reading_time",
+      "info": "t:info.show_reading_time",
+      "default": true
+    }
+  ]
+}
+{% endschema %}

@@ -1,15 +1,22 @@
 // ES1-T235: lớp chuyển động (trai_nghiem.xlsx) và chữ menu con. Playwright đặt navigator.webdriver nên motion.js tắt; spec này giả lập trình duyệt thường.
-import { test, expect } from '@playwright/test';
+import { test, expect } from './support/test';
+import { newStoreContext } from './support/store-noise';
+import { autoDeclineConsent } from './support/consent';
 
 const asUser = () => Object.defineProperty(navigator, 'webdriver', { get: () => false });
+
+// ES1-T434: banner cookie Shopify hiện muộn, che control → Decline khi nó xuất hiện.
+test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 
 test.describe('ES1-T235 trải nghiệm', () => {
   test('hiện dần: phần dưới màn hình chờ, cuộn tới thì hiện đủ', async ({ page }) => {
     await page.addInitScript(asUser);
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-motion', 'on');
-    const block = page.locator('.shop-the-look');
+    // ES1-T250: hiện dần theo từng phần (chữ, card, ảnh) thay vì cả khối
+    const block = page.locator('.shop-the-look h2').first();
     await expect(block).toHaveAttribute('data-reveal', 'wait');
+    await expect(block).toHaveAttribute('data-reveal-kind', 'text');
     await block.scrollIntoViewIfNeeded();
     await expect(block).toHaveCSS('opacity', '1', { timeout: 5000 });
     await expect(block).not.toHaveAttribute('data-reveal', 'wait');
@@ -25,7 +32,7 @@ test.describe('ES1-T235 trải nghiệm', () => {
   });
 
   test('prefers-reduced-motion: không bật chuyển động, nội dung hiện ngay', async ({ browser }) => {
-    const context = await browser.newContext({ reducedMotion: 'reduce', storageState: 'tests/setup/state.json', baseURL: process.env.STORE_ORIGIN });
+    const context = await newStoreContext(browser, { reducedMotion: 'reduce', storageState: 'tests/setup/state.json', baseURL: process.env.STORE_ORIGIN });
     const page = await context.newPage();
     await page.addInitScript(asUser);
     await page.goto(new URL(process.env.PREVIEW_URL!).pathname + new URL(process.env.PREVIEW_URL!).search);

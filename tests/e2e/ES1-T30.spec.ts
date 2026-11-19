@@ -1,6 +1,6 @@
 // Ticket ES1-T30 (2727475000000133022) — TE-2 AC6–AC9 phần tương tác: assets/slideshow.js.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T30.spec.ts
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page } from './support/test';
 
 const SPEED_SECONDS = 3; // min của setting autoplay_speed
 const AFTER_TICK = (SPEED_SECONDS + 2) * 1000;
@@ -177,7 +177,8 @@ test.describe('ES1-T30 autoplay', () => {
     }
   });
 
-  test('bật autoplay thì tự chuyển, live region tắt báo, pause dừng hẳn, play chạy lại', async ({ page }) => {
+  test('bật autoplay thì tự chuyển, live region tắt báo, pause dừng hẳn, play chạy lại', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'TE-2 AC8: dưới 80rem không autoplay, kiểm ở ES1-T333');
     await enableAutoplay(page);
     await open(page);
     const root = page.getByTestId('slideshow');
@@ -212,13 +213,16 @@ test.describe('ES1-T30 autoplay', () => {
     await expect.poll(() => activeIndex(page), { timeout: AFTER_TICK }).toBe(1);
   });
 
-  test('focus bàn phím trong block giữ, rời focus chạy lại', async ({ page }) => {
+  test('focus bàn phím trong block giữ, rời focus chạy lại', async ({ page }, ti) => {
+    test.skip(ti.project.name === 'mobile', 'TE-2 AC8: dưới 80rem không autoplay, kiểm ở ES1-T333');
+    const target = page.getByTestId('slideshow-next');
     await enableAutoplay(page);
     await open(page);
-    await page.getByTestId('slideshow-next').focus();
+    await expect(target).toBeVisible();
+    await target.focus();
     await page.waitForTimeout(AFTER_TICK);
     expect(await activeIndex(page)).toBe(0);
-    await page.getByTestId('slideshow-next').blur();
+    await target.blur();
     await expect.poll(() => activeIndex(page), { timeout: AFTER_TICK }).toBe(1);
   });
 

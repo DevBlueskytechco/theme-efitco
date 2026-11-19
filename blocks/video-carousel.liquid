@@ -1,9 +1,14 @@
 {% doc %}
   Renders the video demo row (TE-13 AC3, Figma 1:817): eyebrow, heading, optional
   subheading, link and 3 stats, then a list of video-card blocks that scrolls
-  sideways with scroll-snap, mouse, touch and keyboard without JavaScript
-  (assets/base.css). The list runs to the viewport edge, so the first card lines up
-  with the heading and the last one can be cut off.
+  sideways with scroll-snap, touch and keyboard without JavaScript (assets/base.css,
+  "Hàng ngang"). The list runs to the viewport edge, so the first card lines up with
+  the heading and the next card shows (TE-13 AC8: 252 at 360, 264 from 768, 4 full
+  cards and at least 25% of card 5 at 1280).
+
+  Buttons and progress line: snippets/carousel-nav, snippets/carousel-progress, in
+  the scroll-buttons box. Hidden below 48rem, until assets/scroll-buttons.js sets
+  data-enhanced, and when the row fits (data-static, set by the script, TE-7-R2-BE1).
 
   The parent cannot read its children: the body is a rendered string, so 8 cards at
   most means 8 lines in the template. When no card renders, the editor shows a
@@ -15,11 +20,15 @@
   a URL.
 
   JavaScript hooks are on the video-card block; data-lazy-module on the root is the
-  URL of assets/video-carousel.js, read by assets/lazy-module.js.
+  URL of assets/video-carousel.js, read by assets/lazy-module.js. Row hooks: custom
+  element scroll-buttons (data-enhanced, data-static, data-lazy-module),
+  data-scroll-track, data-scroll-prev, data-scroll-next, data-scroll-progress.
 
   Test hooks: data-testid="video-carousel", "video-carousel-eyebrow",
   "video-carousel-heading", "video-carousel-subheading", "video-carousel-link",
-  "video-carousel-stat", "video-carousel-list", "video-carousel-placeholder".
+  "video-carousel-stat", "video-carousel-nav", "video-carousel-prev",
+  "video-carousel-next", "video-carousel-list", "carousel-progress",
+  "video-carousel-placeholder".
 
   @param {string} [id] - Static block id, needed when a template has more than one video-carousel block
   @param {string} content - One video-card block call per card, 8 at most
@@ -71,6 +80,15 @@
     data-testid="video-carousel"
     {{ block.shopify_attributes }}
   >
+    {%- comment -%}
+      Header and list share one scroll-buttons box (next, back, progress). It repeats the block's
+      grid, so the layout stays the same; lazy-module.js imports scroll-buttons.js near the viewport.
+    {%- endcomment -%}
+    <scroll-buttons
+      class="video-carousel__scroller"
+      data-lazy-module="{{ 'scroll-buttons.js' | asset_url }}"
+      data-motion-src="{{ 'scroll-extras.js' | asset_url }}"
+    >
     <div class="video-carousel__header">
       <div class="video-carousel__row">
         <div class="video-carousel__title">
@@ -90,6 +108,11 @@
             {{- block.settings.link_label | escape -}}
           </a>
         {%- endif -%}
+        {%- liquid
+          assign nav_previous = 'blocks.video_carousel.previous' | t
+          assign nav_next = 'blocks.video_carousel.next' | t
+        -%}
+        {% render 'carousel-nav', prefix: 'video-carousel', label_previous: nav_previous, label_next: nav_next %}
       </div>
 
       {%- if stats != blank or block.settings.subheading != blank -%}
@@ -115,10 +138,13 @@
       role="list"
       tabindex="0"
       aria-label="{{ 'blocks.video_carousel.list_label' | t }}"
+      data-scroll-track
       data-testid="video-carousel-list"
     >
       {{ content }}
     </ul>
+    {% render 'carousel-progress' %}
+    </scroll-buttons>
     <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
   </div>
 {%- elsif request.design_mode -%}
