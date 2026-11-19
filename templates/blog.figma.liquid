@@ -1,0 +1,16 @@
+{% comment %}
+  Store dev fixture for the blog page, opened with {blog.url}?view=figma (ES1-T510, TE-20 AC15;
+  ES1-T507 #2). Same blocks as templates/blog.liquid; the only difference is the Figma copy
+  passed as block parameters (docs/ui-spec/blog.md §2 settings table: eyebrow
+  "From the Efitco blog", Figma 1:1024).
+
+  The copy lives here, not in the schema default or locales: a fresh install keeps the eyebrow
+  empty and hidden (ADR 0011 §3, ES1-T308 #1). The value is merchant content in a test template,
+  like the literals in templates/index.te12.liquid, so it is not a locale string.
+
+  Test template (ADR 0011 §6): kept for e2e, excluded from the release package.
+  Remove this file before a real store release.
+{% endcomment %}
+{% block 'container', id: 'blog-main' %}
+  {% block 'blog-articles', eyebrow: 'From the Efitco blog' %}{% endblock %}
+{% endblock %}
