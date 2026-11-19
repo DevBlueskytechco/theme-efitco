@@ -1,6 +1,6 @@
 {% doc %}
-  Renders one article as a list item: a link with the image, the first tag as a
-  label, the title and the reading time. The blog page (blocks/blog-articles)
+  Renders one article as a list item: a dark frame with the image, the first tag
+  as a label, the title (the only link) and the reading time. The blog page (blocks/blog-articles)
   also turns on the excerpt and the date (TE-20 AC2, blog.md §1.6); the home
   page row (blocks/blog-posts) keeps the Figma 1:1022 card with no parameters.
 
@@ -18,14 +18,13 @@
   dot drawn by CSS, either part can be off); without it the line is the reading
   time only, as on the home page.
 
-  Link name (TE-20 AC2, ES1-T506): the link wraps the whole card, so it points
-  aria-labelledby at the title; its accessible name is the title only, not the
-  tag, excerpt or meta. The title id is "{id_prefix}-article-{article.id}";
-  blog-articles and related-articles pass block.id so the same article in two
-  blocks never repeats an id. The home row (blog-posts) keeps the call with no
-  parameters (AC8) and gets the default prefix.
+  Link name (TE-20 AC2, ES1-T506): the link wraps only the title text inside the
+  heading, so its accessible name is the title (WCAG 2.5.3 label in name). Its
+  ::after covers the frame, so the whole card is still one click target; the
+  tag, excerpt and meta are plain text under it. The frame (dark box 3 / 4,
+  radius) is a div, so the home row looks the same (AC8).
 
-  Test hooks: data-testid="article-card", "article-card-link", "article-card-image",
+  Test hooks: data-testid="article-card", "article-card-frame", "article-card-link", "article-card-image",
   "article-card-tag", "article-card-title", "article-card-excerpt",
   "article-card-meta", "article-card-date", "article-card-read-time".
 
@@ -37,16 +36,14 @@
   @param {string} [sizes] - The sizes attribute of the image. Default: the home page row
   @param {string} [loading] - 'lazy' (default) or 'eager' for the LCP card
   @param {string} [fetchpriority] - 'high' with loading 'eager' for the LCP card
-  @param {string} [id_prefix] - Prefix of the title id, the caller's block.id. Default: 'article-card'
 
   @example
   {% for post in blog.articles limit: 5 %}
-    {% render 'article-card', article: post, id_prefix: block.id %}
+    {% render 'article-card', article: post %}
   {% endfor %}
 
   {% render 'article-card',
     article: post,
-    id_prefix: block.id,
     heading_tag: 'h2',
     show_date: true,
     show_excerpt: true,
@@ -68,7 +65,6 @@
   endif
   assign card_sizes = sizes | default: '(min-width: 64rem) 336px, (min-width: 48rem) 40vw, 70vw'
   assign card_loading = loading | default: 'lazy'
-  assign card_title_id = id_prefix | default: 'article-card' | append: '-article-' | append: article.id
 
   assign card_excerpt = ''
   if show_excerpt
@@ -77,12 +73,7 @@
 -%}
 
 <li class="article-card" data-testid="article-card">
-  <a
-    class="article-card__link"
-    href="{{ article.url }}"
-    aria-labelledby="{{ card_title_id }}"
-    data-testid="article-card-link"
-  >
+  <div class="article-card__frame" data-testid="article-card-frame">
     {%- if article.image != blank -%}
       {% render 'image',
         image: article.image,
@@ -100,8 +91,10 @@
       <p class="article-card__tag" data-testid="article-card-tag">{{ article_tag | escape }}</p>
     {%- endif -%}
     <div class="article-card__content">
-      <{{ card_heading }} class="article-card__title" id="{{ card_title_id }}" data-testid="article-card-title">
-        {{- article.title | escape -}}
+      <{{ card_heading }} class="article-card__title" data-testid="article-card-title">
+        <a class="article-card__link" href="{{ article.url }}" data-testid="article-card-link">
+          {{- article.title | escape -}}
+        </a>
       </{{ card_heading }}>
       {%- if card_excerpt != blank -%}
         <p class="article-card__excerpt" data-testid="article-card-excerpt">{{ card_excerpt }}</p>
@@ -119,5 +112,5 @@
         </p>
       {%- endif -%}
     </div>
-  </a>
+  </div>
 </li>

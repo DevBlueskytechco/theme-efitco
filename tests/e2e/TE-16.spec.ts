@@ -182,9 +182,21 @@ async function checkKeyboard(page: Page) {
   await page.keyboard.press('Tab');
   const focused = await page.evaluate(() => {
     const el = document.activeElement as HTMLElement | null;
-    return { testid: el?.dataset.testid, inList: !!el?.closest('[data-testid="blog-posts-list"]'), outline: el ? getComputedStyle(el).outlineStyle : 'none' };
+    // ES1-T506: link chỉ bọc tiêu đề, vòng focus vẽ ở ::after phủ cả card
+    const ring = el ? getComputedStyle(el, '::after') : null;
+    return {
+      testid: el?.dataset.testid,
+      inList: !!el?.closest('[data-testid="blog-posts-list"]'),
+      outline: ring?.outlineStyle ?? 'none',
+      outlineColor: ring?.outlineColor ?? 'rgba(0, 0, 0, 0)',
+    };
   });
-  expect(focused).toEqual({ testid: 'article-card-link', inList: true, outline: expect.not.stringMatching(/^none$/) });
+  expect(focused).toEqual({
+    testid: 'article-card-link',
+    inList: true,
+    outline: expect.not.stringMatching(/^none$/),
+    outlineColor: expect.not.stringMatching(/^rgba\(0, 0, 0, 0\)$|^transparent$/),
+  });
 }
 
 test.describe('TE-16 tĩnh', () => {
@@ -385,7 +397,7 @@ test.describe('TE-16 có JS, 5 bài (figma-blog)', () => {
     for (const [i, box] of (await boxes(cards)).entries()) expectSize(box, [336, 448], `mất ảnh card ${i + 1}`);
     await expect(cards.first().getByTestId('article-card-title')).toBeVisible();
     await expect(cards.first().getByTestId('article-card-read-time')).toBeVisible();
-    const bg = await cards.getByTestId('article-card-link').evaluateAll((els) => els.map((el) => getComputedStyle(el).backgroundColor));
+    const bg = await cards.getByTestId('article-card-frame').evaluateAll((els) => els.map((el) => getComputedStyle(el).backgroundColor));
     for (const color of bg) expect(color, 'nền card khi không có ảnh').not.toBe('rgba(0, 0, 0, 0)');
     expect(pageErrors).toEqual([]);
   });
@@ -408,7 +420,8 @@ test.describe('TE-16 có JS, 5 bài (figma-blog)', () => {
     for (const [handle, article] of Object.entries(ARTICLES)) {
       const links = cardByHandle(root, handle).getByRole('link');
       await expect(links, handle).toHaveCount(1);
-      await expect(links).toHaveAccessibleName(new RegExp(article.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+      // ES1-T506 (TE-20 AC2): link chỉ bọc chữ tiêu đề nên tên link đúng bằng tiêu đề
+      await expect(links).toHaveAccessibleName(article.title);
     }
   });
 
@@ -478,7 +491,7 @@ test.describe('TE-16 dưới 5 bài, rỗng (index.te16)', () => {
     const [withImage] = await boxes(cardByHandle(edge, 'te16-one-minute'));
     const [noImage] = await boxes(bare);
     expectSize(noImage, [withImage.width, withImage.height], 'card không ảnh so card có ảnh');
-    const bg = await bare.getByTestId('article-card-link').evaluate((el) => getComputedStyle(el).backgroundColor);
+    const bg = await bare.getByTestId('article-card-frame').evaluate((el) => getComputedStyle(el).backgroundColor);
     expect(bg).not.toBe('rgba(0, 0, 0, 0)');
   });
 
