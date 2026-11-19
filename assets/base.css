@@ -4266,6 +4266,14 @@ product-variant-picker:not(:defined) {
   display: none;
 }
 
+/* Bộ chọn biến thể chung PDP / featured / quickview (TE-4 AC13, AC14; variant-picker.md §3–§7).
+   Kích thước theo spec: ô 44 (vùng chạm), lõi swatch 36, ô lưới thu gọn 72 */
+.product-variant-picker {
+  --option-size: 44px;
+  --option-cell: 72px;
+  --option-swatch: 36px;
+}
+
 .product-option {
   min-inline-size: 0;
   margin: 0;
@@ -4273,24 +4281,51 @@ product-variant-picker:not(:defined) {
   border: 0;
 }
 
-.product-option .product-form__label {
-  margin-block-end: var(--space-2);
+/* Legend "Weight: 45 lb": tên 600, giá trị đang chọn 400 muted (8.45), cách giá trị 12.
+   float để legend vào luồng thường (margin chạy được trên mọi trình duyệt) */
+.product-option__legend {
+  float: inline-start;
+  inline-size: 100%;
+  margin-block-end: var(--space-3);
+  padding: 0;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+.product-option__name {
+  font-weight: 600;
+}
+
+.product-option__selected {
+  color: var(--color-muted);
 }
 
 .product-option__values {
   display: flex;
+  clear: both;
   flex-wrap: wrap;
   gap: var(--space-2);
 }
 
-/* Pill 44px (WCAG 2.5.8 sàn 24px) */
+/* > 10 giá trị (pill): lưới 72, 7 ô + "+N" in sẵn từ Liquid, không cuộn ngang */
+.product-option__values--collapsible:not(.product-option__values--swatch) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(var(--option-cell), 1fr));
+}
+
+.product-option__value[hidden] {
+  display: none;
+}
+
+/* Pill: cao 44, rộng ≥ 56, padding 16, Inter 14/500 */
 .product-option__value {
   position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-block-size: 44px;
-  min-inline-size: 44px;
+  min-block-size: var(--option-size);
+  min-inline-size: calc(var(--option-size) + var(--space-3));
   padding-inline: var(--space-4);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
@@ -4298,63 +4333,217 @@ product-variant-picker:not(:defined) {
   color: var(--color-foreground);
   font-size: var(--font-size-sm);
   font-weight: 500;
+  text-align: center;
+  overflow-wrap: anywhere;
   cursor: pointer;
+}
+
+.product-option__values--collapsible .product-option__value:not(.product-option__value--swatch) {
+  min-inline-size: 0;
+  padding-inline: var(--space-2);
 }
 
 .product-option__value:hover {
   border-color: var(--color-foreground);
 }
 
+/* Hết hàng: chữ muted gạch ngang, viền thường. Không tồn tại: thêm viền đứt muted-light (5.33).
+   Không opacity, không disabled: vẫn chọn được (AC13) */
+.product-option__value--sold-out,
+.product-option__value--unavailable {
+  color: var(--color-muted);
+}
+
+.product-option__value--sold-out .product-option__text,
+.product-option__value--unavailable .product-option__text {
+  text-decoration: line-through;
+}
+
+.product-option__value--unavailable {
+  border-style: dashed;
+  border-color: var(--color-muted-light);
+}
+
+.product-option__value--unavailable:hover {
+  border-color: var(--color-foreground);
+}
+
+/* Đang chọn: nền foreground chữ nền (17.4), viền liền; gạch chữ giữ khi hết hàng / không tồn tại */
 .product-option__value:has(:checked) {
+  border-style: solid;
   border-color: var(--color-foreground);
   background-color: var(--color-foreground);
   color: var(--color-background);
 }
 
-.product-option__value:has(:focus-visible) {
-  outline: 2px solid var(--color-foreground);
+.product-option__value:has(:focus-visible),
+.product-option__more:focus-visible,
+.product-option__retry:focus-visible {
+  outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
 
-/* Không còn variant bán được với lựa chọn hiện tại: vẫn chọn được để thấy Sold out / Unavailable */
-.product-option__value:has([data-available='false']) .product-option__text {
-  text-decoration: line-through;
-}
-
-.product-option__value:has([data-available='false']:not(:checked)) {
-  color: var(--color-muted);
-}
-
+/* Swatch: ô 44 tròn, lõi 36 viền 50% (3.36:1) */
 .product-option__value--swatch {
+  display: inline-grid;
+  place-items: center;
+  inline-size: var(--option-size);
+  min-inline-size: var(--option-size);
+  block-size: var(--option-size);
   padding: 0;
+  border-color: transparent;
   border-radius: 50%;
 }
 
-.product-option__value--swatch::before {
-  position: absolute;
-  inset: var(--space-1);
-  border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent);
+.product-option__swatch {
+  display: block;
+  overflow: hidden;
+  inline-size: var(--option-swatch);
+  block-size: var(--option-swatch);
+  border: 1px solid color-mix(in srgb, var(--color-foreground) 50%, transparent);
   border-radius: 50%;
   background-color: var(--swatch-color, var(--color-background-cream));
-  background-image: var(--swatch-image, none);
-  background-position: center;
-  background-size: cover;
-  content: '';
+}
+
+.product-option__swatch-image {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* Vòng ngoài 44: đứt muted-light khi không tồn tại, 1px foreground khi hover (giữ kiểu đứt) */
+.product-option__value--swatch.product-option__value--unavailable {
+  border-color: var(--color-muted-light);
+}
+
+.product-option__value--swatch:hover {
+  border-color: var(--color-foreground);
 }
 
 .product-option__value--swatch:has(:checked) {
+  border: 2px solid var(--color-foreground);
   background-color: var(--color-background);
 }
 
-/* Gạch chéo trên swatch không bán được (chữ đã ẩn nên line-through không thấy) */
-.product-option__value--swatch:has([data-available='false'])::after {
+/* Gạch chéo −45° 2px foreground, viền nền 1px để thấy trên swatch đen lẫn trắng */
+.product-option__value--swatch.product-option__value--sold-out::after,
+.product-option__value--swatch.product-option__value--unavailable::after {
   position: absolute;
-  inset-block-start: 50%;
+  inset-block-start: calc(50% - 1px);
   inset-inline: var(--space-1);
-  block-size: 1px;
+  block-size: 2px;
   background-color: var(--color-foreground);
+  box-shadow: 0 0 0 1px var(--color-background);
   content: '';
   rotate: -45deg;
+}
+
+/* Nút "+N" / "Show Fewer": pill nền alt, viền muted-light, chữ 14/600 (15.8) + caret */
+.product-option__more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  min-block-size: var(--option-size);
+  min-inline-size: var(--option-size);
+  padding-inline: var(--space-3);
+  border: 1px solid var(--color-muted-light);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background-alt);
+  color: var(--color-foreground);
+  font: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-option__more:hover {
+  border-color: var(--color-foreground);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.product-option__more[aria-expanded='true'] {
+  grid-column: span 2;
+}
+
+.product-option__more[aria-expanded='false'] .product-option__more-label--expanded,
+.product-option__more[aria-expanded='true'] .product-option__more-label--collapsed {
+  display: none;
+}
+
+.product-option__caret {
+  flex: none;
+}
+
+.product-option__more[aria-expanded='true'] .product-option__caret {
+  rotate: 180deg;
+}
+
+/* Lỗi tải (BE điền chữ vào role=alert): icon + chữ sale (6.38), nút Try Again cao 44 */
+.product-option__feedback {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--space-2);
+  color: var(--color-sale);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+}
+
+/* Rỗng: cao 0, không khoảng trống; alert vẫn trong cây truy cập để đọc khi BE điền chữ */
+.product-option__feedback:has(.product-option__error:not(:empty)) {
+  margin-block-start: var(--space-2);
+}
+
+.product-option__feedback:has(.product-option__error:empty) .product-option__error-icon {
+  display: none;
+}
+
+.product-option__error-icon {
+  display: inline-flex;
+  padding-block-start: 2px;
+}
+
+.product-option__error-icon .status-icon {
+  inline-size: 16px;
+  block-size: 16px;
+}
+
+.product-option__error {
+  margin: 0;
+}
+
+.product-option__retry.button {
+  grid-column: 1 / -1;
+  justify-self: start;
+  min-height: var(--option-size);
+  padding: 0 var(--space-4);
+  border-color: var(--color-foreground);
+  border-radius: var(--radius-button);
+  color: var(--color-foreground);
+  font-size: var(--font-size-sm);
+}
+
+.product-option__retry.button:hover {
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.product-option__retry[hidden] {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-option__value,
+  .product-option__more,
+  .product-option__retry {
+    transition:
+      border-color var(--motion-fast) var(--ease-out),
+      background-color var(--motion-fast) var(--ease-out),
+      color var(--motion-fast) var(--ease-out);
+  }
 }
 
 /* Selling plan (AC4) */

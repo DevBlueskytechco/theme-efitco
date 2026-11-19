@@ -1,35 +1,276 @@
 {% doc %}
-  Variant picker: custom element product-variant-picker, its variant JSON and
-  one fieldset of radios per option. Sits outside the form so its radios
-  (name option-{position}) are never submitted. Callers render it only when the
-  product has a variant choice.
+  Variant picker shared by the product page, the featured product block and
+  quick view (TE-4 AC13, AC14, NFR-7; ADR 0008 item 1; docs/ui-spec/variant-picker.md).
+  Built only from product.options_with_values and option.values: no loop over
+  product.variants, no variant JSON, no select listing variants (up to 2048
+  variants). Sits outside the form so its radios are never submitted; the form
+  sends only its hidden input name=id. Callers render it only when the product
+  has a variant choice.
 
-  Without fetch_url and regions the picker fetches the current page and updates
-  ?variant= (product page), and the caller loads assets/product-variant-picker.js.
-  With them it fetches fetch_url and those regions only, and the URL stays the
-  same (a block on another page, TE-13), and the JSON carries price_html. The
-  caller loads the module there too: this element has display none until it is
-  defined, so data-lazy-module here would never intersect.
+  One fieldset per option, legend "Name: selected value". Each value is a label
+  wrapping a radio with value = option value id. State per value, computed by
+  Shopify from the other selected options (no JS):
+  - available: value.available.
+  - sold_out: value.variant exists, not available. Strike-through text, hidden
+    suffix ", sold out".
+  - unavailable: value.variant is blank (no such combination). Strike-through
+    text + dashed border, hidden suffix ", unavailable".
+  Every value stays selectable (no disabled). Swatches only when every value of
+  the option has a swatch (VP3); otherwise the whole option uses text pills.
+
+  More than 10 values: grid, 7 shown + "+N" button in cell 8, the rest have
+  `hidden` (Liquid, CLS 0). A selected value after position 7 replaces value 7.
+  The button holds both labels; CSS shows "+N" or "Show Fewer" from
+  aria-expanded. BE toggles `hidden` on the values and aria-expanded.
+
+  Without fetch_url (product page) the fieldsets sit in partial product-options
+  inside the host element, so the host and its listeners survive an apply.
+  With fetch_url (featured product, quick view) the caller's own partial wraps
+  the picker (ADR 0008 item 3), no inner partial.
+
+  Hooks for BE (assets/product-variant-picker.js):
+  - Host: data-product-url, data-form-id, data-fetch-url, data-partials (and
+    data-regions, same value, until BE2 drops it), data-label-loading,
+    data-label-loaded, data-label-load-error ([value], [price],
+    [availability] placeholders).
+  - Fieldset: data-option-position, data-option-name.
+  - Radio: value and data-option-value-id = value.id, data-state
+    (available | sold_out | unavailable), data-available, data-variant-id when
+    value.variant exists, data-product-url when the value links to another
+    product (combined listing).
+  - Selected value text in the legend: [data-option-selected].
+  - "+N": button[data-option-more] aria-expanded, aria-controls = values id.
+  - Load error: [role=alert] product-option-error (empty) + retry button
+    product-option-retry (`hidden` until BE shows it).
 
   Test hooks: product-variant-picker, product-option (fieldset),
-  product-option-value (label wrapping the radio).
+  product-option-value (label), product-option-more, product-option-error,
+  product-option-retry.
 
   @param {product} product - The product to pick a variant of
-  @param {variant} current_variant - The variant to check on load
   @param {string} form_id - Id of the product form the picker updates
-  @param {string} [fetch_url] - URL to fetch regions from, output as data-fetch-url
-  @param {string} [regions] - Space-separated partial names, output as data-regions
+  @param {string} [id_prefix] - Prefix for every id and radio name: blank on the product page, 'qv-' in quick view
+  @param {string} [fetch_url] - URL to fetch partials from, output as data-fetch-url
+  @param {string} [regions] - Space-separated partial names, output as data-partials
 
   @example
-  {% render 'product-variant-picker', product: product, current_variant: current_variant, form_id: form_id %}
+  {% render 'product-variant-picker', product: product, form_id: form_id %}
   {% render 'product-variant-picker',
     product: featured,
-    current_variant: current_variant,
     form_id: form_id,
+    id_prefix: 'qv-',
     fetch_url: fetch_url,
-    regions: 'product-price product-buy-buttons'
+    regions: 'quick-view'
   %}
 {% enddoc %}
+
+{%- liquid
+  # Hằng chung PDP và quickview (sổ M5, TE-4 AC14), không setting
+  assign collapse_threshold = 10
+  assign collapse_visible = 7
+
+  assign product_path = product.url | split: '?' | first
+  assign label_sold_out = 'products.variant.sold_out_suffix' | t
+  assign label_unavailable = 'products.variant.unavailable_suffix' | t
+  assign label_loading = 'products.variant.loading_value' | t: value: '[value]'
+  assign label_loaded = 'products.variant.loaded' | t: value: '[value]', price: '[price]', availability: '[availability]'
+  assign label_load_error = 'products.variant.load_error' | t: value: '[value]'
+-%}
+
+{%- capture options_html -%}
+  {%- for option in product.options_with_values -%}
+    {%- liquid
+      assign option_id = id_prefix | append: form_id | append: '-option-' | append: option.position
+      assign values_id = option_id | append: '-values'
+      assign error_id = option_id | append: '-error'
+      assign option_name = option.name | escape
+      assign value_count = option.values.size
+
+      assign use_swatch = true
+      for value in option.values
+        if value.swatch == blank
+          assign use_swatch = false
+          break
+        endif
+      endfor
+
+      assign collapsible = false
+      assign selected_index = 0
+      if value_count > collapse_threshold
+        assign collapsible = true
+        for value in option.values
+          if value.selected
+            assign selected_index = forloop.index
+            break
+          endif
+        endfor
+      endif
+      assign hidden_count = value_count | minus: collapse_visible
+
+      assign values_class = 'product-option__values'
+      if use_swatch
+        assign values_class = values_class | append: ' product-option__values--swatch'
+      endif
+      if collapsible
+        assign values_class = values_class | append: ' product-option__values--collapsible'
+      endif
+    -%}
+    <fieldset
+      class="product-option"
+      data-option-position="{{ option.position }}"
+      data-option-name="{{ option_name }}"
+      data-testid="product-option"
+    >
+      <legend class="product-option__legend">
+        <span class="product-option__name">{{ option_name }}:</span>
+        <span class="product-option__selected" data-option-selected>{{ option.selected_value | escape }}</span>
+      </legend>
+
+      <div id="{{ values_id }}" class="{{ values_class }}">
+        {%- for value in option.values -%}
+          {%- liquid
+            if value.variant == blank
+              assign value_state = 'unavailable'
+            elsif value.available
+              assign value_state = 'available'
+            else
+              assign value_state = 'sold_out'
+            endif
+
+            assign value_hidden = false
+            if collapsible and forloop.index > collapse_visible
+              assign value_hidden = true
+            endif
+            if collapsible and selected_index > collapse_visible
+              if forloop.index == collapse_visible
+                assign value_hidden = true
+              elsif value.selected
+                assign value_hidden = false
+              endif
+            endif
+
+            assign value_url = blank
+            if value.product_url != blank
+              assign value_path = value.product_url | split: '?' | first
+              if value_path != product_path
+                assign value_url = value.product_url
+              endif
+            endif
+          -%}
+          <label
+            class="product-option__value{% if use_swatch %} product-option__value--swatch{% endif %} product-option__value--{{ value_state | replace: '_', '-' }}"
+            data-testid="product-option-value"
+            {% if value_hidden %}
+              hidden
+            {% endif %}
+          >
+            <input
+              class="product-option__input visually-hidden"
+              type="radio"
+              name="{{ option_id }}"
+              value="{{ value.id }}"
+              data-option-value-id="{{ value.id }}"
+              data-state="{{ value_state }}"
+              data-available="{{ value.available }}"
+              {% if value.variant != blank %}
+                data-variant-id="{{ value.variant.id }}"
+              {% endif %}
+              {% if value_url != blank %}
+                data-product-url="{{ value_url }}"
+              {% endif %}
+              {% if value.selected %}
+                checked
+              {% endif %}
+            >
+            {%- if use_swatch -%}
+              <span
+                class="product-option__swatch"
+                {% if value.swatch.color != blank %}
+                  style="--swatch-color: {{ value.swatch.color }};"
+                {% endif %}
+                aria-hidden="true"
+              >
+                {%- if value.swatch.image != blank -%}
+                  {{-
+                    value.swatch.image
+                    | image_url: width: 72, height: 72, crop: 'center'
+                    | image_tag:
+                      width: 36,
+                      height: 36,
+                      widths: '36, 72',
+                      sizes: '36px',
+                      loading: 'lazy',
+                      alt: '',
+                      class: 'product-option__swatch-image'
+                  -}}
+                {%- endif -%}
+              </span>
+            {%- endif -%}
+            <span class="product-option__text{% if use_swatch %} visually-hidden{% endif %}">
+              {{- value.name | escape -}}
+              {%- case value_state -%}
+                {%- when 'sold_out' -%}
+                  <span class="visually-hidden">{{ label_sold_out }}</span>
+                {%- when 'unavailable' -%}
+                  <span class="visually-hidden">{{ label_unavailable }}</span>
+              {%- endcase -%}
+            </span>
+          </label>
+        {%- endfor -%}
+
+        {%- if collapsible -%}
+          <button
+            class="product-option__more"
+            type="button"
+            aria-expanded="false"
+            aria-controls="{{ values_id }}"
+            data-option-more
+            data-testid="product-option-more"
+          >
+            <span class="product-option__more-label product-option__more-label--collapsed">
+              {{- 'products.variant.show_more' | t: count: hidden_count -}}
+              <span class="visually-hidden">{{ 'products.variant.show_more_hidden' | t: option: option_name }}</span>
+            </span>
+            <span class="product-option__more-label product-option__more-label--expanded">
+              {{- 'products.variant.show_fewer' | t -}}
+              <span class="visually-hidden">{{ 'products.variant.show_fewer_hidden' | t: option: option_name }}</span>
+            </span>
+            <svg
+              class="product-option__caret"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 12 8"
+              width="12"
+              height="8"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path d="m1 1.5 5 5 5-5" />
+            </svg>
+          </button>
+        {%- endif -%}
+      </div>
+
+      <div class="product-option__feedback">
+        <span class="product-option__error-icon">{% render 'status-icon', name: 'warning' %}</span>
+        <p id="{{ error_id }}" class="product-option__error" role="alert" data-testid="product-option-error"></p>
+        <button
+          class="button button--secondary product-option__retry"
+          type="button"
+          aria-describedby="{{ error_id }}"
+          data-testid="product-option-retry"
+          hidden
+        >
+          {{- 'general.try_again' | t -}}
+        </button>
+      </div>
+    </fieldset>
+  {%- endfor -%}
+{%- endcapture -%}
 
 <product-variant-picker
   class="product-variant-picker"
@@ -39,64 +280,19 @@
     data-fetch-url="{{ fetch_url }}"
   {% endif %}
   {% if regions != blank %}
+    data-partials="{{ regions }}"
     data-regions="{{ regions }}"
   {% endif %}
+  data-label-loading="{{ label_loading | escape }}"
+  data-label-loaded="{{ label_loaded | escape }}"
+  data-label-load-error="{{ label_load_error | escape }}"
   data-testid="product-variant-picker"
 >
-  {%- liquid
-    assign with_price_html = false
-    if fetch_url != blank
-      assign with_price_html = true
-    endif
-  -%}
-  {%- render 'variant-json', product: product, price_html: with_price_html -%}
-  {%- for option in product.options_with_values -%}
-    {%- assign option_index = option.position | minus: 1 -%}
-    <fieldset
-      class="product-option"
-      data-option-position="{{ option.position }}"
-      data-testid="product-option"
-    >
-      <legend class="product-form__label">{{ option.name | escape }}</legend>
-      <div class="product-option__values">
-        {%- for value in option.values -%}
-          {%- liquid
-            assign checked = false
-            if current_variant.options[option_index] == value.name
-              assign checked = true
-            endif
-            assign swatch_style = ''
-            if value.swatch.image
-              assign swatch_url = value.swatch.image | image_url: width: 88
-              assign swatch_style = '--swatch-image: url(' | append: swatch_url | append: ');'
-            elsif value.swatch.color
-              assign swatch_style = '--swatch-color: ' | append: value.swatch.color | append: ';'
-            endif
-          -%}
-          <label
-            class="product-option__value{% if swatch_style != blank %} product-option__value--swatch{% endif %}"
-            {% if swatch_style != blank %}
-              style="{{ swatch_style }}"
-            {% endif %}
-            data-testid="product-option-value"
-          >
-            <input
-              class="product-option__input visually-hidden"
-              type="radio"
-              name="option-{{ option.position }}"
-              value="{{ value.name | escape }}"
-              data-option-value-id="{{ value.id }}"
-              data-available="{{ value.available }}"
-              {% if checked %}
-                checked
-              {% endif %}
-            >
-            <span class="product-option__text{% if swatch_style != blank %} visually-hidden{% endif %}">
-              {{- value.name | escape -}}
-            </span>
-          </label>
-        {%- endfor -%}
-      </div>
-    </fieldset>
-  {%- endfor -%}
+  {%- if fetch_url == blank -%}
+    {% partial 'product-options' %}
+      {{- options_html -}}
+    {% endpartial %}
+  {%- else -%}
+    {{- options_html -}}
+  {%- endif -%}
 </product-variant-picker>
