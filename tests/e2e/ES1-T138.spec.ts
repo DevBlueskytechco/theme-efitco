@@ -198,7 +198,7 @@ test.describe('ES1-T138 TE-11 kết quả quiz', () => {
     expect(url.searchParams.get('type')).toBe('product');
     expect(url.searchParams.getAll('filter.p.tag').sort()).toEqual(['quiz-beginner', 'quiz-home', 'quiz-upper']);
 
-    const first = page.getByTestId('search-results-product').getByTestId('product-card-title').first();
+    const first = page.getByTestId('search-product-grid').getByTestId('product-card-title').first();
     await expect(first).toBeVisible();
     const handle = new URL((await first.getAttribute('href'))!, page.url()).pathname.split('/').pop()!;
     const product = await context.request.get(`${url.origin}/products/${handle}.json`);

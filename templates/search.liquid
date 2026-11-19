@@ -1,63 +1,132 @@
-{% # TE-8 composition (drafts/techlead/ES1-T123/task-split.md D1, D4). The GET form works without JavaScript; hidden type and options[prefix] are the ES1-T124 #4 defaults. <collection-filters> stays here because it wraps 2 blocks; assets/collection-filters.js (BE) reads data-results-partial for the name of the results partial. %}
+{% # TE-8 composition (docs/ui-spec/search.md §2, §3.1–§3.3, §10; drafts/techlead/ES1-T307/task-split.md §3 row ES1-T128). Page head: breadcrumb, h1, GET form (works without JavaScript; hidden type and options[prefix] are the ES1-T124 #4 defaults), status line role="status" (BE rewrites it from data-results-label after a refresh) and the result type links. <collection-filters> stays here because it wraps 2 blocks; the modifier collection-layout--drawer keeps the filter dialog a drawer at every width (search.md §3.6, CTO 10/11 #2); assets/collection-filters.js (BE) reads data-results-partial for the name of the results partial. Test hooks: search-head, search-title, search-form, search-input, search-submit, search-status, search-type-nav. %}
 {%- liquid
   assign search_types = 'product,article,page'
   assign search_prefix = 'last'
+
+  # Current view of the type links: one type, or All for any other combination
+  assign current_types = search.types | join: ','
+  if current_types == blank
+    assign current_types = search_types
+  endif
+  assign current_view = 'all'
+  case current_types
+    when 'product', 'article', 'page'
+      assign current_view = current_types
+  endcase
+
+  assign search_terms = search.terms | escape
+  assign encoded_terms = search.terms | url_encode
+  assign encoded_prefix = search_prefix | url_encode
+  assign base_url = routes.search_url | append: '?q=' | append: encoded_terms
+  assign prefix_param = '&options%5Bprefix%5D=' | append: encoded_prefix
+
+  # Clear all keeps q, the current types and a sort order the shopper chose, same rule as the collection page (collection.md §7)
+  assign encoded_types = current_types | url_encode
+  assign clear_url = base_url | append: '&type=' | append: encoded_types | append: prefix_param
+  if search.sort_by != blank and search.sort_by != search.default_sort_by
+    assign sort_param = search.sort_by | url_encode
+    assign clear_url = clear_url | append: '&sort_by=' | append: sort_param
+  endif
+
+  if search.performed
+    assign page_heading = 'search.results_title' | t
+  else
+    assign page_heading = 'search.title' | t
+  endif
 -%}
 
 {% block 'container', id: 'search-header' %}
-  <div class="search-header">
-    <h1 class="search-header__title" data-testid="search-title">{{ 'search.title' | t }}</h1>
+  {% render 'breadcrumb' %}
 
-    <form
-      class="search-form"
-      action="{{ routes.search_url }}"
-      method="get"
-      role="search"
-      data-testid="search-form"
-    >
-      <label class="visually-hidden" for="search-page-input">{{ 'search.input_label' | t }}</label>
-      <input
-        class="search-form__input"
-        type="search"
-        id="search-page-input"
-        name="q"
-        value="{{ search.terms | escape }}"
-        placeholder="{{ 'search.placeholder' | t }}"
-        autocomplete="off"
-        data-testid="search-input"
+  <div class="search-top">
+    <div class="search-head" data-testid="search-head">
+      <h1 class="search-head__title" data-testid="search-title">{{ page_heading }}</h1>
+
+      <form
+        class="search-form"
+        action="{{ routes.search_url }}"
+        method="get"
+        role="search"
+        data-testid="search-form"
       >
-      <input type="hidden" name="type" value="{{ search_types }}">
-      <input type="hidden" name="options[prefix]" value="{{ search_prefix }}">
-      <button class="button search-form__submit" type="submit" data-testid="search-submit">
-        {{- 'search.submit' | t -}}
-      </button>
-    </form>
+        <label class="visually-hidden" for="search-page-input">{{ 'search.input_label' | t }}</label>
+        <span class="search-form__field">
+          <span class="search-form__icon">{% render 'header-icon', name: 'search' %}</span>
+          <input
+            class="search-form__input"
+            type="search"
+            id="search-page-input"
+            name="q"
+            value="{{ search.terms | escape }}"
+            placeholder="{{ 'search.placeholder' | t | escape }}"
+            autocomplete="off"
+            data-testid="search-input"
+          >
+        </span>
+        <input type="hidden" name="type" value="{{ search_types }}">
+        <input type="hidden" name="options[prefix]" value="{{ search_prefix }}">
+        <button class="button search-form__submit" type="submit" data-testid="search-submit">
+          <span class="search-form__submit-icon">{% render 'header-icon', name: 'search' %}</span>
+          <span class="search-form__submit-label">{{ 'search.submit' | t }}</span>
+        </button>
+      </form>
+
+      {%- if search.performed -%}
+        <p class="search-head__status" role="status" data-testid="search-status">
+          {%- if search.results_count == 0 -%}
+            {{- 'search.no_results_html' | t: terms: search_terms -}}
+          {%- else -%}
+            {{- 'search.results_for_html' | t: count: search.results_count, terms: search_terms -}}
+          {%- endif -%}
+        </p>
+      {%- endif -%}
+    </div>
+
+    {%- if search.performed -%}
+      {%- assign type_views = 'all,product,article,page' | split: ',' -%}
+      <nav class="search-type-nav" aria-label="{{ 'search.type_nav_label' | t | escape }}" data-testid="search-type-nav">
+        <ul class="search-type-nav__list" role="list">
+          {%- for view in type_views -%}
+            {%- liquid
+              case view
+                when 'product'
+                  assign view_label = 'search.type_products' | t
+                  assign view_types = 'product'
+                when 'article'
+                  assign view_label = 'search.type_articles' | t
+                  assign view_types = 'article'
+                when 'page'
+                  assign view_label = 'search.type_pages' | t
+                  assign view_types = 'page'
+                else
+                  assign view_label = 'search.type_all' | t
+                  assign view_types = search_types | url_encode
+              endcase
+              assign view_url = base_url | append: '&type=' | append: view_types | append: prefix_param
+            -%}
+            <li>
+              <a
+                class="search-type-nav__link"
+                href="{{ view_url }}"
+                {% if view == current_view %}
+                  aria-current="page"
+                {% endif %}
+              >
+                {{- view_label -}}
+              </a>
+            </li>
+          {%- endfor -%}
+        </ul>
+      </nav>
+    {%- endif -%}
   </div>
 {% endblock %}
 
 {% if search.performed %}
-  {%- liquid
-    # Filters and Clear filters keep the current search: same q and types (a link with type=product stays product only)
-    assign current_types = search.types | join: ','
-    if current_types == blank
-      assign current_types = search_types
-    endif
-    assign encoded_terms = search.terms | url_encode
-    assign encoded_types = current_types | url_encode
-    assign encoded_prefix = search_prefix | url_encode
-    assign clear_url = routes.search_url | append: '?q=' | append: encoded_terms | append: '&type=' | append: encoded_types | append: '&options%5Bprefix%5D=' | append: encoded_prefix
-
-    # Clear all keeps a sort order the shopper chose, same rule as the collection page (collection.md §7)
-    if search.sort_by != blank and search.sort_by != search.default_sort_by
-      assign sort_param = search.sort_by | url_encode
-      assign clear_url = clear_url | append: '&sort_by=' | append: sort_param
-    endif
-  -%}
-
   {% block 'container', id: 'search-main' %}
     <collection-filters
-      class="collection-layout"
-      data-results-partial="search-results"
+      class="collection-layout collection-layout--drawer"
+      data-results-partial="search-products"
       data-label-price-invalid="{{ 'blocks.collection_filters.price_invalid' | t | escape }}"
     >
       {% block 'collection-filters', filters: search.filters, action_url: routes.search_url, clear_url: clear_url, results_count: search.results_count %}
@@ -65,7 +134,7 @@
         <input type="hidden" name="type" value="{{ current_types | escape }}">
         <input type="hidden" name="options[prefix]" value="{{ search_prefix }}">
       {% endblock %}
-      {% block 'search-results', clear_url: clear_url %}{% endblock %}
+      {% block 'search-results', clear_url: clear_url, view: current_view %}{% endblock %}
     </collection-filters>
   {% endblock %}
 {% endif %}

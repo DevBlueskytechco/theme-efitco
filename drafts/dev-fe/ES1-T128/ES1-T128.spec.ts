@@ -3,6 +3,9 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T128.spec.ts -g "AC2|AC3|nojs"
 // Dữ liệu: ES1-T125 chưa có TE8_* → q mặc định 'a' (như TE-1), từ khoá 0 kết quả mặc định là chuỗi ngẫu nhiên. Test cần filter / trang 2 skip có lý do.
 // ES1-T475 TC-05: test/expect lấy từ support/test (fixture chặn nhiễu store), không từ @playwright/test
+// Testid theo docs/ui-spec/search.md §10 (hợp đồng chung với QA ES1-T131): search-status, search-products, search-product-grid,
+// search-articles, search-pages, search-empty(-button), search-active-filters; bỏ tên cũ search-results-* (ES1-T123 D9).
+// Drawer lọc mọi mốc (search.md §3.6, CTO 10/11 #2): ở 1280 phải mở drawer mới tick được.
 import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
@@ -45,14 +48,15 @@ async function expectAxeClean(page: Page, include = 'main') {
   expect(report, `axe serious/critical trong ${include}`).toEqual([]);
 }
 
-/** Tổng kết quả, số đầu tiên trong data-results-label (đã dịch). */
+/** Tổng kết quả, số đầu tiên trong data-results-label (đã dịch); 0 kết quả thì nhãn không có số. */
 async function resultTotal(page: Page): Promise<number> {
   const label = await page.locator('[data-results-label]').getAttribute('data-results-label');
-  return Number((label ?? '').replace(/[^\d]/g, ''));
+  return Number((label ?? '').replace(/,/g, '').match(/^\d+/)?.[0] ?? 0);
 }
 
+const GROUPS = { product: 'search-products', article: 'search-articles', page: 'search-pages' } as const;
 const items = (page: Page) =>
-  page.locator('[data-testid="search-results-product"], [data-testid="search-results-article"], [data-testid="search-results-page"]');
+  page.locator('[data-testid="search-product-grid"] > li, [data-testid="search-articles"] li, [data-testid="search-pages"] li');
 
 const hasFilters = async (page: Page) => (await page.getByTestId('collection-filter-group').count()) > 0;
 
@@ -88,26 +92,30 @@ test.describe('ES1-T128 markup', () => {
     const total = await resultTotal(page);
     test.skip(total === 0, `q=${Q.all} không có kết quả (ES1-T125)`);
 
-    const groups = page.getByTestId('search-results-group');
-    const types = await groups.evaluateAll((els) => els.map((el) => el.getAttribute('data-object-type')));
+    const testids = Object.values(GROUPS) as string[];
+    const types = await page.evaluate((ids) => {
+      const els = [...document.querySelectorAll(ids.map((id) => `[data-testid="${id}"]`).join(','))];
+      return els.map((el) => el.getAttribute('data-testid'));
+    }, testids);
     expect(types.length).toBeGreaterThan(0);
-    expect(types, 'thứ tự product, article, page').toEqual(ORDER.filter((t) => types.includes(t)));
+    expect(types, 'thứ tự product, article, page').toEqual(testids.filter((t) => types.includes(t)));
     expect(new Set(types).size, 'mỗi loại 1 nhóm').toBe(types.length);
 
-    for (const type of types) {
-      const group = groups.and(page.locator(`[data-object-type="${type}"]`));
-      await expect(group.getByTestId('search-results-group-heading')).toHaveCount(1);
+    for (const type of ORDER) {
+      const group = page.getByTestId(GROUPS[type as keyof typeof GROUPS]);
+      if (!(await group.count())) continue;
       await expect(group.locator('h2')).toHaveCount(1);
-      expect(await group.getByTestId(`search-results-${type}`).count(), `nhóm ${type} rỗng thì không được render`).toBeGreaterThan(0);
+      const rows = type === 'product' ? group.getByTestId('product-card') : group.getByRole('listitem');
+      expect(await rows.count(), `nhóm ${type} rỗng thì không được render`).toBeGreaterThan(0);
     }
 
     expect(await items(page).count()).toBe(Math.min(PAGE_SIZE, total));
-    await expect(page.getByTestId('search-results-count')).toContainText(String(total));
+    await expect(page.getByTestId('search-status')).toContainText(String(total));
+    await expect(page.getByTestId('search-status')).toHaveAttribute('role', 'status');
     await expect(page.locator('[data-results-label]')).toHaveCount(1);
-    await expect(page.getByTestId('collection-status')).toHaveAttribute('role', 'status');
 
     // Product dùng product card, heading h3
-    const product = page.getByTestId('search-results-product').first();
+    const product = page.getByTestId('search-product-grid').locator('> li').first();
     if (await product.count()) {
       await expect(product.getByTestId('product-card')).toHaveCount(1);
       await expect(product.locator('h3 [data-testid="product-card-title"]')).toHaveCount(1);
@@ -141,8 +149,7 @@ test.describe('ES1-T128 markup', () => {
     await expectNotChallenged(page);
     const main = page.locator('main');
     await expect(main.locator('img[src="x"]')).toHaveCount(0);
-    const message = page.getByTestId('search-results-empty').or(page.getByTestId('search-results-count'));
-    await expect(message.first()).toContainText(payload);
+    await expect(page.getByTestId('search-status')).toContainText(payload);
     await expect(page.getByTestId('search-input')).toHaveValue(payload);
     expect(dialog, 'onerror không được chạy').toBe(false);
     expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([]);
@@ -152,7 +159,7 @@ test.describe('ES1-T128 markup', () => {
     const q = 'Tạ & đơn';
     await page.goto(searchUrl(q));
     await expectNotChallenged(page);
-    const message = page.getByTestId('search-results-empty').or(page.getByTestId('search-results-count')).first();
+    const message = page.getByTestId('search-status');
     await expect(message).toContainText(q);
     expect(await message.textContent()).not.toContain('&amp;');
     await expect(page.getByTestId('search-input')).toHaveValue(q);
@@ -209,7 +216,7 @@ test.describe('ES1-T128 nojs', () => {
     await expect(page.getByTestId('collection-sort')).toHaveValue(value!);
   });
 
-  test('nojs AC2 filter + Apply ở 1280 thu hẹp kết quả, q còn, Clear all giữ q', async ({ page }) => {
+  test('nojs AC2 filter + Apply ở 1280 (drawer) thu hẹp kết quả, q còn, chip + Clear all giữ q', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(searchUrl(Q.filter));
     await expectNotChallenged(page);
@@ -217,6 +224,8 @@ test.describe('ES1-T128 nojs', () => {
     const form = page.locator('#collection-filter-form');
     await expect(form).not.toHaveAttribute('data-collection-handle');
     const before = await resultTotal(page);
+    await page.getByTestId('collection-filter-open').click();
+    await expect(page.getByTestId('collection-filter-drawer')).toBeVisible();
     const input = page.locator('[data-testid="collection-filter-input"]:not(:checked):not(:disabled)').first();
     test.skip((await input.count()) === 0, 'Không có option lọc nào chọn được');
     await input.check();
@@ -227,8 +236,11 @@ test.describe('ES1-T128 nojs', () => {
     expect(params.get('type')).toBe(TYPES);
     expect(await resultTotal(page)).toBeLessThanOrEqual(before);
     await expect(page.getByTestId('collection-filter-count')).toHaveText('1');
+    await expect(page.getByTestId('search-active-filters-chip')).toHaveCount(1);
+    await expect(page.getByTestId('search-filter-note')).toBeVisible();
 
-    await page.getByTestId('collection-filter-clear').click();
+    await page.getByTestId('search-active-filters-clear').click();
+    await page.waitForURL((url) => ![...url.searchParams.keys()].some((k) => k.startsWith('filter.')));
     const cleared = new URL(page.url()).searchParams;
     expect(cleared.get('q')).toBe(Q.filter);
     expect([...cleared.keys()].some((k) => k.startsWith('filter.'))).toBe(false);
@@ -238,12 +250,12 @@ test.describe('ES1-T128 nojs', () => {
     const errors = watchErrors(page);
     await page.goto(searchUrl(Q.none));
     await expectNotChallenged(page);
-    await expect(page.getByTestId('search-results-empty')).toBeVisible();
-    await expect(page.getByTestId('search-results-empty')).toContainText(Q.none);
-    const cta = page.getByTestId('search-results-empty-cta');
+    await expect(page.getByTestId('search-empty')).toBeVisible();
+    await expect(page.getByTestId('search-empty')).toContainText(Q.none);
+    const cta = page.getByTestId('search-empty-button');
     expect(new URL((await cta.getAttribute('href'))!, page.url()).pathname).toMatch(/\/collections\/all$/);
-    await expect(page.getByTestId('search-results-group')).toHaveCount(0);
-    await expect(page.getByTestId('collection-empty-clear')).toHaveCount(0);
+    await expect(page.getByTestId('search-products')).toHaveCount(0);
+    await expect(page.getByTestId('search-filtered-empty')).toHaveCount(0);
     expect(errors).toEqual([]);
   });
 
