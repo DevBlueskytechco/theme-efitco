@@ -94,9 +94,9 @@
   href="{{ canonical_url }}"
 >
 
-{% if page_description %}
-  <meta
-    name="description"
-    content="{{ page_description | escape }}"
-  >
-{% endif %}
+{% # Always one meta description: 404, password, gift card have no page_description → shop.description → shop.name (TE-21 AC16, ES1-T495). %}
+<meta
+  name="description"
+  content="{{ og_description | escape }}"
+>
+

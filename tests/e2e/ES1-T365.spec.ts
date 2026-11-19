@@ -12,6 +12,8 @@ import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
+// ES1-T478 (ADR 0013): CSS trang collection ở assets/collection.css, nạp sau base.css trên collection/search/list-collections
+const COLLECTION = readFileSync('assets/collection.css', 'utf8');
 const CRITICAL = readFileSync('assets/critical.css', 'utf8');
 const TEMPLATE = readFileSync('templates/collection.liquid', 'utf8');
 const BANNER = readFileSync('blocks/collection-banner.liquid', 'utf8');
@@ -25,8 +27,8 @@ const IMAGE = env('TE6_IMAGE_COLLECTION_HANDLE');
 const START = '/** Collection page (TE-6';
 const END = '/** Lọc collection (TE-6 AC9, AC10';
 const section = () => {
-  const from = BASE.indexOf(START);
-  return BASE.slice(from, BASE.indexOf(END, from));
+  const from = COLLECTION.indexOf(START);
+  return COLLECTION.slice(from, COLLECTION.indexOf(END, from));
 };
 const body = (src: string) => src.slice(src.indexOf('{% enddoc %}'));
 const schema = (src: string) => JSON.parse(src.match(/{% schema %}([\s\S]*?){% endschema %}/)![1]);
@@ -82,7 +84,7 @@ const FIXTURE = ({ filters = true, chips = true } = {}) => `
 
 const mount = async (page: Page, width: number, opts?: { filters?: boolean; chips?: boolean }) => {
   await page.setViewportSize({ width, height: 900 });
-  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}</style></head><body>${FIXTURE(opts)}</body></html>`);
+  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}${COLLECTION}</style></head><body>${FIXTURE(opts)}</body></html>`);
 };
 const box = async (page: Page, id: string) => (await page.getByTestId(id).first().boundingBox())!;
 const css = (page: Page, id: string, prop: string, pseudo: string | null = null) =>
@@ -205,9 +207,10 @@ test.describe('ES1-T365 tĩnh', () => {
     expect(cssText).not.toMatch(/(^|[\s;{])(left|right|top|bottom|width|height|(margin|padding)-(left|right|top|bottom))\s*:/m);
     expect(cssText).not.toMatch(/z-index:\s*-?\d/);
     expect(cssText).not.toMatch(/\d+ms\b|\d+(\.\d+)?s\b\s*(ease|linear|;)/);
-    expect(BASE).not.toMatch(/\.collection-banner__(image|title)\b|\.collection-products__(count|empty)\b/);
-    // Trần tạm 57 344 B (CTO 17/11, ES1-T472 a) tới khi tách CSS theo template (ES1-T478) đưa base.css về ≤ 49 152
-    expect(gzipSync(BASE).length).toBeLessThanOrEqual(57344);
+    for (const css of [BASE, COLLECTION]) expect(css).not.toMatch(/\.collection-banner__(image|title)\b|\.collection-products__(count|empty)\b/);
+    // Trần ADR 0013 (ES1-T478): base.css ≤ 49 152 B gzip, collection.css ≤ 16 384 B gzip
+    expect(gzipSync(BASE).length).toBeLessThanOrEqual(49152);
+    expect(gzipSync(COLLECTION).length).toBeLessThanOrEqual(16384);
     expect(Buffer.byteLength(CRITICAL)).toBeLessThanOrEqual(10240);
   });
 

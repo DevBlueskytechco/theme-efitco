@@ -11,7 +11,7 @@
 //   TS_GIFT_CARD_URL, TE386_GIFT_CARD_PARTIAL_URL, TE386_GIFT_CARD_EXPIRED_URL, TE386_GIFT_CARD_DISABLED_URL
 //   TE386_STORE_STATE = new | configured   (AC17, fixture TE-17-R2-QA0)
 // Phần JS do BE còn mở: ES1-T474 (contact), ES1-T443 (nút mắt password), ES1-T410 (QR, copy, print gift card) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T486, ES1-T487, ES1-T488, ES1-T386-B04, ES1-T386-B05); khi bug sửa test đỏ lại → gỡ test.fail.
+// Bug đã biết: test.fail gắn mã (ES1-T486); đã gỡ: ES1-T487, ES1-T488, ES1-T386-B04 (ES1-T494), ES1-T386-B05 (ES1-T495); khi bug sửa test đỏ lại → gỡ test.fail.
 import { test, expect, type Browser, type BrowserContext, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -188,7 +188,7 @@ test.describe('ES1-T386 tĩnh', () => {
     expect(src).toMatch(/if gift_card\.expired or gift_card\.enabled == false\s*\n\s*assign inactive = true/);
     expect(src).toMatch(/unless gift_card\.expired or gift_card\.enabled == false -%\}\s*<div class="gift-card__pay">[\s\S]*?data-gift-card-qr/);
     expect(src).toMatch(/unless inactive -%\}\s*<button[\s\S]*?data-gift-card-copy/);
-    const actions = src.slice(src.indexOf('<div class="gift-card__actions">'));
+    const actions = src.slice(src.indexOf('class="gift-card__actions"'));
     const at = (s: string) => actions.indexOf(s);
     const order = [at('{%- if inactive -%}'), at('data-testid="gift-card-contact"'), at('{%- else -%}'), at('data-testid="gift-card-wallet"'), at('data-testid="gift-card-start"')];
     order.forEach((i) => expect(i).toBeGreaterThan(-1));
@@ -258,7 +258,7 @@ const giftFixture = (inactive: boolean) => `
 </main>`;
 
 async function giftCardFixture(page: Page, inactive: boolean) {
-  await page.setContent(`<!doctype html><html lang="en"><head><title>gift card</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style></head><body class="template-gift-card">${giftFixture(inactive)}</body></html>`);
+  await page.setContent(`<!doctype html><html lang="en"><head><title>gift card</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head><body class="template-gift-card">${giftFixture(inactive)}</body></html>`);
 }
 
 test.describe('ES1-T386 kiểm mockup gift card', () => {
@@ -638,10 +638,9 @@ test.describe('ES1-T386 404', () => {
   test.beforeEach(({}, ti) => { desktopOnly(ti.project.name); });
 
   // TC-24 tách riêng để bug LCP không che các kiểm khác của 404. Căn cứ: srs TE-21 AC8, AC16 "LCP: 404 là h1"; 404.md §8 "h1 … ở mọi mốc".
-  // Dưới 1280: nền noise của header (background-image 240 × 240, critical.css .site-header) là ứng viên LCP lớn hơn h1 → bug ES1-T386-B04.
+  // ES1-T386-B04 (sửa ở ES1-T494): noise header/announcement vẽ bằng border-image fill thay background-image → không còn là ứng viên LCP.
   for (const width of WIDTHS) {
     test(`TC-24 AC8/AC16 404 @${width}: LCP là h1`, async ({ page }) => {
-      test.fail(width < 1280, 'ES1-T386-B04: dưới 1280 LCP là <header> (nền noise-dark.png), không phải h1');
       await page.setViewportSize({ width, height: VIEW_H });
       await page.goto(MISSING);
       await expectNotChallenged(page);
@@ -727,7 +726,6 @@ test.describe('ES1-T386 404', () => {
   });
 
   test('TC-20 AC7 gõ ≥ 2 ký tự vào ô tìm 404 → gợi ý predictive như TE-8 AC1 (bug ES1-T486)', async ({ page }) => {
-    test.fail(true, 'ES1-T486: ô tìm 404 chưa nối predictive search');
     await openAt(page, MISSING, 1280);
     const suggest = page.waitForRequest(/\/search\/suggest/, { timeout: 5_000 });
     await page.getByTestId('not-found-search-input').pressSequentially('du', { delay: 50 });
@@ -808,7 +806,10 @@ test.describe('ES1-T386 password', () => {
           const m = await rect(media);
           expect(m.y, 'ảnh dưới thanh 80').toBeGreaterThanOrEqual(bar.y + bar.height - 1);
           if (width >= 1024) {
-            await expect(img).toHaveAttribute('fetchpriority', 'high');
+            // ES1-T487: ưu tiên cao chỉ ở desktop qua <link rel=preload media="(min-width: 64rem)">, ảnh không fetchpriority.
+            const preload = page.getByTestId('password-media-preload');
+            await expect(preload).toHaveAttribute('fetchpriority', 'high');
+            await expect(preload).toHaveAttribute('media', /min-width:\s*64rem/);
             expect(m.x, 'từ 64rem ảnh bên phải').toBeGreaterThanOrEqual(heading.x + heading.width - 1);
           } else expect(m.y, 'dưới 64rem ảnh sau nội dung').toBeGreaterThan(heading.y + heading.height);
         } else if (width >= 1024) {
@@ -959,7 +960,6 @@ test.describe('ES1-T386 password', () => {
   });
 
   test('TC-32 AC11 sai mật khẩu: focus vào ô mật khẩu sau khi tải lại (bug ES1-T488)', async ({ browser }) => {
-    test.fail(true, 'ES1-T488: không có cơ chế focus #PasswordInput khi form.errors');
     const { context, page } = await openPassword(browser, 1280);
     try {
       await submitWrongPassword(page);
@@ -1011,7 +1011,6 @@ test.describe('ES1-T386 password', () => {
       try {
         const img = page.getByTestId('password-media').locator('img');
         test.skip((await img.count()) === 0, 'chưa chọn ảnh password');
-        test.fail(true, 'ES1-T487: fetchpriority="high" in cố định mọi mốc');
         await expect(img).toHaveAttribute('loading', 'eager');
         expect(await img.getAttribute('fetchpriority')).not.toBe('high');
       } finally {
@@ -1210,10 +1209,9 @@ test.describe('ES1-T386 chung', () => {
     } else test.info().annotations.push({ type: 'thiếu dữ liệu', description: 'ES1-T298: gift card chưa kiểm title' });
   });
 
-  // snippets/meta-tags.liquid chỉ in meta description khi page_description có giá trị; 404 không có (CI run 44171510755) → bug ES1-T386-B05.
-  // 3 trang chung 1 nguyên nhân nên gộp 1 test, expect.soft để đo đủ cả 3; sửa snippet xong test báo "passed unexpectedly" → gỡ test.fail.
+  // Bug ES1-T386-B05 (ES1-T495) đã sửa: meta-tags luôn in meta description, dự phòng shop.description → shop.name.
+  // 3 trang chung 1 nguyên nhân nên gộp 1 test, expect.soft để đo đủ cả 3.
   test('TC-47 AC16 404, password, gift card có meta description (1280), bug ES1-T386-B05', async ({ page, browser }) => {
-    test.fail(true, 'ES1-T386-B05: snippets/meta-tags.liquid bỏ meta description khi page_description trống (404)');
     await openAt(page, MISSING, 1280);
     await expect.soft(page.locator('meta[name="description"]'), '404 meta description').toHaveCount(1);
     const { context, page: pw } = await openPassword(browser, 1280);

@@ -1,31 +1,69 @@
 {% doc %}
   Renders one article as a list item: a link with the image, the first tag as a
-  label, the title and the reading time.
+  label, the title and the reading time. The blog page (blocks/blog-articles)
+  also turns on the excerpt and the date (TE-20 AC2, blog.md §1.6); the home
+  page row (blocks/blog-posts) keeps the Figma 1:1022 card with no parameters.
 
-  The image is decorative because the title already names the link, and always lazy.
-  Without an image the card keeps its dark frame, so the white text stays readable.
-  Without a tag there is no label.
+  The image is decorative because the title already names the link, lazy unless
+  the caller passes loading 'eager' for the LCP card. Without an image the card
+  keeps its dark frame, so the white text stays readable. Without a tag there is
+  no label. The title is never cut (decisions 11/11 (3)).
 
   Reading time (plan ES1-T169 D8): words in article.content at 200 words per minute,
-  rounded up. An article with no words has no reading time, so the line is hidden.
+  rounded up. An article with no words has no reading time, so it is hidden.
   Each tag gets a space before it so that words on either side of a tag or a line
   break stay separate; a tag inside a word counts that word twice.
 
+  Meta: with show_date the line is "{date} · {N} min read" (`<time datetime>`,
+  dot drawn by CSS, either part can be off); without it the line is the reading
+  time only, as on the home page.
+
   Test hooks: data-testid="article-card", "article-card-link", "article-card-image",
-  "article-card-tag", "article-card-title", "article-card-read-time".
+  "article-card-tag", "article-card-title", "article-card-excerpt",
+  "article-card-meta", "article-card-date", "article-card-read-time".
 
   @param {article} article - The article to render
+  @param {string} [heading_tag] - 'h3' (default) or 'h2' when the card sits right under the page h1
+  @param {boolean} [show_date] - Shows the published date in the meta line. Default: false
+  @param {boolean} [show_read_time] - Set to false to hide the reading time. Default: true
+  @param {boolean} [show_excerpt] - Shows excerpt_or_content without HTML, 20 words. Default: false
+  @param {string} [sizes] - The sizes attribute of the image. Default: the home page row
+  @param {string} [loading] - 'lazy' (default) or 'eager' for the LCP card
+  @param {string} [fetchpriority] - 'high' with loading 'eager' for the LCP card
 
   @example
   {% for post in blog.articles limit: 5 %}
     {% render 'article-card', article: post %}
   {% endfor %}
+
+  {% render 'article-card',
+    article: post,
+    heading_tag: 'h2',
+    show_date: true,
+    show_excerpt: true,
+    sizes: '(min-width: 64rem) 25vw, 100vw'
+  %}
 {% enddoc %}
 
 {%- liquid
   assign word_count = article.content | newline_to_br | strip_newlines | replace: '&nbsp;', ' ' | replace: '<', ' <' | strip_html | split: ' ' | size
   assign read_minutes = word_count | plus: 199 | divided_by: 200
+  if show_read_time == false
+    assign read_minutes = 0
+  endif
   assign article_tag = article.tags | first
+
+  assign card_heading = 'h3'
+  if heading_tag == 'h2'
+    assign card_heading = 'h2'
+  endif
+  assign card_sizes = sizes | default: '(min-width: 64rem) 336px, (min-width: 48rem) 40vw, 70vw'
+  assign card_loading = loading | default: 'lazy'
+
+  assign card_excerpt = ''
+  if show_excerpt
+    assign card_excerpt = article.excerpt_or_content | strip_html | truncatewords: 20
+  endif
 -%}
 
 <li class="article-card" data-testid="article-card">
@@ -36,8 +74,9 @@
         class: 'article-card__image',
         width: 672,
         widths: '252, 336, 504, 672',
-        sizes: '(min-width: 64rem) 336px, (min-width: 48rem) 40vw, 70vw',
-        loading: 'lazy',
+        sizes: card_sizes,
+        loading: card_loading,
+        fetchpriority: fetchpriority,
         decorative: true,
         testid: 'article-card-image'
       %}
@@ -46,8 +85,20 @@
       <p class="article-card__tag" data-testid="article-card-tag">{{ article_tag | escape }}</p>
     {%- endif -%}
     <div class="article-card__content">
-      <h3 class="article-card__title" data-testid="article-card-title">{{ article.title | escape }}</h3>
-      {%- if read_minutes > 0 -%}
+      <{{ card_heading }} class="article-card__title" data-testid="article-card-title">
+        {{- article.title | escape -}}
+      </{{ card_heading }}>
+      {%- if card_excerpt != blank -%}
+        <p class="article-card__excerpt" data-testid="article-card-excerpt">{{ card_excerpt }}</p>
+      {%- endif -%}
+      {%- if show_date -%}
+        <p class="article-card__meta" data-testid="article-card-meta">
+          <span data-testid="article-card-date">{{ article.published_at | time_tag: format: 'date' }}</span>
+          {%- if read_minutes > 0 -%}
+            <span data-testid="article-card-read-time">{{ 'blocks.blog_posts.read_time' | t: count: read_minutes }}</span>
+          {%- endif -%}
+        </p>
+      {%- elsif read_minutes > 0 -%}
         <p class="article-card__read-time" data-testid="article-card-read-time">
           {{- 'blocks.blog_posts.read_time' | t: count: read_minutes -}}
         </p>
