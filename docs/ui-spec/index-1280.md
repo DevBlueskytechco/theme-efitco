@@ -84,7 +84,7 @@ Anatomy, dữ liệu, trạng thái từng khối giữ như `index-mobile-a.md`
 - Gradient `transparent 50% → --color-background-dark` (Figma 1:389).
 
 ### 2.4 Shop the look
-- Lưới 12: ảnh `span 8` tỉ lệ 936/816; cột phải `span 4`, flex dọc, khoảng `clamp(16, 1.25vw, 24)`; ô Fits `min-height: clamp(84, 5.2vw, 100)`; hàng `min-height: clamp(80, 4.9vw, 94)`, ảnh `clamp(56, 3.333vw, 64)`; panel `margin-block-start: auto` (đáy panel = đáy ảnh), padding `clamp(24, 3.125vw − 20, 40)`.
+- Lưới 12: ảnh `span 8` tỉ lệ 936/816; cột phải `span 4`, flex dọc, khoảng `clamp(16, 1.25vw, 24)`; ô Fits `min-height: clamp(84, 5.2vw, 100)`; hàng `min-height: clamp(80, 4.9vw, 93)` (Figma 1:560; ES1-T501, CTO 19/11 ES1-T502), ảnh `clamp(56, 3.333vw, 64)`; panel `margin-block-start: auto` (đáy panel = đáy ảnh), padding `clamp(24, 3.125vw − 20, 40)`.
 - Dòng giảm giá: `color-mix(badge-new 55%, trắng)` 5.41:1 trên panel, cùng cách bundle (sổ 10/11 H6); Figma xanh 2.50:1.
 
 ### 2.5 Make fitness

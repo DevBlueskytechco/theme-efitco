@@ -112,7 +112,8 @@ test.describe('ES1-T382 tĩnh', () => {
   });
 
   test('CSS: mục bài viết chỉ dùng token, thuộc tính logical', () => {
-    const css = noComments(read('assets/base.css'));
+    // ES1-T478 (ADR 0013): CSS trang bài viết ở assets/aux.css
+    const css = noComments(read('assets/aux.css'));
     const start = css.indexOf('.image.article-main__cover {');
     const end = css.indexOf('aspect-ratio: 1798 / 827; } }');
     expect(start).toBeGreaterThan(0);
@@ -129,7 +130,7 @@ const TOKENS = `:root{--page-width:1440px;--page-margin:20px;--font-size-xs:.812
 
 async function fixture(page: Page) {
   const longTitle = 'Supercalifragilisticexpialidociousandmoretext'.repeat(2);
-  await page.setContent(`<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>fixture</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style></head>
+  await page.setContent(`<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>fixture</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head>
 <body><main>
 <article class="block-container"><div class="article-main">
   <div class="image article-main__cover" data-testid="article-cover"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" width="1800" height="828" alt="Cover"></div>

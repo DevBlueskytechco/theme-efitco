@@ -34,12 +34,14 @@ test.describe('ES1-T403 tĩnh', () => {
     expect(read('templates/page.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? page\.content/);
     expect(read('blocks/collection-banner.liquid')).toMatch(/class="rte[ "][^>]*>\s*\{\{-? collection\.description/);
     expect(read('blocks/product-info.liquid')).toMatch(/class="rte"[^>]*>\s*\{\{-? product\.description/);
-    expect(read('assets/base.css')).not.toContain('product-info__description');
+    // ES1-T478: CSS PDP tách sang assets/product.css
+    for (const file of ['assets/base.css', 'assets/product.css']) expect(read(file)).not.toContain('product-info__description');
   });
 
   test('D5 line-clamp / ellipsis chỉ còn ở tên shop (critical) và badge article-card__tag', () => {
     const hits: string[] = [];
-    for (const file of ['assets/critical.css', 'assets/base.css']) {
+    // ES1-T478: quét cả file CSS theo template (ADR 0013)
+    for (const file of ['assets/critical.css', 'assets/base.css', 'assets/product.css', 'assets/collection.css', 'assets/cart.css', 'assets/aux.css']) {
       const css = noComments(read(file));
       for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
         if (/line-clamp|text-overflow:\s*ellipsis/.test(rule[2])) hits.push(`${file}: ${rule[1].trim()}`);

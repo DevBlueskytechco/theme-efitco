@@ -78,7 +78,8 @@ test.describe('ES1-T387 static', () => {
   });
 
   // Trần 49 152 chưa đạt ở develop (50 805 B sau T332, [Q] ES1-T454; 50 102 B sau ES1-T317; 51 936 B ở develop 32c5ab7 sau T326/T320; 54 814 B ở develop 354e4e9 sau T341/T382/T367; trần tạm 57 344 (CTO 17/11, ES1-T478), [Q] ES1-T472); CTO 13/11: PR này không được tăng base.css so với develop
-  test('CSS: popup cũ (literal figma, px) đã xoá; mục quiz 0 màu literal, 0 z-index số; gzip ≤ trần tạm 57 344', () => {
+  // ES1-T472 a: ES1-T478 tách CSS theo template, base.css về trần 49 152 B gzip, hết trần tạm 57 344
+  test('CSS: popup cũ (literal figma, px) đã xoá; mục quiz 0 màu literal, 0 z-index số; gzip ≤ 49 152', () => {
     const css = read('assets/base.css');
     expect(css).not.toContain('.quiz__dialog-close');
     expect(css).not.toContain('quiz-results-title');
@@ -90,7 +91,7 @@ test.describe('ES1-T387 static', () => {
     expect(quizRules).not.toMatch(/z-index\s*:\s*-?\d/);
     expect(quizRules).not.toMatch(/(^|[\s;{])(left|right|top|bottom|margin-left|margin-right|padding-left|padding-right)\s*:/m);
     expect(css).not.toContain('motion-breathe');
-    expect(gzipSync(css).length).toBeLessThanOrEqual(57344);
+    expect(gzipSync(css).length).toBeLessThanOrEqual(49152);
   });
 
   test('index.te11 truyền collection te11-quiz, giữ panel dưới bước (ES1-T139)', () => {

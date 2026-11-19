@@ -53,12 +53,12 @@ const mount = async (page: Page, width: keyof typeof VIEWPORTS) => {
 test.describe('ES1-T466 fixture base.css', () => {
   test.beforeEach(({}, ti) => test.skip(ti.project.name !== 'desktop', 'đặt viewport trong test'));
 
-  test('rule hiện pause bám :enabled, bỏ selector autoplay/video cũ; base.css gzip trong trần tạm', () => {
+  test('rule hiện pause bám :enabled, bỏ selector autoplay/video cũ; base.css gzip ≤ 49 152', () => {
     expect(BASE).toContain("slideshow-carousel[data-enhanced] .slideshow__pause:enabled {");
     expect(BASE).not.toContain("[data-autoplay='true'] .slideshow__pause");
     expect(BASE).not.toContain(':has(video) .slideshow__pause');
-    // Trần tạm 57 344 B (CTO 17/11, ES1-T472 a) tới khi ES1-T478 tách CSS theo template
-    expect(gzipSync(BASE).length).toBeLessThanOrEqual(57344);
+    // Trần 49 152 B gzip (CTO 17/11, ES1-T472 a): ES1-T478 tách CSS theo template, hết trần tạm 57 344
+    expect(gzipSync(BASE).length).toBeLessThanOrEqual(49152);
   });
 
   for (const width of [360, 768, 1280] as const) {

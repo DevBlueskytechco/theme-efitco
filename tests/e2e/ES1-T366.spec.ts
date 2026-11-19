@@ -8,6 +8,8 @@ import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
+// ES1-T478 (ADR 0013): CSS lọc collection ở assets/collection.css, nạp sau base.css trên collection/search
+const COLLECTION = readFileSync('assets/collection.css', 'utf8');
 const CRITICAL = readFileSync('assets/critical.css', 'utf8');
 const BLOCK = readFileSync('blocks/collection-filters.liquid', 'utf8');
 const GROUP = readFileSync('snippets/filter-group.liquid', 'utf8');
@@ -15,11 +17,11 @@ const OPTION = readFileSync('snippets/filter-option.liquid', 'utf8');
 const LOCALE = JSON.parse(readFileSync('locales/en.default.json', 'utf8'));
 
 const START = '/** Lọc collection (TE-6 AC9, AC10';
-// Mục pagination (ES1-T364) không còn comment đầu mục: kết thúc ở rule đầu tiên của nó.
-const END = '.pagination__list {';
+// ES1-T478: mục kế tiếp trong collection.css là List collections (pagination dùng chung ở base.css).
+const END = '/** List collections (TE-6 AC15)';
 const section = () => {
-  const from = BASE.indexOf(START);
-  return BASE.slice(from, BASE.indexOf(END, from));
+  const from = COLLECTION.indexOf(START);
+  return COLLECTION.slice(from, COLLECTION.indexOf(END, from));
 };
 
 // Token mặc định (settings_schema.json); css-variables.liquid là nguồn thật trên store.
@@ -92,7 +94,7 @@ const FIXTURE = (enhanced: boolean, clear: boolean) => `
 
 const mount = async (page: Page, width: number, { enhanced = false, clear = true } = {}) => {
   await page.setViewportSize({ width, height: 900 });
-  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}</style></head><body>${FIXTURE(enhanced, clear)}</body></html>`);
+  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}${COLLECTION}</style></head><body>${FIXTURE(enhanced, clear)}</body></html>`);
 };
 const box = async (page: Page, id: string) => (await page.getByTestId(id).first().boundingBox())!;
 // Mở popover rồi chờ transition trượt vào xong: boundingBox đo cả translate (bài học ES1-T313 TC-05).
@@ -117,8 +119,10 @@ test.describe('ES1-T366 tĩnh', () => {
     expect(css).not.toMatch(/z-index:\s*-?\d/);
     // Drawer lọc dùng .drawer chung: không còn khung riêng 28rem (max-inline-size 28rem của cart drawer không thuộc mục này)
     expect(css).not.toContain('28rem');
-    expect(BASE).not.toMatch(/\.collection-filters__drawer\s*\{/);
-    expect(BASE).not.toMatch(/\.collection-filters__drawer:popover-open/);
+    for (const file of [BASE, COLLECTION]) {
+      expect(file).not.toMatch(/\.collection-filters__drawer\s*\{/);
+      expect(file).not.toMatch(/\.collection-filters__drawer:popover-open/);
+    }
     expect(BASE).toContain('.drawer:is([open], :popover-open)');
   });
 
