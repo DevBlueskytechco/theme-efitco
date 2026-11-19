@@ -1,0 +1,30 @@
+{
+  "$comment": "ES1-T510: đoạn gộp vào tests/fixtures/home-figma.json (QA quản lý, ES1-T331) mảng blocks[]. Khác các phần tử trang chủ: giá trị đã nằm trong template test templates/blog.figma.liquid, templates/article.figma.liquid (tham số block), không áp qua editor. Mở bằng ?view=figma. Theme mới cài (templates/blog.liquid, article.liquid) không có giá trị này (TC-48).",
+  "blocks": [
+    {
+      "scope": "template:blog.figma",
+      "view": "figma",
+      "type": "blog-articles",
+      "id": null,
+      "ac": ["TE-20 AC15"],
+      "applied_by": "template_params",
+      "settings": { "eyebrow": "From the Efitco blog" },
+      "source": "docs/ui-spec/blog.md §2 bảng settings, Figma 1:1024",
+      "markers": [ { "testid": "page-title", "text": "From the Efitco blog" } ]
+    },
+    {
+      "scope": "template:article.figma",
+      "view": "figma",
+      "type": "related-articles",
+      "id": null,
+      "ac": ["TE-20 AC15"],
+      "applied_by": "template_params",
+      "settings": { "eyebrow": "From the Efitco blog", "heading": "More Training Tips" },
+      "source": "docs/ui-spec/article.md §1.5 và bảng settings, Figma 1:1024, 1:1025",
+      "markers": [
+        { "testid": "related-articles-eyebrow", "text": "From the Efitco blog" },
+        { "testid": "related-articles-heading", "text": "More Training Tips" }
+      ]
+    }
+  ]
+}
