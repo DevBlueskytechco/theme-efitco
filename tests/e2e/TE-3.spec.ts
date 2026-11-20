@@ -929,7 +929,12 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     const total = swatchOption(p, await swatchNames(card!)).values.length;
     const links = card!.getByRole('link');
     await expect(links, 'link ảnh aria-hidden, chỉ còn link tiêu đề').toHaveCount(1);
-    await expect(links.first()).toHaveAccessibleName(`${p.title}, ${total} colors`);
+    // Phần ", N colors" nằm trong span .visually-hidden (position: absolute): Chromium coi phần tử
+    // out-of-flow như block khi ghép tên truy cập nên chèn 1 dấu cách trước dấu phẩy
+    // ("Tiêu đề , 3 colors"). AC2 chỉ yêu cầu tên có thêm số màu; so tiêu đề + số màu, cho phép khoảng trắng đó.
+    await expect(links.first()).toHaveAccessibleName(
+      new RegExp(`^${p.title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*, ${total} colors$`),
+    );
     await expect(card!.getByRole('group')).toHaveCount(0);
     await expect(card!.getByRole('radio')).toHaveCount(0);
     await expect(card!.getByRole('radiogroup')).toHaveCount(0);
