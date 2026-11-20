@@ -15,10 +15,11 @@
     form, "in review" text when blog.moderated?, fields empty.
   - blog.moderated?: note "Comments are reviewed before they appear." above the fields.
 
-  Hooks for BE (no JavaScript in this block): focus [data-testid=comment-status]
-  or #CommentFormErrors after the reload; [data-testid=comment-submit] takes
-  aria-busy while posting (.button[aria-busy] spinner already in base.css).
-  No partial.
+  Hooks for BE: assets/article-comments.js (data-lazy-module on the root, imported
+  near the viewport by assets/lazy-module.js; ES1-T473) focuses
+  [data-testid=comment-status] or #CommentFormErrors after the reload;
+  [data-testid=comment-submit] takes aria-busy while posting (.button[aria-busy]
+  spinner already in base.css). No partial.
 
   Self-contained: callers must leave the body empty.
 
@@ -38,6 +39,7 @@
   <div
     class="article-comments"
     id="comments"
+    data-lazy-module="{{ 'article-comments.js' | asset_url }}"
     data-testid="article-comments"
     {{ block.shopify_attributes }}
   >
@@ -248,6 +250,7 @@
         <p class="form-field__hint">{{ 'blog.required_note' | t }}</p>
       </div>
     {% endform %}
+    <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
   </div>
 {%- elsif request.design_mode -%}
   <p class="article-comments--placeholder" data-testid="article-comments-placeholder" {{ block.shopify_attributes }}>

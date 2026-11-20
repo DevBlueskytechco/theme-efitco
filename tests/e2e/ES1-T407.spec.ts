@@ -61,7 +61,8 @@ test.describe('ES1-T407 @static', () => {
     expect(src).toMatch(/id="ContactBody"[\s\S]*?required/);
     expect(src).toMatch(/aria-describedby="ContactEmailError"/);
     expect(src).toContain('form.posted_successfully?');
-    expect(src).not.toMatch(/<script/);
+    // ES1-T474: block nạp lazy-module.js + contact-form.js (module, có src), không script inline
+    for (const tag of src.match(/<script\b[^>]*>/g) ?? []) expect(tag).toMatch(/ src="\{\{ [^}]+ \}\}" type="module"/);
   });
 
   test('locale có đủ key, không trùng nhóm', () => {

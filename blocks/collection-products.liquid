@@ -1,12 +1,50 @@
 {% doc %}
-  Collection page results (TE-6 AC1, AC2 partial region, ES1-T103 D3). Reads the
-  global `collection`. columns_mobile columns below 48rem; from 48rem
-  columns_desktop, at most 3; from 80rem columns_desktop.
+  Collection page results (TE-6 AC1, AC3, AC6, AC7, AC8, AC11, AC12, AC14;
+  docs/ui-spec/collection.md §3, §6–§9). Reads the global `collection`.
+  columns_mobile columns below 48rem; from 48rem columns_desktop, at most 3; from
+  80rem columns_desktop (default 3: with the filter column a card is 292 at 1280,
+  336 at 1920, Figma 1:502).
 
-  Partial collection-products (name must match assets/collection-filters.js, BE
-  ES1-T110) wraps the whole paginate of 24: result count, grid, pagination and
-  empty message. `data-results-label` on the root inside the partial holds the
-  translated result count for the live region.
+  Toolbar (outside the results partial, so its controls keep their listeners):
+  - collection-filter-open opens the dialog of blocks/collection-filters.liquid
+    with popovertarget; hidden when the collection has no filters, and from 64rem.
+    Partial collection-filter-count inside it: badge with the number of filters
+    applied (aria-hidden) plus the same number as text. Filters applied = all
+    active_values + 1 when price_range has a min or a max.
+  - Partial collection-count: "{n} products" (collection.products_count, after
+    filtering), always shown; tabindex="-1" so JavaScript can move focus to it
+    after a page change.
+  - Sort select with form="collection-filter-form", so sort and filters submit
+    together. Selected: collection.sort_by, then collection.default_sort_by. No
+    sort setting (AC3, ES1-T106 #1). Apply button in noscript.
+  - collection-status: live region, empty until JavaScript fills it.
+  - Hidden (`hidden`) when the collection has no products at all (AC14).
+  Below 64rem the toolbar sticks under the header (var(--sticky-top)).
+
+  Partial collection-products (name must match the BE script, ES1-T110) wraps the
+  paginate of 24 (window_size 1): active filter chips, then the grid and the
+  shared pagination snippet, or one empty state. `data-results-label` on the
+  results element holds the translated count for the live region.
+  - Chips (AC12): `<ul aria-label="Active filters">`, one link per active value to
+    value.url_to_remove, one for the price range to filter.url_to_remove, and
+    "Clear all" to collection.url (keeps a sort the shopper chose). Links, so they
+    work without JavaScript.
+  - Empty states (snippets/empty-state, testid collection-empty): the collection
+    has no products (Shop All Products + Browse collections); filters match
+    nothing (chips stay, Clear filters); `?page=` past the last page (AC7, testid
+    collection-page-empty, "Go to page 1").
+
+  Hooks for BE (ES1-T110), outside the partial:
+  - data-label-updating on the root: "Updating products…".
+  - template[data-collection-updating]: spinner + that text, to put in place of the
+    count while a request runs (role="status" stays on collection-status).
+  - template[data-collection-skeleton]: one grid item with the card skeleton;
+    clone it once per card shown, set aria-busy="true" on collection-grid.
+  - template[data-collection-error]: the error alert (empty-state kind error,
+    testid collection-error, button data-retry "Try Again"); put it above the grid
+    and keep the old grid.
+  A refresh fetches collection-products, collection-count, collection-filter-count
+  and collection-filters together, so every number matches.
 
   Variant items (multi-source collections, TE-3 AC8): same rule as
   blocks/featured-collection.liquid. An item with a parent `product` is a
@@ -17,29 +55,16 @@
 
   Cards need no JavaScript: swatches are indicators (TE-3 AC2, ADR 0010).
 
-  Toolbar (TE-6 AC3, AC4, ES1-T103 D5, D6), outside the results partial:
-  - collection-filter-open opens the dialog of blocks/collection-filters.liquid
-    with popovertarget, hidden when the collection has no filters. Partial
-    collection-filter-count sits inside it: a badge with the number of filters
-    applied and the same number as text for screen readers. Filters applied =
-    all active_values + 1 when price_range has a min or a max.
-  - Sort select with form="collection-filter-form", so sort and filters submit
-    together. Selected: collection.sort_by, then collection.default_sort_by. No
-    sort setting (ES1-T103 D5, ES1-T106 #1). Its Apply button is in noscript.
-  - collection-status: live region, empty until JavaScript fills it.
-
-  Empty result (paginate.items is 0): a message for shoppers, also outside the
-  editor, because this is the page result and not a block missing its
-  configuration. With filters applied the message says nothing matches and links
-  to collection.url instead of all products. No collection (block used outside
-  the collection template): a hint in the theme editor, nothing on the storefront.
-
   Test hooks: collection-products (root), collection-toolbar,
-  collection-filter-open, collection-filter-count, collection-sort,
-  collection-sort-apply, collection-status, collection-results, collection-count,
-  collection-grid, collection-product, collection-empty, collection-empty-cta,
-  collection-empty-clear, and the hooks of snippets/pagination.liquid. JS hook:
-  data-results-label.
+  collection-filter-open, collection-filter-count, collection-count,
+  collection-sort, collection-sort-apply, collection-status, collection-results,
+  collection-active-filters, collection-chip, collection-chips-clear,
+  collection-grid, collection-product, collection-empty, collection-page-empty
+  (each with -heading, -button, -link from snippets/empty-state), and the hooks
+  of snippets/pagination.liquid.
+
+  No collection (block used outside the collection template): a hint in the theme
+  editor, nothing on the storefront.
 
   Self-contained: callers must leave the body empty.
 
@@ -70,7 +95,6 @@
     if collection.filters.size > 0
       assign image_sizes = '(min-width: 80rem) calc(' | append: settings.max_page_width | append: ' * 0.75 / ' | append: columns_desktop | append: '), (min-width: 64rem) calc(75vw / ' | append: columns_tablet | append: '), (min-width: 48rem) calc(100vw / ' | append: columns_tablet | append: '), calc(100vw / ' | append: columns_mobile | append: ')'
     endif
-    assign pagination_label = 'collections.pagination.label' | t
 
     # Same rule as Clear all in blocks/collection-filters.liquid
     assign active_filter_count = 0
@@ -83,16 +107,31 @@
       endif
     endfor
 
+    # Clear all keeps a sort order the shopper chose; the default sort is dropped
+    assign clear_url = collection.url
+    if collection.sort_by != blank and collection.sort_by != collection.default_sort_by
+      assign sort_param = collection.sort_by | url_encode
+      assign clear_url = clear_url | append: '?sort_by=' | append: sort_param
+    endif
+
     assign current_sort = collection.sort_by | default: collection.default_sort_by
+    assign updating_label = 'blocks.collection_products.updating' | t
   -%}
 
   <div
     class="collection-products"
     style="--columns: {{ columns_desktop }}; --columns-tablet: {{ columns_tablet }}; --columns-mobile: {{ columns_mobile }};"
+    data-label-updating="{{ updating_label | escape }}"
     data-testid="collection-products"
     {{ block.shopify_attributes }}
   >
-    <div class="collection-toolbar" data-testid="collection-toolbar">
+    <div
+      class="collection-toolbar"
+      data-testid="collection-toolbar"
+      {% if collection.all_products_count == 0 %}
+        hidden
+      {% endif %}
+    >
       <button
         class="button button--secondary collection-toolbar__filter"
         type="button"
@@ -102,6 +141,7 @@
           hidden
         {% endif %}
       >
+        {% render 'status-icon', name: 'filter' %}
         <span>{{ 'blocks.collection_products.filter' | t }}</span>
         {% partial 'collection-filter-count' %}
           <span class="collection-toolbar__count">
@@ -117,8 +157,16 @@
         {% endpartial %}
       </button>
 
+      {% partial 'collection-count' %}
+        <p class="collection-toolbar__results" tabindex="-1" data-testid="collection-count">
+          {{- 'blocks.collection_products.results_count_html' | t: count: collection.products_count -}}
+        </p>
+      {% endpartial %}
+
       <div class="collection-toolbar__sort">
-        <label for="collection-sort">{{ 'blocks.collection_products.sort_label' | t }}</label>
+        <label class="collection-toolbar__sort-label" for="collection-sort">
+          {{- 'blocks.collection_products.sort_label' | t -}}
+        </label>
         <select
           class="collection-toolbar__select"
           id="collection-sort"
@@ -139,7 +187,7 @@
         </select>
         <noscript>
           <button
-            class="button button--secondary"
+            class="button button--secondary collection-toolbar__sort-apply"
             type="submit"
             form="collection-filter-form"
             data-testid="collection-sort-apply"
@@ -153,38 +201,135 @@
     </div>
 
     {% partial 'collection-products' %}
-      {% paginate collection.products by 24 %}
+      {% paginate collection.products by 24, window_size: 1 %}
         {%- assign results_label = 'blocks.collection_products.results_count' | t: count: paginate.items -%}
         <div
           class="collection-products__results"
           data-results-label="{{ results_label | escape }}"
           data-testid="collection-results"
         >
-          {%- if paginate.items == 0 -%}
-            <div class="collection-products__empty" data-testid="collection-empty">
-              {%- if active_filter_count > 0 -%}
-                <p class="collection-products__empty-text">{{ 'blocks.collection_products.empty_filtered' | t }}</p>
-                <a
-                  class="button button--secondary"
-                  href="{{ collection.url }}"
-                  data-testid="collection-empty-clear"
-                >
-                  {{- 'blocks.collection_products.empty_clear' | t -}}
+          {%- if active_filter_count > 0 -%}
+            {%- assign chips_label = 'blocks.collection_products.active_filters' | t -%}
+            <ul
+              class="collection-chips"
+              role="list"
+              aria-label="{{ chips_label | escape }}"
+              data-testid="collection-active-filters"
+            >
+              {%- for filter in collection.filters -%}
+                {%- assign group_label = 'blocks.collection_products.chip_group' | t: label: filter.label -%}
+                {%- if filter.type == 'price_range' -%}
+                  {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+                    {%- liquid
+                      assign price_from = filter.min_value.value | default: 0 | money | strip_html
+                      if filter.max_value.value != nil
+                        assign price_to = filter.max_value.value | money | strip_html
+                      else
+                        assign price_to = filter.range_max | money | strip_html
+                      endif
+                      assign chip_value = 'blocks.collection_products.price_range' | t: min: price_from, max: price_to
+                      assign chip_name = 'blocks.collection_products.remove_filter' | t: label: filter.label, value: chip_value
+                    -%}
+                    <li>
+                      <a
+                        class="collection-chips__chip"
+                        href="{{ filter.url_to_remove }}"
+                        aria-label="{{ chip_name | escape }}"
+                        data-testid="collection-chip"
+                      >
+                        <span class="collection-chips__group">{{ group_label | escape }}</span>
+                        <span>{{ chip_value | escape }}</span>
+                        {% render 'header-icon', name: 'close' %}
+                      </a>
+                    </li>
+                  {%- endif -%}
+                {%- else -%}
+                  {%- for value in filter.active_values -%}
+                    {%- assign chip_name = 'blocks.collection_products.remove_filter' | t: label: filter.label, value: value.label -%}
+                    <li>
+                      <a
+                        class="collection-chips__chip"
+                        href="{{ value.url_to_remove }}"
+                        aria-label="{{ chip_name | escape }}"
+                        data-testid="collection-chip"
+                      >
+                        <span class="collection-chips__group">{{ group_label | escape }}</span>
+                        <span>{{ value.label | escape }}</span>
+                        {% render 'header-icon', name: 'close' %}
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                {%- endif -%}
+              {%- endfor -%}
+              <li>
+                <a class="collection-chips__clear" href="{{ clear_url }}" data-testid="collection-chips-clear">
+                  {{- 'blocks.collection_products.clear_all' | t -}}
                 </a>
-              {%- else -%}
-                <p class="collection-products__empty-text">{{ 'blocks.collection_products.empty' | t }}</p>
-                <a
-                  class="button button--secondary"
-                  href="{{ routes.all_products_collection_url }}"
-                  data-testid="collection-empty-cta"
-                >
-                  {{- 'blocks.collection_products.empty_cta' | t -}}
-                </a>
-              {%- endif -%}
-            </div>
-          {%- else -%}
-            <p class="collection-products__count" data-testid="collection-count">{{ results_label }}</p>
+              </li>
+            </ul>
+          {%- endif -%}
 
+          {%- liquid
+            # No products at all, or none left without any filter applied: the collection itself is empty
+            assign collection_empty = false
+            if collection.all_products_count == 0
+              assign collection_empty = true
+            elsif paginate.items == 0 and active_filter_count == 0
+              assign collection_empty = true
+            endif
+          -%}
+          {%- if collection_empty -%}
+            {%- liquid
+              assign empty_heading = 'blocks.collection_products.empty_heading' | t
+              assign empty_text = 'blocks.collection_products.empty_hint' | t
+              assign empty_button = 'blocks.collection_products.empty_cta' | t
+              assign empty_link = 'blocks.collection_products.browse_collections' | t
+            -%}
+            {% render 'empty-state',
+              heading: empty_heading,
+              text: empty_text,
+              button_label: empty_button,
+              button_url: routes.all_products_collection_url,
+              link_label: empty_link,
+              link_url: routes.collections_url,
+              icon: 'box',
+              testid: 'collection-empty'
+            %}
+          {%- elsif paginate.items == 0 -%}
+            {%- liquid
+              assign empty_heading = 'blocks.collection_products.empty_filtered_heading' | t
+              assign empty_text = 'blocks.collection_products.empty_filtered_hint' | t
+              assign empty_button = 'blocks.collection_products.empty_clear' | t
+            -%}
+            {% render 'empty-state',
+              heading: empty_heading,
+              text: empty_text,
+              button_label: empty_button,
+              button_url: clear_url,
+              icon: 'filter',
+              testid: 'collection-empty'
+            %}
+          {%- elsif collection.products.size == 0 -%}
+            {%- liquid
+              # ?page= past the last page (AC7): the list is empty but the collection is not
+              assign first_page_url = collection.url
+              assign first_part = paginate.parts | first
+              if first_part.is_link
+                assign first_page_url = first_part.url
+              endif
+              assign empty_heading = 'blocks.collection_products.page_empty_heading' | t
+              assign empty_text = 'blocks.collection_products.page_empty_hint' | t
+              assign empty_button = 'blocks.collection_products.page_first' | t
+            -%}
+            {% render 'empty-state',
+              heading: empty_heading,
+              text: empty_text,
+              button_label: empty_button,
+              button_url: first_page_url,
+              icon: 'box',
+              testid: 'collection-page-empty'
+            %}
+          {%- else -%}
             <ul class="collection-products__grid" role="list" data-testid="collection-grid">
               {%- for item in collection.products -%}
                 {%- liquid
@@ -212,11 +357,34 @@
               {%- endfor -%}
             </ul>
 
-            {% render 'pagination', paginate: paginate, label: pagination_label %}
+            {% render 'pagination', paginate: paginate %}
           {%- endif -%}
         </div>
       {% endpaginate %}
     {% endpartial %}
+
+    <template data-collection-updating>
+      <span class="collection-toolbar__updating">
+        <span class="spinner" aria-hidden="true"></span>
+        {{- updating_label -}}
+      </span>
+    </template>
+    <template data-collection-skeleton>
+      <li class="collection-products__item" aria-hidden="true">
+        <div class="skeleton-card">
+          <span class="skeleton skeleton--media"></span>
+          <span class="skeleton skeleton--line"></span>
+          <span class="skeleton skeleton--line skeleton--short"></span>
+        </div>
+      </li>
+    </template>
+    <template data-collection-error>
+      {%- liquid
+        assign error_heading = 'blocks.collection_products.error_heading' | t
+        assign error_text = 'blocks.collection_products.error_text' | t
+      -%}
+      {% render 'empty-state', kind: 'error', heading: error_heading, text: error_text, testid: 'collection-error' %}
+    </template>
   </div>
 {%- endif -%}
 
@@ -243,7 +411,7 @@
           "label": "t:options.columns.four"
         }
       ],
-      "default": "4"
+      "default": "3"
     },
     {
       "type": "select",

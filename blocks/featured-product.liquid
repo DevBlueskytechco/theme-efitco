@@ -10,8 +10,9 @@
   takes keyboard focus and thumbnails are in-page links, no JavaScript needed.
   The decorative seal (Figma 1:761) sits on the image corner.
 
-  Countdown: countdown_end is YYYY-MM-DD HH:MM in store time, with the store
-  offset added before it is read as epoch seconds. There is no element at all
+  Countdown: only the countdown_end setting, a real end date the merchant enters
+  (ADR 0009, ADR 0011); no template parameter supplies a date. It is
+  YYYY-MM-DD HH:MM in store time, with the store offset added before it is read as epoch seconds. There is no element at all
   when the value is empty, malformed or not after now, when the product is sold
   out, or when the current variant has no compare-at price above its price (R8,
   ES1-T155 #2). A malformed value shows a warning in the editor only. CSS keeps
@@ -59,6 +60,7 @@
   Self-contained: callers must leave the body empty.
 
   @param {string} [id] - Static block id, needed when a template has more than one featured product
+  @param {boolean} [hide_options] - True hides the variant picker, as on the home page (Figma 1:759). Default: false
 
   @example
   {% block 'container', id: 'home-featured-product', tag: 'div' %}
@@ -104,7 +106,7 @@
 
     # Countdown: 16 characters in the shape 0000-00-00 00:00, then a clean read as epoch seconds
     assign now_epoch = 'now' | date: '%s' | plus: 0
-    assign countdown_text = block.settings.countdown_end | default: default_countdown_end | strip
+    assign countdown_text = block.settings.countdown_end | strip
     assign countdown_invalid = false
     assign end_epoch = 0
     if countdown_text != blank
