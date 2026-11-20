@@ -4105,6 +4105,14 @@ product-media-gallery {
   fill: currentcolor;
 }
 
+/* Nhãn chữ "3D" trên thumbnail model (featured product, ADR 0012) */
+.product-media__thumbnail-badge--text {
+  padding-block: 0;
+  border-radius: var(--radius-input);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-body);
+}
+
 /* Dialog zoom: assets/product-media.js (BE ES1-T69) mở bằng showModal() và gắn ảnh */
 .product-media__dialog {
   inline-size: 100%;
@@ -7939,6 +7947,18 @@ featured-product {
 .featured-product__media-item .image > img {
   block-size: 100%;
   object-fit: contain;
+  mix-blend-mode: normal;
+}
+
+/* Rich media (ADR 0012): snippets/product-media-item fills the 668 / 653 frame like an image */
+.featured-product__media-item > :is(.product-media__video, .product-media__external, .product-media__model),
+.featured-product__media-item .product-media__video-tag {
+  block-size: 100%;
+  aspect-ratio: auto;
+}
+
+.featured-product__media-item .product-media__video-tag {
+  object-fit: contain;
 }
 
 .featured-product__placeholder-svg {
@@ -7957,6 +7977,7 @@ featured-product {
 }
 
 .featured-product__thumbnail {
+  position: relative;
   display: block;
   inline-size: 64px;
   block-size: 64px;
