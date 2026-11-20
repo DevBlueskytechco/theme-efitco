@@ -515,12 +515,15 @@
    drawer lọc mọi mốc (.collection-layout--drawer, CTO 10/11 #2), lưới 2 / 3 / 4 cột cả bề ngang */
 .search-top {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
   padding-block: var(--space-2) var(--space-6);
 }
 
+/* Cột minmax(0, 1fr): bề rộng tự nhiên của ô input không nới cột quá khung ở 360 (TC-33, B-01) */
 .search-head {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: var(--space-4);
   min-inline-size: 0;
 }
