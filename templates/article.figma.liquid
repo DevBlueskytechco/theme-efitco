@@ -1,0 +1,24 @@
+{% comment %}
+  Store dev fixture for the article page, opened with {article.url}?view=figma (ES1-T510,
+  TE-20 AC15; ES1-T507 #2). Same blocks as templates/article.liquid; the only difference is
+  the Figma copy of the related articles row passed as block parameters
+  (docs/ui-spec/article.md §1.5 and settings table: eyebrow "From the Efitco blog",
+  heading "More Training Tips", Figma 1:1024, 1:1025).
+
+  The copy lives here, not in the schema default or locales: a fresh install has no eyebrow
+  and the heading falls back to blog.related_heading (ADR 0011 §3, ES1-T308 #1).
+
+  Test template (ADR 0011 §6): kept for e2e, excluded from the release package.
+  Remove this file before a real store release.
+{% endcomment %}
+{% block 'container', id: 'article-main', tag: 'article' %}
+  {% block 'article-main' %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'article-comments' %}
+  {% block 'article-comments' %}{% endblock %}
+{% endblock %}
+
+{% block 'container', id: 'article-related' %}
+  {% block 'related-articles', eyebrow: 'From the Efitco blog', heading: 'More Training Tips' %}{% endblock %}
+{% endblock %}
