@@ -5,10 +5,12 @@
   48rem (4 when the grid has exactly 4 cards), columns_desktop columns from 80rem.
   No carousel.
 
-  Source: the collection setting; when it is empty, collections[default_collection]
-  (the home page template passes 'all' so a fresh install and the CI preview
-  show products). When there is no source or it has no products, the editor
-  shows placeholder cards with a hint and the storefront renders nothing.
+  Source: the collection setting; when it is empty, collections[default_collection].
+  The home page passes 'all' (Shopify's built-in catalog, not demo content; CTO
+  13/11 on ES1-T405), so a fresh install and the CI preview show products. No
+  figma-* handle is ever passed (ADR 0011 mục 2). When there is no source or it
+  has no products, the editor shows placeholder cards with a hint and the
+  storefront renders nothing.
 
   Variant items (multi-source collections, Editions Fall '26 #20, AC8): an item
   that has a parent `product` is treated as a variant. The card then gets the
@@ -17,7 +19,8 @@
   property and render with the product's default variant.
 
   Tabs (Figma 1:496, AC-H11, AC-H12): tab 1 is the source above, tabs 2 to 4 come
-  from tab_N_collection or collections[default_tab_N_collection]. A tab shows only
+  from tab_N_collection or, in test templates only, collections[default_tab_N_collection]
+  (templates/index.liquid passes none, ADR 0011). A tab shows only
   when it has a collection. With fewer than 2 tabs there is no tab bar and the
   output matches a block without tabs. Labels are block settings, so a template
   presets one with tab_N_label; empty label: collection title.
@@ -46,10 +49,10 @@
   "featured-collection-tab-empty".
 
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading id. Default: block.id
-  @param {string} [default_collection] - Collection handle used when the collection setting is empty, such as 'all'. Empty: no fallback
-  @param {string} [default_tab_2_collection] - Collection handle for tab 2 when its setting is empty. Empty: no fallback
-  @param {string} [default_tab_3_collection] - Collection handle for tab 3 when its setting is empty. Empty: no fallback
-  @param {string} [default_tab_4_collection] - Collection handle for tab 4 when its setting is empty. Empty: no fallback
+  @param {string} [default_collection] - Collection handle used when the collection setting is empty: only 'all' (built-in catalog). Empty: no fallback
+  @param {string} [default_tab_2_collection] - Test templates only: collection handle for tab 2 when its setting is empty. Empty: no fallback
+  @param {string} [default_tab_3_collection] - Test templates only: collection handle for tab 3 when its setting is empty. Empty: no fallback
+  @param {string} [default_tab_4_collection] - Test templates only: collection handle for tab 4 when its setting is empty. Empty: no fallback
   @param {string} [view_all_url] - Destination of the View all link, such as routes.all_products_collection_url on the 404 page; the label then reads "View All Products". Empty: the first tab's collection
 
   @example
