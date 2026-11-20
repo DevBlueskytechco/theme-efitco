@@ -7,6 +7,7 @@ import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
+import { fixtureApplied, skipUnlessFixture } from './support/home-fixture';
 
 const TE13 = '/?view=te13';
 const FIGMA = '/?view=figma';
@@ -218,8 +219,19 @@ test.describe('ES1-T157 TE-13 video carousel', () => {
     expect(errors).toEqual([]);
   });
 
-  test('AC3-markup trang chủ đã nối dữ liệu (CTO 07/11): có video carousel', async ({ page }) => {
+  // ES1-T405 (ADR 0011 mục 2): index.liquid không truyền tài nguyên; theme chưa cấu hình không in khối, không khung rỗng.
+  // Kỳ vọng "đã nối dữ liệu" (CTO 07/11) chỉ còn khi store dev đã áp fixture ES1-T331 (sentinel support/home-fixture.ts).
+  test('AC3-markup trang chủ chưa cấu hình: không video carousel, không khung rỗng', async ({ page }) => {
     await page.goto(HOME);
+    test.skip(await fixtureApplied(page), 'store dev đã áp fixture ES1-T331: khối có dữ liệu, kiểm ở test fixture');
+    await expect(band(page, 'home-video-carousel')).toHaveCount(0);
+    await expect(page.getByTestId('video-carousel')).toHaveCount(0);
+    await expect(page.getByTestId('video-carousel-placeholder')).toHaveCount(0);
+  });
+
+  test('AC3-markup trang chủ đã nối dữ liệu (CTO 07/11, fixture): có video carousel', async ({ page }) => {
+    await page.goto(HOME);
+    await skipUnlessFixture(page);
     await expect(band(page, 'home-video-carousel')).toHaveCount(1);
     await expect(page.getByTestId('video-carousel')).toHaveCount(1);
   });
