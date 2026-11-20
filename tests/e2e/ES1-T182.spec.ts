@@ -71,6 +71,7 @@ test.describe('ES1-T182 TE-17-FE1c', () => {
   // (ADR 0011, ES1-T405) → storefront không có bundle builder, không khung rỗng.
   test('AC-H36 / chưa cấu hình: không bundle builder, không khung rỗng', async ({ page }) => {
     await page.goto(HOME);
+    test.skip(await fixtureApplied(page), 'store dev đã áp fixture ES1-T331: khối có dữ liệu, kiểm ở test fixture');
     await expect(tid(page, 'bundle-builder')).toHaveCount(0);
     await expect(tid(page, 'bundle-builder-placeholder')).toHaveCount(0);
   });
