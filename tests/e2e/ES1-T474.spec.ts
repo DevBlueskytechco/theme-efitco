@@ -103,7 +103,7 @@ ${designMode ? '<script>window.Shopify = { designMode: true };</script>' : ''}</
 ${inner}
 </form>
 <script src="/assets/lazy-module.js?v=1" type="module"></script>
-</div></body></html>`;
+</div><iframe name="post-sink" hidden></iframe></body></html>`;
 }
 
 type Hits = { module: number; posts: number; release: () => void };
@@ -126,7 +126,7 @@ async function openFake(page: Page, state: State = 'fresh', opts: { designMode?:
     }
     if (req.method() === 'POST' && url.pathname === '/contact') {
       hits.posts++;
-      return; // treo: giữ trạng thái đang gửi
+      return route.fulfill({ status: 204, body: '' });
     }
     return route.fulfill({ body: contactHtml(state, opts), contentType: 'text/html; charset=utf-8' });
   });
@@ -135,6 +135,10 @@ async function openFake(page: Page, state: State = 'fresh', opts: { designMode?:
   await page.getByTestId('contact-form').waitFor({ state: 'attached' });
   return hits;
 }
+
+/** POST vào iframe ẩn: trang chính không điều hướng nên còn kiểm được trạng thái đang gửi. POST điều hướng trang chính
+ * (kể cả trả 204) thì click() và mọi locator chờ điều hướng tới hết timeout (CI PR #278: TC-06, TC-08 đỏ). */
+const postToSink = (page: Page) => page.getByTestId('contact-form').evaluate((f: HTMLFormElement) => (f.target = 'post-sink'));
 
 /** Tương tác đầu (focusin) để lazy-module nạp contact-form.js, chờ module chạy xong. */
 async function upgrade(page: Page, hits: Hits) {
@@ -239,6 +243,7 @@ test.describe('ES1-T474 trang giả', () => {
     const errors = watchConsole(page);
     const hits = await openFake(page);
     await upgrade(page, hits);
+    await postToSink(page);
     await page.locator('#ContactName').fill('QA');
     await page.locator('#ContactEmail').fill('qa@example.com');
     await page.locator('#ContactBody').fill('Hello');
@@ -276,6 +281,7 @@ test.describe('ES1-T474 trang giả', () => {
   test('TC-08 form novalidate (như không JS, ES1-T386 TC-10): gửi rỗng vẫn POST để Shopify kiểm', async ({ page }) => {
     const hits = await openFake(page);
     await upgrade(page, hits);
+    await postToSink(page);
     await page.getByTestId('contact-form').evaluate((f: HTMLFormElement) => (f.noValidate = true));
     await page.getByTestId('contact-submit').click();
     await expect.poll(() => hits.posts).toBe(1);

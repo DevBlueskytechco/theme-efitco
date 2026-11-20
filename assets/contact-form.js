@@ -99,9 +99,26 @@ addEventListener("submit", (e) => {
   busy(form, true);
 });
 
+// Press on submit: an error sentence shown on blur moves the button, the click is lost; check after
+let pressed, left;
+addEventListener("pointerdown", (e) => (pressed = e.target.closest?.(`${FORM} [type="submit"]`)), true);
+for (const type of ["pointerup", "pointercancel"]) {
+  addEventListener(
+    type,
+    () => {
+      const el = left;
+      pressed = left = null;
+      if (el) setTimeout(() => el != document.activeElement && !el.readOnly && check(el));
+    },
+    true
+  );
+}
+
 addEventListener("focusout", (e) => {
   const el = e.target;
-  if (el.form?.matches(FORM) && el.required && !el.readOnly) check(el);
+  if (!el.form?.matches(FORM) || !el.required || el.readOnly) return;
+  if (pressed?.form == el.form) left = el;
+  else check(el);
 });
 
 // Fixed while typing: the error goes at once; a new error waits for blur
