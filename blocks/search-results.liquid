@@ -37,10 +37,15 @@
   Test hooks (search.md §10): search-products, search-product-grid,
   search-active-filters, search-filter-note, search-filtered-empty(-heading,
   -button), search-articles, search-pages, search-pagination, search-empty
-  (-heading, -button); shared with TE-6: collection-filter-open,
+  (-heading, -button), search-error (-heading, -button); shared with TE-6:
+  collection-filter-open,
   collection-filter-count, collection-sort, collection-sort-apply and the hooks
   of snippets/pagination.liquid (pagination-summary only here) and
-  snippets/product-card.liquid. JS hook: data-results-label.
+  snippets/product-card.liquid. JS hooks: data-results-label;
+  data-results-focus on the products group (focus after a page change);
+  template[data-results-error] outside the partial: the S6b alert (empty-state
+  kind error, testid search-error, button data-retry "Try Again"), which JS
+  puts right after the template, above the old results.
 
   @param {string} [clear_url] - Link that removes the filters and keeps the search terms. Default: routes.search_url
   @param {string} [view] - Current result type view from the type links: 'all', 'product', 'article' or 'page'. Default: 'all'
@@ -73,6 +78,14 @@
   -%}
 
   <div class="search-results" data-testid="search-results" {{ block.shopify_attributes }}>
+    <template data-results-error>
+      {%- liquid
+        assign error_heading = 'search.update_error_title' | t
+        assign error_text = 'search.update_error_text' | t
+        render 'empty-state', kind: 'error', heading: error_heading, text: error_text, testid: 'search-error'
+      -%}
+    </template>
+
     {% partial 'search-products' %}
       {% paginate search.results by 24, window_size: 1 %}
         {%- liquid
@@ -132,6 +145,7 @@
                 class="search-results__group search-results__group--products"
                 aria-labelledby="search-products-heading"
                 data-testid="search-products"
+                data-results-focus
               >
                 <div class="search-results__group-head">
                   <h2 class="search-results__group-heading" id="search-products-heading">
