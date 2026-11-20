@@ -47,26 +47,23 @@
   bundle-builder-note, bundle-builder-submit, bundle-builder-status,
   bundle-builder-error, bundle-builder-placeholder.
 
-  Source: the collection setting; when it is empty, collections[default_collection]
-  (the home page template passes 'all', plan ES1-T169 D1). Empty state: no source
-  or no products → a hint in the theme editor, nothing on the storefront.
+  Source: the collection setting only, empty on a fresh install (ADR 0011 mục 2:
+  templates pass no collection). Empty state: no source or no products → a hint
+  in the theme editor, nothing on the storefront.
 
   Self-contained: callers must leave the body empty.
 
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading and input ids. Default: block.id
-  @param {string} [default_collection] - Collection handle used when the collection setting is empty, such as 'all'. Empty: no fallback
+  @param {string} [preselect] - Card positions checked on load, such as ',1,2,3,'. Empty: none
 
   @example
   {% block 'container', id: 'home-bundle-builder', tag: 'div', background: 'cream' %}
-    {% block 'bundle-builder', id: 'bundle-builder', default_collection: 'all' %}{% endblock %}
+    {% block 'bundle-builder', id: 'bundle-builder' %}{% endblock %}
   {% endblock %}
 {% enddoc %}
 
 {%- liquid
   assign source = block.settings.collection
-  if source == blank and default_collection != blank
-    assign source = collections[default_collection]
-  endif
 
   assign has_products = false
   if source != blank and source.products_count > 0

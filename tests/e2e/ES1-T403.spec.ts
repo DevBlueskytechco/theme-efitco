@@ -48,7 +48,9 @@ test.describe('ES1-T403 tĩnh', () => {
       }
     }
     expect(hits.some((h) => /title/.test(h))).toBe(false);
-    expect(hits.filter((h) => h.startsWith('assets/base.css'))).toEqual(['assets/base.css: .article-card__tag']);
+    // AC thay: ui-spec collection.md §Sort (ES1-T365) — giá trị sort dài cắt "…"; D5 chỉ cấm cắt TÊN, assert /title/ giữ nguyên.
+    // ES1-T478 (ADR 0013): rule sort ở collection.css; ngoài critical chỉ 2 chỗ này được cắt.
+    expect(hits.filter((h) => !h.startsWith('assets/critical.css'))).toEqual(['assets/base.css: .article-card__tag', 'assets/collection.css: .collection-toolbar__select']);
   });
 
   test('C8 viền radio quiz không dùng #999 (2.85:1)', () => {

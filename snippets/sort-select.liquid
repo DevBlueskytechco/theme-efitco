@@ -1,7 +1,8 @@
 {% doc %}
-  Sort select for the collection and search toolbars (TE-6 AC3, TE-8 AC2,
-  ES1-T123 D4). The select joins the filter form of blocks/collection-filters
-  with form="collection-filter-form", so sort and filters submit together.
+  Sort select for the search toolbar (TE-6 AC3, TE-8 AC2, ES1-T123 D4). Same
+  markup as the inline select in blocks/collection-products.liquid: change both.
+  The select joins the filter form of blocks/collection-filters with
+  form="collection-filter-form", so sort and filters submit together.
   Selected: sort_by, then default_sort_by. Its Apply button is in noscript: with
   JavaScript, assets/collection-filters.js applies the change.
 
@@ -22,7 +23,9 @@
 {%- assign current_sort = sort_by | default: default_sort_by -%}
 
 <div class="collection-toolbar__sort">
-  <label for="collection-sort">{{ 'blocks.collection_products.sort_label' | t }}</label>
+  <label class="collection-toolbar__sort-label" for="collection-sort">
+    {{- 'blocks.collection_products.sort_label' | t -}}
+  </label>
   <select
     class="collection-toolbar__select"
     id="collection-sort"
@@ -43,7 +46,7 @@
   </select>
   <noscript>
     <button
-      class="button button--secondary"
+      class="button button--secondary collection-toolbar__sort-apply"
       type="submit"
       form="collection-filter-form"
       data-testid="collection-sort-apply"
