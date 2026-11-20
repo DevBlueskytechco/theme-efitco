@@ -67,6 +67,27 @@ export async function fixtureApplied(page: Page): Promise<boolean> {
 }
 
 // Gọi sau khi đã mở `/`. Thiếu cả 2 marker nhận biết thì skip; thiếu 1 thì để test chạy và fail ở assertion (fixture áp dở).
+// ES1-T402 (ADR 0011 mục 3): chữ footer (mô tả, heading, text newsletter, trust, nhãn nút) là setting block footer trong layout, default rỗng,
+// rỗng thì ẩn, nút dùng locale. preview-push không áp setting layout:theme (ES1-T428/ES1-T177), sentinel ở / không chứng minh phần này.
+export const FOOTER_PENDING = 'setting footer (layout:theme) chưa áp trên preview: chữ footer default rỗng nên ẩn, nút dùng locale (ES1-T402, ES1-T428/ES1-T177)';
+export const FOOTER_SETTING_TESTIDS = ['footer-description', 'footer-newsletter-heading', 'footer-newsletter-text', 'footer-trust-item'] as const;
+export const FOOTER_SUBMIT_DEFAULT: string = JSON.parse(readFileSync(resolve(__dirname, '../../../locales/en.default.json'), 'utf8')).blocks.footer.newsletter_submit;
+
+// Có ít nhất 1 phần tử chỉ render từ setting footer = setting footer đã áp.
+export async function footerSettingsApplied(page: Page): Promise<boolean> {
+  const footer = page.getByTestId('footer');
+  for (const id of FOOTER_SETTING_TESTIDS) if ((await footer.getByTestId(id).count()) > 0) return true;
+  return false;
+}
+
+// Marker cần có trên trang: setting footer chưa áp thì nút footer phải là nhãn locale (không bỏ marker), ghi annotation.
+export async function expectedMarkers(page: Page, fixture: HomeFixture): Promise<Marker[]> {
+  const markers = allMarkers(fixture);
+  if (await footerSettingsApplied(page)) return markers;
+  test.info().annotations.push({ type: 'footer-fixture-pending', description: FOOTER_PENDING });
+  return markers.map((marker) => (marker.type === 'footer' && marker.testid === 'footer-newsletter-submit' ? { ...marker, text: FOOTER_SUBMIT_DEFAULT } : marker));
+}
+
 export async function skipUnlessFixture(page: Page) {
   const missing = await missingMarkers(page, SENTINELS);
   test.skip(missing.length === SENTINELS.length, NOT_APPLIED);
