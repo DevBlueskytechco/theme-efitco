@@ -1,10 +1,16 @@
 {% doc %}
-  Product structured data (TE-4 AC11): one JSON-LD Product with name, url,
-  up to 5 images (1200px), description (HTML stripped), brand (vendor), sku
-  and one Offer per variant (price, priceCurrency from the market currency,
-  InStock / OutOfStock, absolute variant URL). Every value goes through the
-  json filter. Static: it already lists every variant, so it is not part of
-  a partial and is not refreshed when the variant changes.
+  Product structured data (TE-4 AC11; ADR 0008 item 1; product.md §17): one
+  JSON-LD Product with name, url, up to 5 images (1200px), description (HTML
+  stripped), brand (vendor), sku, and offers:
+  - one Offer for current_variant (product.selected_or_first_available_variant,
+    so ?variant= deep links describe that variant): sku, price, priceCurrency
+    from the market currency, InStock / OutOfStock, absolute variant URL;
+  - plus one AggregateOffer when the product has more than one variant:
+    lowPrice = product.price_min, highPrice = product.price_max,
+    offerCount = product.variants_count, availability from product.available.
+  No loop over the product's variant list (NFR-7: up to 2048 variants, the
+  list stops at 250). Every value goes through the json filter. Static: not
+  part of a partial, not refreshed when the variant changes.
 
   Replaces the Skeleton `product | structured_data` output in
   snippets/meta-tags.liquid so the page has a single Product entity.
@@ -18,8 +24,24 @@
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
   assign product_url = request.origin | append: product.url
+  assign offer_url = request.origin | append: current_variant.url
+  assign offer_price = current_variant.price | divided_by: 100.0
   # Space before each tag so block elements (</p><p>) do not glue words together.
   assign description = product.description | replace: '<', ' <' | strip_html | strip
+
+  if current_variant.available
+    assign offer_availability = 'https://schema.org/InStock'
+  else
+    assign offer_availability = 'https://schema.org/OutOfStock'
+  endif
+
+  if product.available
+    assign aggregate_availability = 'https://schema.org/InStock'
+  else
+    assign aggregate_availability = 'https://schema.org/OutOfStock'
+  endif
+  assign low_price = product.price_min | divided_by: 100.0
+  assign high_price = product.price_max | divided_by: 100.0
 -%}
 
 <script type="application/ld+json" data-testid="product-structured-data">
@@ -49,27 +71,27 @@
       "sku": {{ current_variant.sku | json }},
     {%- endif %}
     "offers": [
-      {%- for variant in product.variants -%}
-        {%- liquid
-          assign offer_url = request.origin | append: variant.url
-          assign offer_price = variant.price | divided_by: 100.0
-          if variant.available
-            assign offer_availability = 'https://schema.org/InStock'
-          else
-            assign offer_availability = 'https://schema.org/OutOfStock'
-          endif
-        -%}
+      {
+        "@type": "Offer",
+        {%- if current_variant.sku != blank %}
+          "sku": {{ current_variant.sku | json }},
+        {%- endif %}
+        "price": {{ offer_price | json }},
+        "priceCurrency": {{ cart.currency.iso_code | json }},
+        "availability": {{ offer_availability | json }},
+        "url": {{ offer_url | json }}
+      }
+      {%- if product.variants_count > 1 -%}
+        ,
         {
-          "@type": "Offer",
-          {%- if variant.sku != blank %}
-            "sku": {{ variant.sku | json }},
-          {%- endif %}
-          "price": {{ offer_price | json }},
+          "@type": "AggregateOffer",
+          "lowPrice": {{ low_price | json }},
+          "highPrice": {{ high_price | json }},
+          "offerCount": {{ product.variants_count | json }},
           "priceCurrency": {{ cart.currency.iso_code | json }},
-          "availability": {{ offer_availability | json }},
-          "url": {{ offer_url | json }}
-        }{% unless forloop.last %},{% endunless %}
-      {%- endfor -%}
+          "availability": {{ aggregate_availability | json }}
+        }
+      {%- endif %}
     ]
   }
 </script>

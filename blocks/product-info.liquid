@@ -7,15 +7,19 @@
   - Vendor when the show_vendor setting is on (default on) and the product
     has one.
   - Partial product-price (name must match assets/product-variant-picker.js,
-    BE ES1-T66): snippets/price.liquid for current_variant plus the price
-    notes. Tax note from cart.taxes_included and cart.duties_included (set
+    BE TE-4-R2-BE2, ADR 0008 item 3): snippets/price.liquid for
+    current_variant plus the price notes. Loading state (TE-4 AC15,
+    variant-picker §6): the region has data-variant-busy; while JS sets
+    aria-busy="true" on it, CSS (assets/product.css) swaps the price line for
+    a skeleton the height of the price line (product-price-skeleton). Tax note from cart.taxes_included and cart.duties_included (set
     per market): both → taxes_and_duties_included, taxes only →
     taxes_included, duties only → duties_included, neither →
     taxes_at_checkout. Shipping note (links shop.shipping_policy.url when the
     store has one) only when current_variant.requires_shipping (AC9), so it is
     inside the partial and follows the variant.
   - product.description (rich text from the admin).
-  - snippets/product-structured-data.liquid: JSON-LD Product, static.
+  - snippets/product-structured-data.liquid: JSON-LD Product with the Offer
+    of current_variant + AggregateOffer (AC11, ADR 0008 item 1), static.
   - Storefront event shopify:product:view (ES1-T76, TE-4 AC12): the content
     sits in <s-view-event> with product | standard_event_data, context page.
     No JS here: assets/standard-events.js (BE ES1-T81, loaded in layout)
@@ -23,7 +27,7 @@
 
   Test hooks: product-info, product-view-event, product-title, product-vendor,
   product-price (the snippet keeps price, price-regular, price-compare,
-  price-range, price-unit), product-notes, product-note-tax, product-note-shipping,
+  price-range, price-unit), product-price-skeleton, product-notes, product-note-tax, product-note-shipping,
   product-description, product-structured-data.
 
   Empty state: no product (block used outside the product template) → a hint
@@ -75,7 +79,8 @@
       <h1 class="product-info__title" data-testid="product-title">{{ product.title | escape }}</h1>
 
       {% partial 'product-price' %}
-        <div class="product-info__price" data-testid="product-price">
+        <div class="product-info__price" data-variant-busy data-testid="product-price">
+          <span class="skeleton product-info__price-skeleton" aria-hidden="true" data-testid="product-price-skeleton"></span>
           {% render 'price', product: product, variant: current_variant %}
 
           <div class="product-info__notes" data-testid="product-notes">

@@ -1544,11 +1544,12 @@ test.describe('ES1-T70 TE-4 AC10 thuế theo market', () => {
 });
 
 // ---------- AC11 JSON-LD ----------
-type Offer = { '@type': string; price: number; priceCurrency: string; availability: string; url: string };
+// ES1-T349 (ADR 0008 mục 1, NFR-7): offers = Offer của biến thể đang chọn + AggregateOffer (khi > 1 biến thể), không lặp danh sách biến thể.
+type Offer = { '@type': string; price?: number; lowPrice?: number; highPrice?: number; offerCount?: number; priceCurrency: string; availability: string; url?: string };
 type LdProduct = { '@type': string; name: string; url: string; image?: string[]; description?: string; brand?: { name: string }; offers: Offer[] };
 
 test.describe('ES1-T70 TE-4 AC11 JSON-LD', () => {
-  test('AC11 TC-1101 đúng 1 Product, offers đủ variant: price, priceCurrency, availability, url; brand, image', async ({ page }) => {
+  test('AC11 TC-1101 đúng 1 Product, Offer biến thể đang chọn + AggregateOffer: price, priceCurrency, availability, url; brand, image', async ({ page }) => {
     const handle = await open(page, DATA.options, 'TE4_OPTIONS_HANDLE');
     const js = await productJs(page, handle);
     const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -1562,15 +1563,26 @@ test.describe('ES1-T70 TE-4 AC11 JSON-LD', () => {
     for (const src of ld.image ?? []) expect(src).toMatch(/^https:\/\/.*width=1200/);
     if (ld.description) expect(ld.description).not.toMatch(/<[a-z/]/i);
     const active = await page.evaluate(() => (window as Win).Shopify?.currency?.active ?? null);
-    expect(ld.offers).toHaveLength(js.variants.length);
-    js.variants.forEach((variant, i) => {
-      const offer = ld.offers[i];
-      expect(offer['@type']).toBe('Offer');
-      expect(offer.price).toBeCloseTo(variant.price / 100, 2);
-      if (active) expect(offer.priceCurrency).toBe(active);
-      expect(offer.availability).toBe(variant.available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock');
-      expect(offer.url).toMatch(new RegExp(`^https://.*variant=${variant.id}`));
-    });
+    const offers = ld.offers.filter((o) => o['@type'] === 'Offer');
+    expect(offers, 'đúng 1 Offer (biến thể đang chọn)').toHaveLength(1);
+    const id = await tid(page, T.variantId).inputValue();
+    const variant = js.variants.find((v) => String(v.id) === id)!;
+    expect(variant, 'hidden id là biến thể của sản phẩm').toBeTruthy();
+    const [offer] = offers;
+    expect(offer.price).toBeCloseTo(variant.price / 100, 2);
+    if (active) expect(offer.priceCurrency).toBe(active);
+    expect(offer.availability).toBe(variant.available ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock');
+    expect(offer.url).toMatch(new RegExp(`^https://.*variant=${variant.id}`));
+    const aggregate = ld.offers.filter((o) => o['@type'] === 'AggregateOffer');
+    expect(aggregate, 'AggregateOffer khi > 1 biến thể').toHaveLength(js.variants.length > 1 ? 1 : 0);
+    if (aggregate.length) {
+      const prices = js.variants.map((v) => v.price / 100);
+      expect(aggregate[0].lowPrice).toBeCloseTo(Math.min(...prices), 2);
+      expect(aggregate[0].highPrice).toBeCloseTo(Math.max(...prices), 2);
+      expect(aggregate[0].offerCount).toBe(js.variants.length);
+      if (active) expect(aggregate[0].priceCurrency).toBe(active);
+    }
+    expect(ld.offers).toHaveLength(offers.length + aggregate.length);
   });
 
   test('AC11 TC-1102 sản phẩm hết hàng: mọi offer OutOfStock', async ({ page }) => {
@@ -1691,30 +1703,24 @@ test.describe('ES1-T70 TE-4 nojs', () => {
     await expect(tid(page, T.zoomLink).first()).toHaveAttribute('href', /[?&]width=2048/);
   });
 
-  test('AC2 TC-251 nojs chọn variant thứ 2 trong select, submit: /cart.js đúng variant', async ({ page }) => {
-    const handle = await open(page, DATA.variants, 'TE4_VARIANTS_HANDLE');
-    const js = await productDataNoScript(page, handle);
-    const target = js.variants.filter((v) => v.available)[1];
-    test.skip(!target, 'TE4_VARIANTS_HANDLE cần từ 2 variant còn hàng');
+  // ES1-T349 (TE-4 AC13, NFR-7, product.md §17): không JS không có select liệt kê biến thể; form chỉ gửi hidden id (TC-851 kiểm thêm giỏ).
+  test('AC2 TC-251 nojs không select liệt kê biến thể, picker ẩn, form chỉ 1 trường name=id', async ({ page }) => {
+    await open(page, DATA.variants, 'TE4_VARIANTS_HANDLE');
     await expect(tid(page, T.picker)).toBeHidden();
-    const select = tid(page, T.variantSelect);
-    await expect(select).toBeVisible();
-    await expect(select).toHaveAttribute('name', 'id');
-    for (const v of js.variants.filter((x) => !x.available)) await expect(select.locator(`option[value="${v.id}"]`)).toBeDisabled();
-    await select.selectOption(String(target.id));
-    await tid(page, T.add).click();
-    await page.waitForURL(isCart);
-    expect((await cartItemsNoScript(page)).map((i) => i.variant_id)).toEqual([target.id]);
+    await expect(tid(page, T.variantSelect)).toHaveCount(0);
+    const form = page.locator(`#product-form-${await tid(page, T.form).getAttribute('data-product-id')}`);
+    await expect(form.locator('select[name="id"]')).toHaveCount(0);
+    await expect(form.locator('[name="id"]')).toHaveCount(1);
+    await expect(tid(page, T.variantId)).toHaveAttribute('type', 'hidden');
   });
 
-  test('AC2 TC-252 nojs ?variant= render đúng variant trong select và hidden id', async ({ page }) => {
+  test('AC2 TC-252 nojs ?variant= render đúng variant trong hidden id', async ({ page }) => {
     const handle = await open(page, DATA.options, 'TE4_OPTIONS_HANDLE');
     const js = await productDataNoScript(page, handle);
     const target = js.variants.find((v) => v.available && v.id !== (js.variants.find((x) => x.available) ?? js.variants[0]).id);
     test.skip(!target, 'Cần từ 2 variant còn hàng');
     await page.goto(productPath(handle, `?variant=${target!.id}`));
     await expect(tid(page, T.variantId)).toHaveValue(String(target!.id));
-    await expect(tid(page, T.variantSelect)).toHaveValue(String(target!.id));
   });
 
   test('AC2 TC-253 nojs sản phẩm hết hàng: nút disabled', async ({ page }) => {
@@ -1767,7 +1773,7 @@ test.describe('ES1-T70 TE-4 nojs', () => {
   test('AC8 TC-851 nojs thêm giỏ không chọn gì: POST form thường, tới /cart, đúng variant mặc định', async ({ page }) => {
     await open(page, DATA.variants, 'TE4_VARIANTS_HANDLE');
     test.skip(await tid(page, T.add).isDisabled(), 'Variant mặc định hết hàng');
-    const id = Number(await tid(page, T.variantSelect).inputValue());
+    const id = Number(await tid(page, T.variantId).inputValue());
     await tid(page, T.add).click();
     await page.waitForURL(isCart);
     expect((await cartItemsNoScript(page)).map((i) => i.variant_id)).toEqual([id]);

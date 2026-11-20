@@ -51,7 +51,8 @@
   featured-product-add, featured-product-view-detail, featured-product-status,
   featured-product-error, featured-product-placeholder, featured-product-seal
   (snippets/featured-product-seal). Also product-variant-picker,
-  product-option, product-option-value, product-variant-select and price*.
+  product-option, product-option-value and price*. No select listing
+  variants (TE-4 AC13, NFR-7): without JS the form buys the current variant.
 
   Empty state: no product selected → a hint in the theme editor, nothing on the
   storefront.
@@ -412,10 +413,6 @@
 
             {%- form 'product', featured, id: form_id, class: 'featured-product__actions' -%}
               <input type="hidden" name="id" value="{{ current_variant.id }}">
-
-              {%- if has_variant_choice -%}
-                {%- render 'product-variant-select', product: featured, current_variant: current_variant, form_id: form_id -%}
-              {%- endif -%}
 
               {% partial 'product-buy-buttons' %}
                 <div class="featured-product__add-wrapper">
