@@ -406,7 +406,7 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
     expect(new URL(page.url()).searchParams.getAll('filter.p.tag')).toHaveLength(3);
   });
 
-  test('AC3 có dữ liệu: tối đa 4 card, status từ data-label-results, swatch trong card chạy sau apply', async ({ page }) => {
+  test('AC3 có dữ liệu: tối đa 4 card, status từ data-label-results, swatch trong card là chỉ báo sau apply', async ({ page }) => {
     test.skip(!quizReady(), QUIZ_SKIP);
     // ES1-T417: request kết quả đi sang collection riêng (5 sp mang đủ 3 tag → 4 card); route.continue do trình duyệt gửi, giữ cookie (ES1-T171)
     await page.route(isResults, (route) => {
@@ -427,15 +427,14 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
     await expect(tid(page, 'quiz-status')).toHaveText(label!.replace('%n', '4'));
     await expectNoSeriousAxe(page);
 
-    const swatches = tid(page, 'quiz-results-grid').locator('product-swatch').filter({ has: page.locator('input[data-variant-id]') });
-    if (await swatches.count()) {
-      const card = swatches.first();
-      const inputs = card.locator('input[data-variant-id]');
-      if ((await inputs.count()) > 1) {
-        await inputs.nth(1).check({ force: true });
-        const url = await inputs.nth(1).getAttribute('data-variant-url');
-        await expect(card.locator('a[data-card-link]').first()).toHaveAttribute('href', url!);
-      }
+    // ES1-T441: nhánh <product-swatch> (check radio đổi link) bỏ: swatch card là chỉ báo aria-hidden không bấm (docs/srs.md#TE-3 AC2 0.3,
+    // ES1-T337), ES1-T338 xoá product-swatch.js. Card kết quả sau apply giữ markup chỉ báo.
+    const grid = tid(page, 'quiz-results-grid');
+    await expect(grid.locator('product-swatch')).toHaveCount(0);
+    const rows = grid.getByTestId('product-card-swatches');
+    for (let i = 0; i < (await rows.count()); i++) {
+      await expect(rows.nth(i)).toHaveAttribute('aria-hidden', 'true');
+      await expect(rows.nth(i).locator('input, label, a, button, [tabindex]')).toHaveCount(0);
     }
     await expectNoReload(page);
     expect(errors).toEqual([]);

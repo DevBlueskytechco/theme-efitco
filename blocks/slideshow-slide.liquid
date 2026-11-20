@@ -11,6 +11,9 @@
   value the merchant saved always wins. Clearing a setting brings the sample back,
   so show_item is how a merchant hides the slide. Text from the t filter may
   already be escaped, so it goes through escape_once; default_heading is HTML.
+  Claims and figures are never sample text (ADR 0011 mục 3, ES1-T406):
+  templates/index.liquid passes no default_eyebrow, so an empty eyebrow stays
+  hidden on a fresh install.
 
   When show_item is off, the storefront renders nothing and the editor keeps an
   empty slide with a hint, so the merchant can still select it. Turning off the
@@ -200,7 +203,7 @@
       "type": "text",
       "id": "eyebrow",
       "label": "t:labels.slide_eyebrow",
-      "info": "t:info.sample_text"
+      "info": "t:info.empty_hides"
     },
     {
       "type": "text",

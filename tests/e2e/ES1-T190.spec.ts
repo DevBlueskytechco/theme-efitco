@@ -1,10 +1,11 @@
 // KHÔNG CHẮC: spec chưa chạy (phiên viết không có preview, chưa type-check, CI đang tắt e2e theo CTO 06/11); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép sang tests/e2e/ES1-T190.spec.ts.
 // Ticket ES1-T190 TE-3-FE5: badge rating, badge New, mặc định 4 sản phẩm, vùng bấm swatch 44 px (D7, AC-H13, AC-H14, AC6).
+// ES1-T441: vùng bấm swatch 44 px (D7) và đổi swatch không còn là yêu cầu (docs/srs.md#TE-3 AC2, AC6 bản 0.3; ES1-T337): xoá 4 test, thêm test chỉ báo aria-hidden.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T190.spec.ts
 // Dữ liệu P01, P02, P04 từ ES1-T178: thiếu thì skip có lý do. T190_NEW_SALE_HANDLE: sản phẩm vừa tag new vừa sale, không có thì test thứ tự dùng DOM.
 import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
-import { expectNotChallenged, expectStoreAllowed, skipIfStoreBlocked } from './support/store-guard';
+import { expectNotChallenged } from './support/store-guard';
 import { readFileSync } from 'node:fs';
 import { watchShopPay403 } from './support/console-guard';
 
@@ -140,15 +141,8 @@ test.describe('ES1-T190 New (AC-H14)', () => {
     await expect(badge).toBeVisible();
   });
 
-  test('đổi swatch sang variant không badge: New còn nguyên', async ({ page }) => {
-    const card = await cardOf(page, NEW);
-    const radios = card.locator('input[type="radio"][data-badge="none"]:not(:checked)');
-    test.skip((await radios.count()) === 0, 'Không có swatch khác cùng data-badge none');
-    await page.waitForFunction(() => customElements.get('product-swatch') !== undefined);
-    const id = await radios.first().getAttribute('id');
-    await card.locator(`label[for="${id}"]`).click();
-    await expect(card.getByTestId(T.badgeNew)).toBeVisible();
-  });
+  // ES1-T441: test "đổi swatch sang variant không badge: New còn nguyên" bỏ: swatch card là chỉ báo aria-hidden, không đổi được
+  // (docs/srs.md#TE-3 AC2 0.3, ES1-T337), ES1-T338 xoá product-swatch.js. Thứ tự New/badge kiểm ở test CSS phía trên.
 });
 
 test.describe('ES1-T190 lưới mặc định 4 (D7)', () => {
@@ -178,7 +172,7 @@ test.describe('ES1-T190 lưới mặc định 4 (D7)', () => {
 // ES1-T434 (12/11): docs/srs.md#TE-3 AC6 bản 0.3: swatch card là chỉ báo aria-hidden, "không phải control nên không có yêu cầu vùng chạm
 // (thay vùng bấm swatch 44px của D7, ES1-T169)"; AC2 0.3: không bấm được. 3 test vùng bấm bỏ (test.skip, giữ thân để đối chiếu),
 // giữ đo hình 32 x 16. Chỉ đo card figma-*: PR #191 đỏ sau khi store có sản phẩm demo ES1-T298; card ngoài figma-* trong hàng 5 ghi annotation.
-test.describe('ES1-T190 vùng bấm swatch (D7, AC6)', () => {
+test.describe('ES1-T190 swatch chỉ báo (AC6 0.3)', () => {
   async function swatches(page: Page) {
     const block = await openFigma(page);
     const cards = block.getByTestId(T.card);
@@ -204,65 +198,14 @@ test.describe('ES1-T190 vùng bấm swatch (D7, AC6)', () => {
     }
   });
 
-  test.skip('vùng bấm thật: điểm cách tâm 21 px vẫn trúng label', async ({ page }) => {
+  // ES1-T441: 3 test vùng bấm (điểm cách tâm 21 px, không chồng vùng bấm, bấm mép chọn đúng swatch) xoá hẳn: AC6 0.3 không yêu cầu
+  // vùng chạm cho chỉ báo, AC2 0.3 không bấm được. Bấm không làm gì: TE-3.spec.ts TC-18; 32 × 16 cách 4 ở 4 mốc: TE-3.spec.ts TC-54.
+  test('AC2 AC6 0.3: hàng swatch hàng 5 là chỉ báo aria-hidden, không phần tử nhận focus', async ({ page }) => {
     const groups = await swatches(page);
-    const label = groups.first().getByTestId(T.swatch).first();
-    await label.scrollIntoViewIfNeeded();
-    const hits = await label.evaluate((el) => {
-      const r = el.getBoundingClientRect();
-      const cx = r.left + r.width / 2;
-      const cy = r.top + r.height / 2;
-      const reach = innerWidth >= 1280 ? 17 : 21;
-      return [[-reach, 0], [reach, 0], [0, -21], [0, 21]].map(([dx, dy]) => el.contains(document.elementFromPoint(cx + dx, cy + dy)));
-    });
-    expect(hits).toEqual([true, true, true, true]);
-  });
-
-  test.skip('không chồng vùng bấm của swatch cạnh, 2 cỡ màn hình', async ({ page }, ti) => {
-    test.skip(ti.project.name !== 'desktop', 'Đổi viewport ở project desktop; Pixel 7 đã có test đo ở trên');
-    // ES1-T300 (CTO 11/11 16:12): run 42981296470 đỏ do HTTP /?view=figma → 429 = môi trường store dev → skip có lý do; lỗi khác vẫn fail.
-    await skipIfStoreBlocked('ES1-T300: store dev trả 429 cho /?view=figma (môi trường)', async () => {
-      for (const width of [360, 1280]) {
-        await page.setViewportSize({ width, height: 900 });
-        // Như openFigma, thêm expectStoreAllowed: 429 ném 'store trả 429', cf-mitigated ném 'bị Cloudflare chặn' → skipIfStoreBlocked nhận ra. Mã lỗi khác vẫn fail ở assertion HTTP.
-        const res = await page.goto(FIGMA);
-        if (res) expectStoreAllowed(res);
-        expect(res?.status(), `HTTP ${FIGMA}`).toBeLessThan(400);
-        await expectNotChallenged(page);
-        const groups = page.getByTestId(T.block).getByTestId(T.swatches);
-        test.skip((await groups.count()) === 0, 'Không có card có swatch trong hàng 5: chờ dữ liệu ES1-T178');
-        for (const group of await groups.all()) {
-          const overlaps = await group.evaluate((root) => {
-            const rects = [...root.querySelectorAll('[data-testid="product-card-swatch"]')].map((el) => {
-              const r = el.getBoundingClientRect();
-              const s = getComputedStyle(el, '::after');
-              return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: parseFloat(s.width), h: parseFloat(s.height) };
-            });
-            let bad = 0;
-            rects.forEach((a, i) => rects.slice(i + 1).forEach((b) => {
-              const clearX = Math.abs(a.x - b.x) >= (a.w + b.w) / 2 - 0.5;
-              const clearY = Math.abs(a.y - b.y) >= (a.h + b.h) / 2 - 0.5;
-              if (!clearX && !clearY) bad += 1;
-            }));
-            return bad;
-          });
-          expect(overlaps, `${width}px`).toBe(0);
-        }
-      }
-    });
-  });
-
-  test.skip('bấm mép vùng bấm chọn đúng swatch', async ({ page }) => {
-    const groups = await swatches(page);
-    const group = groups.first();
-    const labels = group.getByTestId(T.swatch);
-    test.skip((await labels.count()) < 2, 'Cần từ 2 swatch');
-    const label = labels.nth(1);
-    await label.scrollIntoViewIfNeeded();
-    const box = (await label.boundingBox())!;
-    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2 + 21);
-    const id = await label.getAttribute('for');
-    await expect(page.locator(`[id="${id}"]`)).toBeChecked();
+    for (const group of await groups.all()) {
+      await expect(group).toHaveAttribute('aria-hidden', 'true');
+      await expect(group.locator('input, label, a, button, [tabindex]')).toHaveCount(0);
+    }
   });
 });
 
