@@ -1,4 +1,4 @@
-// <featured-product> ES1-T158. No storage, R8.
+// <featured-product> ES1-T158, ES1-T350. No storage, R8.
 const T = "a[data-featured-media-id]";
 class F extends HTMLElement {
 $(s) {
@@ -22,7 +22,7 @@ clearInterval(this.t);
 }
 handleEvent(e) {
 if (e.type[0] == "v") return this.run();
-if (e.type[0] == "t") return this.variant(e.detail);
+if (e.type[0] == "t") return this.show(e.detail.featuredMediaId);
 const a = e.target.closest(T);
 if (a) e.preventDefault(), this.show(a.dataset.featuredMediaId);
 }
@@ -51,16 +51,12 @@ if (!li) return;
 l.scrollTo({ left: li.offsetLeft - l.offsetLeft, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 for (const a of this.querySelectorAll(T)) a.ariaCurrent = a.dataset.featuredMediaId == id ? "true" : null;
 }
-// 2+ blocks: ES1-T169 D4.
-variant(e) {
-this.show(e.featuredMediaId);
-if (document.querySelectorAll("featured-product").length < 2) return;
-const v = JSON.parse(this.$("script").textContent).variants.find((x) => x.id == e.variantId);
-const d = this.$("product-form").dataset;
-const b = this.$('[name="add"]');
-this.$(".featured-product__price").innerHTML = v.price_html;
-b.disabled = !v.available;
-b.querySelector("span").textContent = v.available ? d.labelAdd : d.labelSoldOut;
+// 2+ blocks share partial names (ES1-T169 D4): the picker hands its band the ?option_values= request.
+async swap(url, signal) {
+const r = await fetch(url, { signal });
+if (!r.ok) throw r.status;
+const n = new DOMParser().parseFromString(await r.text(), "text/html").querySelector("featured-product");
+for (const s of ['[data-testid="featured-product-price"]', "[data-selected-variant]", '[name="add"]']) this.$(s).replaceWith(n.querySelector(s));
 }
 }
 customElements.get("featured-product") || customElements.define("featured-product", F);

@@ -39,7 +39,12 @@
   data-product-id, data-product-url, data-cart-add-url, data-cart-url,
   data-cart-type, data-label-add, data-label-added, data-label-sold-out,
   data-label-unavailable; data-fetch-url and data-regions on product-variant-picker.
-  Partials: product-price, product-buy-buttons.
+  Partials: product-price, product-buy-buttons (add button and
+  snippets/selected-variant-json: one variant, null when the selected option
+  values form no variant; the button then says Unavailable, disabled). With 2+
+  featured products on a page the partial names repeat, so
+  assets/featured-product.js swap() replaces the price, the JSON and the button
+  of its own band from ?view=featured-product&option_values= (ES1-T169 D4).
 
   Test hooks: featured-product, featured-product-eyebrow, featured-product-title,
   featured-product-media, featured-product-media-item, featured-product-thumbnail,
@@ -96,6 +101,22 @@
     endif
     if hide_options
       assign has_variant_choice = false
+    endif
+
+    # Tổ hợp đang chọn không tạo thành biến thể: cùng quy tắc blocks/product-form (ADR 0008, ES1-T253)
+    assign variant_exists = true
+    if has_variant_choice
+      for option in featured.options_with_values limit: 1
+        for value in option.values
+          if value.selected and value.variant == blank
+            assign variant_exists = false
+          endif
+        endfor
+      endfor
+    endif
+    assign can_buy = false
+    if variant_exists and current_variant.available
+      assign can_buy = true
     endif
     assign fetch_url = featured.url | append: '?view=featured-product'
 
@@ -416,23 +437,26 @@
 
               {% partial 'product-buy-buttons' %}
                 <div class="featured-product__add-wrapper">
+                  {%- render 'selected-variant-json', variant: current_variant, exists: variant_exists -%}
                   <button
                     class="button featured-product__add"
                     type="submit"
                     name="add"
-                    {% unless current_variant.available %}
+                    {% unless can_buy %}
                       disabled
                     {% endunless %}
                     data-testid="featured-product-add"
                   >
-                    {%- if current_variant.available -%}
+                    {%- if can_buy -%}
                       {% render 'header-icon', name: 'bag' %}
                     {%- endif -%}
                     <span class="product-form__add-label">
-                      {%- if current_variant.available -%}
+                      {%- if can_buy -%}
                         {{- label_add -}}
-                      {%- else -%}
+                      {%- elsif variant_exists -%}
                         {{- label_sold_out -}}
+                      {%- else -%}
+                        {{- label_unavailable -}}
                       {%- endif -%}
                     </span>
                   </button>

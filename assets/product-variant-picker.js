@@ -1,30 +1,25 @@
-// <product-variant-picker> TE-4, TE-13.
+// <product-variant-picker> TE-4, TE-13; ADR 0008.
 import { partials } from "@shopify/partial-rendering";
 
-const REGIONS = ["product-price", "product-buy-buttons", "product-installments", "product-pickup", "product-selling-plans", "product-sticky-bar"];
-const OPTION = 'input[type="radio"][name^="option-"]';
-const PLAN = 'input[type="radio"][name="selling_plan"]';
-const FIELDSET = "fieldset[data-option-position]";
-const INVENTORY = ".product-form__inventory";
+const REGIONS = ["product-options", "product-price", "product-buy-buttons", "product-installments", "product-pickup", "product-selling-plans", "product-sticky-bar"];
+const SET = "fieldset[data-option-position]";
+const OPTION = `${SET} input`;
+const PLAN = "input[name=selling_plan]";
 const events = import("https://cdn.shopify.com/storefront/standard-events.js").catch(() => null);
 
-const gid = (type, id) => `gid://shopify/${type}/${id}`;
+const gid = (t, id) => `gid://shopify/${t}/${id}`;
+const fill = (text = "", o) => text.replace(/\[(\w+)\]/g, (m, k) => o[k] ?? "").replace(/^[,\s]+|[,\s]+$/g, "");
+const nameOf = (r) => r?.parentElement.querySelector(".product-option__text")?.firstChild?.data.trim();
 
 class ProductVariantPicker extends HTMLElement {
 	connectedCallback() {
-		try {
-			this.data = JSON.parse(this.querySelector("script[data-product-variants]").textContent);
-		} catch {
-			this.data = {};
-		}
-		this.variants = this.data.variants || [];
 		this.root = this.closest("product-form");
+		this.scope = this.closest("featured-product") || document;
 		this.form = document.getElementById(this.dataset.formId);
-		this.idInput = this.form?.querySelector('input[type="hidden"][name="id"]');
-		this.save();
+		this.open = new Set();
 		this.listen("addEventListener");
-		// Lazy: radios may differ.
-		if (this.dataset.fetchUrl && this.match(this.selection())?.id !== Number(this.idInput?.value)) this.select();
+		this.loaded = this.ids((r) => r.defaultChecked);
+		if (this.ids() != `${this.loaded}`) this.load(this.ids());
 	}
 
 	disconnectedCallback() {
@@ -33,163 +28,143 @@ class ProductVariantPicker extends HTMLElement {
 	}
 
 	listen(m) {
-		for (const t of [this, this.form]) t?.[m]("change", this);
-		for (const e of ["popstate", "pageshow"]) window[m](e, this);
+		this[m]("change", this);
+		this[m]("click", this);
+		this.form[m]("change", this);
+		document[m]("submit", this, true);
 	}
 
-	handleEvent({ type, target }) {
-		if (type === "popstate") {
-			const id = Number(new URLSearchParams(window.location.search).get("variant"));
-			const v = this.variants.find((x) => x.id === id);
-			if (v && id !== Number(this.idInput?.value)) this.show(v);
-		} else if (type === "pageshow") {
-			const v = this.match(this.selection());
-			if (v && v.id !== Number(this.idInput?.value)) this.update(v);
-		} else if (target instanceof HTMLInputElement && target.checked) {
-			if (target.matches(OPTION) && this.contains(target)) this.select();
-			else if (target.matches(PLAN) && target.form === this.form) this.update(this.match(this.selection()));
+	handleEvent(e) {
+		const t = e.target;
+		const b = t.closest("button");
+		if (e.type == "submit") this.controller && t == this.form && (e.preventDefault(), e.stopImmediatePropagation());
+		else if (b?.matches("[data-option-more]")) this.more(b, 1);
+		else if (b?.matches(".product-option__retry") && this.retry) this.check(this.retry[0]), this.load(...this.retry);
+		else if (e.type != "change");
+		else if (t.matches(PLAN)) this.load(this.loaded);
+		else if (t.dataset.productUrl) location.assign(t.dataset.productUrl);
+		else if (t.matches(OPTION)) this.load(this.ids(), t);
+	}
+
+	ids(test = (r) => r.checked) {
+		return [...this.querySelectorAll(OPTION)].filter(test).map((r) => r.dataset.optionValueId);
+	}
+
+	check(ids) {
+		for (const r of this.querySelectorAll(OPTION)) r.checked = ids.includes(r.dataset.optionValueId);
+	}
+
+	more(b, focus) {
+		const open = b.ariaExpanded != "true";
+		const all = [...b.parentElement.querySelectorAll("label")];
+		const sel = all.findIndex((l) => l.querySelector(":checked"));
+		b.ariaExpanded = open;
+		all.forEach((l, i) => (l.hidden = !open && (sel > 6 ? i > 5 && i != sel : i > 6)));
+		this.open[open ? "add" : "delete"](b.closest(SET).dataset.optionPosition);
+		if (focus) open ? all[sel > 6 ? 6 : 7]?.querySelector("input").focus() : b.scrollIntoView({ block: "nearest" });
+	}
+
+	say(text) {
+		const s = this.root.querySelector(":scope>[role=status]");
+		if (s) s.textContent = text;
+	}
+
+	adds() {
+		return [...this.form.elements].filter((el) => el.name == "add");
+	}
+
+	pending(on) {
+		for (const el of [this.root, ...this.scope.querySelectorAll("[data-variant-busy]"), ...this.adds()]) el[el.name == "add" ? "ariaDisabled" : "ariaBusy"] = on ? "true" : null;
+	}
+
+	fail(f, text = "") {
+		const a = f?.querySelector("[role=alert]");
+		if (a) a.textContent = text;
+		f?.querySelector(".product-option__retry")?.toggleAttribute("hidden", !text);
+	}
+
+	async load(ids, input) {
+		this.controller?.abort();
+		const c = (this.controller = new AbortController());
+		const { fetchUrl, partials: names, labelLoading, labelLoaded, labelLoadError } = this.dataset;
+		const value = nameOf(input);
+		const done = input ? this.emit() : () => {};
+		const plan = this.form.querySelector(`${PLAN}:checked`)?.value;
+		const url = new URL(fetchUrl || location.href, location.href);
+		const page = new URL(location.href);
+		for (const p of [url.searchParams, page.searchParams]) p.delete("variant"), p.delete("selling_plan"), plan && p.set("selling_plan", plan);
+		url.searchParams.set("option_values", ids);
+		this.pending(1);
+		this.say(fill(labelLoading, { value }));
+		let v = null;
+		try {
+			// 2+ featured products: same partial names (D4).
+			if (fetchUrl && document.querySelectorAll("featured-product").length > 1) await this.scope.swap(url, c.signal);
+			else await partials.apply(await partials.fetch(...(names ? names.split(" ") : REGIONS), { url: url.href, signal: c.signal }));
+			if (c.signal.aborted) return;
+			this.loaded = ids;
+			for (const f of this.querySelectorAll(SET)) {
+				const b = f.querySelector("[data-option-more]");
+				this.fail(f);
+				if (b?.ariaExpanded == "false" && this.open.has(f.dataset.optionPosition)) this.more(b);
+			}
+			if (plan) for (const r of this.form.querySelectorAll(PLAN)) r.checked = r.value == plan;
+			try {
+				v = JSON.parse(this.root.querySelector("[data-selected-variant]").textContent);
+			} catch {}
+			if (v) {
+				this.form.elements.id.value = v.id;
+				page.searchParams.set("variant", v.id);
+				if (!fetchUrl) history.replaceState(history.state, "", page);
+				this.dispatchEvent(new CustomEvent("theme:variant:change", { bubbles: true, detail: { variantId: v.id, featuredMediaId: v.featured_media } }));
+			}
+			const [add] = this.adds();
+			const price = this.scope.querySelector("[data-testid$=product-price] .price__current")?.textContent.trim();
+			const availability = (this.root.querySelector(".product-form__inventory") || (add.disabled && add))?.textContent.trim();
+			this.say(fill(labelLoaded, { value, price, availability }));
+		} catch {
+			if (c.signal.aborted) return;
+			const f = input?.closest(SET) || this.querySelector(SET);
+			this.check(this.loaded);
+			this.fail(this.retry?.[2]);
+			this.retry = [ids, input, f];
+			this.fail(f, fill(labelLoadError, { value }));
+			this.say("");
+			if (this.contains(document.activeElement)) f.querySelector(":checked")?.focus();
+		} finally {
+			done(v);
+			if (this.controller == c) this.controller = this.pending();
 		}
 	}
 
-	selection() {
-		return [...this.querySelectorAll(FIELDSET)].map((f) => f.querySelector(`${OPTION}:checked`)?.value);
-	}
-
-	match(selected) {
-		return this.variants.find((v) => v.options.every((value, i) => value === selected[i]));
-	}
-
-	select() {
-		const selected = this.selection();
-		this.syncAvailable(selected);
-		const v = this.match(selected);
-		this.emitSelect(selected, v);
-		if (v) this.update(v);
-		else this.unavailable();
-	}
-
-	show(v) {
-		this.querySelectorAll(FIELDSET).forEach((f, i) => {
-			for (const input of f.querySelectorAll(OPTION)) if (input.value === v.options[i]) input.checked = true;
-		});
-		this.syncAvailable(v.options);
-		this.emitSelect(v.options, v);
-		this.update(v);
-	}
-
-	syncAvailable(selected) {
-		this.querySelectorAll(FIELDSET).forEach((f, i) => {
-			for (const input of f.querySelectorAll(OPTION)) {
-				input.dataset.available = String(
-					this.variants.some((v) => v.available && v.options.every((value, j) => value === (j === i ? input.value : selected[j])))
-				);
-			}
-		});
-	}
-
-	emitSelect(selected, v) {
-		const { product: p = {}, options: names = [], currency } = this.data;
-		const selectedOptions = names.map((name, i) => ({ name, value: selected[i] })).filter((o) => o.value != null);
-		const variant = v ? {
-			id: gid("ProductVariant", v.id),
-			title: v.title,
-			availableForSale: v.available,
-			price: { amount: (v.price / 100).toFixed(2), currencyCode: currency },
-			selectedOptions: names.map((name, i) => ({ name, value: v.options[i] })),
-		} : null;
-		const product = { id: gid("Product", p.id), title: p.title, handle: p.handle };
-		const target = this.root || this;
+	emit() {
+		const fs = [...this.querySelectorAll(SET)];
+		const names = fs.map((f) => f.dataset.optionName);
+		const selectedOptions = fs.map((f, i) => ({ name: names[i], value: nameOf(f.querySelector(":checked")) }));
+		const product = {
+			id: gid("Product", this.root.dataset.productId),
+			title: this.scope.querySelector("[data-testid$=product-title]")?.textContent.trim(),
+			handle: decodeURIComponent(this.dataset.productUrl.split("?")[0].split("/").pop()),
+		};
+		let done;
+		const result = new Promise((r) => (done = r)).then((v) => ({
+			variant: v && {
+				id: gid("ProductVariant", v.id),
+				title: v.title,
+				availableForSale: v.available,
+				price: { amount: (v.price / 100).toFixed(2), currencyCode: window.Shopify?.currency?.active },
+				selectedOptions: v.options.map((value, i) => ({ name: names[i], value })),
+			},
+		}));
 		events.then((m) => {
-			const E = m?.ProductSelectEvent;
-			if (!E || !selectedOptions.length) return;
 			try {
+				const E = m.ProductSelectEvent;
 				const d = E.createPromise?.();
-				const ok = typeof d?.resolve === "function";
-				target.dispatchEvent(new E({ product, selectedOptions, promise: ok ? d.promise : Promise.resolve({ variant }) }));
-				if (ok) d.resolve({ variant });
+				this.root.dispatchEvent(new E({ product, selectedOptions, promise: d?.resolve ? d.promise : result }));
+				result.then((r) => d?.resolve(r));
 			} catch {}
 		});
-	}
-
-	announce(text) {
-		const status = this.root?.querySelector('[role="status"]');
-		if (status) status.textContent = text;
-	}
-
-	buttons() {
-		return [...document.querySelectorAll('button[name="add"]')].filter((b) => b.form === this.form);
-	}
-
-	save() {
-		const i = (this.inv = this.root?.querySelector(INVENTORY));
-		this.saved = [...this.buttons(), i].filter(Boolean).map((el) => [el, el.disabled, el.dataset.state, el.innerHTML]);
-	}
-
-	restore() {
-		for (const [el, d, s, html] of this.saved) {
-			el.innerHTML = html;
-			if (s) el.dataset.state = s;
-			else el.disabled = d;
-		}
-	}
-
-	unavailable() {
-		this.controller?.abort();
-		const label = this.root?.dataset.labelUnavailable || "";
-		for (const b of this.buttons()) {
-			b.disabled = true;
-			(b.querySelector(".product-form__add-label") || b).textContent = label;
-		}
-		if (this.inv) {
-			this.inv.dataset.state = "unavailable";
-			this.inv.textContent = label;
-		}
-		this.announce(label);
-	}
-
-	async update(v) {
-		if (!v) return;
-		this.controller?.abort();
-		const controller = (this.controller = new AbortController());
-		if (this.idInput) this.idInput.value = v.id;
-
-		const { fetchUrl, regions } = this.dataset;
-		const url = new URL(fetchUrl || window.location.href, window.location.href);
-		url.searchParams.set("variant", v.id);
-		const plan = this.form?.querySelector(`${PLAN}:checked`)?.value;
-		if (plan) url.searchParams.set("selling_plan", plan);
-		else url.searchParams.delete("selling_plan");
-		if (!fetchUrl) window.history.replaceState(window.history.state, "", url);
-
-		this.dispatchEvent(new CustomEvent("theme:variant:change", { bubbles: true, detail: { variantId: v.id, featuredMediaId: v.featured_media } }));
-
-		// Partial names repeat: featured-product.js renders JSON (ES1-T169 D4).
-		if (document.querySelectorAll("featured-product").length > 1) return this.sayPrice(v);
-
-		this.root?.setAttribute("aria-busy", "true");
-		try {
-			const names = regions ? regions.split(" ") : REGIONS;
-			const update = await partials.fetch(...names, { url: url.toString(), signal: controller.signal });
-			if (controller.signal.aborted) return;
-			await partials.apply(update);
-			if (plan) for (const input of this.form.querySelectorAll(PLAN)) input.checked = input.value === plan;
-			this.save();
-			if (this.inv) this.announce(this.inv.textContent.trim());
-		} catch {
-			if (!controller.signal.aborted) this.restore();
-		} finally {
-			if (this.controller === controller) this.root?.removeAttribute("aria-busy");
-			if (!controller.signal.aborted) this.sayPrice(v);
-		}
-	}
-
-	// Outside the product page: JSON, whatever the partial did (ES1-T223).
-	sayPrice({ price_html: html, available }) {
-		if (html == null) return;
-		const t = document.createElement("template");
-		t.innerHTML = html;
-		const sold = available ? "" : this.root?.dataset.labelSoldOut;
-		this.announce(`${t.content.textContent.trim()} ${sold}`.trim());
+		return done;
 	}
 }
 

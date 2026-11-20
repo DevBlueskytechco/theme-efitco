@@ -354,21 +354,7 @@
           value="{{ current_variant.id }}"
           data-testid="product-form-variant-id"
         >
-        <script type="application/json" data-selected-variant data-testid="product-selected-variant">
-          {%- if variant_exists -%}
-            {
-              "id": {{ current_variant.id | json }},
-              "title": {{ current_variant.title | json }},
-              "available": {{ current_variant.available | json }},
-              "price": {{ current_variant.price | json }},
-              "compare_at_price": {{ current_variant.compare_at_price | json }},
-              "options": {{ current_variant.options | json }},
-              "featured_media": {{ current_variant.featured_media.id | json }}
-            }
-          {%- else -%}
-            null
-          {%- endif -%}
-        </script>
+        {%- render 'selected-variant-json', variant: current_variant, exists: variant_exists -%}
         <div class="product-form__buy-buttons">
           <div class="product-form__stock" data-variant-busy data-testid="product-stock">
             <p class="product-form__inventory" data-state="{{ stock_state }}" data-testid="product-inventory">

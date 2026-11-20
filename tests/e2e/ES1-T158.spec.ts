@@ -1,7 +1,8 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không có trình duyệt và preview; CTO 06/11: e2e tắt tới khi trang chủ xong).
 // Ticket ES1-T158 TE-13-BE1: assets/featured-product.js, video-carousel.js, product-variant-picker.js (docs/srs.md#TE-13 AC1-AC4, AC-H22, AC-H23; drafts/techlead/ES1-T142/task-split.md D2, D4, D5, D6, D8, D10; plan ES1-T169 D4).
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T158.spec.ts -g "AC1|AC2|AC3|AC4"
-// /?view=te13: 1 featured product, partial. /?view=te13-states: nhiều block, JSON (D4).
+// /?view=te13: 1 featured product, partial. /?view=te13-states: nhiều block (D4): tên partial trùng nên band tự thay giá, JSON 1 biến thể, nút (featured-product.js swap).
+// ES1-T350 (ADR 0008): không còn JSON danh sách biến thể; radio value = id option value, gửi ?option_values=. Dữ liệu biến thể từ /products/<handle>.js trong trang (ES1-T74).
 // Đổi HTML bằng init script ở readystatechange đầu tiên (trước khi module chạy), không dùng route.fetch: store có thể trả trang chặn cho request lặp (plan ES1-T169 nhóm A).
 // Video: store có thể chưa có video Shopify (ES1-T153) nên đổi thẻ YouTube thành thẻ kind shopify với URL giả; play, pause của media được stub vì không có tệp thật.
 import { readFileSync, statSync } from 'node:fs';
@@ -9,7 +10,8 @@ import { test, expect, type Locator, type Page, type Request } from './support/t
 import AxeBuilder from '@axe-core/playwright';
 import { CART_GLOB, themeAdd } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
-import { readCartJson } from './support/product-data';
+import { pageJson, readCartJson, requireJson } from './support/product-data';
+import { chooseOptions, setCheckedByName } from './support/variant-picker';
 import { gotoStore, watchStore, expectNotChallenged, skipIfStoreBlocked } from './support/store-guard';
 
 const TE13 = '/?view=te13';
@@ -20,13 +22,22 @@ const FAKE_VIDEO = 'https://cdn.shopify.com/videos/c/vp/es1-t158/fake.mp4';
 const EMBED = /youtube-nocookie\.com|player\.vimeo\.com/;
 const COUNTDOWN = 'featured-product-countdown';
 
-type Variant = { id: number; options: string[]; available: boolean; price_html: string; featured_media: number | null };
+type Variant = { id: number; options: string[]; available: boolean; price: number; compare_at_price: number | null; featured_media: { id: number } | null };
 type Units = { days: string; hours: string; minutes: string; seconds: string };
 
 const band = (page: Page, id: string) => page.getByTestId(`container-${id}`);
 const card = (page: Page, n: number) => page.locator(`[data-video-card-id="te13-video-${n}"]`).locator('video-card');
 const isFetch = (request: Request) => new URL(request.url()).searchParams.get('view') === 'featured-product';
-const text = (html: string) => html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+// Tiền trên trang → cents (như TE-4.spec.ts).
+function cents(value: string | null): number {
+  const m = (value ?? '').match(/\d[\d.,\s  ']*/);
+  if (!m) return NaN;
+  const t = m[0].replace(/[\s  ']/g, '').replace(/[.,]+$/, '');
+  const last = Math.max(t.lastIndexOf('.'), t.lastIndexOf(','));
+  const n = last >= 0 && t.length - last - 1 !== 3 ? Number(`${t.slice(0, last).replace(/[.,]/g, '')}.${t.slice(last + 1)}`) : Number(t.replace(/[.,]/g, ''));
+  return Math.round(n * 100);
+}
+const isOptionFetch = (request: Request) => isFetch(request) && new URL(request.url()).searchParams.has('option_values');
 
 function watchConsole(page: Page) {
   const errors: string[] = [];
@@ -149,8 +160,10 @@ async function pause(page: Page) {
   await page.clock.pauseAt((await page.evaluate(() => Date.now())) + 1000);
 }
 
-const readVariants = async (scope: Locator) =>
-  JSON.parse((await scope.locator('script[data-product-variants]').textContent()) ?? '{}').variants as Variant[];
+async function readVariants(scope: Locator) {
+  const path = (await scope.locator('product-form').getAttribute('data-product-url'))!.split('?')[0];
+  return requireJson(await pageJson<{ variants: Variant[] }>(scope.page(), `${path}.js`), `${path}.js`).variants;
+}
 
 async function otherVariant(scope: Locator, want: (v: Variant) => boolean = (v) => v.available) {
   const id = Number(await scope.locator('input[type="hidden"][name="id"]').inputValue());
@@ -159,12 +172,14 @@ async function otherVariant(scope: Locator, want: (v: Variant) => boolean = (v) 
 }
 
 async function choose(scope: Locator, variant: Variant) {
-  const fieldsets = scope.getByTestId('product-option');
-  for (let i = 0; i < variant.options.length; i += 1) {
-    const selector = `input[type="radio"][value="${variant.options[i].replace(/"/g, '\\"')}"]`;
-    if (await fieldsets.nth(i).locator(selector).isChecked()) continue;
-    await fieldsets.nth(i).getByTestId('product-option-value').filter({ has: scope.page().locator(selector) }).click();
-  }
+  await chooseOptions(scope, variant.options);
+}
+
+/** Giá, % giảm của band khớp biến thể (thay so price_html của JSON cũ). */
+async function expectPrice(scope: Locator, variant: Variant) {
+  const price = scope.getByTestId('featured-product-price');
+  await expect.poll(async () => cents(await price.getByTestId('price-regular').first().textContent())).toBe(variant.price);
+  await expect(scope.getByTestId('featured-product-discount')).toHaveCount(variant.compare_at_price && variant.compare_at_price > variant.price ? 1 : 0);
 }
 
 async function openPicker(page: Page, url: string, bandId: string) {
@@ -325,17 +340,20 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
 
     await choose(scope, next!);
     await expect(scope.locator('input[type="hidden"][name="id"]')).toHaveValue(String(next!.id));
-    await expect.poll(() => requests.length).toBe(1);
+    await expect.poll(() => requests.filter(isOptionFetch).length).toBeGreaterThan(0);
     await expect(scope.locator('product-form')).not.toHaveAttribute('aria-busy', /.*/);
 
-    const url = new URL(requests[0].url());
+    const url = new URL(requests.at(-1)!.url());
     expect(url.pathname).toMatch(/\/products\//);
-    expect(url.searchParams.get('variant')).toBe(String(next!.id));
+    expect(url.searchParams.has('variant'), 'ADR 0008: gửi option_values, không gửi variant').toBe(false);
+    expect(url.searchParams.get('option_values')!.split(',')).toEqual(
+      await scope.getByTestId('product-variant-picker').locator('input[type="radio"]:checked').evaluateAll((els) => els.map((e) => e.getAttribute('data-option-value-id')))
+    );
     // Không thấy tên partial trong URL thì 4 kiểm tra dưới luôn qua: tên thật do data-regions quyết (test contract ở nhóm tĩnh).
     for (const name of ['product-installments', 'product-pickup', 'product-selling-plans', 'product-sticky-bar']) expect(decodeURIComponent(requests[0].url())).not.toContain(name);
     await expect(scope.getByTestId('product-variant-picker')).toHaveAttribute('data-regions', 'product-price product-buy-buttons');
 
-    await expect(scope.getByTestId('featured-product-price')).toHaveText(text(next!.price_html));
+    await expectPrice(scope, next!);
     await expect(scope.getByTestId('featured-product-add')).toBeEnabled();
     await expect(scope.getByTestId('featured-product-status')).not.toBeEmpty();
     expect(page.url()).toBe(before);
@@ -350,11 +368,18 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
     test.skip(!next, 'Cần 2 variant còn hàng');
     const add = scope.getByTestId('featured-product-add');
     const label = await add.locator('.product-form__add-label').textContent();
+    const id = await scope.locator('input[type="hidden"][name="id"]').inputValue();
+    const price = await scope.getByTestId('featured-product-price').innerHTML();
 
     await choose(scope, next!);
-    await expect(scope.locator('input[type="hidden"][name="id"]')).toHaveValue(String(next!.id));
+    // ES1-T350 AC15: lỗi thì giữ biến thể cuối đã tải (id, giá), có alert + Try Again; không kẹt.
+    await expect(scope.getByTestId('product-option-error').filter({ hasText: /\S/ })).toHaveCount(1);
+    await expect(scope.getByTestId('product-option-retry').filter({ visible: true })).toHaveCount(1);
+    await expect(scope.locator('input[type="hidden"][name="id"]')).toHaveValue(id);
+    expect(await scope.getByTestId('featured-product-price').innerHTML()).toBe(price);
     await expect(scope.locator('product-form')).not.toHaveAttribute('aria-busy', /.*/);
     await expect(add).toBeEnabled();
+    await expect(add).not.toHaveAttribute('aria-disabled', 'true');
     await expect(add.locator('.product-form__add-label')).toHaveText(label ?? '');
     expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([]);
   });
@@ -424,11 +449,7 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
     test.skip(!next, 'Cần 2 variant còn hàng');
     await scope.getByTestId('featured-product-add').scrollIntoViewIfNeeded(); // Module nạp khi gần viewport.
 
-    await scope.getByTestId('product-variant-picker').evaluate((el, options) => {
-      el.querySelectorAll('fieldset').forEach((fieldset, i) => {
-        for (const input of fieldset.querySelectorAll('input[type="radio"]')) (input as HTMLInputElement).checked = (input as HTMLInputElement).value === options[i];
-      });
-    }, next!.options);
+    await setCheckedByName(scope.getByTestId('product-variant-picker'), next!.options);
     release();
     await expect(scope.locator('input[type="hidden"][name="id"]')).toHaveValue(String(next!.id));
 
@@ -438,20 +459,17 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
     expect(posted[0]).toMatch(new RegExp(`name="id"\\r?\\n\\r?\\n${next!.id}\\r?\\n`));
   });
 
-  test('AC2 price_html trong JSON trùng markup server của region product-price', async ({ page }) => {
+  // ES1-T350: JSON danh sách biến thể (price_html) đã bỏ (NFR-7). Thay bằng: band chỉ có JSON 1 biến thể, khớp id gửi giỏ và giá server.
+  test('AC2 NFR-7: không JSON danh sách biến thể; JSON biến thể đang chọn khớp hidden id và giá', async ({ page }) => {
     await page.goto(TE13);
     const scope = band(page, 'te13-a');
-    test.skip((await scope.locator('script[data-product-variants]').count()) === 0, 'Sản phẩm không có nhiều variant');
-    const { current } = await otherVariant(scope);
-    // Qua DOM để so cùng dạng serialize (entity, thuộc tính), chỉ bỏ khoảng trắng giữa thẻ.
-    const normal = (html: string) =>
-      page.evaluate((value) => {
-        const box = document.createElement('div');
-        box.innerHTML = value;
-        return box.innerHTML.replace(/>\s+</g, '><').trim();
-      }, html);
-    const server = await scope.getByTestId('featured-product-price').innerHTML();
-    expect(await normal(current.price_html)).toBe(await normal(server));
+    test.skip((await scope.getByTestId('product-variant-picker').count()) === 0, 'Sản phẩm không có nhiều variant');
+    await expect(scope.locator('script[data-product-variants]')).toHaveCount(0);
+    const json = scope.locator('script[data-selected-variant]');
+    await expect(json).toHaveCount(1);
+    const v = JSON.parse((await json.textContent()) ?? 'null') as Variant;
+    expect(String(v.id)).toBe(await scope.locator('input[type="hidden"][name="id"]').inputValue());
+    expect(cents(await scope.getByTestId('featured-product-price').getByTestId('price-regular').first().textContent())).toBe(v.price);
   });
 
   test('AC2 thumbnail: reduced-motion cuộn auto, aria-current đổi, URL không đổi', async ({ page }) => {
@@ -477,16 +495,17 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
     const scope = await openPicker(page, TE13, 'te13-a');
     const thumbs = scope.getByTestId('featured-product-thumbnail');
     const ids = await thumbs.evaluateAll((els) => els.map((el) => Number((el as HTMLElement).dataset.featuredMediaId)));
-    const { next } = await otherVariant(scope, (v) => v.available && ids.indexOf(v.featured_media ?? 0) > 0);
+    const { next } = await otherVariant(scope, (v) => v.available && ids.indexOf(v.featured_media?.id ?? 0) > 0);
     test.skip(!next, 'Cần variant còn hàng có ảnh riêng, không phải ảnh đầu');
     await choose(scope, next!);
-    await expect(scope.locator(`a[data-featured-media-id="${next!.featured_media}"]`)).toHaveAttribute('aria-current', 'true');
+    await expect(scope.locator(`a[data-featured-media-id="${next!.featured_media!.id}"]`)).toHaveAttribute('aria-current', 'true');
     await expect.poll(() => scope.getByTestId('featured-product-media').evaluate((el) => el.scrollLeft)).toBeGreaterThan(0);
   });
 });
 
-test.describe('ES1-T158 AC2 nhiều block: JSON (D4)', () => {
-  test('AC2 đổi variant band B: 0 fetch, giá và nút đổi theo JSON, band khác giữ nguyên', async ({ page }) => {
+test.describe('ES1-T158 AC2 nhiều block: band tự thay (D4)', () => {
+  // ES1-T350: không còn JSON danh sách biến thể → band B hỏi server 1 lần (?option_values=) và chỉ thay vùng của nó (trước: 0 fetch, đọc JSON).
+  test('AC2 đổi variant band B: giá và nút đổi theo server, chỉ band B đổi, URL giữ', async ({ page }) => {
     const errors = watchConsole(page);
     const requests: string[] = [];
     page.on('request', (request) => {
@@ -501,13 +520,14 @@ test.describe('ES1-T158 AC2 nhiều block: JSON (D4)', () => {
 
     await choose(scope, next!);
     await expect(scope.locator('input[type="hidden"][name="id"]')).toHaveValue(String(next!.id));
-    await expect(scope.getByTestId('featured-product-price')).toHaveText(text(next!.price_html));
+    await expectPrice(scope, next!);
     await expect(scope.getByTestId('featured-product-add')).toBeEnabled();
     await expect(scope.locator('product-form')).not.toHaveAttribute('aria-busy', /.*/);
 
     expect(await band(page, 'te13-a').getByTestId('featured-product-price').innerHTML()).toBe(otherPrice);
     expect(await band(page, 'te13-a').locator('input[type="hidden"][name="id"]').inputValue()).toBe(otherId);
-    expect(requests).toEqual([]);
+    expect(requests.length, 'mỗi lần đổi 1 request ?option_values=').toBeGreaterThan(0);
+    for (const r of requests) expect(new URL(r).searchParams.has('option_values')).toBe(true);
     expect(page.url()).toBe(before);
     expect(errors).toEqual([]);
   });

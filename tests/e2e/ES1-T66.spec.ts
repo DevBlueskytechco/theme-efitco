@@ -9,6 +9,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
 import { watchShopPay403 } from './support/console-guard';
+import { chooseOptions } from './support/variant-picker';
 
 const T = {
   form: 'product-form',
@@ -92,15 +93,9 @@ function watchConsole(page: Page, ignoreNetwork = false) {
   return errors;
 }
 
+// ES1-T350 (ADR 0008): radio value = id option value, chọn theo tên trong nhãn.
 async function selectOptions(page: Page, options: string[]) {
-  const fieldsets = tid(page, T.option);
-  for (let i = 0; i < options.length; i += 1) {
-    const value = fieldsets.nth(i).getByTestId(T.optionValue).filter({
-      has: page.locator(`input[type="radio"][value=${JSON.stringify(options[i])}]`),
-    });
-    const input = value.locator('input[type="radio"]');
-    if (!(await input.isChecked())) await value.click();
-  }
+  await chooseOptions(tid(page, T.picker), options);
 }
 
 async function settled(page: Page) {
@@ -152,9 +147,11 @@ async function expectVariantUi(page: Page, variant: JsVariant) {
 }
 
 test.describe('ES1-T66 TE-4 variant picker', () => {
-  test('contract partial: 6 tên trong REGIONS khớp {% partial %} trong blocks', () => {
+  // ES1-T350 (ADR 0008 mục 3): thêm product-options (bộ chọn trong partial, snippets/product-variant-picker).
+  test('contract partial: 7 tên trong REGIONS khớp {% partial %} trong blocks, snippets', () => {
     const regions = [...(JS.match(/const REGIONS = \[([^\]]+)\]/)?.[1] ?? '').matchAll(/"([^"]+)"/g)].map((m) => m[1]);
     expect(regions).toEqual([
+      'product-options',
       'product-price',
       'product-buy-buttons',
       'product-installments',
@@ -162,7 +159,7 @@ test.describe('ES1-T66 TE-4 variant picker', () => {
       'product-selling-plans',
       'product-sticky-bar',
     ]);
-    const liquid = ['blocks/product-info.liquid', 'blocks/product-form.liquid', 'blocks/product-sticky-bar.liquid']
+    const liquid = ['blocks/product-info.liquid', 'blocks/product-form.liquid', 'blocks/product-sticky-bar.liquid', 'snippets/product-variant-picker.liquid']
       .map((f) => readFileSync(join(ROOT, f), 'utf8'))
       .join('\n');
     const declared = new Set([...liquid.matchAll(/{%-?\s*partial\s+'([^']+)'/g)].map((m) => m[1]));
@@ -175,8 +172,9 @@ test.describe('ES1-T66 TE-4 variant picker', () => {
     // ES1-T81: không có import map → import thẳng URL CDN.
     expect(JS).toMatch(/import\(\s*"https:\/\/cdn\.shopify\.com\/storefront\/standard-events\.js"\s*\)/);
     expect(JS).not.toMatch(/["']@shopify\/standard-events["']/);
-    // ES1-T158: names = data-regions hoặc REGIONS.
-    expect(JS).toMatch(/regions \? regions\.split\(" "\) : REGIONS/);
-    expect(JS).toMatch(/partials\.fetch\(\.\.\.names,/);
+    // ES1-T158: names = data-partials (snippet in cùng giá trị data-regions) hoặc REGIONS. ES1-T350: URL mang option_values.
+    expect(JS).toMatch(/partials\.fetch\(\.\.\.\(names \? names\.split\(" "\) : REGIONS\), \{ url: url\.href, signal/);
+    expect(JS).toMatch(/searchParams\.set\("option_values", ids\)/);
+    expect(JS).not.toMatch(/data-product-variants|variants\.find/);
   });
 });

@@ -158,7 +158,8 @@ test.describe('ES1-T347 AC15 đổi biến thể theo option value', () => {
     await expect(add).toHaveAttribute('aria-disabled', 'true');
     await expect(add).not.toHaveAttribute('aria-busy', 'true');
     await expect(add).toBeVisible();
-    await add.click();
+    // Playwright coi aria-disabled="true" là disabled và chờ; force để kiểm đúng việc bấm không thêm giỏ (VP1).
+    await add.click({ force: true });
     await page.waitForTimeout(500);
     expect(adds, 'bấm Add To Cart lúc đang tải không gửi request thêm giỏ').toHaveLength(0);
     await expect(tid(page, T.variantId)).toHaveValue(oldId);

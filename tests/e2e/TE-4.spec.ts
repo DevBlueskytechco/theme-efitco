@@ -3,7 +3,8 @@
 // Test case: drafts/qa/ES1-T70/test-cases.md. Tên test: "AC<n> TC-<id> ...". Nhóm không JS có chữ "nojs".
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/TE-4.spec.ts [-g "AC2 |nojs"]
 // Dữ liệu: env TE4_* không rỗng, rồi tests/e2e/store-data.json (ES1-T78); thiếu → skip có lý do. Handle có dấu: so pathname sau decodeURIComponent.
-// So tiền: .js lấy bằng fetch trong trang để cùng market (ES1-T74). Nhóm nojs không chạy script trong trang: sản phẩm đọc JSON nhúng variant-json, giỏ đọc qua context phụ (ES1-T100, support/product-data.ts).
+// So tiền: .js lấy bằng fetch trong trang để cùng market (ES1-T74). Nhóm nojs không chạy script trong trang: sản phẩm đọc qua getJson, giỏ đọc qua context phụ (ES1-T100, support/product-data.ts).
+// ES1-T350 (ADR 0008): radio value = id option value; chọn/đọc theo tên trong nhãn (support/variant-picker.ts); partial gửi ?option_values=, không gửi ?variant=.
 import { test as base, expect, type Page, type Request, type Route } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { autoDeclineConsent } from './support/consent';
@@ -12,6 +13,7 @@ import { env } from './support/store-data';
 import { pageJson, productDataNoScript, readCartJson, readCartNoScript, requireJson } from './support/product-data';
 import { CART, CART_GLOB } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
+import { checkedNames, chooseOptions, optionValue as valueIn } from './support/variant-picker';
 
 // DoD: 0 console error trên mọi test. Fixture tự chạy, kiểm sau mỗi test.
 // Bỏ qua: script Shopify/analytics, YouTube/Vimeo/model-viewer (nguồn ngoài theme) và 429 (giới hạn store dev).
@@ -207,7 +209,7 @@ const isCart = (url: URL) => /\/cart\/?$/.test(url.pathname);
 const mediaItem = (page: Page, id: string | number) => page.locator(`[data-testid="${T.mediaItem}"][data-media-id="${id}"]`);
 const thumbOf = (page: Page, id: string | number) => page.locator(`[data-testid="${T.thumb}"][data-media-id="${id}"]`);
 const recsIn = (page: Page, container: string) => tid(page, container).getByTestId(T.recs);
-const partialUrl = (handle: string) => (url: URL) => decodeURIComponent(url.pathname).endsWith(productPath(handle)) && url.searchParams.has('variant');
+const partialUrl = (handle: string) => (url: URL) => decodeURIComponent(url.pathname).endsWith(productPath(handle)) && url.searchParams.has('option_values');
 
 // Tiền trên trang → cents (đồng bộ TE-3.spec.ts), chịu được "Tk 1,000.00" và "1.000,00 ₫".
 function cents(text: string | null): number {
@@ -244,16 +246,11 @@ const cartItems = async (page: Page) => (await readCartJson<CartJs>(page)).items
 const cartItemsNoScript = async (page: Page) => (await readCartNoScript<CartJs>(page)).items;
 
 function optionValue(page: Page, index: number, value: string) {
-  return tid(page, T.option).nth(index).getByTestId(T.optionValue).filter({
-    has: page.locator(`input[type="radio"][value=${JSON.stringify(value)}]`),
-  });
+  return valueIn(tid(page, T.option).nth(index), value);
 }
 
 async function selectOptions(page: Page, options: string[]) {
-  for (const [i, value] of options.entries()) {
-    const label = optionValue(page, i, value);
-    if (!(await label.locator('input[type="radio"]').isChecked())) await label.click();
-  }
+  await chooseOptions(tid(page, T.picker), options);
 }
 
 const settled = (page: Page) => expect(tid(page, T.form)).not.toHaveAttribute('aria-busy', 'true');
@@ -652,8 +649,9 @@ test.describe('ES1-T70 TE-4 AC2 variant', () => {
     const js = await productJs(page, handle);
     const first = js.variants.find((v) => v.available) ?? js.variants[0];
     await expect(tid(page, T.variantId)).toHaveValue(String(first.id));
-    for (const [i, value] of first.options.entries()) {
-      await expect(tid(page, T.option).nth(i).locator(`input[name="option-${i + 1}"]:checked`)).toHaveAttribute('value', value);
+    expect(await checkedNames(tid(page, T.picker))).toEqual(first.options);
+    for (let i = 0; i < first.options.length; i += 1) {
+      await expect(tid(page, T.option).nth(i).locator('input[type="radio"]:checked')).toHaveCount(1);
     }
     await expect(tid(page, T.inventory)).toHaveAttribute('data-state', first.available ? 'in_stock' : 'sold_out');
     expect(await tid(page, T.picker).evaluate((el) => el.closest('form') === null), 'radio không bị submit').toBe(true);
@@ -671,10 +669,9 @@ test.describe('ES1-T70 TE-4 AC2 variant', () => {
     }
     const last = picks[picks.length - 1];
     for (let i = 0; i < product.options.length; i += 1) {
-      for (const input of await tid(page, T.option).nth(i).locator('input[type="radio"]').all()) {
-        const value = await input.getAttribute('value');
+      for (const value of product.options[i].values) {
         const ok = product.variants.some((v) => v.available && v.options.every((o, j) => o === (j === i ? value : last.options[j])));
-        await expect(input).toHaveAttribute('data-available', String(ok));
+        await expect(optionValue(page, i, value).locator('input[type="radio"]')).toHaveAttribute('data-available', String(ok));
       }
     }
   });
@@ -709,7 +706,8 @@ test.describe('ES1-T70 TE-4 AC2 variant', () => {
     }
   });
 
-  test('AC2 TC-205 tổ hợp không tồn tại: nút disabled + Unavailable, không fetch partial, live region báo', async ({ page }) => {
+  // ES1-T350 (ADR 0008): tổ hợp không tồn tại cũng gửi ?option_values=, server trả trạng thái Unavailable (trước: JS tự dựng, không fetch).
+  test('AC2 TC-205 tổ hợp không tồn tại: nút disabled + Unavailable do server trả qua partial, id/URL giữ biến thể cũ, live region báo', async ({ page }) => {
     const { handle, product } = await openPicker(page);
     const missing = missingCombo(product);
     test.skip(product.options.length < 2 || !missing, 'Cần sản phẩm 2 option có tổ hợp không tồn tại');
@@ -722,21 +720,26 @@ test.describe('ES1-T70 TE-4 AC2 variant', () => {
     for (const [i, value] of missing!.entries()) {
       if (!(await optionValue(page, i, value).locator('input').isChecked())) clicks.push([i, value]);
     }
-    for (const [i, value] of clicks.slice(0, -1)) await optionValue(page, i, value).click();
-    await settled(page);
+    for (const [i, value] of clicks.slice(0, -1)) {
+      await optionValue(page, i, value).click();
+      await settled(page);
+    }
+    const before = { id: await currentId(page), variant: new URL(page.url()).searchParams.get('variant') };
     partials.length = 0;
     const [i, value] = clicks[clicks.length - 1];
     await optionValue(page, i, value).click();
+    await settled(page);
 
     const label = (await tid(page, T.form).getAttribute('data-label-unavailable')) ?? '';
     await expect(tid(page, T.add)).toBeDisabled();
     await expect(tid(page, T.add)).toHaveText(label);
     await expect(tid(page, T.inventory)).toHaveAttribute('data-state', 'unavailable');
     await expect(tid(page, T.stickyAdd)).toBeDisabled();
-    await expect(tid(page, T.status)).toHaveText(label);
-    await page.waitForTimeout(500);
-    expect(partials, 'tổ hợp không tồn tại không được fetch').toEqual([]);
-    expect(product.variants.some((v) => String(v.id) === new URL(page.url()).searchParams.get('variant')) || !new URL(page.url()).searchParams.get('variant')).toBe(true);
+    await expect(tid(page, T.status)).toContainText(label);
+    expect(partials, 'tổ hợp không tồn tại hỏi server qua ?option_values=').toHaveLength(1);
+    expect(await checkedNames(tid(page, T.picker))).toEqual(missing);
+    expect(await currentId(page)).toBe(before.id);
+    expect(new URL(page.url()).searchParams.get('variant')).toBe(before.variant);
   });
 
   test('AC2 TC-206 ?variant= deep link: radio, hidden id, tồn theo variant; hết hàng thì nút disabled', async ({ page }) => {
@@ -746,9 +749,7 @@ test.describe('ES1-T70 TE-4 AC2 variant', () => {
     test.skip(!target, 'Cần từ 2 variant');
     await page.goto(productPath(handle, `?variant=${target.id}`));
     await expect(tid(page, T.variantId)).toHaveValue(String(target.id));
-    for (const [i, value] of target.options.entries()) {
-      await expect(tid(page, T.option).nth(i).locator('input[type="radio"]:checked')).toHaveAttribute('value', value);
-    }
+    expect(await checkedNames(tid(page, T.picker))).toEqual(target.options);
     if (target.available) await expect(tid(page, T.add)).toBeEnabled();
     else {
       await expect(tid(page, T.add)).toBeDisabled();
@@ -780,27 +781,39 @@ test.describe('ES1-T70 TE-4 AC2 variant', () => {
     const target = product.variants.find((v) => v.id !== start && v.available !== startVariant?.available) ?? product.variants.find((v) => v.id !== start);
     test.skip(!target, 'Sản phẩm chỉ có 1 variant');
     const before = await buttonsSnapshot(page);
+    const names = await checkedNames(tid(page, T.picker));
     await onPartial(page, handle, (route) => route.abort('failed'));
     await selectOptions(page, target!.options);
     await settled(page);
     expect(await buttonsSnapshot(page)).toEqual(before);
+    // ES1-T350 AC15: giữ biến thể cuối đã tải: radio, id về như trước, lỗi + Try Again.
+    expect(await checkedNames(tid(page, T.picker))).toEqual(names);
+    await expect(tid(page, T.variantId)).toHaveValue(String(start));
+    await expect(tid(page, T.picker).getByTestId('product-option-error').filter({ hasText: /\S/ })).toHaveCount(1);
+    await expect(tid(page, T.add)).not.toHaveAttribute('aria-disabled', 'true');
   });
 
-  test('AC2 TC-210 mất mạng sau khi đi qua tổ hợp không tồn tại: không kẹt Unavailable (ES1-T87)', async ({ page, consoleGuard }) => {
+  // ES1-T350: tổ hợp không tồn tại nay do server trả (không còn nhãn Unavailable dựng ở JS); lỗi mạng sau đó giữ đúng trạng thái đã tải, không kẹt aria-busy/aria-disabled.
+  test('AC2 TC-210 mất mạng sau khi đi qua tổ hợp không tồn tại: giữ trạng thái đã tải, không kẹt (ES1-T87)', async ({ page, consoleGuard }) => {
     consoleGuard.allowNetworkLog();
     const { handle, product } = await openPicker(page);
     const missing = missingCombo(product);
     test.skip(product.options.length < 2 || !missing, 'Cần sản phẩm 2 option có tổ hợp không tồn tại');
     const start = await currentId(page);
     const other = product.variants.find((v) => v.id !== start)!;
-    const before = await buttonsSnapshot(page);
-    await onPartial(page, handle, (route) => route.abort());
     await selectOptions(page, missing!);
+    await settled(page);
     await expect(tid(page, T.inventory)).toHaveAttribute('data-state', 'unavailable');
+    const before = await buttonsSnapshot(page);
+    const id = await currentId(page);
+    await onPartial(page, handle, (route) => route.abort());
     await selectOptions(page, other.options);
     await settled(page);
     expect(await buttonsSnapshot(page)).toEqual(before);
-    await expect(tid(page, T.variantId)).toHaveValue(String(other.id));
+    expect(await checkedNames(tid(page, T.picker))).toEqual(missing);
+    await expect(tid(page, T.variantId)).toHaveValue(String(id));
+    await expect(tid(page, T.add)).not.toHaveAttribute('aria-disabled', 'true');
+    await expect(tid(page, T.stickyAdd)).not.toHaveAttribute('aria-disabled', 'true');
   });
 
   test('AC2 TC-211 request đang chạy bị tổ hợp không tồn tại huỷ: giữ Unavailable (ES1-T87)', async ({ page, consoleGuard }) => {
@@ -839,7 +852,7 @@ test.describe('ES1-T70 TE-4 AC2 variant', () => {
     const newValue = (await checked.getAttribute('value'))!;
     await settled(page);
     expect(await page.evaluate(() => (document.activeElement as HTMLInputElement | null)?.value)).toBe(newValue);
-    const outline = await optionValue(page, 0, newValue).evaluate((el) => getComputedStyle(el).outlineStyle);
+    const outline = await tid(page, T.option).first().getByTestId(T.optionValue).filter({ has: page.locator(`input[value="${newValue}"]`) }).evaluate((el) => getComputedStyle(el).outlineStyle);
     expect(outline).not.toBe('none');
     expect(await stayed(page)).toBe(true);
   });
@@ -853,7 +866,8 @@ test.describe('ES1-T70 TE-4 AC2 variant', () => {
     await settled(page);
     await expect(tid(page, T.status)).toHaveAttribute('role', 'status');
     await expect(tid(page, T.status)).toHaveAttribute('aria-live', 'polite');
-    await expect(tid(page, T.status)).toHaveText(target!.available ? 'In stock' : 'Sold out');
+    // ES1-T350: status đọc "[giá trị], [giá], [tồn]" (products.variant.loaded).
+    await expect(tid(page, T.status)).toContainText(target!.available ? 'In stock' : 'Sold out');
     await expect(tid(page, T.error)).toHaveAttribute('role', 'alert');
     await expect(tid(page, T.error)).toHaveText('');
   });
@@ -900,12 +914,16 @@ test.describe('ES1-T70 TE-4 AC3 nội dung', () => {
     const options = tid(page, T.option);
     await expect(options).toHaveCount(js.options.length);
     for (const [i, option] of js.options.entries()) {
-      await expect(options.nth(i).locator('legend')).toHaveText(option.name);
+      // FE1 (ES1-T348): legend "Tên: giá trị đang chọn".
+      await expect(options.nth(i).locator('legend .product-option__name')).toHaveText(`${option.name}:`);
       const radios = options.nth(i).locator('input[type="radio"]');
       await expect(radios).toHaveCount(option.values.length);
+      // ES1-T350 (ADR 0008): value = id option value; tên giá trị là tên truy cập (có thể kèm hậu tố ẩn ", sold out" / ", unavailable").
       for (const [j, value] of option.values.entries()) {
-        await expect(radios.nth(j)).toHaveAttribute('value', value);
-        await expect(radios.nth(j)).toHaveAccessibleName(value);
+        const id = await radios.nth(j).getAttribute('data-option-value-id');
+        expect(id).toMatch(/^\d+$/);
+        await expect(radios.nth(j)).toHaveAttribute('value', id!);
+        await expect(radios.nth(j)).toHaveAccessibleName(new RegExp(`^${value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(, |$)`));
       }
     }
   });
