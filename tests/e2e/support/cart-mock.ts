@@ -242,10 +242,14 @@ export class MockCart {
   }
 
   // Thay trang /cart thật bằng trang tối giản khi test chỉ cần biết đã chuyển trang: không thêm 1 lần tải trang.
+  // ES1-T99: trang tối giản cũng opt-in @view-transition như base.css của trang thật. Trang theme opt-in (navigation: auto) mà trang đích không opt-in
+  // thì Chromium huỷ cross-document view transition và báo pageerror "Transition was aborted because of invalid state. ViewTransition opt-in disabled"
+  // (CI PR #270, TC-23, TC-31). Thêm meta viewport như layout/theme.liquid: thiếu nó thì trình duyệt mobile dựng trang giả ở 980px,
+  // Chromium huỷ transition với "Viewport size changed" (CI run 44476241447, TC-23 mobile). Nhiễu do trang giả, không phải lỗi theme: /cart thật có base.css nên không gặp, theme không có JS view transition.
   async stubCartDocument() {
     await this.page.route(
       (url) => /\/cart\/?$/.test(url.pathname),
-      (route) => (route.request().resourceType() === 'document' ? route.fulfill({ contentType: 'text/html', body: '<!doctype html><html lang="en"><title>cart</title><div data-testid="cart-page">cart</div></html>' }) : route.fallback()),
+      (route) => (route.request().resourceType() === 'document' ? route.fulfill({ contentType: 'text/html', body: '<!doctype html><html lang="en"><meta name="viewport" content="width=device-width, initial-scale=1"><title>cart</title><style>@view-transition { navigation: auto; }</style><div data-testid="cart-page">cart</div></html>' }) : route.fallback()),
     );
   }
 
