@@ -51,7 +51,7 @@ if (!li) return;
 l.scrollTo({ left: li.offsetLeft - l.offsetLeft, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 for (const a of this.querySelectorAll(T)) a.ariaCurrent = a.dataset.featuredMediaId == id ? "true" : null;
 }
-// D4: 2+ bands share partial names.
+// D4: 2+ bands
 async swap(url, signal) {
 const r = await fetch(url, { signal });
 if (!r.ok) throw r.status;
