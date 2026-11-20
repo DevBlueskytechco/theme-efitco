@@ -16,7 +16,9 @@
   Empty heading setting uses the locale heading; no privacy policy in the shop
   hides the privacy sentence. Self-contained: callers must leave the body empty.
 
-  JavaScript hooks for the enhancement script (Dev BE, not loaded yet):
+  JavaScript hooks for assets/contact-form.js (ES1-T474): assets/lazy-module.js imports it on
+  the first interaction with the form (data-lazy-module, data-lazy-on="interaction"); after a
+  submit with field errors, or on success, it loads at once to move focus there:
   - form data-contact-form, data-label-sending ("Sending your message…");
   - live region data-contact-live (role="status", empty until sending);
   - summary data-contact-summary (hidden when no field error), title
@@ -53,6 +55,7 @@
   assign summary_label_1 = 'contact.check_fields' | t: count: 1
   assign summary_label_2 = 'contact.check_fields' | t: count: 2
   assign summary_label_3 = 'contact.check_fields' | t: count: 3
+  assign contact_form_js = 'contact-form.js' | asset_url
 -%}
 
 <div class="contact-form" data-testid="contact-form-block" {{ block.shopify_attributes }}>
@@ -60,6 +63,8 @@
     class: 'contact-form__form',
     data-contact-form: '',
     data-label-sending: sending_label,
+    data-lazy-module: contact_form_js,
+    data-lazy-on: 'interaction',
     data-testid: 'contact-form'
   -%}
     {%- if form.posted_successfully? -%}
@@ -79,6 +84,7 @@
           </div>
         </div>
       </div>
+      <script src="{{ contact_form_js }}" type="module"></script>
     {%- else -%}
       {%- liquid
         assign name_error = false
@@ -292,8 +298,12 @@
         <span class="button__label">{{ 'contact.submit' | t }}</span>
       </button>
       <div class="visually-hidden" role="status" data-contact-live data-testid="contact-live"></div>
+      {%- if field_error_count > 0 -%}
+        <script src="{{ contact_form_js }}" type="module"></script>
+      {%- endif -%}
     {%- endif -%}
   {%- endform -%}
+  <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
 </div>
 
 {% schema %}

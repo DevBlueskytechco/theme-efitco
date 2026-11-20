@@ -33,7 +33,8 @@ test.describe('ES1-T382 tĩnh', () => {
       expect(src, f).not.toContain('"presets"');
       expect(src, f).toContain('{{ block.shopify_attributes }}');
       expect(src, f).toMatch(/elsif request\.design_mode/);
-      expect(src, f).not.toMatch(/<script src|data-lazy-module/);
+      // ES1-T473 (D6): BE thêm lazy-module vào article-comments, related-articles; kiểm ở tests/e2e/ES1-T473.spec.ts
+      if (f === 'article-main') expect(src, f).not.toMatch(/<script src|data-lazy-module/);
     }
   });
 
