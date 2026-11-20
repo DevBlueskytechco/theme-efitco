@@ -13,6 +13,14 @@
   so show_stat_1 and show_stat_2 are how a merchant hides a stat. Text from the t
   filter may already be escaped, so it goes through escape_once.
 
+  Layout (Figma 1:1057, index-mobile-b.md §7, index-1280.md khối 15): questions
+  first, then the image group. Below 48rem the image takes the row (509 / 542)
+  and the stat tiles sit in 2 columns that overlap the image bottom by 48, 12 in
+  from each side. From 48rem the image is 76.2% wide at the inline end and the
+  tiles row (79.6% wide, inline start 0) overlaps it, 7.5% above its bottom
+  (40 from 64rem). From 64rem questions and image group are 2 columns
+  1fr | 80 | 1fr (580 | 80 | 580 at 1280). The +/− icon uses the question color.
+
   A stat tile renders when its show setting is on and any of its 3 texts is
   present. Without an image and stats, the column is not rendered and the questions
   take the full row. When the body is empty, the editor shows a placeholder and the
@@ -121,7 +129,7 @@
             class: 'faq__image',
             width: 1018,
             widths: '360, 509, 720, 1018',
-            sizes: '(min-width: 64rem) 38vw, 100vw',
+            sizes: '(min-width: 64rem) 38vw, (min-width: 48rem) 72vw, 100vw',
             loading: 'lazy',
             testid: 'faq-image'
           %}

@@ -5534,10 +5534,11 @@ cart-drawer {
   overflow: hidden;
 }
 
+/* index-mobile-b §5: ảnh trên chữ 1:1 ở 360, 4:3 từ 48rem; 920 / 876 từ 64rem */
 .image-with-text__media::before {
   content: "";
   display: block;
-  aspect-ratio: 920 / 876;
+  aspect-ratio: 1;
 }
 
 .image.image-with-text__media > img {
@@ -5548,12 +5549,12 @@ cart-drawer {
   object-fit: cover;
 }
 
-/* Figma 1:998: gradient từ 61.3% xuống đáy */
+/* Ảnh trên chữ: gradient trong suốt 55% → nền tối đáy (index-mobile-b §5); Figma 1:998 từ 61.3% khi 2 cột */
 .image.image-with-text__media::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(to bottom, transparent 61.3%, var(--color-background-dark));
+  background-image: linear-gradient(to bottom, transparent 55%, var(--color-background-dark));
 }
 
 .image-with-text__media--empty {
@@ -5578,13 +5579,46 @@ cart-drawer {
   min-inline-size: 0;
 }
 
+/* 360: chữ sát ảnh (trên 8, dưới 48); 2 ảnh nhỏ ẩn, lazy nên không tải */
 .image-with-text--split .image-with-text__content {
-  padding-block: var(--space-7);
+  padding-block: var(--space-2) var(--space-7);
   padding-inline: var(--page-margin);
 }
 
 .image-with-text--split .image-with-text__accents {
   display: none;
+}
+
+/* 768: ảnh 4:3; chữ chừa 200 bên cuối cho ảnh nhỏ; ảnh 1 168 đè đáy ảnh lớn 40, ảnh 2 100 cách đáy 48, mép cuối 32 */
+@media (min-width: 48rem) {
+  .image-with-text--split .image-with-text__media::before {
+    aspect-ratio: 4 / 3;
+  }
+
+  .image-with-text--split .image-with-text__content {
+    padding-block: var(--space-4) var(--space-7);
+    padding-inline-end: calc(var(--page-margin) + var(--space-1) * 50);
+  }
+
+  .image-with-text--split .image-with-text__accents {
+    display: contents;
+  }
+
+  .image-with-text--split .image.image-with-text__accent {
+    position: absolute;
+  }
+
+  .image-with-text--split .image.image-with-text__accent--1 {
+    inset-block-start: calc(var(--space-1) * -10);
+    inset-inline-end: var(--page-margin);
+    inline-size: calc(var(--space-1) * 42);
+  }
+
+  .image-with-text--split .image.image-with-text__accent--2 {
+    inset-block-end: var(--space-7);
+    inset-inline-end: calc(var(--page-margin) + var(--space-6));
+    inline-size: calc(var(--space-1) * 25);
+  }
 }
 
 /* Layout banner, Figma 1:625 */
@@ -5712,7 +5746,21 @@ cart-drawer {
     grid-column: 1 / -1;
   }
 
+  /* 64–80rem: 2 cột 920 / 1000, ảnh nhỏ ẩn tới 80rem (như trước, mặc định ES1-T449) */
+  .image-with-text--split .image-with-text__media::before {
+    aspect-ratio: 920 / 876;
+  }
+
+  .image.image-with-text__media::after {
+    background-image: linear-gradient(to bottom, transparent 61.3%, var(--color-background-dark));
+  }
+
+  .image-with-text--split .image-with-text__accents {
+    display: none;
+  }
+
   .image-with-text--split .image-with-text__content {
+    padding-block: var(--space-7);
     padding-inline: var(--image-with-text-inset);
   }
 
@@ -5731,10 +5779,30 @@ cart-drawer {
     display: contents;
   }
 
-  /* Hộp chữ dừng đúng mép ảnh accent 201: Figma 660, chừa 21 để chữ dài không đè ảnh */
+  /* index-1280 §2.6: cột ảnh = lề + (nội dung − 80) / 2 (600 ở 1280, 920 ở 1920), chữ cách ảnh 80 */
+  .image-with-text--split {
+    --image-with-text-side: max(var(--page-margin), (100% - var(--page-width)) / 2 + var(--page-margin));
+
+    grid-template-columns: minmax(0, calc(var(--image-with-text-side) + (100% - 2 * var(--image-with-text-side) - var(--space-1) * 20) / 2)) minmax(0, 1fr);
+  }
+
+  .image-with-text--image-right {
+    grid-template-columns: minmax(0, 1fr) minmax(0, calc(var(--image-with-text-side) + (100% - 2 * var(--image-with-text-side) - var(--space-1) * 20) / 2));
+  }
+
+  .image-with-text--split .image-with-text__heading {
+    font-size: min(var(--font-size-display), 6.25vw);
+  }
+
+  /* Hộp chữ dừng đúng mép trái ảnh nhỏ 1 (201 | 134 ở 1280): chữ dài không đè ảnh */
   .image-with-text--split .image-with-text__content {
-    max-inline-size: calc(var(--image-with-text-inset) + min(639px, 33.28vw));
-    padding-inline-end: 0;
+    max-inline-size: calc(100% - var(--image-with-text-inset) - min(201px, 10.47vw));
+    padding-inline: calc(var(--space-1) * 20) 0;
+  }
+
+  /* Ảnh phải (không có trong Figma): chữ ở cột đầu, lề như trước */
+  .image-with-text--image-right .image-with-text__content {
+    padding-inline: var(--image-with-text-inset) 0;
   }
 
   .image.image-with-text__accent {
@@ -7617,10 +7685,11 @@ cart-drawer {
   }
 }
 
-/** FAQ (TE-7, Figma 1:1057): dưới 64rem câu hỏi, ảnh, ô stat xếp dọc; từ 64rem 2 cột, ô stat đè mép dưới ảnh */
+/** FAQ (TE-7, Figma 1:1057; index-mobile-b §7, index-1280 khối 15): câu hỏi rồi nhóm ảnh. 360 ô số đè đáy ảnh 48,
+    768 ảnh 76.2% lệch cuối + hàng ô 79.6% đè trái, từ 64rem 2 cột 1fr | 80 | 1fr */
 .faq {
   display: grid;
-  gap: calc(var(--space-1) * 10);
+  gap: var(--space-6);
   min-inline-size: 0;
   padding-block: var(--space-7);
 }
@@ -7687,7 +7756,7 @@ cart-drawer {
   grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
   column-gap: var(--space-3);
-  min-block-size: 44px;
+  min-block-size: calc(var(--space-1) * 14);
   padding-block: var(--space-2);
   color: var(--color-muted);
   list-style: none;
@@ -7787,6 +7856,28 @@ cart-drawer {
   text-align: start;
 }
 
+/* 360: 2 ô 142, gap 12, lùi 12 mỗi bên, đè đáy ảnh 48; số 40 */
+.faq__media--overlay {
+  position: relative;
+  gap: 0;
+}
+
+.faq__media--overlay .faq__stats {
+  position: relative;
+  flex-wrap: nowrap;
+  margin-block-start: calc(var(--space-7) * -1);
+  margin-inline: var(--space-3);
+}
+
+.faq__media--overlay .faq__stat {
+  flex: 1 1 0;
+  padding: var(--space-4);
+}
+
+.faq__media--overlay .faq__stat-value {
+  font-size: calc(var(--space-1) * 10);
+}
+
 .faq__stat--accent {
   background-color: var(--color-accent);
   color: var(--color-accent-foreground);
@@ -7823,39 +7914,49 @@ cart-drawer {
   line-height: calc(22 / 14);
 }
 
+/* 768 giữ bố cục Figma: ảnh 509 / 668 (553 ở 768) sát mép cuối; hàng ô 532 / 668 (582, mỗi ô 285) mép đầu 0, cách đáy ảnh 7.5%; số 48 */
+@media (min-width: 48rem) {
+  .faq {
+    gap: calc(var(--space-1) * 10);
+  }
+
+  .faq__image {
+    inline-size: calc(509 / 668 * 100%);
+    margin-inline-start: auto;
+  }
+
+  .faq__media--overlay .faq__stats {
+    position: absolute;
+    inset-block-end: 7.5%;
+    inset-inline-start: 0;
+    inline-size: calc(532 / 668 * 100%);
+    margin: 0;
+  }
+
+  .faq__media--overlay .faq__stat {
+    flex: 0 1 calc(50% - var(--space-3) / 2);
+    padding: var(--space-5);
+  }
+
+  .faq__media--overlay .faq__stat-value {
+    font-size: calc(var(--space-1) * 12);
+  }
+}
+
+/* Figma: 668 + 80 + 668; 1280: 580 + 80 + 580, ảnh 442 × 471, ô 225 × 148 cách đáy 40 */
 @media (min-width: 64rem) {
   .faq {
     padding-block: var(--space-8);
   }
 
-  /* Figma: 668 + 80 + 668 */
   .faq--with-media {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
     column-gap: calc(var(--space-1) * 20);
   }
 
-  /* Ảnh 509 / 668 của cột, sát mép cuối */
-  .faq__image {
-    inline-size: calc(509 / 668 * 100%);
-    margin-inline-start: auto;
-  }
-
-  /* Hàng ô 532 / 668 của cột, cách đáy ảnh 40 */
-  .faq__media--overlay {
-    position: relative;
-  }
-
   .faq__media--overlay .faq__stats {
-    position: absolute;
     inset-block-end: calc(var(--space-1) * 10);
-    inset-inline-start: 0;
-    flex-wrap: nowrap;
-    inline-size: calc(532 / 668 * 100%);
-  }
-
-  .faq__media--overlay .faq__stat {
-    flex: 0 1 calc(50% - var(--space-3) / 2);
   }
 }
 
@@ -7876,9 +7977,15 @@ featured-product {
   font-size: var(--font-size-sm);
 }
 
+/* index-mobile-b §2: dưới 64rem ảnh → chi tiết cách 32 */
 .featured-product__view {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-6);
+}
+
+/* Partial featured-product (ADR 0008): chỉ bọc vùng cập nhật, không thêm hộp */
+.featured-product__region {
+  display: contents;
 }
 
 .featured-product__gallery,
@@ -7893,11 +8000,11 @@ featured-product {
   align-content: start;
 }
 
-/* Figma 1:761: 113 x 112, 24 from the image corner; 72 x 71, 12 below 48rem (ES1-T174) */
+/* Figma 1:761: 113 x 112, 24 from the image corner; index-mobile-b §2: 72 cách góc 16 ở 360, 88 cách 24 ở 768 */
 .featured-product__seal {
   position: absolute;
-  inset-block-start: var(--space-3);
-  inset-inline-start: var(--space-3);
+  inset-block-start: var(--space-4);
+  inset-inline-start: var(--space-4);
   inline-size: 4.5rem;
   block-size: auto;
   color: var(--color-muted-on-dark);
@@ -7910,11 +8017,17 @@ featured-product {
   .featured-product__seal {
     inset-block-start: var(--space-5);
     inset-inline-start: var(--space-5);
+    inline-size: 5.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .featured-product__seal {
     inline-size: 7.0625rem;
   }
 }
 
-/* Figma 1:760: 668 / 653 */
+/* Khung ảnh: 1:1 ở 360 (320 × 320), 4:3 ở 768 (728 × 546), Figma 1:760 668 / 653 từ 64rem (580 × 566 ở 1280) */
 .featured-product__media-list {
   display: flex;
   margin: 0;
@@ -7935,7 +8048,7 @@ featured-product {
 .featured-product__media-item {
   flex: 0 0 100%;
   min-inline-size: 0;
-  aspect-ratio: 668 / 653;
+  aspect-ratio: 1;
   scroll-margin-block-start: var(--space-8);
   scroll-snap-align: start;
 }
@@ -7944,10 +8057,28 @@ featured-product {
   block-size: 100%;
 }
 
+/* Dưới 64rem sản phẩm contain, cách khung 8% (index-mobile-b §2) */
 .featured-product__media-item .image > img {
   block-size: 100%;
+  padding: 8%;
   object-fit: contain;
   mix-blend-mode: normal;
+}
+
+@media (min-width: 48rem) {
+  .featured-product__media-item {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (min-width: 64rem) {
+  .featured-product__media-item {
+    aspect-ratio: 668 / 653;
+  }
+
+  .featured-product__media-item .image > img {
+    padding: 0;
+  }
 }
 
 /* Rich media (ADR 0012): snippets/product-media-item fills the 668 / 653 frame like an image */
@@ -8189,25 +8320,62 @@ featured-product[data-design-mode] .featured-product__countdown {
   text-align: end;
 }
 
+/* 360: mỗi hàng thông số xếp dọc, nhãn 14 trên, giá trị 16/500 dưới, padding 12 / 16 (giá trị dài không vừa 2 cột ở 320) */
+.featured-product__specs,
+.featured-product__specs tbody {
+  display: block;
+}
+
+.featured-product__spec {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+}
+
+.featured-product__spec-label,
+.featured-product__spec-value {
+  padding: 0;
+  text-align: start;
+}
+
+@media (min-width: 48rem) {
+  .featured-product__specs {
+    display: table;
+  }
+
+  .featured-product__specs tbody {
+    display: table-row-group;
+  }
+
+  .featured-product__spec {
+    display: table-row;
+  }
+
+  .featured-product__spec-label,
+  .featured-product__spec-value {
+    padding-block: var(--space-3);
+    padding-inline: var(--space-5);
+  }
+
+  .featured-product__spec-value {
+    text-align: end;
+  }
+}
+
 .featured-product__buy {
   display: grid;
   gap: var(--space-4);
 }
 
+/* 360: 2 nút xếp dọc rộng hết cột, primary trên, cách 12; từ 48rem 1 hàng theo nội dung */
 .featured-product__actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--space-3);
 }
 
 /* Không JS: select trong noscript chiếm trọn hàng trên 2 nút */
 .featured-product__actions noscript {
   flex-basis: 100%;
-}
-
-.featured-product__add-wrapper,
-.featured-product__view-detail {
-  flex: 1 1 auto;
 }
 
 .featured-product__add {
@@ -8246,14 +8414,14 @@ featured-product[data-design-mode] .featured-product__countdown {
     padding-block: var(--space-2);
   }
 
+  .featured-product__actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
   .featured-product__add-wrapper,
   .featured-product__view-detail {
     flex: none;
-  }
-
-  .featured-product__spec-label,
-  .featured-product__spec-value {
-    padding-inline: var(--space-5);
   }
 }
 
