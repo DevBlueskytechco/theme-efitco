@@ -6,6 +6,7 @@ import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
+import { skipUnlessFixture } from './support/home-fixture';
 
 const TE7 = '/?view=te7';
 const HOME = '/';
@@ -258,7 +259,6 @@ test.describe('ES1-T119 TE-7 FAQ', () => {
     await expect(tid(home, 'faq-item')).toHaveCount(5);
     await expect(home.locator('details[open]')).toHaveCount(1);
     await expect(openItem(page, 'faq-1')).toHaveCount(1);
-    await expect(tid(home, 'faq-image')).toHaveCount(1); // trang chủ đã nối ảnh (CTO 07/11)
     await expect(tid(home, 'faq-stat-1')).toContainText('360+');
     await expect(tid(home, 'faq-stat-2')).toBeVisible();
 
@@ -267,5 +267,13 @@ test.describe('ES1-T119 TE-7 FAQ', () => {
     expect(text.toLowerCase()).not.toContain('lorem');
     await expectNoSeriousAxe(page);
     expect(errors).toEqual([]);
+  });
+
+  // ES1-T405 (ADR 0011 mục 2): index.liquid không truyền tài nguyên; theme chưa cấu hình không in khối, không khung rỗng.
+  // Kỳ vọng "đã nối dữ liệu" (CTO 07/11) chỉ còn khi store dev đã áp fixture ES1-T331 (sentinel support/home-fixture.ts).
+  test('AC5 trang chủ đã nối ảnh (CTO 07/11, fixture): FAQ có ảnh', async ({ page }) => {
+    await page.goto(HOME);
+    await skipUnlessFixture(page);
+    await expect(tid(band(page, 'home-faq'), 'faq-image')).toHaveCount(1);
   });
 });

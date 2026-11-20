@@ -181,11 +181,13 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
     await expect(input).not.toBeChecked();
   });
 
-  test('AC1-markup trang chủ chưa cấu hình: bundle builder lấy collection all, có bậc 10%, 15% theo D1 ES1-T169', async ({ page }) => {
+  // SRS 0.5 TE-12 AC1, AC-H18, AC-H36 (ES1-T308 #1) thay D1 ES1-T169: theme chưa cấu hình không có collection
+  // (ADR 0011, ES1-T405) → storefront không có bundle builder, không khung rỗng, không bậc giảm mẫu.
+  // Bậc 10%, 15% chỉ có trên store dev đã áp fixture: ES1-T331 TC-13 (AC-H18, skipUnlessFixture).
+  test('AC1-markup trang chủ chưa cấu hình: không collection thì storefront không có bundle builder, không khung rỗng (AC-H36)', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
-    await expect(page.getByTestId('bundle-builder')).toHaveCount(1);
-    await expect(page.getByTestId('bundle-builder')).toHaveAttribute('data-tiers', '2:10,3:15');
+    await expect(page.getByTestId('bundle-builder')).toHaveCount(0);
     await expect(page.getByTestId('bundle-builder-placeholder')).toHaveCount(0);
     await expectNoSeriousAxe(page);
     expect(errors).toEqual([]);
