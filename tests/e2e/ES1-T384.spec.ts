@@ -161,7 +161,8 @@ test.describe('ES1-T384 store', () => {
       await expect(details).toHaveAttribute('open', '');
     }
     await expect(page.getByTestId('password-input')).toBeVisible();
-    await expect(page.getByTestId('password-toggle')).toBeHidden();
+    // ES1-T443 (TE-21 AC11, password.md §5): password-page.js gỡ hidden → có JS thì nút mắt hiện (markup vẫn hidden, kiểm ở nhóm tĩnh)
+    await expect(page.getByTestId('password-toggle')).toBeVisible();
     await expectNotChallenged(page);
     const { violations } = await new AxeBuilder({ page }).analyze();
     expect(violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? '')).map((v) => v.id)).toEqual([]);
