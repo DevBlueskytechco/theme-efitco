@@ -15,8 +15,8 @@
   A parent cannot read its children and Liquid cannot add them up (AGENTS.md), so
   assets/bundle-form.js sums data-price. Discounts are display only (R8): Liquid only
   outputs data-tiers, the real price comes from an automatic discount. No discount
-  note under the panel (decisions.md 07/11, AC-H19). No tier above 0: no data-tiers
-  and no discount row. The discount row uses --panel-saving with a tag icon and a
+  note under the panel (decisions.md 07/11, AC-H19). Every tier percent defaults to 0
+  (ADR 0011 mục 3, ES1-T406). No tier above 0: no data-tiers and no discount row. The discount row uses --panel-saving with a tag icon and a
   minus sign (foundation §2).
 
   Hooks for assets/bundle-form.js (BE ES1-T149; same contract as bundle-builder, no
@@ -336,7 +336,7 @@
       "step": 1,
       "unit": "t:labels.unit_percent",
       "label": "t:labels.tier_1_percent",
-      "default": 10
+      "default": 0
     },
     {
       "type": "range",
