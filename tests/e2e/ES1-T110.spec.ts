@@ -4,7 +4,7 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T110.spec.ts -g "AC1|AC2|AC3"
 // Dữ liệu: TE6_COLLECTION_HANDLE (ES1-T105), thiếu thì /collections/all. Test cần filter, phân trang, swatch skip có lý do khi store không có.
 // Request partial: fetch (resourceType fetch) tới đúng pathname của collection; tải cả trang là document.
-import { test, expect, type Page, type Request, type Route } from '@playwright/test';
+import { test, expect, type Page, type Request, type Route } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
