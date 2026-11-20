@@ -6,6 +6,12 @@
   and copyright line. Works without JavaScript. Composed directly in
   layout/theme.liquid so it appears on every page.
 
+  Layout (docs/ui-spec/foundation.md §4, SRS TE-1 AC11): 3 tiers. Menu
+  columns are a closed <details> under 48rem and open from 48rem (CSS);
+  trust bar 2 x 2 under 48rem, 4 columns from 48rem. The wordmark is
+  decorative (aria-hidden). Follow on Shop sits under the social row and is
+  never restyled (foundation §27, §29).
+
   Social URLs are global settings (config/settings_schema.json, Social
   group); everything else is a block setting. Text settings default to empty
   (ADR 0011): an empty heading, text, description or trust item is not
@@ -124,7 +130,15 @@
         </button>
       </div>
 
-      <p class="site-footer__invalid" data-testid="footer-newsletter-invalid">{{ 'blocks.footer.newsletter_invalid' | t }}</p>
+      {% comment %}
+        Error text is white with a red icon: --color-sale on the dark background is
+        2.73:1 (foundation §2, §4). Client check: JS toggles [data-invalid] on the form
+        and aria-invalid on the input; aria-describedby="footer-newsletter-invalid" is BE's.
+      {% endcomment %}
+      <p class="site-footer__invalid" id="footer-newsletter-invalid" data-testid="footer-newsletter-invalid">
+        {%- render 'status-icon', name: 'error' -%}
+        <span>{{ 'blocks.footer.newsletter_invalid' | t }}</span>
+      </p>
       <p class="site-footer__note" data-testid="footer-newsletter-note">
         {{- 'blocks.footer.newsletter_note' | t -}}
       </p>
@@ -136,14 +150,20 @@
           role="alert"
           data-testid="footer-newsletter-error"
         >
-          {{ form.errors | default_errors }}
+          {%- render 'status-icon', name: 'error' -%}
+          <div class="site-footer__message-body">{{ form.errors | default_errors }}</div>
         </div>
       {%- endif -%}
 
       {%- if form.posted_successfully? -%}
-        <p class="site-footer__message" role="status" data-testid="footer-newsletter-success">
-          {{- 'blocks.footer.newsletter_success' | t -}}
-        </p>
+        <div
+          class="site-footer__message form-message form-message--success"
+          role="status"
+          data-testid="footer-newsletter-success"
+        >
+          {%- render 'status-icon', name: 'success' -%}
+          <p class="site-footer__message-body">{{ 'blocks.footer.newsletter_success' | t }}</p>
+        </div>
       {%- endif -%}
     {%- endform -%}
   </div>
@@ -196,7 +216,7 @@
                     <a
                       class="site-footer__social-link"
                       href="{{ settings[social_key] }}"
-                      aria-label="{{ social_name }}"
+                      aria-label="{{ 'blocks.footer.social_link' | t: shop: shop.name, network: social_name | escape }}"
                       data-testid="footer-social-link"
                     >
                       {%- render 'icon-social', network: network -%}
@@ -210,7 +230,7 @@
           {%- endif -%}
 
           {%- if shop.features.follow_on_shop? -%}
-            <div class="site-footer__shop-follow">{{ shop | login_button: action: 'follow' }}</div>
+            <div class="site-footer__shop-follow" data-testid="footer-shop-follow">{{ shop | login_button: action: 'follow' }}</div>
           {%- endif -%}
         </div>
       </div>
@@ -220,17 +240,28 @@
         <nav class="site-footer__nav" aria-label="{{ 'blocks.footer.menu_label' | t }}">
           {%- for link in menu_links -%}
             {%- if link.links.size > 0 -%}
-              <div class="site-footer__column">
-                <h2 class="site-footer__column-heading">{{ link.title | escape }}</h2>
-                <ul class="site-footer__list">
-                  {%- for child_link in link.links -%}
-                    <li>
-                      <a class="site-footer__link" href="{{ child_link.url }}" data-testid="footer-menu-link">
-                        {{- child_link.title | escape -}}
-                      </a>
-                    </li>
-                  {%- endfor -%}
-                </ul>
+              {% comment %}
+                Under 48rem the column is a closed <details> (row 52, links 44). From 48rem
+                CSS forces the content open and swaps the summary for the plain title, so
+                the title is never an <h*> (foundation §4, SRS TE-1 AC11).
+              {% endcomment %}
+              <div class="site-footer__column" data-testid="footer-menu-column">
+                <p class="site-footer__column-heading">{{ link.title | escape }}</p>
+                <details class="site-footer__menu">
+                  <summary class="site-footer__menu-summary" data-testid="footer-menu-toggle">
+                    <span>{{ link.title | escape }}</span>
+                    <svg aria-hidden="true" focusable="false" class="site-footer__chevron" width="9" height="5" viewBox="0 0 9 5" fill="none"><path d="M0.17192 0.168975C0.401146 -0.0563249 0.77273 -0.0563249 1.00196 0.168975L4.49999 3.60715L7.998 0.168975C8.22722 -0.056325 8.59887 -0.056325 8.82809 0.168975C9.0573 0.394275 9.0573 0.759568 8.82809 0.984845L4.91501 4.831C4.80497 4.93923 4.65565 5 4.49999 5C4.34433 5 4.19501 4.93923 4.08497 4.831L0.17192 0.984845C-0.0573072 0.759568 -0.0573072 0.394275 0.17192 0.168975Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>
+                  </summary>
+                  <ul class="site-footer__list">
+                    {%- for child_link in link.links -%}
+                      <li>
+                        <a class="site-footer__link" href="{{ child_link.url }}" data-testid="footer-menu-link">
+                          {{- child_link.title | escape -}}
+                        </a>
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                </details>
               </div>
             {%- else -%}
               {%- assign has_flat_links = true -%}
@@ -275,15 +306,13 @@
     {%- endif -%}
   </div>
 
+  {% comment %}
+    DOM order follows 360 (wordmark, localization + payment, copyright); from
+    80rem the grid places copyright left, wordmark middle, commerce right.
+  {% endcomment %}
   <div class="site-footer__bottom">
-    <div class="site-footer__copyright">
-      &copy;
-      {{ 'now' | date: '%Y' }}
-      {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
-    </div>
-
     {%- if block.settings.show_wordmark -%}
-      <p class="site-footer__wordmark">{{ shop.name | escape }}</p>
+      <p class="site-footer__wordmark" aria-hidden="true" data-testid="footer-wordmark">{{ shop.name | escape }}</p>
     {%- endif -%}
 
     <div class="site-footer__commerce-group">
@@ -362,6 +391,12 @@
           {%- endfor -%}
         </ul>
       {%- endif -%}
+    </div>
+
+    <div class="site-footer__copyright" data-testid="footer-copyright">
+      &copy;
+      {{ 'now' | date: '%Y' }}
+      {{ shop.name | link_to: routes.root_url }}, {{ powered_by_link }}
     </div>
   </div>
 </footer>
