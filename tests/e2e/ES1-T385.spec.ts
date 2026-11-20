@@ -13,7 +13,8 @@
 //   TE385_POST_COMMENT=1 (đăng bình luận thật), TE385_STORE_STATE=configured (AC15), FRESH_THEME_ID (theme mới cài, AC15)
 // Bài có ảnh, bài không ảnh, trang tag tìm lúc chạy từ trang blog, không cứng handle bài.
 // Phần JS do BE còn mở: ES1-T473 (focus hộp lỗi/thành công bình luận, chevron bài liên quan) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T506 (ES1-T385-B01)); khi bug sửa test đỏ lại → gỡ test.fail.
+// Bug đã biết: test.fail gắn mã (ES1-T506 (ES1-T385-B01), ES1-T517 (B02), ES1-T518 (B03)); khi bug sửa test đỏ lại → gỡ test.fail.
+// Câu hỏi AC: ES1-T519 [Q] (AC14 bài không ảnh → LCP h1) — TC-46b test.fail tới khi CTO chốt.
 import { test, expect, type Browser, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -78,11 +79,13 @@ async function before(a: Locator, b: Locator) {
 
 // --- Tương phản WCAG ---
 type RGB = [number, number, number];
+// Computed color: rgb()/rgba() (0–255) hoặc color(srgb r g b / a) (0–1) — Chrome trả dạng sau cho màu từ color-mix(in srgb, …).
 function parseColor(c: string): { rgb: RGB; a: number } {
-  const m = c.match(/rgba?\(([^)]+)\)/);
+  const m = c.match(/rgba?\(([^)]+)\)/) ?? c.match(/color\(srgb\s+([^)]+)\)/);
   expect(m, `màu không đọc được: ${c}`).not.toBeNull();
   const parts = m![1].split(/[\s,/]+/).filter(Boolean).map(Number);
-  return { rgb: [parts[0], parts[1], parts[2]], a: parts.length > 3 ? parts[3] : 1 };
+  const k = m![0].startsWith('color(') ? 255 : 1;
+  return { rgb: [parts[0] * k, parts[1] * k, parts[2] * k], a: parts.length > 3 ? parts[3] : 1 };
 }
 const blend = (fg: { rgb: RGB; a: number }, bg: RGB): RGB => fg.rgb.map((v, i) => v * fg.a + bg[i] * (1 - fg.a)) as RGB;
 const lum = (rgb: RGB) => {
@@ -512,6 +515,7 @@ test.describe('ES1-T385 blog', () => {
 
   test('TC-14 AC3, AC7 bàn phím: Tab tới chủ đề cuối, outline hiện, link nằm trọn trong khung cuộn', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
+    test.fail(true, 'ES1-T517 (ES1-T385-B02): 360 Tab tới chủ đề cuối, khung cuộn không cuộn hết, link và outline bị cắt mép phải');
     for (const w of [360, 1280]) {
       await openBlog(page, w);
       const links = topicsNav(page).getByRole('link');
@@ -826,7 +830,7 @@ test.describe('ES1-T385 bài viết', () => {
     }
   });
 
-  test('TC-33 AC10: .rte đoạn 16px / 1.7, ≤ 65ch, link gạch chân; 640 × 450 không cuộn ngang', async ({ page }, ti) => {
+  test('TC-33 AC10: .rte đoạn 16px (360, 768) / 18px (1280, 1920), line-height 1.7, ≤ 65ch, link gạch chân; 640 × 450 không cuộn ngang', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
     const path = await coverArticle(page);
     for (const w of WIDTHS) {
@@ -843,8 +847,10 @@ test.describe('ES1-T385 bài viết', () => {
         probe.remove();
         return { size: cs.fontSize, lh: cs.lineHeight, width: el.getBoundingClientRect().width, ch65 };
       });
-      expect(s.size, `${w}`).toBe('16px');
-      expect(parseFloat(s.lh), `${w}: line-height 1.7`).toBeCloseTo(27.2, 0);
+      // article.md §3 bảng mốc "Chữ nội dung": 16 / 1.7 ở 360, 768; 18 / 1.7 ở 1280, 1920 (aux.css: .article-main .rte font-size-lg từ 64rem).
+      const size = w >= 1024 ? 18 : 16;
+      expect(s.size, `${w}`).toBe(`${size}px`);
+      expect(parseFloat(s.lh), `${w}: line-height 1.7`).toBeCloseTo(size * 1.7, 0);
       expect(s.width, `${w}: ≤ 65ch`).toBeLessThanOrEqual(s.ch65 + 1);
       for (const a of await page.getByTestId('article-content').locator('p a').all()) expect(await css(a, 'text-decoration-line')).toContain('underline');
     }
@@ -1085,7 +1091,8 @@ test.describe('ES1-T385 bài viết', () => {
     await expect(page.getByTestId('related-articles')).toHaveCount(0);
   });
 
-  test('TC-45 AC14: title, meta description ≤ 160, 1 BlogPosting đủ trường, 1 BreadcrumbList 3 mục', async ({ page }, ti) => {
+  // Độ dài meta description tách sang TC-45b (bug ES1-T518) để title, JSON-LD vẫn được kiểm.
+  test('TC-45 AC14: title, 1 meta description, 1 BlogPosting đủ trường, 1 BreadcrumbList 3 mục', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
     const d = await discover(page);
     const paths = [d.withCover, d.noCover].filter((p): p is string => !!p);
@@ -1096,7 +1103,6 @@ test.describe('ES1-T385 bài viết', () => {
       expect((await page.title()).trim().startsWith(h1), `${path}: title bắt đầu bằng tên bài`).toBe(true);
       const desc = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
       expect(desc.trim().length, `${path}: có meta description`).toBeGreaterThan(0);
-      expect(desc.length, `${path}: ≤ 160 ký tự (${desc.length})`).toBeLessThanOrEqual(160);
       expect(desc).not.toMatch(/<[a-z/]/i);
       await expect(page.locator('meta[name="description"]')).toHaveCount(1);
       const blocks = (await page.locator('script[type="application/ld+json"]').allTextContents()).map((s) => JSON.parse(s) as Record<string, unknown>);
@@ -1113,20 +1119,47 @@ test.describe('ES1-T385 bài viết', () => {
     }
   });
 
-  test('TC-46 AC14: LCP là ảnh bìa; bài không ảnh LCP là h1', async ({ page }, ti) => {
+  test('TC-45b AC14: meta description bài ≤ 160 ký tự', async ({ page }, ti) => {
+    desktopOnly(ti.project.name);
+    test.fail(true, 'ES1-T518 (ES1-T385-B03): meta-tags dùng page_description (~320 ký tự), chưa cắt excerpt_or_content về 160');
+    const d = await discover(page);
+    const paths = [d.withCover, d.noCover].filter((p): p is string => !!p);
+    test.fixme(paths.length === 0, 'không có bài');
+    for (const path of paths) {
+      await openArticle(page, 1280, path);
+      const desc = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+      expect(desc.length, `${path}: ≤ 160 ký tự (${desc.length})`).toBeLessThanOrEqual(160);
+    }
+  });
+
+  // AC14: "Given đo Lighthouse … có ảnh bìa Then ảnh bìa là LCP" → đo ở khung nhìn Lighthouse (mobile mặc định 412 × 823, preset desktop 1350 × 940),
+  // không ở 360 × 900: khung cao 900 ở 360 cho đoạn đầu bài (~285 × 320 px) lớn hơn ảnh bìa 320 × 240, LCP phụ thuộc độ dài nội dung, không phải theme.
+  const LH_VIEWPORTS = [
+    { w: 412, h: 823 },
+    { w: 1350, h: 940 },
+  ] as const;
+
+  test('TC-46 AC14: có ảnh bìa → LCP là ảnh bìa (khung nhìn Lighthouse)', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
     const d = await discover(page);
-    for (const w of [360, 1280]) {
-      if (d.withCover) {
-        await openArticle(page, w, d.withCover);
-        const e = await lcp(page);
-        expect(e.tag === 'img' && e.testids.includes('article-cover'), `${w} có ảnh: LCP ${e.tag} [${e.testids.join(' < ')}]`).toBe(true);
-      }
-      if (d.noCover) {
-        await openArticle(page, w, d.noCover);
-        const e = await lcp(page);
-        expect(e.testids.includes('page-title-heading'), `${w} không ảnh: LCP ${e.tag} [${e.testids.join(' < ')}]`).toBe(true);
-      } else test.info().annotations.push({ type: 'dữ liệu', description: 'không có bài không ảnh: phần LCP = h1 chưa đo' });
+    test.fixme(!d.withCover, `blog ${BLOG} không có bài có ảnh`);
+    for (const { w, h } of LH_VIEWPORTS) {
+      await openArticle(page, w, d.withCover!, h);
+      const e = await lcp(page);
+      expect(e.tag === 'img' && e.testids.includes('article-cover'), `${w}×${h} có ảnh: LCP ${e.tag} [${e.testids.join(' < ')}]`).toBe(true);
+    }
+  });
+
+  test('TC-46b AC14: không ảnh bìa → LCP là h1 (khung nhìn Lighthouse)', async ({ page }, ti) => {
+    desktopOnly(ti.project.name);
+    const d = await discover(page);
+    test.fixme(!d.noCover, 'không có bài không ảnh (TE385_ARTICLE_NO_COVER_PATH — ES1-T507)');
+    test.fail(true, 'ES1-T519 [Q]: bài không ảnh, đoạn đầu .rte lớn hơn h1 trong khung nhìn nên LCP là <p> — chờ CTO chốt AC14');
+    for (const { w, h } of LH_VIEWPORTS) {
+      await openArticle(page, w, d.noCover!, h);
+      const e = await lcp(page);
+      expect(e.tag === 'img', `${w}×${h} không ảnh: LCP không được là ảnh`).toBe(false);
+      expect(e.testids.includes('page-title-heading'), `${w}×${h} không ảnh: LCP ${e.tag} [${e.testids.join(' < ')}]`).toBe(true);
     }
   });
 });
