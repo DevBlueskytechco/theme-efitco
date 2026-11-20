@@ -90,7 +90,10 @@ test.describe('ES1-T383 tĩnh', () => {
     expect(src).toMatch(/aria-describedby="ContactBodyHint\{% if body_error %\} ContactBodyError/);
     expect(src).toMatch(/aria-describedby="ContactEmailError"/);
     expect(src).toContain('shop.privacy_policy');
-    expect(src).not.toMatch(/<script|autofocus|novalidate/);
+    expect(src).not.toMatch(/autofocus|novalidate/);
+    // ES1-T474: script do BE đặt, chỉ lazy-module.js + contact-form.js, không inline
+    const scripts = [...src.matchAll(/<script\b[^>]*>/g)].map((m) => m[0]);
+    for (const tag of scripts) expect(tag).toMatch(/src="\{\{ (contact_form_js|'lazy-module\.js' \| asset_url) \}\}" type="module"/);
   });
 
   test('AC4, AC5 contact-form: tóm tắt lỗi role=alert, lỗi chung .alert, thành công role=status + Continue Shopping', () => {
