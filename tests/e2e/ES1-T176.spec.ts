@@ -7,6 +7,7 @@ import { autoDeclineConsent } from './support/consent';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { gotoStore } from './support/store-guard';
+import { footerSettingsApplied, FOOTER_PENDING, loadHomeFixture } from './support/home-fixture';
 import { applyMasks, buildBaseline, decodePng, encodePng, fitTo, loadRows, medianColor, ROOT } from './support/figma-baseline.cjs';
 import { compareStyles, gapBetween, nodeBox, parseContent, snapshotIndex, type StyleSpec } from './support/figma-compare';
 import exceptions from './support/figma-exceptions.json';
@@ -317,10 +318,13 @@ test.describe('ES1-T176 so Figma', () => {
 
   test.describe('So copy theo bảng ES1-T173 (AC-H2)', () => {
     const copyRows = (rows as Row[]).filter((row) => row.copyRow);
-    // Bảng ES1-T173 ghi copy hàng 16 vào locale; ES1-T464 chuyển heading newsletter sang setting inline_richtext default rỗng.
-    // Setting block footer ở layout chưa áp được trên preview (ES1-T428, ES1-T177): vắng heading thì không so dòng này.
-    const SETTING_COPY: Record<string, Array<{ value: string; testid: string; why: string }>> = {
-      '16': [{ value: 'Get 15% Off Your First Order', testid: 'footer-newsletter-heading', why: 'newsletter_heading default rỗng, ẩn khi rỗng (ES1-T464); setting footer chưa áp trên preview (ES1-T428/ES1-T177)' }],
+    // Bảng ES1-T173 ghi copy hàng 16 vào locale; ES1-T464, ES1-T402 chuyển heading, text newsletter, mô tả, trust, nhãn nút sang setting
+    // block footer default rỗng (ADR 0011 mục 3). Setting footer ở layout chưa áp được trên preview (ES1-T428, ES1-T177):
+    // chưa áp thì không so các dòng lấy từ setting (chữ = giá trị setting trong fixture ES1-T331); đã áp thì so đủ.
+    const footerSettings = loadHomeFixture().blocks.find((block) => block.scope === 'layout:theme' && block.type === 'footer')?.settings ?? {};
+    const footerCopy = new Set(Object.values(footerSettings).filter((value): value is string => typeof value === 'string').map((value) => value.replace(/<[^>]*>/g, '').trim()));
+    const SETTING_COPY: Record<string, { values: Set<string>; applied: (page: Page) => Promise<boolean>; why: string }> = {
+      '16': { values: footerCopy, applied: footerSettingsApplied, why: FOOTER_PENDING },
     };
     const ready = copyRows.filter((row) => !row.copyNeedsData);
 
@@ -335,11 +339,12 @@ test.describe('ES1-T176 so Figma', () => {
         await page.waitForTimeout(800); // module lazy tính số liệu panel
         const text = (await root.innerText().catch(() => '')).replace(/\s+/g, ' ').trim();
         const skip = new Set((row.copySkip ?? []).map((s: { value: string }) => s.value));
-        // Copy lấy từ setting default rỗng (ES1-T308 #1): phần tử chưa render thì bỏ qua dòng đó, ghi annotation.
-        for (const item of SETTING_COPY[row.copyRow] ?? []) {
-          if ((await root.getByTestId(item.testid).count()) > 0) continue;
-          skip.add(item.value);
-          test.info().annotations.push({ type: 'copy-setting-empty', description: `Hàng ${row.copyRow} "${item.value}": ${item.why}` });
+        // Copy lấy từ setting default rỗng (ES1-T308 #1): setting chưa áp thì bỏ qua các dòng đó, ghi annotation.
+        const settingCopy = SETTING_COPY[row.copyRow];
+        if (settingCopy && !(await settingCopy.applied(page))) {
+          const lines = content[row.copyRow].filter((line) => settingCopy.values.has(line.value)).map((line) => line.value);
+          lines.forEach((value) => skip.add(value));
+          test.info().annotations.push({ type: 'copy-setting-empty', description: `Hàng ${row.copyRow} ${JSON.stringify(lines)}: ${settingCopy.why}` });
         }
         const missing = content[row.copyRow].filter((line) => line.kind === 'copy' && !skip.has(line.value)).map((line) => line.expected).filter((expected) => !text.includes(expected));
         report.push({ row: row.copyRow, missing });
