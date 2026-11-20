@@ -9,6 +9,7 @@ import { expectNotChallenged, expectStoreAllowed, gotoStore, skipIfStoreBlocked 
 import { env } from './support/store-data';
 import { readCartNoScript } from './support/product-data';
 import { watchShopPay403 } from './support/console-guard';
+import { fixtureApplied, skipUnlessFixture } from './support/home-fixture';
 
 // Plan ES1-T169 D4: band A-E chuyển sang index.te13-states (ES1-T157).
 const TE13 = '/?view=te13-states';
@@ -210,8 +211,19 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     await expect(page.getByTestId('product-selling-plans')).toHaveCount(0);
   });
 
-  test('AC2 trang chủ đã nối dữ liệu (CTO 07/11): có featured product, không placeholder', async ({ page }) => {
+  // ES1-T405 (ADR 0011 mục 2): index.liquid không truyền tài nguyên; theme chưa cấu hình không in khối, không khung rỗng.
+  // Kỳ vọng "đã nối dữ liệu" (CTO 07/11) chỉ còn khi store dev đã áp fixture ES1-T331 (sentinel support/home-fixture.ts).
+  test('AC2 trang chủ chưa cấu hình: không featured product, không khung rỗng', async ({ page }) => {
     await page.goto('/');
+    test.skip(await fixtureApplied(page), 'store dev đã áp fixture ES1-T331: khối có dữ liệu, kiểm ở test fixture');
+    await expect(page.locator('featured-product')).toHaveCount(0);
+    await expect(page.getByTestId('featured-product-placeholder')).toHaveCount(0);
+    await expect(page.getByTestId('container-home-featured-product')).toHaveCount(0);
+  });
+
+  test('AC2 trang chủ đã nối dữ liệu (CTO 07/11, fixture): có featured product, không placeholder', async ({ page }) => {
+    await page.goto('/');
+    await skipUnlessFixture(page);
     await expect(page.locator('featured-product')).toHaveCount(1);
     await expect(page.getByTestId('featured-product-placeholder')).toHaveCount(0);
     await expect(page.getByTestId('container-home-featured-product')).toHaveCount(1);
