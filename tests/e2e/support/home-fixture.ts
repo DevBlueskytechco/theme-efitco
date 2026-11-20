@@ -54,10 +54,12 @@ export async function missingMarkers(page: Page, markers: Marker[]): Promise<Mar
   return missing;
 }
 
-// Marker nhận biết nhanh: eyebrow hero (hàng 2) và "360+" (hàng 15), đúng 2 chuỗi AC-H5 nêu tên.
+// Marker nhận biết nhanh: chỉ marker cần setting tài nguyên của fixture (product hàng 10, collection hàng 4).
+// ES1-T405 (ADR 0011): index.liquid bỏ handle figma-*/all_products, nên 2 chuỗi AC-H5 ("Trusted by 10,000+ athletes", "360+")
+// vẫn ra từ locale default (tới TS-FE4 ES1-T406) dù store chưa áp fixture → không dùng để nhận biết. AC-H5 vẫn kiểm qua allMarkers.
 export const SENTINELS: Marker[] = [
-  { testid: 'slideshow-slide', text: 'Trusted by 10,000+ athletes' },
-  { testid: 'faq-stat-1', text: '360+' },
+  { testid: 'featured-product-title', text: 'Ativafit Lava 66 lb Adjustable' },
+  { testid: 'level-card-count', text: '24 Products' },
 ];
 
 export async function fixtureApplied(page: Page): Promise<boolean> {

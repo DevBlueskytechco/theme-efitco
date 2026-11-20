@@ -326,12 +326,16 @@ test.describe('ES1-T109 nojs', () => {
     await expect(page.getByTestId('collection-filter-count')).toHaveText('2');
   });
 
-  test('nojs lọc ra 0 sản phẩm: thông báo và link collection-empty-clear thay CTA', async ({ page }) => {
+  // AC thay (ES1-T365, TE-6 AC14 0.5, collection.md §9): empty state chung, nút "Clear filters" (testid collection-empty-button)
+  // về collection.url, không link "Browse collections"; hook cũ collection-empty-cta/-clear đã bỏ.
+  test('nojs lọc ra 0 sản phẩm: empty state "No Matching Products", Clear filters về URL không filter', async ({ page }) => {
     test.skip(!ENV.noResultQuery, 'Thiếu TE6_FILTER_NO_RESULT_QUERY (ES1-T105 #3)');
     await page.goto(`${MAIN}?${ENV.noResultQuery}`);
     await expect(page.getByTestId('collection-empty')).toBeVisible();
-    await expect(page.getByTestId('collection-empty-cta')).toHaveCount(0);
-    const clear = page.getByTestId('collection-empty-clear');
+    await expect(page.getByTestId('collection-empty-heading')).toHaveText('No Matching Products');
+    await expect(page.getByTestId('collection-empty-link')).toHaveCount(0);
+    const clear = page.getByTestId('collection-empty-button');
+    await expect(clear).toHaveText('Clear filters');
     await clear.click();
     expect(new URL(page.url()).search).toBe('');
   });
