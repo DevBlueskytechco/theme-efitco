@@ -7,6 +7,7 @@ import { test, expect, type Page } from './support/test';
 import { readFileSync, statSync } from 'node:fs';
 import { env } from './support/store-data';
 import { expectNotChallenged } from './support/store-guard';
+import { watchShopPay403 } from './support/console-guard';
 
 const read = (p: string) => readFileSync(p, 'utf8');
 const JS = 'assets/article-comments.js';
@@ -54,6 +55,8 @@ test.describe('ES1-T473 tĩnh', () => {
 });
 
 // Fixture: origin giả, form POST tới /comments (route treo để thấy trạng thái đang gửi).
+// Form gửi vào iframe ẩn (target): điều hướng POST treo ở khung chính làm locator/evaluate của Playwright chờ
+// "navigation to finish" mãi (CI PR #277, cả khi trả 204). JS chỉ nghe sự kiện submit nên target không đổi hành vi.
 const ORIGIN = 'https://fixture.test';
 type State = 'blank' | 'errors' | 'status';
 
@@ -65,13 +68,13 @@ function html(state: State) {
   return `<!doctype html><html lang="en"><head><title>fixture</title></head><body><main>
 <p style="block-size:50vh">Article</p>
 <div class="article-comments" id="comments" data-lazy-module="${ORIGIN}/article-comments.js" data-testid="article-comments">
-  <form method="post" action="${ORIGIN}/comments#comment_form" class="comment-form" data-testid="comment-form">
+  <form method="post" action="${ORIGIN}/comments#comment_form" class="comment-form" data-testid="comment-form" target="post-sink">
     ${status}${errors}
     <label for="CommentAuthor">Name</label><input id="CommentAuthor" name="comment[author]" required>
     <button type="submit" class="button" data-testid="comment-submit">Post Comment</button>
   </form>
   <script src="${ORIGIN}/lazy-module.js" type="module"></script>
-</div></main></body></html>`;
+</div><iframe name="post-sink" title="post" hidden></iframe></main></body></html>`;
 }
 
 async function serve(page: Page, state: State) {
@@ -84,8 +87,9 @@ async function serve(page: Page, state: State) {
     return route.abort();
   });
   const errors: string[] = [];
+  const ignored = watchShopPay403(page);
   page.on('pageerror', (e) => errors.push(e.message));
-  page.on('console', (m) => m.type() === 'error' && errors.push(m.text()));
+  page.on('console', (m) => m.type() === 'error' && !ignored(m) && errors.push(m.text()));
   await page.goto(`${ORIGIN}/article`);
   return { errors, posts: () => posts };
 }
@@ -132,7 +136,7 @@ test.describe('ES1-T473 fixture', () => {
       return f.dispatchEvent(ev);
     });
     expect(second, 'submit lần 2 bị preventDefault').toBe(false);
-    expect(posts()).toBeLessThanOrEqual(1);
+    await expect.poll(posts).toBe(1);
     expect(errors).toEqual([]);
   });
 
