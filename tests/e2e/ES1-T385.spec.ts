@@ -13,8 +13,8 @@
 //   TE385_POST_COMMENT=1 (đăng bình luận thật), TE385_STORE_STATE=configured (AC15), FRESH_THEME_ID (theme mới cài, AC15)
 // Bài có ảnh, bài không ảnh, trang tag tìm lúc chạy từ trang blog, không cứng handle bài.
 // Phần JS do BE còn mở: ES1-T473 (focus hộp lỗi/thành công bình luận, chevron bài liên quan) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T506 (ES1-T385-B01), ES1-T517 (B02), ES1-T518 (B03)); khi bug sửa test đỏ lại → gỡ test.fail.
-// Câu hỏi AC: ES1-T519 [Q] (AC14 bài không ảnh → LCP h1) — TC-46b test.fail tới khi CTO chốt.
+// Bug đã biết: test.fail gắn mã (ES1-T506 (ES1-T385-B01), ES1-T517 (B02, TC-14 360), ES1-T518 (B03), ES1-T520 (B04, TC-33 1280/1920)); khi bug sửa test đỏ lại → gỡ test.fail.
+// Câu hỏi AC: ES1-T519 [Q] (AC14 bài không ảnh → LCP h1) — TC-46b là test thường, chờ CI đo thật mới chốt.
 import { test, expect, type Browser, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -513,10 +513,11 @@ test.describe('ES1-T385 blog', () => {
     await expect(page.getByTestId('blog-articles-topics')).toHaveCount(0);
   });
 
-  test('TC-14 AC3, AC7 bàn phím: Tab tới chủ đề cuối, outline hiện, link nằm trọn trong khung cuộn', async ({ page }, ti) => {
-    desktopOnly(ti.project.name);
-    test.fail(true, 'ES1-T517 (ES1-T385-B02): 360 Tab tới chủ đề cuối, khung cuộn không cuộn hết, link và outline bị cắt mép phải');
-    for (const w of [360, 1280]) {
+  // TC-14 tách theo mốc: 360 vướng bug ES1-T517 (test.fail), 1280 là test thường.
+  for (const w of [360, 1280] as const) {
+    test(`TC-14 AC3, AC7 bàn phím ${w}: Tab tới chủ đề cuối, outline hiện, link nằm trọn trong khung cuộn`, async ({ page }, ti) => {
+      desktopOnly(ti.project.name);
+      test.fail(w === 360, 'ES1-T517 (ES1-T385-B02): 360 Tab tới chủ đề cuối, khung cuộn không cuộn hết, link và outline bị cắt mép phải');
       await openBlog(page, w);
       const links = topicsNav(page).getByRole('link');
       const n = await links.count();
@@ -528,8 +529,8 @@ test.describe('ES1-T385 blog', () => {
       const l = await rect(last);
       const ul = await rect(topicsNav(page).locator('ul'));
       expect(l.x >= ul.x - 1 && l.x + l.width <= ul.x + ul.width + 1, `${w}: link focus nằm trọn trong khung`).toBe(true);
-    }
-  });
+    });
+  }
 
   test('TC-15 AC4: tag không còn bài → giữ nav, "No Articles On This Topic", primary "View All Articles", ×4', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
@@ -830,32 +831,41 @@ test.describe('ES1-T385 bài viết', () => {
     }
   });
 
-  test('TC-33 AC10: .rte đoạn 16px (360, 768) / 18px (1280, 1920), line-height 1.7, ≤ 65ch, link gạch chân; 640 × 450 không cuộn ngang', async ({ page }, ti) => {
+  // srs TE-10 AC15 (sổ 11/11, TS-FE5 ES1-T403) + foundation §28 (CTO 11/11, "Thay §4 article.md"): đoạn .rte 16px / lh 1.7 mọi mốc.
+  // Văn bản chốt sau thắng bảng mốc cũ article.md §3 (18 / 1.7 ở 1280, 1920). Theme aux.css (.article-main .rte font-size-lg từ 64rem) lệch → bug ES1-T520.
+  async function rteParagraph(page: Page, w: number, path: string) {
+    await openArticle(page, w, path);
+    const p = page.getByTestId('article-content').locator('p').first();
+    test.fixme((await p.count()) === 0, 'bài không có đoạn văn');
+    const s = await p.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      const probe = document.createElement('span');
+      probe.style.cssText = 'display:inline-block;white-space:nowrap;visibility:hidden;position:absolute';
+      probe.textContent = '0'.repeat(65);
+      el.append(probe);
+      const ch65 = probe.getBoundingClientRect().width;
+      probe.remove();
+      return { size: cs.fontSize, lh: cs.lineHeight, width: el.getBoundingClientRect().width, ch65 };
+    });
+    expect(s.size, `${w}: đoạn 16px`).toBe('16px');
+    expect(parseFloat(s.lh), `${w}: line-height 1.7`).toBeCloseTo(27.2, 0);
+    expect(s.width, `${w}: ≤ 65ch`).toBeLessThanOrEqual(s.ch65 + 1);
+    for (const a of await page.getByTestId('article-content').locator('p a').all()) expect(await css(a, 'text-decoration-line')).toContain('underline');
+  }
+
+  test('TC-33 AC10 360, 768: .rte đoạn 16px / 1.7, ≤ 65ch, link gạch chân; 640 × 450 không cuộn ngang', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
     const path = await coverArticle(page);
-    for (const w of WIDTHS) {
-      await openArticle(page, w, path);
-      const p = page.getByTestId('article-content').locator('p').first();
-      test.fixme((await p.count()) === 0, 'bài không có đoạn văn');
-      const s = await p.evaluate((el) => {
-        const cs = getComputedStyle(el);
-        const probe = document.createElement('span');
-        probe.style.cssText = 'display:inline-block;white-space:nowrap;visibility:hidden;position:absolute';
-        probe.textContent = '0'.repeat(65);
-        el.append(probe);
-        const ch65 = probe.getBoundingClientRect().width;
-        probe.remove();
-        return { size: cs.fontSize, lh: cs.lineHeight, width: el.getBoundingClientRect().width, ch65 };
-      });
-      // article.md §3 bảng mốc "Chữ nội dung": 16 / 1.7 ở 360, 768; 18 / 1.7 ở 1280, 1920 (aux.css: .article-main .rte font-size-lg từ 64rem).
-      const size = w >= 1024 ? 18 : 16;
-      expect(s.size, `${w}`).toBe(`${size}px`);
-      expect(parseFloat(s.lh), `${w}: line-height 1.7`).toBeCloseTo(size * 1.7, 0);
-      expect(s.width, `${w}: ≤ 65ch`).toBeLessThanOrEqual(s.ch65 + 1);
-      for (const a of await page.getByTestId('article-content').locator('p a').all()) expect(await css(a, 'text-decoration-line')).toContain('underline');
-    }
+    for (const w of [360, 768]) await rteParagraph(page, w, path);
     await openArticle(page, 640, path, 450);
     expect(await noHScroll(page), '640×450').toBe(true);
+  });
+
+  test('TC-33 AC10 1280, 1920: .rte đoạn 16px / 1.7, ≤ 65ch, link gạch chân', async ({ page }, ti) => {
+    desktopOnly(ti.project.name);
+    test.fail(true, 'ES1-T520 (ES1-T385-B04): aux.css .article-main .rte font-size-lg từ 64rem → đoạn 18px, srs TE-10 AC15 + foundation §28 chốt 16px');
+    const path = await coverArticle(page);
+    for (const w of [1280, 1920]) await rteParagraph(page, w, path);
   });
 
   test('TC-34 AC11: blog tắt bình luận → không khu bình luận', async ({ page }, ti) => {
@@ -1154,7 +1164,6 @@ test.describe('ES1-T385 bài viết', () => {
     desktopOnly(ti.project.name);
     const d = await discover(page);
     test.fixme(!d.noCover, 'không có bài không ảnh (TE385_ARTICLE_NO_COVER_PATH — ES1-T507)');
-    test.fail(true, 'ES1-T519 [Q]: bài không ảnh, đoạn đầu .rte lớn hơn h1 trong khung nhìn nên LCP là <p> — chờ CTO chốt AC14');
     for (const { w, h } of LH_VIEWPORTS) {
       await openArticle(page, w, d.noCover!, h);
       const e = await lcp(page);
