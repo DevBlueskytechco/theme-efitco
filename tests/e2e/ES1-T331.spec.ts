@@ -8,7 +8,7 @@ import { test, expect, type Page } from './support/test';
 import { readFileSync, existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { gotoStore } from './support/store-guard';
-import { allMarkers, loadHomeFixture, missingMarkers, skipUnlessFixture, type FixtureBlock } from './support/home-fixture';
+import { expectedMarkers, footerSettingsApplied, FOOTER_PENDING, FOOTER_SETTING_TESTIDS, FOOTER_SUBMIT_DEFAULT, loadHomeFixture, missingMarkers, skipUnlessFixture, type FixtureBlock } from './support/home-fixture';
 
 const ROOT = resolve(__dirname, '../..');
 const fixture = loadHomeFixture();
@@ -121,7 +121,7 @@ test.describe('ES1-T331 fixture nội dung Figma', () => {
         test.skip(info.project.name === 'mobile' && width !== 360, 'mobile chỉ đo 360');
         await openHome(page, width);
         await skipUnlessFixture(page);
-        expect(await missingMarkers(page, allMarkers(fixture))).toEqual([]);
+        expect(await missingMarkers(page, await expectedMarkers(page, fixture))).toEqual([]);
       });
     }
 
@@ -131,7 +131,7 @@ test.describe('ES1-T331 fixture nội dung Figma', () => {
         test.skip(info.project.name !== 'desktop', 'nojs đo 1 lần ở desktop');
         await openHome(page, 1280);
         await skipUnlessFixture(page);
-        expect(await missingMarkers(page, allMarkers(fixture))).toEqual([]);
+        expect(await missingMarkers(page, await expectedMarkers(page, fixture))).toEqual([]);
       });
     });
 
@@ -193,14 +193,16 @@ test.describe('ES1-T331 fixture nội dung Figma', () => {
       await skipUnlessFixture(page);
       const footer = page.getByTestId('footer');
       await expect(footer.getByTestId('footer-logo')).toBeVisible();
-      await expect(footer.getByTestId('footer-description')).toContainText('Efitco provides premium fitness accessories');
-      // ES1-T464: newsletter_heading default rỗng, ẩn khi rỗng; setting footer (layout:theme) chưa áp được trên preview (ES1-T428/ES1-T177).
-      if ((await footer.getByTestId('footer-newsletter-heading').count()) > 0) {
+      // ES1-T464, ES1-T402: chữ footer là setting default rỗng; setting footer (layout:theme) chưa áp được trên preview (ES1-T428/ES1-T177).
+      if (await footerSettingsApplied(page)) {
+        await expect(footer.getByTestId('footer-description')).toContainText('Efitco provides premium fitness accessories');
         await expect(footer.getByTestId('footer-newsletter-heading')).toContainText('Get 15% Off');
+        await expect(footer.getByTestId('footer-newsletter-submit')).toContainText('Get 15% Off');
       } else {
-        info.annotations.push({ type: 'footer-fixture-pending', description: 'newsletter_heading chưa áp trên preview (ES1-T464, ES1-T428/ES1-T177)' });
+        info.annotations.push({ type: 'footer-fixture-pending', description: FOOTER_PENDING });
+        for (const id of FOOTER_SETTING_TESTIDS) await expect(footer.getByTestId(id), `${id} rỗng thì ẩn`).toHaveCount(0);
+        await expect(footer.getByTestId('footer-newsletter-submit')).toHaveText(FOOTER_SUBMIT_DEFAULT);
       }
-      await expect(footer.getByTestId('footer-newsletter-submit')).toContainText('Get 15% Off');
       await expect(footer.getByTestId('footer-newsletter-note')).toHaveText(/No spam\. Unsubscribe anytime\./);
     });
 
@@ -209,7 +211,7 @@ test.describe('ES1-T331 fixture nội dung Figma', () => {
       await page.route(/\/cdn\/shop\/files\/efx-/, (route) => route.abort());
       await openHome(page, 1280);
       await skipUnlessFixture(page);
-      expect(await missingMarkers(page, allMarkers(fixture))).toEqual([]);
+      expect(await missingMarkers(page, await expectedMarkers(page, fixture))).toEqual([]);
     });
   });
 

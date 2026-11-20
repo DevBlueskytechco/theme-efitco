@@ -8,7 +8,7 @@ import { test, expect, type Browser, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged, gotoStore } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
-import { loadHomeFixture, missingMarkers, NOT_APPLIED, SENTINELS } from './support/home-fixture';
+import { footerSettingsApplied, FOOTER_SETTING_TESTIDS, FOOTER_SUBMIT_DEFAULT, loadHomeFixture, missingMarkers, NOT_APPLIED, SENTINELS } from './support/home-fixture';
 
 const PAGES = ['/', '/collections/all', '/cart', '/search'];
 const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
@@ -19,7 +19,6 @@ const stripTags = (html: string) => norm(html.replace(/<[^>]*>/g, ' '));
 const footerFixture = loadHomeFixture().blocks.find((block) => block.scope === 'layout:theme' && block.type === 'footer');
 if (!footerFixture) throw new Error('tests/fixtures/home-figma.json thiếu khối layout:theme footer (ES1-T331)');
 const settings = footerFixture.settings as Record<string, string | null>;
-const pending = (footerFixture.pending_settings ?? {}) as Record<string, string>;
 
 const DESCRIPTION = stripTags(String(settings.description ?? ''));
 const HEADING_HTML = String(settings.newsletter_heading ?? '');
@@ -27,8 +26,8 @@ const HEADING = stripTags(HEADING_HTML);
 // Phần nhấn = chữ trong <em> của fixture; fixture chưa có <em> thì test màu skip có lý do.
 const HEADING_EM = stripTags(HEADING_HTML.match(/<em>([\s\S]*?)<\/em>/i)?.[1] ?? '');
 const NEWSLETTER_TEXT = stripTags(String(settings.newsletter_text ?? ''));
-// newsletter_button_label còn ở pending_settings tới khi ES1-T304 merge; khi đó khoá chuyển sang settings.
-const BUTTON_LABEL = norm(String(settings.newsletter_button_label ?? pending.newsletter_button_label ?? ''));
+// newsletter_button_label: setting default rỗng (ES1-T402), rỗng thì nút dùng locale blocks.footer.newsletter_submit.
+const BUTTON_LABEL = norm(String(settings.newsletter_button_label ?? ''));
 const NOTE = footerFixture.markers?.find((marker) => marker.testid === 'footer-newsletter-note')?.text ?? '';
 
 // Sentinel fixture nằm ở /. Run 43864636567: mở / rồi page.goto(path) trên CÙNG trang thì lần điều hướng thứ 2 bị Cloudflare
@@ -80,16 +79,23 @@ async function footerHeadingApplied(page: Page) {
   return false;
 }
 
+// ES1-T402 (ADR 0011 mục 3): mô tả, text newsletter, trust, nhãn nút cũng là setting default rỗng như heading.
+// Đã áp setting footer: so đủ chữ fixture. Chưa áp: kiểm "rỗng thì ẩn" + nút là nhãn locale, ghi annotation.
 async function expectFooterParts(page: Page) {
   const footer = page.getByTestId('footer');
   await expect(footer.getByTestId('footer-logo')).toBeVisible();
-  expect(norm(await footer.getByTestId('footer-description').textContent())).toBe(DESCRIPTION);
-  if (await footerHeadingApplied(page)) {
-    expect(norm(await footer.getByTestId('footer-newsletter-heading').textContent())).toBe(HEADING);
-  }
-  expect(norm(await footer.locator('.site-footer__newsletter-text').textContent())).toBe(NEWSLETTER_TEXT);
   const submit = footer.getByTestId('footer-newsletter-submit');
-  expect(norm(await submit.textContent())).toBe(BUTTON_LABEL);
+  if (await footerSettingsApplied(page)) {
+    expect(norm(await footer.getByTestId('footer-description').textContent())).toBe(DESCRIPTION);
+    expect(norm(await footer.getByTestId('footer-newsletter-heading').textContent())).toBe(HEADING);
+    expect(norm(await footer.getByTestId('footer-newsletter-text').textContent())).toBe(NEWSLETTER_TEXT);
+    expect(norm(await submit.textContent())).toBe(BUTTON_LABEL);
+  } else {
+    test.info().annotations.push({ type: 'footer-fixture-pending', description: FOOTER_PENDING });
+    for (const id of FOOTER_SETTING_TESTIDS) await expect(footer.getByTestId(id), `${id} rỗng thì ẩn`).toHaveCount(0);
+    await expect(footer.locator('.site-footer__newsletter')).toHaveCount(0);
+    expect(norm(await submit.textContent())).toBe(FOOTER_SUBMIT_DEFAULT);
+  }
   await expect(submit.locator('svg')).toHaveAttribute('aria-hidden', 'true');
   expect(norm(await footer.getByTestId('footer-newsletter-note').textContent())).toBe(NOTE);
 }
