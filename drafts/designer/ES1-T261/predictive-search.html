@@ -15,10 +15,13 @@
   @media (min-width: 48rem) { .stage { --stage-h: 1024px; } }
   @media (min-width: 80rem) { .stage { --stage-h: 800px; } }
   @media (min-width: 100rem) { .stage { --stage-h: 1080px; } }
+  /* V73/V74: khung đủ cao để panel popup hiện hết các khối (không còn tiêu đề khối bị cắt mất danh sách) và thấy 2 góc dưới bo --radius-card */
+  @media (min-width: 80rem) { .stage--tall { --stage-h: 1180px; } }
+  @media (min-width: 100rem) { .stage--tall { --stage-h: 1240px; } }
   .stage > .scrim { position: absolute; }
   .ghost .site-header { position: relative; }
   .ghost-page { display: grid; gap: var(--space-5); padding-block: var(--space-6); }
-  .ghost-line { display: block; width: 40%; height: 40px; border-radius: var(--space-1); background: var(--color-background-alt); }
+  .ghost-line { display: block; width: 40%; height: 40px; border-radius: var(--radius-xs); background: var(--color-background-alt); }
   .ghost-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--grid-gap); }
   .ghost-grid span { aspect-ratio: 1; border-radius: var(--radius-card); background: var(--color-background-cream); }
   @media (min-width: 48rem) { .ghost-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -26,10 +29,10 @@
   .edge-box { max-width: 480px; padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
 
   /* ===== Search overlay (ĐỀ XUẤT, docs/ui-spec/predictive-search.md) ===== */
-  .ps { position: absolute; z-index: 21; display: flex; flex-direction: column; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); }
+  .ps { position: absolute; z-index: var(--layer-overlay); display: flex; flex-direction: column; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); }
   .ps--popup { inset: 0; }
   @media (min-width: 48rem) {
-    .ps--popup { inset: 0 0 auto; max-height: 80%; border-end-start-radius: var(--radius-card); border-end-end-radius: var(--radius-card); }
+    .ps--popup { inset: 0 0 auto; max-height: 80%; overflow: hidden; border-end-start-radius: var(--radius-card); border-end-end-radius: var(--radius-card); } /* V74: overflow hidden để chân trắng không đè 2 góc bo */
   }
   .ps--drawer { inset-block: 0; inset-inline-end: 0; width: min(90%, 420px); }
   @media (min-width: 80rem) { .ps--drawer { width: 480px; } }
@@ -38,7 +41,7 @@
   .ps--drawer .ps__inner { width: auto; margin: 0; padding-inline: var(--space-5); }
 
   .ps__head .ps__inner { display: flex; align-items: center; gap: var(--space-3); min-height: calc(var(--space-1) * 18); padding-inline-end: var(--space-3); border-block-end: 1px solid var(--color-border); }
-  .ps__title { flex: 1; margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); line-height: 1.1; }
+  .ps__title { flex: 1; margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); line-height: var(--line-height-heading); }
 
   .ps__top { flex: none; }
   .ps__top .ps__inner { display: flex; align-items: center; gap: var(--space-3); padding-block: var(--space-3); }
@@ -51,36 +54,16 @@
   @media (min-width: 80rem) {
     .ps--popup .ps__top .ps__inner { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); }
     .ps--popup .ps__logo { display: inline-flex; grid-column: 1 / span 3; }
-    .ps--popup .ps-field { grid-column: 4 / span 8; }
+    .ps--popup .search-field { grid-column: 4 / span 8; }
     .ps--popup .ps__close { grid-column: 12; justify-self: end; }
   }
   /* Nút đóng 48 trên nền tối: viền trắng 24%, icon trắng 17.4:1; hover nền trắng icon tối */
   .ps--popup .ps__close { border-color: color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); background: transparent; color: var(--color-background-dark-foreground); }
   .ps--popup .ps__close:hover, .ps--popup .ps__close.is-hover { border-color: var(--color-background-dark-foreground); background: var(--color-background-dark-foreground); color: var(--color-background-dark); }
 
-  .ps-field { position: relative; display: flex; flex: 1; align-items: center; min-width: 0; min-height: var(--control-height); border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); background: var(--color-background); transition: border-color var(--motion-fast) var(--ease-out); }
-  .ps-field:hover { border-color: var(--color-foreground); }
-  .ps-field:focus-within, .ps-field.is-focus { border-color: var(--color-accent); outline: 2px solid var(--color-accent); outline-offset: -1px; }
-  .ps-field input { flex: 1; min-width: 0; min-height: calc(var(--control-height) - 2px); padding: 0 var(--space-2) 0 0; border: 0; background: none; color: var(--color-foreground); font-size: var(--font-size-base); outline: none; appearance: none; }
-  .ps-field input::-webkit-search-cancel-button { appearance: none; }
-  .ps-field input::placeholder { color: var(--color-muted-light); opacity: 1; }
-  @media (min-width: 80rem) { .ps--popup .ps-field input { font-size: var(--font-size-lg); } }
-  .ps-field__submit, .ps-field__clear { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 44px; height: 44px; padding: 0; border: 0; border-radius: var(--radius-input); background: none; color: var(--color-foreground); cursor: pointer; }
-  .ps-field__submit svg { width: 20px; height: 20px; }
-  .ps-field__clear { color: var(--color-muted); }
-  .ps-field__clear:hover { color: var(--color-foreground); }
-  .ps-field__clear svg { width: 18px; height: 18px; }
-  .ps-field .spinner { flex: none; width: 20px; height: 20px; margin-inline: var(--space-3); }
-  /* Ô tìm trên thanh tối: như input footer Figma 1:1104 (sổ 09/11: viền 100% muted-on-dark 6.11:1) */
-  .ps--popup .ps-field { border-color: var(--color-muted-on-dark); background: transparent; }
-  .ps--popup .ps-field:hover { border-color: var(--color-background-dark-foreground); }
-  .ps--popup .ps-field:focus-within, .ps--popup .ps-field.is-focus { border-color: var(--color-background-dark-foreground); outline-color: var(--color-background-dark-foreground); }
-  .ps--popup .ps-field input { color: var(--color-background-dark-foreground); }
-  .ps--popup .ps-field input::placeholder { color: var(--color-muted-on-dark); }
-  .ps--popup .ps-field__submit { color: var(--color-background-dark-foreground); }
-  .ps--popup .ps-field__clear { color: var(--color-muted-on-dark); }
-  .ps--popup .ps-field__clear:hover { color: var(--color-background-dark-foreground); }
-  .ps--popup .ps-field .spinner { border-color: color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); border-block-start-color: var(--color-background-dark-foreground); }
+  /* ES1-T527 vòng 2: ô tìm = kit .search-field (+ --on-dark ở popup thanh tối, Figma 1:1104): icon kính lúp trái, xoá + submit 44 trong ô, spinner khi tải. Bỏ .ps-field riêng */
+  .ps__top .search-field { flex: 1; }
+  @media (min-width: 80rem) { .ps--popup .search-field .field__input { font-size: var(--font-size-lg); } }
 
   .ps__tabs .ps__inner { padding-block: 0 var(--space-3); }
   .ps--popup .ps__tabs .ps__inner { padding-block: var(--space-4); }
@@ -108,21 +91,21 @@
     .ps--popup .ps-layout { grid-template-columns: repeat(12, minmax(0, 1fr)); }
   }
 
-  .ps-group__title { margin: 0 0 var(--space-2); color: var(--color-muted); font-family: var(--font-primary--family); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: 0.04em; line-height: 20px; text-transform: uppercase; }
+  .ps-group__title { margin: 0 0 var(--space-2); }
   .ps-group__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-block-end: var(--space-2); }
   .ps-group__head .ps-group__title { margin: 0; }
   .ps-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
 
   .ps-option { display: flex; align-items: center; gap: var(--space-3); min-height: 44px; margin-inline: calc(var(--space-3) * -1); padding: var(--space-1) var(--space-3); border-radius: var(--radius-input); color: inherit; text-decoration: none; transition: background-color var(--motion-fast) var(--ease-out); }
   .ps-option:hover, .ps-option.is-hover { background: var(--color-background-alt); }
-  .ps-option[aria-selected='true'] { background: var(--color-background-alt); outline: 2px solid var(--color-foreground); outline-offset: -2px; }
+  .ps-option[aria-selected='true'] { background: var(--color-background-alt); outline: 2px solid var(--color-accent); outline-offset: -2px; }
   .ps-option > svg { flex: none; width: 16px; height: 16px; color: var(--color-muted); }
   .ps-option__text { min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
   .ps-option__text mark { background: none; color: inherit; font-weight: 400; }
   .ps-option__meta { flex: none; margin-inline-start: auto; color: var(--color-muted); font-size: var(--font-size-sm); }
   .ps-option--plain .ps-option__text { font-weight: 500; }
   .ps-option--article { align-items: flex-start; padding-block: var(--space-2); }
-  .ps-option--article img { flex: none; width: 64px; height: 48px; border-radius: var(--space-1); object-fit: cover; }
+  .ps-option--article img { flex: none; width: 64px; height: 48px; border-radius: var(--radius-xs); object-fit: cover; }
   .ps-option--article .ps-option__text { display: grid; gap: 2px; font-weight: 500; line-height: 1.4; }
   .ps-option--article small { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
 
@@ -130,8 +113,8 @@
   .ps-products { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
   .ps-card { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-3); min-height: 80px; margin-inline: calc(var(--space-3) * -1); padding: var(--space-2) var(--space-3); border-radius: var(--radius-input); color: inherit; text-decoration: none; transition: background-color var(--motion-fast) var(--ease-out); }
   .ps-card:hover, .ps-card.is-hover { background: var(--color-background-alt); }
-  .ps-card[aria-selected='true'] { background: var(--color-background-alt); outline: 2px solid var(--color-foreground); outline-offset: -2px; }
-  .ps-card__media { position: relative; display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); }
+  .ps-card[aria-selected='true'] { background: var(--color-background-alt); outline: 2px solid var(--color-accent); outline-offset: -2px; }
+  .ps-card__media { position: relative; display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-swatch); background: var(--color-background-cream); }
   /* Badge -N% góc trái trên như card Figma 1:502 (chỉ ở dạng card, không ở hàng ảnh 64) */
   .ps-card__badge { position: absolute; z-index: 1; inset-block-start: var(--space-2); inset-inline-start: var(--space-2); display: none; }
   .ps-products--grid .ps-card__badge { display: inline-flex; }
@@ -141,7 +124,6 @@
   .ps-card__info { display: grid; gap: 2px; min-width: 0; }
   .ps-card__title { font-weight: 500; letter-spacing: -0.01em; line-height: 1.625; } /* 16/26 Figma 1:502 */
   .ps-card .price { font-size: var(--font-size-sm); line-height: 1.5; }
-  .ps-card__stock { color: var(--color-muted); font-size: var(--font-size-sm); }
 
   .ps-products--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--grid-gap); }
   .ps-products--grid .ps-card { grid-template-columns: 1fr; align-items: start; gap: var(--space-2); min-height: 0; margin: 0; padding: 0; border-radius: var(--radius-card); background: none; }
@@ -183,30 +165,20 @@
   .ps-hint { display: flex; align-items: center; gap: var(--space-2); margin-block-end: var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
   .ps-hint svg { flex: none; width: 16px; height: 16px; }
   .ps-section + .ps-section { margin-block-start: var(--space-6); }
-  .ps-section h4 { margin: 0 0 var(--space-3); color: var(--color-muted); font-family: var(--font-primary--family); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: 0.04em; line-height: 20px; text-transform: uppercase; }
+  .ps-section h4 { margin: 0 0 var(--space-3); }
   .ps-section__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-block-end: var(--space-2); }
   .ps-section__head h4 { margin: 0; }
   .ps-text-button { display: inline-flex; align-items: center; min-height: 44px; padding: 0; border: 0; background: none; color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
   .ps-text-button:hover { color: var(--color-accent); }
-  .ps-chips { display: flex; flex-wrap: wrap; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-  .ps-chip { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-4); border: 1px solid var(--color-background-alt); border-radius: var(--radius-pill); background: var(--color-background-alt); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
-  .ps-chip svg { width: 14px; height: 14px; color: var(--color-muted); }
-  .ps-chip:hover, .ps-chip.is-hover { border-color: var(--color-foreground); }
-  @media (min-width: 80rem) { .ps-chip { min-height: 40px; } }
   .ps-links { margin: 0; padding: 0; list-style: none; }
   .ps-links a { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: 44px; color: inherit; font-weight: 500; text-decoration: none; }
   .ps-links a:hover { color: var(--color-accent); text-decoration: underline; text-underline-offset: 0.2em; }
   .ps-links small { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
 
-  .ps-message { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-card); background: var(--color-background-alt); }
-  .ps-message + .ps-section { margin-block-start: var(--space-6); }
-  .ps-message > svg { flex: none; width: 24px; height: 24px; margin-block-start: 2px; }
-  .ps-message__title { font-size: var(--font-size-lg); font-weight: 600; line-height: 1.4; }
-  .ps-message p + p { margin-block-start: var(--space-1); color: var(--color-muted); font-size: var(--font-size-sm); }
 
   .ps-skeleton-rows { display: grid; gap: var(--space-4); }
   .ps-skeleton-row { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-3); }
-  .ps-skeleton-row .skeleton--media { border-radius: var(--space-2); }
+  .ps-skeleton-row .skeleton--media { border-radius: var(--radius-swatch); }
   .ps-skeleton-row > div { display: grid; gap: var(--space-2); }
   .ps-skeleton-row .skeleton--line:last-child { width: 30%; }
   .ps-skeleton-lines { display: grid; gap: var(--space-4); }
@@ -221,7 +193,6 @@
     .ps-skeleton-cards .skeleton-card .skeleton--line:last-child { width: 40%; }
   }
   .ps-alert { max-width: 40rem; }
-  .ps-alert .button { justify-self: start; margin-block-start: var(--space-2); }
   .ps-alert strong { font-size: var(--font-size-base); }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -230,6 +201,12 @@
   }
   @keyframes ps-drop { from { opacity: 0; translate: 0 calc(var(--space-5) * -1); } }
   @keyframes ps-slide { from { translate: 100% 0; } }
+
+  /* ===== ES1-T527: kit .group-label (V76), .chip/.chip-list (V41), .empty-state--compact (V54), .button--small;
+     hàng active-descendant = outline accent inset như .listbox__option (V68); Sold out dòng có ảnh = badge + ảnh 0.6 (V67) ===== */
+  .ps-empty + .ps-section { margin-block-start: var(--space-6); }
+  .ps-card__media img.is-sold-out { opacity: 0.6; }
+  .ps-card__info .badge { justify-self: start; }
 </style>
 </head>
 <body>
@@ -277,11 +254,12 @@
         <h3 class="visually-hidden" id="t1">Search</h3>
         <div class="ps__top"><div class="ps__inner">
           <a class="ps__logo site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
-          <form class="ps-field" role="search" action="#" data-testid="predictive-search-form">
-            <button class="ps-field__submit" type="submit" aria-label="Search" data-testid="predictive-search-submit"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
+          <form class="search-field search-field--on-dark" role="search" action="#" data-testid="predictive-search-form">
             <label class="visually-hidden" for="q1">Search products, collections, pages, or articles</label>
-            <input id="q1" type="search" name="q" value="bench" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="true" aria-controls="lb1" aria-activedescendant="o1-2" aria-autocomplete="list" autocomplete="off" data-testid="predictive-search-input">
-            <button class="ps-field__clear" type="button" aria-label="Clear search" data-testid="predictive-search-clear"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <input class="field__input" id="q1" type="search" name="q" value="bench" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="true" aria-controls="lb1" aria-activedescendant="o1-2" aria-autocomplete="list" autocomplete="off" data-testid="predictive-search-input">
+            <button class="search-field__clear" type="button" aria-label="Clear search" data-testid="predictive-search-clear"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <button class="search-field__submit" type="submit" aria-label="Search" data-testid="predictive-search-submit"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </form>
           <button class="close-button ps__close" type="button" aria-label="Close search" data-testid="predictive-search-close"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         </div></div>
@@ -295,14 +273,14 @@
         <div class="ps__body" id="panel1" role="tabpanel" aria-labelledby="tab1-all"><div class="ps__inner">
           <div class="ps-layout" id="lb1" role="listbox" aria-label="Search suggestions" data-testid="predictive-search-listbox">
             <div class="ps-group" role="group" aria-labelledby="g1-q">
-              <div class="ps-group__title" id="g1-q">Suggestions</div>
+              <div class="group-label ps-group__title" id="g1-q">Suggestions</div>
               <a class="ps-option" id="o1-1" role="option" aria-selected="false" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="ps-option__text"><mark>bench</mark></span></a>
               <a class="ps-option" id="o1-2" role="option" aria-selected="true" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="ps-option__text">adjustable <mark>bench</mark></span></a>
               <a class="ps-option" id="o1-3" role="option" aria-selected="false" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="ps-option__text">flexfold <mark>bench</mark></span></a>
               <a class="ps-option" id="o1-4" role="option" aria-selected="false" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="ps-option__text">foldable <mark>bench</mark></span></a>
             </div>
             <div class="ps-group ps-main" role="group" aria-labelledby="g1-p">
-              <div class="ps-group__title" id="g1-p">Products</div>
+              <div class="group-label ps-group__title" id="g1-p">Products</div>
               <div class="ps-products ps-products--all">
                 <a class="ps-card is-hover" id="o1-5" role="option" aria-selected="false" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-17%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Adjustable Bench</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$229.00</s></span></span></a>
                 <a class="ps-card" id="o1-6" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P06.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">FlexFold Bench</span><span class="price"><span>$189.99</span></span></span></a>
@@ -311,7 +289,7 @@
               </div>
             </div>
             <div class="ps-group" role="group" aria-labelledby="g1-c">
-              <div class="ps-group__title" id="g1-c">Collections</div>
+              <div class="group-label ps-group__title" id="g1-c">Collections</div>
               <a class="ps-option ps-option--plain" id="o1-9" role="option" aria-selected="false" href="#"><svg aria-hidden="true"><use href="#i-grid"/></svg><span class="ps-option__text"><mark>Bench</mark>es &amp; Racks</span><span class="ps-option__meta">6 products</span></a>
             </div>
           </div>
@@ -345,11 +323,12 @@
         <h3 class="visually-hidden" id="t2">Search</h3>
         <div class="ps__top"><div class="ps__inner">
           <a class="ps__logo site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
-          <form class="ps-field" role="search" action="#">
-            <button class="ps-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
+          <form class="search-field search-field--on-dark" role="search" action="#">
             <label class="visually-hidden" for="q2">Search products, collections, pages, or articles</label>
-            <input id="q2" type="search" name="q" value="set" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="true" aria-controls="lb2" aria-autocomplete="list" autocomplete="off">
-            <button class="ps-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <input class="field__input" id="q2" type="search" name="q" value="set" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="true" aria-controls="lb2" aria-autocomplete="list" autocomplete="off">
+            <button class="search-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <button class="search-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </form>
           <button class="close-button ps__close" type="button" aria-label="Close search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         </div></div>
@@ -364,7 +343,7 @@
         <div class="ps__body" id="panel2" role="tabpanel" aria-labelledby="tab2-products"><div class="ps__inner">
           <div class="ps-layout ps-layout--full" id="lb2" role="listbox" aria-label="Search suggestions">
             <div class="ps-group ps-main" role="group" aria-labelledby="g2-p">
-              <div class="ps-group__title visually-hidden" id="g2-p">Products</div>
+              <div class="group-label ps-group__title visually-hidden" id="g2-p">Products</div>
               <div class="ps-products ps-products--grid ps-products--tab">
                 <a class="ps-card" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Resistance Band Set</span><span class="price"><span>$45.00</span></span></span></a>
                 <a class="ps-card" role="option" aria-selected="false" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-15%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Olympic Plate Set 100</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$289.00</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$339.00</s></span></span></a>
@@ -387,7 +366,7 @@
       <h2 id="s3">3. No products found</h2>
       <p class="demo-note" lang="vi">0 kết quả: ẩn tab, câu báo không đổ lỗi + mẹo sửa, rồi gợi ý tiếp: từ khoá phổ biến, collection phổ biến, sản phẩm đang bán chạy (11 §5). Nút chân thành "Shop All Products". Trường hợp có bài viết nhưng 0 sản phẩm xem spec §6.</p>
     </div>
-    <div class="stage">
+    <div class="stage stage--tall">
       <div class="ghost" aria-hidden="true">
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg><use href="#i-menu"/></svg></span>
@@ -402,36 +381,31 @@
         <h3 class="visually-hidden" id="t3">Search</h3>
         <div class="ps__top"><div class="ps__inner">
           <a class="ps__logo site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
-          <form class="ps-field" role="search" action="#">
-            <button class="ps-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
+          <form class="search-field search-field--on-dark" role="search" action="#">
             <label class="visually-hidden" for="q3">Search products, collections, pages, or articles</label>
-            <input id="q3" type="search" name="q" value="treadmill" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="false" aria-controls="lb3" aria-autocomplete="list" autocomplete="off">
-            <button class="ps-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <input class="field__input" id="q3" type="search" name="q" value="treadmill" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="false" aria-controls="lb3" aria-autocomplete="list" autocomplete="off">
+            <button class="search-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <button class="search-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </form>
           <button class="close-button ps__close" type="button" aria-label="Close search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         </div></div>
         <div class="ps__body"><div class="ps__inner">
           <div class="ps-layout">
             <div class="ps-section-wrap">
-              <div class="ps-message" role="status" data-testid="predictive-search-empty">
-                <svg aria-hidden="true"><use href="#i-search"/></svg>
-                <div>
-                  <p class="ps-message__title">No results for “treadmill”</p>
-                  <p>Check the spelling, or try a more general word such as “bench” or “band”.</p>
-                </div>
-              </div>
+              <div class="empty-state empty-state--compact ps-empty" role="status" data-testid="predictive-search-empty"><span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-search"/></svg></span><p class="empty-state__title">No results for “treadmill”</p><p>Check the spelling, or try a more general word such as “bench” or “band”.</p></div>
               <section class="ps-section" aria-labelledby="h3-pop">
-                <h4 id="h3-pop">Popular searches</h4>
-                <ul class="ps-chips">
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Adjustable bench</a></li>
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Kettlebell</a></li>
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Resistance band</a></li>
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Training mat</a></li>
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Power rack</a></li>
+                <h4 class="group-label" id="h3-pop">Popular searches</h4>
+                <ul class="chip-list">
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Adjustable bench</a></li>
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Kettlebell</a></li>
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Resistance band</a></li>
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Training mat</a></li>
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Power rack</a></li>
                 </ul>
               </section>
               <section class="ps-section" aria-labelledby="h3-col">
-                <h4 id="h3-col">Popular collections</h4>
+                <h4 class="group-label" id="h3-col">Popular collections</h4>
                 <ul class="ps-links">
                   <li><a href="#">Free Weights <small>7 products</small></a></li>
                   <li><a href="#">Benches &amp; Racks <small>6 products</small></a></li>
@@ -441,7 +415,7 @@
               </section>
             </div>
             <section class="ps-section ps-main" aria-labelledby="h3-tr">
-              <h4 id="h3-tr">Trending now</h4>
+              <h4 class="group-label" id="h3-tr">Trending now</h4>
               <ul class="ps-products ps-products--grid">
                 <li><a class="ps-card" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-24%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Ativafit Lava 66 lb Adjustable</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$499.99</s></span></span></a></li>
                 <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Iron Core Kettlebell 16 kg</span><span class="price"><span>$119.00</span></span></span></a></li>
@@ -482,11 +456,12 @@
           <button class="close-button" type="button" aria-label="Close search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         </div></div>
         <div class="ps__top"><div class="ps__inner">
-          <form class="ps-field" role="search" action="#">
-            <button class="ps-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
+          <form class="search-field" role="search" action="#">
             <label class="visually-hidden" for="q4">Search products, collections, pages, or articles</label>
-            <input id="q4" type="search" name="q" value="training" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="true" aria-controls="lb4" aria-autocomplete="list" autocomplete="off">
-            <button class="ps-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <input class="field__input" id="q4" type="search" name="q" value="training" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="true" aria-controls="lb4" aria-autocomplete="list" autocomplete="off">
+            <button class="search-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <button class="search-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </form>
         </div></div>
         <div class="ps__tabs"><div class="ps__inner">
@@ -500,24 +475,24 @@
         <div class="ps__body" id="panel4" role="tabpanel" aria-labelledby="tab4-all"><div class="ps__inner">
           <div class="ps-layout" id="lb4" role="listbox" aria-label="Search suggestions">
             <div class="ps-group" role="group" aria-labelledby="g4-q">
-              <div class="ps-group__title" id="g4-q">Suggestions</div>
+              <div class="group-label ps-group__title" id="g4-q">Suggestions</div>
               <a class="ps-option" role="option" aria-selected="false" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="ps-option__text"><mark>training</mark> mat</span></a>
               <a class="ps-option" role="option" aria-selected="false" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="ps-option__text"><mark>training</mark> mat 12 mm</span></a>
               <a class="ps-option" role="option" aria-selected="false" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg><span class="ps-option__text">functional <mark>training</mark></span></a>
             </div>
             <div class="ps-group" role="group" aria-labelledby="g4-p">
-              <div class="ps-group__title" id="g4-p">Products</div>
+              <div class="group-label ps-group__title" id="g4-p">Products</div>
               <div class="ps-products">
                 <a class="ps-card" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P14.jpg?width=160" alt="" width="160" height="160"></span><span class="ps-card__info"><span class="ps-card__title">Training mat</span><span class="price"><span>$69.00</span></span></span></a>
                 <a class="ps-card" role="option" aria-selected="false" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=160" alt="" width="160" height="160"></span><span class="ps-card__info"><span class="ps-card__title">Training Mat 12 mm</span><span class="price"><span>$69.00</span></span></span></a>
               </div>
             </div>
             <div class="ps-group" role="group" aria-labelledby="g4-c">
-              <div class="ps-group__title" id="g4-c">Collections</div>
+              <div class="group-label ps-group__title" id="g4-c">Collections</div>
               <a class="ps-option ps-option--plain" role="option" aria-selected="false" href="#"><svg aria-hidden="true"><use href="#i-grid"/></svg><span class="ps-option__text">Functional <mark>Training</mark></span><span class="ps-option__meta">5 products</span></a>
             </div>
             <div class="ps-group" role="group" aria-labelledby="g4-a">
-              <div class="ps-group__title" id="g4-a">Articles</div>
+              <div class="group-label ps-group__title" id="g4-a">Articles</div>
               <a class="ps-option ps-option--article" role="option" aria-selected="false" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg?width=160" alt="" width="64" height="48"><span class="ps-option__text">How to stretch properly after <mark>training</mark><small>Nov 5, 2026</small></span></a>
             </div>
           </div>
@@ -536,7 +511,7 @@
       <h2 id="s5">5. Empty: opened, fewer than 2 characters</h2>
       <p class="demo-note" lang="vi">Mở popup hoặc mới gõ 1 ký tự: câu nhắc "Type at least 2 characters", tìm gần đây (lưu trên máy, có Clear), từ khoá phổ biến, collection phổ biến, sản phẩm đang bán chạy. Ảnh chỉ tải khi popup mở.</p>
     </div>
-    <div class="stage">
+    <div class="stage stage--tall">
       <div class="ghost" aria-hidden="true">
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg><use href="#i-menu"/></svg></span>
@@ -551,11 +526,12 @@
         <h3 class="visually-hidden" id="t5">Search</h3>
         <div class="ps__top"><div class="ps__inner">
           <a class="ps__logo site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
-          <form class="ps-field is-focus" role="search" action="#">
-            <button class="ps-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
+          <form class="search-field search-field--on-dark" role="search" action="#">
             <label class="visually-hidden" for="q5">Search products, collections, pages, or articles</label>
-            <input id="q5" type="search" name="q" value="b" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="false" aria-controls="lb5" aria-autocomplete="list" aria-describedby="hint5" autocomplete="off">
-            <button class="ps-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <input class="field__input is-focus" id="q5" type="search" name="q" value="b" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="false" aria-controls="lb5" aria-autocomplete="list" aria-describedby="hint5" autocomplete="off">
+            <button class="search-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <button class="search-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </form>
           <button class="close-button ps__close" type="button" aria-label="Close search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         </div></div>
@@ -564,24 +540,24 @@
           <div class="ps-layout">
             <div class="ps-section-wrap">
               <section class="ps-section" aria-labelledby="h5-rec">
-                <div class="ps-section__head"><h4 id="h5-rec">Recent searches</h4><button class="ps-text-button" type="button">Clear<span class="visually-hidden"> recent searches</span></button></div>
-                <ul class="ps-chips">
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-clock"/></svg>kettlebell</a></li>
-                  <li><a class="ps-chip is-hover" href="#"><svg aria-hidden="true"><use href="#i-clock"/></svg>bench</a></li>
+                <div class="ps-section__head"><h4 class="group-label" id="h5-rec">Recent searches</h4><button class="ps-text-button" type="button">Clear<span class="visually-hidden"> recent searches</span></button></div>
+                <ul class="chip-list">
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-clock"/></svg>kettlebell</a></li>
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-clock"/></svg>bench</a></li>
                 </ul>
               </section>
               <section class="ps-section" aria-labelledby="h5-pop">
-                <h4 id="h5-pop">Popular searches</h4>
-                <ul class="ps-chips">
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Adjustable bench</a></li>
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Kettlebell</a></li>
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Resistance band</a></li>
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Training mat</a></li>
-                  <li><a class="ps-chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Power rack</a></li>
+                <h4 class="group-label" id="h5-pop">Popular searches</h4>
+                <ul class="chip-list">
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Adjustable bench</a></li>
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Kettlebell</a></li>
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Resistance band</a></li>
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Training mat</a></li>
+                  <li><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Power rack</a></li>
                 </ul>
               </section>
               <section class="ps-section" aria-labelledby="h5-col">
-                <h4 id="h5-col">Popular collections</h4>
+                <h4 class="group-label" id="h5-col">Popular collections</h4>
                 <ul class="ps-links">
                   <li><a href="#">Free Weights <small>7 products</small></a></li>
                   <li><a href="#">Benches &amp; Racks <small>6 products</small></a></li>
@@ -590,7 +566,7 @@
               </section>
             </div>
             <section class="ps-section ps-main" aria-labelledby="h5-tr">
-              <h4 id="h5-tr">Trending now</h4>
+              <h4 class="group-label" id="h5-tr">Trending now</h4>
               <ul class="ps-products ps-products--grid">
                 <li><a class="ps-card" href="#"><span class="ps-card__media"><span class="ps-card__badge badge badge--sale">-24%</span><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Ativafit Lava 66 lb Adjustable</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$499.99</s></span></span></a></li>
                 <li><a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg?width=480" alt="" width="480" height="480"></span><span class="ps-card__info"><span class="ps-card__title">Iron Core Kettlebell 16 kg</span><span class="price"><span>$119.00</span></span></span></a></li>
@@ -625,11 +601,12 @@
         <h3 class="visually-hidden" id="t6">Search</h3>
         <div class="ps__top"><div class="ps__inner">
           <a class="ps__logo site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
-          <form class="ps-field is-focus" role="search" action="#">
-            <button class="ps-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
+          <form class="search-field search-field--on-dark" role="search" action="#">
             <label class="visually-hidden" for="q6">Search products, collections, pages, or articles</label>
-            <input id="q6" type="search" name="q" value="kettle" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="false" aria-controls="lb6" aria-autocomplete="list" autocomplete="off">
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <input class="field__input is-focus" id="q6" type="search" name="q" value="kettle" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="false" aria-controls="lb6" aria-autocomplete="list" autocomplete="off">
             <span class="spinner" aria-hidden="true"></span>
+            <button class="search-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </form>
           <button class="close-button ps__close" type="button" aria-label="Close search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         </div></div>
@@ -682,11 +659,12 @@
         <h3 class="visually-hidden" id="t7">Search</h3>
         <div class="ps__top"><div class="ps__inner">
           <a class="ps__logo site-header__logo" href="#" aria-label="Efitco home"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a>
-          <form class="ps-field" role="search" action="#">
-            <button class="ps-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-search"/></svg></button>
+          <form class="search-field search-field--on-dark" role="search" action="#">
             <label class="visually-hidden" for="q7">Search products, collections, pages, or articles</label>
-            <input id="q7" type="search" name="q" value="kettle" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="false" aria-controls="lb7" aria-autocomplete="list" autocomplete="off">
-            <button class="ps-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <svg aria-hidden="true"><use href="#i-search"/></svg>
+            <input class="field__input" id="q7" type="search" name="q" value="kettle" placeholder="Search benches, kettlebells, mats…" role="combobox" aria-expanded="false" aria-controls="lb7" aria-autocomplete="list" autocomplete="off">
+            <button class="search-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+            <button class="search-field__submit" type="submit" aria-label="Search"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
           </form>
           <button class="close-button ps__close" type="button" aria-label="Close search"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         </div></div>
@@ -696,7 +674,7 @@
             <div class="alert__body">
               <strong>Suggestions are unavailable right now</strong>
               <p>Check your connection and try again, or press Enter to see all results for “kettle”.</p>
-              <button class="button button--secondary" type="button">Try Again</button>
+              <button class="button button--secondary button--small" type="button">Try Again</button>
             </div>
           </div>
         </div></div>
@@ -712,13 +690,13 @@
   <section class="demo-block" aria-labelledby="s8" style="padding-block-end: var(--space-7)">
     <div class="container">
       <h2 id="s8">8. Edge cases in the product list</h2>
-      <p class="demo-note" lang="vi">Ca biên từ demo-data edge_cases: không ảnh (placeholder trên cream), hết hàng (chữ "Sold out" cạnh giá, xếp cuối), giá sale nhỏ, tên dài cắt 2 dòng.</p>
+      <p class="demo-note" lang="vi">Ca biên từ demo-data edge_cases: không ảnh (placeholder trên cream), hết hàng (dòng có ảnh: badge Sold out + ảnh 0.6, xếp cuối; quy tắc DS V67), giá sale nhỏ, tên dài cắt 2 dòng.</p>
       <div class="edge-box">
         <div class="ps-products">
           <a class="ps-card" href="#"><span class="ps-card__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="ps-card__info"><span class="ps-card__title">Sản phẩm không có media</span><span class="price"><span>$34.00</span></span></span></a>
           <a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg?width=160" alt="" width="160" height="160"></span><span class="ps-card__info"><span class="ps-card__title">Sale giá nhỏ</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$0.99</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$1.99</s></span></span></a>
           <a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg?width=160" alt="" width="160" height="160"></span><span class="ps-card__info"><span class="ps-card__title">Sản phẩm có màu sale và màu không sale</span><span class="price"><span>$200.00</span></span></span></a>
-          <a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=160" alt="" width="160" height="160" style="opacity:.6"></span><span class="ps-card__info"><span class="ps-card__title">Hết hàng toàn bộ</span><span class="price"><span>$1,000.00</span><span class="ps-card__stock">· Sold out</span></span></span></a>
+          <a class="ps-card" href="#"><span class="ps-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=160" alt="" width="160" height="160" class="is-sold-out"></span><span class="ps-card__info"><span class="ps-card__title">Hết hàng toàn bộ</span><span class="price"><span>$1,000.00</span></span><span><span class="badge badge--sold-out">Sold out</span></span></span></a>
         </div>
       </div>
     </div>

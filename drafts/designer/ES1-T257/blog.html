@@ -7,81 +7,59 @@
 <meta name="description" content="Training tips, home gym setups and nutrition advice from the Efitco team.">
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
-  /* Riêng trang blog (ES1-T257). Spec: docs/ui-spec/blog.md */
+  /* Riêng trang blog (ES1-T257). Spec: docs/ui-spec/blog.md. ES1-T527 (DS check 20/11): chỉ bố cục trang;
+     pagination* lấy từ kit (V57), bo 16 = --radius-panel (V04, V59), khoảng meta → tab một token cho mọi trạng thái (V64). */
   .blog-page { padding-block-end: var(--section-gap); }
 
-  /* Lọc tag: link thật, dáng tab (foundation §7) */
-  .blog-page .page-title { padding-block-end: var(--space-5); }
-  @media (min-width: 64rem) { .blog-page .page-title { padding-block-end: var(--space-6); } }
-  .topic-nav { margin-block-end: var(--space-6); }
+  /* V64: đầu blog (mặc định và lọc tag) cùng khoảng meta → hàng tab = --heading-gap (24 / 40 từ 80rem, thang C) */
+  .blog-title { padding-block-end: var(--heading-gap); }
+
+  /* Lọc tag: link thật, dáng tab (foundation §7); đang chọn = aria-current (kit) */
+  .topic-nav { margin-block-end: var(--space-2xl); }
   .topic-nav .tabs { padding: 3px; margin: -3px; }
   /* < 48rem: hàng tab tràn sát mép màn để lộ tab kế tiếp (cuộn ngang trong hàng, không cuộn trang) */
   @media (max-width: 47.99rem) { .topic-nav .tabs { margin-inline: calc(var(--page-margin) * -1); padding-inline: var(--page-margin); scroll-padding-inline: var(--page-margin); } }
   .topic-nav .tab { text-decoration: none; }
-  .topic-nav .tab[aria-current='page'] { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
-  @media (min-width: 80rem) { .topic-nav { margin-block-end: calc(var(--space-1) * 10); } }
+  @media (min-width: 80rem) { .topic-nav { margin-block-end: var(--heading-gap); } }
 
   /* Bài nổi bật (trang 1, không lọc tag) */
-  .featured-post { position: relative; display: grid; gap: var(--space-5); margin-block-end: var(--space-7); }
-  .featured-post__media { aspect-ratio: 4 / 3; overflow: hidden; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-dark); }
+  .featured-post { position: relative; display: grid; gap: var(--space-xl); margin-block-end: var(--space-4xl); }
+  .featured-post__media { aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); }
   .featured-post__media img { width: 100%; height: 100%; object-fit: cover; transition: scale var(--motion-slow) var(--ease-out); }
   .featured-post:hover .featured-post__media img, .featured-post.is-hover .featured-post__media img { scale: 1.04; }
-  .featured-post__body { display: grid; align-content: center; justify-items: start; gap: var(--space-4); }
+  .featured-post__body { display: grid; align-content: center; justify-items: start; gap: var(--space-md); }
   .featured-post__title { font-size: var(--font-size-h2); }
   .featured-post__title a { text-decoration: none; }
   .featured-post__title a::after { content: ''; position: absolute; inset: 0; z-index: 1; }
   .featured-post__title a:hover, .featured-post.is-hover .featured-post__title a { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.12em; }
   .featured-post__title a:focus-visible { outline: none; }
-  .featured-post:has(a:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: calc(var(--radius-card) + var(--space-1)); }
+  .featured-post:has(a:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 4px; border-radius: var(--radius-panel); }
   .featured-post__excerpt { max-width: 60ch; color: var(--color-muted); }
-  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); line-height: calc(22 / 14); }
-  .meta > span + span::before { content: '·'; margin-inline-end: var(--space-2); color: var(--color-muted-light); }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .meta > span + span::before { content: '·'; margin-inline-end: var(--space-xs); color: var(--color-muted-light); }
   @media (min-width: 48rem) {
-    .featured-post { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-6); }
+    .featured-post { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: var(--space-2xl); }
   }
   @media (min-width: 64rem) {
-    .featured-post { gap: var(--space-7); margin-block-end: calc(var(--space-1) * 16); }
+    .featured-post { gap: var(--space-4xl); margin-block-end: var(--space-5xl); }
   }
   @media (min-width: 80rem) {
-    .featured-post__title { font-size: var(--font-size-h1); line-height: calc(58 / 48); }
+    .featured-post__title { font-size: var(--font-size-h1); }
     .featured-post__excerpt { font-size: var(--font-size-lg); }
   }
 
   /* Lưới card (Figma 1:1022): 1 / 2 / 3 / 4 cột */
-  .article-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-5) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
-  .article-grid .article-card__title { font-size: var(--font-size-lg); }
+  .article-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
   /* Shopify §7 Blog (11/11): trang blog hiện excerpt_or_content (truncatewords 20) */
-  .article-card__excerpt { margin: 0; color: color-mix(in srgb, var(--color-background-dark-foreground) 85%, transparent); font-size: var(--font-size-sm); line-height: calc(22 / 14); }
-  /* Vòng 3: Figma 1:1030 padding 24 từ 48rem (code base.css cũng vậy; kit đang 16). Meta chữ trắng như code (ES1-T174), không #999 */
-  .article-card__meta { color: var(--color-background-dark-foreground); }
-  .article-card__meta span + span::before { content: '·'; margin-inline: var(--space-2); }
-  @media (min-width: 48rem) { .article-card__content { padding: 0 var(--space-5) var(--space-5); } }
+  .article-card__excerpt { margin: 0; color: color-mix(in srgb, var(--color-background-dark-foreground) 85%, transparent); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  /* ES1-T527 vòng 2: lề 24 từ 48rem, meta chữ trắng + '·', mẫu hover .is-hover đều lấy từ kit article-card (Figma 1:1030) */
   @media (min-width: 48rem) { .article-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 64rem) { .article-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (min-width: 80rem) { .article-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: calc(var(--space-1) * 10); } }
-
-  /* Phân trang: khối chung docs/ui-spec/pagination.md (ES1-T287), thay nút chữ Newer/Older */
-  .pagination { margin-block-start: var(--space-7); }
-  @media (min-width: 64rem) { .pagination { margin-block-start: calc(var(--space-1) * 16); } }
-  .pagination + .pagination { margin-block-start: var(--space-6); }
-  .pagination__list { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-  .pagination__step { text-decoration: none; }
-  .pagination__step[aria-disabled='true'] { cursor: default; }
-  .pagination__item--prev { margin-inline-end: var(--space-2); }
-  .pagination__item--next { margin-inline-start: var(--space-2); }
-  .pagination__page { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
-  a.pagination__page:hover, .pagination__page.is-hover { border-color: var(--color-foreground); }
-  .pagination__page:focus-visible, .pagination__page.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-  .pagination__page[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
-  .pagination__gap { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 44px; color: var(--color-muted); font-size: var(--font-size-sm); }
-  .pagination__status { font-size: var(--font-size-sm); font-weight: 500; white-space: nowrap; }
-  :dir(rtl) .pagination__step svg { scale: -1 1; }
-  @media (max-width: 47.99rem) { .pagination__num { display: none; } .pagination__list { justify-content: space-between; } .pagination__item--prev, .pagination__item--next { margin: 0; } }
-  @media (min-width: 48rem) { .pagination__status { display: none; } }
+  @media (min-width: 80rem) { .article-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: var(--space-3xl); } }
 
   /* Trạng thái */
-  .skeleton--card { aspect-ratio: 3 / 4; border-radius: calc(var(--radius-card) + var(--space-1)); }
-  .demo-states { padding-block: var(--space-7); }
+  .skeleton--card { aspect-ratio: 3 / 4; border-radius: var(--radius-panel); }
+  .demo-states { padding-block: var(--space-4xl); }
 </style>
 </head>
 <body>
@@ -142,7 +120,7 @@
       <ol><li><a href="#">Home</a></li><li><span aria-current="page">Training Tips &amp; Inspiration</span></li></ol>
     </nav>
 
-    <div class="page-title">
+    <div class="page-title blog-title">
       <p class="eyebrow">From the Efitco blog</p>
       <h1>Training Tips &amp; Inspiration</h1>
       <p class="page-title__meta">4 articles</p>
@@ -212,7 +190,7 @@
 <!-- Footer vòng 3 (Figma 1:1104, foundation §4): newsletter · panel dải rộng · hàng cuối có wordmark -->
 <footer class="site-footer">
   <div class="container site-footer__band">
-    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
     <div class="site-footer__newsletter">
       <h2><span>Get 15% Off</span> Your First Order</h2>
       <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
@@ -263,11 +241,11 @@
 
   <section class="demo-block">
     <h2>Trạng thái: lọc theo tag "Diet plans"</h2>
-    <p class="demo-note">URL /blogs/figma-blog/tagged/diet-plans. Không có bài nổi bật; breadcrumb thêm tag; meta đổi; tab tag có aria-current. Ảnh hàng card đầu eager (LCP khi không có bài nổi bật).</p>
+    <p class="demo-note">URL /blogs/figma-blog/tagged/diet-plans. Khoảng meta → hàng tab = --heading-gap như trạng thái mặc định (V64). Không có bài nổi bật; breadcrumb thêm tag; meta đổi; tab tag có aria-current. Ảnh hàng card đầu eager (LCP khi không có bài nổi bật).</p>
     <nav class="breadcrumb" aria-label="Breadcrumb, tag sample"><ol><li><a href="#">Home</a></li><li><a href="#">Training Tips &amp; Inspiration</a></li><li><span aria-current="page">Diet plans</span></li></ol></nav>
-    <div class="page-title">
+    <div class="page-title blog-title">
       <p class="eyebrow">From the Efitco blog</p>
-      <p class="h1" style="font-family: var(--font-heading--family); font-weight: var(--font-heading--weight); letter-spacing: -0.02em;">Training Tips &amp; Inspiration</p>
+      <p class="h1">Training Tips &amp; Inspiration</p>
       <p class="page-title__meta">2 articles tagged Diet plans</p>
     </div>
     <nav class="topic-nav" aria-label="Blog topics, tag sample">
@@ -293,7 +271,7 @@
       <p>New training tips are on the way. Until then, find the right gear for your next session.</p>
       <div class="empty-state__actions">
         <a class="button" href="#">Explore Equipment</a>
-        <a class="text-link" href="#" style="align-self: center">Back to homepage</a>
+        <a class="text-link" href="#">Back to homepage</a>
       </div>
     </div>
   </section>
@@ -336,11 +314,11 @@
 
   <section class="demo-block">
     <h2>Trạng thái: card không ảnh, không tag, không thời gian đọc · hover · focus</h2>
-    <p class="demo-note">Không ảnh: nền --color-background-dark #1A1A1A (17.4:1). Không tag: không pill. article.content rỗng: ẩn thời gian đọc (AC-H27), còn ngày.</p>
+    <p class="demo-note">Không ảnh: kit .article-card--no-image, nền --color-background-dark #1A1A1A (17.4:1), không gradient. Card bo 16 = --radius-panel (V04). Không tag: không pill. article.content rỗng: ẩn thời gian đọc (AC-H27), còn ngày.</p>
     <ul class="article-grid">
-      <li><a class="article-card" href="#"><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__excerpt">Practical advice from our coaches on choosing, using and caring for your home gym gear.</p><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span></p></div></a></li>
-      <li><a class="article-card is-hover" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Featured</span><div class="article-card__content"><h3 class="article-card__title" style="text-decoration: underline; text-underline-offset: 0.1em">Set up a perfect home gym in just 15m²</h3><p class="article-card__meta"><span>Hover</span></p></div></a></li>
-      <li><a class="article-card" href="#" style="outline: 2px solid var(--color-accent); outline-offset: 2px"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__excerpt">Practical advice from our coaches on choosing, using and caring for your home gym gear.</p><p class="article-card__meta"><span>Focus</span></p></div></a></li>
+      <li><a class="article-card article-card--no-image" href="#"><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__excerpt">Practical advice from our coaches on choosing, using and caring for your home gym gear.</p><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span></p></div></a></li>
+      <li><a class="article-card is-hover" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Featured</span><div class="article-card__content"><h3 class="article-card__title">Set up a perfect home gym in just 15m²</h3><p class="article-card__meta"><span>Hover</span></p></div></a></li>
+      <li><a class="article-card is-focus" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__excerpt">Practical advice from our coaches on choosing, using and caring for your home gym gear.</p><p class="article-card__meta"><span>Focus</span></p></div></a></li>
     </ul>
   </section>
 
