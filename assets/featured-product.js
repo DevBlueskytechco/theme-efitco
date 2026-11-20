@@ -57,9 +57,9 @@ const r = await fetch(url, { signal });
 if (!r.ok) throw r.status;
 const q = (e) => e.querySelectorAll("featured-product :is(fieldset,[data-variant-price],[data-selected-variant],[name=add])");
 const n = q(new DOMParser().parseFromString(await r.text(), "text/html"));
-const f = document.activeElement.value;
+const a = document.activeElement, f = this.contains(a) && a.value;
 q(this).forEach((e, i) => e.replaceWith(n[i]));
-this.$(`[value="${f}"]`)?.focus();
+f && this.$(`[value="${f}"]`)?.focus();
 }
 }
 customElements.get("featured-product") || customElements.define("featured-product", F);
