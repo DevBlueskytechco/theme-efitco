@@ -4,13 +4,17 @@
 // Merchant sửa trong editor (TC-H6) là bước tay; ở đây param trùng tên setting đóng vai giá trị đã lưu, trên /?view=te7.
 import { test, expect, type Locator, type Page } from './support/test';
 import { gotoStore } from './support/store-guard';
+import { fixtureApplied, skipUnlessFixture } from './support/home-fixture';
 
 const HOME = '/';
 const FIGMA = '/?view=figma';
 const TE7 = '/?view=te7';
 
+// ES1-T406 (TS-FE4, ADR 0011 mục 3, SRS 0.5 AC-H5, AC-H36): eyebrow slide là claim, index.liquid không truyền default;
+// theme chưa cấu hình không có eyebrow. Chuỗi Figma chỉ có trên /?view=figma (literal) và store dev đã áp fixture ES1-T331.
+const SLIDE_EYEBROW_FIGMA = 'Trusted by 10,000+ athletes';
+const NOT_CONFIGURED_SKIP = 'store dev đã áp fixture ES1-T331: copy Figma, kiểm ở test fixture';
 const SLIDE = {
-  eyebrow: 'Trusted by 10,000+ athletes',
   heading: 'Level Up Your Fitness',
   subheading: 'Upgrade your journey with Efitco gear made for every workout.',
   button: 'Explore Equipment',
@@ -20,12 +24,15 @@ const BANNER = {
   body: 'Just simple, effective workouts you can do anytime at home',
   button: 'Get Started Now',
 };
+// ES1-T406 sửa chính tả N13 trong locale ("We are about"); /?view=figma và fixture giữ chữ Figma "We aRE about".
 const WHY = {
-  eyebrow: 'We aRE about',
+  eyebrow: 'We are about',
   heading: 'Why Choose efitco?',
   body: "Affordable, high-quality fitness gear that supports beginners to elite athletes. We design for the home first — equipment that folds, stacks or disappears when you're done, so your living room stays a living room between sessions.",
   button: 'View About Us',
 };
+
+const WHY_FIGMA = { ...WHY, eyebrow: 'We aRE about' };
 
 const tid = (scope: Page | Locator, id: string) => scope.getByTestId(id);
 const band = (page: Page, id: string) => page.getByTestId(`container-${id}`);
@@ -34,12 +41,13 @@ const norm = (text: string | null) => (text ?? '').replace(/\s+/g, ' ').trim();
 // textContent: giữ chữ gốc, không qua text-transform uppercase của CSS
 const content = async (locator: Locator) => norm(await locator.textContent());
 
-async function expectSlides(page: Page) {
+async function expectSlides(page: Page, eyebrow?: string) {
   const slides = tid(page, 'slideshow-slide');
   await expect(slides).toHaveCount(2);
   for (const index of [0, 1]) {
     const scope = slides.nth(index);
-    expect(await content(scope.locator('.slideshow__eyebrow'))).toBe(SLIDE.eyebrow);
+    if (eyebrow) expect(await content(scope.locator('.slideshow__eyebrow'))).toBe(eyebrow);
+    else await expect(scope.locator('.slideshow__eyebrow')).toHaveCount(0);
     expect(await content(tid(scope, 'slideshow-heading'))).toBe(SLIDE.heading);
     expect(await content(scope.locator('.slideshow__subheading'))).toBe(SLIDE.subheading);
     expect(await content(tid(scope, 'slideshow-button-primary'))).toBe(SLIDE.button);
@@ -56,14 +64,23 @@ async function expectIwt(scope: Locator, copy: { eyebrow?: string; heading: stri
 }
 
 test.describe('ES1-T180 TE-17 hàng 2, 4a, 8, 13 mặc định', () => {
-  test('AC-H5 hàng 2 chưa cấu hình: 2 slide cùng copy, h1 chỉ ở slide 1, 2 dòng', async ({ page }) => {
+  test('AC-H5, AC-H36 hàng 2 chưa cấu hình: 2 slide cùng copy, không eyebrow claim, h1 chỉ ở slide 1, 2 dòng', async ({ page }) => {
     await page.goto(HOME);
+    test.skip(await fixtureApplied(page), NOT_CONFIGURED_SKIP);
     await expectSlides(page);
     const h1 = page.locator('h1[data-testid="slideshow-heading"]');
     await expect(h1).toHaveCount(1);
     await expect(tid(page, 'slideshow-slide').first().locator('h1')).toHaveCount(1);
     const lines = await h1.evaluate((el) => Math.round(el.getBoundingClientRect().height / parseFloat(getComputedStyle(el).lineHeight)));
     expect(lines).toBe(2);
+  });
+
+  test('AC-H5 hàng 2 đã cấu hình (fixture): 2 slide có eyebrow Figma', async ({ page }) => {
+    await page.goto(HOME);
+    await skipUnlessFixture(page);
+    const slides = tid(page, 'slideshow-slide');
+    await expect(slides).toHaveCount(2);
+    for (const index of [0, 1]) expect(await content(slides.nth(index).locator('.slideshow__eyebrow'))).toBe(SLIDE_EYEBROW_FIGMA);
   });
 
   test('AC-H5 hàng 4a chưa cấu hình: copy đúng 1:457, 1:460, 1:462', async ({ page }) => {
@@ -76,6 +93,7 @@ test.describe('ES1-T180 TE-17 hàng 2, 4a, 8, 13 mặc định', () => {
 
   test('AC-H5 hàng 8, 13 chưa cấu hình: đúng bảng ES1-T173, 2 block khác nhau, hàng 8 không eyebrow', async ({ page }) => {
     await page.goto(HOME);
+    test.skip(await fixtureApplied(page), NOT_CONFIGURED_SKIP);
     const inspiration = band(page, 'home-inspiration');
     const whyChoose = band(page, 'home-why-choose');
     await expectIwt(inspiration, BANNER);
@@ -153,11 +171,11 @@ test.describe('ES1-T180 TE-17 hàng 2, 4a, 8, 13 mặc định', () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  test('Cổng /?view=figma: cùng copy với /', async ({ page }) => {
+  test('Cổng /?view=figma: copy Figma (eyebrow slide, chữ Figma hàng 13)', async ({ page }) => {
     await page.goto(FIGMA);
-    await expectSlides(page);
+    await expectSlides(page, SLIDE_EYEBROW_FIGMA);
     await expectIwt(band(page, 'figma-inspiration'), BANNER);
-    await expectIwt(band(page, 'figma-why-choose'), WHY);
+    await expectIwt(band(page, 'figma-why-choose'), WHY_FIGMA);
   });
 
   test('LCP vẫn là slide 1: 1 ảnh eager, fetchpriority chỉ ở slide 1', async ({ page }) => {

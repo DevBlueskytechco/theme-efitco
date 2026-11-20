@@ -1,6 +1,6 @@
 {% layout none %}
 {% # ES1-T384 (TE-21 AC13 to AC15, R7.9; docs/ui-spec/gift-card.md): own document, printed and shared outside the storefront layout. %}
-{% # JS hooks for TS-BE1 (ES1-T410), no script here: data-gift-card-qr (QR frame), data-gift-card-copy, data-gift-card-print, data-gift-card-status. %}
+{% # JS hooks for TS-BE1 (ES1-T410, assets/gift-card-qr.js + Shopify vendor/qrcode.js, 2 script tags in head): data-gift-card-qr (QR frame), data-gift-card-copy, data-gift-card-print, data-gift-card-status. %}
 {% # ES1-T489 test hooks: data-testid gift-card-heading, gift-card-pill, gift-card-amount, gift-card-initial, gift-card-expires, gift-card-actions (plus logo, card, balance, alert, code, copy, qr, wallet, start, print, contact). %}
 
 {%- liquid
@@ -28,6 +28,10 @@
     {% # Charset, viewport (width=device-width,initial-scale=1), social, title. One viewport tag only: it lives in meta-tags. %}
     {% render 'meta-tags' %}
     <meta name="robots" content="noindex">
+
+    {% # ES1-T410 (TS-BE1): QR library from Shopify CDN (defer), then the module (runs after it, in order). %}
+    <script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer></script>
+    <script src="{{ 'gift-card-qr.js' | asset_url }}" type="module"></script>
 
     {{ content_for_header }}
   </head>

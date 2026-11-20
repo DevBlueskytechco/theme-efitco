@@ -3,11 +3,13 @@
   and the open state come from the browser with no JavaScript. Self-contained:
   callers must leave the body empty.
 
-  Sample content (plan ES1-T169 D1): the template passes default_question and
-  default_answer from locales. They have other names than the settings, so they
-  stay plain variables and a value the merchant saved always wins. Clearing a
-  setting brings the sample back, so show_item is how a merchant hides the item.
-  Text from the t filter may already be escaped, so it goes through escape_once.
+  Template values (plan ES1-T169 D1): a template may pass default_question and
+  default_answer. They have other names than the settings, so they stay plain
+  variables and a value the merchant saved always wins. Text may already be
+  escaped, so it goes through escape_once. templates/index.liquid passes none
+  (ADR 0011 mục 3, ES1-T406): answers about shipping, warranty or returns are
+  promises of the store, so an empty question stays hidden. Test templates pass
+  literals.
 
   When show_item is off or there is no question at all, the editor shows a
   placeholder and the storefront renders nothing.
@@ -20,13 +22,11 @@
 
   @param {string} id - Unique item id within the template, such as 'faq-1'
   @param {boolean} [open] - Template parameter, not a setting: starts this question open. Use it on the first question only.
-  @param {string} [default_question] - Sample question used when the question setting is empty
-  @param {string} [default_answer] - Sample answer as HTML, used when the answer setting is empty
+  @param {string} [default_question] - Test templates only: question used when the question setting is empty
+  @param {string} [default_answer] - Test templates only: answer as HTML, used when the answer setting is empty
 
   @example
-  {% assign sample_question = 'blocks.faq_item.q1_question' | t %}
-  {% assign sample_answer = 'blocks.faq_item.default_answer_html' | t %}
-  {% block 'faq-item', id: 'faq-1', open: true, default_question: sample_question, default_answer: sample_answer %}{% endblock %}
+  {% block 'faq-item', id: 'faq-1', open: true %}{% endblock %}
 {% enddoc %}
 
 {%- liquid

@@ -1,6 +1,6 @@
 {% doc %}
-  Renders one article as a list item: a link with the image, the first tag as a
-  label, the title and the reading time. The blog page (blocks/blog-articles)
+  Renders one article as a list item: a dark frame with the image, the first tag
+  as a label, the title (the only link) and the reading time. The blog page (blocks/blog-articles)
   also turns on the excerpt and the date (TE-20 AC2, blog.md §1.6); the home
   page row (blocks/blog-posts) keeps the Figma 1:1022 card with no parameters.
 
@@ -18,7 +18,13 @@
   dot drawn by CSS, either part can be off); without it the line is the reading
   time only, as on the home page.
 
-  Test hooks: data-testid="article-card", "article-card-link", "article-card-image",
+  Link name (TE-20 AC2, ES1-T506): the link wraps only the title text inside the
+  heading, so its accessible name is the title (WCAG 2.5.3 label in name). Its
+  ::after covers the frame, so the whole card is still one click target; the
+  tag, excerpt and meta are plain text under it. The frame (dark box 3 / 4,
+  radius) is a div, so the home row looks the same (AC8).
+
+  Test hooks: data-testid="article-card", "article-card-frame", "article-card-link", "article-card-image",
   "article-card-tag", "article-card-title", "article-card-excerpt",
   "article-card-meta", "article-card-date", "article-card-read-time".
 
@@ -67,7 +73,7 @@
 -%}
 
 <li class="article-card" data-testid="article-card">
-  <a class="article-card__link" href="{{ article.url }}" data-testid="article-card-link">
+  <div class="article-card__frame" data-testid="article-card-frame">
     {%- if article.image != blank -%}
       {% render 'image',
         image: article.image,
@@ -86,7 +92,9 @@
     {%- endif -%}
     <div class="article-card__content">
       <{{ card_heading }} class="article-card__title" data-testid="article-card-title">
-        {{- article.title | escape -}}
+        <a class="article-card__link" href="{{ article.url }}" data-testid="article-card-link">
+          {{- article.title | escape -}}
+        </a>
       </{{ card_heading }}>
       {%- if card_excerpt != blank -%}
         <p class="article-card__excerpt" data-testid="article-card-excerpt">{{ card_excerpt }}</p>
@@ -104,5 +112,5 @@
         </p>
       {%- endif -%}
     </div>
-  </a>
+  </div>
 </li>

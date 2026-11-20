@@ -3,10 +3,15 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T179.spec.ts
 // Merchant sửa trong editor (TC-H6) là bước tay; ở đây param trùng tên setting đóng vai giá trị đã lưu, trên /?view=te7.
 import { test, expect, type Locator, type Page } from './support/test';
+import { fixtureApplied, skipUnlessFixture } from './support/home-fixture';
 
 const HOME = '/';
 const FIGMA = '/?view=figma';
 const TE7 = '/?view=te7';
+// ES1-T406 (TS-FE4, ADR 0011 mục 3, SRS 0.5 TE-7 AC5, AC-H25, AC-H36): index.liquid không truyền copy FAQ, review mẫu.
+// Theme chưa cấu hình không in 2 band này; copy Figma trên / chỉ có khi store dev đã áp fixture ES1-T331.
+// Hành vi và bố cục (mở câu, 4 card 456/360) đo trên /?view=figma: template cổng truyền literal Figma, không cần store cấu hình.
+const NOT_CONFIGURED_SKIP = 'store dev đã áp fixture ES1-T331: copy Figma, kiểm ở test fixture';
 
 const QUESTIONS = [
   'How long does shipping take?',
@@ -64,27 +69,42 @@ async function expectFigmaTestimonials(scope: Locator) {
 }
 
 test.describe('ES1-T179 TE-17 FAQ, testimonials mặc định', () => {
-  test('AC-H5 trang chủ chưa cấu hình: FAQ đúng 1:1057, có 360+', async ({ page }) => {
+  test('AC5, AC-H36 trang chủ chưa cấu hình: không FAQ, không review mẫu, không khung rỗng', async ({ page }) => {
     await page.goto(HOME);
+    test.skip(await fixtureApplied(page), NOT_CONFIGURED_SKIP);
+    for (const id of ['home-faq', 'home-testimonials']) await expect(band(page, id)).toHaveCount(0);
+    for (const id of ['faq', 'faq-placeholder', 'faq-item-placeholder', 'testimonials', 'testimonial-item', 'testimonial-placeholder']) {
+      await expect(tid(page, id)).toHaveCount(0);
+    }
+    const text = await page.locator('main').innerText();
+    for (const sample of ['360+', 'Months on every item', QUESTIONS[0], REVIEWS[0].author, REVIEWS[0].quote]) expect(text).not.toContain(sample);
+  });
+
+  test('AC-H5 trang chủ đã cấu hình (fixture): FAQ đúng 1:1057, có 360+', async ({ page }) => {
+    await page.goto(HOME);
+    await skipUnlessFixture(page);
     await expectFigmaFaq(band(page, 'home-faq'));
   });
 
-  test('AC-H25 trang chủ chưa cấu hình: 4 review đúng 1:885, card 2 có 4 sao, Verified tắt', async ({ page }) => {
+  test('AC-H25 trang chủ đã cấu hình (fixture): 4 review đúng 1:885, card 2 có 4 sao, Verified tắt', async ({ page }) => {
     await page.goto(HOME);
+    await skipUnlessFixture(page);
     await expectFigmaTestimonials(band(page, 'home-testimonials'));
   });
 
-  test('AC-H5 mở câu 2 thấy đúng câu trả lời, câu 1 đóng', async ({ page }) => {
-    await page.goto(HOME);
-    await tid(question(page, 'faq-2'), 'faq-question').click();
-    await expect(question(page, 'faq-2').locator('[data-testid="faq-answer"]')).toContainText('from 11 to 66 lb per hand');
-    await expect(band(page, 'home-faq').locator('details[open]')).toHaveCount(1);
+  test('AC-H5 /?view=figma: mở câu 2 thấy đúng câu trả lời, câu 1 đóng', async ({ page }) => {
+    await page.goto(FIGMA);
+    await tid(question(page, 'figma-faq-2'), 'faq-question').click();
+    await expect(question(page, 'figma-faq-2').locator('[data-testid="faq-answer"]')).toContainText('from 11 to 66 lb per hand');
+    await expect(band(page, 'figma-faq').locator('details[open]')).toHaveCount(1);
   });
 
   test('AC-H5 không còn chữ hướng dẫn, không escape 2 lần', async ({ page }) => {
     await page.goto(HOME);
     for (const id of ['home-faq', 'home-testimonials']) {
       const scope = band(page, id);
+      // Chưa cấu hình: band không render (ES1-T406), không có chữ để kiểm
+      if ((await scope.count()) === 0) continue;
       const text = await scope.innerText();
       expect(text).not.toContain('Add a');
       expect(text).not.toContain('Customer name');
@@ -155,10 +175,10 @@ test.describe('ES1-T179 TE-17 FAQ, testimonials mặc định', () => {
     }
   });
 
-  test('AC-H24 1920: 4 card 456, card đầu thẳng tiêu đề, card 4 tràn, trang không cuộn ngang', async ({ page }) => {
+  test('AC-H24 1920: 4 card 456, card đầu thẳng tiêu đề, card 4 tràn, trang không cuộn ngang (/?view=figma)', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto(HOME);
-    const scope = band(page, 'home-testimonials');
+    await page.goto(FIGMA);
+    const scope = band(page, 'figma-testimonials');
     const cards = tid(scope, 'testimonial-item');
     const widths = await cards.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().width));
     expect(widths).toEqual([456, 456, 456, 456]);
@@ -180,10 +200,10 @@ test.describe('ES1-T179 TE-17 FAQ, testimonials mặc định', () => {
     expect(pageOverflow).toBeLessThanOrEqual(0);
   });
 
-  test('AC-H24 1920: bàn phím và thanh cuộn tới hết card 4', async ({ page }) => {
+  test('AC-H24 1920: bàn phím và thanh cuộn tới hết card 4 (/?view=figma)', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto(HOME);
-    const scope = band(page, 'home-testimonials');
+    await page.goto(FIGMA);
+    const scope = band(page, 'figma-testimonials');
     const list = tid(scope, 'testimonials-list');
     await expect(list).toHaveAttribute('tabindex', '0');
 
@@ -208,10 +228,10 @@ test.describe('ES1-T179 TE-17 FAQ, testimonials mặc định', () => {
   });
 
   // ES1-T334: TE-7 AC6 (SRS 0.5): 1280 hàng ngang card 360 (spec-updates.md §2).
-  test('AC6 1280: hàng ngang card 360, thấy 3 card + ≥ 25% card 4', async ({ page }) => {
+  test('AC6 1280: hàng ngang card 360, thấy 3 card + ≥ 25% card 4 (/?view=figma)', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
-    await page.goto(HOME);
-    const scope = band(page, 'home-testimonials');
+    await page.goto(FIGMA);
+    const scope = band(page, 'figma-testimonials');
     const list = tid(scope, 'testimonials-list');
     expect(await list.evaluate((el) => getComputedStyle(el).display)).toBe('flex');
     expect(await list.evaluate((el) => el.scrollWidth > el.clientWidth)).toBeTruthy();
