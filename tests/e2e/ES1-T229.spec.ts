@@ -79,7 +79,8 @@ test.describe('ES1-T229 gỡ spec thăm dò', () => {
   test('TC-05 AC2 không còn file thăm dò, không spec nào import', () => {
     expect(existsSync(join(E2E, 'ES1-T227.spec.ts'))).toBe(false);
     expect(existsSync(join(E2E, 'support/action-probe.ts'))).toBe(false);
-    for (const name of ['ES1-T203.spec.ts', 'ES1-T189.spec.ts', 'ES1-T73.spec.ts', 'ES1-T94.spec.ts', 'ES1-T95.spec.ts']) {
+    // ES1-T441: ES1-T73.spec.ts đã xoá (swatch card là chỉ báo, ES1-T338 gỡ product-swatch.js); thay bằng TE-3.spec.ts TC-15.
+    for (const name of ['ES1-T203.spec.ts', 'ES1-T189.spec.ts', 'ES1-T94.spec.ts', 'ES1-T95.spec.ts']) {
       expect(spec(name), name).not.toContain('support/action-probe');
     }
   });
@@ -183,15 +184,19 @@ test.describe('ES1-T229 nhận diện Cloudflare', () => {
     if (saved !== undefined) process.env.E2E_429_LOG = saved;
   });
 
-  test('TC-10 AC4 T73, T94, T95 không còn điều hướng thiếu guard, T73 không skip khi store trả 403', ({}, ti) => {
+  // ES1-T441: ES1-T73.spec.ts đã xoá; Back của card kiểm ở TE-3.spec.ts TC-15 qua clickAndLoad + expectLoaded.
+  test('TC-10 AC4 T94, T95 không còn điều hướng thiếu guard; T73 đã gỡ, TE-3 TC-15 Back qua guard', ({}, ti) => {
     desktopOnly(ti.project.name);
-    for (const name of ['ES1-T73.spec.ts', 'ES1-T94.spec.ts', 'ES1-T95.spec.ts']) {
+    for (const name of ['ES1-T94.spec.ts', 'ES1-T95.spec.ts']) {
       const source = spec(name);
       expect(source, name).not.toMatch(/\bpage\.goto\(/);
       expect(source, name).not.toMatch(/^\s*await page\.(reload|goBack|waitForLoadState)\(\);?$/m);
       expect(source, name).toContain('./support/store-guard');
     }
-    expect(spec('ES1-T73.spec.ts')).not.toContain('res.status() >= 400');
+    expect(existsSync(join(E2E, 'ES1-T73.spec.ts'))).toBe(false);
+    const tc15 = spec('TE-3.spec.ts').split(`test('TC-15 `)[1]?.split(`\n  });`)[0] ?? '';
+    expect(tc15).toContain('clickAndLoad(');
+    expect(tc15).toContain('expectLoaded(page, await page.goBack())');
     const nojs = spec('ES1-T94.spec.ts').split(`test.describe('nojs'`)[1];
     expect(nojs.match(/clickAndLoad\(/g)).toHaveLength(3);
     expect(nojs.match(/gotoNoScript\(page, '\/cart'\)/g)).toHaveLength(3);
