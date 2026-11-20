@@ -125,6 +125,28 @@ async function openFake(page: Page, options?: { labels?: boolean; delay?: number
   return posts;
 }
 
+// click()/press('Enter') của Playwright chờ điều hướng do form gửi xong mới trả về (POST trễ → trang đã là "Sent"),
+// nên test không đọc được aria-busy sau click. Ghi ngay trong trang: MutationObserver thấy aria-busy="true"
+// → console 'es1-t443-busy:<testid>'; resubmit = bấm lại nút đó ngay khi đang gửi (thử chặn gửi lần 2).
+async function trackBusy(page: Page, resubmit = false) {
+  const busy: string[] = [];
+  page.on('console', (msg) => {
+    const t = msg.text();
+    if (t.startsWith('es1-t443-busy:')) busy.push(t.slice('es1-t443-busy:'.length));
+  });
+  await page.addInitScript((again) => {
+    new MutationObserver((list) => {
+      for (const m of list) {
+        const el = m.target as HTMLElement;
+        if (el.getAttribute('aria-busy') !== 'true') continue;
+        console.log(`es1-t443-busy:${el.dataset.testid}`);
+        if (again) setTimeout(() => el.click());
+      }
+    }).observe(document, { subtree: true, attributes: true, attributeFilter: ['aria-busy'] });
+  }, resubmit);
+  return busy;
+}
+
 test.describe('ES1-T443 trang giả', () => {
   test.beforeEach(({}, ti) => desktopOnly(ti.project.name));
 
@@ -191,25 +213,26 @@ test.describe('ES1-T443 trang giả', () => {
 
   test('TC-06 submit mật khẩu: password-submit aria-busy=true khi đang gửi; bấm lần 2 không gửi thêm', async ({ page }) => {
     const errors = watchConsole(page);
+    // Bấm lại khi đang gửi: không có chặn thì Chrome huỷ POST đầu và gửi POST thứ 2
+    const busy = await trackBusy(page, true);
     const posts = await openFake(page, { delay: 2000 });
     await page.getByTestId('password-input').fill('es1-t443');
-    const submit = page.getByTestId('password-submit');
-    await submit.click();
-    await expect(submit).toHaveAttribute('aria-busy', 'true');
-    // Không có chặn thì Chrome huỷ POST đầu và gửi POST thứ 2
-    await submit.click({ timeout: 1000 }).catch(() => {});
+    await page.getByTestId('password-submit').click();
     await expect(page.locator('h1')).toHaveText('Sent', { timeout: 10_000 });
+    await expect.poll(() => busy).toEqual(['password-submit']);
     expect(posts).toEqual(['/password']);
     expect(errors).toEqual([]);
   });
 
   test('TC-07 newsletter: Enter trong ô email đặt aria-busy cho password-newsletter-submit; ô mật khẩu không bị đụng', async ({ page }) => {
+    const busy = await trackBusy(page);
     const posts = await openFake(page, { delay: 2000 });
     await page.getByTestId('password-newsletter-email').fill('qa@example.com');
     await page.getByTestId('password-newsletter-email').press('Enter');
-    await expect(page.getByTestId('password-newsletter-submit')).toHaveAttribute('aria-busy', 'true');
-    await expect(page.getByTestId('password-submit')).not.toHaveAttribute('aria-busy');
-    await expect.poll(() => posts).toEqual(['/contact']);
+    await expect(page.locator('h1')).toHaveText('Sent', { timeout: 10_000 });
+    // Chỉ nút newsletter bận; password-submit không bị đặt aria-busy
+    await expect.poll(() => busy).toEqual(['password-newsletter-submit']);
+    expect(posts).toEqual(['/contact']);
   });
 
   test('TC-08 email trống/sai: trình duyệt chặn submit, không aria-busy, không POST', async ({ page }) => {
