@@ -45,7 +45,7 @@
   minutes, seconds) on each cell with data-countdown-value on its number;
   data-featured-media-id, data-media-id and data-media-type on each media item
   and thumbnail; product-media-gallery with data-product-id and
-  data-media-count (no data-lazy-module yet, TS-BE1 adds it); product-form with
+  data-media-count and data-lazy-module (product-media.js, near viewport); product-form with
   data-product-id, data-product-url, data-cart-add-url, data-cart-url,
   data-cart-type, data-label-add, data-label-added, data-label-sold-out,
   data-label-unavailable; data-fetch-url and data-regions on product-variant-picker.
@@ -209,6 +209,7 @@
         class="featured-product__gallery"
         data-product-id="{{ featured.id }}"
         data-media-count="{{ media_total }}"
+        data-lazy-module="{{ 'product-media.js' | asset_url }}"
       >
         <ul
           class="featured-product__media-list"
