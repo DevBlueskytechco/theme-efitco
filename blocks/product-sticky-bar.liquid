@@ -16,7 +16,7 @@
   form in blocks/product-form.liquid. Sold out → disabled with the Sold out
   label; selected option values form no variant (same rule as
   blocks/product-form, value.variant blank) → disabled with the Unavailable
-  label. No variant picker and no loop over the variant list (NFR-7).
+  label and no price (never the fallback variant's price). No variant picker and no loop over the variant list (NFR-7).
 
   Loading state (TE-4 AC15): the price has data-variant-busy (JS sets
   aria-busy, CSS shows a skeleton); JS sets aria-disabled on the button
@@ -85,7 +85,9 @@
         <div class="product-sticky-bar__buy">
           <div class="product-sticky-bar__price" data-variant-busy data-testid="product-sticky-bar-price">
             <span class="skeleton product-sticky-bar__price-skeleton" aria-hidden="true"></span>
-            {% render 'price', product: product, variant: current_variant %}
+            {%- if variant_exists -%}
+              {% render 'price', product: product, variant: current_variant %}
+            {%- endif -%}
           </div>
           <button
             class="button product-sticky-bar__add"

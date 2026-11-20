@@ -11,7 +11,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { CART_GLOB, themeAdd } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
 import { pageJson, readCartJson, requireJson } from './support/product-data';
-import { chooseOptions, setCheckedByName } from './support/variant-picker';
+import { checkedNames, chooseOptions, legendNames, setCheckedByName } from './support/variant-picker';
 import { gotoStore, watchStore, expectNotChallenged, skipIfStoreBlocked } from './support/store-guard';
 
 const TE13 = '/?view=te13';
@@ -171,8 +171,9 @@ async function otherVariant(scope: Locator, want: (v: Variant) => boolean = (v) 
   return { current: variants.find((v) => v.id === id)!, next: variants.find((v) => v.id !== id && want(v)) };
 }
 
-async function choose(scope: Locator, variant: Variant) {
-  await chooseOptions(scope, variant.options);
+/** Chọn biến thể, trả số lần bấm thật (= số request ?option_values= phải có). */
+function choose(scope: Locator, variant: Variant) {
+  return chooseOptions(scope, variant.options);
 }
 
 /** Giá, % giảm của band khớp biến thể (thay so price_html của JSON cũ). */
@@ -217,10 +218,14 @@ test.describe('ES1-T158 tĩnh', () => {
     expect(readFileSync('snippets/product-variant-picker.liquid', 'utf8')).not.toMatch(/data-lazy-module=/);
   });
 
-  test('AC2 contract partial: 2 tên trong data-regions khớp {% partial %} của block', () => {
+  // ES1-T350 review #1 (ADR 0008 mục 3): bộ chọn của featured nằm trong partial product-options (snippet bọc khi regions có tên này).
+  test('AC2 contract partial: 3 tên trong data-regions khớp {% partial %} của block + product-options của snippet', () => {
     const liquid = readFileSync('blocks/featured-product.liquid', 'utf8');
+    const snippet = readFileSync('snippets/product-variant-picker.liquid', 'utf8');
     const regions = liquid.match(/regions: '([^']+)'/)?.[1].split(' ').sort();
-    expect(regions).toEqual([...liquid.matchAll(/{%-?\s*partial\s+'([^']+)'/g)].map((m) => m[1]).sort());
+    expect(regions).toEqual(['product-buy-buttons', 'product-options', 'product-price']);
+    expect(snippet).toMatch(/{%-?\s*if fetch_url == blank or regions contains 'product-options'\s*-?%}\s*{%-?\s*partial 'product-options'/);
+    expect(regions).toEqual([...liquid.matchAll(/{%-?\s*partial\s+'([^']+)'/g)].map((m) => m[1]).concat('product-options').sort());
   });
 });
 
@@ -327,7 +332,7 @@ test.describe('ES1-T158 AC1 countdown', () => {
 });
 
 test.describe('ES1-T158 AC2 1 block: partial', () => {
-  test('AC2 AC-H22 đổi variant: giá, % giảm, nút, id đổi; URL giữ; request view=featured-product, 2 partial', async ({ page }) => {
+  test('AC2 AC-H22 đổi variant: giá, % giảm, nút, id, legend đổi; URL giữ; 1 request view=featured-product mỗi lần bấm, 3 partial', async ({ page }) => {
     const errors = watchConsole(page);
     const requests: Request[] = [];
     page.on('request', (request) => {
@@ -338,10 +343,16 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
     const { next } = await otherVariant(scope);
     test.skip(!next, 'Cần 2 variant còn hàng');
 
-    await choose(scope, next!);
+    const clicks = await choose(scope, next!);
+    expect(clicks, 'biến thể khác cần ≥ 1 lần bấm').toBeGreaterThan(0);
     await expect(scope.locator('input[type="hidden"][name="id"]')).toHaveValue(String(next!.id));
-    await expect.poll(() => requests.filter(isOptionFetch).length).toBeGreaterThan(0);
     await expect(scope.locator('product-form')).not.toHaveAttribute('aria-busy', /.*/);
+    // Đúng 1 request ?option_values= mỗi lần bấm, không request thừa (kể cả request bị huỷ khi bấm liên tiếp).
+    expect(requests.filter(isOptionFetch)).toHaveLength(clicks);
+    expect(requests.filter((r) => !isOptionFetch(r))).toHaveLength(0);
+    // Legend và trạng thái giá trị do server làm mới qua partial product-options (review #1).
+    expect(await legendNames(scope)).toEqual(next!.options);
+    expect(await checkedNames(scope)).toEqual(next!.options);
 
     const url = new URL(requests.at(-1)!.url());
     expect(url.pathname).toMatch(/\/products\//);
@@ -350,8 +361,8 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
       await scope.getByTestId('product-variant-picker').locator('input[type="radio"]:checked').evaluateAll((els) => els.map((e) => e.getAttribute('data-option-value-id')))
     );
     // Không thấy tên partial trong URL thì 4 kiểm tra dưới luôn qua: tên thật do data-regions quyết (test contract ở nhóm tĩnh).
-    for (const name of ['product-installments', 'product-pickup', 'product-selling-plans', 'product-sticky-bar']) expect(decodeURIComponent(requests[0].url())).not.toContain(name);
-    await expect(scope.getByTestId('product-variant-picker')).toHaveAttribute('data-regions', 'product-price product-buy-buttons');
+    for (const name of ['product-installments', 'product-pickup', 'product-selling-plans', 'product-sticky-bar']) expect(decodeURIComponent(url.href)).not.toContain(name);
+    await expect(scope.getByTestId('product-variant-picker')).toHaveAttribute('data-regions', 'product-options product-price product-buy-buttons');
 
     await expectPrice(scope, next!);
     await expect(scope.getByTestId('featured-product-add')).toBeEnabled();
@@ -517,8 +528,9 @@ test.describe('ES1-T158 AC2 nhiều block: band tự thay (D4)', () => {
     test.skip(!next, 'Cần 2 variant còn hàng');
     const otherPrice = await band(page, 'te13-a').getByTestId('featured-product-price').innerHTML();
     const otherId = await band(page, 'te13-a').locator('input[type="hidden"][name="id"]').inputValue();
+    const otherLegend = await legendNames(band(page, 'te13-a'));
 
-    await choose(scope, next!);
+    const clicks = await choose(scope, next!);
     await expect(scope.locator('input[type="hidden"][name="id"]')).toHaveValue(String(next!.id));
     await expectPrice(scope, next!);
     await expect(scope.getByTestId('featured-product-add')).toBeEnabled();
@@ -526,7 +538,12 @@ test.describe('ES1-T158 AC2 nhiều block: band tự thay (D4)', () => {
 
     expect(await band(page, 'te13-a').getByTestId('featured-product-price').innerHTML()).toBe(otherPrice);
     expect(await band(page, 'te13-a').locator('input[type="hidden"][name="id"]').inputValue()).toBe(otherId);
-    expect(requests.length, 'mỗi lần đổi 1 request ?option_values=').toBeGreaterThan(0);
+    expect(await legendNames(band(page, 'te13-a'))).toEqual(otherLegend);
+    // Band B: fieldset do swap() thay từ server → legend theo lựa chọn mới (review #1).
+    expect(await legendNames(scope)).toEqual(next!.options);
+    expect(await checkedNames(scope)).toEqual(next!.options);
+    expect(clicks, 'biến thể khác cần ≥ 1 lần bấm').toBeGreaterThan(0);
+    expect(requests, 'mỗi lần bấm đúng 1 request ?option_values=').toHaveLength(clicks);
     for (const r of requests) expect(new URL(r).searchParams.has('option_values')).toBe(true);
     expect(page.url()).toBe(before);
     expect(errors).toEqual([]);

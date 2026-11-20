@@ -61,8 +61,10 @@
   data-label-add, data-label-added (status text after add, ES1-T84),
   data-label-sold-out, data-label-unavailable. Live regions:
   product-form-status (role status) and product-form-error (role alert),
-  empty on load. The picker has its own role=alert per option, so JS finds
-  the add error by data-testid, not by role. JS sets aria-busy on the root
+  empty on load, both direct children of product-form. The picker has its own
+  role=alert per option, so assets/product-form.js reads only direct children
+  (:scope>[role=status], :scope>[role=alert]); keep these two out of nested
+  wrappers. JS sets aria-busy on the root
   while loading.
 
   Test hooks: product-form, product-variant-picker, product-option (fieldset),
@@ -354,7 +356,7 @@
           value="{{ current_variant.id }}"
           data-testid="product-form-variant-id"
         >
-        {%- render 'selected-variant-json', variant: current_variant, exists: variant_exists -%}
+        {%- render 'selected-variant-data', variant: current_variant, exists: variant_exists -%}
         <div class="product-form__buy-buttons">
           <div class="product-form__stock" data-variant-busy data-testid="product-stock">
             <p class="product-form__inventory" data-state="{{ stock_state }}" data-testid="product-inventory">

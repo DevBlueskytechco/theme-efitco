@@ -130,7 +130,9 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     const picker = tid(band(page, 'b'), 'product-variant-picker');
     await expect(picker).toHaveCount(1);
     await expect(picker).toHaveAttribute('data-fetch-url', /\/products\/.+\?view=featured-product$/);
-    await expect(picker).toHaveAttribute('data-regions', 'product-price product-buy-buttons');
+    // ES1-T350 review #1 (ADR 0008 mục 3): bộ chọn nằm trong partial product-options để server làm mới legend, trạng thái giá trị.
+    await expect(picker).toHaveAttribute('data-regions', 'product-options product-price product-buy-buttons');
+    await expect(picker).toHaveAttribute('data-partials', 'product-options product-price product-buy-buttons');
   });
 
   test('AC2 form đúng hợp đồng product-form.js', async ({ page }) => {
@@ -187,10 +189,13 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     await expect(tid(b, 'featured-product-specs')).toHaveCount(0);
   });
 
-  test('AC2 ?view=featured-product có đúng 2 partial', async ({ page }) => {
+  test('AC2 ?view=featured-product có đúng 3 partial (2 ở block + product-options ở snippet bộ chọn)', async ({ page }) => {
     const liquid = readFileSync('blocks/featured-product.liquid', 'utf8');
     const names = [...liquid.matchAll(/{%-?\s*partial\s+'([^']+)'/g)].map((m) => m[1]).sort();
     expect(names).toEqual(['product-buy-buttons', 'product-price']);
+    expect(liquid).toMatch(/regions: 'product-options product-price product-buy-buttons'/);
+    // Template dữ liệu, không phải trang: không layout (review #4, giảm tải swap() nhiều band).
+    expect(readFileSync('templates/product.featured-product.liquid', 'utf8')).toMatch(/^{%\s*layout none\s*%}/);
 
     const handle = env('TE4_VARIANTS_HANDLE');
     test.skip(!handle, 'Thiếu TE4_VARIANTS_HANDLE');
@@ -198,6 +203,8 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     expect(response?.ok()).toBeTruthy();
     await expect(page.getByTestId('featured-product-price')).toHaveCount(1);
     await expect(page.getByTestId('featured-product-add')).toHaveCount(1);
+    await expect(page.getByTestId('product-variant-picker')).toHaveCount(1);
+    await expect(page.locator('link[rel="stylesheet"]'), 'layout none: không tải CSS/header của theme').toHaveCount(0);
     await expect(page.getByTestId('product-installments')).toHaveCount(0);
     await expect(page.getByTestId('product-pickup')).toHaveCount(0);
     await expect(page.getByTestId('product-selling-plans')).toHaveCount(0);

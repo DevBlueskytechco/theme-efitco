@@ -51,12 +51,15 @@ if (!li) return;
 l.scrollTo({ left: li.offsetLeft - l.offsetLeft, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 for (const a of this.querySelectorAll(T)) a.ariaCurrent = a.dataset.featuredMediaId == id ? "true" : null;
 }
-// 2+ blocks share partial names (ES1-T169 D4): the picker hands its band the ?option_values= request.
+// D4: 2+ bands share partial names.
 async swap(url, signal) {
 const r = await fetch(url, { signal });
 if (!r.ok) throw r.status;
-const n = new DOMParser().parseFromString(await r.text(), "text/html").querySelector("featured-product");
-for (const s of ['[data-testid="featured-product-price"]', "[data-selected-variant]", '[name="add"]']) this.$(s).replaceWith(n.querySelector(s));
+const q = (e) => e.querySelectorAll("featured-product :is(fieldset,[data-variant-price],[data-selected-variant],[name=add])");
+const n = q(new DOMParser().parseFromString(await r.text(), "text/html"));
+const f = document.activeElement.value;
+q(this).forEach((e, i) => e.replaceWith(n[i]));
+this.$(`[value="${f}"]`)?.focus();
 }
 }
 customElements.get("featured-product") || customElements.define("featured-product", F);

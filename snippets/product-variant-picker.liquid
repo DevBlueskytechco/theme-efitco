@@ -23,10 +23,15 @@
   The button holds both labels; CSS shows "+N" or "Show Fewer" from
   aria-expanded. BE toggles `hidden` on the values and aria-expanded.
 
-  Without fetch_url (product page) the fieldsets sit in partial product-options
-  inside the host element, so the host and its listeners survive an apply.
-  With fetch_url (featured product, quick view) the caller's own partial wraps
-  the picker (ADR 0008 item 3), no inner partial.
+  The fieldsets sit in partial product-options inside the host element, so
+  the server refreshes the legend and every value state (data-state,
+  data-available, classes) after each change while the host and its listeners
+  survive an apply (ADR 0008 item 3): always on the product page (no
+  fetch_url), and with fetch_url when regions lists product-options (featured
+  product). Quick view (regions 'quick-view') has no inner partial: its own
+  partial wraps the whole picker. With 2+ featured products on one page the
+  name repeats, so assets/featured-product.js swap() replaces the fieldsets of
+  its own band instead.
 
   Hooks for BE (assets/product-variant-picker.js):
   - Host: data-product-url, data-form-id, data-fetch-url, data-partials (and
@@ -51,7 +56,7 @@
   @param {string} form_id - Id of the product form the picker updates
   @param {string} [id_prefix] - Prefix for every id and radio name: blank on the product page, 'qv-' in quick view
   @param {string} [fetch_url] - URL to fetch partials from, output as data-fetch-url
-  @param {string} [regions] - Space-separated partial names, output as data-partials
+  @param {string} [regions] - Space-separated partial names, output as data-partials; include product-options to wrap the fieldsets in that partial
 
   @example
   {% render 'product-variant-picker', product: product, form_id: form_id %}
@@ -288,7 +293,7 @@
   data-label-load-error="{{ label_load_error | escape }}"
   data-testid="product-variant-picker"
 >
-  {%- if fetch_url == blank -%}
+  {%- if fetch_url == blank or regions contains 'product-options' -%}
     {% partial 'product-options' %}
       {{- options_html -}}
     {% endpartial %}

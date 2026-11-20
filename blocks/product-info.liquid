@@ -8,7 +8,11 @@
     has one.
   - Partial product-price (name must match assets/product-variant-picker.js,
     BE TE-4-R2-BE2, ADR 0008 item 3): snippets/price.liquid for
-    current_variant plus the price notes. Loading state (TE-4 AC15,
+    current_variant plus the price notes; no price when the selected option
+    values form no variant (same rule as blocks/product-form, value.variant
+    blank), so the page never shows the fallback variant's price next to
+    Unavailable. data-variant-price marks the region JS reads the price from
+    for the status line. Loading state (TE-4 AC15,
     variant-picker §6): the region has data-variant-busy; while JS sets
     aria-busy="true" on it, CSS (assets/product.css) swaps the price line for
     a skeleton the height of the price line (product-price-skeleton). Tax note from cart.taxes_included and cart.duties_included (set
@@ -53,6 +57,18 @@
   {%- liquid
     assign current_variant = product.selected_or_first_available_variant
 
+    # Tổ hợp đang chọn không tạo thành biến thể: cùng quy tắc blocks/product-form (ADR 0008, ES1-T253)
+    assign variant_exists = true
+    unless product.has_only_default_variant
+      for option in product.options_with_values limit: 1
+        for value in option.values
+          if value.selected and value.variant == blank
+            assign variant_exists = false
+          endif
+        endfor
+      endfor
+    endunless
+
     if cart.taxes_included and cart.duties_included
       assign tax_note_key = 'blocks.product_info.taxes_and_duties_included'
     elsif cart.taxes_included
@@ -79,9 +95,11 @@
       <h1 class="product-info__title" data-testid="product-title">{{ product.title | escape }}</h1>
 
       {% partial 'product-price' %}
-        <div class="product-info__price" data-variant-busy data-testid="product-price">
+        <div class="product-info__price" data-variant-busy data-variant-price data-testid="product-price">
           <span class="skeleton product-info__price-skeleton" aria-hidden="true" data-testid="product-price-skeleton"></span>
-          {% render 'price', product: product, variant: current_variant %}
+          {%- if variant_exists -%}
+            {% render 'price', product: product, variant: current_variant %}
+          {%- endif -%}
 
           <div class="product-info__notes" data-testid="product-notes">
             <p class="product-info__note" data-testid="product-note-tax">{{ tax_note_key | t }}</p>

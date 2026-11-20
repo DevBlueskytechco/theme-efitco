@@ -4,7 +4,7 @@
   description, spec table, Add to cart and View Detail. Reads the product from
   block.settings.product, never the global product. templates/product.featured-product
   passes the global product as the product parameter, so ?view=featured-product
-  returns the 2 partials below with the same markup for the requested variant.
+  returns the 3 partials below with the same markup for the requested variant.
 
   Gallery: image media only, 8 at most, scroll-snap, lazy. From 2 images the list
   takes keyboard focus and thumbnails are in-page links, no JavaScript needed.
@@ -39,12 +39,18 @@
   data-product-id, data-product-url, data-cart-add-url, data-cart-url,
   data-cart-type, data-label-add, data-label-added, data-label-sold-out,
   data-label-unavailable; data-fetch-url and data-regions on product-variant-picker.
-  Partials: product-price, product-buy-buttons (add button and
-  snippets/selected-variant-json: one variant, null when the selected option
+  Partials (ADR 0008 item 3, one featured product per real page):
+  product-options (the picker fieldsets, rendered by
+  snippets/product-variant-picker because regions lists it: the server
+  refreshes the legend and every value state after a change), product-price
+  (data-variant-price; no price and no discount when the selected option
+  values form no variant), product-buy-buttons (add button and
+  snippets/selected-variant-data: one variant, null when the selected option
   values form no variant; the button then says Unavailable, disabled). With 2+
   featured products on a page the partial names repeat, so
-  assets/featured-product.js swap() replaces the price, the JSON and the button
-  of its own band from ?view=featured-product&option_values= (ES1-T169 D4).
+  assets/featured-product.js swap() replaces the fieldsets, the price, the
+  JSON and the button of its own band from
+  ?view=featured-product&option_values= (ES1-T169 D4).
 
   Test hooks: featured-product, featured-product-eyebrow, featured-product-title,
   featured-product-media, featured-product-media-item, featured-product-thumbnail,
@@ -357,9 +363,11 @@
           {% endif %}
         >
           {% partial 'product-price' %}
-            <div class="featured-product__price" data-testid="featured-product-price">
-              {% render 'price', product: featured, variant: current_variant %}
-              {%- if current_variant.compare_at_price > current_variant.price -%}
+            <div class="featured-product__price" data-variant-price data-testid="featured-product-price">
+              {%- if variant_exists -%}
+                {% render 'price', product: featured, variant: current_variant %}
+              {%- endif -%}
+              {%- if variant_exists and current_variant.compare_at_price > current_variant.price -%}
                 {%- assign discount_percent = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
                 <span class="featured-product__discount" data-testid="featured-product-discount">
                   {%- if discount_percent > 0 -%}
@@ -428,7 +436,7 @@
                 product: featured,
                 form_id: form_id,
                 fetch_url: fetch_url,
-                regions: 'product-price product-buy-buttons'
+                regions: 'product-options product-price product-buy-buttons'
               -%}
             {%- endif -%}
 
@@ -437,7 +445,7 @@
 
               {% partial 'product-buy-buttons' %}
                 <div class="featured-product__add-wrapper">
-                  {%- render 'selected-variant-json', variant: current_variant, exists: variant_exists -%}
+                  {%- render 'selected-variant-data', variant: current_variant, exists: variant_exists -%}
                   <button
                     class="button featured-product__add"
                     type="submit"

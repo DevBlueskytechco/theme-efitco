@@ -5,6 +5,9 @@
   - one Offer for current_variant (product.selected_or_first_available_variant,
     so ?variant= deep links describe that variant): sku, price, priceCurrency
     from the market currency, InStock / OutOfStock, absolute variant URL;
+    The Offer is left out when the selected option values form no variant
+    (?option_values= of a missing combination; same rule as
+    blocks/product-form, value.variant blank): no fallback variant price;
   - plus one AggregateOffer when the product has more than one variant:
     lowPrice = product.price_min, highPrice = product.price_max,
     offerCount = product.variants_count, availability from product.available.
@@ -23,6 +26,18 @@
 
 {%- liquid
   assign current_variant = product.selected_or_first_available_variant
+
+  assign variant_exists = true
+  unless product.has_only_default_variant
+    for option in product.options_with_values limit: 1
+      for value in option.values
+        if value.selected and value.variant == blank
+          assign variant_exists = false
+        endif
+      endfor
+    endfor
+  endunless
+
   assign product_url = request.origin | append: product.url
   assign offer_url = request.origin | append: current_variant.url
   assign offer_price = current_variant.price | divided_by: 100.0
@@ -67,10 +82,11 @@
         "name": {{ product.vendor | json }}
       },
     {%- endif %}
-    {%- if current_variant.sku != blank %}
+    {%- if variant_exists and current_variant.sku != blank %}
       "sku": {{ current_variant.sku | json }},
     {%- endif %}
     "offers": [
+      {%- if variant_exists %}
       {
         "@type": "Offer",
         {%- if current_variant.sku != blank %}
@@ -81,8 +97,9 @@
         "availability": {{ offer_availability | json }},
         "url": {{ offer_url | json }}
       }
+      {%- endif %}
       {%- if product.variants_count > 1 -%}
-        ,
+        {%- if variant_exists %},{% endif %}
         {
           "@type": "AggregateOffer",
           "lowPrice": {{ low_price | json }},

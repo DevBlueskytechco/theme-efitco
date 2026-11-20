@@ -39,3 +39,22 @@ Nhánh chồng: FE1 (ES1-T348, PR #281) + FE2 (ES1-T349) + BE2 (ES1-T350), merge
 - `npx playwright test --list`: 3 550 test / 104 file.
 - Spec tĩnh (config tạm không globalSetup): ES1-T66, ES1-T67, ES1-T69, ES1-T81, ES1-T85, ES1-T87, ES1-T96 contract, ES1-T158 tĩnh, ES1-T347 tĩnh: đạt.
 - Test store: chờ CI.
+
+## Sửa sau review vòng 1
+
+KHÔNG CHẮC: `{% layout none %}` trên `templates/product.featured-product.liquid` chưa kiểm với `partials.fetch` trên store (sandbox không gọi store) → chờ CI ES1-T158 nhóm "1 block: partial"; nếu đỏ thì bỏ 1 dòng đó, `swap()` đã giới hạn trong `featured-product` nên vẫn đúng khi có layout.
+
+| # | Sửa |
+| --- | --- |
+| 1 | Featured: `regions` = `product-options product-price product-buy-buttons`; snippet bọc fieldset trong partial `product-options` khi không có `fetch_url` hoặc `regions` có tên này (quickview `quick-view` không đổi) → server làm mới legend, `data-state`, `data-available`, class. Nhiều band: `swap()` thay cả fieldset của band, giữ focus theo `value` radio. Lệch chữ ADR 0008 mục 3 (1 partial `featured-product`): một partial bọc cả cột sẽ thay host `<product-variant-picker>` (mất listener, focus, trạng thái "+N"); đề xuất Tech Lead sửa ADR theo cách này. |
+| 2 | Try Again: `load()` chạy `check()` đồng bộ rồi focus radio đang chọn của fieldset trước khi nút bị ẩn; lỗi vẫn focus radio đã khôi phục. |
+| 3 | ES1-T158: số request `option_values` = đúng số lần bấm (1 band, nhiều band), không request thừa; tên partial kiểm ở request cuối; legend + radio đang chọn sau đổi (band A giữ nguyên). |
+| 4 | `templates/product.featured-product.liquid` `{% layout none %}`: `swap()` không còn tải header/footer/CSS (xem KHÔNG CHẮC). |
+| 5 | Legend `[data-option-selected]` đổi ngay lúc bấm (`check()`), về giá trị cũ khi lỗi. |
+| 6 | Tổ hợp không tồn tại: không in giá (product-info, sticky bar, featured + badge %), JSON-LD bỏ `Offer` (giữ `AggregateOffer`), status "[value], Unavailable" (không giá). Ẩn giá như Dawn: ĐỀ XUẤT, Designer xem lại. |
+| 7 | Giá cho status đọc `[data-variant-price] .price__current` (thuộc tính mới trên `product-price`, `featured-product-price`), không khớp testimonial. |
+| 8 | Doc `blocks/product-form.liquid`: JS đọc `:scope>[role=status]`, `:scope>[role=alert]`. |
+| 9 | Đổi tên `snippets/selected-variant-json.liquid` → `selected-variant-data.liquid`: lệnh Đo ADR 0008 ra 0 dòng. |
+
+Byte: picker 7 146 → 7 123 (≤ 7 168; bù bằng `replaceChildren`, gộp `selectedOptions`, bỏ try/catch JSON, bỏ 1 comment); featured-product 2 282 → 2 289 (≤ 2 304); product-form 6 867 (không đổi); base.css không đổi.
+Tự kiểm tra: `shopify theme check` 0 lỗi, 22 warning có sẵn; `playwright --list` 3 550 / 104 file; 27 spec tĩnh (ES1-T66, T67, T69, T81, T85, T87, T96, T158, T347, T369, T478) đạt + phần tĩnh ES1-T156; test store chờ CI.

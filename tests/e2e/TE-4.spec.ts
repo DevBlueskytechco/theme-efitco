@@ -736,6 +736,10 @@ test.describe('ES1-T70 TE-4 AC2 variant', () => {
     await expect(tid(page, T.inventory)).toHaveAttribute('data-state', 'unavailable');
     await expect(tid(page, T.stickyAdd)).toBeDisabled();
     await expect(tid(page, T.status)).toContainText(label);
+    // Review #6: không hiện giá biến thể dự phòng cạnh Unavailable (vùng giá, sticky bar, câu status).
+    await expect(tid(page, T.price).getByTestId('price')).toHaveCount(0);
+    await expect(tid(page, T.stickyPrice).getByTestId('price')).toHaveCount(0);
+    await expect(tid(page, T.status)).toHaveText(`${value}, ${label}`);
     expect(partials, 'tổ hợp không tồn tại hỏi server qua ?option_values=').toHaveLength(1);
     expect(await checkedNames(tid(page, T.picker))).toEqual(missing);
     expect(await currentId(page)).toBe(before.id);

@@ -12,9 +12,11 @@ export function optionValue(fieldset: Locator, name: string): Locator {
   });
 }
 
-/** Chọn lần lượt tên giá trị theo thứ tự option; mở "+N" nếu giá trị đang bị thu gọn. Giá trị đã chọn thì bỏ qua. */
-export async function chooseOptions(scope: Locator, names: string[]) {
+/** Chọn lần lượt tên giá trị theo thứ tự option; mở "+N" nếu giá trị đang bị thu gọn. Giá trị đã chọn thì bỏ qua.
+ *  Trả số lần bấm giá trị thật (mỗi lần bấm = 1 change = 1 request ?option_values=). */
+export async function chooseOptions(scope: Locator, names: string[]): Promise<number> {
   const fieldsets = scope.getByTestId('product-option');
+  let clicks = 0;
   for (const [i, name] of names.entries()) {
     const fs = fieldsets.nth(i);
     const label = optionValue(fs, name);
@@ -22,7 +24,14 @@ export async function chooseOptions(scope: Locator, names: string[]) {
     if (await label.locator('input[type="radio"]').isChecked()) continue;
     if (!(await label.isVisible())) await fs.getByTestId('product-option-more').click();
     await label.click();
+    clicks += 1;
   }
+  return clicks;
+}
+
+/** Chữ giá trị đang chọn trong legend ([data-option-selected]) của từng option. */
+export function legendNames(scope: Locator): Promise<string[]> {
+  return scope.getByTestId('product-option').evaluateAll((sets) => sets.map((fs) => fs.querySelector('[data-option-selected]')?.textContent?.trim() ?? ''));
 }
 
 /** Tên các giá trị đang chọn, theo thứ tự option. */
