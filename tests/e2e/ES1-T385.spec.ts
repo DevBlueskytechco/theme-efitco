@@ -14,7 +14,7 @@
 // Bài có ảnh, bài không ảnh, trang tag tìm lúc chạy từ trang blog, không cứng handle bài.
 // Phần JS do BE còn mở: ES1-T473 (focus hộp lỗi/thành công bình luận, chevron bài liên quan) → fixme gắn mã.
 // Bug đã biết: test.fail gắn mã (ES1-T506 (ES1-T385-B01), ES1-T517 (B02, TC-14 360), ES1-T518 (B03), ES1-T520 (B04, TC-33 1280/1920)); khi bug sửa test đỏ lại → gỡ test.fail.
-// Câu hỏi AC: ES1-T519 [Q] (AC14 bài không ảnh → LCP h1) — TC-46b là test thường, chờ CI đo thật mới chốt.
+// Câu hỏi AC: ES1-T519 [Q] (AC14 bài không ảnh → LCP h1) — CI 20/11 đo LCP là <p>; TC-46b test.fail tới khi CTO chốt.
 import { test, expect, type Browser, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
@@ -1164,6 +1164,8 @@ test.describe('ES1-T385 bài viết', () => {
     desktopOnly(ti.project.name);
     const d = await discover(page);
     test.fixme(!d.noCover, 'không có bài không ảnh (TE385_ARTICLE_NO_COVER_PATH — ES1-T507)');
+    // CI run 44702293347 (20/11) đo thật: 412×823 không ảnh → LCP là <p> đầu bài, không phải h1. Chờ CTO chốt ES1-T519.
+    test.fail(true, 'ES1-T519 [Q]: AC14 "không ảnh bìa → LCP là h1" — CI đo LCP là đoạn đầu .rte');
     for (const { w, h } of LH_VIEWPORTS) {
       await openArticle(page, w, d.noCover!, h);
       const e = await lcp(page);
