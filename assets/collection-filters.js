@@ -1,12 +1,14 @@
-// <collection-filters> TE-6 (ES1-T110, ES1-T111), reused by /search (ES1-T123 D4).
+// <collection-filters> TE-6, also /search (ES1-T123 D4).
 import { partials } from "@shopify/partial-rendering";
 
 const T = (id) => `[data-testid="${id}"]`;
 const PAGES = T("pagination");
-const LINK = `${PAGES} a[href],a${T("collection-filter-clear")},a${T("collection-empty-clear")}`;
+const LINK = [PAGES + " a[href]", ..."filter-clear empty-button chip chips-clear".split(" ").map((s) => "a" + T("collection-" + s))].join();
 const RESULTS = "[data-results-label]";
 const GROUP = "details[data-filter-param]";
 const OPEN = T("collection-filter-open");
+// /search S6b: alert, old grid kept; none (collection): reload.
+const ERROR = "template[data-results-error]";
 const events = import("https://cdn.shopify.com/storefront/standard-events.js").catch(() => null);
 
 class CollectionFilters extends HTMLElement {
@@ -38,7 +40,7 @@ class CollectionFilters extends HTMLElement {
 		return document.getElementById("collection-filter-drawer");
 	}
 
-	// <modal-dialog> (ADR 0007) while the Filter button shows; showModal throws on a popover.
+	// <modal-dialog> (ADR 0007); showModal throws on a popover.
 	show(o) {
 		const g = this.dlg;
 		const m = g?.parentElement;
@@ -48,11 +50,9 @@ class CollectionFilters extends HTMLElement {
 		return 1;
 	}
 
-	// close() returns focus to the opener.
 	hide() {
 		const g = this.dlg;
-		if (g?.open) g.close();
-		else if (g?.matches(":popover-open")) g.hidePopover();
+		g?.open ? g.close() : g?.matches(":popover-open") && g.hidePopover();
 	}
 
 	handleEvent(e) {
@@ -62,43 +62,42 @@ class CollectionFilters extends HTMLElement {
 		const own = f && t.form == f;
 		const num = own && t.type == "number";
 		if (t == this.mq) {
-			// 64rem+: a column, not a modal.
 			if (t.matches && !o?.getClientRects().length) this.hide();
 		} else if (type[7] == ":") {
-			// shopify:block:(de)select: open below 64rem, close.
 			if (t.contains?.(this.dlg)) type.endsWith("deselect") ? this.hide() : this.show(o);
 		} else if (type == "pageshow") {
 			if (e.persisted && location.href != this.shown) this.go(location.href);
 			else if (!this.hasAttribute("aria-busy")) this.sync();
 		} else if (type == "input") {
-			// Price: debounce 400 ms, drop the request in flight.
+			// Price: debounce 400 ms.
 			if (!num) return;
 			clearTimeout(this.tm);
 			this.ctrl?.abort();
 			this.bad();
 			this.tm = setTimeout(() => this.price(), 400);
 		} else if (type == "keydown") {
-			// Enter: apply now, no implicit submit (submit closes the drawer).
+			// Enter: apply now (submit closes).
 			if (num && e.key == "Enter" && !e.isComposing) e.preventDefault(), this.price(1);
 		} else if (type == "focusout") {
 			if (num) this.bad(1);
 		} else if (type == "change") {
-			// Card swatches are in no form.
+			// Swatches: no form.
 			if (own && !num && !this.bad(1)) this.go(this.url(), 0, 1);
 		} else if (type == "submit") {
 			if (t != f) return;
 			e.preventDefault();
 			clearTimeout(this.tm);
 			if (this.bad(1)) return;
-			// "Show N products": close once the filters are applied.
+			// "Show N products": close once applied.
 			const u = this.url();
 			const p = this.hasAttribute("aria-busy") ? (u == this.want ? this.p : this.go(u, 0, 1)) : u == this.shown || this.go(u, 0, 1);
 			Promise.resolve(p).then((ok) => ok && this.hide());
 		} else {
+			if (t.closest?.("[data-retry]") && this.err?.contains(t)) return this.go(...this.args);
 			const b = t.closest?.(OPEN);
 			if (b && !e.defaultPrevented && this.show(b)) return e.preventDefault();
 			const a = t.closest?.(LINK);
-			if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+			if (!a || a.pathname != location.pathname || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
 			e.preventDefault();
 			const page = !!a.closest(PAGES);
 			this.go(a.href, page, !page);
@@ -112,7 +111,7 @@ class CollectionFilters extends HTMLElement {
 		if (u != (this.hasAttribute("aria-busy") ? this.want : this.shown)) this.go(u, 0, 1);
 	}
 
-	// min > max: no request; error on blur, Enter, submit (filter-group.liquid).
+	// min > max: no request.
 	bad(show) {
 		const [lo, hi, err] = ["min", "max", "error"].map((s) => this.querySelector(T("collection-filter-price-" + s)));
 		if (!lo || !hi) return;
@@ -128,25 +127,27 @@ class CollectionFilters extends HTMLElement {
 		return no;
 	}
 
+	// Server 500.00 → 500.
 	url() {
+		const f = this.form;
 		const u = new URL(location.pathname, location.href);
-		for (let [k, v] of new FormData(this.form)) if ((v = `${v}`.trim())) u.searchParams.append(k, v);
+		for (let [k, v] of new FormData(f)) if ((v = `${v}`.trim())) u.searchParams.append(k, f.elements[k]?.type == "number" ? v.replace(/\.0+$/, "") : v);
 		return u.href;
 	}
 
 	go(url, page, emit) {
 		this.want = url;
+		this.args = [url, page, emit];
 		return (this.p = this.run(url, page, emit));
 	}
 
-	// Resolves 1 once applied; undefined when aborted or on the full-page fallback.
 	async run(url, page, emit) {
 		this.ctrl?.abort();
 		const c = (this.ctrl = new AbortController());
 		const done = emit && this.emit(url);
-		// Label still empty after apply = not applied.
 		this.querySelector(RESULTS)?.setAttribute("data-results-label", "");
 		this.setAttribute("aria-busy", "true");
+		this.err?.remove();
 		try {
 			const update = await partials.fetch(this.dataset.resultsPartial || "collection-products", "collection-filters", "collection-filter-count", { url, signal: c.signal });
 			if (c.signal.aborted) return;
@@ -160,30 +161,35 @@ class CollectionFilters extends HTMLElement {
 			history.replaceState(history.state, "", url);
 			this.shown = location.href;
 			this.sync();
-			// Focused control replaced: its twin, else ×.
+			// Focus lost: twin, else ×.
 			if (a && !a.isConnected) (document.getElementById(a.id) || this.querySelector(T("collection-filter-close")))?.focus();
 			for (const d of this.querySelectorAll(GROUP)) d.open = open.get(d.dataset.filterParam) ?? d.open;
-			const status = this.querySelector(T("collection-status"));
-			if (status) status.textContent = label;
+			this.querySelector(T("collection-status"))?.replaceChildren(label);
 			if (page) {
-				r.tabIndex = -1;
-				r.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-				r.focus({ preventScroll: true });
+				const f = r.querySelector("[data-results-focus]") || r;
+				f.tabIndex = -1;
+				f.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+				f.focus({ preventScroll: true });
 			}
 			if (done) done({ productsCount: +(r.dataset.resultsCount ?? label.replace(/\D/g, "")) });
 			return 1;
 		} catch {
-			if (!c.signal.aborted) location.assign(url);
+			if (c.signal.aborted) return;
+			const t = this.querySelector(ERROR);
+			if (!t) return location.assign(url);
+			// Alert reachable; ticks stay.
+			this.hide();
+			t.after((this.err = t.content.firstElementChild.cloneNode(true)));
 		} finally {
 			if (this.ctrl == c) this.removeAttribute("aria-busy");
 		}
 	}
 
-	// apply() keeps form values: reset every control to the server state.
+	// apply() keeps form values: reset.
 	sync() {
 		const q = new URLSearchParams(location.search);
 		for (const el of this.form?.elements || []) {
-			if (el.type == "checkbox" || el.type == "radio") el.checked = el.defaultChecked;
+			if (/^(checkbox|radio)$/.test(el.type)) el.checked = el.defaultChecked;
 			else if (el.options) {
 				const v = q.get(el.name);
 				for (const o of el.options) o.selected = v == null ? o.defaultSelected : o.value == v;
@@ -191,14 +197,13 @@ class CollectionFilters extends HTMLElement {
 		}
 	}
 
-	// shopify:collection:update, collection pages only (ES1-T123 D4 #3).
+	// shopify:collection:update, collections only.
 	emit(url) {
 		const f = this.form;
 		const d = f?.dataset;
 		if (!d?.collectionHandle) return;
 		let done;
 		const result = new Promise((r) => (done = r));
-		// productFilters is optional and left out (ES1-T249).
 		const s = new URL(url).searchParams.get("sort_by")?.split("-")[0];
 		const sortKey = s == "best" ? "BEST_SELLING" : s?.toUpperCase();
 		const collection = { id: d.collectionId ? `gid://shopify/Collection/${d.collectionId}` : null, handle: d.collectionHandle, productsCount: +d.productsCount || 0 };

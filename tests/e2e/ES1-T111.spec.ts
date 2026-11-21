@@ -293,6 +293,10 @@ test.describe('ES1-T111 contract', () => {
     </dialog></modal-dialog></div>
     <button type="button" popovertarget="collection-filter-drawer" data-testid="collection-filter-open">Filter</button>
     <div data-results-label="3 products"></div><div role="status" data-testid="collection-status"></div>
+    <a href="/collections/x?filter.v.a=2" data-testid="collection-chip">Remove filter A: 2</a>
+    <a href="/collections/x?sort_by=price-ascending" data-testid="collection-chips-clear">Clear all</a>
+    <a href="/collections/x?sort_by=title-ascending" data-testid="collection-empty-button">Clear filters</a>
+    <a href="/collections/all" data-testid="collection-empty-button">Continue shopping</a>
   </collection-filters></body>`;
 
   async function fixture(page: Page, width = 360) {
@@ -330,6 +334,42 @@ test.describe('ES1-T111 contract', () => {
     await expect.poll(() => search(page)).toBe('?filter.v.price.gte=20.40');
     await page.waitForTimeout(500);
     expect(await fetches(page), 'debounce đã huỷ khi Enter').toBe(3);
+    expect(errors).toEqual([]);
+  });
+
+  // Store CI đỏ (PR #285): server render giá 500.00, sau apply sync() trả ô về giá trị đó; URL phải giữ 500 như lúc nhập.
+  test('AC2-price tĩnh: giá server dạng 500.00 gửi lại là 500, 20.40 giữ nguyên', async ({ page }) => {
+    const errors = await fixture(page, 1280);
+    const lo = page.getByTestId('collection-filter-price-min');
+    const hi = page.getByTestId('collection-filter-price-max');
+    await hi.evaluate((i: HTMLInputElement) => {
+      i.setAttribute('value', '500.00');
+      i.value = '500.00';
+    });
+    await lo.fill('20.40');
+    await lo.press('Enter');
+    await expect.poll(() => search(page)).toBe('?filter.v.price.gte=20.40&filter.v.price.lte=500');
+    expect(errors).toEqual([]);
+  });
+
+  // ES1-T526: empty state chung (collection-empty-button, ES1-T365) và chip lọc refresh partial như Clear all cũ; link sang trang khác không chặn.
+  test('ES1-T526 tĩnh: chip, Clear all, Clear filters refresh partial không tải lại; link khác path đi bình thường', async ({ page }) => {
+    const errors = await fixture(page, 1280);
+    await page.evaluate(() => ((window as unknown as { __m: number }).__m = 1));
+    const steps: [string, string, string][] = [
+      ['collection-chip', '/collections/x?filter.v.a=2', '?filter.v.a=2'],
+      ['collection-chips-clear', '/collections/x?sort_by=price-ascending', '?sort_by=price-ascending'],
+      ['collection-empty-button', '/collections/x?sort_by=title-ascending', '?sort_by=title-ascending'],
+    ];
+    for (const [i, [id, href, q]] of steps.entries()) {
+      await page.locator(`a[data-testid="${id}"][href="${href}"]`).click();
+      await expect.poll(() => fetches(page), id).toBe(i + 1);
+      await expect.poll(() => search(page), id).toBe(q);
+    }
+    expect(await page.evaluate(() => (window as unknown as { __m?: number }).__m), 'không tải lại').toBe(1);
+
+    await page.route('http://fixture.test/collections/all', (r) => r.fulfill({ contentType: 'text/html', body: '<p>all</p>' }));
+    await Promise.all([page.waitForURL('http://fixture.test/collections/all'), page.locator('a[href="/collections/all"]').click()]);
     expect(errors).toEqual([]);
   });
 

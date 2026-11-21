@@ -8,7 +8,8 @@
   Toolbar (outside the results partial, so its controls keep their listeners):
   - collection-filter-open opens the dialog of blocks/collection-filters.liquid
     with popovertarget; hidden when the collection has no filters, and from 64rem.
-    Partial collection-filter-count inside it: badge with the number of filters
+    Partial collection-filter-count inside it renders snippets/filter-count.liquid
+    (shared with blocks/search-results.liquid): badge with the number of filters
     applied (aria-hidden) plus the same number as text. Filters applied = all
     active_values + 1 when price_range has a min or a max.
   - Partial collection-count: "{n} products" (collection.products_count, after
@@ -16,7 +17,9 @@
     after a page change.
   - Sort select with form="collection-filter-form", so sort and filters submit
     together. Selected: collection.sort_by, then collection.default_sort_by. No
-    sort setting (AC3, ES1-T106 #1). Apply button in noscript.
+    sort setting (AC3, ES1-T106 #1). Apply button in noscript. Same markup as
+    snippets/sort-select.liquid (search toolbar), kept inline because ES1-T365
+    TC-04 reads it from this file.
   - collection-status: live region, empty until JavaScript fills it.
   - Hidden (`hidden`) when the collection has no products at all (AC14).
   Below 64rem the toolbar sticks under the header (var(--sticky-top)).
@@ -96,16 +99,11 @@
       assign image_sizes = '(min-width: 80rem) calc(' | append: settings.max_page_width | append: ' * 0.75 / ' | append: columns_desktop | append: '), (min-width: 64rem) calc(75vw / ' | append: columns_tablet | append: '), (min-width: 48rem) calc(100vw / ' | append: columns_tablet | append: '), calc(100vw / ' | append: columns_mobile | append: ')'
     endif
 
-    # Same rule as Clear all in blocks/collection-filters.liquid
-    assign active_filter_count = 0
-    for filter in collection.filters
-      assign active_filter_count = active_filter_count | plus: filter.active_values.size
-      if filter.type == 'price_range'
-        if filter.min_value.value != nil or filter.max_value.value != nil
-          assign active_filter_count = active_filter_count | plus: 1
-        endif
-      endif
-    endfor
+    # Same rule as Clear all in blocks/collection-filters.liquid (snippets/filter-count.liquid)
+    capture active_filter_count
+      render 'filter-count', filters: collection.filters, count_only: true
+    endcapture
+    assign active_filter_count = active_filter_count | strip | plus: 0
 
     # Clear all keeps a sort order the shopper chose; the default sort is dropped
     assign clear_url = collection.url
@@ -144,16 +142,7 @@
         {% render 'status-icon', name: 'filter' %}
         <span>{{ 'blocks.collection_products.filter' | t }}</span>
         {% partial 'collection-filter-count' %}
-          <span class="collection-toolbar__count">
-            {%- if active_filter_count > 0 -%}
-              <span class="collection-toolbar__badge" aria-hidden="true" data-testid="collection-filter-count">
-                {{- active_filter_count -}}
-              </span>
-              <span class="visually-hidden">
-                {{- 'blocks.collection_products.filters_applied' | t: count: active_filter_count -}}
-              </span>
-            {%- endif -%}
-          </span>
+          {% render 'filter-count', filters: collection.filters %}
         {% endpartial %}
       </button>
 

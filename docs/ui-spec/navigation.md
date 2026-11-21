@@ -56,7 +56,7 @@ Mega menu (≥ 80rem):
 Menu drawer (< 80rem):
 1. Nút menu trong thanh tối (`header-drawer-toggle`, ô 44, lùi −12), `aria-expanded`.
 2. Scrim toàn màn (phủ cả thanh tối ở phần 10% bên phải).
-3. Drawer trái nền trắng (kit `.drawer--start`; thanh tối không lặp vào drawer, foundation §15): `.overlay__header` (tiêu đề "Menu" + nút đóng 48) · `.overlay__body` cuộn riêng · `.overlay__footer` (Sign In, Currency, Language).
+3. Drawer trái nền trắng (kit `.drawer--start`; thanh tối không lặp vào drawer, foundation §15): `.overlay__header` (tiêu đề "Menu" + nút đóng 48) · `.overlay__body` cuộn riêng · `.overlay__footer` (Sign In secondary). Localization = 1 hàng gộp "cờ + USD / EN ›" cuối danh sách cấp 1, chạm mở cấp 2 (localization.md §4.4, LC1; ES1-T527 V65).
 4. Cấp 1: hàng link; mục có con là nút có chevron ›.
 5. Cấp 2 (trượt vào trong cùng drawer): nút Back + nút đóng · tiêu đề cấp 2 · "View all …" · nhóm (tiêu đề nhóm = link cấp 2 có cấp 3, dưới là link cấp 3) hoặc hàng collection có ảnh 56 · card sản phẩm nổi bật cuối danh sách (nếu có).
 
@@ -132,7 +132,7 @@ Khi panel mở: header giữ tối (sổ 10/11; foundation §3.2, §14), không 
 | Nhóm cấp 3 | tiêu đề nhóm 14/600 uppercase muted (link, cao 44), cách nhóm trên 24; link 16/400 cao 48 | 14 #1094M khoảng cách chạm |
 | Hàng collection có ảnh | cao 72; ảnh 56 × 56 bo 8 `cover`; gap 16; tên 16/500; số 14 muted | |
 | Card sản phẩm | ngang: ảnh 96 nền trắng + chữ; nền cream bo 12 padding 12; cách nhóm trên 32 | |
-| Chân drawer | viền trên; Sign In (icon 24 + chữ 16/500, cao 44); 2 nút Currency / Language cao 44 viền `--color-muted-light`, xuống dòng khi hẹp | foundation §15 (account, localization); sổ quyết định 09/11 viền ô nhập |
+| Chân drawer | viền trên; Sign In = `.button--secondary` full, icon user 20 (DS Drawers); localization = hàng gộp 52 cuối danh sách cấp 1 (cờ 26 + "USD / EN" + ›), KHÔNG 2 nút Currency / Language | foundation §15, localization.md §4.4, LC1 (ES1-T527 V65) |
 
 ## 6. Tương tác, bàn phím, chuyển động
 
