@@ -79,7 +79,7 @@ THAY (11/11, Shopify §8): dùng `.rte` chung foundation §28 (cũng cho mô t�
 - h2 `--font-size-h2`, h3 `--font-size-h3` (heading 700); h4 Inter 600 18. Khoảng trên heading 48, dưới 12.
 - Link: gạch chân 1px offset 0.2em, 500; hover accent (5.01) — bắt buộc gạch chân vì Lighthouse `link-in-text-block`.
 - ul/ol thụt 24, gap 8, marker `--color-muted`.
-- Trích dẫn: nền sand, viền trái 4px foreground, bo phải 12, chữ heading 700 h3; nguồn 14/500 muted (6.81 trên sand).
+- Trích dẫn: theo foundation §28 (`.rte blockquote` của kit, ES1-T527 V53): viền inline-start 4 accent, không nền, chữ heading 700 h3; nguồn 14/500 muted. Bỏ kiểu nền sand vòng 3. Ảnh RTE tràn cột 720 (`.rte figure { margin: 0 }`, V60).
 - Ảnh: full cột, bo `--radius-card`, chú thích 14 muted; khoảng trên/dưới 32.
 - Bảng: bọc `.table-wrap` cuộn ngang riêng (zoom 200% không tràn trang), viền border bo 12, th nền alt 600, ô padding 12/16, chữ 14, `min-width: 30rem`.
 - `hr`: 1px border, cách 48.
@@ -115,7 +115,7 @@ Spam: Shopify có thể chuyển sang trang hCaptcha `/challenge` sau submit; kh
 
 ## 8. Token dùng
 
-`--color-background|foreground|muted|muted-light|border|background-alt|background-sand|accent|sale|badge-new`, `--font-heading--*`, `--font-primary--family`, `--font-size-sm|base|lg|h1|h2|h3`, `--space-1..8`, `--radius-input|button|card` (bo 16 = `--radius-card` + `--space-1`), `--color-background-dark(-foreground)`, `--color-muted-on-dark` (header, footer), `--control-height`, `--section-gap`, `--grid-gap`, `--header-height`, `--motion-accordion`. Không token mới.
+`--color-background|foreground|muted|muted-light|border|background-alt|background-sand|accent|sale|badge-new`, `--font-heading--*`, `--font-primary--family`, `--font-size-sm|base|lg|h1|h2|h3`, `--space-1..8`, `--radius-input|button|card|panel` (bo 16 = `--radius-panel`, ES1-T527 V04/V59), `--color-background-dark(-foreground)`, `--color-muted-on-dark` (header, footer), `--control-height`, `--section-gap`, `--grid-gap`, `--header-height`, `--motion-accordion`. Không token mới.
 
 ## 9. Lighthouse
 
