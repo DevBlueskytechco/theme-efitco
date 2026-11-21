@@ -1,0 +1,84 @@
+{% doc %}
+  Chips of the storefront filters in use (docs/ui-spec/search.md §3.5,
+  collection.md §7; TE-8 AC7, TE-6 AC4). Each chip is a real link to
+  url_to_remove, so it works without JavaScript: one chip per active value of a
+  list or boolean filter, one chip per price_range filter with a min or a max
+  (filter.url_to_remove). The muted group name ("Color:") comes before the
+  value; the accessible name is "Remove filter Color: Black". The last item is
+  Clear all (clear_url keeps the search terms and the sort order).
+
+  Renders nothing when no filter is applied, so callers can render it
+  unconditionally. Uses the same counting rule as snippets/filter-count.liquid.
+
+  Test hooks: {testid} (the list), {testid}-chip, {testid}-clear.
+
+  @param {filter[]} filters - search.filters or collection.filters
+  @param {string} clear_url - Link that removes every filter
+  @param {string} [testid] - data-testid of the list. Default: 'active-filters'
+
+  @example
+  {% render 'active-filters', filters: search.filters, clear_url: clear_url, testid: 'search-active-filters' %}
+{% enddoc %}
+
+{%- liquid
+  assign list_testid = testid | default: 'active-filters'
+  capture active_count
+    render 'filter-count', filters: filters, count_only: true
+  endcapture
+  assign active_count = active_count | strip | plus: 0
+-%}
+
+{%- if active_count > 0 -%}
+  <ul
+    class="active-filters"
+    role="list"
+    aria-label="{{ 'search.active_filters' | t | escape }}"
+    data-testid="{{ list_testid }}"
+  >
+    {%- for filter in filters -%}
+      {%- if filter.type == 'price_range' -%}
+        {%- if filter.min_value.value != nil or filter.max_value.value != nil -%}
+          {%- liquid
+            assign price_min = filter.min_value.value | default: 0 | money
+            assign price_max = filter.max_value.value | default: filter.range_max | money
+            assign chip_value = price_min | append: ' – ' | append: price_max
+            assign chip_label = 'search.remove_filter' | t: filter: filter.label, value: chip_value
+          -%}
+          <li>
+            <a
+              class="active-filters__chip"
+              href="{{ filter.url_to_remove }}"
+              aria-label="{{ chip_label | escape }}"
+              data-testid="{{ list_testid }}-chip"
+            >
+              <span class="active-filters__group">{{ filter.label | escape }}:</span>
+              {{ chip_value }}
+              {%- render 'header-icon', name: 'close' -%}
+            </a>
+          </li>
+        {%- endif -%}
+      {%- else -%}
+        {%- for value in filter.active_values -%}
+          {%- assign chip_label = 'search.remove_filter' | t: filter: filter.label, value: value.label -%}
+          <li>
+            <a
+              class="active-filters__chip"
+              href="{{ value.url_to_remove }}"
+              aria-label="{{ chip_label | escape }}"
+              data-testid="{{ list_testid }}-chip"
+            >
+              <span class="active-filters__group">{{ filter.label | escape }}:</span>
+              {{ value.label | escape }}
+              {%- render 'header-icon', name: 'close' -%}
+            </a>
+          </li>
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endfor -%}
+    <li>
+      <a class="active-filters__clear" href="{{ clear_url | escape }}" data-testid="{{ list_testid }}-clear">
+        {{- 'search.clear_all' | t -}}
+      </a>
+    </li>
+  </ul>
+{%- endif -%}
