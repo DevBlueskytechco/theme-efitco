@@ -80,7 +80,7 @@ A.
    - `base.css` ≤ 49 152 B tới khi ES1-T566 merge, sau đó ≤ 40 960 B. Sau ES1-T565 + T566 ước ≈ 30–33 KB, nên còn 8–11 KB cho component chung R2: layer manager, countdown, phân trang, quick view.
    - Mỗi file tầng 4 ≤ 8 192 B. Chạm trần thì tách block con ra file riêng, không nâng trần.
    - File tầng 3 giữ ≤ 16 384 B. `critical.css` ≤ 10 240 B thô.
-   - Ngân sách trang chủ: `base.css` + tổng file tầng 4 do `templates/index.liquid` nạp ≤ 53 248 B. Số file tầng 4 trên index ≤ 10 (đợt này 9: 5 của ES1-T565 + testimonials, video-carousel, faq, shop-by-level; multicolumn, hello-world không có ở index).
+   - Ngân sách trang chủ: `base.css` + tổng file tầng 4 do `templates/index.liquid` nạp ≤ 57 344 B (CTO 21/11 ES1-T569: chấp nhận overhead nén từng file block; Lighthouse vẫn là gate). Số file tầng 4 trên index ≤ 10 (đợt này 9: 5 của ES1-T565 + testimonials, video-carousel, faq, shop-by-level; multicolumn, hello-world không có ở index).
 6. FOUC và LCP:
    - Block ở màn đầu (slideshow, header, announcement) không dùng tầng 4. Phần màn đầu vẫn ở `critical.css` (ADR 0003), nên LCP và FCP không phụ thuộc file block.
    - File tầng 4 không preload. Thẻ link nằm trong HTML stream ngay trước block, preload scanner thấy sớm. Preload lại đẩy CSS block dưới màn đầu tranh băng thông với ảnh LCP.
@@ -124,7 +124,7 @@ A.
     - Mọi `assets/*.css` có dòng `stylesheet_tag` trong `blocks/*.liquid` (trừ 5 file tầng 1–3): gzip ≤ 8 192.
     - Mỗi file tầng 4 có ≥ 1 block nạp. Block cha trong bảng mục 2 nạp đúng 1 lần.
     - Không dòng nào có `preload`. Dòng link không nằm giữa `{% partial` và `{% endpartial %}`. Không `stylesheet_tag` trong `snippets/`.
-    - `base.css` ≤ 49 152 (≤ 40 960 sau ES1-T566). `base.css` + file tầng 4 mà block trong `templates/index.liquid` nạp ≤ 53 248. Số file đó ≤ 10.
+    - `base.css` ≤ 49 152 (≤ 40 960 sau ES1-T566). `base.css` + file tầng 4 mà block trong `templates/index.liquid` nạp ≤ 57 344. Số file đó ≤ 10.
     - Không prelude trùng giữa `base.css`, file tầng 3 và file tầng 4. Dùng lại hàm `preludes` của ES1-T478; bỏ qua khai báo lặp do tách selector list vì prelude đã khác.
     - Không class `.quiz`, `.bundle-builder`, `.shop-the-look`, `.featured-product__`, `.image-with-text` (sau T566 thêm `.testimonial`, `.video-card`, `.video-carousel`, `.faq`, `.level-card`, `.shop-by-level`, `.multicolumn`, `.welcome`, `.highlight`) đứng đầu prelude trong `base.css`.
   - Ảnh: index 360/768/1280/1920 (+ page.contact ở ES1-T566), `reducedMotion`, trước/sau, 0 khác biệt bố cục. Ghi PR body.
