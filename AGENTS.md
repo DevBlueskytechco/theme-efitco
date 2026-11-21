@@ -239,7 +239,7 @@ Snippets (`snippets/`):
 | `rating-stars` | Five stars for a 0–5 rating; accessible name from the caller. |
 | `slideshow-icon` | Direction and media icons (previous, next, pause, play, arrow). |
 | `status-icon` | Decorative status icon for toasts, alerts and empty states. |
-| `variant-json` | Variant data as JSON for `assets/product-variant-picker.js`; no visible markup. |
+| `selected-variant-data` | The selected variant only, as JSON for `assets/product-variant-picker.js` (null when the combination does not exist); no visible markup. ADR 0008: no list of all variants. |
 
 - Adding, renaming or removing a block or snippet updates these tables in the
   same change.
@@ -309,7 +309,7 @@ Every snippet must:
   Why: the icon then follows text color and is not read twice.
 - A snippet that only outputs data for JavaScript renders a
   `<script type="application/json">` and no visible markup
-  (`snippets/variant-json.liquid`).
+  (`snippets/selected-variant-data.liquid`).
   Why: one JSON source per page avoids parsing data out of HTML.
 
 Accessibility for blocks and snippets:
@@ -417,7 +417,7 @@ Accessibility for blocks and snippets:
   `data-enhanced` before showing enhanced controls.
   Why: a script error or slow network must not block buying.
 - Read Liquid output through `data-*` attributes and JSON snippets
-  (`snippets/variant-json.liquid`); translated strings for JavaScript come
+  (`snippets/selected-variant-data.liquid`); translated strings for JavaScript come
   from `data-label-*` attributes rendered with `| t`.
   Why: JavaScript cannot call `| t` or `routes.*`, so Liquid hands over
   finished values.
@@ -536,7 +536,7 @@ Accessibility for blocks and snippets:
 | Link to a storefront page | `routes.*` (`routes.root_url`, `routes.cart_url`, `routes.search_url`) | `blocks/header.liquid` |
 | Add JavaScript | One ES module in `assets/` (at most 8 KB), one custom element, loaded by the block with `type="module"`; markup works without it | `assets/header-sticky.js` loaded in `blocks/header.liquid` |
 | Update part of the page without reload | Wrap the region in `{% partial 'name' %}`, refresh it from JS with the same name | `blocks/liquid-tips.liquid` + `assets/liquid-tips.js`; with a URL: `blocks/product-info.liquid` (`product-price`) + `assets/product-variant-picker.js` |
-| Give JavaScript server data | JSON snippet or `data-*` attributes | `snippets/variant-json.liquid` |
+| Give JavaScript server data | JSON snippet or `data-*` attributes | `snippets/selected-variant-data.liquid` |
 | Report a storefront event | Liquid `<s-view-event>` for views; `shopify:*` event from JS for changes | `blocks/product-info.liquid`, `assets/product-form.js` |
 | Add product structured data | Extend the single JSON-LD snippet; do not add a second Product | `snippets/product-structured-data.liquid` |
 | Theme Check reports an error | Fix the Liquid; never edit `.theme-check.yml` | `{% doc %}` params in `blocks/slideshow-slide.liquid` |
