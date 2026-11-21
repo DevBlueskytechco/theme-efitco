@@ -229,7 +229,9 @@
   endif
 -%}
 
-{{ 'quiz.css' | asset_url | stylesheet_tag }}
+{%- if steps != blank or results_only or request.design_mode -%}
+  {{ 'quiz.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if steps != blank or results_only -%}
   <{{ root_tag }}
     class="{{ root_class }}"

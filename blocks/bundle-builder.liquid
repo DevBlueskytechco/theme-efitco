@@ -107,7 +107,9 @@
   assign label_error = 'blocks.bundle_builder.error' | t
 -%}
 
-{{ 'bundle-builder.css' | asset_url | stylesheet_tag }}
+{%- if has_products or request.design_mode -%}
+  {{ 'bundle-builder.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if has_products -%}
   <bundle-form
     class="bundle-builder"

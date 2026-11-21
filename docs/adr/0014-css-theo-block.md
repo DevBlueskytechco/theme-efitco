@@ -65,6 +65,8 @@ A.
 3. Cách nạp trong block:
    - Đúng 1 dòng `{{ '<file>.css' | asset_url | stylesheet_tag }}` trong block cha (block gọi từ template).
    - Vị trí: phần xuất HTML, ngay trước thẻ root, trước nhánh `if` placeholder, để cả nội dung thật lẫn placeholder đều có CSS.
+   - Chỉ in khi block in markup (ES1-T565, CI 44888604310): bọc dòng link trong `if <điều kiện render> or request.design_mode`, cùng điều kiện với nhánh nội dung thật + nhánh placeholder. Ví dụ `{%- if show_item or request.design_mode -%}{{ 'image-with-text.css' | asset_url | stylesheet_tag }}{%- endif -%}`. Lý do: `blocks/container.liquid` bỏ khung khi body rỗng (`content | strip`); 1 thẻ link đứng một mình làm body không rỗng, storefront in band rỗng (ES1-T120, T148, T156, T180, T182).
+   - View dữ liệu `{% layout none %}` (vd `templates/product.featured-product`, trả partial cho trang đã có link) không in link: template truyền `stylesheet: false`, block bỏ dòng link (ES1-T156: 0 `link[rel=stylesheet]`).
    - Ngoài mọi `{% partial %}`. `partials.refresh/apply` không chèn lại hay xoá link. Quick view và quiz results lấy partial về trang đã có link.
    - Block con không nạp. Block cha khác render block con đó thì cũng nạp, ví dụ `contact-aside` nạp `faq.css`.
    - Không `preload: true`. Không `media="print"`/`onload`. Không thêm vào `layout/`. Không gọi từ snippet.
@@ -75,6 +77,7 @@ A.
    - Không chuyển được (class dùng ở ≥ 2 block, ở snippet dùng chung, ở màn đầu, ở quick view) thì giữ `base.css`. Không chắc cũng giữ `base.css`.
    - File block chỉ dùng token, keyframe chung, class chung đã có ở `base.css`. Không định nghĩa lại token, không `@keyframes motion-*`. Keyframe chỉ 1 block dùng (`quiz-fade`) đi theo block.
    - Thứ tự cascade: file block nạp sau `base.css`, nên rule block giờ thắng mọi rule chung cùng độ ưu tiên. Kể cả rule chung trước đây nằm sau nó trong `base.css`: `.button` trong `@media (min-width: 80rem)` base.css:8979, `.price` 9189, `.rating-stars` 9133, `.button[aria-busy]` 9244. FE so ảnh trước/sau. Lệch thì tăng độ ưu tiên ở rule chung hoặc bỏ thuộc tính trùng ở rule block. Không dùng `!important`.
+   - Mục chuyển hết sang file block mà comment đầu mục là mốc cắt của spec (vd `/** Image with text (TE-7` cho ES1-T94, T95, T217, T369) thì giữ comment mốc tại chỗ, ghi file đích. Không sửa spec để bỏ mốc.
    - Block mới R2: mặc định tầng 4. Chỉ vào `base.css` khi ở màn đầu template mặc định hoặc là component dùng chung. Lý do ghi trong PR body.
 5. Trần (đo `zlib.gzipSync(readFileSync(f)).length`, mức mặc định):
    - `base.css` ≤ 49 152 B tới khi ES1-T566 merge, sau đó ≤ 40 960 B. Sau ES1-T565 + T566 ước ≈ 30–33 KB, nên còn 8–11 KB cho component chung R2: layer manager, countdown, phân trang, quick view.

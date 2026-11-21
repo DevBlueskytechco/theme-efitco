@@ -94,7 +94,9 @@
   assign label_hotspot = 'blocks.shop_the_look.hotspot_product' | t
 -%}
 
-{{ 'shop-the-look.css' | asset_url | stylesheet_tag }}
+{%- if rows != blank or request.design_mode -%}
+  {{ 'shop-the-look.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if rows != blank -%}
   <bundle-form
     class="shop-the-look"

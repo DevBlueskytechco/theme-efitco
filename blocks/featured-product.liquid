@@ -83,12 +83,15 @@
 
   Styles: assets/featured-product.css (this block and the seal), loaded by the
   stylesheet_tag line before the root, outside every partial, without preload
-  (ADR 0014). Gallery, picker, form and countdown styles stay in assets/base.css.
+  (ADR 0014), only when the block prints markup (product set, or the theme
+  editor) and never in the ?view=featured-product data view. Gallery, picker,
+  form and countdown styles stay in assets/base.css.
 
   Self-contained: callers must leave the body empty.
 
   @param {string} [id] - Static block id, needed when a template has more than one featured product
   @param {boolean} [hide_options] - True hides the variant picker, as on the home page (Figma 1:759). Default: false
+  @param {boolean} [stylesheet] - False skips the stylesheet_tag line. Only templates/product.featured-product passes it: that layout none data view returns partials to a page that already has the link. Default: true
 
   @example
   {% block 'container', id: 'home-featured-product', tag: 'div' %}
@@ -96,9 +99,21 @@
   {% endblock %}
 {% enddoc %}
 
-{%- assign featured = block.settings.product -%}
+{%- liquid
+  assign featured = block.settings.product
+  # ADR 0014: link only when the block prints markup, else the container sees a non-empty body and renders an empty band. The data view (stylesheet: false, layout none) never prints it.
+  assign load_stylesheet = false
+  if featured != blank or request.design_mode
+    assign load_stylesheet = true
+  endif
+  if stylesheet == false
+    assign load_stylesheet = false
+  endif
+-%}
 
-{{ 'featured-product.css' | asset_url | stylesheet_tag }}
+{%- if load_stylesheet -%}
+  {{ 'featured-product.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if featured == blank -%}
   {%- if request.design_mode -%}
     <div

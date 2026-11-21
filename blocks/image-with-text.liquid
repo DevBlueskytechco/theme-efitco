@@ -180,7 +180,9 @@
   endif
 -%}
 
-{{ 'image-with-text.css' | asset_url | stylesheet_tag }}
+{%- if show_item or request.design_mode -%}
+  {{ 'image-with-text.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if show_item -%}
   <div
     class="image-with-text {{ layout_class }}"
