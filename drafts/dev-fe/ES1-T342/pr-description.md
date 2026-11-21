@@ -1,6 +1,6 @@
 KHÔNG CHẮC: (1) 64–80rem (1024) không có số đo trong ui-spec (index-mobile-b dòng 35 nói bố cục 768 giữ tới 1279, code và ES1-T449 dùng 2 cột từ 64rem): giữ 2 cột từ 64rem cho featured, why, FAQ, bố cục 768 áp 48–64rem; đã hỏi Designer ES1-T528 (im lặng = nhận). (2) base.css gzip 49 123 / 49 152 sau merge develop, còn 29 B: PR sau thêm CSS trang chủ sẽ vượt, cần tách hoặc rút tiếp. (3) Đã bỏ (partial `featured-product` thay bằng hợp đồng ADR 0008 của develop). (4) Spec ES1-T342 chưa chạy, scope-guard chặn dev-fe ghi tests/ → Orchestrator chép `drafts/dev-fe/ES1-T342/ES1-T342.spec.ts` sang `tests/e2e/`.
 
-# ES1-T342 TE-17-R2-FE3: featured product, why choose, FAQ theo 360 / 768 / 1280; partial featured-product
+# ES1-T342 TE-17-R2-FE3: featured product, why choose, FAQ theo 360 / 768 / 1280 (hợp đồng partial theo ADR 0008 của develop)
 
 Ticket: ES1-T342 · Story TE-17 · AC TE-13 AC2 (+ AC6 số đo), AC-H22 (phần markup), TE-7 AC2, AC3 (+ AC7) · Sau ES1-T409 (rich media, đã merge). Nguồn: index-mobile-b.md §2, §5, §7; index-1280.md §1 khối 10, 13, 15, §2.6; ADR 0008 mục 3; Figma 1:759, 1:992, 1:1057.
 
@@ -8,7 +8,7 @@ Ticket: ES1-T342 · Story TE-17 · AC TE-13 AC2 (+ AC6 số đo), AC-H22 (phần
 - `blocks/featured-product.liquid`
   - Merge develop (#281, ADR 0008): bỏ partial `featured-product` + `featured-product-region` của bản trước; giữ hợp đồng develop (partial `product-options` / `product-price` / `product-buy-buttons`, `data-variant-price`, `selected-variant-data`, `swap()`). PR chỉ thêm doc bố cục và chữ ẩn View Detail.
   - TE-13 AC6: "View Detail" thêm chữ ẩn " of {product}" (`blocks.featured_product.view_detail_suffix`), cả nhánh selling plan.
-  - Doc: bố cục 3 mốc, partial, testid `featured-product-region`.
+  - Doc: bố cục 3 mốc (partial theo ADR 0008, không còn testid `featured-product-region`).
 - `blocks/image-with-text.liquid`: `sizes` ảnh nhỏ split có mốc 768 (168 / 100), từ 80rem theo vw như cũ; doc bố cục split 360 / 768 / 64–80 / 80rem.
 - `blocks/faq.liquid`: `sizes` ảnh thêm 72vw ở 48rem (553 / 768); doc bố cục.
 - `blocks/faq-item.liquid`: doc hàng ≥ 56, icon theo màu chữ. Không đổi markup.
