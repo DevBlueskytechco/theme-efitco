@@ -14,7 +14,7 @@ KHÔNG CHẮC: banner consent (Shopify Customer Privacy) và Shopify Inbox do Sh
 
 Mục đích: một chỗ duy nhất quy định phần tử nào nằm trên phần tử nào (trục z), phần tử nào ở đâu trong dải đáy màn hình (trục dọc), lớp nào chặn popup tự mở, và cách giữ focus bàn phím không bị che. Spec trang (product, cart, index-mobile-b, collection, search, navigation, mini-cart-quickview, marketing-popups) trỏ về đây thay vì tự đặt số.
 
-Story: TE-9 (overlay toàn theme), TE-10 AC6 (Inbox không che sticky add-to-cart, cart drawer ở 360 và 1280). Figma: không có (Figma 1:359 chỉ có trang chủ desktop tĩnh). Mọi quy tắc dưới là `ĐỀ XUẤT:` theo nguồn ghi từng dòng, trừ phần đã chốt trong sổ quyết định.
+Story: TE-9 (overlay toàn theme), TE-10 AC6 (Inbox không che sticky add-to-cart, cart drawer ở 360 và 1280). Nguồn chuẩn: mockup `drafts/designer/ES1-T263/marketing-popups.html` mục 5 + `drafts/designer/_kit/kit.css` (`--layer-*`, CTO 21/11). Mọi quy tắc dưới là `ĐỀ XUẤT:` theo nguồn ghi từng dòng, trừ phần đã chốt trong sổ quyết định.
 
 Đầu ra:
 - Spec này.
@@ -58,7 +58,7 @@ Story: TE-9 (overlay toàn theme), TE-10 AC6 (Inbox không che sticky add-to-car
 
 | Thanh | Trang | Mốc | Cao (+ safe area) | Hiện khi | Spec |
 | --- | --- | --- | --- | --- | --- |
-| Sticky add to cart | product | 360 | 72 | nút Add To Cart chính ra khỏi màn | product §10 |
+| Sticky add to cart | product | 360 | 72 | nút Add to cart chính ra khỏi màn | product §10 |
 | | | 768, 1280, 1920 | 80 | như trên; "Show on desktop" mặc định BẬT | product §10; sổ 10/11 |
 | Checkout bar | cart | < 64rem (360, 768) | 72 | panel tóm tắt ra khỏi màn, giỏ có hàng | cart §3.7 |
 | Bundle bar | trang chủ | 360 | 72 | lưới bundle trong màn, panel chưa vào | index-mobile-b §1; sổ 10/11 (H, thanh dính bundle 360) |
@@ -91,7 +91,7 @@ Lớp modal (top layer) làm toast-region bên ngoài bị inert và nằm dư�
 
 ### 2.6 Nút back-to-top
 
-SRS TE-10 AC6 nhắc "back-to-top" nhưng không spec, Figma nào có. ĐỀ XUẤT không thêm: header dính 80 luôn có đường về đầu trang (logo, phím Home), mỗi phần tử đáy thêm là một rủi ro che (A15). Nếu CTO muốn thêm: làn phải, trên làn Inbox, `--edge + --bottom-bar-height + --inbox-clearance`, toast đẩy lên thêm 56.
+SRS TE-10 AC6 nhắc "back-to-top" nhưng không spec hay mockup nào có. ĐỀ XUẤT không thêm: header dính 80 luôn có đường về đầu trang (logo, phím Home), mỗi phần tử đáy thêm là một rủi ro che (A15). Nếu CTO muốn thêm: làn phải, trên làn Inbox, `--edge + --bottom-bar-height + --inbox-clearance`, toast đẩy lên thêm 56.
 
 ## 3. Focus không bị che (WCAG 2.2 SC 2.4.11, kỹ thuật C43)
 
@@ -106,7 +106,7 @@ html {
 | --- | --- |
 | `--sticky-top` | 0 khi `sticky_header` tắt; `--header-height` (80) khi bật; + chiều cao thanh công cụ dính collection/search dưới 64rem (đặt cố định theo bố cục collection §5.1, không đo) |
 
-- Áp cho: Tab tuần tự, link neo (`#reviews`, skip link, link lỗi form → trường), `scrollIntoView` của BE (cuộn về bộ chọn khi "Choose Options", product §10). Trình duyệt cuộn phần tử nhận focus vào vùng trừ padding.
+- Áp cho: Tab tuần tự, link neo (`#reviews`, skip link, link lỗi form → trường), `scrollIntoView` của BE (cuộn về bộ chọn khi "Choose options", product §10). Trình duyệt cuộn phần tử nhận focus vào vùng trừ padding.
 - Khung cuộn riêng có phần dính: `scroll-padding-block-end` bằng chiều cao phần dính đáy khung: drawer có chân dính (foundation §15, chân cao nút + 2 × 16), drawer lọc (chân "Clear all" + "Show N products"), quickview sheet (hàng mua 48 + 2 × 16, mini-cart-quickview §3.1), predictive search (chân dính). `scroll-padding-block-start` bằng header khung khi header khung dính (quickview sheet nút đóng dính).
 - Thanh đáy và teaser tự thân không bao giờ che focus của chúng; focus ở nội dung dưới thanh thì scroll-padding đẩy lên.
 - Kiểm (QA): Tab qua footer PDP 360 khi sticky bar hiện, Tab qua dòng giỏ cart 360 khi checkout bar hiện, Tab qua card bundle 360 khi bundle bar hiện: viền focus luôn thấy đủ. Phóng 200% ở 1280 lặp lại.
@@ -168,11 +168,11 @@ Số mép dưới chưa cộng `--inbox-clearance` (toast) và safe area. Teaser
 
 ## 7. Trạng thái
 
-Figma không có. ĐỀ XUẤT, mockup ES1-T263 mục 5.
+ĐỀ XUẤT, mockup ES1-T263 mục 5.
 
 | Trạng thái | Hiển thị |
 | --- | --- |
-| Trang chủ 360, bundle bar hiện | teaser trượt lên 72, đáy 88; bundle bar "5 Items · $436.90" + "Add Bundle To Cart" (dữ liệu index-mobile-b §1) |
+| Trang chủ 360, bundle bar hiện | teaser trượt lên 72, đáy 88; bundle bar "5 Items · $436.90" + "Add bundle to cart" (dữ liệu index-mobile-b §1) |
 | Trang chủ 360, toast | teaser ẩn; toast full width trên thanh |
 | PDP mọi mốc | sticky ATC "Ativafit Lava 66 lb Adjustable" $379.99 / $499.99; không teaser |
 | Cart < 64rem | checkout bar "Total $461.99" + "Checkout →" (cart §3.7); không teaser |

@@ -1,3 +1,6 @@
+> CẬP NHẬT 21/11/2026 (CTO, ES1-T567) — TÀI LIỆU LỊCH SỬ (bản rà 11/11).
+> Nguồn chuẩn thiết kế hiện nay là mockup HTML `drafts/designer/**` cùng `drafts/designer/_kit/kit.css`. Chỗ bên dưới nhắc file thiết kế cũ hoặc mã node là ghi chép lúc rà, không còn là căn cứ; kết luận tuân thủ Shopify giữ nguyên.
+
 # Audit C — Theme Store mục 3, 8, 12, 14, 15, 16, 18, 20 (theme-efitco, develop, 11/11/2026)
 
 Phạm vi: thiết kế (docs/ui-spec, docs/design, DESIGN.md, docs/figma/img, drafts/designer) + code (config, locales, blocks, snippets, templates, assets/base.css, critical.css). Chỉ đọc, không sửa repo.

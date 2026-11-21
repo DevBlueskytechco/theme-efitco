@@ -1,4 +1,4 @@
-KHÔNG CHẮC: Figma không có trang collection (gốc duy nhất là trang chủ 1:359). demo-data không có ảnh collection, mô tả collection, danh sách sản phẩm theo collection, cấu hình filter Search & Discovery, metafield rating (đã hỏi ở ES1-T265). Mockup dùng /collections/all (36 sản phẩm = 22 figma + 14 edge_cases, thứ tự export); filter giả định Availability, Price, Color, Size, Brand; số đếm tính từ demo-data; banner minh hoạ bằng efx-col-1.jpg, không mô tả. Ảnh sản phẩm store dev lệch tên (ES1-T245).
+KHÔNG CHẮC: trang collection phát triển từ ngôn ngữ trang chủ và kit (không có bản dựng riêng trước mockup này). demo-data không có ảnh collection, mô tả collection, danh sách sản phẩm theo collection, cấu hình filter Search & Discovery, metafield rating (đã hỏi ở ES1-T265). Mockup dùng /collections/all (36 sản phẩm = 22 sản phẩm demo + 14 edge_cases, thứ tự export); filter giả định Availability, Price, Color, Size, Brand; số đếm tính từ demo-data; banner minh hoạ bằng efx-col-1.jpg, không mô tả. Ảnh sản phẩm store dev lệch tên (ES1-T245).
 
 # UI spec: Trang collection (ES1-T254, vòng 3)
 
@@ -10,9 +10,9 @@ Template `templates/collection.liquid`: `collection-banner` → `<collection-fil
 - Spec này; spec danh sách collection: `docs/ui-spec/list-collections.md`.
 - Mockup `drafts/designer/ES1-T254/collection.html` + `collection-360|768|1280|1920.png`. Trang chính ở đầu file; S1–S7 (banner có ảnh, đang lọc, drawer, sort + phân trang, ca biên card, rỗng, đang tải, lỗi) ở cuối file.
 
-Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:359 > bộ kiến thức. Thành phần lấy từ foundation vòng 3 (`docs/ui-spec/foundation.md`, `drafts/designer/_kit/kit.css`). Không dùng trang live hay ảnh chụp store làm gốc (sổ 10/11).
+Nguồn: sổ quyết định CTO > kit + mockup (`drafts/designer/**`, nguồn chuẩn CTO 21/11) > DESIGN.md > AGENTS.md > bộ kiến thức. Thành phần lấy từ foundation vòng 3 (`docs/ui-spec/foundation.md`, `drafts/designer/_kit/kit.css`). Không dùng trang live hay ảnh chụp store làm gốc (sổ 10/11).
 
-Figma tham chiếu: header 1:362, card sản phẩm 1:502 (trong 1:490), card collection + nút chevron 52 1:395 / 1:398, hero thẻ bo góc 1:361, footer 1:1104.
+Thành phần kit dùng lại: header (kit §3), `.product-card`, `.collection-card` + `.round-button` 52, `.page-banner` (thẻ bo góc dưới header), footer (kit §4).
 
 ## Thay đổi audit (ES1-T283, sửa ở ES1-T287)
 
@@ -28,13 +28,13 @@ Mockup `drafts/designer/ES1-T254/collection.html`: phân trang trang chính (1/2
 
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
 | --- | --- | --- | --- | --- |
-| 1 | Header | A nền trắng (không ảnh), B trong suốt đè banner | 1 biến thể: thanh tối `--color-background-dark` + noise, cao 80, logo 100 × 30, menu trắng 60%, search 20; không đè ảnh | Sổ 10/11, Figma 1:362, foundation §3 |
-| 2 | Banner có ảnh | tràn màn (360) / lùi 12 bo 24, cao 360–560 gồm header, lớp tối 55% → 30% → 80% | `.page-banner`: thẻ trong container dưới header, cách 16 / 24, bo 16, cao tối thiểu 280 / 360, lớp tối 75% đáy → 60% từ giữa lên | Sổ 10/11, foundation §3.3, Figma 1:361 |
+| 1 | Header | A nền trắng (không ảnh), B trong suốt đè banner | 1 biến thể: thanh tối `--color-background-dark` + noise, cao 80, logo 100 × 30, menu trắng 60%, search 20; không đè ảnh | Sổ 10/11, foundation §3 |
+| 2 | Banner có ảnh | tràn màn (360) / lùi 12 bo 24, cao 360–560 gồm header, lớp tối 55% → 30% → 80% | `.page-banner`: thẻ trong container dưới header, cách 16 / 24, bo 16, cao tối thiểu 280 / 360, lớp tối 75% đáy → 60% từ giữa lên | Sổ 10/11, foundation §3.3 |
 | 3 | Rủi ro chữ header trên ảnh sáng | có (55%, 3.78:1 với ảnh trắng) | hết: header nền tối riêng; chữ banner ≥ 4.56:1 với mọi ảnh | foundation §3.3 |
-| 4 | Previous / Next phân trang | nút chữ "Previous" / "Next" + mũi tên, viền vuông | nút tròn 52 chevron 11 × 16 như Figma 1:398 (trắng viền `--color-border`, rê chuột cam), tên "Previous page" / "Next page" | Sổ 09/11, Figma 1:398, ticket vòng 3 |
+| 4 | Previous / Next phân trang | nút chữ "Previous" / "Next" + mũi tên, viền vuông | nút tròn 52 chevron 11 × 16 `.round-button` của kit (trắng viền `--color-border`, rê chuột cam), tên "Previous page" / "Next page" | Sổ 09/11, ticket vòng 3 |
 | 5 | Số trang | vuông bo 4, 48 / 44 | tròn 44 (pill), cùng hình với chevron; trang hiện tại cam | ĐỀ XUẤT §8 |
 | 6 | Swatch trên card | radio bấm được | chỉ báo `aria-hidden`, không bấm; số màu đọc trong tên link (", 3 colors") | foundation §9 vòng 3 |
-| 7 | Footer | newsletter + wordmark rút gọn | đủ 3 tầng Figma 1:1104: newsletter có ảnh, panel dải rộng (social 4, 2 menu, trust 4), hàng cuối wordmark + locale + thanh toán | foundation §4 |
+| 7 | Footer | newsletter + wordmark rút gọn | đủ 3 tầng (kit §4): newsletter có ảnh, panel dải rộng (social 4, 2 menu, trust 4), hàng cuối wordmark + locale + thanh toán | foundation §4 |
 | 8 | Drawer nhóm Color | 3 giá trị + "Show 7 more" (lệch quy tắc 6) | 6 giá trị + "Show 4 more", khớp cột lọc | §5.2 |
 | 9 | Toolbar dính | top 80 dưới header trắng | top 80 dưới header tối; gạch 1px border ngăn với nội dung | foundation §3 |
 
@@ -76,7 +76,7 @@ Không thêm setting. Dùng setting có sẵn:
 | Nội dung | 320 | 728 | 1240 | 1416 |
 | Cột lọc | drawer 90% (324) | drawer 420 | 3/12 = 292 | 3/12 = 336 |
 | Cột kết quả | 320 | 728 | 9/12 = 924 | 9/12 = 1056 |
-| Card (mặc định đề xuất) | 2 × 152 | 3 × 232 | 3 × 292 | 3 × 336 (= Figma 1:502) |
+| Card (mặc định đề xuất) | 2 × 152 | 3 × 232 | 3 × 292 | 3 × 336 |
 | Card nếu giữ 4 cột | — | — | 4 × 213 | 4 × 246 |
 | Gap card ngang / dọc | 16 / 24 | 16 / 24 | 24 / 40 | 24 / 40 |
 | Gap cột lọc ↔ kết quả | — | — | 24 | 24 |
@@ -94,7 +94,7 @@ Khoảng cách dọc: header → breadcrumb 16 (24 từ 64rem), breadcrumb → h
 Theo foundation §5: breadcrumb 14 trên nền trắng ngay dưới header tối, h1 `--font-size-h1` (33 / 43 / 48 / 48), mô tả body 16 `--color-muted` (8.45:1), `max-inline-size: 65ch` (06 §7.3). Link trong mô tả gạch chân (Lighthouse link-in-text-block).
 
 ### 4B. Có ảnh: `.page-banner` dưới header (S1)
-Sổ 10/11: header trang con luôn là thanh tối riêng, không đè ảnh, kể cả trang có banner. Hình thức theo hero Figma 1:361 (thẻ bo góc dưới header), chi tiết ở foundation §3.3.
+Sổ 10/11: header trang con luôn là thanh tối riêng, không đè ảnh, kể cả trang có banner. Hình thức cùng ngôn ngữ thẻ hero trang chủ (thẻ bo góc dưới header), chi tiết ở foundation §3.3.
 
 | | 360 | 768 | 1280 | 1920 |
 | --- | --- | --- | --- | --- |
@@ -119,7 +119,7 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 - Không có filter nào (`collection.filters` rỗng): không có cột, lưới chiếm 12/12 (code đã có).
 
 ### 5.2 Nhóm lọc (`snippets/filter-group`)
-- `<details open>`, summary cao 52, chữ 16/600, chevron 12 × 7 bên phải xoay 180° khi mở (15 §6: icon bên phải; chevron cùng dạng chevron menu header 1:362). Gạch 1px `--color-border` giữa nhóm.
+- `<details open>`, summary cao 52, chữ 16/600, chevron 12 × 7 bên phải xoay 180° khi mở (15 §6: icon bên phải; chevron cùng dạng chevron menu header). Gạch 1px `--color-border` giữa nhóm.
 - ĐỀ XUẤT: summary có "N selected" 14 muted khi nhóm có giá trị đang chọn (08 #488D).
 - Thứ tự nhóm do merchant xếp trong Search & Discovery; hướng dẫn merchant đặt Price, Color, Size, Brand, Availability lên đầu (08 #474D).
 - Dòng giá trị: `<label>` cả hàng, cao 44, checkbox 20 `accent-color: --color-accent`, nhãn 16, số đếm 14 muted canh phải (08 #467D, #479D). Chọn: tick cam + nhãn 600. Hover: nhãn gạch chân. Focus: outline 2px accent trên checkbox.
@@ -161,7 +161,7 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 
 ## 8. Lưới card, phân trang
 
-- Card = foundation §9 (Figma 1:502): media 1:1 nền cream bo 12 không viền, badge góc, tiêu đề Inter 16/500 hiện đủ, không cắt (yêu cầu Shopify §7, 11/11), giá, swatch 32 × 16 cách 4. Tiêu đề card h2 (code `heading_level: 'h2'`). Badge một góc: Sold out > -N% > New. Giá luôn hiện kể cả hết hàng (08 #452D).
+- Card = foundation §9: media 1:1 nền cream bo 12 không viền, badge góc, tiêu đề Inter 16/500 hiện đủ, không cắt (yêu cầu Shopify §7, 11/11), giá, swatch 32 × 16 cách 4. Tiêu đề card h2 (code `heading_level: 'h2'`). Badge một góc: Sold out > -N% > New. Giá luôn hiện kể cả hết hàng (08 #452D).
 - Swatch là chỉ báo (foundation §9 vòng 3): `aria-hidden`, không bấm, không focus; tên link đọc thêm ", 3 colors". Nhiều hơn 3 màu: 3 swatch + "N colors" 14 muted.
 - Ca biên (S5, edge_cases): hết hàng toàn bộ → Sold out + ảnh 0.6; không media → placeholder; "Sale giá nhỏ" $0.99 / $1.99 → -50%; compare_at ($100) thấp hơn giá ($200) → không badge, không giá gạch; gift card → "From $10.00".
 - Phân trang 24 / trang (SRS AC1; giữ số trang thay Load more: link thật cho SEO, chạy không JS, 08 #2167D).
@@ -174,10 +174,10 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 
 | Trạng thái | Thiết kế | Nguồn |
 | --- | --- | --- |
-| Collection rỗng (S6) | empty-state foundation §18: icon hộp trong tròn 72 · h2 "No Products Here Yet" · "No products in this collection yet. Browse all our gear or pick another category." · primary "Shop All Products" (`routes.all_products_collection_url`) + text link "Browse collections" (`routes.collections_url`). Ẩn Filter/Sort khi `all_products_count` = 0. | AGENTS empty state, 05 §7 |
+| Collection rỗng (S6) | empty-state foundation §18: icon hộp trong tròn 72 · h2 "No Products Here Yet" · "No products in this collection yet. Browse all our gear or pick another category." · primary "Shop all products" (`routes.all_products_collection_url`) + text link "Browse collections" (`routes.collections_url`). Ẩn Filter/Sort khi `all_products_count` = 0. | AGENTS empty state, 05 §7 |
 | Lọc không ra (S6) | chip vẫn hiện để bỏ từng lọc · icon lọc · h2 "No Matching Products" · "No products match these filters. Remove a filter or widen the price range." · primary "Clear filters". | 05 §7 |
 | Đang cập nhật (S7) | Không làm mờ card, không làm mờ chữ (foundation §18: Lighthouse color-contrast tính opacity). Ngay khi lọc/sort/xoá chip: chỗ số kết quả thành spinner 20 + "Updating products…" (`role="status"`). Chờ ≤ 300 ms: card cũ giữ nguyên độ đậm, vẫn bấm được (link sản phẩm còn đúng). Chờ > 300 ms, hoặc sang trang bằng JS: lưới `aria-busy="true"` + skeleton foundation §18 (media 1:1 + 2 dòng 14, dòng 2 rộng 40%), số ô = số card đang hiện, cùng cỡ card (0 CLS), như search S5. Thanh công cụ, chip, cột lọc vẫn dùng được. Ngưỡng 300 ms là ngưỡng chung của design system (foundation §18.1, sổ 21/11 components-14): tránh nháy skeleton khi phản hồi nhanh (05 §3 mục 6, 05 §6 "không delay không rõ lý do"); đổi ngưỡng thì đổi ở foundation, không ghi số riêng ở đây. | foundation §18, search.md §6 S5, 05 §6 |
-| Lỗi tải (S7) | alert foundation §18 trên lưới: icon ! sale · "We couldn't update the products" · "Check your connection, then try again. Your filters are kept." · secondary "Try Again". Lưới cũ giữ nguyên. `role="alert"`. | foundation §18, 05 §4 |
+| Lỗi tải (S7) | alert foundation §18 trên lưới: icon ! sale · "We couldn't update the products" · "Check your connection, then try again. Your filters are kept." · secondary "Try again". Lưới cũ giữ nguyên. `role="alert"`. | foundation §18, 05 §4 |
 | Lỗi giá (S3) | §5.2 | 05 §4 |
 | Hover / focus / active | card nhấc 4 + ảnh 1.04; chip đảo đen; số trang viền đen; Previous/Next cam; select viền đen; focus outline 2px accent (trên header tối outline trắng) | foundation §3, §6, sổ 07/11, 09/11 |
 | Không JS | form GET + chip/phân trang/Clear all là link; drawer là popover gốc (code); "Show N products" submit | SRS AC2 |
@@ -199,7 +199,7 @@ Tương phản (L tính tay, foundation §2):
 | trắng / banner (lớp ≥ 60%, ảnh trắng tuyệt đối) | ≥ 4.56 | breadcrumb, h1, mô tả trên ảnh |
 | trắng 60% / header #1A1A1A | 6.93 | menu header |
 
-- Viền nút tròn `--color-border` 1.26:1 chỉ là trang trí: nút nhận diện bằng chevron foreground 17.4:1 (WCAG 1.4.11 tính icon), như Figma 1:398.
+- Viền nút tròn `--color-border` 1.26:1 chỉ là trang trí: nút nhận diện bằng chevron foreground 17.4:1 (WCAG 1.4.11 tính icon).
 - Vùng chạm: dòng lọc 44, summary 52, chip 44 (40 desktop), Previous/Next 52, số trang 44, nút Filter, Sort 48 / 52, đóng drawer 48, swatch lọc 24 trong hàng nhãn 44.
 - Bàn phím: Tab qua nhóm (summary Enter/Space), checkbox Space; drawer `showModal()` bẫy focus, Escape đóng, trả focus về nút Filter (AC4); chip là link; select gốc. Swatch card không nhận focus.
 - Screen reader: số kết quả trong live region `collection-status` sau mỗi lần lọc; badge số `aria-hidden` + chữ ẩn; chip có tên đầy đủ; "Show 4 more" có chữ ẩn tên nhóm; Previous/Next có `aria-label`; số trang `aria-label="Page 2"` (code); số màu trong tên link card.
@@ -222,7 +222,7 @@ Chỉ tiêu: SEO 100 (collection nằm trong phạm vi SEO, sổ 10/11), A11y 10
 - Header tối dùng `noise-dark.png` có sẵn làm `background-image` (critical.css), không chặn LCP; chevron là SVG inline từ `snippets/slideshow-icon`.
 - A11y đã tránh: label thật cho Sort và ô giá; dialog có tên (`aria-labelledby`); Previous/Next icon có tên riêng; badge số không phải tên duy nhất; swatch card `aria-hidden` (không có control 16px dưới target-size); không heading nhảy bậc; không chữ xám trên `--color-border`; chữ trên banner ≥ 4.56:1 nhờ header không còn đè ảnh.
 - Rủi ro còn lại: axe chấm chữ trên ảnh nền là "incomplete" (không mất điểm) nhưng thiết kế đã đảm bảo ≥ 4.56:1 bằng lớp tối cố định.
-- SEO: một h1; phân trang và chip là `<a href>` thật; tên link mô tả đích ("Next page", "Remove filter Color: Black", "Shop All Products"); chữ nhỏ nhất 12 (nhãn Sort); canonical theo `meta-tags` (URL có `filter.*`, `sort_by` không thành trang trùng); JSON-LD BreadcrumbList.
+- SEO: một h1; phân trang và chip là `<a href>` thật; tên link mô tả đích ("Next page", "Remove filter Color: Black", "Shop all products"); chữ nhỏ nhất 12 (nhãn Sort); canonical theo `meta-tags` (URL có `filter.*`, `sort_by` không thành trang trùng); JSON-LD BreadcrumbList.
 - Best Practices: 0 lỗi console (mockup 0 lỗi ở 4 mốc); ảnh `object-fit` không méo; ô giá không chặn dán.
 - Performance/CLS: header và thanh công cụ dính bằng CSS, cao cố định; chip, trạng thái cập nhật, lỗi nằm trong vùng kết quả và giữ chỗ; drawer `position: fixed`; "Show N more" chỉ mở khi bấm.
 
@@ -244,6 +244,13 @@ Chỉ tiêu: SEO 100 (collection nằm trong phạm vi SEO, sổ 10/11), A11y 10
 ## 14. Quyết định CTO đã chốt (10/11)
 
 CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
-1. Có cột lọc thì đổi "Columns on desktop" mặc định 4 → 3 để card 292 / 336 đúng cỡ Figma 1:502? Đề xuất: có (§3; 08 #2272D).
+1. Có cột lọc thì đổi "Columns on desktop" mặc định 4 → 3 để card 292 / 336 đúng cỡ `.product-card` của trang chủ? Đề xuất: có (§3; 08 #2272D).
 2. Drawer lọc mobile rộng 90% (chạm nền để đóng) thay toàn màn của ES1-T107 #3? Đề xuất: có (foundation §15; 15 §1; 08 §7).
-3. Previous/Next phân trang dùng nút tròn 52 chevron như carousel Figma 1:398 (tên "Previous page"/"Next page" qua aria-label), bỏ chữ hiện trên nút? Đề xuất: có (§8; sổ 09/11 nút tròn 52 mọi điều hướng prev/next).
+3. Previous/Next phân trang dùng nút tròn 52 chevron như carousel trang chủ (tên "Previous page"/"Next page" qua aria-label), bỏ chữ hiện trên nút? Đề xuất: có (§8; sổ 09/11 nút tròn 52 mọi điều hướng prev/next).
+
+## Cập nhật 21/11 (ES1-T567, CTO 21/11)
+
+- Nguồn chuẩn là mockup HTML + `drafts/designer/_kit/kit.css`; Designer dựng lại bản vẽ từ mockup. Số trong spec lệch mockup thì mockup thắng.
+- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog, empty state, tab, menu giữ Title Case (chờ CTO). "Checkout" giữ một chữ (thuật ngữ content.md §4, chờ CTO).
+- Line-height theo bội 4 qua token kit: 16/24 (`--line-height-body`), 14/20 (`--line-height-sm`), 13/20 (`--line-height-label`), 18/28 (`--line-height-title`), h1 40/48 → 48/56, h3 28/36, h4 20/24. Trang không viết line-height bằng số.
+- Nút "Clear all", "Clear all filters" (empty state), "Show 10 products", "Show 4 more", "Shop all products", "Try again" theo sentence case. Cần FE: các khoá locale tương ứng.

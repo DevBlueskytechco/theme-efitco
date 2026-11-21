@@ -2,6 +2,7 @@ KHÔNG CHẮC: số gzip "hiện tại" lấy từ ES1-T472 (develop ~51,9 KB sa
 
 # 0013. Tách CSS theo template: base.css (khung + trang chủ) và 4 file nạp theo template.name
 Ngày: 2026-11-17 | Trạng thái: Chấp nhận (CTO 17/11, ES1-T472 phương án a) | Đảo ES1-T310 #1 (1 file base.css), sửa task-split ES1-T307 D7, bổ sung ADR 0003
+Cập nhật 21/11/2026 (CTO, ES1-T567): nguồn thiết kế là mockup `drafts/designer/**` + `drafts/designer/_kit/kit.css`; tên file thiết kế và mã node trong ADR này là bối cảnh lúc ra quyết định, không còn là căn cứ; quyết định giữ nguyên.
 
 ## Bối cảnh
 - ES1-T310 #1 (11/11) chốt giữ 1 file `assets/base.css`, trần gzip ≤ 49 152 B, nạp chặn render ở mọi trang từ `layout/theme.liquid:28`. Điều kiện mở ADR này là "lhci desktop < 98 do CSS" hoặc không giữ được trần.

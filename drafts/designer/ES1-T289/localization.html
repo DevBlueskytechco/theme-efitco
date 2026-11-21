@@ -11,7 +11,7 @@
   .site-header.demo-static { position: relative; }
   .page-stub { padding-block: var(--space-7); }
 
-  /* ---------- Trigger (Figma 1:1104: cờ 26 + USD / EN + chevron) ---------- */
+  /* ---------- Trigger (kit .site-footer__locale: cờ 24 + USD / EN + chevron) ---------- */
   .loc-trigger { list-style: none; }
   .loc-trigger::-webkit-details-marker { display: none; }
   .site-footer__locale > svg:last-child { transition: rotate var(--motion-base) var(--ease-out); }
@@ -42,13 +42,13 @@
   .site-footer { position: relative; }
   .loc-scrim { position: absolute; inset: 0; z-index: var(--layer-scrim); background: var(--overlay-scrim); }
   .loc-sheet { position: absolute; inset-inline: 0; inset-block-end: 0; z-index: var(--layer-overlay); display: flex; flex-direction: column; gap: var(--space-4); height: 704px; padding: var(--space-6) var(--space-4) var(--space-5); border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); text-align: start; }
-  .loc-sheet::before { content: ''; position: absolute; inset-block-start: var(--space-2); inset-inline-start: calc(50% - 20px); width: 40px; height: 4px; border-radius: 2px; background: var(--color-border); }
+  .loc-sheet::before { content: ''; position: absolute; inset-block-start: var(--space-2); inset-inline-start: calc(50% - var(--space-lg)); width: var(--space-3xl); height: var(--progress-height); border-radius: var(--radius-pill); background: var(--color-border); }
   .loc-sheet .dialog__title { margin: 0; padding-inline-end: calc(var(--space-1) * 14); }
   .loc-sheet .dialog__close { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); }
   .loc-sheet .loc__list { flex: 1; max-height: none; }
   .loc-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
   /* 2 tab chia đều, không tràn mép ở drawer 360 (review vòng 2): nhãn dài xuống dòng trong tab cao ≥ 44 */
-  .loc-tabs .tab { justify-content: center; min-width: 0; padding: var(--space-2xs) var(--space-xs); white-space: normal; overflow-wrap: anywhere; text-align: center; line-height: 1.25; } /* + <wbr> sau '/': "Country/region" có chỗ ngắt, giữ lề trong 8 (ES1-T527 vòng 3) */
+  .loc-tabs .tab { justify-content: center; min-width: 0; padding: var(--space-2xs) var(--space-xs); white-space: normal; overflow-wrap: anywhere; text-align: center; line-height: 1.25; } /* 16/20: nhãn 2 dòng vừa tab 44; Thiết kế */ /* + <wbr> sau '/': "Country/region" có chỗ ngắt, giữ lề trong 8 (ES1-T527 vòng 3) */
   @media (min-width: 48rem) { .site-footer .loc-scrim, .site-footer .loc-sheet { display: none; } }
   .loc-sheet--static { position: relative; height: 640px; }
   .loc-sheet--short { height: auto; }
@@ -82,9 +82,9 @@
   .loc__option .spinner { flex: none; }
   .loc-sheet .loc__option, .level2__body .loc__option { min-height: var(--control-height); }
   .loc__empty { min-height: calc(var(--space-1) * 50); align-content: center; }
-  .loc__text-button { min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .loc__text-button { min-height: var(--touch-target); padding: 0; border: 0; background: none; cursor: pointer; }
   .loc__retry { justify-self: start; }
-  .level2__title { font-size: var(--font-size-h2); font-weight: var(--font-heading--weight-display); }
+  .level2__title { font-size: var(--font-size-h2); line-height: var(--line-height-h2); font-weight: var(--font-heading--weight-display); }
 </style>
 </head>
 <body>
@@ -138,7 +138,7 @@
 
 <main id="main">
   <div class="container page-stub">
-    <p class="demo-label">ES1-T289 · Localization · cuối trang: footer Figma 1:1104, bảng đang mở (≥ 768 popover, 360 bottom sheet)</p>
+    <p class="demo-label">ES1-T289 · Localization · cuối trang: footer, bảng đang mở (≥ 768 popover, 360 bottom sheet)</p>
     <h1 class="visually-hidden">Country and language selector</h1>
   </div>
 </main>
@@ -152,7 +152,7 @@
     </div>
     <form class="site-footer__form" action="#" method="post" novalidate>
       <label class="visually-hidden" for="nl-email">Email</label>
-      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% off</button></div>
       <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
@@ -362,7 +362,7 @@
 
   <div class="demo-block">
     <h2>L9–L11 · Đang đổi, lỗi, tên dài</h2>
-    <p class="demo-note">L9: bấm Canada → spinner thay tiền tệ (chỉ khi > 300 ms), hàng khác aria-disabled, bảng aria-busy; Shopify chuyển trang xong là hết. L10: chỉ khi BE gửi bằng fetch và lỗi mạng; alert trên danh sách, nút "Try Again" gửi lại. L11: tên dài xuống 2 dòng.</p>
+    <p class="demo-note">L9: bấm Canada → spinner thay tiền tệ (chỉ khi > 300 ms), hàng khác aria-disabled, bảng aria-busy; Shopify chuyển trang xong là hết. L10: chỉ khi BE gửi bằng fetch và lỗi mạng; alert trên danh sách, nút "Try again" gửi lại. L11: tên dài xuống 2 dòng.</p>
     <div class="state-grid">
       <div class="loc__panel loc__panel--static loc__panel--one" aria-busy="true">
         <div class="loc__group">
@@ -378,7 +378,7 @@
       <div class="stage-stack">
         <div class="loc__panel loc__panel--static loc__panel--one">
           <div class="loc__group">
-            <div class="alert" role="alert" data-testid="footer-localization-error"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><p>We couldn't switch to Canada. Check your connection and try again.</p><button class="button button--secondary button--small loc__retry" type="button">Try Again</button></div></div>
+            <div class="alert" role="alert" data-testid="footer-localization-error"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><p>We couldn't switch to Canada. Check your connection and try again.</p><button class="button button--secondary button--small loc__retry" type="button">Try again</button></div></div>
             <p class="group-label" id="l10-label">Country/region</p>
             <ul class="loc__list" aria-labelledby="l10-label">
               <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
@@ -401,7 +401,7 @@
 
   <div class="demo-block">
     <h2>Drawer menu &lt; 1280 · Sheet tab Language</h2>
-    <p class="demo-note">Drawer (V65, khớp DS Drawers §28 và ES1-T260 navigation): hàng gộp kit <code>.drawer-loc</code> (cờ 26 + USD / EN ›) là hàng CUỐI danh sách cấp 1, không khung, thay 2 nút Currency / Language; chân chỉ Sign In secondary full. Chạm hàng → cấp 2 trượt vào trong drawer (Back + ×), cùng nội dung sheet; không mở sheet chồng drawer. Sheet tab Language: danh sách ngắn, sheet giữ cao 88dvh khi có ô tìm để không nhảy khi đổi tab.</p>
+    <p class="demo-note">Drawer (V65, khớp kit .drawer, foundation §28 và ES1-T260 navigation): hàng gộp kit <code>.drawer-loc</code> (cờ 24 + USD / EN ›) là hàng CUỐI danh sách cấp 1, không khung, thay 2 nút Currency / Language; chân chỉ Sign in secondary full. Chạm hàng → cấp 2 trượt vào trong drawer (Back + ×), cùng nội dung sheet; không mở sheet chồng drawer. Sheet tab Language: danh sách ngắn, sheet giữ cao 88dvh khi có ô tìm để không nhảy khi đổi tab.</p>
     <div class="state-grid">
       <div class="drawer-stage">
         <div class="scrim" aria-hidden="true"></div>
@@ -420,7 +420,7 @@
             </ul>
           </div>
           <div class="overlay__footer">
-            <a class="button button--secondary" href="#"><svg class="button__icon" aria-hidden="true"><use href="#i-user"/></svg>Sign In</a>
+            <a class="button button--secondary" href="#"><svg class="button__icon" aria-hidden="true"><use href="#i-user"/></svg>Sign in</a>
           </div>
         </div>
       </div>

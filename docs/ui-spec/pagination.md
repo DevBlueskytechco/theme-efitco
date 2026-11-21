@@ -2,7 +2,7 @@
 
 Mục đích: một kiểu phân trang cho mọi danh sách nhiều trang, để người mua biết đang ở trang nào, sang trang kế bằng 1 chạm, bot crawl được mọi trang. Story TE-6 AC1, AC5 (collection, list-collections), TE-8 AC3 (search), TE-9 AC3 (blog, bình luận bài viết).
 Snippet: `snippets/pagination.liquid` (đã có, sửa theo spec này). Dùng ở: `collection.md` §8, `list-collections.md` §4, `search.md` §3.9, `blog.md` §5, `article.md` §1 (bình luận).
-Figma: không có phân trang. Phát triển từ nút chevron tròn 52 Figma 1:398 (sổ 09/11) và màu accent của Figma 1:359. Thành phần: `docs/ui-spec/foundation.md` §6 (F§6), kit `.round-button`.
+Nguồn chuẩn: mockup `drafts/designer/ES1-T287/pagination.html` + `drafts/designer/_kit/kit.css` (CTO 21/11). Phát triển từ nút chevron tròn 52 của carousel (sổ 09/11, `--round-button-size`) và màu accent thương hiệu. Thành phần: `docs/ui-spec/foundation.md` §6 (F§6), kit `.round-button`.
 Mockup: `drafts/designer/ES1-T287/pagination.html` + `pagination-360|768|1280|1920.png` (bảng mọi trạng thái).
 
 ## Thay đổi audit (ES1-T283)
@@ -50,7 +50,7 @@ Cửa sổ số: `{% paginate … by N, window_size: 1 %}` → tối đa 7 mục
 
 | Trạng thái | Previous / Next | Số trang | Nguồn |
 | --- | --- | --- | --- |
-| Mặc định | trắng, viền border, chevron foreground | viền border, chữ foreground | F§6, Figma 1:398 |
+| Mặc định | trắng, viền border, chevron foreground | viền border, chữ foreground | F§6 |
 | Hover | nền + viền accent, chevron trắng, scale 1.06, 250ms | viền foreground, 150ms | Sổ 09/11 (rê chuột cam), F§6 |
 | Active (nhấn) | scale 0.94 | — | F§6 |
 | Focus (bàn phím) | outline 2px accent offset 3 | outline 2px accent offset 2 | F§6 |
@@ -110,7 +110,7 @@ Chuỗi (`locales/en.default.json`, nhóm có sẵn `collections.pagination`): `
 | accent-foreground / accent | 5.01 | trang hiện tại, chevron khi hover |
 | accent / background | 5.01 | outline focus (≥ 3, WCAG 1.4.11) |
 | muted / background | 8.45 | dấu "…", tóm tắt |
-| border / background | 1.26 | viền nút, viền số: trang trí; nút nhận diện bằng chevron/chữ 17.4 (như Figma 1:398) |
+| border / background | 1.26 | viền nút, viền số: trang trí; nút nhận diện bằng chevron/chữ 17.4 (như nút tròn carousel, sổ 09/11) |
 | chevron 35% / background | 2.2 | nút tắt: WCAG 1.4.3, 1.4.11 miễn cho thành phần không hoạt động; không có chữ nên Lighthouse `color-contrast` không chấm |
 
 - Landmark `<nav>` có tên ("Pagination", bình luận "Comment pages"); một trang chỉ có 1 nav mỗi tên.

@@ -6,15 +6,15 @@ KHÔNG CHẮC: demo-data không có gift card đã phát hành (mã, số dư, h
 
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
 | --- | --- | --- | --- | --- |
-| 1 | Thanh trên | nền trắng, viền dưới, logo giữa | thanh tối `--color-background-dark` + noise cao 80 như header 1:362; logo trắng 100 × 30 thẳng mép trái container (link về shop) | Sổ 10/11, Figma 1:362, 1:377 |
-| 2 | Thẻ gift card | nền dark trơn, bo 24 | nền dark + noise (như dải 1:360, panel 1:1106), bo 16 | Figma 1:360, 1:361 (bo 16) |
-| 3 | Panel | bo 24 | bo 16, cùng hệ thẻ Figma | Figma 1:1022, 1:1106 |
+| 1 | Thanh trên | nền trắng, viền dưới, logo giữa | thanh tối `--color-background-dark` + noise cao 80 như header của kit; logo trắng 100 × 30 thẳng mép trái container (link về shop) | Sổ 10/11, foundation §3 |
+| 2 | Thẻ gift card | nền dark trơn, bo 24 | nền dark + noise (như dải tối đầu trang chủ, panel footer), bo 16 | foundation §1 (`--radius-panel` 16, `--dark-texture`) |
+| 3 | Panel | bo 24 | bo 16, cùng hệ thẻ của kit (`--radius-panel`) | foundation §1 (radius; surface lồng trong bo nhỏ hơn hoặc bằng cha, Polaris) |
 | 4 | Tương phản trên thẻ | tính với #1E1E1E (16.7 / 5.85) | tính lại với #1A1A1A: trắng 17.4, muted-on-dark 6.11 | foundation §2 |
 | 5 | Mã, QR, meta, hành động, trạng thái S1–S4, in | — | giữ nguyên; `@media print` bỏ noise (nền trắng) | — |
 
 Mục đích: người nhận mở link gift card thấy ngay số dư, mã để dùng online, QR để dùng tại cửa hàng, hạn dùng; chép mã, thêm vào Apple Wallet, in thẻ. Story TE-9 AC2 (QR ≥ 120px, mã, Apple Wallet, logo); Theme Store yêu cầu demo có gift card (01).
 
-Figma: không có trang này. Ngôn ngữ: thanh tối 1:362, nền dark + noise 1:360, chữ trắng như footer 1:1104, display heading 800, bo 16 như thẻ 1:361 và panel 1:1106. Thành phần foundation §3, §6, §8, §12, §18.
+Nguồn chuẩn: mockup `drafts/designer/ES1-T258/gift_card.html` + kit (CTO 21/11, ES1-T567). Ngôn ngữ: thanh tối header, nền dark + noise, chữ trắng như footer, display heading 800, bo 16 như thẻ hero và panel footer. Thành phần foundation §3, §6, §8, §12, §18.
 
 Mockup: `drafts/designer/ES1-T258/gift_card.html` + `gift_card-360|768|1280|1920.png`. Cuối file: S1 đã dùng một phần, S2 hết hạn / bị tắt, S3 đã chép mã, S4 không logo.
 
@@ -28,13 +28,13 @@ Mockup: `drafts/designer/ES1-T258/gift_card.html` + `gift_card-360|768|1280|1920
 
 1. Thanh trên 80: nền `--color-background-dark` + noise; logo trắng 100 × 30 thẳng mép trái container (`settings.logo` hoặc shop.name), link về `shop.url`, `aria-label="Efitco home"`, ô bấm 44. Không menu (trang ngoài layout).
 2. Intro căn giữa: eyebrow "Gift card" · h1 "Your Efitco Gift Card" (`shop.name`) · "Use this gift card at checkout." (locale `gift_card.use_at_checkout`).
-3. Thẻ (chỉ CSS, không ảnh): tỉ lệ 1.586 (thẻ ngân hàng), nền `--color-background-dark` + noise, bo 16, vòng trang trí trắng 6% góc trên · logo trắng + nhãn `.badge--outline` "Gift card" (ES1-T527 V63: pill 28, 13/600, viền + chữ trắng, Title case) · "Balance" 14 muted-on-dark · số dư `gift_card.balance | money` heading 800 `--font-size-h1` 40 → 48 · nếu balance < initial_value: "of $50.00 initial value".
+3. Thẻ (chỉ CSS, không ảnh): tỉ lệ 1.586 (thẻ ngân hàng), nền `--color-background-dark` + noise, bo 16, vòng trang trí trắng 6% góc trên · logo trắng + nhãn `.badge--outline` "Gift card" (ES1-T527 V63: pill 28, 13/600, viền + chữ trắng, sentence case) · "Balance" 14 muted-on-dark · số dư `gift_card.balance | money` heading 800 `--font-size-h1` 40 → 48 · nếu balance < initial_value: "of $50.00 initial value".
 4. Panel trắng bo 16:
-   - "Gift card code" · mã `gift_card.code | format_code` 18/600 giãn chữ 0.08em trong ô viền đứt muted-light nền alt, `user-select: all` · nút secondary "Copy Code" (JS, BE).
+   - "Gift card code" · mã `gift_card.code | format_code` 18/600 giãn chữ 0.08em trong ô viền đứt muted-light nền alt, `user-select: all` · nút secondary "Copy code" (JS, BE).
    - QR 144 × 144 (≥ 120 theo SRS) viền border, nền trắng; tên "QR code, scan to redeem gift card"; chú thích "Pay in store" + "Show this QR code at the counter, or enter the code at online checkout."
    - Bảng meta: Initial value · Expires (`gift_card.expires_on | date: '%B %e, %Y'`; không có hạn thì bỏ dòng).
    - Apple Wallet: huy hiệu chính thức `gift-card/add-to-apple-wallet.svg | shopify_asset_url`, không vẽ lại, không đổi màu (foundation §27). Yêu cầu Shopify: Apple Wallet, mã, QR ≥ 120 × 120, logo hoặc `shop.name`.
-   - Hành động: Apple Wallet (asset Shopify, cao ≥ 44, chỉ khi `gift_card.pass_url`) · primary "Start Shopping" (`shop.url`) · secondary "Print Gift Card" (`window.print()`, BE).
+   - Hành động: Apple Wallet (asset Shopify, cao ≥ 44, chỉ khi `gift_card.pass_url`) · primary "Start shopping" (`shop.url`) · secondary "Print gift card" (`window.print()`, BE).
 
 ## 3. Settings merchant
 
@@ -51,7 +51,7 @@ Không setting mới (template `layout none`, không block). Dùng `settings.log
 | Panel padding | 24 | 32 | 40 | 40 |
 | Mã + Copy | xếp dọc, nút full | xếp dọc, nút auto trái | như 768 | như 768 |
 | QR + chú thích | 2 cột (144 + chữ) | như 360 | như 360 | như 360 |
-| Hành động | dọc, full width: Wallet → Start Shopping → Print | Wallet hàng riêng; Start + Print 2 cột | như 768 | như 768 |
+| Hành động | dọc, full width: Wallet → Start shopping → Print | Wallet hàng riêng; Start + Print 2 cột | như 768 | như 768 |
 | Khoảng trên / dưới main | 48 / 48 | 48 / 48 | 48 / 120 | 48 / 120 |
 
 ## 5. Trạng thái
@@ -59,7 +59,7 @@ Không setting mới (template `layout none`, không block). Dùng `settings.log
 | Trạng thái | Hiện thế nào | Nguồn |
 | --- | --- | --- |
 | Đã dùng một phần (S1) | số dư + dòng "of $50.00 initial value" | Dawn/Shopify gift card mặc định |
-| Hết hạn (S2) | `gift_card.expired`: thẻ xám (`filter: grayscale`), số dư gạch, nhãn `.badge--outline` "Expired"; `.alert` "This gift card has expired" + ngày hết hạn + cách xử lý; ẩn QR, Wallet, Copy; nút secondary "Contact Us"; vẫn hiện mã | 05 §4, 01 (không chỉ màu) |
+| Hết hạn (S2) | `gift_card.expired`: thẻ xám (`filter: grayscale`), số dư gạch, nhãn `.badge--outline` "Expired"; `.alert` "This gift card has expired" + ngày hết hạn + cách xử lý; ẩn QR, Wallet, Copy; nút secondary "Contact us"; vẫn hiện mã | 05 §4, 01 (không chỉ màu) |
 | Bị tắt | `gift_card.enabled == false`: như S2, tiêu đề "This gift card is no longer active" (code hiện gộp chung chuỗi expired, cần tách) | ĐỀ XUẤT 05 §4.1 lỗi cụ thể |
 | Đã chép (S3) | nhãn nút "Copied" + icon check 2s, `role="status"` "Gift card code copied" | 05 §6 phản hồi |
 | Không JS | ẩn nút Copy, Print; QR không vẽ → giữ khung 144 với chữ "Enter the code at checkout" (không khung trống) | AGENTS progressive enhancement |
@@ -95,4 +95,4 @@ Không setting mới (template `layout none`, không block). Dùng `settings.log
 ## 9. Quyết định CTO đã chốt (10/11)
 
 CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
-1. Thẻ gift card dựng bằng CSS (nền dark, logo, số dư) thay ảnh `gift-card/card.svg` của Shopify khi chưa có logo, và thêm nút Copy Code + Print Gift Card (2 ticket con BE nhỏ)? Đề xuất: có; 0 ảnh lớn, in được, đúng ngôn ngữ nền tối Figma 1:360 và footer 1:1104.
+1. Thẻ gift card dựng bằng CSS (nền dark, logo, số dư) thay ảnh `gift-card/card.svg` của Shopify khi chưa có logo, và thêm nút "Copy code" + "Print gift card" (2 ticket con BE nhỏ)? Đề xuất: có; 0 ảnh lớn, in được, đúng ngôn ngữ nền tối của dải đầu trang chủ và footer.

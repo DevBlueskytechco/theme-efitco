@@ -1,16 +1,16 @@
-ĐÃ THAY bởi index-mobile-a.md, index-mobile-b.md (10/11). Desktop 1280: `index-1280.md` (ES1-T293); 1920 là Figma 1:359. Không dùng file này làm nguồn thiết kế; chỉ còn để đối chiếu hiện trạng code cũ (index-mobile-a.md §12). Mockup `drafts/designer/ES1-T252/` cũng đã thay bởi `drafts/designer/ES1-T278/` (ES1-T292).
+ĐÃ THAY bởi index-mobile-a.md, index-mobile-b.md (10/11). Desktop 1280 và 1920: `index-1280.md`, mockup ES1-T293 (nguồn chuẩn, CTO 21/11 ES1-T567). Không dùng file này làm nguồn thiết kế; chỉ còn để đối chiếu hiện trạng code cũ (index-mobile-a.md §12). Mockup `drafts/designer/ES1-T252/` cũng đã thay bởi `drafts/designer/ES1-T278/` (ES1-T292).
 
 KHÔNG CHẮC: (1) Ảnh live chụp theo khối, sau khi trang đã cuộn: header dính đè lên giữa ảnh của 9 khối, nên chỗ bị che không soát được. (2) Lúc chụp, một số ảnh lazy chưa tải (shop the look, testimonial, why choose, blog, featured product ở 360) và module JS chưa chạy (tổng bundle, shop the look ở 360; đồng hồ featured product). Những chỗ này đã soát bằng code (`assets/base.css`, `blocks/*.liquid`), không kết luận từ ảnh. (3) Ảnh sản phẩm lệch tên (ES1-T245) nên không tính là lỗi bố cục. (4) Hai file `index-1280.png` và `index-1920.png` còn lại từ lần 2, không thuộc lần 3 (desktop không làm lại); Designer không xoá được file, nhờ Orchestrator xoá.
 
 # UI spec: Trang chủ 768 và 360 (ES1-T252, lần 3)
 
-Mục tiêu: người mua trên tablet và điện thoại hiểu Efitco bán gì ở màn đầu và tới được danh mục, bestseller, quiz, combo, bài viết mà không phải mở menu. Story TE-17. Template `templates/index.liquid`; Figma 1:359 chỉ có bản desktop.
+Mục tiêu: người mua trên tablet và điện thoại hiểu Efitco bán gì ở màn đầu và tới được danh mục, bestseller, quiz, combo, bài viết mà không phải mở menu. Story TE-17. Template `templates/index.liquid`.
 
-Gốc: trang live trên store dev (theme efitco-develop-7b0137a). Desktop 1280/1920 đã khớp Figma (CTO 10/11), lần này không chụp lại, không đổi.
+Gốc: trang live trên store dev (theme efitco-develop-7b0137a). Desktop 1280/1920 lần này không chụp lại, không đổi.
 Ảnh live theo khối: `drafts/designer/ES1-T252/live/<khối>-768.png`, `<khối>-360.png` (32 ảnh, selector `[data-testid=container-home-<khối>]`, `[data-testid=header]`, `[data-testid=footer]`).
 Mockup: `drafts/designer/ES1-T252/index.html`, chỉ 5 khối có đề xuất, PNG `index-768.png`, `index-360.png`. Mỗi khối trong mockup có một dải vàng ghi khác live ở đâu.
 
-Thứ tự nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma > bộ kiến thức (`NN §mục`).
+Thứ tự nguồn (lúc lập, đã thay): sổ quyết định CTO > AGENTS.md > DESIGN.md > bộ kiến thức (`NN §mục`).
 
 ## 1. Bảng 16 khối × 2 khổ
 
@@ -30,13 +30,13 @@ Thứ tự nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma > b
 | | | 360 | Tab cuộn ngang; lưới 2 cột; swatch nhìn 32 × 16, vùng chạm 44 (`::after`), bước 44 | Không | Giữ như live |
 | 6 | Quiz (`home-quiz`) | 768 | Panel tối; thẻ trắng: body map trái, 3 lựa chọn phải cao 80 | Không | Giữ như live |
 | | | 360 | Body map ẩn; lựa chọn cả hàng cao ≥ 72 | Không | Giữ như live |
-| 7 | Shop the look (`home-shop-the-look`) | 768 | 1 cột: ảnh 728 × 635 → ô kích thước → 4 hàng → panel tổng | Nút "Add Setup To Cart" ở y ≈ 1546 tính từ đầu khối, tức 1.5 màn iPad dọc (1024), cách danh sách và ảnh hotspot; tablet có đủ bề ngang để đặt tổng cạnh danh sách (05 nhóm 4 §1.3 "CTA rất gần khi cuộn nhẹ"; 19 §D1 tablet tận dụng không gian) | ĐỀ XUẤT: dưới ảnh chia 2 cột `1fr 300px`, gap 16: trái ô kích thước + 4 hàng, phải panel tổng `position: sticky` trong khối. Nút còn ~ y 970. Mockup §2.2 |
+| 7 | Shop the look (`home-shop-the-look`) | 768 | 1 cột: ảnh 728 × 635 → ô kích thước → 4 hàng → panel tổng | Nút "Add setup to cart" ở y ≈ 1546 tính từ đầu khối, tức 1.5 màn iPad dọc (1024), cách danh sách và ảnh hotspot; tablet có đủ bề ngang để đặt tổng cạnh danh sách (05 nhóm 4 §1.3 "CTA rất gần khi cuộn nhẹ"; 19 §D1 tablet tận dụng không gian) | ĐỀ XUẤT: dưới ảnh chia 2 cột `1fr 300px`, gap 16: trái ô kích thước + 4 hàng, phải panel tổng `position: sticky` trong khối. Nút còn ~ y 970. Mockup §2.2 |
 | | | 360 | 1 cột như 768 | Không về bố cục. Panel tổng rỗng khi module JS chưa chạy: `data-bundle-subtotal`, `data-bundle-total` là span rỗng trong Liquid | Giữ bố cục live. ĐỀ XUẤT (FE + BE): Liquid in sẵn số lượng, tạm tính, giảm, tổng theo hàng đang chọn; JS chỉ cập nhật (05 nhóm 4 §6; 14 §2 #928M) |
 | 8 | Inspiration (`home-inspiration`) | 768 | 3 ảnh 200 một hàng trên, tiêu đề display căn giữa, câu phụ, nút | Không | Giữ như live |
 | | | 360 | 3 ảnh 96 một hàng trên, tiêu đề 4 dòng | Không | Giữ như live |
 | 9 | Bundle builder (`home-bundle-builder`) | 768 | Lưới 3 cột; panel "Your Bundle" dưới | Không về bố cục | Giữ như live |
 | | | 360 | Lưới 2 cột; panel dưới | Panel rỗng tới khi JS chạy (như khối 7) | Giữ bố cục live; ĐỀ XUẤT in tổng từ Liquid như khối 7 |
-| 10 | Featured product (`home-featured-product`) | 768 | Ảnh 1/1 728 × 712; dưới là thông tin; 2 nút 1 hàng | (a) Ảnh vuông đẩy "Add To Cart" tới y ≈ 1362, 1.3 màn iPad dọc (05 nhóm 4 §1.3). (b) Đồng hồ `visibility: hidden` tới khi module chạy (base.css 6923) → ô trống ~100 px giữa tên và giá ở 768, ~150 ở 360 | ĐỀ XUẤT: ảnh 4/3 (728 × 546, ảnh `contain` trên cream, không cắt sản phẩm), dấu tròn 113 cách góc 24; đồng hồ hiện ngay số Liquid đã in (`hours_text`…), JS chỉ chạy tiếp. Nút còn ~ y 1160. Mockup §2.3 |
+| 10 | Featured product (`home-featured-product`) | 768 | Ảnh 1/1 728 × 712; dưới là thông tin; 2 nút 1 hàng | (a) Ảnh vuông đẩy "Add to cart" tới y ≈ 1362, 1.3 màn iPad dọc (05 nhóm 4 §1.3). (b) Đồng hồ `visibility: hidden` tới khi module chạy (base.css 6923) → ô trống ~100 px giữa tên và giá ở 768, ~150 ở 360 | ĐỀ XUẤT: ảnh 4/3 (728 × 546, ảnh `contain` trên cream, không cắt sản phẩm), dấu tròn 113 cách góc 24; đồng hồ hiện ngay số Liquid đã in (`hours_text`…), JS chỉ chạy tiếp. Nút còn ~ y 1160. Mockup §2.3 |
 | | | 360 | Ảnh 1/1 320; 2 nút xếp dọc full | (b) như 768 | Giữ bố cục live; đồng hồ hiện ngay như 768 |
 | 11 | Video demo (`home-video-carousel`) | 768 | Tiêu đề 2 dòng; nút 52 hàng riêng dưới tiêu đề; card 264, lộ card 3 | Không | Giữ như live |
 | | | 360 | Card 252, lộ card kế; ẩn nút | Không | Giữ như live |
@@ -67,7 +67,7 @@ Ngoài phần ghi dưới đây, mọi màu, cỡ chữ, khoảng cách giữ nh
 
 ### 2.3 Featured product (768, 360)
 - 768: `.featured-product__media` `aspect-ratio: 4 / 3`, ảnh `object-fit: contain`; dấu tròn 113 cách góc 24 (như từ 48rem hiện có). 360 giữ 1/1.
-- Đồng hồ: bỏ `visibility: hidden` chờ `data-enhanced`; số do Liquid in lúc render (đã có `hours_text`, `minutes_text`…), JS chỉ đếm tiếp. Nếu hết giờ lúc render, Liquid không in khối (đã có `show_countdown`). Mockup vẽ kiểu Figma 1:776 (nền #1A1A1A, ô 44 viền #333) ở cả 768 và 360, một dòng, rộng theo nội dung.
+- Đồng hồ: bỏ `visibility: hidden` chờ `data-enhanced`; số do Liquid in lúc render (đã có `hours_text`, `minutes_text`…), JS chỉ đếm tiếp. Nếu hết giờ lúc render, Liquid không in khối (đã có `show_countdown`). Mockup vẽ kiểu đồng hồ nền tối (nền #1A1A1A, ô 44 viền #333) ở cả 768 và 360, một dòng, rộng theo nội dung.
 - KHÔNG CHẮC: lý do code ẩn đồng hồ tới khi JS chạy có thể là tránh số đứng yên khi trang cache lâu (comment `featured-product.liquid` dòng 19: "numbers that do not move would be a fake countdown"). Nếu giữ ẩn thì ít nhất cần chừa đúng chiều cao 60 thay vì ô trống ~100–150. Đã hỏi Tech Lead ở ES1-T276.
 
 ### 2.4 Testimonials (768)
@@ -107,7 +107,7 @@ Tỉ lệ tính tay: L sRGB → tuyến tính, (L1 + 0.05) / (L2 + 0.05). Lớp 
 - Heading: 1 h1 (hero slide 1), h2 mỗi khối, h3 trong card; không đổi.
 
 ### 3.3 SEO
-- Chữ link mô tả đích: giữ như live ("Explore Equipment", "Browse All Setups", "View Preset Bundles", "Get Started Now", "View About Us"); "View Detail" có phần ẩn " of {product}".
+- Chữ link mô tả đích: giữ như live ("Explore equipment", "Browse all setups", "View preset bundles", "Get started now", "View about us"); "View details" có phần ẩn " of {product}".
 - Ảnh nội dung có alt; ảnh trang trí (review, FAQ, level) `alt=""`. Chữ nhỏ nhất 13 (badge) ≥ 12.
 
 ### 3.4 Best Practices

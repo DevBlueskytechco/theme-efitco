@@ -1,3 +1,6 @@
+> TÀI LIỆU LỊCH SỬ (ĐÃ THAY 21/11/2026, ES1-T567): ghi chép của thời điểm lập, không còn là căn cứ thiết kế.
+> Nguồn chuẩn hiện nay là mockup HTML `drafts/designer/**` cùng `drafts/designer/_kit/kit.css`; nội dung bên dưới giữ nguyên.
+
 KHÔNG CHẮC: (1) `docs/design/decisions.md` dòng 12 liệt kê spec có câu CTO đã chốt nhưng không có foundation F1–F3; bản sổ CTO nạp cho Designer ghi "các câu khác vòng 3 chốt theo đề xuất trong spec", nên audit coi F1–F3 là đã chốt. (2) Repo không có văn bản yêu cầu Theme Store đầy đủ (01 chỉ có link shopify.dev): danh sách tính năng ở §2.3 lấy từ SRS TE-1, TE-3, TE-4, TE-5 (mã R4, R7) và 01 phần B; Tech Lead đối chiếu shopify.dev trước khi chia ticket. (3) Banner cookie/consent do Shopify vẽ (Customer Privacy), theme không chỉnh được giao diện; vị trí thật trên store dev chưa kiểm. (4) Audit đọc spec và HTML mockup, không mở từng PNG để so pixel (ticket cấm render).
 
 # Audit thiết kế vòng 3 + 3b trước khi trình BGĐ (ES1-T283)

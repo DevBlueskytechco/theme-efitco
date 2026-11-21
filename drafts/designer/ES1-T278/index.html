@@ -4,43 +4,45 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Efitco home, tablet 768 and mobile 360: header to Make fitness (ES1-T278)</title>
-<meta name="description" content="Efitco home page mockup for 768 and 360, developed from the desktop Figma frame 1:359: header, hero, Browse Categories, intro and shop by level, bestsellers, quiz, shop the look, Make fitness.">
+<meta name="description" content="Efitco home page mockup for 768 and 360, the source of truth for the first eight blocks below 1280: header, hero, Browse Categories, intro and shop by level, bestsellers, quiz, shop the look, Make fitness.">
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
 /*
-  ES1-T278 (DES-H2a). Gốc duy nhất: Figma 1:359 desktop (sổ quyết định 10/11). Spec: docs/ui-spec/index-mobile-a.md.
-  Chỉ 8 khối đầu trang, đúng thứ tự Figma. Mốc: < 48rem = 360, ≥ 48rem = 768.
-  Desktop 1280/1920 là chính Figma, mockup không vẽ lại (≥ 80rem chỉ để không vỡ).
-  ES1-T527 (DS check 20/11): component dùng chung lấy từ kit (.collection-card, .option-card, .product-row, .dpanel,
+  ES1-T278 (DES-H2a). File này là NGUỒN CHUẨN cho 8 khối đầu trang chủ ở 360 và 768 (CTO 21/11, ES1-T567). Spec: docs/ui-spec/index-mobile-a.md.
+  Chỉ 8 khối đầu trang, đúng thứ tự khối của trang chủ desktop (ES1-T293). Mốc: < 48rem = 360, ≥ 48rem = 768.
+  Desktop 1280/1920: drafts/designer/ES1-T293/index.html (≥ 80rem ở file này chỉ để không vỡ).
+  Tỉ lệ ảnh. Chuẩn: Carbon aspect ratio 1:1, 4:3; Spectrum 3:4 (hero 360).
+  Kích thước khối (width / height) viết px, bội 4, không dùng token khoảng cách (Polaris: space token không dùng cho width / height).
+  ES1-T527 (rà soát kit 20/11): component dùng chung lấy từ kit (.collection-card, .option-card, .product-row, .dpanel,
   .meter, .section-link, .badge, .alert, .skeleton, .spinner, .empty-state, .dialog); file này chỉ còn bố cục trang.
 */
-.icon-16 { width: 16px; height: 14px; flex: none; }
+.icon-16 { width: 16px; height: 14px; flex: none; } /* Thiết kế: quang học glyph mũi tên 16 × 14 */
 
-/* ===== 1. Header (1:362): kit .site-header, không đổi ===== */
+/* ===== 1. Header: kit .site-header, không đổi ===== */
 
-/* ===== 2. Hero (1:422, 1:437) ===== */
+/* ===== 2. Hero: 360 = 3/4, 768 = 4/3 (CTO 10/11) ===== */
 .hero { position: relative; display: grid; aspect-ratio: 3 / 4; overflow: hidden; background: var(--color-background-dark); color: var(--color-background-dark-foreground); }
 /* ES1-T292: ảnh hero hiện ngay (LCP, không reveal); focal point efx-slide-2.jpg = 25% 0% để vùng chữ nằm trên nền trơn (≥ 4.5:1) ở cả 360 và 768 */
 .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 25% 0%; }
 /* Sổ 10/11: lớp tối 30% (overlay_opacity 30) chỉ dưới 1280 */
 .hero__overlay { position: absolute; inset: 0; background: color-mix(in srgb, var(--color-background-dark) 30%, transparent); }
-.hero__content { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: var(--space-sm); width: var(--content-width); margin-inline: auto; padding-block: var(--space-2xl) calc(var(--space-1) * 15); text-align: start; }
-.hero__eyebrow { color: inherit; } /* kit .eyebrow (M/H6, D/H6), trắng trên ảnh như Figma */
+.hero__content { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-end; gap: var(--space-sm); width: var(--content-width); margin-inline: auto; padding-block: var(--space-2xl) var(--space-5xl); text-align: start; }
+.hero__eyebrow { color: inherit; } /* kit .eyebrow; trắng trên ảnh. AA: lớp tối 30%, chữ trắng */
 .hero__sub { max-width: 30ch; }
 .hero__content .button { margin-block-start: var(--space-sm); }
 .hero__dots { position: absolute; inset-block-end: var(--space-2xs); inset-inline-start: calc(var(--page-margin) - var(--space-md)); display: flex; }
-.hero__dot { position: relative; width: 44px; height: 44px; padding: 0; border: 0; background: none; color: var(--color-background-dark-foreground); cursor: pointer; }
+.hero__dot { position: relative; width: var(--touch-target); height: var(--touch-target); padding: 0; border: 0; background: none; color: var(--color-background-dark-foreground); cursor: pointer; }
 .hero__dot::before { content: ''; position: absolute; inset: var(--space-md); border: 1px solid currentColor; border-radius: 50%; }
 .hero__dot[aria-current='true']::before { background: currentColor; }
 .hero__arrows { display: none; }
 .hero .round-button { border-color: var(--color-background); }
 
-/* ===== 3. Browse Categories (1:395): kit .collection-card trong .section--dark ===== */
+/* ===== 3. Browse Categories: kit .collection-card trong .section--dark ===== */
 .cat-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: var(--space-md); margin-block-end: var(--heading-gap); }
 .cat-row { margin-inline-end: calc(var(--page-margin) * -1); padding-inline-end: var(--page-margin); }
-.cat-row > li { flex-basis: min(70vw, 336px); }
+.cat-row > li { flex-basis: min(70vw, 21rem); }
 
-/* ===== 4. Intro + Shop by level (1:453) ===== */
+/* ===== 4. Intro + Shop by level: card 4/3 ở 360, 1/1 ở 768 ===== */
 .intro__img { display: inline-block; width: 1.65em; height: 0.94em; margin-inline: 0.04em; vertical-align: -0.1em; border-radius: var(--radius-sm); object-fit: cover; }
 .intro__aside { display: grid; justify-items: start; gap: var(--space-sm); margin-block-start: var(--space-xl); }
 .intro__body { max-width: 34rem; }
@@ -48,30 +50,30 @@
 .level-grid { display: grid; gap: var(--grid-gap); margin: 0; padding: 0; list-style: none; }
 .level-card { position: relative; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); color: var(--color-background-dark-foreground); text-decoration: none; }
 .level-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; transition: scale var(--motion-slow) var(--ease-out); }
-/* Figma: gradient đen 0 → 80% từ 63% xuống đáy; dưới 80rem bắt đầu 35% để nhãn + tiêu đề + số SP luôn trên nền tối */
+/* Gradient tối 0 → 85%; dưới 80rem bắt đầu từ 35% để nhãn + tiêu đề + số SP luôn trên nền tối (AA) */
 .level-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 35%, color-mix(in srgb, var(--color-background-dark) 85%, transparent)); }
 .level-card:hover img { scale: 1.04; }
 .level-card__body { position: relative; z-index: 2; display: grid; gap: var(--space-2xs); padding: var(--space-xl) var(--space-xl) var(--space-md); }
-.level-card__label { font-family: var(--font-heading--family); font-size: var(--font-size-sm); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
-.level-card__title { color: inherit; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); } /* V27 */
+.level-card__label { font-family: var(--font-heading--family); font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
+.level-card__title { color: inherit; font-family: var(--font-heading--family); font-size: var(--font-size-h3); line-height: var(--line-height-h3); font-weight: var(--font-heading--weight); } /* V27 */
 /* V31: dưới 64rem luôn hiện "N Products →" (không có hover trên cảm ứng) */
-.level-card__foot { display: flex; align-items: center; justify-content: space-between; min-height: 44px; margin-block-start: var(--space-xs); border-block-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); font-size: var(--font-size-sm); font-weight: 500; }
+.level-card__foot { display: flex; align-items: center; justify-content: space-between; min-height: var(--touch-target); margin-block-start: var(--space-xs); border-block-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: 500; }
 
-/* ===== 5. Bestsellers (1:490) ===== */
+/* ===== 5. Bestsellers ===== */
 .best .tabs { margin-block-end: var(--space-xl); margin-inline-end: calc(var(--page-margin) * -1); padding-inline-end: var(--page-margin); }
 
-/* ===== 6. Quiz (1:506) ===== */
+/* ===== 6. Quiz ===== */
 .quiz { padding: var(--space-4xl) var(--page-margin); background: var(--color-background-panel); color: var(--color-background-dark-foreground); }
 .quiz__intro { display: grid; justify-items: start; gap: var(--space-sm); }
 .quiz__intro h2 { color: inherit; }
 .quiz__intro :focus-visible { outline-color: var(--color-background-dark-foreground); }
-.quiz__notes { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-xl); margin: var(--space-xs) 0 0; padding: 0; list-style: none; color: var(--panel-muted); font-size: var(--font-size-sm); font-weight: 500; }
+.quiz__notes { display: flex; flex-wrap: wrap; gap: var(--space-xs) var(--space-xl); margin: var(--space-xs) 0 0; padding: 0; list-style: none; color: var(--panel-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: 500; }
 .quiz__notes li { display: inline-flex; align-items: center; gap: var(--space-xs); }
-.quiz__notes svg { width: 16px; height: 16px; }
+.quiz__notes svg { width: var(--icon-size-sm); height: var(--icon-size-sm); }
 .quiz__card { margin-block-start: var(--space-2xl); padding: var(--space-xl) var(--space-md); border-radius: var(--radius-panel); background: var(--color-background); color: var(--color-foreground); }
-.quiz__progress { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-md); color: var(--color-muted); font-size: var(--font-size-sm); }
+.quiz__progress { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-md); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
 .quiz__q { margin-block-start: var(--space-xl); }
-.quiz__hint { margin-block-start: var(--space-2xs); color: var(--color-muted); font-size: var(--font-size-sm); }
+.quiz__hint { margin-block-start: var(--space-2xs); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
 .quiz__body { display: grid; gap: var(--space-md); margin-block-start: var(--space-xl); }
 .quiz__map { display: none; }
 .quiz__options { display: grid; gap: var(--space-xs); min-width: 0; margin: 0; padding: 0; border: 0; }
@@ -80,21 +82,21 @@
 .quiz-opt__thumb { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: var(--color-background-sand); }
 .quiz-opt__text { display: grid; }
 
-/* ===== 7. Shop the look (1:560) ===== */
+/* ===== 7. Shop the look: ảnh 1/1 ===== */
 .stl__head { display: grid; gap: var(--space-sm); margin-block-end: var(--heading-gap); }
 .stl__head .section-header { margin: 0; }
 .stl__head .section-link { justify-self: start; }
-.stl__media { position: relative; aspect-ratio: 936 / 816; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); }
+.stl__media { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); }
 .stl__media img { width: 100%; height: 100%; object-fit: cover; }
-.hotspot { position: absolute; width: 44px; height: 44px; margin: -22px 0 0 -22px; padding: 0; border: 0; background: none; cursor: pointer; }
+.hotspot { position: absolute; width: var(--touch-target); height: var(--touch-target); margin: calc(var(--touch-target) / -2) 0 0 calc(var(--touch-target) / -2); padding: 0; border: 0; background: none; cursor: pointer; }
 .hotspot::before { content: ''; position: absolute; inset: var(--space-sm); border-radius: 50%; background: var(--color-background); box-shadow: 0 0 0 var(--space-2xs) color-mix(in srgb, var(--color-background) 40%, transparent); }
-.hotspot[aria-pressed='true']::before { inset: 10px; box-shadow: 0 0 0 2px var(--color-foreground), 0 0 0 6px color-mix(in srgb, var(--color-background) 60%, transparent); }
+.hotspot[aria-pressed='true']::before { inset: var(--space-xs); box-shadow: 0 0 0 var(--space-050) var(--color-foreground), 0 0 0 var(--space-150) color-mix(in srgb, var(--color-background) 60%, transparent); }
 .stl__body { display: grid; gap: var(--space-xl); margin-block-start: var(--space-xl); }
 .stl__fits { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md) var(--space-xl); border-radius: var(--radius-sm); background: var(--color-background-sand); }
 .stl__fits-icon { display: grid; flex: none; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--color-background); }
 .stl__fits-icon svg { width: 28px; height: 28px; }
-.stl__fits b { display: block; font-size: var(--font-size-lg); }
-.stl__fits span { color: var(--color-muted); font-size: var(--font-size-sm); }
+.stl__fits b { display: block; font-size: var(--font-size-lg); line-height: var(--line-height-title); }
+.stl__fits span { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
 .stl__rows { display: grid; gap: var(--space-sm); margin: var(--space-sm) 0 0; padding: 0; list-style: none; }
 /* V26/V30: dòng = kit .option-card (đang xem = is-checked) chứa kit .product-row; cả dòng là link */
 .stl-row .product-row__title a { text-decoration: none; }
@@ -106,12 +108,12 @@
 .dpanel__row--saving > :first-child { white-space: nowrap; }
 /* V30: ô cream bọc thumb = kit .product-row__media (ES1-T527 vòng 3 đưa vào kit) */
 
-/* ===== 8. Make fitness (1:625) ===== */
+/* ===== 8. Make fitness ===== */
 .mf { position: relative; overflow: hidden; }
 .mf__top { display: flex; justify-content: space-between; align-items: flex-start; }
 .mf__img { border-radius: var(--radius-card); object-fit: cover; }
-.mf__img--1 { width: calc(var(--space-1) * 28); height: calc(var(--space-1) * 28); }
-.mf__img--2 { width: calc(var(--space-1) * 22); height: calc(var(--space-1) * 22); margin-block-start: var(--space-3xl); }
+.mf__img--1 { width: 112px; height: 112px; }
+.mf__img--2 { width: 88px; height: 88px; margin-block-start: var(--space-3xl); }
 .mf__img--3 { display: none; }
 .mf__text { display: grid; justify-items: center; gap: var(--space-xl); margin-block-start: var(--space-2xl); text-align: center; }
 .mf__heading { color: var(--color-muted); }
@@ -125,20 +127,20 @@
 .state__box { padding: var(--space-md); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
 .hero--empty { aspect-ratio: auto; min-height: 240px; }
 .hero--empty .hero__content { width: auto; margin: 0; padding: var(--space-xl) var(--space-md) var(--space-3xl); }
-.hero--empty .display { font-size: var(--font-size-h1); }
+.hero--empty .display { font-size: var(--font-size-h1); line-height: var(--line-height-h1); }
 .skeleton-card .skeleton--line:last-child { width: 40%; }
-.status-line { display: flex; align-items: center; gap: var(--space-sm); margin-block-start: var(--space-md); color: var(--color-muted); font-size: var(--font-size-sm); }
+.status-line { display: flex; align-items: center; gap: var(--space-sm); margin-block-start: var(--space-md); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
 .state .demo-stage { min-height: 400px; }
 
 @media (min-width: 48rem) {
   /* Hero 768: tràn mép như 360 (dải rộng --band-inset = 0 ở 768), chữ giữa dọc, mép 20; 2 nút 52 góc dưới phải, không dot */
   .hero { aspect-ratio: 4 / 3; }
-  .hero__content { justify-content: center; gap: var(--space-md); padding-block: var(--space-7); }
+  .hero__content { justify-content: center; gap: var(--space-md); padding-block: var(--space-4xl); }
   .hero__content > * { max-width: 28rem; }
   .hero__dots { display: none; }
   .hero__arrows { position: absolute; inset-block-end: var(--space-xl); inset-inline-end: var(--page-margin); display: flex; gap: var(--space-xs); }
 
-  .cat-row > li { flex-basis: min(40vw, 336px); }
+  .cat-row > li { flex-basis: min(40vw, 21rem); }
 
   .intro__aside { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--space-2xl); }
   .level-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -167,7 +169,7 @@
   .mf__img--3 { display: block; position: absolute; inset-block-end: var(--space-5xl); inset-inline-start: var(--page-margin); width: 104px; height: 104px; }
   .mf__text { margin-block-start: var(--space-xl); }
   .mf__heading { max-width: 15ch; }
-  .mf__sub { max-width: 30ch; font-size: var(--font-size-lg); }
+  .mf__sub { max-width: 30ch; font-size: var(--font-size-lg); line-height: var(--line-height-title); }
 
   .states__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .state--wide { grid-column: 1 / -1; }
@@ -197,7 +199,7 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- ===== 1. Header (Figma 1:362): thanh tối riêng 80, không đè ảnh (sổ 10/11) ===== -->
+<!-- ===== 1. Header : thanh tối riêng 80, không đè ảnh (sổ 10/11) ===== -->
 <header class="site-header" data-testid="header">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -212,7 +214,7 @@
 
 <main id="main">
 
-  <!-- ===== 2. Hero (1:422 slide 1, 1:437 slide 2) ===== -->
+  <!-- ===== 2. Hero ===== -->
   <section class="hero" data-testid="container-home-hero" aria-roledescription="carousel" aria-label="Featured equipment">
     <img class="hero__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-2.jpg?width=1600" srcset="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-2.jpg?width=1080 1080w, https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-2.jpg?width=1600 1600w, https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-2.jpg?width=1920 1920w" sizes="(min-width: 80rem) 100vw, (min-width: 48rem) 164vw, 291vw" alt="Athlete doing a dumbbell row" width="1920" height="880" loading="eager" fetchpriority="high">
     <div class="hero__overlay" aria-hidden="true"></div>
@@ -220,7 +222,7 @@
       <p class="eyebrow hero__eyebrow">Trusted by 10,000+ athletes</p>
       <h1 class="display">Level Up<br>Your Fitness</h1>
       <p class="hero__sub">Upgrade your journey with Efitco gear made for every workout.</p>
-      <a class="button" href="#">Explore Equipment <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <a class="button" href="#">Explore equipment <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
     </div>
     <div class="hero__dots">
       <button class="hero__dot" type="button" aria-label="Show slide 1 of 2" aria-current="true"></button>
@@ -232,7 +234,7 @@
     </div>
   </section>
 
-  <!-- ===== 3. Browse Categories (1:395) trên dải tối 1:360 ===== -->
+  <!-- ===== 3. Browse Categories trên dải tối ===== -->
   <section class="section section--dark" data-testid="container-home-collection-list" aria-labelledby="cat-h">
     <div class="container">
       <div class="cat-head">
@@ -253,13 +255,13 @@
     </div>
   </section>
 
-  <!-- ===== 4. Intro + Shop by level (1:453), nền sand ===== -->
+  <!-- ===== 4. Intro + Shop by level, nền sand ===== -->
   <section class="section section--sand" data-testid="container-home-intro" aria-labelledby="intro-h">
     <div class="container">
       <h2 class="display" id="intro-h">Everything You Need <img class="intro__img" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-inline.jpg?width=340" alt="" width="330" height="188"> to Train.</h2>
       <div class="intro__aside">
         <p class="intro__body">Versatile equipment for home training - strength, mobility, endurance, at every level.</p>
-        <a class="button button--link" href="#"><span class="button__label">Become A Member</span><svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="button button--link" href="#"><span class="button__label">Become a member</span><svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
 
       <div class="level">
@@ -276,7 +278,7 @@
     </div>
   </section>
 
-  <!-- ===== 5. Bestsellers (1:490) ===== -->
+  <!-- ===== 5. Bestsellers ===== -->
   <section class="section best" data-testid="container-home-featured-collection" aria-labelledby="best-h">
     <div class="container">
       <div class="section-header">
@@ -330,11 +332,11 @@
     </div>
   </section>
 
-  <!-- ===== 6. Quiz (1:506): panel tối; 360 tràn mép, 768 thẻ bo 24 trong container ===== -->
+  <!-- ===== 6. Quiz: panel tối; 360 tràn mép, 768 thẻ bo 24 trong container ===== -->
   <div class="quiz-wrap" data-testid="container-home-quiz">
     <section class="quiz" aria-labelledby="quiz-h">
       <div class="quiz__intro">
-        <p class="badge badge--tag">Our most-loved feature</p>
+        <p class="badge badge--outline">Our most-loved feature</p>
         <h2 id="quiz-h">Find Your Perfect Gear</h2>
         <p>Two questions. One shortlist.</p>
         <ul class="quiz__notes">
@@ -359,7 +361,7 @@
     </section>
   </div>
 
-  <!-- ===== 7. Shop the look (1:560) ===== -->
+  <!-- ===== 7. Shop the look ===== -->
   <section class="section" data-testid="container-home-shop-the-look" aria-labelledby="stl-h">
     <div class="container">
       <div class="stl__head">
@@ -367,7 +369,7 @@
           <p class="eyebrow">Shop this setup</p>
           <h2 id="stl-h">A Complete Corner Gym, Itemised</h2>
         </div>
-        <a class="section-link" href="#">Browse All Setups<svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="section-link" href="#">Browse all setups<svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
       <div class="stl__media">
         <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-look.jpg?width=1080" alt="Corner home gym with adjustable bench, dumbbells and storage cart" width="1872" height="1632">
@@ -393,13 +395,13 @@
           <p class="dpanel__row dpanel__row--muted"><span>4 items</span><span>$1,187.98</span></p>
           <p class="dpanel__row dpanel__row--saving"><span><svg viewBox="0 0 20 20" aria-hidden="true"><use href="#i-tag"/></svg>Setup discount (10%)</span><span>−$118.80</span></p>
           <p class="dpanel__row dpanel__row--total"><span>Total</span><span>$1,069.18</span></p>
-          <button class="button button--full" type="button">Add Setup To Cart <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          <button class="button button--full" type="button">Add setup to cart <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></button>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== 8. Make fitness (1:625), nền sand ===== -->
+  <!-- ===== 8. Make fitness, nền sand ===== -->
   <section class="section section--sand mf" data-testid="container-home-inspiration" aria-labelledby="mf-h">
     <div class="container">
       <div class="mf__top" aria-hidden="true">
@@ -410,12 +412,12 @@
       <div class="mf__text">
         <h2 class="display mf__heading" id="mf-h"><span>Make</span> fitness a natural part of your everyday life !</h2>
         <p class="mf__sub">Just simple, effective workouts you can do anytime at home</p>
-        <a class="button" href="#">Get Started Now <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <a class="button" href="#">Get started now <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
     </div>
   </section>
 
-  <!-- ===== Trạng thái (ĐỀ XUẤT, Figma không có) ===== -->
+  <!-- ===== Trạng thái (ĐỀ XUẤT) ===== -->
   <section class="section states" data-testid="states" aria-labelledby="st-h">
     <div class="container">
       <div class="section-header"><p class="eyebrow">States</p><h2 id="st-h">Empty, Loading And Error States</h2></div>
@@ -426,7 +428,7 @@
             <div class="hero__content">
               <p class="eyebrow hero__eyebrow">Trusted by 10,000+ athletes</p>
               <p class="display">Level Up<br>Your Fitness</p>
-              <a class="button" href="#">Explore Equipment</a>
+              <a class="button" href="#">Explore equipment</a>
             </div>
           </div>
         </div>
@@ -446,7 +448,7 @@
             <span class="empty-state__icon" aria-hidden="true"><svg><use href="#i-box"/></svg></span>
             <h3>Nothing In Accessories Yet</h3>
             <p>New gear lands every week. Browse the full range in the meantime.</p>
-            <a class="button" href="#">Shop All Products</a>
+            <a class="button" href="#">Shop all products</a>
           </div>
         </div>
         <div class="state state--wide">
@@ -458,8 +460,8 @@
               <h3 class="dialog__title" id="sheet-h">No Exact Match</h3>
               <p class="text-muted">We could not find gear for every answer. Change one answer or browse all equipment.</p>
               <div class="dialog__actions">
-                <a class="button button--secondary" href="#">Shop All Gear</a>
-                <button class="button" type="button">Change Answers</button>
+                <a class="button button--secondary" href="#">Shop all equipment</a>
+                <button class="button" type="button">Change my answers</button>
               </div>
             </div>
           </div>
@@ -473,14 +475,14 @@
             <p class="dpanel__row dpanel__row--muted"><span>3 items</span><span>$638.98</span></p>
             <p class="dpanel__row dpanel__row--saving"><span><svg viewBox="0 0 20 20" aria-hidden="true"><use href="#i-tag"/></svg>Setup discount (10%)</span><span>−$63.90</span></p>
             <p class="dpanel__row dpanel__row--total"><span>Total</span><span>$575.08</span></p>
-            <button class="button button--full" type="button" aria-busy="true">Add Setup To Cart<span class="visually-hidden">, adding</span></button>
+            <button class="button button--full" type="button" aria-busy="true">Add setup to cart<span class="visually-hidden">, adding</span></button>
           </div>
         </div>
         <div class="state">
           <p class="state__label">Shop the look: add to cart failed</p>
           <div class="alert" role="alert">
             <svg aria-hidden="true"><use href="#i-alert"/></svg>
-            <div class="alert__body"><strong>Setup Not Added</strong><p>One item just sold out. Your cart is unchanged.</p><button class="button button--secondary button--small" type="button">Try Again</button></div>
+            <div class="alert__body"><strong>Setup not added</strong><p>One item just sold out. Your cart is unchanged.</p><button class="button button--secondary button--small" type="button">Try again</button></div>
           </div>
         </div>
       </div>

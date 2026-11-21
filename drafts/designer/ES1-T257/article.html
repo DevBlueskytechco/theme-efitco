@@ -8,16 +8,16 @@
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
   /* Riêng trang bài viết (ES1-T257). Spec: docs/ui-spec/article.md.
-     ES1-T527 (DS check 20/11): rte và .reading-column (720) lấy từ kit, thân bài 16/1.7 mọi khổ (V53);
+     ES1-T527 (rà soát kit 20/11): rte và .reading-column (720) lấy từ kit, thân bài 16/28 mọi khổ (--line-height-reading; V53, ES1-T567);
      pagination* từ kit (V57); bo 16 = --radius-panel (V04). Trang chỉ giữ bố cục. */
 
   /* Ảnh bìa (LCP), vòng 3: thẻ bo 16 NẰM DƯỚI header tối, trong container (khung .page-banner foundation §3.3,
-     tỉ lệ hero Figma 1:361 1798/827 từ 80rem). Không chữ đè ảnh → không lớp tối, ảnh giữ màu thật */
+     tỉ lệ 4/3 → 16/9 từ 48rem → 2/1 từ 80rem. Chuẩn: Carbon aspect ratio). Không chữ đè ảnh → không lớp tối, ảnh giữ màu thật */
   .article-cover { width: var(--content-width); margin: var(--space-md) auto 0; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); }
   .article-cover img { width: 100%; height: 100%; object-fit: cover; }
   @media (min-width: 48rem) { .article-cover { aspect-ratio: 16 / 9; } }
   @media (min-width: 64rem) { .article-cover { margin-block-start: var(--space-xl); } }
-  @media (min-width: 80rem) { .article-cover { aspect-ratio: 1798 / 827; } }
+  @media (min-width: 80rem) { .article-cover { aspect-ratio: 2 / 1; } }
 
   /* Đầu bài trong cột đọc (.reading-column của kit) */
   .article-header { display: grid; justify-items: start; gap: var(--space-sm); padding-block: var(--space-xs) var(--space-2xl); }
@@ -27,35 +27,36 @@
   .meta > span + span::before { content: '·'; margin-inline-end: var(--space-xs); color: var(--color-muted-light); }
   .tag-link { position: relative; text-decoration: none; }
   .tag-link::after { content: ''; position: absolute; inset: calc(var(--space-xs) * -1) calc(var(--space-2xs) * -1); } /* vùng chạm 44 */
-  .tag-link:hover { background: color-mix(in srgb, var(--color-accent) 88%, var(--color-foreground)); }
+  .tag-link:hover { border-color: var(--color-foreground); } /* tag trung tính (ES1-T567): hover viền đậm như chip của kit */
   @media (min-width: 64rem) { .article-header { padding-block: var(--space-md) var(--space-4xl); } }
 
   .article-end { display: grid; gap: var(--space-xl); margin-block-start: var(--space-4xl); padding-block-start: var(--space-xl); border-block-start: 1px solid var(--color-border); }
   .article-topics { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); }
-  .article-topics > span { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; }
+  .article-topics > span { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: 600; }
   .article-topics .tab { text-decoration: none; }
-  .back-link { display: inline-flex; align-items: center; gap: var(--space-sm); min-height: 44px; font-weight: 600; text-decoration: none; justify-self: start; }
-  .back-link svg { width: 20px; height: 16px; scale: -1 1; transition: translate var(--motion-base) var(--ease-out); }
+  .back-link { display: inline-flex; align-items: center; gap: var(--space-sm); min-height: var(--touch-target); font-weight: 600; text-decoration: none; justify-self: start; }
+  .back-link svg { width: var(--icon-size-md); height: var(--icon-size-sm); scale: -1 1; transition: translate var(--motion-base) var(--ease-out); }
   .back-link:hover span { text-decoration: underline; text-underline-offset: 0.2em; }
   .back-link:hover svg { translate: calc(var(--space-2xs) * -1) 0; }
 
   /* Bình luận */
   .comments { margin-block-start: var(--space-4xl); padding-block-start: var(--space-4xl); border-block-start: 1px solid var(--color-border); }
-  .comments > h2 { font-size: var(--font-size-h2); }
+  .comments > h2 { font-size: var(--font-size-h2); line-height: var(--line-height-h2); }
   .comment-list { margin: var(--space-xl) 0 0; padding: 0; list-style: none; border-block-start: 1px solid var(--color-border); }
-  .comment { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: var(--space-xs) var(--space-md); padding-block: var(--space-xl); border-block-end: 1px solid var(--color-border); }
-  .comment__avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--color-background-alt); font-weight: 600; }
+  .comment-list { --avatar-size: 2.5rem; } /* Thiết kế: avatar chữ cái 40, bội 4 */
+  .comment { display: grid; grid-template-columns: var(--avatar-size) minmax(0, 1fr); gap: var(--space-xs) var(--space-md); padding-block: var(--space-xl); border-block-end: 1px solid var(--color-border); }
+  .comment__avatar { display: grid; place-items: center; width: var(--avatar-size); height: var(--avatar-size); border-radius: 50%; background: var(--color-background-alt); font-weight: 600; }
   .comment__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2xs) var(--space-sm); }
   .comment__author { font-weight: 600; }
-  .comment__date { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .comment__date { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .comment__body { grid-column: 2; color: var(--color-foreground); }
   .comments__none { margin-block-start: var(--space-md); color: var(--color-muted); }
   .comment-form { display: grid; gap: var(--space-xl); margin-block-start: var(--space-4xl); }
-  .comment-form h2 { font-size: var(--font-size-h3); }
-  .comment-form__note { display: flex; gap: var(--space-xs); align-items: flex-start; color: var(--color-muted); font-size: var(--font-size-sm); }
-  .comment-form__note svg { flex: none; width: 16px; height: 16px; margin-block-start: 3px; }
+  .comment-form h2 { font-size: var(--font-size-h3); line-height: var(--line-height-h3); }
+  .comment-form__note { display: flex; gap: var(--space-xs); align-items: flex-start; color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .comment-form__note svg { flex: none; width: var(--icon-size-sm); height: var(--icon-size-sm); margin-block-start: var(--space-050); }
   .comment-form__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md); }
-  .comment-form__required { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .comment-form__required { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   @media (max-width: 47.99rem) { .comment-form__actions .button { width: 100%; } }
   /* Phân trang bình luận: kit pagination (docs/ui-spec/pagination.md, PG1), không định nghĩa lại (V57) */
 
@@ -63,8 +64,8 @@
   .related { margin-block-start: var(--section-gap); padding-block-end: var(--section-gap); }
   .related .card-row > li { display: flex; }
   .related .article-card { flex: 1; }
-  /* Card Figma 1:1022/1:1030: lề 24 từ 48rem, meta trắng + '·' lấy từ kit article-card (ES1-T527 vòng 2) */
-  .related h2 { font-size: var(--font-size-h1); }
+  /* Card bài viết: lề 24 từ 48rem, meta trắng + '·' lấy từ kit article-card (ES1-T527 vòng 2) */
+  .related h2 { font-size: var(--font-size-h1); line-height: var(--line-height-h1); }
   /* 1280+: 3 card vừa khung, không tràn → ẩn nút và thanh tiến trình (như AC-H9) */
   @media (min-width: 80rem) { .related .carousel-nav, .related .carousel-progress { display: none; } }
   /* ES1-T527 vòng 2: 1280+ 3 card chia đều hết khung (không chừa ~184px trống bên phải) */
@@ -74,8 +75,8 @@
   .skeleton--card { display: block; aspect-ratio: 3 / 4; border-radius: var(--radius-panel); }
   .demo-states { padding-block: var(--space-4xl); }
   /* Mẫu trạng thái trong cột đọc: tiêu đề + chú thích cách nội dung mẫu như .demo-block > .demo-note của kit */
-  .demo-block > .reading-column > h2 { margin-block-end: var(--space-2); }
-  .demo-block > .reading-column > .demo-note { margin-block-end: var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .demo-block > .reading-column > h2 { margin-block-end: var(--space-xs); }
+  .demo-block > .reading-column > .demo-note { margin-block-end: var(--space-xl); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .demo-stage > .demo-plain-header { position: relative; }
   .demo-stage .site-header__inner { width: auto; padding-inline: var(--space-xl); }
 </style></head>
@@ -107,7 +108,7 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- Header vòng 3: thanh tối #1A1A1A + noise, cao 80, KHÔNG đè ảnh bìa (sổ 10/11, Figma 1:362, foundation §3) -->
+<!-- Header vòng 3: thanh tối #1A1A1A + noise, cao 80, KHÔNG đè ảnh bìa (sổ 10/11, foundation §3) -->
 <header class="site-header">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -193,7 +194,7 @@
               <div class="field span-all"><label class="field__label" for="c-body">Comment <span class="req" aria-hidden="true">*</span></label><textarea class="field__input" id="c-body" name="comment[body]" required></textarea></div>
             </div>
             <div class="comment-form__actions">
-              <button class="button" type="submit">Post Comment</button>
+              <button class="button" type="submit">Post comment</button>
               <span class="comment-form__required" aria-hidden="true">* Required</span>
             </div>
           </form>
@@ -221,7 +222,7 @@
   </section>
 </main>
 
-<!-- Footer vòng 3 (Figma 1:1104, foundation §4): newsletter · panel dải rộng · hàng cuối có wordmark -->
+<!-- Footer vòng 3 (foundation §4): newsletter · panel dải rộng · hàng cuối có wordmark -->
 <footer class="site-footer">
   <div class="container site-footer__band">
     <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
@@ -231,7 +232,7 @@
     </div>
     <form class="site-footer__form" onsubmit="return false" novalidate>
       <label class="visually-hidden" for="nl-email">Email</label>
-      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% off</button></div>
       <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
@@ -363,7 +364,7 @@
           <div class="field"><label class="field__label" for="e-email">Email <span class="req" aria-hidden="true">*</span></label><input class="field__input" id="e-email" type="email" autocomplete="email" value="minh.tran.example.com" aria-invalid="true" aria-describedby="e-email-err" required><p class="field__error" id="e-email-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Enter an email like name@example.com.</p></div>
           <div class="field span-all"><label class="field__label" for="e-body">Comment <span class="req" aria-hidden="true">*</span></label><textarea class="field__input" id="e-body" aria-invalid="true" aria-describedby="e-body-err" required></textarea><p class="field__error" id="e-body-err"><svg aria-hidden="true"><use href="#i-alert"/></svg>Write a comment before posting.</p></div>
         </div>
-        <div class="comment-form__actions"><button class="button" type="button">Post Comment</button></div>
+        <div class="comment-form__actions"><button class="button" type="button">Post comment</button></div>
       </div>
     </div>
   </section>
@@ -373,9 +374,9 @@
       <h2>Trạng thái: đang gửi · hover · focus · lỗi mạng</h2>
       <p class="demo-note">Đang gửi: aria-busy, spinner, bề rộng giữ nguyên, không bấm lại (05 §5; cần JS nhỏ, không JS thì form gửi thường). Lỗi mạng/captcha: toast error (foundation §17).</p>
       <div class="demo-row">
-        <button class="button" type="button" aria-busy="true">Post Comment<span class="visually-hidden">, posting</span></button>
-        <button class="button is-hover" type="button">Post Comment</button>
-        <button class="button is-focus" type="button">Post Comment</button>
+        <button class="button" type="button" aria-busy="true">Post comment<span class="visually-hidden">, posting</span></button>
+        <button class="button is-hover" type="button">Post comment</button>
+        <button class="button is-focus" type="button">Post comment</button>
         <input class="field__input is-focus" style="max-width: 16rem" type="text" aria-label="Name, focus sample" value="Minh T.">
       </div>
       <div class="alert" role="alert" style="margin-block-start: var(--space-xl)">

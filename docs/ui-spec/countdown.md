@@ -1,6 +1,16 @@
-KHÔNG CHẮC: (1) ES1-T276 (Tech Lead) chưa trả lời việc hiện số Liquid ngay trước khi JS chạy; spec đề xuất hiện ngay và luôn giữ chỗ khung (§5 K0). (2) Figma chỉ có 1 trạng thái (1:773, 3 ô, desktop); cỡ Compact, 4 ô, < 1 giờ, hết giờ là ĐỀ XUẤT lấy từ product.md §4.2 (đã chốt 10/11 theo đề xuất) cho chung cả 3 chỗ. (3) Store demo chưa có metafield `custom.sale_ends_at` trong `docs/design/demo-data.json`; BA nhập cho `figma-ativafit-lava-featured` khi dựng demo.
+KHÔNG CHẮC: (1) ES1-T276 (Tech Lead) chưa trả lời việc hiện số Liquid ngay trước khi JS chạy; spec đề xuất hiện ngay và luôn giữ chỗ khung (§5 K0). (2) Cỡ Compact, 4 ô, < 1 giờ, hết giờ lấy từ product.md §4.2 (đã chốt 10/11 theo đề xuất) cho chung cả 3 chỗ; cả 5 trạng thái có ở màn `h-countdown` của mockup. (3) Store demo chưa có metafield `custom.sale_ends_at` trong `docs/design/demo-data.json`; BA nhập cho sản phẩm featured của store dev (Ativafit Lava) khi dựng demo.
 
 # UI spec: Countdown "Sale ends in" dùng chung (ES1-T291)
+
+## Thay đổi ES1-T567 (CTO 21/11: mockup là nguồn chuẩn, chuẩn Polaris trước)
+
+| # | Trước | Sau | Nguồn |
+| --- | --- | --- | --- |
+| 1 | Thứ tự nguồn có bản vẽ; anatomy và số đo dẫn mã node | Nguồn = kit `.sale-countdown*` + màn `h-countdown` của `foundation.html`; bỏ mọi mã node | CTO 21/11 |
+| 2 | Nhãn và chữ hết giờ Inter 500 16/26 | 16/24 (`--line-height-body`) | Bội 4; Chuẩn: Carbon body-02 |
+| 3 | Bo 8 viết `calc(var(--radius-card) - var(--space-1))` | `--radius-sm` (8) | Thang bo góc của kit |
+| 4 | Bề rộng trạng thái hết giờ 267 / 311 px | `min-inline-size` 16.75rem (268) / 19.5rem (312) | Đơn vị rem; Thiết kế: giữ bề rộng lúc đang chạy để không nhảy bố cục |
+| 5 | Nút big offer "Shop The Deal" | "Shop the offer" | Chuẩn: Polaris Button (sentence case) |
 
 ## Thay đổi audit (ES1-T283 A14, CTO chốt 10/11 câu 2)
 
@@ -12,38 +22,39 @@ KHÔNG CHẮC: (1) ES1-T276 (Tech Lead) chưa trả lời việc hiện số Liq
 
 Mục đích: báo cho người mua thời điểm thật một ưu đãi kết thúc, cùng một hình và một mốc giờ ở mọi chỗ sản phẩm đó xuất hiện. Story TE-13 AC1 (featured), TE-4 (PDP), TE-9 (big offer).
 
-Dùng ở: khối featured product trang chủ (Figma 1:759, index-mobile-b §2), buy box trang sản phẩm (product.md §4.2), thẻ big offer (marketing-popups.md §4). Quickview không có countdown (mini-cart-quickview không đặt; giữ gọn).
+Dùng ở: khối featured product trang chủ (`#container-home-featured-product` của mockup ES1-T293, index-mobile-b §2), buy box trang sản phẩm (product.md §4.2), thẻ big offer (marketing-popups.md §4). Quickview không có countdown (mini-cart-quickview không đặt; giữ gọn).
 
-Mockup: `drafts/designer/ES1-T251/foundation.html` mục 16 "Sale Countdown" + `foundation-360|768|1280|1920.png`.
+Mockup (nguồn chuẩn): `drafts/designer/ES1-T251/foundation.html` section `h-countdown` ("33. Sale Countdown"); CSS: kit `.sale-countdown-host`, `.sale-countdown`, `.sale-countdown__label`, `__units`, `__unit`, `__ended`, `--compact`, `--ended`, `[data-state='ending']`.
 
-Thứ tự nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:359 > foundation > bộ kiến thức (`NN §mục`).
+Thứ tự nguồn (CTO 21/11, ES1-T567): `kit.css` → mockup `drafts/designer/**` → `docs/tokens.json`, DESIGN.md, spec này (chép theo kit) → code theme. Quyết định và lý do: `docs/design/decisions.md`; bộ kiến thức ghi `NN §mục`.
 
 ---
 
-## 1. Anatomy (Figma 1:773)
+## 1. Anatomy (màn `h-countdown`, kit `.sale-countdown`)
 
 Khung (`role="timer"`) · nhãn "Sale ends in" · hàng ô số (ngày) · giờ · phút · giây · câu ẩn ngày giờ kết thúc.
 
-- Khung: nền `--color-background-dark` (không noise, Figma 1:773 fill phẳng), chữ `--color-background-dark-foreground`, bo 8 (Figma 1:773; không có token 8: `calc(var(--radius-card) - var(--space-1))`, ô số cùng bo), cao 60, rộng theo nội dung (`inline-size: fit-content; max-inline-size: 100%`), căn giữa dọc.
-- Nhãn: Inter 500 16/26 ls −0.01em (Figma 1:774), một dòng.
-- Ô số: vuông, bo 8, viền 1px `color-mix(in srgb, var(--color-background-dark-foreground) 12%, var(--color-background-dark))` (≈ #333 Figma 1:776), nền trong suốt; số Inter 700 `font-variant-numeric: tabular-nums`, luôn 2 chữ số (`05`), ô ngày có thể 3 chữ số, ô giãn theo số.
-- Không dấu ":" giữa ô, không nhãn đơn vị nhìn thấy (Figma không có; product.md §4.2 đã chốt).
+- Khung: nền `--color-background-dark` (phẳng, không noise. Thiết kế: khối nhỏ trong nội dung, noise chỉ dùng cho dải nền lớn), chữ `--color-background-dark-foreground`, bo 8 (`--radius-sm`, ô số cùng bo), cao tối thiểu 60 (Thiết kế: ô 44 + đệm dọc 8 × 2; bội 4), rộng theo nội dung (`inline-size: fit-content; max-inline-size: 100%`), căn giữa dọc.
+- Nhãn: Inter 500 16/24 (`--line-height-body`; Chuẩn: Carbon body-02) ls −0.01em (`--letter-spacing-body`), một dòng.
+- Ô số: vuông, bo 8, viền 1px `color-mix(in srgb, var(--color-background-dark-foreground) 12%, var(--color-background-dark))` (≈ #333. Thiết kế: viền trang trí trắng 12% trên nền tối), nền trong suốt; số Inter 700 `font-variant-numeric: tabular-nums`, luôn 2 chữ số (`05`), ô ngày có thể 3 chữ số, ô giãn theo số.
+- Không dấu ":" giữa ô, không nhãn đơn vị nhìn thấy (product.md §4.2 đã chốt).
 
 ## 2. Kích thước
 
 Hai cỡ, chọn theo bề rộng khung chứa (không theo loại trang), để 4 ô luôn vừa:
 
-| Giá trị | Compact | Regular (Figma 1:773) |
+| Giá trị | Compact | Regular |
 | --- | --- | --- |
 | Khi nào | khung chứa < 368 | khung chứa ≥ 368 |
 | Cao khung | 60 | 60 |
-| Padding ngang | 16 (`--space-4`) | 24 (`--space-5`) |
-| Nhãn → ô | 16 | 16 (Figma 15, P4) |
+| Padding ngang | 16 (`--space-md`) | 24 (`--space-xl`) |
+| Nhãn → ô | 16 (`--space-md`) | 16 (`--space-md`; P4) |
 | Ô | 40 × 40 | 44 × 44 |
 | Số | Inter 700 16/24 | Inter 700 18/28 ls −0.01em |
-| Khoảng giữa ô | 4 (`--space-1`) | 12 (`--space-3`) |
-| Rộng 3 ô | 267 | 311 (Figma 310) |
-| Rộng 4 ô | 311 | 367 |
+| Khoảng giữa ô | 4 (`--space-2xs`) | 12 (`--space-sm`) |
+| Rộng 3 ô (theo nội dung) | ≈ 268 | ≈ 312 |
+| Rộng 4 ô (theo nội dung) | ≈ 312 | ≈ 368 |
+| Rộng tối thiểu khi hết giờ (`.sale-countdown--ended`) | 16.75rem (268) | 19.5rem (312) |
 
 368 = rộng 4 ô Regular làm tròn lên. Cách làm (Dev FE): `container-type: inline-size` trên phần tử bọc, `@container (min-width: 23rem)` bật Regular. Không có container query thì theo mốc: `< 48rem` Compact, `≥ 48rem` Regular, riêng thẻ big offer luôn Compact.
 
@@ -51,25 +62,25 @@ Kết quả theo chỗ dùng và mốc:
 
 | Chỗ | 360 | 768 | 1280 | 1920 |
 | --- | --- | --- | --- | --- |
-| Featured product (trang chủ) | Compact, khung chứa 320 | Regular, 728 | Regular, cột phải (Figma 668) | Regular, Figma 1:773 |
+| Featured product (trang chủ) | Compact, khung chứa 320 | Regular, 728 | Regular, cột phải | Regular |
 | Buy box PDP | Compact, 320 | Regular (buy box ≥ 368, product.md §4.2) | Regular, cột buy box | Regular |
 | Thẻ big offer | Compact, sheet (328) | Compact, popover 400 − padding 48 = 352 | Compact, 352 | Compact, 352 |
 
-Big offer ≥ 768 Compact vì 4 ô Regular (367) không vừa 352; giữ một cỡ trong thẻ thay vì đổi cỡ theo số ô (câu CTO 1).
+Big offer ≥ 768 Compact vì 4 ô Regular (≈ 368) không vừa 352; giữ một cỡ trong thẻ thay vì đổi cỡ theo số ô (câu CTO 1).
 
-Chữ dài (nhãn merchant tự đặt, bản dịch dài): khung `flex-wrap: wrap`, nhãn lên hàng riêng, ô xuống hàng dưới, padding dọc 12, cao theo nội dung; không cắt chữ, không tràn ngang. Khuyên nhãn ≤ 16 ký tự (info của setting).
+Chữ dài (nhãn merchant tự đặt, bản dịch dài): khung `flex-wrap: wrap`, nhãn lên hàng riêng, ô xuống hàng dưới, cách hàng 8, padding dọc 8 (`--space-xs`), cao theo nội dung; không cắt chữ, không tràn ngang. Khuyên nhãn ≤ 16 ký tự (info của setting).
 
 Vị trí:
-- Featured product: giữa h2 và hàng giá (Figma 1:769: tiêu đề → 1:773 → giá 1:782), cách trên 16, dưới 16.
+- Featured product: giữa h2 và hàng giá (tiêu đề → countdown → giá, như `#container-home-featured-product` của mockup), cách trên 16, dưới 16.
 - PDP: giữa h1 và giá (product.md §4.2).
-- Big offer: sau hàng giá, trước nút "Shop The Deal" (marketing-popups.md §4).
+- Big offer: sau hàng giá, trước nút "Shop the offer" (marketing-popups.md §4).
 
 ## 3. Số ô
 
 | Thời gian còn lại | Ô | Ví dụ |
 | --- | --- | --- |
 | ≥ 24 giờ | 4: ngày, giờ, phút, giây | 02 · 22 · 36 · 28 |
-| < 24 giờ | 3: giờ, phút, giây | 22 · 36 · 28 (Figma) |
+| < 24 giờ | 3: giờ, phút, giây | 22 · 36 · 28 |
 
 Khi đang xem mà qua mốc 24 giờ thì ô ngày biến mất (khung co lại 1 lần trong khung đã dành, không đẩy nội dung bên dưới vì cao khung không đổi). Ngày ≥ 100 thì ô ngày 3 chữ số, ô giãn theo số.
 
@@ -96,10 +107,10 @@ Countdown chỉ hiển thị, không đổi giá. Merchant tự kết thúc giá
 | Mã | Khi nào | Hiển thị | Mockup |
 | --- | --- | --- | --- |
 | K0 | vừa render | số Liquid in sẵn, hiện ngay; JS đếm tiếp. Khung có kích thước thật từ đầu (0 CLS). Nếu Tech Lead giữ ẩn tới khi JS chạy (ES1-T276) thì dùng `visibility: hidden` (giữ chỗ), không `display: none` | — |
-| Mặc định | < 24 giờ | 3 ô | foundation mục 16 |
-| K1 | ≥ 24 giờ | 4 ô | foundation mục 16 |
-| K2 | < 1 giờ | ô nền `--color-accent`, viền accent, số `--color-accent-foreground` (5.01). Không nhấp nháy, không đổi cỡ. ĐỀ XUẤT: 05 §3 (trạng thái rõ), sổ 09/11 (cam cho phần nhấn) | foundation mục 16 |
-| K3 | hết giờ khi đang xem | giữ khung cùng cỡ, thay nhãn + ô bằng "This sale has ended" Inter 500 16/26 trắng 60% (6.93). Featured, PDP: giá và nút giữ nguyên tới khi tải lại (giá thật do Shopify tính khi thanh toán). Big offer: thẻ đang mở giữ K3; đóng thẻ thì teaser ẩn (marketing-popups §4 "không render khi hết giờ") | foundation mục 16 |
+| Mặc định | < 24 giờ | 3 ô | `h-countdown` |
+| K1 | ≥ 24 giờ | 4 ô | `h-countdown` |
+| K2 | < 1 giờ | ô nền `--color-accent`, viền accent, số `--color-accent-foreground` (5.01). Không nhấp nháy, không đổi cỡ. ĐỀ XUẤT: 05 §3 (trạng thái rõ), sổ 09/11 (cam cho phần nhấn) | `h-countdown` |
+| K3 | hết giờ khi đang xem | giữ khung cùng cỡ, thay nhãn + ô bằng "This sale has ended" Inter 500 16/24 trắng 60% (6.93); khung giữ bề rộng tối thiểu 16.75rem / 19.5rem (§2). Featured, PDP: giá và nút giữ nguyên tới khi tải lại (giá thật do Shopify tính khi thanh toán). Big offer: thẻ đang mở giữ K3; đóng thẻ thì teaser ẩn (marketing-popups §4 "không render khi hết giờ") | `h-countdown` |
 | K4 | không ngày / quá hạn lúc render / không giá gạch / hết hàng | không in khối, không chừa chỗ | — |
 | Trang cache cũ | JS tải thấy đã quá hạn | chuyển ngay K3 | — |
 | Không JS | `scripting: none` | không hiện (số đứng yên là đếm giả, comment `featured-product.liquid`); khối không chiếm chỗ từ đầu nên 0 CLS | — |
@@ -166,5 +177,5 @@ Ticket con theo `.claude/rules/fe-be-boundary.md`: FE1 snippet + CSS + locale (t
 
 ## 12. Quyết định CTO đã chốt 11/11 (theo đề xuất, sổ 11/11)
 
-1. Thẻ big offer dùng cỡ Compact ở mọi mốc (popover 352 không đủ 4 ô Regular 367), thay vì nới popover lên 416? Đề xuất: Compact, giữ popover 400.
+1. Thẻ big offer dùng cỡ Compact ở mọi mốc (popover 352 không đủ 4 ô Regular ≈ 368), thay vì nới popover lên 416? Đề xuất: Compact, giữ popover 400.
 2. Hết giờ khi đang xem (K3): giữ khung với "This sale has ended", giá và nút giữ nguyên tới khi tải lại, không tự tải lại trang? Đề xuất: có (0 CLS, giá thật do Shopify tính khi thanh toán).

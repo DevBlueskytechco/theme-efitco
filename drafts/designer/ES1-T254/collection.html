@@ -9,7 +9,7 @@
 <style>
   /* Chỉ bố cục cho mockup collection (spec docs/ui-spec/collection.md). Mọi giá trị từ token kit.
      ES1-T527: nhóm lọc = .facet (V42), ô chọn = .choice, chip = .chip--remove (V41), phân trang = .pagination* (V57),
-     danh sách sort = .listbox (V68), sort = select DS nhãn 14 bên trái (V47). Trang KHÔNG định nghĩa lại selector kit. */
+     danh sách sort = .listbox (V68), sort = select của kit (.field select) nhãn 14 bên trái (V47). Trang KHÔNG định nghĩa lại selector kit. */
   .site-header.demo-static { position: relative; }
 
   /* §2 Đầu trang không ảnh (biến thể A) */
@@ -30,13 +30,13 @@
     .results { grid-column: span 9; }
   }
   .results { min-width: 0; }
-  .filters__title { padding-block: var(--space-sm); border-block-end: 1px solid var(--color-foreground); font-size: var(--font-size-h3); }
+  .filters__title { padding-block: var(--space-sm); border-block-end: 1px solid var(--color-foreground); font-size: var(--font-size-h3); line-height: var(--line-height-h3); }
   .filters__form > .facet:first-child, .drawer__summary + .facet { border-block-start: 0; }
 
   /* §5 Nội dung nhóm lọc (khung nhóm = .facet của kit) */
   .fopts { display: grid; margin: 0; padding: 0; list-style: none; }
   /* Ô màu trong bộ lọc = .facet-swatch của kit (--swatch, V43); ES1-T527 vòng 2 bỏ bản riêng */
-  .facet-more { min-height: 44px; padding: 0; border: 0; background: none; font-weight: 600; cursor: pointer; justify-self: start; }
+  .facet-more { min-height: var(--touch-target); padding: 0; border: 0; background: none; font-weight: 600; cursor: pointer; justify-self: start; }
   .money { position: relative; }
   .money > span { position: absolute; inset-block: 0; inset-inline-start: var(--space-sm); display: grid; place-items: center; color: var(--color-muted); pointer-events: none; }
   .money .field__input { padding-inline-start: calc(var(--space-sm) + var(--space-md)); }
@@ -47,7 +47,7 @@
   .toolbar__filter { flex: 1 1 0; padding-inline: var(--space-md); }
   .filter-badge { display: inline-grid; place-items: center; min-width: 24px; height: 24px; padding-inline: var(--space-2xs); border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-accent-foreground); font-size: var(--font-size-xs); font-weight: 700; }
   .button--secondary:hover .filter-badge { background: var(--color-background); color: var(--color-foreground); }
-  /* Sort = select DS; nhãn 14/600 bên trái ô (V47, foundation §12), không nhãn nổi trong ô */
+  /* Sort = select của kit; nhãn 14/600 bên trái ô (V47, foundation §12), không nhãn nổi trong ô */
   .sort { display: flex; flex: 1 1 0; align-items: center; gap: var(--space-xs); min-width: 0; }
   .sort__label { flex: none; white-space: nowrap; }
   .sort select { min-width: 0; text-overflow: ellipsis; cursor: pointer; }
@@ -87,7 +87,7 @@
   /* Drawer lọc (dưới 64rem) */
   .demo-stage--drawer { min-height: 780px; }
   .drawer__summary { margin: 0 0 var(--space-xs); color: var(--color-muted); font-size: var(--font-size-sm); }
-  /* V44 vòng 2: 2 nút cùng hàng khi đủ chỗ; hẹp thì xuống 2 hàng (Show N Products ở trên, Clear All dưới), không cắt chữ */
+  /* V44 vòng 2: 2 nút cùng hàng khi đủ chỗ; hẹp thì xuống 2 hàng (Show N Products ở trên, Clear all dưới), không cắt chữ */
   .drawer__actions { display: flex; flex-wrap: wrap-reverse; gap: var(--space-sm); }
   .drawer__actions .button { flex: 1 1 auto; padding-inline: var(--space-md); white-space: nowrap; }
 
@@ -140,7 +140,7 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- ===== Header mọi trang: thanh tối riêng + noise, cao 80, không đè ảnh (sổ 10/11, Figma 1:362) ===== -->
+<!-- ===== Header mọi trang: thanh tối riêng + noise, cao 80, không đè ảnh (sổ 10/11) ===== -->
 <header class="site-header demo-static">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -201,7 +201,7 @@
             <li><label class="choice"><span class="facet-swatch" style="--swatch: var(--color-background)"><input type="checkbox" name="filter.v.option.color" value="White"><span></span></span><span>White</span><span class="facet__count">4</span></label></li>
             <li><label class="choice"><span class="facet-swatch" style="--swatch: var(--color-rating)"><input type="checkbox" name="filter.v.option.color" value="Gold"><span></span></span><span>Gold</span><span class="facet__count">4</span></label></li>
           </ul>
-          <button class="text-link facet-more" type="button" aria-expanded="false">Show 4 More<span class="visually-hidden"> Color options</span></button></div>
+          <button class="text-link facet-more" type="button" aria-expanded="false">Show 4 more<span class="visually-hidden"> Color options</span></button></div>
         </details>
         <details class="facet" open>
           <summary>Size <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
@@ -256,7 +256,7 @@
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P03.jpg" alt="FlexFold Adjustable Bench" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">FlexFold Adjustable Bench<span class="visually-hidden">, 3 colors</span></a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$189.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$229.00</s></p><ul class="swatches" aria-hidden="true"><li><span class="swatch" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" style="--swatch: var(--color-background)"></span></li></ul></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="600" height="600"><div class="product-card__badges"><span class="badge badge--new">New</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg<span class="visually-hidden">, 3 colors</span></a></h2><p class="price"><span>$119.00</span></p><ul class="swatches" aria-hidden="true"><li><span class="swatch" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" style="--swatch: var(--color-background)"></span></li></ul></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-24%</span></div></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Ativafit Lava 66 lb Adjustable<span class="visually-hidden">, 3 colors</span></a></h2><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$379.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$499.99</s></p><ul class="swatches" aria-hidden="true"><li><span class="swatch" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" style="--swatch: var(--color-background)"></span></li></ul></div></li>
-        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/2-16686825872651420933582.jpg" alt="Sản phẩm số" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Sản phẩm số</a></h2><p class="price"><span>$343.00</span></p></div></li>
+        <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/2-16686825872651420933582.jpg" alt="Digital product" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Digital product</a></h2><p class="price"><span>$343.00</span></p></div></li>
         <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/1-1668682587206912817789.jpg" alt="Gift card" width="600" height="600"></div><div class="product-card__info"><h2 class="product-card__title"><a href="#">Gift card</a></h2><p class="price"><span>From $10.00</span></p></div></li>
       </ul>
 
@@ -273,7 +273,7 @@
   </div>
 </main>
 
-<!-- ===== Footer (foundation §4 vòng 3, Figma 1:1104) ===== -->
+<!-- ===== Footer (foundation §4 vòng 3) ===== -->
 <footer class="site-footer">
   <div class="container site-footer__band">
     <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
@@ -283,7 +283,7 @@
     </div>
     <form class="site-footer__form" onsubmit="return false">
       <label class="visually-hidden" for="nl-email">Email</label>
-      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% off</button></div>
       <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
@@ -328,7 +328,7 @@
   <!-- S1. Collection có ảnh: header tối + banner thẻ bo góc bên dưới (không đè) -->
   <section class="demo-block" aria-labelledby="s1">
     <h2 id="s1">S1. Collection có ảnh: header tối, banner thẻ bo 16 nằm dưới header</h2>
-    <p class="demo-note">Sổ 10/11: header trang con luôn là thanh tối riêng, không đè ảnh. Banner = .page-banner foundation §3.3 (ngôn ngữ hero Figma 1:361): trong container, cách header 16 / 24, bo 16, cao tối thiểu 280 / 360, lớp tối 75% đáy → 60% từ giữa lên. Ảnh minh hoạ efx-col-1.jpg (card Free Weights, Figma 1:395); collection trên store dev chưa có ảnh, chưa có mô tả (KHÔNG CHẮC).</p>
+    <p class="demo-note">Sổ 10/11: header trang con luôn là thanh tối riêng, không đè ảnh. Banner = .page-banner foundation §3.3 (cùng ngôn ngữ thẻ hero trang chủ): trong container, cách header 16 / 24, bo 16, cao tối thiểu 280 / 360, lớp tối 75% đáy → 60% từ giữa lên. Ảnh minh hoạ efx-col-1.jpg (card Free Weights); collection trên store dev chưa có ảnh, chưa có mô tả (KHÔNG CHẮC).</p>
   </section>
 </div>
 <div>
@@ -365,7 +365,7 @@
 <div class="container demo-states">
   <!-- S2. Lọc đang áp: badge, chip, xoá -->
   <section class="demo-block" aria-labelledby="s2">
-    <h2 id="s2">S2. Đang lọc: badge số lọc, chip, Clear All</h2>
+    <h2 id="s2">S2. Đang lọc: badge số lọc, chip, Clear all</h2>
     <p class="demo-note">Color: Black + Availability: In stock trên /collections/all → 10 sản phẩm (tính từ demo-data). Chip là link `url_to_remove`, không cần JS. Hover chip đảo nền đen (chip 2), focus outline cam (chip 3).</p>
     <div class="results" style="max-width: 924px">
       <div class="toolbar" style="position: static">
@@ -377,7 +377,7 @@
         <li><a class="chip chip--remove" href="#" aria-label="Remove filter Color: Black"><span class="chip__key">Color:</span> Black <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
         <li><a class="chip chip--remove is-hover" href="#" aria-label="Remove filter Availability: In stock"><span class="chip__key">Availability:</span> In stock <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
         <li><a class="chip chip--remove is-focus" href="#" aria-label="Remove filter Price: $50 to $400"><span class="chip__key">Price:</span> $50–$400 <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
-        <li><a class="chip-clear text-link" href="#">Clear All</a></li>
+        <li><a class="chip-clear text-link" href="#">Clear all</a></li>
       </ul>
     </div>
   </section>
@@ -385,7 +385,7 @@
   <!-- S3. Drawer lọc (< 64rem) -->
   <section class="demo-block" aria-labelledby="s3">
     <h2 id="s3">S3. Drawer lọc (dưới 1024)</h2>
-    <p class="demo-note">Drawer trái 90% (360) / 420 (768), foundation §15. Nhóm mở sẵn, nút chân dính đáy: Clear All + Show N Products (đếm theo kết quả). Lỗi giá hiện ngay dưới ô (locale price_invalid).</p>
+    <p class="demo-note">Drawer trái 90% (360) / 420 (768), foundation §15. Nhóm mở sẵn, nút chân dính đáy: Clear all + Show N Products (đếm theo kết quả). Lỗi giá hiện ngay dưới ô (locale price_invalid).</p>
     <div class="demo-stage demo-stage--drawer">
       <div class="scrim"></div>
       <div class="drawer drawer--start" role="dialog" aria-modal="true" aria-labelledby="drawer-title">
@@ -417,7 +417,7 @@
               <li><label class="choice"><span class="facet-swatch" style="--swatch: var(--color-background-sand)"><input type="checkbox"><span></span></span><span>Beige</span><span class="facet__count">5</span></label></li>
               <li><label class="choice"><span class="facet-swatch" style="--swatch: var(--color-background)"><input type="checkbox"><span></span></span><span>White</span><span class="facet__count">4</span></label></li>
               <li><label class="choice"><span class="facet-swatch" style="--swatch: var(--color-rating)"><input type="checkbox"><span></span></span><span>Gold</span><span class="facet__count">4</span></label></li>
-            </ul><button class="text-link facet-more" type="button" aria-expanded="false">Show 4 More<span class="visually-hidden"> Color options</span></button></div>
+            </ul><button class="text-link facet-more" type="button" aria-expanded="false">Show 4 more<span class="visually-hidden"> Color options</span></button></div>
           </details>
           <details class="facet">
             <summary>Size <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
@@ -427,8 +427,8 @@
           </details>
         </div>
         <div class="overlay__footer drawer__actions">
-          <a class="button button--secondary" href="#">Clear All</a>
-          <button class="button" type="button">Show 10 Products</button>
+          <a class="button button--secondary" href="#">Clear all</a>
+          <button class="button" type="button">Show 10 products</button>
         </div>
       </div>
     </div>
@@ -437,7 +437,7 @@
   <!-- S4. Sort + phân trang -->
   <section class="demo-block" aria-labelledby="s4">
     <h2 id="s4">S4. Sắp xếp và phân trang</h2>
-    <p class="demo-note">Sort là `select` gốc (OS mở danh sách; trên mobile là picker của hệ điều hành). Nhãn "Sort by" 14/600 bên trái ô select DS (V47, không nhãn nổi trong ô); danh sách mở = .listbox (V68). Tên tuỳ chọn do Shopify trả (`sort_options`). Phân trang: Previous/Next là nút tròn 52 chevron như Figma 1:398 (trắng viền #E5E5E5, rê chuột cam); ≥ 768 số trang tròn 44; dưới 768 [‹] Page X of Y [›]. Đầu/cuối giữ nút bằng cặp màu disabled (viền border, icon muted-light, không opacity) + aria-disabled (sổ 21/11, docs/ui-spec/pagination.md).</p>
+    <p class="demo-note">Sort là `select` gốc (OS mở danh sách; trên mobile là picker của hệ điều hành). Nhãn "Sort by" 14/600 bên trái ô select của kit (.field select, V47, không nhãn nổi trong ô); danh sách mở = .listbox (V68). Tên tuỳ chọn do Shopify trả (`sort_options`). Phân trang: Previous/Next là nút tròn 52 chevron .round-button của kit (trắng viền #E5E5E5, rê chuột cam); ≥ 768 số trang tròn 44; dưới 768 [‹] Page X of Y [›]. Đầu/cuối giữ nút bằng cặp màu disabled (viền border, icon muted-light, không opacity) + aria-disabled (sổ 21/11, docs/ui-spec/pagination.md).</p>
     <div class="state-pair">
       <div class="state-box">
         <p class="demo-label">Sort: mặc định · hover · focus · danh sách mở (desktop)</p>
@@ -485,10 +485,10 @@
     <h2 id="s5">S5. Ca biên card (trang 2 của /collections/all)</h2>
     <p class="demo-note">edge_cases: hết hàng toàn bộ (badge Sold out, ảnh mờ, giá giữ), không media (placeholder), sale giá nhỏ (-50%), compare_at thấp hơn giá (không badge, không gạch giá).</p>
     <ul class="product-grid" role="list">
-      <li class="product-card is-sold-out"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg" alt="Hết hàng toàn bộ" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sold-out">Sold out</span></div></div><div class="product-card__info"><h3 class="product-card__title"><a href="#">Hết hàng toàn bộ</a></h3><p class="price"><span>$1,000.00</span></p><div class="swatches" aria-hidden="true"><span class="swatch" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-muted-light)"></span><span class="swatch" style="--swatch: var(--color-background-sand)"></span><span class="swatch-more">+2</span></div></div></li>
-      <li class="product-card"><div class="product-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></div><div class="product-card__info"><h3 class="product-card__title"><a href="#">Sản phẩm không có media</a></h3><p class="price"><span>$34.00</span></p></div></li>
-      <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg" alt="Sale giá nhỏ" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-50%</span></div></div><div class="product-card__info"><h3 class="product-card__title"><a href="#">Sale giá nhỏ</a></h3><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$0.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$1.99</s></p></div></li>
-      <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg" alt="Sản phẩm có màu sale và màu không sale" width="600" height="600"></div><div class="product-card__info"><h3 class="product-card__title"><a href="#">Sản phẩm có màu sale và màu không sale</a></h3><p class="price"><span>$200.00</span></p><div class="swatches" aria-hidden="true"><span class="swatch" style="--swatch: var(--color-sale)"></span><span class="swatch" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-badge-new)"></span><span class="swatch-more">+4</span></div></div></li>
+      <li class="product-card is-sold-out"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg" alt="Foldable bench" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sold-out">Sold out</span></div></div><div class="product-card__info"><h3 class="product-card__title"><a href="#">Foldable bench</a></h3><p class="price"><span>$1,000.00</span></p><div class="swatches" aria-hidden="true"><span class="swatch" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-muted-light)"></span><span class="swatch" style="--swatch: var(--color-background-sand)"></span><span class="swatch-more">+2</span></div></div></li>
+      <li class="product-card"><div class="product-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></div><div class="product-card__info"><h3 class="product-card__title"><a href="#">Training mat</a></h3><p class="price"><span>$34.00</span></p></div></li>
+      <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg" alt="Grip tape" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">-50%</span></div></div><div class="product-card__info"><h3 class="product-card__title"><a href="#">Grip tape</a></h3><p class="price"><span class="price__sale"><span class="visually-hidden">Sale price </span>$0.99</span><s class="price__compare"><span class="visually-hidden">Regular price </span>$1.99</s></p></div></li>
+      <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg" alt="Two-tone kettlebell" width="600" height="600"></div><div class="product-card__info"><h3 class="product-card__title"><a href="#">Two-tone kettlebell</a></h3><p class="price"><span>$200.00</span></p><div class="swatches" aria-hidden="true"><span class="swatch" style="--swatch: var(--color-sale)"></span><span class="swatch" style="--swatch: var(--color-foreground)"></span><span class="swatch" style="--swatch: var(--color-badge-new)"></span><span class="swatch-more">+4</span></div></div></li>
     </ul>
   </section>
 
@@ -501,7 +501,7 @@
           <span class="empty-state__icon" aria-hidden="true"><svg><use href="#i-empty"/></svg></span>
           <h3>No Products Here Yet</h3>
           <p>No products in this collection yet. Browse all our gear or pick another category.</p>
-          <div class="empty-state__actions"><a class="button" href="#">Shop All Products</a><a class="text-link" href="#">Browse collections</a></div>
+          <div class="empty-state__actions"><a class="button" href="#">Shop all products</a><a class="text-link" href="#">Browse collections</a></div>
         </div>
       </div>
       <div class="state-box">
@@ -513,7 +513,7 @@
           <span class="empty-state__icon" aria-hidden="true"><svg><use href="#i-filter"/></svg></span>
           <h3>No Matching Products</h3>
           <p>No products match these filters. Remove a filter or widen the price range.</p>
-          <div class="empty-state__actions"><a class="button" href="#">Clear Filters</a></div>
+          <div class="empty-state__actions"><a class="button" href="#">Clear all filters</a></div>
         </div>
       </div>
     </div>
@@ -543,7 +543,7 @@
           <div class="alert__body">
             <strong>We couldn't update the products</strong>
             <p>Check your connection, then try again. Your filters are kept.</p>
-            <div><button class="button button--secondary" type="button">Try Again</button></div>
+            <div><button class="button button--secondary" type="button">Try again</button></div>
           </div>
         </div>
       </div>

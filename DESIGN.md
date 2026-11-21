@@ -5,16 +5,28 @@ coding agents) who change how the theme looks. `AGENTS.md` covers code
 structure; this file covers visual decisions. When they disagree, `AGENTS.md`
 wins.
 
-Sources: Figma "Efitco T10" frame `Homepage` (node 1:359, desktop 1920 only),
-Figma "Efitco Theme Final / Design System 2" (text styles, Space and Radius
-variables; DS check 20/11, ES1-T527), `docs/tokens.json`, `docs/token-compliance.md`, `docs/figma-inventory.md`,
-ADR 0001, 0003, 0005. Values in this file are copied from those sources; do not
-add a token that is not in `docs/tokens.json`. Component detail (anatomy,
-states, do / don't) lives in `docs/ui-spec/foundation.md` and the mockup kit
-`drafts/designer/_kit/kit.css`; when this file and foundation.md disagree,
-foundation.md and `docs/design/decisions.md` win.
+Source of truth (CTO 21/11, ES1-T567): the HTML mockups in
+`drafts/designer/**` and the kit `drafts/designer/_kit/kit.css` (tokens in
+`:root`, shared components). `docs/tokens.json`, this file and
+`docs/ui-spec/*.md` follow the kit; theme code (`config/settings_schema.json`,
+`snippets/css-variables.liquid`) mirrors the kit `:root`. The human designer
+rebuilds the design file from the mockups (see
+`docs/design/figma-handoff.md`); when the two differ, the mockup wins. Decisions and reasons:
+`docs/design/decisions.md`. ADR 0001, 0003, 0005 still apply. Do not add a
+token that is not in the kit `:root` and `docs/tokens.json`. Component detail
+(anatomy, states, do / don't) lives in `docs/ui-spec/foundation.md` and the
+design system screen `drafts/designer/ES1-T251/foundation.html`.
 
-Design system version: 1.3.0 (proposed, waiting for CTO approval). The number
+Standards: Polaris first (4px spacing grid, three token tiers named by role,
+44px touch targets, line heights in multiples of 4, sentence-case button
+labels). Where Polaris gives no rule for a storefront (type scale, column
+grid, container, named breakpoints, control height) the source names the
+system used instead (Carbon, Material 3, Fluent 2, Spectrum, Ant) or says
+"Design:" with the reason. Brand identity is kept: the color palette, the two
+font families, the logo, the photos, uppercase condensed display headings,
+and the layout and block order of each page.
+
+Design system version: 2.0.0 (proposed, waiting for CTO approval). The number
 lives in `docs/tokens.json` `_version`; rules and history are in
 `docs/design/CHANGELOG.md`. Writing rules for every string are in
 `docs/design/content.md`. How to propose and land a change is in
@@ -27,12 +39,15 @@ lives in `docs/tokens.json` `_version`; rules and history are in
 - One accent color means "do something" (buttons, active controls). Do not use
   it for decoration. Why: a single action color keeps CTAs findable and keeps
   contrast checks to one pair.
-  - Decided exceptions (CTO, `docs/design/decisions.md`): eyebrow text on light
-    and sand backgrounds (09/11), the highlighted part of a large heading such
-    as "Get 15% Off" (09/11), the warning toast (09/11) and the warning form message (CTO 21/11,
-    components-06), both through `--color-warning`, and the article tag badge
-    `.badge--tag` (Figma 1:1022; CTO 21/11, ES1-T535). Do not add another:
-    any other category label uses a neutral badge or plain text.
+  - Brand uses of the accent (CTO, `docs/design/decisions.md`; Polaris: the
+    Brand role is separate from status roles): eyebrow text on light and sand
+    backgrounds (09/11) and the highlighted part of a large heading such as
+    "Get 15% Off" (09/11). The warning toast (09/11) and the warning form
+    message (CTO 21/11) read `--color-warning`, which points to the accent
+    (Polaris: warning is orange). Do not add another: color marks status, not
+    category, so a category label such as the article tag `.badge--tag` is a
+    neutral badge (white background, `border` outline, `foreground` text;
+    CTO 21/11, ES1-T567) or plain text.
 - Every value comes from a theme setting. Why: merchants and Sidekick change the
   look in theme settings without editing CSS (ADR 0001).
 
@@ -46,19 +61,26 @@ lives in `docs/tokens.json` `_version`; rules and history are in
   Tints and shadows use `color-mix()` with a variable. Why: 0 hardcoded colors
   is a release check (ADR 0001).
 - A new, renamed or re-valued token is changed in four places in one change,
-  with a changelog line and a version number: (1) setting default in
-  `config/settings_schema.json` (only when the token has a setting), (2)
-  variable in `snippets/css-variables.liquid`, (3) `docs/tokens.json`, (4)
-  this file, `docs/ui-spec/foundation.md` and the mockup kit. Why: the four
-  places drift apart otherwise.
-- Source of truth for a token value: a value that has a line in
-  `docs/design/decisions.md` follows that line in all four places. For a
-  token with no decision line, when the four places disagree the earlier
-  place in that list wins (PROPOSED by the designer in ES1-T535, not yet a
-  CTO decision). Known mismatches waiting for FE, where the decision wins
-  over the setting default: `badge_new_color` #467A48 → #4B824D (V01) and
-  `background_alt_color` #F4F4F4 → #F4F4F5 (V18). Every `:root` variable is
-  declared in `snippets/css-variables.liquid`, not in `assets/base.css`.
+  starting from the kit, with a changelog line and a version number: (1) the
+  kit `:root`, (2) `docs/tokens.json`, (3) this file and
+  `docs/ui-spec/foundation.md`, (4) theme code: the setting default in
+  `config/settings_schema.json` (only when the token has a setting) and the
+  variable in `snippets/css-variables.liquid`. Why: the four places drift
+  apart otherwise.
+- Source of truth for a token value (CTO 21/11, ES1-T567): the kit `:root`.
+  A place that differs from the kit is wrong and is logged as "Cần FE"; the
+  kit is not changed to match a setting. A CTO decision in
+  `docs/design/decisions.md` is applied to the kit first. Known mismatches
+  waiting for FE: `badge_new_color` #467A48 → #4B824D (V01),
+  `background_alt_color` #F4F4F4 → #F4F4F5 (V18), spacing steps 2, 6, 20, 40,
+  64, 80 and the name `--space-4xl` for 48, per-step line heights, body line
+  height 1.625 → 1.5, `--band-inset` 60 → 64, `--tab-padding-inline` 28 → 24.
+  Every `:root` variable is declared in `snippets/css-variables.liquid`, not
+  in `assets/base.css`.
+- Write the source of a value in one of five forms: "Chuẩn: Polaris <step>",
+  "Chuẩn: <Carbon | M3 | Fluent 2 | Spectrum | Ant> …", "CTO dd/mm",
+  "AA: n:1", "Thiết kế: …" (design reason: brand, glyph optics, layout
+  stability). Do not credit Polaris for something Polaris does not state.
 - Keep contrast at WCAG AA (4.5:1 normal text, 3:1 text ≥ 24px or ≥ 18.66px
   bold). Why: Lighthouse accessibility must stay ≥ 98.
 
@@ -68,24 +90,27 @@ Three tiers, read top to bottom (CTO 21/11, ES1-T535; foundation.md §32).
 
 | Tier | What it is | Examples |
 | --- | --- | --- |
-| 1 · Primitive | Raw value on a scale. Comes from a theme setting or the Figma Design System 2 scale | `accent_color` #C8400E, `--space-md` 16, `--radius-md` 12, `--motion-base` 250, `--icon-size-md` 20 |
+| 1 · Primitive | Raw value on a scale (multiples of 4px). Declared in the kit `:root`; theme settings mirror it | `accent_color` #C8400E, `--space-md` 16, `--radius-md` 12, `--motion-base` 250, `--icon-size-md` 20 |
 | 2 · Semantic | Named by role, points to tier 1. Components read this tier | `--color-accent`, `--color-warning`, `--radius-card`, `--shadow-raised`, `--layer-overlay`, `--touch-target` |
-| 3 · Component | Value owned by one component, derived from tier 2 or kept at the exact Figma number | `--control-height`, `--toast-color`, `--alert-color`, `--tab-padding-inline`, `--thumb-size` |
+| 3 · Component | Value owned by one component: derived from tier 2, or a size token of that component | `--control-height`, `--row-height`, `--round-button-size`, `--progress-height`, `--toast-color`, `--alert-color`, `--tab-padding-inline`, `--thumb-size` |
 
 - A component reads a semantic token first and a primitive only when no role
   exists (spacing has no roles, so components read `--space-*` directly). It
   never reads a hex, a raw px value or a setting. Why: a merchant setting then
   reaches every component through one chain.
-- Do not name a variable after its value (`--figma-1a1a1a`, `--gray-500`).
-  Why: the name becomes wrong the day the value changes; `--figma-666666`
-  already points to #999999.
-- `--figma-*` variables are legacy. `assets/base.css` still uses 23 of them
-  (85 uses); the table that maps each one to a role token is in foundation.md
-  §32.4. Do not add a new one and do not use them in new code.
-- Token groups and counts (kit `:root`, 134 variables): color 32, typography
-  26, space 12 + 8 aliases, radius 6 + 7 roles, motion 8 + 3 easings, shadow
-  4, layer 8, icon 4, size and layout 15, component 1. Breakpoints (48rem,
-  64rem, 80rem) are constants in media queries, not variables.
+- Do not name a variable after its value or after where the value came from
+  (`--gray-500`, `--black-1a`). Why: the name becomes wrong the day the value
+  changes; one legacy variable named after #666666 already points to #999999.
+- Value-named variables with the old prefix are legacy. `assets/base.css`
+  still uses 23 of them (85 uses), `assets/aux.css` 2 (6 uses); the table
+  that maps each one, by value, to a role token is in foundation.md §32.4,
+  and the full names are in `drafts/designer/ES1-T567/notes.md`. Do not add
+  a new one and do not use them in new code.
+- Token groups and counts (kit `:root`, 150 variables): color 32, typography
+  34 (12 of them line heights), space 14 + 8 aliases, radius 6 + 7 roles,
+  motion 8 + 3 easings, shadow 4, layer 8, icon 4, size and layout 15,
+  component 7. Breakpoints (48rem, 64rem, 80rem) are constants in media
+  queries, not variables.
 
 ## Color tokens (22 settings + 3 derived + 3 status aliases)
 
@@ -103,11 +128,11 @@ become hyphens).
 | background_alt_foreground | #1A1A1A | `background_alt_foreground_color` | `--color-background-alt-foreground` | Text on alt |
 | background_cream | #F5F5F1 | `background_cream_color` | `--color-background-cream` | Highlight cards |
 | background_cream_foreground | #1A1A1A | `background_cream_foreground_color` | `--color-background-cream-foreground` | Text on cream |
-| background_sand | #EBE6E0 | `background_sand_color` | `--color-background-sand` | Rich text + training level band, inspiration banner (1:625, ES1-T116), product cards |
+| background_sand | #EBE6E0 | `background_sand_color` | `--color-background-sand` | Rich text + training level band, inspiration banner (ES1-T116), product cards |
 | background_sand_foreground | #1A1A1A | `background_sand_foreground_color` | `--color-background-sand-foreground` | Text on sand |
 | background_dark | #1A1A1A | `background_dark_color` | `--color-background-dark` | Header bar, footer, dark bands, hero fallback, image overlay |
 | background_dark_foreground | #FFFFFF | `background_dark_foreground_color` | `--color-background-dark-foreground` | Text on dark and on hero images |
-| background_panel | #393942 | `background_panel_color` | `--color-background-panel` | Quiz, shop the look and bundle panels (1:507, 1:611, 1:718). Text uses `background_dark_foreground` |
+| background_panel | #393942 | `background_panel_color` | `--color-background-panel` | Quiz, shop the look and bundle panels, cart summary. Text uses `background_dark_foreground` |
 | muted_on_dark | #999999 | `muted_on_dark_color` | `--color-muted-on-dark` | Secondary text on dark only |
 | accent | #C8400E | `accent_color` | `--color-accent` | Primary buttons, active controls |
 | accent_foreground | #FFFFFF | `accent_foreground_color` | `--color-accent-foreground` | Text on accent |
@@ -157,18 +182,21 @@ Section backgrounds are set in the template, not in a block setting:
 The container sets both the background and its matching foreground. Why: one
 line in the template changes a band, and text color always follows (ADR 0005).
 
-## Contrast decisions (CTO)
+## Colors adjusted to pass AA (CTO)
 
-These override the colors read from Figma. Visual diffs must not flag them.
+The palette is brand identity and is kept as is (CTO 21/11). These values
+were changed earlier so text passes WCAG AA; do not change them back.
 
-| Decision | Figma | Theme | Ratio | Why |
+| Decision | Previous value | Value in use | Ratio | Why |
 | --- | --- | --- | --- | --- |
 | Accent | #D94610 | #C8400E | 5.01:1 white text on accent, 4.55:1 on #F4F4F5 | #D94610 is 4.34:1, fails AA for 16px CTA text (CTO 30/10) |
-| Secondary gray on light | #999999, #808080 | #6B6B6B (`muted_light`) | 5.33 on white, 4.85 on #F4F4F5, 4.88 on #F5F5F1 | Figma grays are 2.85:1 and 3.95:1 (CTO 27/10) |
+| Secondary gray on light | #999999, #808080 | #6B6B6B (`muted_light`) | 5.33 on white, 4.85 on #F4F4F5, 4.88 on #F5F5F1 | The previous grays are 2.85:1 and 3.95:1 (CTO 27/10) |
 | Gray on dark | #999999 | #999999 (`muted_on_dark`) | 6.11 on #1A1A1A | Allowed on dark only |
 | Gray on panel | #999999, #B2B2B2, white 60% | `--panel-muted` (white 70% + panel, #C4C4C6) | 6.56 on #393942 | #999999 is 4.01:1 on the panel; one pair for every dark panel (CTO 11/11 FD1) |
 | Text on sand | — | `muted` #4D4D4D for secondary text | 6.81 | `muted_light` is 4.30 on sand, fails AA |
 | Accent text on sand | — | only ≥ 24px or ≥ 18.66px bold | 4.03 | Passes AA large text only (ADR 0005) |
+| Alternate gray background | #F4F4F4 | #F4F4F5 (`background_alt`) | 15.83 foreground on it | One alternate gray (CTO 20/11 V18) |
+| New badge green | #467A48 | #4B824D (`badge_new`) | 4.57 white text on it | CTO 20/11 V01 |
 
 Hero text sits on photos: keep the slide overlay (`overlay_opacity`, default
 30%, `--color-background-dark` mixed with transparent). Why: white text on an
@@ -178,94 +206,127 @@ uncontrolled photo has no guaranteed contrast.
 
 Two fonts, both from the Shopify font library through `font_picker`. Never
 self-host or add a third family. Why: one heading + one body family is the
-theme standard; Figma's two stray fonts (Sofia Sans 800, Host Grotesk 700)
-render with the heading font (CTO 30/10).
+theme standard (CTO 30/10).
 
 | Role | Setting id | Default | CSS variables | Weights |
 | --- | --- | --- | --- | --- |
 | Heading | `type_heading_font` | Sofia Sans Condensed 700 (`sofia_sans_condensed_n7`) | `--font-heading--family`, `--font-heading--weight`, `--font-heading--weight-display` (800) | 700 headings, 800 display, eyebrow and wordmark |
-| Body | `type_primary_font` | Inter 500 (`inter_n5`, Figma Common/Body; settings default still `inter_n4` until FE changes it) | `--font-primary--family`, `--font-body-weight` | 400 form values, 500 body, 600 labels and buttons, 700 titles |
+| Body | `type_primary_font` | Inter 500 (`inter_n5`, CTO 20/11 V05; settings default still `inter_n4` until FE changes it) | `--font-primary--family`, `--font-body-weight` | 400 form values, 500 body, 600 labels and buttons, 700 titles |
 
-Type scale = the 18 text styles of Figma Design System 2. Headings interpolate
-with `clamp()` from the mobile style at 360 to the desktop style at 1280.
+Twelve text styles. Headings interpolate with `clamp()` from 360 to 1280.
+Sizes (CTO 20/11 V02, V05) are kept. Polaris does not state a px type scale
+for storefronts, so the sizes sit on steps found in Polaris React font (13,
+14, 16, 18, 20, 32, 36, 40), M3 (28, 32, 36) and Carbon (28, 32, 36, 48).
+Each size step has its own line-height token, and the line lands on a
+multiple of 4px at 360 and at 1280 (Polaris React line heights 16, 20, 24,
+28, 32, 40, 48). Numbers are size / line in px.
 
-| Figma style (mobile → desktop) | CSS variable | 360 | 1280+ | Weight / case |
-| --- | --- | --- | --- | --- |
-| M/H1 → D/H1 | `--font-size-display` | 52/62 | 100/100 | 800 uppercase, −3% → −4% |
-| M/H2 → D/H2 | `--font-size-h1` | 40/48 | 48/58 | 700, −2% |
-| M/H3 → D/H3 | `--font-size-h2` | 32/38 | 36/44 | 700, −2% |
-| M/H4 = D/H4 | `--font-size-h3` | 28/34 | 28/34 | 700, −2% |
-| M/H5 = D/H5 | `--font-size-h4` | 20/24 | 20/24 | 700, −2% |
-| M/H6 → D/H6 | `--font-size-eyebrow` | 14/16 | 16/20 | 800 uppercase, +4% |
-| Common/Title | `--font-size-lg` | 18/28 | 18/28 | Inter 700, −1% |
-| Common/Body | `--font-size-base` | 16/26 | 16/26 | Inter 500, −1% |
-| Common/Body small | `--font-size-sm` | 14/22 | 14/22 | Inter 500 |
-| Common/Form | `--font-size-sm` | 14/22 | 14/22 | Inter 400 (input values stay 16 so iOS does not zoom) |
-| Common/Label | `--font-size-xs` | 13/20 | 13/20 | Inter 600, −2% |
-| Common/Button | `--font-size-base` | 16/26 | 16/26 | Inter 600, −1% |
-| — | `--font-size-wordmark` | 64 | 200 | Footer EFITCO wordmark |
+| Style | Size variable · line-height variable | 360 | 1280+ | Weight / case | Source |
+| --- | --- | --- | --- | --- | --- |
+| Display | `--font-size-display` · `--line-height-display` 1.1538, 1 from 48rem | 52/60 | 100/100 | Sofia 800 uppercase, −3% → −4% from 48rem | Design: brand type style |
+| h1 | `--font-size-h1` · `--line-height-h1` 1.2, 1.1667 from 80rem | 40/48 | 48/56 | Sofia 700, −2% | 40/48: Polaris React font 40, line height 48. 48/56: Design, same ratio on the 4px grid (Polaris has no 56 line); size 48 is on the Carbon scale |
+| h2 | `--font-size-h2` · `--line-height-h2` 1.25, 1.2222 from 80rem | 32/40 | 36/44 | Sofia 700, −2% | M3 Headline L 32/40, Display S 36/44 |
+| h3 | `--font-size-h3` · `--line-height-h3` 1.2857 | 28/36 | 28/36 | Sofia 700, −2% | M3 Headline M 28/36, Carbon heading-04 |
+| h4 | `--font-size-h4` · `--line-height-h4` 1.2 | 20/24 | 20/24 | Sofia 700, −2% | Polaris React heading 20/24 |
+| Eyebrow | `--font-size-eyebrow` · `--line-height-eyebrow` 1.25rem (fixed 20) | 14/20 | 16/20 | Sofia 800 uppercase, +4% | Design: brand type style; fixed 20 line because the size is fluid (20 is on the Polaris React line-height scale) |
+| Title | `--font-size-lg` · `--line-height-title` 1.5556 | 18/28 | 18/28 | Inter 700, −1% | Polaris React font 18, line height 28 |
+| Body | `--font-size-base` · `--line-height-body` 1.5 | 16/24 | 16/24 | Inter 500, −1% | Carbon body-02 16/24, M3 Body L 16/24 |
+| Body small | `--font-size-sm` · `--line-height-sm` 1.4286 | 14/20 | 14/20 | Inter 500 | Polaris React body 14/20 |
+| Form | `--font-size-sm` · `--line-height-sm` | 14/20 | 14/20 | Inter 400 (input values stay 16 so iOS does not zoom) | Polaris React body 14/20 |
+| Label | `--font-size-xs` · `--line-height-label` 1.5385 | 13/20 | 13/20 | Inter 600, −2% (`--letter-spacing-label`) | Polaris React body 13/20 |
+| Button | `--font-size-base` · `--line-height-body` | 16/24 | 16/24 | Inter 600, −1%, sentence case; small 14/20 | Polaris Button (label); Carbon body-02 |
+| Group label | `--font-size-sm` · `--line-height-sm` | 14/20 | 14/20 | Inter 600 uppercase, +4%, muted | CTO 20/11 V76 |
 
-- Headings line-height `--line-height-heading` (1.2); display 1.19 below
-  48rem and 1 above; body `--line-height-body` (1.625 = 26/16).
-- Line heights follow Figma Design System 2, not a 4px grid: 62, 58, 38, 34,
-  26 and 22 are not multiples of 4. Decided exception to the Polaris
-  line-height scale (CTO 21/11, ES1-T535); do not "fix" them.
+Not in the twelve: long-form text (`.rte`, footer description) uses
+`--line-height-reading` 1.75 (16/28); prices are 16/24 (`.price`), 20/28
+(`.price--lg`, `--line-height-price-lg` 1.4, Carbon heading-03) and 28/36
+(`.price--xl`), with `font-variant-numeric: tabular-nums` (Polaris: tabular
+numbers for money); the footer wordmark `--font-size-wordmark` 64 → 200 is a
+brand asset.
+
+- Line heights are unitless numbers read from the token of the size step.
+  `--line-height-heading` (one 1.2 for h1–h4) is removed from the kit
+  (ES1-T567). Do not
+  write a line height as a number in a component or a page, except `1` for
+  icons and single-line numbers.
+- h1 and h2 change their ratio at 80rem because the size interpolates;
+  360 and 1280 sit on the 4px grid, in between h1 is off by at most 1.6px
+  and h2 by 1px. The eyebrow uses a fixed 20px line (`1.25rem`) because
+  its size is fluid. The display uses 1 from 48rem (Design: one block of display
+  text), so at 768 its line is not a multiple of 4.
+- Letter spacing: body −1%, label −2%, headings −2%, display −3% / −4%,
+  uppercase +4%. Body weight is 500 (CTO 20/11 V05).
 - Body copy in sentence case. Do not uppercase body text or h2 section
-  headings. Why: uppercase is reserved for display headings, eyebrows and
-  group labels so they stand out.
+  headings. Why: uppercase is reserved for display headings, eyebrows, group
+  labels and the marketing popup title (brand type style) so they stand out.
 - Smallest text is 13px (`--font-size-xs`); never 12px.
 
 ## Spacing
 
 One setting, `space_base` (default 4px), drives the scale. Why: the
 merchant changes overall density with one control. There is one naming
-system: the named steps `--space-2xs…7xl`, which match Figma Space/4…64 plus
-a desktop tier (CTO 20/11 V06, CTO 21/11). `--space-1…8` and
+system: the named steps `--space-050…7xl` on a 4px grid. Source: Polaris web
+spacing 2 / 4 / 6 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 (`small-500` …
+`large-500`); 64 and 80 are in Polaris React space. `--space-1…8` and
 `calc(var(--space-1) * N)` are the old names; they remain only as aliases in
 existing theme code and are not used in new components.
 
-| Named variable | px | Index alias | Typical use |
-| --- | --- | --- | --- |
-| `--space-2xs` | 4 | `--space-1` | Icon nudge, tight gaps |
-| `--space-xs` | 8 | `--space-2` | Inline gaps, label → input |
-| `--space-sm` | 12 | `--space-3` | Eyebrow → heading, mobile grid gap |
-| `--space-md` | 16 | `--space-4` | Card padding, tablet grid gap |
-| `--space-lg` | 20 | `space_base × 5` | Panel padding |
-| `--space-xl` | 24 | `--space-5` | Heading → content (mobile), desktop grid gap |
-| `--space-2xl` | 32 | `--space-6` | Button padding (inline), column gaps |
-| `--space-3xl` | 40 | `space_base × 10` | Heading → content (desktop) |
-| `--space-4xl` | 56 | `space_base × 14` | Section padding below 64rem |
-| `--space-5xl` | 64 | `space_base × 16` | Page title bottom (desktop) |
-| `--space-6xl` | 80 | `space_base × 20` | Desktop tier |
-| `--space-7xl` | 120 | `--space-8` | Section padding from 64rem |
+| Named variable | px | Index alias | Source | Typical use |
+| --- | --- | --- | --- | --- |
+| `--space-050` | 2 | — | Polaris `small-500` | Half step: icon gap, optical nudge only |
+| `--space-2xs` | 4 | `--space-1` | Polaris `small-400` | Icon nudge, tight gaps |
+| `--space-150` | 6 | — | Polaris `small-300` | Half step: icon gap, optical nudge only |
+| `--space-xs` | 8 | `--space-2` | Polaris `small-200` | Inline gaps, label → input |
+| `--space-sm` | 12 | `--space-3` | Polaris `small-100` | Eyebrow → heading, mobile grid gap |
+| `--space-md` | 16 | `--space-4` | Polaris `base` | Card padding, tablet grid gap |
+| `--space-lg` | 20 | `space_base × 5` | Polaris `large-100` | Panel padding, page margin |
+| `--space-xl` | 24 | `--space-5` | Polaris `large-200` | Heading → content (mobile), desktop grid gap, tab padding |
+| `--space-2xl` | 32 | `--space-6` | Polaris `large-300` | Button padding (inline), column gaps |
+| `--space-3xl` | 40 | `space_base × 10` | Polaris `large-400` | Heading → content (desktop) |
+| `--space-4xl` | 48 | `--space-7` | Polaris `large-500` | Section padding below 64rem, dialog padding, page title bottom |
+| `--space-5xl` | 64 | `space_base × 16` | Polaris React space 64px | Page title bottom (desktop), wide band inset |
+| `--space-6xl` | 80 | `space_base × 20` | Polaris React space 80px | Desktop tier |
+| `--space-7xl` | 120 | `--space-8` | Design: desktop section rhythm, on the 4px grid | Section padding from 64rem |
 
-`--space-7` (48) is outside the Figma DS2 scale and has no named step; use it for control heights, and for layout gaps only where the page's Figma Final frame measures exactly 48 (home 1280/1920, CTO 20/11 ES1-T527).
-Do not write raw px for spacing.
+`--space-4xl` was 56 before ES1-T567; 56 is not on the Polaris scale.
+`--space-7` is now only an alias of `--space-4xl`. Do not write raw px for
+spacing.
 
 - A value that is off the scale: do not write `calc()` or a raw px value in
-  a component. First round it to the nearest step. If the Figma Final frame
-  requires the exact number, declare one component-tier token with its Figma
-  node (for example `--tab-padding-inline` 28, Figma 1:490). If three or more
-  components need the same value, propose a new step for the CTO to decide.
+  a component. Round it to the nearest step (Carbon: off-scale values
+  "should be avoided whenever possible"); for example tab padding 28 → 24,
+  toast padding 10 → 12, wide band inset 60 → 64. If three or more
+  components need the same off-scale value, propose a new step for the CTO
+  to decide.
 - The spacing scale is for padding, gap and margin. Sizes (width, height) use
-  size tokens: `--control-height`, `--touch-target`, `--icon-size-*`.
-- Theme code still needs the steps 20, 40, 56, 64 and 80 as variables; until
-  FE adds them `assets/base.css` has 177 lines with
-  `calc(var(--space-1) * N)` (233 across `assets/*.css`). Factors 11, 12 and
-  13 (44, 48, 52) are sizes, not spacing: they map to `--touch-target` and
-  `--control-height(-compact)`. Old name → new name table: foundation.md
+  size tokens and never a spacing token (Polaris): `--control-height`
+  (48 / 52), `--control-height-compact` (44), `--touch-target` (44),
+  `--tab-height-desktop` (40), `--row-height` (52), `--round-button-size`
+  (52), `--count-badge-size` (20), `--progress-height` (4), `--meter-height`
+  (8), `--icon-size-*`.
+- Named exceptions: glyph path coordinates (chevron 9 × 5 and 12 × 7, CTA
+  arrow 16 × 14, star 14 × 13, check mark) are optical and stay as drawn;
+  buttons and icons rendered by Shopify or Apple keep their own values
+  (CTO 11/11).
+- Theme code still needs the steps 2, 6, 20, 40, 64 and 80 as variables and
+  the name `--space-4xl` for 48; until FE adds them `assets/base.css` has 177
+  lines with `calc(var(--space-1) * N)` (233 across `assets/*.css`). Factor
+  14 (56) maps to 48 or 64 by use. Factors 11, 12 and 13 (44, 48, 52) used
+  as heights are sizes, not spacing. Old name → new name table: foundation.md
   §1.2.
 
 ## Corner radius
 
-Scale = Figma Radius/4…20 plus pill. Four settings set the role tokens.
+Scale 4 / 8 / 12 / 16 / 20 plus pill (CTO 20/11 V04). The same steps are in
+Polaris React border radius (admin, used as a reference) and in M3 shape;
+Polaris web states no px radius. Four settings set the role tokens.
 
 | Variable | px | Setting id | Use |
 | --- | --- | --- | --- |
 | `--radius-xs` → `--radius-input`, `--radius-button` | 4 | `input_corner_radius`, `button_corner_radius` | Inputs, buttons, chips, tabs |
 | `--radius-sm` → `--radius-swatch` | 8 | — | Card swatches, line-item thumbnails |
 | `--radius-md` → `--radius-card`, `--radius-hero` | 12 | `card_corner_radius`, `hero_corner_radius` | Product card media, dropdowns, popovers, tables |
-| `--radius-lg` → `--radius-panel` | 16 | — | Page banner, article and collection cards, footer panel, dark panels, meter box |
+| `--radius-lg` → `--radius-panel` | 16 | — | Home hero and hero mini (mockup uses 16; `hero_corner_radius` default still 12 in theme code, Cần FE), page banner, article and collection cards, footer panel, dark panels, meter box |
 | `--radius-xl` → `--radius-dialog` | 20 | — | Dialogs and bottom sheets |
 | `--radius-pill` | 999 | — | Badges, variant pills, pagination numbers |
 
@@ -279,10 +340,10 @@ token.
 - Components read the role (`--radius-card`, `--radius-panel`,
   `--radius-dialog`), not the step. Do not write `calc(radius ± space)` and
   do not use a spacing token as a radius.
-- Off-scale radii still in theme code (2, 18, 24, `--figma-radius-*`,
-  `calc(var(--radius-card) ± var(--space-1))`) map to the scale: 2 and 18 →
-  pill, 8 → `--radius-sm`, 16 → `--radius-panel`, 24 → `--radius-dialog`
-  (20). Full table: foundation.md §1.2.
+- Off-scale radii still in theme code (2, 18, 24, the value-named legacy
+  radius variables, `calc(var(--radius-card) ± var(--space-1))`) map to the
+  scale: 2 and 18 → pill, 8 → `--radius-sm`, 16 → `--radius-panel`, 24 →
+  `--radius-dialog` (20). Full table: foundation.md §1.2.
 
 ## Elevation and layers
 
@@ -330,9 +391,10 @@ One set, one style: outlined, single color (`currentColor`), 1.5 stroke on a
 | `--icon-size-lg` | 24 | Header (account, cart, menu), alert, compact empty state |
 | `--icon-stroke-width` | 1.5 | Every outlined icon |
 
-- Do not scale an icon outside the three sizes. Sizes kept from Figma inside
-  one component (menu chevron, CTA arrow, the chevron in the 52px round
-  button, stars, social and trust icons) belong to that component.
+- Do not scale an icon outside the three sizes. Sizes that belong to one
+  component (menu chevron 9 × 5 and 12 × 7, CTA arrow 16 × 14, the 11 × 16
+  chevron in the 52px round button, stars 14 × 13, social and trust icons)
+  are glyph optics and stay with that component.
 - Reserved icons have one meaning each: search, bag (cart), close, arrow
   (go to the next page or step), trash (remove a cart line). Do not reuse
   them for anything else.
@@ -344,20 +406,32 @@ One set, one style: outlined, single color (`currentColor`), 1.5 stroke on a
 ## Page rhythm
 
 - Content width: `max_page_width` → `--page-width`, default `91rem`
-  (1416px content from Figma + 2 × 20px margin); option `110rem` for wide.
-- Side margin: `min_page_margin` → `--page-margin`, default 20px (10–100).
+  (1416px content + 2 × 20px margin; Design: Polaris states no storefront
+  container, the value sits near the Polaris React `xl` 1440 breakpoint);
+  option `110rem` for wide.
+- Side margin: `min_page_margin` → `--page-margin`, default 20px (10–100;
+  Polaris `large-100`).
 - Layout is the container grid: margin | content | margin. Children sit in the
   content column; `.full-width` spans the viewport. Why: every band lines up to
-  the same 1416px edge as Figma.
-- Vertical rhythm between bands: `--space-4xl` (56) below 64rem,
+  the same 1416px content edge.
+- Columns 4 / 8 / 12 (below 48rem / from 48rem / from 80rem), grid gap
+  12 / 16 / 24. Polaris states no column grid for storefronts; source:
+  Fluent 2 layout (12 columns, gutter changes by breakpoint) and M3 margins
+  16 / 24. Every value is on the 4px scale.
+- Wide bands (home hero, footer panel) pull in at most 64px per side from the
+  viewport edge (`--band-inset`, Polaris React space 64px): 1792 wide at
+  1920, edge to edge on narrow screens.
+- Vertical rhythm between bands: `--space-4xl` (48) below 64rem,
   `--space-7xl` (120) from 64rem. Inside a block: heading → content 24, 40
-  from 80rem. Grid gap 12 / 16 / 24 (below 48rem / below 80rem / from 80rem).
+  from 80rem; eyebrow → heading 12.
 - Header height: `--header-height` = `space_base` × 20 (80px). Every page has
   the same dark bar (`background_dark` + noise); it never overlays an image.
   Scrolling only adds a shadow (CTO 10/11).
 - Breakpoints (mobile-first from 360): `48rem` (768), `64rem` (1024),
-  `80rem` (1280). Mobile type and spacing come from Figma Design System 2
-  mobile styles (ES1-T527); tablet interpolates.
+  `80rem` (1280). They are the theme code convention (`AGENTS.md`); Polaris
+  web names no breakpoints and 768 equals Polaris React `md`. Mobile type and
+  spacing are the 360 values of the kit scales; tablet interpolates. Every
+  page is designed at 360, 768, 1280 and 1920 (CTO 09/11).
 - Touch targets: `--touch-target` (44px) at every breakpoint for six groups:
   main menu links, form submit (search, add to cart), cart, hamburger, close
   buttons of modals and drawers, variant options (pill, swatch). Every other
@@ -407,15 +481,21 @@ component.
   example the image inside the rich text heading) use `alt=""`.
 - Empty image in the editor: show a placeholder; on the storefront use the
   dark background color, never a broken image.
-- Aspect ratios follow the Figma frames:
+- Aspect ratios come from one named set, never from the px of a single
+  frame. Source: Carbon aspect ratios (1:1, 2:1, 2:3, 3:2, 4:3, 16:9), M3
+  carousel items (9:16 to 16:9), Spectrum (preview at most 3:4 tall).
 
 | Place | Ratio | Source |
 | --- | --- | --- |
-| Hero / slideshow | 1798 / 827 at 1280+, 4 / 3 at 768, 4 / 5 below | Figma 1:422, derived mobile |
-| Collection card image (Browse Categories) | 336 / 220 (card 336 × 270 with title) | Figma 1:395 |
-| Training level card | 1 / 1 (456 × 456) | Figma 1:464 |
-| Blog card | 300 / 448 | Figma 1:1022 |
-| Inline heading image | 165 / 94, scales with the heading em | Figma 1:455 |
+| Product card, quick view, product gallery, featured product | 1 / 1 | Polaris Image default 1/1 |
+| Hero / slideshow, mini hero, article cover | 2 / 1 at 1280+, 4 / 3 at 768, 3 / 4 below | Carbon 2:1, 4:3; Spectrum 3:4 at 360 |
+| Collection card image | 3 / 2 | Carbon 3:2 |
+| Collection card in the mega menu, mega promo image, FAQ image | 4 / 3 | Carbon 4:3 |
+| Training level card, shop the look, why choose us | 1 / 1 | Carbon 1:1 |
+| Blog card | 3 / 4 | Spectrum 3:4 |
+| Testimonial card, inline heading image (scales with the heading em) | 16 / 9 | Carbon 16:9 |
+| Vertical video card | 9 / 16 | M3 carousel 9:16 |
+| Gift card | 1.586 / 1 | Design: ID-1 card ratio |
 
 Ratios for blocks not built yet are provisional until Product and Design
 confirm them (question ES1-T39).
@@ -433,13 +513,15 @@ confirm them (question ES1-T39).
 
 ## Calls to action
 
-- Voice: Title Case, 2–4 words, starts with a verb, says what happens next.
-  Figma copy: "Explore Equipment", "Become A Member", "View About Us",
-  "Add Setup To Cart", "Add Bundle To Cart". Provisional until ES1-T39.
-  Title Case is a decided brand exception to Polaris sentence case (CTO
-  07/11, confirmed 21/11); the rest of the Polaris rule applies (verb first,
-  no articles, no punctuation).
-- Standard commerce actions ("Add To Cart", "Sold Out", "Checkout") use the
+- Voice: sentence case, 2–4 words, starts with a verb, no articles, no
+  punctuation, says what happens next (Polaris Button; CTO 21/11, replaces
+  Title Case of 07/11). Mockup copy: "Explore equipment", "Become a member",
+  "Add setup to cart", "Add bundle to cart", "View details". Link CTAs and
+  "View all …" links follow the same case with 2–5 words that name the
+  destination ("Read the full guide", "View all articles"). Proper names,
+  abbreviations and branded buttons keep their own spelling. Full rules:
+  `docs/design/content.md`.
+- Standard commerce actions ("Add to cart", "Sold out", "Checkout") use the
   theme locale strings, not custom copy. Why: they must match Shopify checkout
   wording and translations.
 - No fake urgency or fake discounts: countdowns hide when the end date passes;
@@ -455,7 +537,7 @@ confirm them (question ES1-T39).
     secondary action next to a primary inside cards and quick view. Never a
     borderless gray button (that is the disabled look).
   - `.button--small`: 44px, 14/600, for cards, suggestions and inline errors.
-  - `.button--link`: heading font 700, 28/34, no background, arrow icon
+  - `.button--link`: heading font 700, 28/36, no background, arrow icon
     20 × 16; hover underlines the label and nudges the arrow `--space-1`
     toward inline-end (off with `prefers-reduced-motion`).
 - Focus ring: 2px solid `--color-accent`, offset 2px, on every interactive

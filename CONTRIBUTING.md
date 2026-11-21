@@ -43,30 +43,41 @@ decision first. Do not reverse one in a pull request.
 
 ### Order of sources
 
-1. `docs/design/decisions.md` (CTO decisions)
-2. `AGENTS.md`
-3. `DESIGN.md`
-4. Figma: home frame 1:359 and "Efitco Theme Final / Design System 2"
+The HTML mockups are the design source of truth (CTO 21/11, ES1-T567). The
+human designer rebuilds the design file from the mockups, following
+`docs/design/figma-handoff.md`; when the two differ, the mockup wins.
 
-For a token value: a value that has a line in `docs/design/decisions.md`
-follows that line in every copy. For a token with no decision line, when the
-copies disagree: `config/settings_schema.json` →
-`snippets/css-variables.liquid` → `docs/tokens.json` → `DESIGN.md`,
-`docs/ui-spec/foundation.md` and `drafts/designer/_kit/kit.css`; the earlier
-one wins (proposed in ES1-T535, waiting for a CTO decision). Known mismatches
-where the decision wins over the setting default until FE fixes it:
-`badge_new_color` #467A48 → #4B824D (V01), `background_alt_color` #F4F4F4 →
-#F4F4F5 (V18).
+1. `drafts/designer/_kit/kit.css`: tokens in `:root` and shared components
+2. `drafts/designer/**`: page mockups (layout, block order, states) at 360,
+   768, 1280 and 1920
+3. `docs/tokens.json`, `DESIGN.md`, `docs/ui-spec/*.md`: machine-readable copy
+   and explanation; they follow the kit
+4. Theme code: `config/settings_schema.json` and
+   `snippets/css-variables.liquid` mirror the kit `:root`; a difference is
+   logged as "Cần FE" in the ticket notes, the kit is not changed to match
+
+`docs/design/decisions.md` records CTO decisions and their reasons. A new
+decision is applied to the kit first, then copied to the other places.
+`AGENTS.md` still governs code structure. Standards for a new value: Polaris
+first; where Polaris gives no rule, name the system used instead (Carbon,
+Material 3, Fluent 2, Spectrum, Ant) or write "Thiết kế:" with the reason.
+Known mismatches waiting for FE: `badge_new_color` #467A48 → #4B824D (V01),
+`background_alt_color` #F4F4F4 → #F4F4F5 (V18), and the list in
+`drafts/designer/ES1-T567/notes.md`.
 
 ### Rules for a token change
 
-- Change all four places in one pull request: the setting default (when the
-  token has a setting), `snippets/css-variables.liquid`, `docs/tokens.json`,
-  and the docs (`DESIGN.md`, `docs/ui-spec/foundation.md`) with the mockup kit.
+- Change all four places in one pull request, starting from the kit: the
+  mockup kit `:root`, `docs/tokens.json`, the docs (`DESIGN.md`,
+  `docs/ui-spec/foundation.md`), and the theme code (setting default when the
+  token has a setting, `snippets/css-variables.liquid`).
 - Put the token in the right tier (primitive, semantic, component; see
   `DESIGN.md`, "Token tiers"). Components read semantic tokens.
-- Name a token by role or scale step, never by value. Do not add a `--figma-*`
-  variable.
+- Name a token by role or scale step, never by value or by the place the
+  value came from.
+- Write the source of a value in one of five forms: "Chuẩn: Polaris <step>",
+  "Chuẩn: <other system> …", "CTO dd/mm", "AA: n:1", "Thiết kế: …". Do not
+  credit Polaris for something Polaris does not state.
 - A new color token needs a contrast line in `docs/tokens.json` `_contrast`
   in the same change. Do not add a brand color or a font without a CTO
   decision.
@@ -101,6 +112,8 @@ Built → Deprecated. Only Approved and Built components go into new pages.
       for anything directional
 - [ ] Spec updated (`docs/ui-spec/`), design system section updated
       (`drafts/designer/ES1-T251/foundation.html`), strings follow
-      `docs/design/content.md`
+      `docs/design/content.md` (button labels in sentence case)
+- [ ] Every value has a source in one of the five forms; no reference to
+      an external design file or node id
 - [ ] Four token places in sync; version and changelog updated
 - [ ] No page-level copy of a kit component's CSS

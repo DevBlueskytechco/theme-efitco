@@ -15,8 +15,8 @@
   .lc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2xl) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
   @media (min-width: 48rem) { .lc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (min-width: 80rem) { .lc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: var(--space-3xl); } }
-  /* 2 cột ở 360: tên h3 28 quá to cho card rộng ~160 → bậc h4 20/24 dưới 48rem (Figma M/H5) */
-  @media (max-width: 47.99rem) { .lc-grid .collection-card { gap: var(--space-sm); } .lc-grid .collection-card__title { font-size: var(--font-size-h4); } .lc-grid .collection-card__count { margin-block-start: calc(var(--space-xs) * -1); } }
+  /* 2 cột ở 360: tên h3 28 quá to cho card rộng ~160 → bậc h4 20/24 dưới 48rem (--font-size-h4 + --line-height-h4) */
+  @media (max-width: 47.99rem) { .lc-grid .collection-card { gap: var(--space-sm); } .lc-grid .collection-card__title { font-size: var(--font-size-h4); line-height: var(--line-height-h4); } .lc-grid .collection-card__count { margin-block-start: calc(var(--space-xs) * -1); } }
   /* Vòng focus card: cách chữ/mép --space-xs như .product-card (review vòng 2; kit .collection-card để 4px, đề xuất kit nâng lên --space-xs — notes.md) */
   .lc-grid .collection-card:focus-visible, .lc-grid .collection-card.is-focus { outline-offset: var(--space-xs); }
   .section-end { padding-block-end: var(--section-gap); }
@@ -50,7 +50,7 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- Header mọi trang: thanh tối riêng + noise, cao 80, không đè ảnh (sổ 10/11, Figma 1:362) -->
+<!-- Header mọi trang: thanh tối riêng + noise, cao 80, không đè ảnh (sổ 10/11) -->
 <header class="site-header demo-static">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -102,7 +102,7 @@
   </ul>
 </main>
 
-<!-- Footer (foundation §4 vòng 3, Figma 1:1104) -->
+<!-- Footer (foundation §4 vòng 3) -->
 <footer class="site-footer">
   <div class="container site-footer__band">
     <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
@@ -112,7 +112,7 @@
     </div>
     <form class="site-footer__form" onsubmit="return false">
       <label class="visually-hidden" for="nl-email">Email</label>
-      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% off</button></div>
       <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
@@ -173,7 +173,7 @@
         <span class="empty-state__icon" aria-hidden="true"><svg><use href="#i-empty"/></svg></span>
         <h3>No Collections Yet</h3>
         <p>No collections to show yet. Browse every product in the store instead.</p>
-        <div class="empty-state__actions"><a class="button" href="#">Shop All Products</a></div>
+        <div class="empty-state__actions"><a class="button" href="#">Shop all products</a></div>
       </div>
     </div>
   </section>

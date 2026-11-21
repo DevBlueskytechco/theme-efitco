@@ -1,4 +1,4 @@
-KHÔNG CHẮC: demo-data không có pages, shop.email, shop policies (hỏi BA ở ES1-T268). Copy mẫu lấy từ Figma 1:992, 1:1057, 1:1104 và locale `blocks.faq_item.*`; nội dung thật do merchant soạn trong Pages.
+KHÔNG CHẮC: demo-data không có pages, shop.email, shop policies (hỏi BA ở ES1-T268). Copy mẫu lấy từ section FAQ, footer của trang chủ và locale `blocks.faq_item.*`; nội dung thật do merchant soạn trong Pages.
 
 # UI spec: Page nội dung và Contact (ES1-T258, vòng 3)
 
@@ -6,15 +6,15 @@ KHÔNG CHẮC: demo-data không có pages, shop.email, shop policies (hỏi BA �
 
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
 | --- | --- | --- | --- | --- |
-| 1 | Header | Header A nền trắng, viền dưới | thanh tối `--color-background-dark` + noise, cao 80, không đè nội dung; logo 100 × 30; menu trắng 60%, "Contact" `aria-current` trắng 100% + gạch chân 2px; search 20, account/cart 24 | Sổ 10/11, Figma 1:362, 1:377, foundation §3 |
-| 2 | Footer | newsletter 2 cột, 3 social, wordmark tách hàng | footer Figma 1:1104: ảnh 98 × 123 + 2 thẻ sau, panel dải rộng bo 16 nền +2% trắng, 4 social (TikTok, Instagram, YouTube, Facebook) tên "Efitco on …", wordmark giữa hàng cuối với copyright và cờ + USD / EN + 5 icon thanh toán | Figma 1:1104–1:1192, foundation §4 |
-| 3 | Aside Contact | bo 24 (`--radius-dialog`) | bo 16 (`--radius-card` + 4) như thẻ Figma 1:361, 1:1022, 1:1106 | Figma |
-| 4 | Câu hỏi accordion aside | 16 mọi mốc | 18/600 từ 1280 như Figma 1:1057; 16 dưới 1280 | Figma 1:1057 |
+| 1 | Header | Header A nền trắng, viền dưới | thanh tối `--color-background-dark` + noise, cao 80, không đè nội dung; logo 100 × 30; menu trắng 60%, "Contact" `aria-current` trắng 100% + gạch chân 2px; search 20, account/cart 24 | Sổ 10/11, foundation §3 |
+| 2 | Footer | newsletter 2 cột, 3 social, wordmark tách hàng | footer của kit: ảnh 96 × 120 + 2 thẻ sau, panel dải rộng bo 16 nền +2% trắng, 4 social (TikTok, Instagram, YouTube, Facebook) tên "Efitco on …", wordmark giữa hàng cuối với copyright và cờ + USD / EN + 5 icon thanh toán | foundation §4 |
+| 3 | Aside Contact | bo 24 (`--radius-dialog`) | bo 16 (`--radius-panel`) như thẻ hero, card bài viết, panel footer | foundation §1 (radius; Polaris React border radius 16, M3 shape) |
+| 4 | Câu hỏi accordion aside | 16 mọi mốc | 18/28, 600 từ 1280 như câu hỏi accordion FAQ của kit; 16/24 dưới 1280 | foundation §13 |
 | 5 | Breadcrumb, form, RTE, trạng thái S1–S6 | — | giữ nguyên; breadcrumb nằm trên nền trắng ngay dưới thanh tối | foundation §5 |
 
 Mục đích: người mua đọc trang nội dung (Our Story, FAQs, chính sách) dễ đọc trên mọi màn; trên Contact Us gửi được câu hỏi trong 1 form 3 trường, và thấy câu trả lời nhanh trước khi viết. Story TE-9 AC2 (page.contact: form name/email/message có validation và thông báo), AC5 (link chính sách từ `shop.policies`).
 
-Figma: không có (chỉ trang chủ 1:359). Ngôn ngữ lấy từ header 1:362, accordion FAQ 1:1057, footer 1:1104. Thành phần theo `docs/ui-spec/foundation.md` (ES1-T251) và `drafts/designer/_kit/kit.css`.
+Nguồn chuẩn: mockup `drafts/designer/ES1-T258/page.html` + kit (CTO 21/11, ES1-T567). Ngôn ngữ lấy từ header, accordion FAQ, footer của trang chủ. Thành phần theo `docs/ui-spec/foundation.md` (ES1-T251) và `drafts/designer/_kit/kit.css`.
 
 Mockup: `drafts/designer/ES1-T258/page.html` + `page-360|768|1280|1920.png`. Phần chính là Contact Us; cuối file: S1 page mặc định (Our Story, đủ phần tử RTE), S2 form lỗi, S3 đang gửi, S4 gửi thành công, S5 page rỗng, S6 gửi thất bại.
 
@@ -34,13 +34,13 @@ Page mặc định (S1):
 2. Breadcrumb: Home / {page.title} (foundation §5).
 3. Tiêu đề: h1 `--font-size-h1`.
 4. RTE `.rte`: đoạn, h2–h4, link, danh sách, trích dẫn, ảnh + chú thích, bảng, đường kẻ.
-5. Footer (foundation §4, Figma 1:1104).
+5. Footer (foundation §4).
 
 Contact (phần chính mockup):
 1. Header tối (menu "Contact" `aria-current`), breadcrumb Home / Contact Us, h1 "Contact Us".
 2. `.rte` intro (page.content).
-3. Form `contact-form`: h2 "Send Us A Message" + ghi chú "* Required fields" · Name* · Email* · Message* + gợi ý "Add your order number if your message is about an order." · câu quyền riêng tư có link Privacy policy (`shop.policies`) · nút primary "Send Message" (icon gửi).
-4. Aside: eyebrow "Questions and Answers" (Figma 1:1057) · h2 "Quick Answers Before You Write" · accordion 5 câu (locale `faq_item`, câu đầu mở) · link "Shipping policy", "Refund policy" (`shop.policies`).
+3. Form `contact-form`: h2 "Send Us A Message" + ghi chú "* Required fields" · Name* · Email* · Message* + gợi ý "Add your order number if your message is about an order." · câu quyền riêng tư có link Privacy policy (`shop.policies`) · nút primary "Send message" (icon gửi).
+4. Aside: eyebrow "Questions and Answers" (cùng eyebrow section FAQ trang chủ) · h2 "Quick Answers Before You Write" · accordion 5 câu (locale `faq_item`, câu đầu mở) · link "Shipping policy", "Refund policy" (`shop.policies`).
 
 Trường đúng SRS TE-9 AC2 (name, email, message); không thêm phone, subject.
 
@@ -59,10 +59,10 @@ Trường đúng SRS TE-9 AC2 (name, email, message); không thêm phone, subjec
 | | 360 | 768 | 1280 | 1920 |
 | --- | --- | --- | --- | --- |
 | Page: cột đọc | 320 (full) | 720 căn giữa | 720 căn giữa | 720 căn giữa |
-| Page: đoạn văn | 16/27 (lh 1.7), ≤ 65ch | như 360 | như 360 | như 360 |
+| Page: đoạn văn | 16/28 (lh 1.75), ≤ 65ch | như 360 | như 360 | như 360 |
 | Contact: lưới | 1 cột: intro → form → aside | 1 cột | 12 cột: form 1–7, aside 9–12 sticky (top 80+24) | như 1280, nội dung 1416 |
 | Form trường | 1 cột, gap 24 | Name + Email 2 cột, Message cả hàng | như 768 | như 768 |
-| Nút Send Message | full width, cao 48 | auto, min 200, căn trái | cao 52 | cao 52 |
+| Nút "Send message" | full width, cao 48 | auto, min 200, căn trái | cao 52 | cao 52 |
 | Aside | padding 32/24, bo 16, nền alt, câu hỏi 16 | padding 32 | padding 40, câu hỏi 18/600 | như 1280 |
 | Breadcrumb → h1 → nội dung | 16 / 48 | 16 / 48 | 24 / 64 | 24 / 64 |
 | Contact → footer | 48 | 48 | 120 | 120 |
@@ -75,7 +75,7 @@ Thứ tự DOM = thứ tự nhìn ở mọi mốc (intro → form → aside), fo
 THAY (11/11, Shopify §8): dùng `.rte` chung foundation §28 (cũng cho mô tả sản phẩm, collection, bài viết).
 
 ĐỀ XUẤT (foundation §1, 03 §4, 06 §7.3); toàn bộ đọc token:
-- Đoạn 16, lh 1.7, `max-width: 65ch`; khoảng giữa khối 16.
+- Đoạn 16, lh 1.75 (`--line-height-reading`, 16/28, bội 4px; ES1-T567), `max-width: 65ch`; khoảng giữa khối 16.
 - h2 `--font-size-h2`, h3 `--font-size-h3` (heading 700); h4 Inter 600 18. Khoảng trên heading 48, dưới 12.
 - Link: gạch chân 1px offset 0.2em, 500; hover accent (5.01) — bắt buộc gạch chân vì Lighthouse `link-in-text-block`.
 - ul/ol thụt 24, gap 8, marker `--color-muted`.
@@ -93,11 +93,11 @@ Dev FE: bọc `<table>` bằng filter/regex không được trong Liquid an toà
 | Lỗi trường (S2) | hiện khi rời trường và khi submit: viền sale 2px + icon ! + câu cách sửa ("Enter your name.", "Enter an email like name@example.com.", "Enter a message.") 14/500; `aria-invalid`, `aria-describedby` | 05 §4, foundation §12 |
 | Lỗi submit (S2) | hộp tóm tắt `.form-message--error` `role="alert"` `tabindex="-1"` đầu form "Check 2 fields" + danh sách `.form-message__list`, mỗi lỗi một link "Tên trường: cách sửa" nhảy tới trường; focus vào hộp (vòng accent), KHÔNG vào trường lỗi đầu; bấm link thì focus vào ô đó; rời một ô sai thì không chuyển focus | 05 §4.3, foundation §12 bảng "Focus khi form lỗi" (sổ 21/11, components-10) |
 | Đang gửi (S3) | nút `aria-busy`, spinner, giữ bề rộng; trường `readonly`; status ẩn "Sending your message…" | foundation §6 loading |
-| Thành công (S4) | `form.posted_successfully?`: hộp success (viền trái badge-new + icon check) "Thanks for contacting us" thay form, focus vào hộp, nút secondary "Continue Shopping" | 05 §6, foundation §12 |
+| Thành công (S4) | `form.posted_successfully?`: hộp success (viền trái badge-new + icon check) "Thanks for contacting us" thay form, focus vào hộp, nút secondary "Continue shopping" | 05 §6, foundation §12 |
 | Gửi thất bại (S6) | `form.errors` chung (spam challenge thất bại, lỗi mạng): `.alert` "Your message wasn't sent" + cách xử lý; giữ dữ liệu đã nhập | 05 §5 không mất dữ liệu |
 | Rỗng (S5) | `page.content` trống: chỉ h1 (+ form ở contact), không khung RTE rỗng; `request.design_mode` hiện gợi ý "This page has no content yet…" cho merchant | AGENTS empty state |
 | Loading trang | không có (render server) | — |
-| Accordion | foundation §13: + cam bên trái, câu đầu mở, cho mở nhiều; chạy không JS (`<details>`) | Figma 1:1057 |
+| Accordion | foundation §13: + cam bên trái, câu đầu mở, cho mở nhiều; chạy không JS (`<details>`) | foundation §13 |
 | Hover link aside | chữ accent + gạch chân giữ nguyên | foundation §6 text link |
 
 Không JS: form submit thường (Shopify tải lại trang), lỗi do server trả; validation inline là JS tăng cường (BE).
@@ -120,7 +120,7 @@ Spam: Shopify có thể chuyển sang trang hCaptcha `/challenge` sau submit; kh
 ## 9. Lighthouse
 
 - LCP: Contact = h1 "Contact Us" (không ảnh trên màn đầu). Page mặc định = h1 hoặc ảnh đầu tiên trong RTE nếu nằm trên màn đầu.
-- Header tối: noise là `background-image` nhỏ có sẵn (`assets/noise-dark.png`) trong critical.css, không phải ảnh LCP; ảnh footer 98 × 123 lazy.
+- Header tối: noise là `background-image` nhỏ có sẵn (`assets/noise-dark.png`) trong critical.css, không phải ảnh LCP; ảnh footer 96 × 120 lazy.
 - SEO: page nằm trong phạm vi SEO 100 (sổ 10/11).
 - Ảnh lazy: mọi ảnh trong RTE. Liquid: `page.content | replace: '<img ', '<img loading="lazy" decoding="async" '` (ĐỀ XUẤT; ảnh RTE Shopify không có width/height → rủi ro CLS, CSS `height: auto` + bo góc giữ tỉ lệ khi ảnh đã tải).
 - Font: 2 họ qua font_picker (Sofia Sans Condensed 700/800, Inter 400/500/600); preload 1 font body.

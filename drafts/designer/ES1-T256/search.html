@@ -7,12 +7,12 @@
 <meta name="description" content="Search Efitco for benches, dumbbells, racks and recovery gear, plus training articles and store pages.">
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
-  /* CSS riêng trang search (ES1-T256). ES1-T527 (DS check 20/11): chỉ giữ bố cục trang.
+  /* CSS riêng trang search (ES1-T256). ES1-T527 (rà soát kit 20/11): chỉ giữ bố cục trang.
      Thành phần dùng kit ../_kit/kit.css, KHÔNG định nghĩa lại ở đây (V57): .input-group + .search-field (V55),
      chip-list/chip/chip--remove (V41), category-link (V56), .empty-state (+ --framed) (V54),
      pagination* (V57), .facet (V42), .spinner 24 (V61). */
 
-  /* Đầu trang: [h1 → form → status] trái, link loại kết quả phải từ 80rem (như tiêu đề + tab Figma 1:490) */
+  /* Đầu trang: [h1 → form → status] trái, link loại kết quả phải từ 80rem (cùng mẫu đầu section "tiêu đề trái, tab phải" của kit) */
   .search-top { display: grid; gap: var(--space-md); padding-block: var(--space-xs); }
   .search-head { display: grid; gap: var(--space-md); min-width: 0; }
   @media (min-width: 64rem) { .search-top { padding-block-start: var(--space-sm); } .search-head { gap: var(--space-xl); } }
@@ -25,9 +25,9 @@
 
   /* Link loại kết quả: kit .tab, là link điều hướng nên đang chọn = aria-current (kit) */
   .type-nav .tab { padding-inline: var(--space-sm); text-decoration: none; }
-  @media (min-width: 48rem) { .type-nav .tab { padding-inline: calc(var(--space-1) * 7); } }
+  @media (min-width: 48rem) { .type-nav .tab { padding-inline: var(--tab-padding-inline); } }
 
-  /* Nhóm kết quả: tiêu đề trái, công cụ phải (Figma 1:490), tiêu đề → nội dung --heading-gap */
+  /* Nhóm kết quả: tiêu đề trái, công cụ phải, tiêu đề → nội dung --heading-gap */
   .result-group { padding-block-start: var(--space-2xl); }
   @media (min-width: 64rem) { .result-group { padding-block-start: var(--space-3xl); } }
   .group-head { display: grid; gap: var(--space-md); margin-block-end: var(--space-xl); }
@@ -39,7 +39,7 @@
   /* Công cụ: Filter + Sort (cùng snippet với collection ES1-T254 §6) */
   .toolbar { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-sm); }
   .filter-toggle { width: 100%; padding-inline: var(--space-md); }
-  .filter-toggle__count { display: inline-grid; place-items: center; min-width: var(--space-xl); height: var(--space-xl); padding-inline: var(--space-2xs); border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-accent-foreground); font-size: var(--font-size-xs); font-weight: 700; }
+  .filter-toggle__count { display: inline-grid; place-items: center; min-width: var(--space-xl); height: var(--space-xl); padding-inline: var(--space-2xs); border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-accent-foreground); font-size: var(--font-size-xs); line-height: var(--line-height-label); font-weight: 700; }
   .filter-toggle:hover .filter-toggle__count { background: var(--color-background); color: var(--color-foreground); }
   .sort-field { position: relative; min-width: 0; }
   .sort-field label { position: absolute; inset-block-start: var(--space-2xs); inset-inline-start: var(--space-md); color: var(--color-muted); font-size: var(--font-size-xs); font-weight: 500; line-height: var(--line-height-label); pointer-events: none; }
@@ -52,17 +52,18 @@
 
   /* Vị trí hàng chip lọc đang áp (chip ở kit) */
   .active-filters { margin-block: calc(var(--space-xs) * -1) var(--space-xl); }
-  .filter-note { display: flex; gap: var(--space-xs); align-items: flex-start; margin-block: calc(var(--space-xs) * -1) var(--space-xl); color: var(--color-muted); font-size: var(--font-size-sm); }
-  .filter-note svg { flex: none; width: 16px; height: 16px; margin-block-start: 3px; }
+  .filter-note { display: flex; gap: var(--space-xs); align-items: flex-start; margin-block: calc(var(--space-xs) * -1) var(--space-xl); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .filter-note svg { flex: none; width: var(--icon-size-sm); height: var(--icon-size-sm); margin-block-start: var(--space-050); } /* icon 16 căn giữa dòng 20 */
 
   /* Article, page: danh sách (CTO ES1-T127 #4) */
   .other-results { display: grid; gap: 0 var(--space-2xl); }
   @media (min-width: 64rem) { .other-results { grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); } }
   .result-list { display: grid; margin: 0; padding: 0; border-block-start: 1px solid var(--color-border); list-style: none; }
-  .result-row { position: relative; display: grid; grid-template-columns: 72px minmax(0, 1fr); align-items: center; gap: var(--space-md); min-height: 104px; padding-block: var(--space-md); border-block-end: 1px solid var(--color-border); }
-  .result-row__media { display: grid; place-items: center; width: 72px; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); color: var(--color-muted); }
+  .result-list { --result-thumb: 4.5rem; } /* Thiết kế: ảnh thu nhỏ 72 (96 từ 48rem), bội 4; hàng cao = ảnh + đệm 16 × 2 */
+  .result-row { position: relative; display: grid; grid-template-columns: var(--result-thumb) minmax(0, 1fr); align-items: center; gap: var(--space-md); padding-block: var(--space-md); border-block-end: 1px solid var(--color-border); }
+  .result-row__media { display: grid; place-items: center; width: var(--result-thumb); aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); color: var(--color-muted); }
   .result-row__media img { width: 100%; height: 100%; object-fit: cover; transition: scale var(--motion-slow) var(--ease-out); }
-  .result-row__media svg { width: 28px; height: 28px; }
+  .result-row__media svg { width: var(--icon-size-lg); height: var(--icon-size-lg); }
   .result-row__body { display: grid; gap: var(--space-2xs); min-width: 0; }
   /* V62: meta = 14 muted thường (foundation §5), không viết hoa giãn chữ */
   .result-row__meta { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
@@ -75,9 +76,9 @@
   .result-row:focus-within, .result-row.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
   .result-row a:focus-visible { outline: none; }
   @media (min-width: 48rem) {
-    .result-row { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-xl); min-height: 128px; }
-    .result-row__media { width: 96px; }
-    .result-row__title { font-size: var(--font-size-lg); }
+    .result-list { --result-thumb: 6rem; }
+    .result-row { gap: var(--space-xl); }
+    .result-row__title { font-size: var(--font-size-lg); line-height: var(--line-height-title); }
   }
 
   /* Gợi ý (chưa có từ khoá, không kết quả): nhóm chip gợi ý + thẻ danh mục */
@@ -91,19 +92,20 @@
   @media (min-width: 48rem) and (max-width: 79.99rem) { .popular .product-grid > li:nth-child(4) { display: none; } }
   @media (min-width: 64rem) { .popular { padding-block-start: var(--space-6xl); } }
 
-  .status-busy { display: inline-flex; align-items: center; gap: var(--space-xs); color: var(--color-muted); font-size: var(--font-size-sm); } /* V61: spinner 24 của kit, không thu nhỏ */
+  .status-busy { display: inline-flex; align-items: center; gap: var(--space-xs); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); } /* V61: spinner 24 của kit, không thu nhỏ */
   .skeleton-grid .skeleton-card .skeleton--line:nth-child(3) { width: 40%; }
 
   /* Drawer bộ lọc: trái 90% / 420 (foundation §15); nhóm lọc = kit .facet (V42) */
   .filter-drawer .overlay__body { padding-block: var(--space-sm) 0; }
-  .filter-drawer__status { padding-block-end: var(--space-sm); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .filter-drawer__status { padding-block-end: var(--space-sm); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .color-dot { flex: none; width: var(--space-xl); height: var(--space-xl); border: 1px solid color-mix(in srgb, var(--color-foreground) 20%, transparent); border-radius: 50%; background: var(--swatch); }
   .price-range { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); }
   .input-prefix { position: relative; }
   .input-prefix > span { position: absolute; inset-inline-start: var(--space-md); inset-block-start: 50%; translate: 0 -50%; color: var(--color-muted); pointer-events: none; }
   .input-prefix .field__input { padding-inline-start: var(--space-2xl); }
-  .overlay__footer--split { grid-template-columns: auto minmax(0, 1fr); }
-  .overlay__footer--split .button { width: 100%; padding-inline: var(--space-md); }
+  /* Chân drawer lọc: cùng bố cục collection.html (.drawer__actions): một hàng khi đủ chỗ, thiếu chỗ thì nút chính lên trên */
+  .overlay__footer--split { display: flex; flex-wrap: wrap-reverse; }
+  .overlay__footer--split .button { flex: 1 1 auto; padding-inline: var(--space-md); white-space: nowrap; }
 
   /* Khung trạng thái (chỉ mockup) */
   .state-sheet { padding-block: var(--space-4xl); background: var(--color-background); }
@@ -122,7 +124,7 @@
   <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
   <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
-  <!-- Chevron 52: snippets/slideshow-icon previous/next (Figma 1:398), như foundation -->
+  <!-- Chevron 52: snippets/slideshow-icon previous/next, như foundation -->
   <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 16 14"><path d="M8.29289 0.292893C8.68342 -0.0976311 9.31658 -0.0976311 9.70711 0.292893L15.7071 6.29289C15.8946 6.48043 16 6.73478 16 7C16 7.26522 15.8946 7.51957 15.7071 7.70711L9.70711 13.7071C9.31658 14.0976 8.68342 14.0976 8.29289 13.7071C7.90237 13.3166 7.90237 12.6834 8.29289 12.2929L12.5858 8L1 8C0.447715 8 0 7.55229 0 7C0 6.44772 0.447715 6 1 6L12.5858 6L8.29289 1.70711C7.90237 1.31658 7.90237 0.683417 8.29289 0.292893Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
@@ -145,7 +147,7 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- ===== Header mọi trang: thanh tối riêng #1A1A1A + noise, cao 80, không đè ảnh (CTO 10/11, Figma 1:362, foundation §3) ===== -->
+<!-- ===== Header mọi trang: thanh tối riêng #1A1A1A + noise, cao 80, không đè ảnh (CTO 10/11, foundation §3) ===== -->
 <header class="site-header">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -203,7 +205,7 @@
       </nav>
     </div>
 
-    <!-- Nhóm Products: lưới card như collection (CTO ES1-T127 #4), card Figma 1:502 -->
+    <!-- Nhóm Products: lưới card như collection (CTO ES1-T127 #4), card kit .product-card -->
     <section class="result-group" aria-labelledby="g-products" data-testid="search-products">
       <div class="group-head group-head--split">
         <h2 id="g-products">Products <span class="group-head__count">5</span></h2>
@@ -293,7 +295,7 @@
   <div style="height: var(--section-gap)"></div>
 </main>
 
-<!-- ===== Footer (Figma 1:1104, foundation §4 vòng 3) ===== -->
+<!-- ===== Footer (foundation §4 vòng 3) ===== -->
 <footer class="site-footer">
   <div class="container site-footer__band">
     <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
@@ -303,7 +305,7 @@
     </div>
     <form class="site-footer__form" onsubmit="return false" novalidate>
       <label class="visually-hidden" for="nl-email">Email</label>
-      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% off</button></div>
       <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
@@ -343,7 +345,7 @@
 </footer>
 
 <!-- ===================================================================
-     TRẠNG THÁI (ĐỀ XUẤT, Figma không có trang search) — docs/ui-spec/search.md §6
+     TRẠNG THÁI (ĐỀ XUẤT) — docs/ui-spec/search.md §6
      =================================================================== -->
 <div class="state-sheet" aria-label="Search page states">
   <div class="container">
@@ -389,7 +391,7 @@
     <!-- S2 -->
     <section class="demo-block" aria-labelledby="s2">
       <h2 id="s2">S2. No Results</h2>
-      <p class="demo-note">q=treadmill (không có trong 36 sản phẩm demo). Giữ từ khoá trong ô (11 §4 #346). Empty state trong trang của kit (V54: icon 72, h2, 1 câu, primary + text link; không panel nền alt bo 24, V59): câu không đổ lỗi + mẹo + CTA "Shop All Products" (CTO ES1-T127 #5); slot phụ từ khoá phổ biến (chip kit) và danh mục (thẻ .category-link, V56) xếp dưới, cạnh bên từ 80rem (11 §5). Dưới: tiêu đề kiểu Figma 1:490 (eyebrow cam + heading) và 4 sản phẩm từ collection setting (lazy). Không bộ lọc, sắp xếp.</p>
+      <p class="demo-note">q=treadmill (không có trong 36 sản phẩm demo). Giữ từ khoá trong ô (11 §4 #346). Empty state trong trang của kit (V54: icon 72, h2, 1 câu, primary + text link; không panel nền alt bo 24, V59): câu không đổ lỗi + mẹo + CTA "Shop all products" (CTO ES1-T127 #5); slot phụ từ khoá phổ biến (chip kit) và danh mục (thẻ .category-link, V56) xếp dưới, cạnh bên từ 80rem (11 §5). Dưới: tiêu đề section của kit (eyebrow accent + heading) và 4 sản phẩm từ collection setting (lazy). Không bộ lọc, sắp xếp.</p>
       <div class="state-frame" data-testid="search-empty">
         <div class="search-head">
           <p class="h1">Search Results</p>
@@ -405,7 +407,7 @@
             <span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-search"/></svg></span>
             <h3 class="h2">Nothing Matches “treadmill” Yet</h3>
             <p>Try a shorter or more general word, check the spelling, or start from a popular search or category.</p>
-            <div class="empty-state__actions"><a class="button" href="#">Shop All Products</a><a class="text-link" href="#">Read the FAQs</a></div>
+            <div class="empty-state__actions"><a class="button" href="#">Shop all products</a><a class="text-link" href="#">Read the FAQs</a></div>
           </div>
           <div class="suggest">
             <div>
@@ -559,7 +561,7 @@
     <!-- S6 -->
     <section class="demo-block" aria-labelledby="s6">
       <h2 id="s6">S6. Filters Return Nothing, And Update Error</h2>
-      <p class="demo-note">Khung trên: Color White + Price $0–$100 cho q=adjustable ra 0 sản phẩm (2 sản phẩm White đều &gt; $100). Giữ chip; empty state --framed của kit (V54) nói rõ cách sửa. Khung dưới: refresh partial lỗi mạng: alert + Try Again, lưới cũ giữ nguyên.</p>
+      <p class="demo-note">Khung trên: Color White + Price $0–$100 cho q=adjustable ra 0 sản phẩm (2 sản phẩm White đều &gt; $100). Giữ chip; empty state --framed của kit (V54) nói rõ cách sửa. Khung dưới: refresh partial lỗi mạng: alert + Try again, lưới cũ giữ nguyên.</p>
       <div class="state-frame">
         <ul class="chip-list active-filters" aria-label="Active filters" style="margin-block-start: 0">
           <li><a class="chip chip--remove" href="#" aria-label="Remove filter Color: White"><span class="chip__key">Color:</span> White <svg aria-hidden="true"><use href="#i-close"/></svg></a></li>
@@ -570,18 +572,18 @@
           <span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-filter"/></svg></span>
           <h3>No Products Match These Filters</h3>
           <p>Remove a filter or clear them all to see the 5 products for “adjustable”.</p>
-          <div class="empty-state__actions"><a class="button button--secondary" href="#">Clear All Filters</a></div>
+          <div class="empty-state__actions"><a class="button button--secondary" href="#">Clear all filters</a></div>
         </div>
       </div>
       <div class="state-frame">
-        <div class="alert" role="alert" data-testid="search-error"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><strong>We couldn't update the results</strong><p>Check your connection, then try again. Your filters are saved.</p><div><button class="button button--secondary" type="button">Try Again</button></div></div></div>
+        <div class="alert" role="alert" data-testid="search-error"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><strong>We couldn't update the results</strong><p>Check your connection, then try again. Your filters are saved.</p><div><button class="button button--secondary" type="button">Try again</button></div></div></div>
       </div>
     </section>
 
     <!-- S7 -->
     <section class="demo-block" aria-labelledby="s7">
       <h2 id="s7">S7. Pagination</h2>
-      <p class="demo-note">24 kết quả mỗi trang (setting). Link thật, chạy không JS. Previous/Next là nút tròn 52 chevron (Figma 1:398, kit .round-button): trắng viền #E5E5E5, rê chuột cam; đầu/cuối aria-disabled bằng cặp màu disabled (viền border, icon muted-light, không opacity; sổ 21/11). Trang hiện tại nền accent (ES1-T107 #6). &lt; 768: "Page 2 of 2" thay số trang. Minh hoạ q=efitco trang 2/2 (KHÔNG CHẮC số kết quả, spec §11). Mũi tên Previous ở trạng thái hover.</p>
+      <p class="demo-note">24 kết quả mỗi trang (setting). Link thật, chạy không JS. Previous/Next là nút tròn 52 chevron (kit .round-button): trắng viền #E5E5E5, rê chuột cam; đầu/cuối aria-disabled bằng cặp màu disabled (viền border, icon muted-light, không opacity; sổ 21/11). Trang hiện tại nền accent (ES1-T107 #6). &lt; 768: "Page 2 of 2" thay số trang. Minh hoạ q=efitco trang 2/2 (KHÔNG CHẮC số kết quả, spec §11). Mũi tên Previous ở trạng thái hover.</p>
       <div class="state-frame">
         <nav class="pagination" aria-label="Pagination" data-testid="search-pagination" style="margin-block-start: 0">
           <ul class="pagination__list" role="list">
@@ -599,7 +601,7 @@
     <!-- S8 -->
     <section class="demo-block" aria-labelledby="s8">
       <h2 id="s8">S8. Hover And Focus</h2>
-      <p class="demo-note">Hover &lt; 200ms. Focus: outline 2px accent offset 2 (nút tròn offset 3); trên header, footer tối outline trắng. Link loại kết quả: hover viền đen, đang chọn nền đen (tab Figma 1:490). Chip lọc (--remove) hover đảo đen, focus outline accent; chip gợi ý hover viền đen (kit V41); thẻ danh mục hover viền đen + mũi tên cam; dòng kết quả outline cả dòng.</p>
+      <p class="demo-note">Hover &lt; 200ms. Focus: outline 2px accent offset 2 (nút tròn offset 3); trên header, footer tối outline trắng. Link loại kết quả: hover viền đen, đang chọn nền đen (kit .tab). Chip lọc (--remove) hover đảo đen, focus outline accent; chip gợi ý hover viền đen (kit V41); thẻ danh mục hover viền đen + mũi tên cam; dòng kết quả outline cả dòng.</p>
       <div class="state-frame">
         <div class="demo-row">
           <a class="tab is-hover" href="#" style="text-decoration:none">Articles</a>
