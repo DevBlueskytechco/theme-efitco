@@ -53,6 +53,9 @@
   templates pass no collection). Empty state: no source or no products → a hint
   in the theme editor, nothing on the storefront.
 
+  Styles: assets/bundle-builder.css, loaded by the stylesheet_tag line before
+  the root, without preload (ADR 0014).
+
   Self-contained: callers must leave the body empty.
 
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading and input ids. Default: block.id
@@ -104,6 +107,9 @@
   assign label_error = 'blocks.bundle_builder.error' | t
 -%}
 
+{%- if has_products or request.design_mode -%}
+  {{ 'bundle-builder.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if has_products -%}
   <bundle-form
     class="bundle-builder"

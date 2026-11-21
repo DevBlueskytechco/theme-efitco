@@ -19,7 +19,8 @@ const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR
 
 const REVIEWS = `<div class="block-container"><div class="testimonials"><div class="testimonials__header"><h2 data-testid="testimonials-heading">Reviews</h2></div>
 <ul class="testimonials__list" role="list" tabindex="0" data-testid="testimonials-list">${[1, 2, 3, 4].map((n) => `<li class="testimonial-item" data-testid="testimonial-item">Review ${n}</li>`).join('')}</ul></div></div><div style="height:3000px"></div>`;
-const BANNER = '<div class="image-with-text image-with-text--banner"><h2 class="image-with-text__heading" data-testid="heading"><strong>Make</strong> fitness a<br> natural part of<br> your everyday life !</h2></div>';
+// ADR 0014 (ES1-T565): block image-with-text in link assets/image-with-text.css ngay trước root, trang giả làm y như vậy.
+const BANNER = '<link rel="stylesheet" href="/image-with-text.css"><div class="image-with-text image-with-text--banner"><h2 class="image-with-text__heading" data-testid="heading"><strong>Make</strong> fitness a<br> natural part of<br> your everyday life !</h2></div>';
 const FORM = `<form method="post" action="/cart/add"><input type="hidden" name="id" value="11"><button type="submit" data-testid="add">Add</button></form>`;
 
 // Trang giả: CSS thật, thêm trang theo path. Mọi request khác trả 404.

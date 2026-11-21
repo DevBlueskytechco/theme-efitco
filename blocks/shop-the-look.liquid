@@ -44,6 +44,9 @@
   Empty state: no row with a product → a hint in the theme editor, nothing on the
   storefront (ES1-T168 Q1).
 
+  Styles: assets/shop-the-look.css (this block and shop-the-look-row), loaded by
+  the stylesheet_tag line before the root, without preload (ADR 0014).
+
   @param {string} [content] - The shop-the-look-row blocks, at most 6
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading id. Default: block.id
 
@@ -91,6 +94,9 @@
   assign label_hotspot = 'blocks.shop_the_look.hotspot_product' | t
 -%}
 
+{%- if rows != blank or request.design_mode -%}
+  {{ 'shop-the-look.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if rows != blank -%}
   <bundle-form
     class="shop-the-look"
