@@ -2,12 +2,15 @@
 // Ticket ES1-T87 Bug TE-4 (CI #70): partial fetch lỗi/abort thì nút Add To Cart kẹt disabled.
 // Nguyên nhân: selectOptions đi qua tổ hợp không tồn tại → unavailable() đặt disabled + "Unavailable"; fetch của variant cuối lỗi → catch giữ nguyên.
 // Sửa: assets/product-variant-picker.js lưu nút add + tồn kho đã render (lúc load, sau mỗi apply); fetch/apply lỗi mà không do chính picker huỷ → khôi phục.
+// ES1-T350 (ADR 0008): JS không còn tự đặt disabled/nhãn Unavailable (server trả qua partial); lúc tải chỉ aria-disabled, gỡ trong finally;
+// lỗi thì radio về biến thể cuối đã tải, id gửi giỏ chỉ đổi sau khi apply thành công. Luồng store ở TE-4.spec TC-209..TC-211.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... TE4_OPTIONS_HANDLE=... npx playwright test tests/e2e/ES1-T87.spec.ts
 import { test, expect, type Page, type Route } from './support/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
 import { watchShopPay403 } from './support/console-guard';
+import { chooseOptions } from './support/variant-picker';
 
 const T = {
   form: 'product-form',
@@ -57,23 +60,17 @@ async function open(page: Page) {
   }, productPath(HANDLE!)) as Promise<JsProduct>;
 }
 
-// Request partial: fetch/xhr tới trang sản phẩm có ?variant= (handle có dấu → so sau decode, ES1-T78).
+// Request partial: fetch/xhr tới trang sản phẩm có ?option_values= (handle có dấu → so sau decode, ES1-T78).
 async function onPartial(page: Page, handler: (route: Route) => Promise<void> | void) {
   const path = productPath(HANDLE!);
   await page.route(
-    (url) => decodeURIComponent(url.pathname).endsWith(path) && url.searchParams.has('variant'),
+    (url) => decodeURIComponent(url.pathname).endsWith(path) && url.searchParams.has('option_values'),
     (route) => (['fetch', 'xhr'].includes(route.request().resourceType()) ? handler(route) : route.continue())
   );
 }
 
 async function selectOptions(page: Page, options: string[]) {
-  const fieldsets = tid(page, T.option);
-  for (let i = 0; i < options.length; i += 1) {
-    const value = fieldsets.nth(i).getByTestId(T.optionValue).filter({
-      has: page.locator(`input[type="radio"][value=${JSON.stringify(options[i])}]`),
-    });
-    if (!(await value.locator('input[type="radio"]').isChecked())) await value.click();
-  }
+  await chooseOptions(tid(page, T.picker), options);
 }
 
 async function settled(page: Page) {
@@ -100,11 +97,17 @@ function missingCombo(product: JsProduct) {
 }
 
 test.describe('ES1-T87 variant picker: partial fetch lỗi không kẹt nút', () => {
-  test('tĩnh: catch khôi phục khi không phải tự huỷ, lưu lại sau apply, ≤ 7168 B', () => {
+  test('tĩnh: lỗi không do tự huỷ thì về biến thể đã tải, gỡ aria-disabled trong finally, id chỉ đổi sau apply, ≤ 7168 B', () => {
     expect(Buffer.byteLength(JS)).toBeLessThanOrEqual(7168);
-    expect(JS).toMatch(/catch\s*{[^}]*if \(!controller\.signal\.aborted\) this\.restore\(\);/);
-    expect(JS).toMatch(/await partials\.apply\(update\);[\s\S]*?this\.save\(\);/);
-    expect(JS).toMatch(/connectedCallback\(\) {[\s\S]*?this\.save\(\);[\s\S]*?this\.listen\("addEventListener"\)/);
+    // Không còn tự khoá nút: disabled + nhãn do Liquid trả trong partial.
+    expect(JS).not.toMatch(/\.disabled\s*=[^=]/);
+    expect(JS).toMatch(/catch\s*{\s*if \(c\.signal\.aborted\) return;[\s\S]*?this\.check\(this\.loaded\);/);
+    expect(JS).toMatch(/finally\s*{[\s\S]*?if \(this\.controller == c\) this\.controller = this\.pending\(\);/);
+    const apply = JS.indexOf('await partials.apply(');
+    const id = JS.indexOf('this.form.elements.id.value = v.id');
+    expect(apply).toBeGreaterThan(0);
+    expect(id, 'id gửi giỏ chỉ đặt sau khi apply xong').toBeGreaterThan(apply);
+    expect(JS).toMatch(/connectedCallback\(\) {[\s\S]*?this\.listen\("addEventListener"\);[\s\S]*?this\.loaded = /);
   });
 
 });

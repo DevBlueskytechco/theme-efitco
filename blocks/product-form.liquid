@@ -1,40 +1,47 @@
 {% doc %}
   Product page buy form (TE-4 AC2 markup, AC3 option and quantity, AC4, AC6,
-  AC9). Reads the global `product`. Works without JavaScript (NFR-4).
+  AC9, AC15, AC16, NFR-7; ADR 0008 items 1, 3, 4). Reads the global
+  `product`. Works without JavaScript (NFR-4): the form buys
+  current_variant; changing options needs JS (product.md §17).
 
   current_variant = product.selected_or_first_available_variant, so the first
-  available variant loads by default and ?variant= deep links render that
-  variant's radios, hidden id, stock state and button.
+  available variant loads by default, and ?variant= deep links and
+  ?option_values= partial requests render that variant's hidden id, stock
+  state and button. No loop over the product's variant list, no variant
+  list JSON, no select listing variants (up to 2048 variants).
 
-  Variant picker (custom element product-variant-picker, markup in
-  snippets/product-variant-picker, noscript select in
-  snippets/product-variant-select) sits outside the
-  form so its radios (name option-{position}) are never submitted. One
-  fieldset + legend per option; each value is a label wrapping a radio,
-  shown as a pill, or as a swatch when value.swatch is set. Radios carry
-  data-available (value.available) and data-option-value-id. Picker, its
-  variant JSON, its script and the noscript select are not rendered when
-  product.has_only_default_variant or product.variants.size == 1 (AC9: one
-  variant with its own option values is still no choice). Hidden with
-  `scripting: none`: without JS the noscript select below picks the variant.
+  Variant picker: snippets/product-variant-picker (partial product-options,
+  custom element product-variant-picker, BE TE-4-R2-BE2) sits outside the
+  form so its radios are never submitted. Not rendered when
+  product.has_only_default_variant or product.variants_count == 1 (AC9: one
+  variant with its own option values is still no choice). Hidden without JS.
 
-  Inside the form (id product-form-{product.id}): hidden input name=id with
-  the current variant (assets/product-variant-picker.js, BE ES1-T66, keeps it
-  in sync), then a noscript select name=id listing every variant (sold out
-  options disabled) — without JS the last id parameter (the select) wins.
+  variant_exists: false when the selected option values form no variant
+  (the selected value of the first option has no value.variant; same rule as
+  the picker's "unavailable" state). current_variant then falls back to the
+  first available variant, but the stock line and button say Unavailable,
+  the button is disabled and a hint explains it (variant-picker §6.5).
 
-  Partials (names must match the JS):
+  Partials (names must match the JS, ADR 0008 item 3):
   - product-installments: {{ form | payment_terms }}.
   - product-selling-plans: radios name=selling_plan with prices from
     current_variant.selling_plan_allocations; One-time purchase (empty value)
     unless product.requires_selling_plan; product.selected_selling_plan is
     preselected. Empty when the product has no selling plan groups.
-  - product-buy-buttons: stock state (In stock / Sold out) + submit button;
-    sold out → disabled with the Sold out label. Unavailable (combination
-    without a variant) is set by JS from data-label-unavailable.
+  - product-buy-buttons: the hidden input name=id (current_variant, the only
+    id the form sends, ADR 0008 item 4), script[data-selected-variant] (one
+    variant, or null when variant_exists is false), stock line
+    (in_stock / sold_out / unavailable) with a "Checking availability…" line
+    for the loading state, the unavailable hint and the submit button
+    (disabled + Sold out / Unavailable label when it cannot be bought).
   - product-pickup: only when current_variant.requires_shipping and at least
     one store availability has pick_up_enabled; first location + pick up time,
     other locations in a details element.
+
+  Loading state (AC15, variant-picker §6, CSS in assets/product.css): JS sets
+  aria-busy="true" on every [data-variant-busy] region (stock here, price in
+  blocks/product-info, price in blocks/product-sticky-bar) and
+  aria-disabled="true" on the add buttons; it never adds a spinner to them.
 
   {{ form | payment_button }} renders when the show_dynamic_checkout setting
   is on, outside every partial (Shopify's script mounts the buttons, a
@@ -54,17 +61,22 @@
   data-label-add, data-label-added (status text after add, ES1-T84),
   data-label-sold-out, data-label-unavailable. Live regions:
   product-form-status (role status) and product-form-error (role alert),
-  empty on load. JS sets aria-busy on the root while loading.
+  empty on load, both direct children of product-form. The picker has its own
+  role=alert per option, so assets/product-form.js reads only direct children
+  (:scope>[role=status], :scope>[role=alert]); keep these two out of nested
+  wrappers. JS sets aria-busy on the root
+  while loading.
 
   Test hooks: product-form, product-variant-picker, product-option (fieldset),
   product-option-value (label wrapping the radio), product-form-variant-id,
-  product-variant-select, product-quantity, product-selling-plans,
-  product-selling-plan (label wrapping the radio), product-gift-card-toggle
-  (checkbox), product-gift-card-email, product-gift-card-name,
-  product-gift-card-message, product-gift-card-send-on, product-inventory,
-  product-form-add, product-payment-button, product-installments,
-  product-pickup, product-pickup-details, product-form-status,
-  product-form-error.
+  product-selected-variant, product-stock, product-inventory,
+  product-inventory-checking, product-form-unavailable, product-quantity,
+  product-selling-plans, product-selling-plan (label wrapping the radio),
+  product-gift-card-toggle (checkbox), product-gift-card-email,
+  product-gift-card-name, product-gift-card-message,
+  product-gift-card-send-on, product-form-add, product-payment-button,
+  product-installments, product-pickup, product-pickup-details,
+  product-form-status, product-form-error.
 
   Empty state: no product (block used outside the product template) → a
   hint in the theme editor, nothing on the storefront.
@@ -97,8 +109,20 @@
     assign label_unavailable = 'blocks.product_form.unavailable' | t
 
     assign has_variant_choice = true
-    if product.has_only_default_variant or product.variants.size == 1
+    if product.has_only_default_variant or product.variants_count == 1
       assign has_variant_choice = false
+    endif
+
+    # Tổ hợp đang chọn không tạo thành biến thể (ADR 0008, quy tắc ES1-T253: value.variant rỗng)
+    assign variant_exists = true
+    if has_variant_choice
+      for option in product.options_with_values limit: 1
+        for value in option.values
+          if value.selected and value.variant == blank
+            assign variant_exists = false
+          endif
+        endfor
+      endfor
     endif
 
     assign today = 'now' | date: '%Y-%m-%d'
@@ -120,22 +144,11 @@
     {{ block.shopify_attributes }}
   >
     {%- if has_variant_choice -%}
-      {%- render 'product-variant-picker', product: product, current_variant: current_variant, form_id: form_id -%}
+      {%- render 'product-variant-picker', product: product, form_id: form_id -%}
       <script src="{{ 'product-variant-picker.js' | asset_url }}" type="module"></script>
     {%- endif -%}
 
     {%- form 'product', product, id: form_id, class: 'product-form__form' -%}
-      <input
-        type="hidden"
-        name="id"
-        value="{{ current_variant.id }}"
-        data-testid="product-form-variant-id"
-      >
-
-      {%- if has_variant_choice -%}
-        {%- render 'product-variant-select', product: product, current_variant: current_variant, form_id: form_id -%}
-      {%- endif -%}
-
       {% partial 'product-installments' %}
         <div class="product-form__installments" data-testid="product-installments">
           {{- form | payment_terms -}}
@@ -323,32 +336,59 @@
 
       {% partial 'product-buy-buttons' %}
         {%- liquid
-          if current_variant.available
+          assign can_buy = false
+          if variant_exists == false
+            assign stock_state = 'unavailable'
+            assign stock_label = label_unavailable
+          elsif current_variant.available
             assign stock_state = 'in_stock'
             assign stock_label = 'blocks.product_form.in_stock' | t
+            assign can_buy = true
           else
             assign stock_state = 'sold_out'
             assign stock_label = label_sold_out
           endif
+          assign unavailable_id = form_id | append: '-unavailable'
         -%}
+        <input
+          type="hidden"
+          name="id"
+          value="{{ current_variant.id }}"
+          data-testid="product-form-variant-id"
+        >
+        {%- render 'selected-variant-data', variant: current_variant, exists: variant_exists -%}
         <div class="product-form__buy-buttons">
-          <p class="product-form__inventory" data-state="{{ stock_state }}" data-testid="product-inventory">
-            {{- stock_label -}}
-          </p>
+          <div class="product-form__stock" data-variant-busy data-testid="product-stock">
+            <p class="product-form__inventory" data-state="{{ stock_state }}" data-testid="product-inventory">
+              {{- stock_label -}}
+            </p>
+            <p class="product-form__checking" data-testid="product-inventory-checking">
+              <span class="spinner product-form__checking-spinner" aria-hidden="true"></span>
+              {{- 'products.variant.checking' | t -}}
+            </p>
+            {%- unless variant_exists -%}
+              <p id="{{ unavailable_id }}" class="product-form__hint" data-testid="product-form-unavailable">
+                {{- 'products.variant.combination_unavailable' | t -}}
+              </p>
+            {%- endunless -%}
+          </div>
           <button
             class="button product-form__add"
             type="submit"
             name="add"
-            {% unless current_variant.available %}
+            {% unless can_buy %}
               disabled
+            {% endunless %}
+            {% unless variant_exists %}
+              aria-describedby="{{ unavailable_id }}"
             {% endunless %}
             data-testid="product-form-add"
           >
             <span class="product-form__add-label">
-              {%- if current_variant.available -%}
+              {%- if can_buy -%}
                 {{- label_add -}}
               {%- else -%}
-                {{- label_sold_out -}}
+                {{- stock_label -}}
               {%- endif -%}
             </span>
           </button>

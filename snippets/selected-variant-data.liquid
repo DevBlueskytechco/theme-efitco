@@ -1,0 +1,30 @@
+{% doc %}
+  JSON of the one variant the product form buys (ADR 0008 item 4, spike
+  ES1-T347 4.3), read by assets/product-variant-picker.js after each partial
+  apply: id for the hidden input, events, featured media, status. One object,
+  never the variant list (NFR-7). Prints null when the selected option values
+  form no variant. Render it inside the partial that holds the add button.
+
+  Test hook: product-selected-variant.
+
+  @param {variant} variant - The variant to describe
+  @param {boolean} exists - false when the selected combination has no variant
+
+  @example
+  {% render 'selected-variant-data', variant: current_variant, exists: variant_exists %}
+{% enddoc %}
+<script type="application/json" data-selected-variant data-testid="product-selected-variant">
+  {%- if exists -%}
+    {
+      "id": {{ variant.id | json }},
+      "title": {{ variant.title | json }},
+      "available": {{ variant.available | json }},
+      "price": {{ variant.price | json }},
+      "compare_at_price": {{ variant.compare_at_price | json }},
+      "options": {{ variant.options | json }},
+      "featured_media": {{ variant.featured_media.id | json }}
+    }
+  {%- else -%}
+    null
+  {%- endif -%}
+</script>

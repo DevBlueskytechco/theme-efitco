@@ -1,11 +1,10 @@
-// <featured-product> ES1-T158. No storage, R8. Gallery: product-media.js (ADR 0012).
+// <featured-product> ES1-T158, ES1-T350. No storage, R8. Gallery: product-media.js (ADR 0012).
 class F extends HTMLElement {
 $(s) {
 return this.querySelector(s);
 }
 connectedCallback() {
 this.box = this.$("[data-end]");
-this.addEventListener("theme:variant:change", this);
 document.addEventListener("visibilitychange", this);
 if (this.box && this.tick()) {
 new IntersectionObserver((e) => {
@@ -21,7 +20,6 @@ document.removeEventListener("visibilitychange", this);
 }
 handleEvent(e) {
 if (e.type[0] == "v") return this.run();
-this.variant(e.detail);
 }
 run() {
 clearInterval(this.t);
@@ -41,15 +39,15 @@ if (!i) c.parentNode.hidden = n[0] < 1;
 });
 return 1;
 }
-// 2+ blocks: ES1-T169 D4.
-variant(e) {
-if (document.querySelectorAll("featured-product").length < 2) return;
-const v = JSON.parse(this.$("script").textContent).variants.find((x) => x.id == e.variantId);
-const d = this.$("product-form").dataset;
-const b = this.$('[name="add"]');
-this.$(".featured-product__price").innerHTML = v.price_html;
-b.disabled = !v.available;
-b.querySelector("span").textContent = v.available ? d.labelAdd : d.labelSoldOut;
+// D4: 2+ bands
+async swap(url, signal) {
+const r = await fetch(url, { signal });
+if (!r.ok) throw r.status;
+const q = (e) => e.querySelectorAll("featured-product :is(fieldset,[data-variant-price],[data-selected-variant],[name=add])");
+const n = q(new DOMParser().parseFromString(await r.text(), "text/html"));
+const a = document.activeElement, f = this.contains(a) && a.value;
+q(this).forEach((e, i) => e.replaceWith(n[i]));
+f && this.$(`[value="${f}"]`)?.focus();
 }
 }
 customElements.get("featured-product") || customElements.define("featured-product", F);

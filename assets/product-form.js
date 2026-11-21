@@ -10,8 +10,8 @@ class ProductForm extends HTMLElement {
   connectedCallback() {
     const form = (this.form = document.getElementById(`product-form-${this.dataset.productId}`));
     if (!form) return;
-    this.status = this.querySelector('[role="status"]');
-    this.error = this.querySelector('[role="alert"]');
+    this.status = this.querySelector(":scope>[role=status]");
+    this.error = this.querySelector(":scope>[role=alert]");
     this.gift = form.querySelector('input[name="properties[__shopify_send_gift_card_to_customer]"]');
     const f = (this.fields = this.gift?.closest(".product-gift-card")?.querySelector("fieldset"));
     if (f && !f.querySelector(`[name="${OFFSET}"]`)) {
