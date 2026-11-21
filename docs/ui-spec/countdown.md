@@ -10,7 +10,7 @@ KHÔNG CHẮC: (1) ES1-T276 (Tech Lead) chưa trả lời việc hiện số Liq
 | 2 | Nhãn và chữ hết giờ Inter 500 16/26 | 16/24 (`--line-height-body`) | Bội 4; Chuẩn: Carbon body-02 |
 | 3 | Bo 8 viết `calc(var(--radius-card) - var(--space-1))` | `--radius-sm` (8) | Thang bo góc của kit |
 | 4 | Bề rộng trạng thái hết giờ 267 / 311 px | `min-inline-size` 16.75rem (268) / 19.5rem (312) | Đơn vị rem; Thiết kế: giữ bề rộng lúc đang chạy để không nhảy bố cục |
-| 5 | Nút big offer "Shop The Deal" | "Shop the offer" | Chuẩn: Polaris Button (sentence case) |
+| 5 | Nút big offer "Shop The Deal" | "View offer" | Chuẩn: Polaris Button (sentence case, không mạo từ; CTO 21/11 lượt 2, lượt 1 là "Shop the offer") |
 
 ## Thay đổi audit (ES1-T283 A14, CTO chốt 10/11 câu 2)
 
@@ -24,7 +24,7 @@ Mục đích: báo cho người mua thời điểm thật một ưu đãi kết 
 
 Dùng ở: khối featured product trang chủ (`#container-home-featured-product` của mockup ES1-T293, index-mobile-b §2), buy box trang sản phẩm (product.md §4.2), thẻ big offer (marketing-popups.md §4). Quickview không có countdown (mini-cart-quickview không đặt; giữ gọn).
 
-Mockup (nguồn chuẩn): `drafts/designer/ES1-T251/foundation.html` section `h-countdown` ("33. Sale Countdown"); CSS: kit `.sale-countdown-host`, `.sale-countdown`, `.sale-countdown__label`, `__units`, `__unit`, `__ended`, `--compact`, `--ended`, `[data-state='ending']`.
+Mockup (nguồn chuẩn): `drafts/designer/ES1-T251/foundation.html` section `h-countdown` ("33. Sale countdown"); CSS: kit `.sale-countdown-host`, `.sale-countdown`, `.sale-countdown__label`, `__units`, `__unit`, `__ended`, `--compact`, `--ended`, `[data-state='ending']`.
 
 Thứ tự nguồn (CTO 21/11, ES1-T567): `kit.css` → mockup `drafts/designer/**` → `docs/tokens.json`, DESIGN.md, spec này (chép theo kit) → code theme. Quyết định và lý do: `docs/design/decisions.md`; bộ kiến thức ghi `NN §mục`.
 
@@ -73,7 +73,7 @@ Chữ dài (nhãn merchant tự đặt, bản dịch dài): khung `flex-wrap: wr
 Vị trí:
 - Featured product: giữa h2 và hàng giá (tiêu đề → countdown → giá, như `#container-home-featured-product` của mockup), cách trên 16, dưới 16.
 - PDP: giữa h1 và giá (product.md §4.2).
-- Big offer: sau hàng giá, trước nút "Shop the offer" (marketing-popups.md §4).
+- Big offer: sau hàng giá, trước nút "View offer" (marketing-popups.md §4).
 
 ## 3. Số ô
 

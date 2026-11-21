@@ -26,7 +26,7 @@ system used instead (Carbon, Material 3, Fluent 2, Spectrum, Ant) or says
 font families, the logo, the photos, uppercase condensed display headings,
 and the layout and block order of each page.
 
-Design system version: 2.0.0 (proposed, waiting for CTO approval). The number
+Design system version: 2.0.0 (number approved by the CTO, 21/11 round 2). The number
 lives in `docs/tokens.json` `_version`; rules and history are in
 `docs/design/CHANGELOG.md`. Writing rules for every string are in
 `docs/design/content.md`. How to propose and land a change is in
@@ -42,7 +42,7 @@ lives in `docs/tokens.json` `_version`; rules and history are in
   - Brand uses of the accent (CTO, `docs/design/decisions.md`; Polaris: the
     Brand role is separate from status roles): eyebrow text on light and sand
     backgrounds (09/11) and the highlighted part of a large heading such as
-    "Get 15% Off" (09/11). The warning toast (09/11) and the warning form
+    "Get 15% off" (09/11). The warning toast (09/11) and the warning form
     message (CTO 21/11) read `--color-warning`, which points to the accent
     (Polaris: warning is orange). Do not add another: color marks status, not
     category, so a category label such as the article tag `.badge--tag` is a
@@ -174,7 +174,7 @@ Color schemes: the six backgrounds (light, alt, cream, sand, dark, panel) are
 six schemes that share one set of roles (background, text, text subdued,
 border, focus, link). The scheme × role matrix with contrast ratios is in
 `docs/ui-spec/foundation.md` §2.2 and in the mockup section "12b. Color
-Schemes And Roles". It is documentation only for now: there is no
+schemes and roles". It is documentation only for now: there is no
 `color_scheme` setting and no color value changed (CTO 21/11).
 
 Section backgrounds are set in the template, not in a block setting:
@@ -255,10 +255,20 @@ brand asset.
   its size is fluid. The display uses 1 from 48rem (Design: one block of display
   text), so at 768 its line is not a multiple of 4.
 - Letter spacing: body −1%, label −2%, headings −2%, display −3% / −4%,
-  uppercase +4%. Body weight is 500 (CTO 20/11 V05).
+  uppercase +4%. Body weight is 500: brand identity (CTO 20/11 V05, kept by
+  CTO 21/11 round 2).
 - Body copy in sentence case. Do not uppercase body text or h2 section
   headings. Why: uppercase is reserved for display headings, eyebrows, group
-  labels and the marketing popup title (brand type style) so they stand out.
+  labels and the marketing popup title (brand identity, CTO 21/11 round 2) so
+  they stand out. The uppercase comes from CSS `text-transform`; the source
+  string is always sentence case.
+- Headings h1–h4, section titles, dialog and drawer titles, empty states,
+  tabs, menu links (header, mega menu, drawer, footer) and filter chip labels
+  that are interface text use sentence case: capitalise only the first word
+  and proper nouns ("Browse categories", "Your cart", "Our story"; CTO 21/11
+  round 2). Keep as written: the brand name, product, collection and article
+  titles (merchant data such as "Free Weights"), proper names (Shop Pay,
+  Apple Pay) and abbreviations (FAQ, USD).
 - Smallest text is 13px (`--font-size-xs`); never 12px.
 
 ## Spacing
@@ -286,7 +296,7 @@ existing theme code and are not used in new components.
 | `--space-4xl` | 48 | `--space-7` | Polaris `large-500` | Section padding below 64rem, dialog padding, page title bottom |
 | `--space-5xl` | 64 | `space_base × 16` | Polaris React space 64px | Page title bottom (desktop), wide band inset |
 | `--space-6xl` | 80 | `space_base × 20` | Polaris React space 80px | Desktop tier |
-| `--space-7xl` | 120 | `--space-8` | Design: desktop section rhythm, on the 4px grid | Section padding from 64rem |
+| `--space-7xl` | 128 | `--space-8` | Standard: Polaris React space 128px (CTO 21/11 round 2; was 120, off the scale) | Section padding from 64rem |
 
 `--space-4xl` was 56 before ES1-T567; 56 is not on the Polaris scale.
 `--space-7` is now only an alias of `--space-4xl`. Do not write raw px for
@@ -300,7 +310,7 @@ spacing.
   to decide.
 - The spacing scale is for padding, gap and margin. Sizes (width, height) use
   size tokens and never a spacing token (Polaris): `--control-height`
-  (48 / 52), `--control-height-compact` (44), `--touch-target` (44),
+  (48 at every breakpoint), `--control-height-compact` (44), `--touch-target` (44),
   `--tab-height-desktop` (40), `--row-height` (52), `--round-button-size`
   (52), `--count-badge-size` (20), `--progress-height` (4), `--meter-height`
   (8), `--icon-size-*`.
@@ -364,7 +374,7 @@ V15). Do not add a fifth shadow step.
 | `--layer-sticky` | 4 | Collection toolbar, cart summary, product gallery |
 | `--layer-bottom-bar` | 5 | Sticky add to cart, checkout bar, bundle bar |
 | `--layer-header` | 10 | Header, dropdown, mega menu and its scrim |
-| `--layer-floating` | 15 | Big Offer teaser |
+| `--layer-floating` | 15 | Big offer teaser |
 | `--layer-scrim` | 20 | Fallback scrim |
 | `--layer-overlay` | 21 | Drawer and dialog fallback, popover card, localization from 768 |
 | `--layer-toast` | 30 | Toast |
@@ -422,7 +432,7 @@ One set, one style: outlined, single color (`currentColor`), 1.5 stroke on a
   viewport edge (`--band-inset`, Polaris React space 64px): 1792 wide at
   1920, edge to edge on narrow screens.
 - Vertical rhythm between bands: `--space-4xl` (48) below 64rem,
-  `--space-7xl` (120) from 64rem. Inside a block: heading → content 24, 40
+  `--space-7xl` (128) from 64rem. Inside a block: heading → content 24, 40
   from 80rem; eyebrow → heading 12.
 - Header height: `--header-height` = `space_base` × 20 (80px). Every page has
   the same dark bar (`background_dark` + noise); it never overlays an image.
@@ -436,7 +446,9 @@ One set, one style: outlined, single color (`currentColor`), 1.5 stroke on a
   main menu links, form submit (search, add to cart), cart, hamburger, close
   buttons of modals and drawers, variant options (pill, swatch). Every other
   control keeps the floor `--touch-target-min` (24px; 44px below 48rem per
-  CTO 09/11). Sizes per breakpoint: foundation.md §1.3 (CTO 21/11).
+  CTO 09/11). Links in the form error summary (`.form-message__list a`) keep
+  the 44px floor below 80rem and 24px from 80rem (CTO 21/11 round 2). Sizes
+  per breakpoint: foundation.md §1.3 (CTO 21/11).
 
 ## Motion
 
@@ -519,7 +531,10 @@ confirm them (question ES1-T39).
   "Add setup to cart", "Add bundle to cart", "View details". Link CTAs and
   "View all …" links follow the same case with 2–5 words that name the
   destination ("Read the full guide", "View all articles"). Proper names,
-  abbreviations and branded buttons keep their own spelling. Full rules:
+  abbreviations and branded buttons keep their own spelling. "Checkout" stays
+  one word on the button (commerce term). The big offer button reads "View
+  offer" (no article). A discount percentage uses the minus sign U+2212:
+  "−24%", never a hyphen (CTO 21/11 round 2). Full rules:
   `docs/design/content.md`.
 - Standard commerce actions ("Add to cart", "Sold out", "Checkout") use the
   theme locale strings, not custom copy. Why: they must match Shopify checkout
@@ -529,7 +544,7 @@ confirm them (question ES1-T39).
   Why: Theme Store requirement R8.
 - Button styles, in `assets/base.css`:
   - `.button`: accent background, accent foreground, `--radius-button`,
-    weight 600, height 48px (52px from 80rem). Primary action, one per
+    weight 600, height 48px at every breakpoint (CTO 21/11 round 2). Primary action, one per
     section.
   - `.button--secondary`: transparent, border and text in current color;
     white border and text on dark.
@@ -572,11 +587,11 @@ confirm them (question ES1-T39).
   returns focus to the field. Why:
   Shopify accessibility guidance asks for focus on the error message (CTO
   21/11, ES1-T535).
-- Loading indicators appear only after 300 ms: before that keep the old
+- Loading indicators appear only after 500 ms: before that keep the old
   content and block repeat actions; after it show a spinner inside the
   loading area or a skeleton of the same size. One number for buttons,
   collection filters, the variant picker and localization (foundation.md
-  §18.1; Polaris says 500 ms, open question for the CTO).
+  §18.1; Polaris 500 ms, CTO 21/11 round 2, was 300 ms).
 - Tabs, chips and tertiary buttons look alike, so they differ by job: a tab
   switches the panel right below it, a chip filters or suggests, a tertiary
   button performs a secondary action. A small tertiary button in the same
@@ -620,7 +635,7 @@ confirm them (question ES1-T39).
   RTL language is chosen (Inter and Sofia Sans Condensed have none; CTO
   decision); QA has run the RTL sample set with labels 50% longer at 360 and
   1280. What flips, what stays, and who owns each condition: foundation.md
-  §34 and the mockup section "6d. Right-To-Left".
+  §34 and the mockup section "6d. Right-to-left".
 
 ## Component status
 

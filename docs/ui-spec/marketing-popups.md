@@ -14,7 +14,7 @@ KHÔNG CHẮC: SRS 0.2 không có story/AC cho 3 popup (chỉ newsletter footer 
 | 6 | Vị trí teaser khi có toast, Inbox | "Không đè: toast, Inbox, sticky ATC" | toast < 48rem hiện thì teaser ẩn; làn phải dành cho Inbox và toast; số theo layers §2 | layers §2.3 |
 | 7 | Setting "Position" | Left (Right) | bỏ: góc trái là chốt CTO MK2, làn phải dành Inbox, toast | Sổ 10/11 MK2; layers §2.3 |
 | 8 | Ngày hết sale | setting "Sale end date" | metafield sản phẩm `custom.sale_ends_at` là nguồn chính, setting chỉ dùng khi sản phẩm không có metafield; component countdown chung với featured product, PDP | Sổ 10/11 audit (2) |
-| 9 | Mockup | 4 mục | thêm mục 5 "Bottom Of The Screen": trang chủ 360 teaser trên thanh bundle (≥ 768 không thanh), PDP thanh mua không teaser, cart checkout bar không teaser, banner consent hiện | ticket ES1-T290 |
+| 9 | Mockup | 4 mục | thêm mục 5 "Bottom of the screen": trang chủ 360 teaser trên thanh bundle (≥ 768 không thanh), PDP thanh mua không teaser, cart checkout bar không teaser, banner consent hiện | ticket ES1-T290 |
 
 Giữ nguyên: giao diện 3 popup, copy, trigger, hàng đợi điều 2–8, mọi trạng thái cũ, motion, tương phản.
 
@@ -29,7 +29,7 @@ Giữ nguyên: giao diện 3 popup, copy, trigger, hàng đợi điều 2–8, m
 | 5 | Big offer | "khu vực khuyến mãi" là KHÔNG CHẮC (câu CTO 2) | chốt: nút nổi góc dưới trái mở thẻ deal; nút chỉ hiện khi còn hàng, có giá gạch, chưa hết giờ | CTO 10/11 MK2 |
 | 6 | Before you leave biến thể B | luôn dùng khi giỏ rỗng có mã | bỏ nếu người mua đã đăng ký newsletter trong phiên (đã nhận mã 15%) | ĐỀ XUẤT 22 §6 #7 (nội dung liên quan) |
 | 7 | Settings | before you leave không có số ngày | thêm "Days before showing again" (mặc định 1) cho before you leave | 15 §1 (Frequency capping ≤ 1 lần/ngày) |
-| 8 | Mockup | mục 1 newsletter, mục 2 before you leave riêng | mục 1 "One Popup At A Time": dòng thời gian 4 bước + 3 khung nối tiếp: bước 1 newsletter hiện → bước 2 đã đóng, nghỉ 3 s, chỉ còn nút "Big offer" → bước 3 before you leave hiện; nút "Big offer" vẽ dưới scrim ở bước 1, 3; sửa khung ngắn ở 1280/1920 (trước bị kéo cao 720) | CTO 10/11 MK3 |
+| 8 | Mockup | mục 1 newsletter, mục 2 before you leave riêng | mục 1 "One popup at a time": dòng thời gian 4 bước + 3 khung nối tiếp: bước 1 newsletter hiện → bước 2 đã đóng, nghỉ 3 s, chỉ còn nút "Big offer" → bước 3 before you leave hiện; nút "Big offer" vẽ dưới scrim ở bước 1, 3; sửa khung ngắn ở 1280/1920 (trước bị kéo cao 720) | CTO 10/11 MK3 |
 | 9 | Trạng thái | — | thêm "Hàng đợi · popup đang chờ" | mục 5 |
 | 10 | Mục 11 | "Quyết định CTO cần chốt" 3 câu | "Quyết định CTO đã chốt (10/11)" + 3 câu mới, mỗi câu 1 dòng | ticket vòng 3b |
 
@@ -51,7 +51,7 @@ Giữ nguyên từ vòng 3: giao diện 3 popup, copy, cỡ chữ, đếm ngư�
 
 Giữ nguyên (vòng 3): nội dung, copy, trigger, tần suất, settings, mọi trạng thái vòng 2, 3 câu CTO. Tần suất, mặc định và trigger mobile đã đổi ở vòng 3b (bảng trên).
 
-Ghi chú: bo input và nút theo token `--radius-input` / `--radius-button` = 4 (foundation). Tiêu đề popup marketing Sofia 700 HOA, khác tiêu đề dialog thường (foundation §16): Thiết kế: tiêu đề kiểu display trong dialog marketing (V71 / V75); lý do gốc là bản vẽ cũ nên chờ CTO xác nhận giữ.
+Ghi chú: bo input và nút theo token `--radius-input` / `--radius-button` = 4 (foundation). Tiêu đề popup marketing Sofia 700 HOA, khác tiêu đề dialog thường (foundation §16): bản sắc thương hiệu (CTO 21/11 lượt 2 giữ; V71 / V75). HOA do CSS, chữ nguồn sentence case.
 
 Mục đích: thu email và giữ người mua sắp rời đi mà không phá trải nghiệm và chỉ tiêu Lighthouse (sổ quyết định 09/11). Người mua phải: thấy ưu đãi khi đã quan tâm (không phải lúc vừa vào), đóng được bằng 1 chạm, nhận mã hoặc quay lại giỏ trong 1 bước.
 Story: TE-9 (overlay toàn theme, sổ quyết định 09/11); newsletter liên quan TE-1 AC6. Chưa có AC riêng (ES1-T273).
@@ -110,13 +110,13 @@ Chuỗi mẫu trong mockup mục 1: giỏ 2 món, t = 12 s, cuộn 55% → newsl
 
 ## 2. Newsletter popup
 
-Copy và nút theo khối newsletter footer (heading "Get 15% Off Your First Order", "Get 15% Off" phần nhấn cam, mô tả, nút "Get 15% off" + icon gửi, "No spam. Unsubscribe anytime."). Ảnh: `efx-news.jpg` (ảnh newsletter footer, `layout/theme.liquid`).
+Copy và nút theo khối newsletter footer (heading "Get 15% off your first order", "Get 15% off" phần nhấn cam, mô tả, nút "Get 15% off" + icon gửi, "No spam. Unsubscribe anytime."). Ảnh: `efx-news.jpg` (ảnh newsletter footer, `layout/theme.liquid`).
 
 ### Anatomy
 1. Scrim `--overlay-scrim`.
 2. Dialog (modal) M: ảnh trái (≥ 48rem) · thân phải.
 3. Nút đóng × (`.close-button`, góc inline-end trên).
-4. Tiêu đề h2 `aria-labelledby`: "Get 15% Off" màu `--color-accent`, phần còn lại `--color-foreground`; heading 700 uppercase, cỡ h2 32/40 → 36/44, letter-spacing −0.02em (Thiết kế: tiêu đề kiểu display trong dialog marketing, V71 / V75).
+4. Tiêu đề h2 `aria-labelledby`: "Get 15% off" màu `--color-accent`, phần còn lại `--color-foreground`; heading 700 uppercase, cỡ h2 32/40 → 36/44, letter-spacing −0.02em (Thiết kế: tiêu đề kiểu display trong dialog marketing, V71 / V75).
 5. Mô tả Inter 500 16/24 `--color-muted`, cách tiêu đề 8, `aria-describedby` (ẩn dưới 48rem).
 6. Form `customer`: label "Email" (14/600) · input email (`autocomplete="email"`, placeholder "name@example.com") · checkbox đồng ý · nút primary full "Get 15% off" + icon gửi.
 7. Hàng link: "No thanks" (button, đóng + ghi nhớ) · "Privacy policy" (`shop.privacy_policy.url`).
@@ -134,7 +134,7 @@ Copy và nút theo khối newsletter footer (heading "Get 15% Off Your First Ord
 | Tiêu đề | 28, 2 dòng | 32 | 36 | 36 |
 | Khoảng cách | stack 16; tiêu đề → mô tả 12 | như 360 | như 360 | như 360 |
 | Cao đo trên PNG | ~400 / 720 (56%) | ~520 | ~560 | ~560 |
-| Nút | cao 48 | 48 | 52 | 52 |
+| Nút | cao 48 | 48 | 48 | 48 |
 
 Mobile chỉ còn tiêu đề + form vì 15 §1 "không che nội dung chính" và ticket "không che nội dung chính trên mobile": để cả mô tả thì sheet ~70% màn (đo trên bản nháp). Dialog dùng `--radius-dialog` (24), padding 0 để ảnh chạm mép, `overflow: hidden auto`.
 
@@ -144,7 +144,7 @@ Mobile chỉ còn tiêu đề + form vì 15 §1 "không che nội dung chính" v
 | --- | --- | --- | --- |
 | Show newsletter popup | checkbox | true (CTO 10/11 MK3) | — |
 | Image | image_picker | `efx-news.jpg` truyền từ layout như footer | ảnh dọc 3:4, ≥ 600 px rộng |
-| Heading | inline_richtext | `<em>Get 15% Off</em> Your First Order` (`<em>` hiện màu accent, không nghiêng) | ≤ 8 từ |
+| Heading | inline_richtext | `<em>Get 15% off</em> your first order` (`<em>` hiện màu accent, không nghiêng) | ≤ 8 từ |
 | Text | inline_richtext | câu mô tả của newsletter footer | ≤ 30 từ |
 | Button label | text | Get 15% off | 2–4 từ |
 | Show consent checkbox | checkbox | true | — |
@@ -172,8 +172,8 @@ Nguồn delay/scroll: 15 §1 (5–10 s hoặc cuộn 50–60%). Mở khi **cả 
 
 | Biến thể | Khi nào | Nội dung |
 | --- | --- | --- |
-| A. Giỏ có hàng | `cart.item_count > 0` | eyebrow "Before You Go" · h2 "Your Cart Is Saved" · câu "Your {n} items are still in your cart. Check out in a few steps." · tối đa 2 dòng hàng (desktop), 1 dòng (mobile) + link "View {n} more item(s) in your cart" · Subtotal · "Keep shopping" (đóng) + primary "Check out now" |
-| B. Giỏ rỗng, có mã | `cart.item_count == 0`, setting mã không rỗng, người mua chưa đăng ký newsletter trong phiên (mục 1.2 điều 7) | eyebrow · h2 "<em>Take 15% Off</em> Your First Order" · "Use this code at checkout on your first order." · ô mã + "Copy code" · "No thanks" + primary "Shop all equipment" |
+| A. Giỏ có hàng | `cart.item_count > 0` | eyebrow "Before you go" · h2 "Your cart is saved" · câu "Your {n} items are still in your cart. Check out in a few steps." · tối đa 2 dòng hàng (desktop), 1 dòng (mobile) + link "View {n} more item(s) in your cart" · Subtotal · "Keep shopping" (đóng) + primary "Check out now" |
+| B. Giỏ rỗng, có mã | `cart.item_count == 0`, setting mã không rỗng, người mua chưa đăng ký newsletter trong phiên (mục 1.2 điều 7) | eyebrow · h2 "<em>Take 15% off</em> your first order" · "Use this code at checkout on your first order." · ô mã + "Copy code" · "No thanks" + primary "Shop all equipment" |
 | Rỗng | giỏ rỗng, không có mã | không render, không mở |
 
 Dữ liệu trên mockup (demo-data): Ativafit Lava 66 lb Adjustable (sản phẩm demo bản featured, Black, $379.99 gạch $499.99, ảnh `efx-prod-P15.jpg`) + Iron Core Kettlebell 16 kg (sản phẩm demo, Black, $119.00, ảnh `efx-prod-P02.jpg`), Subtotal $498.99. Trạng thái ≥ 3 dòng thêm Speed rope $34.00 → $532.99. KHÔNG CHẮC: ảnh P02 đúng kettlebell trên PNG, nhưng store dev nhiều ảnh lệch tên (ES1-T245).
@@ -205,7 +205,7 @@ Dòng hàng: lưới `64px 1fr auto`, gap 16, padding-block 12, gạch 1px `--co
 | Days before showing again | range | 1 | 1–30 (15 §1 ≤ 1 lần/ngày) |
 | Show cart items | checkbox | true | tắt thì giỏ có hàng dùng biến thể B |
 | Discount code | text | rỗng | KHÔNG CHẮC: store dev chưa có mã (ES1-T273) |
-| Offer heading | inline_richtext | `<em>Take 15% Off</em> Your First Order` | ≤ 8 từ |
+| Offer heading | inline_richtext | `<em>Take 15% off</em> your first order` | ≤ 8 từ |
 | Offer text | text | Use this code at checkout on your first order. | ≤ 20 từ |
 | Button label | text | Shop all equipment | 2–4 từ, mô tả đích |
 | Button link | url | `routes.all_products_collection_url` | — |
@@ -217,13 +217,13 @@ Dòng hàng: lưới `64px 1fr auto`, gap 16, padding-block 12, gạch 1px `--co
 CTO chốt 10/11 (MK2): "khu vực khuyến mãi" = nút nổi "Big offer" (teaser) góc dưới trái, mở thẻ deal của sản phẩm giảm giá (như khối featured product trang chủ: sản phẩm + "Sale ends in" đếm ngược); teaser chỉ hiện khi còn hàng, có giá gạch, chưa hết giờ. Mặc định BẬT (MK3). Teaser không phải popup; thẻ đang mở chiếm lớp trong hàng đợi (mục 1.2 điều 1, 8). Kiểu mobile theo 15 §2 #6 (offer: popup từ dưới lên có ×).
 
 ### Anatomy
-1. Teaser (nút nổi, `position: fixed`, góc dưới inline-start): pill nền `--color-background-dark` + noise (như header vòng 3), chữ `--color-background-dark-foreground` · nút mở (icon tag 20 + "Big offer" 14/600 + badge sale "-24%" pill 28) cao 48 · nút ẩn × 44 × 48 tách bằng gạch 1px trắng 24%.
+1. Teaser (nút nổi, `position: fixed`, góc dưới inline-start): pill nền `--color-background-dark` + noise (như header vòng 3), chữ `--color-background-dark-foreground` · nút mở (icon tag 20 + "Big offer" 14/600 + badge sale "−24%" pill 28) cao 48 · nút ẩn × 44 × 48 tách bằng gạch 1px trắng 24%.
 2. Thẻ ưu đãi (`role="dialog"`, ≥ 48rem không modal; < 48rem modal sheet + scrim), stack cách 24:
    - đầu: eyebrow "Big offer" (cam trên nền trắng) + nút đóng (40 desktop, 48 mobile)
-   - sản phẩm: ảnh 1:1 nền cream bo 16 (96 mobile, 120 từ 48rem) · h2 tên sản phẩm (Sofia 700, cỡ h3, ls −0.02em, dòng 28/36) · hàng giá: giá sale 16/500 `--color-sale` + giá gạch 14/500 `--color-muted` + badge "-24%" pill 28, cách 8
+   - sản phẩm: ảnh 1:1 nền cream bo 16 (96 mobile, 120 từ 48rem) · h2 tên sản phẩm (Sofia 700, cỡ h3, ls −0.02em, dòng 28/36) · hàng giá: giá sale 16/500 `--color-sale` + giá gạch 14/500 `--color-muted` + badge "−24%" pill 28, cách 8
    - thanh đếm ngược: kit `.sale-countdown.sale-countdown--compact` (countdown.md §2, cỡ Compact mọi mốc, CTO 11/11; trang không viết CSS riêng): nền `--color-background-dark`, cao tối thiểu 60, bo 8, padding-inline 16, rộng theo nội dung (≈ 268); "Sale ends in" Inter 500 16/24 trắng; 3 ô (4 ô khi còn ≥ 24 giờ) 40 × 40 bo 8 viền 1px trắng 12% trên nền tối (≈ #333), số Inter 700 16/24, ô cách 4, nhãn → ô 16 (Chuẩn: Polaris base); không dấu ":"; chỉ hiện khi có ngày kết thúc hợp lệ
    - (tuỳ chọn) ô mã như mục 3
-   - primary full "Shop the offer" → URL sản phẩm
+   - primary full "View offer" → URL sản phẩm
 3. Ảnh trong thẻ là trang trí (`alt=""`), không phải link; tên sản phẩm đọc từ h2.
 
 Dữ liệu mockup: sản phẩm demo Ativafit Lava bản featured $379.99 / $499.99 → −24% (120 / 499.99 = 24.0%), ảnh `efx-prod-P15.jpg` (đúng tạ đơn). Đếm ngược 22:36:28 là số minh hoạ, cùng khối featured product trang chủ. Trên store (sổ 10/11 audit 2): ngày hết sale đọc từ metafield sản phẩm `custom.sale_ends_at` (date_time) của sản phẩm chọn trong setting; setting "Sale end date" chỉ dùng khi sản phẩm không có metafield; một component countdown chung với featured product, PDP (cùng quy tắc ẩn: không ngày, hết giờ, biến thể không giá gạch).
@@ -258,7 +258,7 @@ Dữ liệu mockup: sản phẩm demo Ativafit Lava bản featured $379.99 / $49
 | Button text | text | Big offer | ≤ 3 từ |
 | Sale end date | text | rỗng | chỉ dùng khi sản phẩm không có metafield `custom.sale_ends_at` (sổ 10/11 audit 2); định dạng YYYY-MM-DD HH:MM, giờ store; sai định dạng thì ẩn đếm ngược (như `featured_product.countdown_invalid`); info: "Used only when the product has no sale end date metafield." |
 | Discount code | text | rỗng | — |
-| Button label | text | Shop the offer | 2–4 từ |
+| Button label | text | View offer | 2–4 từ |
 | Scroll depth | range (%) | 25 | 0–90 |
 | Open on hover | checkbox | true | tắt thì chỉ mở khi bấm |
 | Days before showing again | range | 1 | 1–30, khi người mua bấm × trên teaser |
@@ -276,17 +276,17 @@ Tất cả trạng thái là ĐỀ XUẤT theo foundation §12, §17, §18; 05 �
 | Email sai | newsletter | viền ô sale 2px, dưới ô: icon ! + "Enter an email like name@example.com." (chuỗi `footer.newsletter_invalid` có sẵn); hiện khi rời ô hoặc khi gửi | `aria-invalid="true"`, `aria-describedby` → lỗi; gửi lỗi thì focus về ô |
 | Chưa đồng ý | newsletter | ô checkbox viền sale + "Tick the box to agree to emails, then try again." | như trên trên checkbox |
 | Đang gửi | newsletter | nút `aria-busy` spinner trắng, giữ bề rộng (0 CLS); ô email readonly | `role="status"` ẩn "Signing you up…" |
-| Thành công | newsletter | thay form: icon check `--color-badge-new` trong tròn 56 nền alt · h2 "You're On The List" · "Thanks for subscribing." + khi setting Discount code có mã: "Use code {code} at checkout." kèm nút Copy code (theme không gửi email, Shopify §8 không claim sai, 11/11) · primary "Continue shopping" (đóng); ghi cờ đã đăng ký, không hiện lại | vùng `role="status"`, focus về tiêu đề mới |
-| Đã đăng ký | newsletter | như thành công, icon info muted · "You're Already Subscribed" · "This email is already on our list." (+ mã như trên khi có setting) Không phải lỗi. KHÔNG CHẮC: Shopify báo trường hợp này thế nào (ES1-T274 #1) | `role="status"` |
+| Thành công | newsletter | thay form: icon check `--color-badge-new` trong tròn 56 nền alt · h2 "You're on the list" · "Thanks for subscribing." + khi setting Discount code có mã: "Use code {code} at checkout." kèm nút Copy code (theme không gửi email, Shopify §8 không claim sai, 11/11) · primary "Continue shopping" (đóng); ghi cờ đã đăng ký, không hiện lại | vùng `role="status"`, focus về tiêu đề mới |
+| Đã đăng ký | newsletter | như thành công, icon info muted · "You're already subscribed" · "This email is already on our list." (+ mã như trên khi có setting) Không phải lỗi. KHÔNG CHẮC: Shopify báo trường hợp này thế nào (ES1-T274 #1) | `role="status"` |
 | Lỗi gửi | newsletter | hộp `.form-message--error` đầu form "We couldn't sign you up" + "Check your connection, then try again."; giữ email đã nhập | `role="alert"` |
 | Đã copy mã | before you leave B, big offer | nút đổi "Copied" + icon tick `--color-badge-new`, viền badge-new; dòng dưới "Code copied. Paste it at checkout."; sau 3 s nút về "Copy code", dòng chữ giữ nguyên (04 §6 không tắt sau 2 s) | dòng chữ trong `role="status"` có sẵn (rỗng lúc đầu, giữ chỗ 20px) |
 | Copy bị chặn | như trên | chọn sẵn chữ mã (nền accent 16%, viền accent) + "We selected the code for you. Press Ctrl+C or Cmd+C to copy it." | `role="status"` |
 | Giỏ ≥ 3 dòng | before you leave A | 2 dòng + "View 1 more item in your cart" | — |
 | Sản phẩm không ảnh | big offer | placeholder icon ảnh `--color-muted-light` trên cream (edge case "Sản phẩm không có media", $34.00) | — |
 | Ảnh đang tải | big offer, newsletter | skeleton cùng tỉ lệ (`.skeleton`), không đổi kích thước | `aria-hidden` |
-| Đếm ngược ẩn | big offer | ngày kết thúc rỗng hoặc sai định dạng: thẻ bỏ thanh đếm ngược, giữ sản phẩm + giá + "Shop the offer" (như `featured_product.countdown_invalid`) | — |
+| Đếm ngược ẩn | big offer | ngày kết thúc rỗng hoặc sai định dạng: thẻ bỏ thanh đếm ngược, giữ sản phẩm + giá + "View offer" (như `featured_product.countdown_invalid`) | — |
 | Hàng đợi · đang chờ | newsletter | không hiện gì; mở 3 s sau khi lớp đang mở (mọi lớp ở layers §4, gồm banner consent) đóng, nếu còn ở trang; before you leave không chờ (mục 1.2) | — |
-| Teaser trên thanh bundle | big offer, trang chủ 360 | thanh bundle hiện ("5 Items · $436.90" + "Add bundle to cart"): teaser trượt lên, mép dưới 88; mockup mục 5 | — |
+| Teaser trên thanh bundle | big offer, trang chủ 360 | thanh bundle hiện ("5 items · $436.90" + "Add bundle to cart"): teaser trượt lên, mép dưới 88; mockup mục 5 | — |
 | Teaser không có | big offer, trang product (mọi mốc), cart | không render; dải đáy chỉ có thanh mua / thanh checkout; mockup mục 5 | — |
 | Banner consent hiện | cả 3 | popup tự mở chờ, teaser và thanh đáy chưa hiện; mockup mục 5 | — |
 | Rỗng | cả 3 | không render: giỏ rỗng không mã (hoặc đã đăng ký trong phiên); sản phẩm hết hàng/không giá gạch/hết giờ; đã đăng ký, đã hiện trong phiên, đóng trong N ngày, trang loại trừ | — |
@@ -315,8 +315,8 @@ Thứ tự focus khi popup tự mở: focus vào tiêu đề h2 (`tabindex="-1"`
 ## 7. Accessibility
 
 - Dialog: `<dialog>` + `showModal()` cho newsletter, before you leave, sheet big offer (bẫy focus, nền inert); big offer ≥ 48rem là `<dialog>` mở bằng `show()` (không modal). Mỗi dialog có `aria-labelledby` (h2) và `aria-describedby` (câu mô tả khi có). Đóng: trả focus về phần tử đã focus trước (popup tự mở: về `<body>`/vị trí cũ, không nhảy trang).
-- Tên nút: "Close newsletter popup", "Close and keep shopping", "Close discount popup", "Close big offer", "Hide big offer". Badge "-24%" có chữ ẩn " off".
-- Vùng chạm: × 48 (mobile) / 40 (popover desktop); teaser 48 cao, × teaser 44 × 48; link-button 44 cao; checkbox cả nhãn bấm được, hàng ≥ 44; nút 48 / 52. Hai control gần nhất ("No thanks" và "Privacy policy") cách nhau ≥ 16 (04 §1).
+- Tên nút: "Close newsletter popup", "Close and keep shopping", "Close discount popup", "Close big offer", "Hide big offer". Badge "−24%" có chữ ẩn " off".
+- Vùng chạm: × 48 (mobile) / 40 (popover desktop); teaser 48 cao, × teaser 44 × 48; link-button 44 cao; checkbox cả nhãn bấm được, hàng ≥ 44; nút 48. Hai control gần nhất ("No thanks" và "Privacy policy") cách nhau ≥ 16 (04 §1).
 - Form: label thật cho email, `autocomplete="email"`, `type="email"`, không chặn dán; checkbox có nhãn; lỗi gắn `aria-describedby`.
 - Đếm ngược: `role="timer"`, nhãn và ô số `aria-hidden`, một câu ẩn ngày giờ kết thúc (countdown.md §7), không `aria-live` (không đọc mỗi giây).
 - Màu không là tín hiệu duy nhất: lỗi có icon + chữ; "Copied" có icon + chữ; giá sale có chữ ẩn "Sale price" / "Regular price".
@@ -334,7 +334,7 @@ Tương phản (L tương đối, (L1 + 0.05) / (L2 + 0.05)):
 | dark-foreground / background-dark (#1A1A1A) | 17.4 | teaser, chữ và số đếm ngược |
 | dark-foreground / dark + trắng 14% ≈ #3A3A3A | 11.4 | teaser hover (L 0.042) |
 | viền ô đếm ngược ≈ #333 / dark | 1.3 | trang trí; số trong ô vẫn 17.4, không cần viền để nhận biết |
-| sale-foreground / sale | 6.38 | badge -24% (cả trên teaser tối) |
+| sale-foreground / sale | 6.38 | badge −24% (cả trên teaser tối) |
 | sale / background | 6.38 | giá sale cạnh badge |
 | muted / background-alt | 7.69 | nhãn "Your code" |
 | foreground / background-alt | 15.8 | mã |
@@ -361,7 +361,7 @@ Không token mới. Giá trị lẻ (264, 288, 400, 720, 480, 96, 120) là kích
 - CLS 0: popup, scrim, teaser đều `position: fixed`; nút giữ bề rộng khi busy; dòng trạng thái copy giữ chỗ 20px; skeleton cùng tỉ lệ.
 - JS: 1 module chung cho 3 popup (trigger thời gian/cuộn/rời trang/cuộn ngược nhanh, hàng đợi 1 lớp mục 1.2, cờ `localStorage`/`sessionStorage`, copy bằng `navigator.clipboard` chỉ khi người mua bấm), nạp lúc rảnh (`requestIdleCallback`) sau `load`, không chặn render. Bắt cuộn bằng listener `passive` (không ảnh hưởng INP/cuộn). Ngân sách: ES1-T274 #3.
 - A11y rủi ro và cách tránh: dialog không tên (có h2 + `aria-labelledby`); nút icon không tên (mọi × có `aria-label` riêng); placeholder nhạt (muted-light 5.33); chữ cam nhỏ (accent chỉ dùng cho eyebrow 16/800 và tiêu đề lớn, đều ≥ 4.5 trên nền trắng); chữ đỏ trên nền tối (không có, footer foundation §4 đã cảnh báo; popup nền trắng); vùng chạm < 24 (không có); focus mất khi đóng (trả focus); `aria-hidden` chứa phần tử focus được (ảnh big offer không phải link).
-- SEO: link mô tả đích ("Check out now", "Shop all equipment", "Shop the offer", "View 1 more item in your cart", "Privacy policy"); không "Learn more" trần; chữ ≥ 14 (badge 13 theo DESIGN); ảnh có alt (ảnh trang trí `alt=""`). Nội dung popup ở cuối `<body>`, sau `<main>`, không đẩy nội dung chính xuống trong DOM.
+- SEO: link mô tả đích ("Check out now", "Shop all equipment", "View offer", "View 1 more item in your cart", "Privacy policy"); không "Learn more" trần; chữ ≥ 14 (badge 13 theo DESIGN); ảnh có alt (ảnh trang trí `alt=""`). Nội dung popup ở cuối `<body>`, sau `<main>`, không đẩy nội dung chính xuống trong DOM.
 - Best Practices: không xin quyền khi tải (clipboard chỉ khi bấm); không `history.pushState` chặn Back; 0 lỗi console (render mockup 4 mốc: 0 lỗi); không chặn dán vào ô email.
 - Google intrusive interstitial: không mở khi vừa vào từ tìm kiếm (chờ thời gian + cuộn), sheet mobile ≤ 60% màn, đóng 1 chạm.
 

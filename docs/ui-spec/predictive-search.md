@@ -20,7 +20,7 @@ Chỉ §5 đổi. Mockup T261 (khung 3, 5) giữ chip cũ tới khi render lại
 | 4 | Nút đóng (popup) | tròn 48 trắng viền border | tròn 48 trong suốt, viền trắng 24%, icon trắng; hover nền trắng icon tối | foundation §6 (trên nền tối) |
 | 5 | Spinner trong ô (popup) | xám trên trắng | vòng trắng 24% + cung trắng | foundation §18 |
 | 6 | Tab | biến thể nhỏ 14/600, padding 16 | tab kit `.tab`: 16/500, padding ngang 24 (`--tab-padding-inline`; THAY 21/11 ES1-T567, trước 28), cao 44 / 40 từ 80rem, cách 8; bỏ `.tab--sm` | foundation §7; Chuẩn: Polaris large-200 |
-| 7 | Card sản phẩm (dạng card) | không badge, media → tên 12, lh 24 | badge -N% góc trái trên (cách 8; 16 từ 64rem), media → tên 8, tên → giá 4, tên 16/24 | foundation §8–9 |
+| 7 | Card sản phẩm (dạng card) | không badge, media → tên 12, lh 24 | badge −N% góc trái trên (cách 8; 16 từ 64rem), media → tên 8, tên → giá 4, tên 16/24 | foundation §8–9 |
 | 8 | Hàng tab trong popup | padding dưới 12 | padding 16 (24 từ 80rem) vì hàng trên đã là thanh tối | bố cục |
 | 9 | Drawer (tab canvas) | — | giữ nền trắng, header drawer 72 (header trang tối không lặp vào drawer) | foundation §15 |
 | 10 | Chevron 52 | — | không dùng: overlay không có hàng carousel (Trending là lưới 2/4 cột) | foundation §6, §11 |
@@ -59,7 +59,7 @@ Code hiện có: `snippets/predictive-search.liquid` (dialog sau link `header-se
 4. Hàng tab (≥ 2 ký tự và có kết quả): All · Products n · Collections n · Articles n · Pages n. Chỉ hiện tab có kết quả.
 5. Thân (cuộn riêng): listbox gồm các nhóm theo thứ tự DOM Suggestions → Products → Collections → Articles → Pages.
    - Suggestions: tối đa 4 từ khoá, icon kính lúp 16, phần người mua đã gõ chữ thường 400, phần gợi ý thêm 600.
-   - Products: tối đa 4 ở tab All; ảnh, tên (hiện đủ, không cắt), giá (sale đỏ + giá gạch), "Sold out" bằng chữ. Dạng card (lưới, desktop tab All): như kit `.product-card` rút gọn: media 1:1 cream bo 12, badge -N% (`.badge--sale`) góc trái trên, tên 16/500 lh 24, giá; không rating, swatch (giữ gọn, chọn biến thể ở trang sản phẩm). Dạng hàng (ảnh 64): không badge, sale đọc từ giá đỏ + giá gạch.
+   - Products: tối đa 4 ở tab All; ảnh, tên (hiện đủ, không cắt), giá (sale đỏ + giá gạch), "Sold out" bằng chữ. Dạng card (lưới, desktop tab All): như kit `.product-card` rút gọn: media 1:1 cream bo 12, badge −N% (`.badge--sale`) góc trái trên, tên 16/500 lh 24, giá; không rating, swatch (giữ gọn, chọn biến thể ở trang sản phẩm). Dạng hàng (ảnh 64): không badge, sale đọc từ giá đỏ + giá gạch.
    - Collections: icon lưới 16, tên, "N products" (14 muted) ở cuối hàng.
    - Articles: ảnh 64 × 48 bo 4, tiêu đề 2 dòng, ngày đăng 14 muted.
    - Pages: icon trang 16, tên.
@@ -74,13 +74,13 @@ Token theo foundation §1. Khoảng cách viết bằng `--space-*`.
 | --- | --- | --- | --- | --- |
 | Khung | toàn màn | dải trên, ≤ 80% cao | dải trên, ≤ 80% cao | như 1280, nội dung 1416 |
 | Hàng đầu | thanh tối 80: ô tìm + đóng 48, gap 12 | như 360 | thanh tối 80, lưới 12: logo cột 1–3, ô cột 4–11, đóng cột 12 | như 1280, logo x 252 |
-| Ô tìm | cao 48, chữ 16 | cao 48, chữ 16 | cao 52, chữ 18 | như 1280 |
+| Ô tìm | cao 48, chữ 16 | cao 48, chữ 16 | cao 48, chữ 18 | như 1280 |
 | Tab | cao 44, padding ngang 24, 16/500, cuộn ngang, tab kế lộ ra; hàng padding 16 | như 360 | cao 40, bắt đầu cột 4; hàng padding 24 | như 1280 |
 | Tab All | 1 cột: gợi ý → sản phẩm dạng hàng (ảnh 64) → collection → bài viết | lưới 8: trái 3 cột (gợi ý, collection, bài viết, trang), phải 5 cột sản phẩm dạng hàng | lưới 12: trái 3 cột, phải 9 cột 4 card (213 rộng) | 4 card 246 rộng |
 | Tab Products | lưới 2 card | lưới 4 card | lưới 5 card | lưới 5 card |
 | Tab Collections / Articles / Pages | danh sách 1 cột | danh sách 1 cột, rộng 100% | như 768 | như 768 |
 | Khám phá | 1 cột: chip, collection, trending 2 cột | trái 3 / phải 5 cột, trending 2 cột | trái 3 / phải 9 cột, trending 4 cột | như 1280 |
-| Chân | nút full width, cao 48 | trạng thái trái, nút phải | như 768, nút cao 52 | như 1280 |
+| Chân | nút full width, cao 48 | trạng thái trái, nút phải | như 768, nút cao 48 | như 1280 |
 | Drawer | 90%, 1 cột như 360, nút chân full width | 420 | 480 | 480 |
 
 Khoảng cách: thân padding `--space-5` (24) / `--space-6` (32) từ 80rem; giữa các nhóm `--space-6`; tiêu đề nhóm → nội dung `--space-2`; hàng option cao 44; hàng sản phẩm cao 80; card gap `--space-5`; card media → tên `--space-2`, tên → giá `--space-1`; badge cách mép media `--space-2` (`--space-4` từ 64rem, như `.product-card__badges`); chân padding `--space-3`.
@@ -179,7 +179,7 @@ Thêm: `placeholder` "Search benches, kettlebells, mats…" (04 §3.7, 11 §1: p
 | thanh tối popup: chữ ô tìm, icon submit, nút đóng, logo trắng / dark | 17.4 |
 | thanh tối popup: placeholder, nút xoá, viền ô `--color-muted-on-dark` / dark | 6.11 (sổ 09/11) |
 | thanh tối popup: outline focus trắng / dark | 17.4 |
-| badge -N% `--color-sale-foreground` / `--color-sale` | 6.38 |
+| badge −N% `--color-sale-foreground` / `--color-sale` | 6.38 |
 | giá sale `--color-sale` trên trắng; trên alt | 6.38; 5.80 |
 | tab chọn: background / foreground | 17.4 |
 | chip: foreground / alt | 15.8 |
@@ -209,7 +209,7 @@ Không animate chiều cao khung khi số kết quả đổi (tránh xô lệch)
 - LCP: overlay không bao giờ là LCP. Dialog đóng lúc tải trang (`display: none`), không ảnh nào trong dialog tải; LCP vẫn là ảnh đầu trang của template (hero / banner). Không mở search tự động.
 - Ảnh lazy: mọi ảnh trong overlay. Ảnh kết quả do JS tạo từ `<template>` sau khi gõ (code). Ảnh "Trending now" render bằng `snippets/image.liquid` với `loading="lazy"` bên trong dialog đóng, hoặc trong `<template>` chèn khi mở (sổ quyết định 09/11: ảnh trong popup tải khi mở); `sizes` 64px (hàng) / `(min-width: 80rem) 250px, 50vw` (card); srcset tới 480. Có `width`/`height` → 0 CLS.
 - Font: Inter (body, ô tìm, option) + Sofia Sans Condensed (h2 drawer). Không font mới.
-- Thanh tối popup dùng lại `noise-dark.png` của header (đã tải, cache), không thêm request. Badge -N% tính từ `compare_at_price` trả về (dữ liệu động, sổ 07/11), không ảnh.
+- Thanh tối popup dùng lại `noise-dark.png` của header (đã tải, cache), không thêm request. Badge −N% tính từ `compare_at_price` trả về (dữ liệu động, sổ 07/11), không ảnh.
 - JS: `predictive-search.js` ≤ 8 KB gồm tab + recent searches; tải module khi trang tải nhưng chỉ fetch khi gõ; trang ≤ 40 KB. Nếu vượt 8 KB: tách recent searches thành module nạp khi mở.
 - CLS: overlay `position: fixed` trên trang, không đẩy layout; skeleton đúng kích thước nội dung; chân và hàng đầu cố định.
 - A11y (Lighthouse chỉ đo trạng thái tải, dialog đóng; QA axe khi mở): rủi ro `aria-required-children` (heading/link không option trong listbox) → khám phá, hộp 0 kết quả, nút "View all" để ngoài listbox; `nested-interactive` → option là `<a>`, không bọc; `aria-dialog-name` → h2; `button-name` → mọi nút icon có `aria-label`; `color-contrast` → bảng §8; `label` → `<label for>` thật; `target-size` → §8.

@@ -6,13 +6,13 @@ KHÔNG CHẮC: khối quiz trang chủ chỉ có bước hỏi; khung kết qu�
 
 | # | Lỗi audit | Trước | Sau (spec này) | Nguồn |
 | --- | --- | --- | --- | --- |
-| 1 | Không có kết quả khớp ở khổ nào | chỉ sheet "No Exact Match" 768/360 (ES1-T278) | popup có kết quả đủ 360 / 768 / 1280 / 1920: dialog L ≥ 768, bottom sheet < 768 (§2, §3) | Sổ 09/11 "Quiz: kết quả mở popup (mobile bottom sheet)"; foundation §16 cỡ L |
+| 1 | Không có kết quả khớp ở khổ nào | chỉ sheet "No exact match" 768/360 (ES1-T278) | popup có kết quả đủ 360 / 768 / 1280 / 1920: dialog L ≥ 768, bottom sheet < 768 (§2, §3) | Sổ 09/11 "Quiz: kết quả mở popup (mobile bottom sheet)"; foundation §16 cỡ L |
 | 2 | Thiếu trạng thái | — | đang tìm, có kết quả, ≤ 4 kết quả, không khớp (giữ T278), lỗi, hết hàng, đang thêm / đã thêm / lỗi thêm, quick view trong popup (§5) | Ticket; foundation §18 |
 | 3 | Card kết quả | `product-card` không nút | card foundation §9 + nút "Quick view" (ES1-T262 §4) + nút "Add to cart" / "Choose options" riêng của quiz (§4) | Ticket; 08 #529D |
 | 4 | Trang `?view=quiz` không JS chưa thiết kế | template chỉ có h1 = tên collection + block | trang đủ header, breadcrumb, tiêu đề, câu trả lời, lưới, hành động, rỗng (§6) | Ticket; AGENTS "Works without JavaScript" |
-| 5 | Heading trang `?view=quiz` nhảy bậc | h1 (collection) → h3 (results heading) → h4 (card) | h1 "Your Gear Shortlist" → h2 card | Sổ 09/11 A11y 100 (heading đúng thứ tự) |
+| 5 | Heading trang `?view=quiz` nhảy bậc | h1 (collection) → h3 (results heading) → h4 (card) | h1 "Your gear shortlist" → h2 card | Sổ 09/11 A11y 100 (heading đúng thứ tự) |
 
-Giữ nguyên: sheet "No Exact Match" của ES1-T278 (copy, nút, thứ bậc), quick view ES1-T262 §3, card foundation §9, khối quiz trang chủ (index-mobile-a §6).
+Giữ nguyên: sheet "No exact match" của ES1-T278 (copy, nút, thứ bậc), quick view ES1-T262 §3, card foundation §9, khối quiz trang chủ (index-mobile-a §6).
 
 ## 1. Mục đích, nguồn
 
@@ -26,7 +26,7 @@ Dữ liệu mockup (`docs/design/demo-data.json`): Lower body · Intermediate ·
 
 Thứ tự trong `<dialog>`:
 1. Nút đóng 48 (foundation §6), góc trên inline-end.
-2. Tiêu đề h3 "Your Gear Shortlist" (heading 800, `--font-size-h2`, `tabindex="-1"`, đích focus khi mở). h3 vì dialog nằm trong khối quiz sau h2 "Find Your Perfect Gear" (heading-order theo DOM).
+2. Tiêu đề h3 "Your gear shortlist" (heading 800, `--font-size-h2`, `tabindex="-1"`, đích focus khi mở). h3 vì dialog nằm trong khối quiz sau h2 "Find your perfect gear" (heading-order theo DOM).
 3. Câu trả lời: `<ul aria-label="Your answers">` 3 pill chỉ đọc: nền sand, chữ foreground 14/500, dấu tick accent 16, cao 32, cách 8. Lấy nhãn của lựa chọn đã chọn (JS đọc từ `label` đã checked). Lý do: người mua thấy kết quả dựa trên gì (05 §6 phản hồi; ĐỀ XUẤT, cùng trạng thái chọn nền sand của khối quiz trang chủ, index-mobile-a §6).
 4. Dòng đếm `role="status"`, 14 muted: "5 products match all 3 answers. Showing the top 4." (≤ 4: "3 products match all 3 answers."). Nguồn số: `collection.products_count` của URL tag.
 5. Lưới tối đa 4 card (`limit: 4`, SRS TE-11 AC3; hằng, không thành setting).
@@ -66,13 +66,13 @@ Mockup khung 2. ĐỀ XUẤT theo nguồn ghi bên cạnh.
 | --- | --- | --- | --- |
 | 1 | Có kết quả | khung 1 | TE-11 AC3 |
 | 2a | Đang tìm | popup mở ngay khi bấm "See my shortlist" (không đợi mạng): tiêu đề + câu trả lời đã có; dòng đếm thay bằng spinner 20 + "Matching your gear…" (`role="status"`); lưới skeleton đúng số cột (media 1:1, 2 dòng, nút 44); chỉ "Retake quiz" ở chân; thân `aria-busy`. Nút Submit `aria-busy` trong lúc mở | foundation §18; index-mobile-a §6 ("Matching your gear") |
-| 2b | Không khớp | nguyên ES1-T278: h "No Exact Match", 1 câu, "Shop all equipment" (secondary) + "Change my answers" (primary, đóng popup, về bước 1, focus tiêu đề bước 1). ≥ 768 dialog S 480, < 768 sheet | ES1-T278; AC-H16 |
+| 2b | Không khớp | nguyên ES1-T278: h "No exact match", 1 câu, "Shop all equipment" (secondary) + "Change my answers" (primary, đóng popup, về bước 1, focus tiêu đề bước 1). ≥ 768 dialog S 480, < 768 sheet | ES1-T278; AC-H16 |
 | 2c | Lỗi tải | tiêu đề giữ; hộp lỗi foundation §18 `role="alert"`: "We couldn't load your matches" / "Check your connection, then try again. Your answers are saved." + "Try again" (secondary, tải lại partial) + link chữ "Open my shortlist as a page" (URL `?view=quiz`, chạy không JS); chân "Retake quiz" | foundation §18; 05 §4 (nói cách sửa) |
 | 2d | Card hết hàng | badge Sold out, ảnh 0.6, nút disabled "Sold out", giá giữ; tên đọc thêm ", sold out" | foundation §9; 08 #2369D |
 | 2d | Đang thêm | nút `aria-busy`, spinner, giữ bề rộng, không bấm lại; chữ ẩn ", adding" | foundation §6; 05 §5 |
 | 2d | Đã thêm | ĐỀ XUẤT (câu CTO 1): popup ở lại; nút đổi "Added" + check badge-new viền badge-new 3 s rồi về "Add to cart"; dòng thông báo đầu thân (mẫu cd-notice ES1-T262: thanh 4px badge-new, "Added to cart" + tên, link "View cart" 44) `role="status"`; số giỏ header nhảy | 05 §6; sổ 09/11 toast success = badge-new; 15 §1 một lớp popup |
 | 2d | Lỗi thêm (422) | câu Shopify trả về dưới nút, 14/500 sale + icon 16, `role="alert"`; nút về bình thường | 05 §4; ES1-T262 5d |
-| 2e | ≤ 4 kết quả | không "View All"; primary "Shop all equipment →"; lưới giữ số cột, card căn đầu dòng | 04 §1 (không CTA vô nghĩa) |
+| 2e | ≤ 4 kết quả | không "View all"; primary "Shop all equipment →"; lưới giữ số cột, card căn đầu dòng | 04 §1 (không CTA vô nghĩa) |
 | 2f | Choose options / Quick View | thay nội dung trong cùng dialog (không mở lớp thứ 2): thanh trên có "Back to shortlist" (back-button 44, chữ 14 muted, nhỏ hơn ×) + ×; thân = quick view ES1-T262 §3 (ảnh, tên h3, giá + badge, bộ chọn option, "Add to cart" + "View details"). Thêm xong: về lưới với thông báo 2d | 15 §1, 22 §6 #5 (không chồng modal); 06 §1 (cùng quick view); câu CTO 2 |
 | — | Ít hơn 3 tag trên URL | Shopify bỏ tag không tồn tại → code tính 0 kết quả → 2b | code `required_tags` (ES1-T133 #1) |
 | — | Không ảnh | placeholder foundation §9 | foundation §9 |
@@ -89,14 +89,14 @@ URL: `/collections/{handle}/{tag}+{tag}+{tag}?view=quiz`. Vai trò: (a) nguồn 
 
 Anatomy (mockup khung 3, 4):
 1. Header foundation §3 (thanh tối, noise).
-2. Breadcrumb foundation §5: Home / Your Gear Shortlist.
-3. Tiêu đề trang foundation §5: eyebrow accent "Product finder" → h1 "Your Gear Shortlist" → meta 16 muted "5 products match all 3 answers. Showing the top 4.". Thay h1 = `collection.title` hiện có ("Products" ở collection all, không nói gì về kết quả).
+2. Breadcrumb foundation §5: Home / Your gear shortlist.
+3. Tiêu đề trang foundation §5: eyebrow accent "Product finder" → h1 "Your gear shortlist" → meta 16 muted "5 products match all 3 answers. Showing the top 4.". Thay h1 = `collection.title` hiện có ("Products" ở collection all, không nói gì về kết quả).
 4. Hàng câu trả lời: "Your answers:" 14 muted + 3 pill sand + link chữ "Retake quiz" (44, `routes.root_url` + `#home-quiz`). Không có nhãn lựa chọn ở template này (setting nằm ở `templates/index.liquid`), nên pill hiện tên tag bỏ tiền tố `quiz-`, viết hoa chữ đầu ("Lower", "Intermediate", "Gym"). ĐỀ XUẤT, câu CTO 3.
 5. Lưới card §4: 2 cột 152 / 4 cột 170 / 4 × 292 / 4 × 336; gap như collection (foundation §1). 768 dùng 4 cột theo chốt H3 (index-mobile-a §13: 4 sản phẩm → 4 cột). Card h2.
 6. Hàng hành động căn giữa, cách lưới 48: primary "View all 5 matches →" + secondary "Retake quiz" (link); < 768 xếp dọc full, cách 12. ≤ 4 kết quả: primary "Shop all equipment →".
 7. Footer foundation §4.
 
-Rỗng (khung 4): tiêu đề trang giữ; khối rỗng foundation §18: icon hộp trong tròn 72, h2 "No Exact Match", câu ES1-T278, primary "Change my answers" (link về quiz trang chủ) + secondary "Shop all equipment". Khoảng trên dưới 48.
+Rỗng (khung 4): tiêu đề trang giữ; khối rỗng foundation §18: icon hộp trong tròn 72, h2 "No exact match", câu ES1-T278, primary "Change my answers" (link về quiz trang chủ) + secondary "Shop all equipment". Khoảng trên dưới 48.
 
 | | 360 | 768 | 1280 | 1920 |
 | --- | --- | --- | --- | --- |
@@ -105,7 +105,7 @@ Rỗng (khung 4): tiêu đề trang giữ; khối rỗng foundation §18: icon h
 | Lưới | 2 × 152, gap 24 / 16 | 4 × 170, gap 24 / 16 | 4 × 292, gap 40 / 24 | 4 × 336 |
 | Hành động | dọc full | 1 hàng giữa | 1 hàng giữa | 1 hàng giữa |
 
-SEO, Performance: `<title>` "Your Gear Shortlist – {shop}"; canonical là URL tag không query (Shopify `canonical_url` bỏ `?view`); ảnh card đầu eager + `fetchpriority="high"` (LCP, AGENTS: hàng card đầu khi không banner), còn lại lazy; không JS bắt buộc.
+SEO, Performance: `<title>` "Your gear shortlist – {shop}"; canonical là URL tag không query (Shopify `canonical_url` bỏ `?view`); ảnh card đầu eager + `fetchpriority="high"` (LCP, AGENTS: hàng card đầu khi không banner), còn lại lazy; không JS bắt buộc.
 
 ## 7. Settings merchant
 
@@ -130,13 +130,13 @@ Tương phản (số foundation §2, index-mobile-a §11):
 | foreground / sand | 14.0 | chữ pill câu trả lời |
 | accent / sand (tick, phi chữ) | 4.04 | ≥ 3 |
 | sale / background | 6.38 | giá sale, lỗi thêm giỏ |
-| sale-foreground / sale | 6.38 | badge -N% |
+| sale-foreground / sale | 6.38 | badge −N% |
 | background / foreground | 17.4 | badge Sold out |
 | accent-foreground / accent | 5.01 | nút primary |
 | muted-light / background | 5.33 | chữ nút secondary disabled "Sold out" |
 | badge-new / background (viền, icon) | 4.57 | "Added", thanh thông báo (phi chữ ≥ 3) |
 
-- Vùng chạm: × 48; nút card, Quick View, Back, "View cart", "Retake quiz" 44; primary / secondary chân 48 (52 từ 80rem). Pill, swatch không tương tác.
+- Vùng chạm: × 48; nút card, Quick View, Back, "View cart", "Retake quiz" 44; primary / secondary chân 48. Pill, swatch không tương tác.
 - Dialog: `<dialog>` + `showModal()` (bẫy focus, nền inert), `aria-labelledby` = tiêu đề, `aria-describedby` = dòng đếm; mở thì focus tiêu đề (`data-quiz-title` có sẵn), đóng trả focus nút mở. 2f: focus tiêu đề quick view; Back trả focus về nút "Choose options" của card đó.
 - Live region: dòng đếm `role="status"` báo "5 products match…" khi kết quả về; thông báo "Added to cart" status; lỗi `role="alert"`. Không làm mờ chữ khi tải (Lighthouse tính opacity).
 - Tên riêng: mỗi nút card kèm tên sản phẩm (chữ ẩn); không có 2 link cùng tên khác đích ("View all 5 matches" và "Shop all equipment" không cùng lúc).
@@ -147,9 +147,9 @@ Tương phản (số foundation §2, index-mobile-a §11):
 
 | Việc | File | Phía |
 | --- | --- | --- |
-| Popup: tiêu đề "Your Gear Shortlist", pill câu trả lời, dòng đếm status, chân "View all N matches" / "Shop all equipment" + "Retake quiz"; bỏ khối `quiz__empty` cũ, dùng markup 2b | `blocks/quiz.liquid`, `locales/en.default.json` (`blocks.quiz.*`) | FE |
+| Popup: tiêu đề "Your gear shortlist", pill câu trả lời, dòng đếm status, chân "View all N matches" / "Shop all equipment" + "Retake quiz"; bỏ khối `quiz__empty` cũ, dùng markup 2b | `blocks/quiz.liquid`, `locales/en.default.json` (`blocks.quiz.*`) | FE |
 | Card quiz: nút dưới card (form add / link Choose options / Sold out), thứ tự còn hàng trước, `sizes` "(min-width: 80rem) 238px, (min-width: 48rem) 154px, 50vw" (thay "25vw, 50vw") | `blocks/quiz.liquid`, `snippets/product-card.liquid` (tham số mới, chỉ quiz dùng) | FE |
-| Trang `?view=quiz`: h1 "Your Gear Shortlist" thay `collection.title`, eyebrow, meta đếm, pill từ `current_tags`, hành động, card h2, rỗng §6; ảnh đầu eager | `templates/collection.quiz.liquid`, `blocks/quiz.liquid` (`results_view`) | FE |
+| Trang `?view=quiz`: h1 "Your gear shortlist" thay `collection.title`, eyebrow, meta đếm, pill từ `current_tags`, hành động, card h2, rỗng §6; ảnh đầu eager | `templates/collection.quiz.liquid`, `blocks/quiz.liquid` (`results_view`) | FE |
 | Schema: `results_popup` default true; `empty_text` default copy T278 | `blocks/quiz.liquid`, locale schema | FE |
 | JS: mở popup ngay + skeleton, lỗi + Try again, add to cart trong popup (status, giữ popup), quick view thay nội dung + Back, Retake, chặn popup marketing khi đang mở | `assets/quiz-dialog.js`, `assets/quiz-finder.js` (+ dùng lại quick view ES1-T262) | BE |
 

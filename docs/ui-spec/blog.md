@@ -1,4 +1,4 @@
-KHÔNG CHẮC: demo-data chỉ có title, url, image, published_at, tags của 4 bài; thiếu `blog.title`, author, excerpt, content (thời gian đọc), bình luận, bài thứ 5 (hỏi BA ở ES1-T267). Mockup dùng "Training Tips & Inspiration" (tiêu đề block Blog posts trang chủ) làm tên blog, thời gian đọc là số mẫu (2, 5, 7, 5 min), excerpt bài nổi bật là chữ mẫu.
+KHÔNG CHẮC: demo-data chỉ có title, url, image, published_at, tags của 4 bài; thiếu `blog.title`, author, excerpt, content (thời gian đọc), bình luận, bài thứ 5 (hỏi BA ở ES1-T267). Mockup dùng "Training tips & inspiration" (tiêu đề block Blog posts trang chủ) làm tên blog, thời gian đọc là số mẫu (2, 5, 7, 5 min), excerpt bài nổi bật là chữ mẫu.
 
 # UI spec: Trang blog (ES1-T257)
 
@@ -76,7 +76,7 @@ Lưới, lề, khoảng cách theo F§1. Mốc code: `< 48rem`, `48rem`, `64rem`
 | Gap lưới (ngang / dọc) | 16 / 24 | 16 / 24 | 24 / 40 | 24 / 40 |
 | Nổi bật → lưới | 48 | 48 | 64 | 64 |
 | Lưới → phân trang | 48 | 48 | 64 | 64 |
-| Cuối trang → footer | 48 | 48 | 120 | 120 |
+| Cuối trang → footer | 48 | 48 | 128 | 128 |
 
 64rem–80rem (1024): lưới 3 cột. 1920: card 336 × 448, gap 24.
 360: card 1 cột cao 427 là cố ý: tiêu đề 3 dòng 18px không đủ chỗ ở card 152 (2 cột); giữ tỉ lệ 3/4 của card bài viết (Chuẩn: Spectrum 3:4; 06 §1 nhất quán).
@@ -88,8 +88,8 @@ Tất cả trạng thái dưới đây là ĐỀ XUẤT theo F§18 và nguồn g
 | Trạng thái | Khi nào | Hiển thị | Nguồn |
 | --- | --- | --- | --- |
 | Lọc tag | URL `/tagged/{tag}` | breadcrumb thêm tag, meta "N articles tagged {tag}", tab tag `aria-current`, không có bài nổi bật, lưới bắt đầu ngay | 04 §4 (active rõ) |
-| Blog rỗng | `blog.articles_count == 0` | ẩn lọc và meta; empty state F§18: icon bài viết, h2 "No Articles Yet", câu "New training tips are on the way. Until then, find the right gear for your next session.", primary "Explore equipment" (cùng nhãn CTA hero trang chủ) → `routes.all_products_collection_url`, text link "Back to homepage" | AGENTS empty state (trang rỗng là nội dung), 05 §7 |
-| Tag không có bài | tag trong URL không còn bài | giữ lọc; h2 "No Articles On This Topic", "Try another topic above or browse every article.", primary "View all articles" → `blog.url` | 05 §7 |
+| Blog rỗng | `blog.articles_count == 0` | ẩn lọc và meta; empty state F§18: icon bài viết, h2 "No articles yet", câu "New training tips are on the way. Until then, find the right gear for your next session.", primary "Explore equipment" (cùng nhãn CTA hero trang chủ) → `routes.all_products_collection_url`, text link "Back to homepage" | AGENTS empty state (trang rỗng là nội dung), 05 §7 |
+| Tag không có bài | tag trong URL không còn bài | giữ lọc; h2 "No articles on this topic", "Try another topic above or browse every article.", primary "View all articles" → `blog.url` | 05 §7 |
 | Không ảnh | `article.image` rỗng | card nền `--color-background-dark` (chữ 17.4:1); bài nổi bật khung 4/3 cùng màu | F§10, DESIGN Images |
 | Không tag | `article.tags` rỗng | không pill | snippet hiện có |
 | Không thời gian đọc | `article.content` rỗng | chỉ còn ngày | AC-H27 |

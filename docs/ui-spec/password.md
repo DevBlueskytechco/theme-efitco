@@ -6,10 +6,10 @@ KHÔNG CHẮC: demo-data không có `shop.password_message` (hỏi BA ES1-T268);
 
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
 | --- | --- | --- | --- | --- |
-| 1 | Nền trang | trắng, ảnh cột phải | nền `--color-background-dark` + noise toàn trang, như dải đầu trang chủ (header + hero + Browse Categories nằm trên 1 dải tối) | Sổ 10/11 (`--color-background-dark` #1A1A1A + noise) |
+| 1 | Nền trang | trắng, ảnh cột phải | nền `--color-background-dark` + noise toàn trang, như dải đầu trang chủ (header + hero + Browse categories nằm trên 1 dải tối) | Sổ 10/11 (`--color-background-dark` #1A1A1A + noise) |
 | 2 | Thanh trên | logo nằm trong cột nội dung, 100 → 140 từ 1280 | thanh 80 riêng hàng đầu, logo trắng 100 × 30 mọi mốc, không là link | foundation §3 |
 | 3 | Ảnh | bo 12, cao 100dvh − 40 | thẻ bo 16 nằm dưới thanh 80 (không đè chữ), cao 100dvh − 80 − 20; 1920 lùi 64 như hero dải rộng 1792 (`--band-inset` của kit = `--space-5xl`; ES1-T567, trước lùi 60 / dải 1798) | foundation §1 (dải rộng; 64 có trong thang Polaris React space), bo 16 `--radius-panel` |
-| 4 | Chữ | foreground, message muted | h1 trắng (17.4), "Your Fitness" cam (chữ lớn 3.48 ≥ 3), eyebrow xám `--color-muted-on-dark` (6.11), message, ghi chú, chân muted-on-dark | Sổ 10/11 (eyebrow nền tối xám), sổ 09/11 (chữ lớn nhấn cam) |
+| 4 | Chữ | foreground, message muted | h1 trắng (17.4), "your fitness" cam (chữ lớn 3.48 ≥ 3), eyebrow xám `--color-muted-on-dark` (6.11), message, ghi chú, chân muted-on-dark | Sổ 10/11 (eyebrow nền tối xám), sổ 09/11 (chữ lớn nhấn cam) |
 | 5 | Ô nhập | viền muted-light trên trắng | ô nhập footer: nền trong suốt, viền 100% muted-on-dark, focus outline trắng | Sổ 09/11, foundation §4 |
 | 6 | Lỗi, thành công | chữ lỗi đỏ; hộp success nền trắng | chữ lỗi trắng + icon đỏ, viền ô đỏ 2px; hộp success viền trắng 12% + thanh badge-new, chữ trắng | foundation §4 (sale trên dark 2.73) |
 | 7 | Nút "Enter using password" | secondary viền đen | secondary trên nền tối: chữ, viền trắng; hover nền trắng chữ dark | kit `.section--dark .button--secondary` |
@@ -34,8 +34,8 @@ Form mật khẩu trong `<details>`: chạy không JS, không popup; mở sẵn 
 ## 2. Anatomy
 
 1. Thanh 80: `settings.logo` (ảnh, alt = shop.name, hiển thị 100 × 30) hoặc shop.name chữ heading 700 28 trắng; không là link (mọi URL đều về trang này).
-2. Eyebrow "Opening Soon" (`--color-muted-on-dark`).
-3. h1 display uppercase "Level Up Your Fitness", phần nhấn "Your Fitness" `--color-accent`.
+2. Eyebrow "Opening soon" (`--color-muted-on-dark`).
+3. h1 display uppercase "Level up your fitness", phần nhấn "your fitness" `--color-accent`.
 4. `shop.password_message` muted-on-dark (merchant sửa ở Admin > Preferences).
 5. Newsletter: label "Email" (hiện, trắng 14/600) · input placeholder "name@example.com" · nút primary "Notify me" (icon gửi) · ghi chú "No spam. Unsubscribe anytime."
 6. Dải "Have a password?" (gạch trắng 12%).
@@ -47,8 +47,8 @@ Form mật khẩu trong `<details>`: chạy không JS, không popup; mở sẵn 
 
 | Tên | Kiểu | Default | Giới hạn |
 | --- | --- | --- | --- |
-| Eyebrow | text | Opening Soon | trống thì ẩn |
-| Heading | inline_richtext | Level Up `<em>`Your Fitness`</em>` | `<em>` hiện màu accent; trống dùng locale `password.title` |
+| Eyebrow | text | Opening soon | trống thì ẩn |
+| Heading | inline_richtext | Level up `<em>`your fitness`</em>` | `<em>` hiện màu accent; trống dùng locale `password.title` |
 | Image | image_picker | trống → thẻ nền trắng 6% (mobile ẩn) | ảnh ngang ≥ 1440 |
 | Show newsletter | checkbox | true | tắt thì form mật khẩu mở sẵn, bỏ dải "Have a password?" |
 
@@ -89,9 +89,9 @@ Màn đầu 360 thấy logo, eyebrow, h1, message, ô email, nút "Notify me".
 - Tương phản (dark #1A1A1A, foundation §2): h1 trắng 17.4; phần nhấn accent/dark 3.48 (chữ lớn 80/48 px, ≥ 3, sổ 09/11); eyebrow, message, ghi chú, chân muted-on-dark 6.11; label, link chân trắng 17.4; nút primary 5.01; viền ô muted-on-dark 6.11; icon mắt 6.11; chữ lỗi trắng 17.4 (không dùng đỏ cho chữ: 2.73).
 - `<main>` duy nhất, 1 h1; logo `<img alt="{{ shop.name }}">`.
 - Label thật cho email và password; `autocomplete="email"`, `autocomplete="current-password"`; không chặn dán.
-- Summary là control có tên "Enter using password", cao 48/52.
+- Summary là control có tên "Enter using password", cao 48.
 - Ảnh trang trí `alt=""`.
-- Vùng chạm: nút 48/52, nút mắt 44, link chân 44.
+- Vùng chạm: nút 48, nút mắt 44, link chân 44.
 - Focus trên nền tối: outline trắng 2px (accent trên dark 3.48 kém rõ, foundation §3.2).
 
 ## 7. Token dùng
@@ -104,7 +104,7 @@ Màn đầu 360 thấy logo, eyebrow, h1, message, ô email, nút "Notify me".
 - Ảnh lazy: không có ảnh nào khác. Noise là `background-image` nhỏ, không chặn LCP. Logo có width/height.
 - Font: Sofia Sans Condensed 800 (h1, eyebrow), Inter 400/500/600.
 - A11y: label, button-name (mắt), color-contrast (đã tính §6), heading-order (1 h1, không h2), target-size.
-- SEO: ngoài phạm vi SEO 100 (sổ 10/11, Shopify trả HTTP 401). Vẫn có title "Opening Soon – Efitco", meta description qua `meta-tags`.
+- SEO: ngoài phạm vi SEO 100 (sổ 10/11, Shopify trả HTTP 401). Vẫn có title "Opening soon – Efitco", meta description qua `meta-tags`.
 - Best Practices: 0 lỗi console; layout password không tải JS theme ngoài nút mắt (≤ 1 KB, BE).
 - Performance: critical.css + base.css như hiện có; không header/footer nên trang nhẹ.
 

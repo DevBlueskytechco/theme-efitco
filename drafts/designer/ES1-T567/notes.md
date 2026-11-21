@@ -2,7 +2,7 @@
 
 Yêu cầu CTO 21/11: bỏ toàn bộ liên kết tới file "Efitco Theme Final / Design System 2"; cập nhật mockup theo chuẩn kiến thức Design System đã nạp (Polaris trước) để có bộ mockup chuẩn, từ đó Designer người dựng lại Figma. Nhánh `feature/ai-ES1-T567`, chồng lên ES1-T535.
 
-Quyết định: `docs/design/decisions.md` mục "CTO 21/11 — ES1-T567". Bản design system 2.0.0 (đề xuất, chờ CTO duyệt số bản): `docs/design/CHANGELOG.md`. Cách dựng lại Figma: `docs/design/figma-handoff.md`.
+Quyết định: `docs/design/decisions.md` mục "CTO 21/11 — ES1-T567". Bản design system 2.0.0 (CTO chốt số bản 21/11 lượt 2): `docs/design/CHANGELOG.md`. CTO chốt lượt 2: mục 10. Cách dựng lại Figma: `docs/design/figma-handoff.md`.
 
 File này là NƠI DUY NHẤT trong tài liệu hiện hành còn in tên code có tiền tố `figma` (mục 5): loại file này khỏi phép grep kiểm "không còn chữ Figma".
 
@@ -12,14 +12,14 @@ Ba bước của ticket: (A) Kit + màn DS, (B) các trang mockup và `docs/ui-s
 
 ### 1.1 Kit và màn DS (bước A)
 
-`drafts/designer/_kit/kit.css`, `drafts/designer/ES1-T251/foundation.html`. `:root` 134 → 151 biến. Section màn DS đổi: `h-type`, `h-spacing-radius`, `h-grid`, `h-token-architecture`, `h-tabs`, `h-badge`, `h-product`, `h-media`, `h-article`, `h-progress`, `h-toast`, `h-content`, cùng nhãn nút ở mọi section. Không đổi `id` section, tên file, URL ảnh.
+`drafts/designer/_kit/kit.css`, `drafts/designer/ES1-T251/foundation.html`. `:root` 134 → 151 biến (nay 150, xem mục 9). Section màn DS đổi: `h-type`, `h-spacing-radius`, `h-grid`, `h-token-architecture`, `h-tabs`, `h-badge`, `h-product`, `h-media`, `h-article`, `h-progress`, `h-toast`, `h-content`, cùng nhãn nút ở mọi section. Không đổi `id` section, tên file, URL ảnh.
 
 ### 1.2 Tài liệu (bước C)
 
 | File | Đã làm |
 | --- | --- |
 | `docs/tokens.json` | Viết lại theo `:root` của kit, `_version` 2.0.0. Bỏ mọi khoá và chú thích dẫn file thiết kế cũ. Thêm `_source_notation` (5 dạng ghi nguồn), `line_height` (từng bậc), `letter_spacing`, `aspect_ratio`, `space.named` 050 / 150 và `_named_source`, 6 khoá `component` mới, `layout.grid_columns`, `container.band_inset_max`. `_source_of_truth` đảo thứ tự: kit → mockup → tokens.json / tài liệu → code theme. Giữ 2 khoá `layout.carousel_progress_height`, `layout.meter_height` (thêm tên biến CSS ở `_progress_css`) |
-| `DESIGN.md` | Đoạn Sources → Source of truth + Standards; phiên bản 2.0.0; ngoại lệ accent bỏ tag bài viết; quy tắc 4 nơi bắt đầu từ kit; 5 dạng ghi nguồn; bảng tầng token; số đếm 151; bảng "Colors adjusted to pass AA" (cột Previous value / Value in use); bảng thang chữ 12 kiểu có cột line-height token và Source; thang khoảng cách 14 bậc có cột Source; token kích thước; bo góc; page rhythm (lưới, dải rộng 64, breakpoint); bảng tỉ lệ ảnh theo bộ có tên; Calls to action sentence case |
+| `DESIGN.md` | Đoạn Sources → Source of truth + Standards; phiên bản 2.0.0; ngoại lệ accent bỏ tag bài viết; quy tắc 4 nơi bắt đầu từ kit; 5 dạng ghi nguồn; bảng tầng token; số đếm 151 (nay 150, xem mục 9); bảng "Colors adjusted to pass AA" (cột Previous value / Value in use); bảng thang chữ 12 kiểu có cột line-height token và Source; thang khoảng cách 14 bậc có cột Source; token kích thước; bo góc; page rhythm (lưới, dải rộng 64, breakpoint); bảng tỉ lệ ảnh theo bộ có tên; Calls to action sentence case |
 | `docs/ui-spec/foundation.md` | Đầu file (nguồn chuẩn, thứ tự nguồn, bản 2.0.0); thêm mục "Thay đổi ES1-T567"; viết lại §1, §1.1, §1.2 (thêm bảng token kích thước), §32.1–§32.4, bảng tỉ lệ §36; sửa §2, §3, §4 footer, §6 nút, §7 tab, §8 badge, §9–§11, §13, §16, §17, §25, §27, §28, §30, §33, §38, §40. Các mục "Thay đổi …" của lượt trước giữ làm lịch sử, chỗ nhắc file cũ gọi là "bản vẽ cũ". 138 dòng nhắc file cũ → 0 |
 | `docs/design/decisions.md` | Sổ lịch sử, không xoá dòng. Thêm khối "CTO 21/11 — ES1-T567" (3 quyết định, quyết định cũ bị thay, từng thay đổi trước → sau kèm chuẩn, phần giữ). Ghi "THAY 21/11 (ES1-T567)" tại hơn 30 dòng. Dòng 10/11 (BGĐ) "gốc thiết kế duy nhất" chuyển xuống mục mới "Đã thay". Mục "Chưa chốt" thêm 13 việc chờ CTO; (6) nguồn sự thật và (7) toast sentence case ghi đã chốt. Nhãn nút trong các dòng còn hiệu lực viết sentence case |
 | `docs/design/content.md` | §2 bảng viết hoa theo loại chuỗi có cột Chuẩn; §2.1 bảng ví dụ đổi; §4 thuật ngữ; §5 theo component; §6 chuỗi cấm; §8 đảo bảng rà locale (23 dòng, khoảng 35 khoá cần FE đổi); §9 còn mở |
@@ -69,7 +69,7 @@ Cột "Soát ảnh": A = bước Kit đã chụp và nhìn; B = việc của age
 
 Không đổi điểm ảnh, chỉ đổi cách viết (số → token): vùng chạm 44 → `--touch-target`; tab / chip 44 / 40 → `--control-height-compact` / `--tab-height-desktop`; hàng 52 → `--row-height`; nút tròn 52 → `--round-button-size`; thanh 4 / 8 → `--progress-height` / `--meter-height`; icon 16 / 20 / 24 → `--icon-size-*`; `--control-height` 48 khai báo trực tiếp.
 
-Giữ nguyên (bản sắc thương hiệu hoặc quyết định CTO không dựa bản vẽ): 22 màu và quyết định AA; 2 họ font; 12 cỡ chữ; body 500; giãn chữ heading / display / caps; thang bo góc; lưới 4 / 8 / 12, gutter 12 / 16 / 24; `--page-width` 91rem; breakpoint 48 / 64 / 80rem; control 48 / 52, compact 44; header 80, logo 100 × 30, menu gap 40, icon gap 4, chữ menu trắng 60% (6.9:1, tính lại); tầng desktop 80, 120; thanh carousel 4, meter 8; eyebrow và phần nhấn heading accent; chữ HOA display, eyebrow, nhãn nhóm, tiêu đề popup marketing; hero 768 = 4/3 và 360 = 3/4 (khung 360 × 480, Spectrum 3:4); nút và icon có thương hiệu; toạ độ glyph.
+Giữ nguyên (bản sắc thương hiệu hoặc quyết định CTO không dựa bản vẽ): 22 màu và quyết định AA; 2 họ font; 12 cỡ chữ; body 500; giãn chữ heading / display / caps; thang bo góc; lưới 4 / 8 / 12, gutter 12 / 16 / 24; `--page-width` 91rem; breakpoint 48 / 64 / 80rem; control 48 / 52, compact 44 (lượt 2: control 48 mọi mốc, mục 10); header 80, logo 100 × 30, menu gap 40, icon gap 4, chữ menu trắng 60% (6.9:1, tính lại); tầng desktop 80, 120; thanh carousel 4, meter 8; eyebrow và phần nhấn heading accent; chữ HOA display, eyebrow, nhãn nhóm, tiêu đề popup marketing; hero 768 = 4/3 và 360 = 3/4 (khung 360 × 480, Spectrum 3:4); nút và icon có thương hiệu; toạ độ glyph.
 
 ## 3. Cần FE (code theme phải đổi theo kit)
 
@@ -92,7 +92,22 @@ Giữ nguyên (bản sắc thương hiệu hoặc quyết định CTO không d�
 | 15 | Thay 24 biến tiền tố cũ đặt theo giá trị (91 lần) bằng token vai trò theo bảng foundation.md §32.4, rồi xoá khối khai báo (tên đầy đủ: mục 5 dưới) | `snippets/css-variables.liquid`, `assets/base.css`, `assets/aux.css` |
 | 16 | Còn từ lượt trước: `badge_new_color` #467A48 → #4B824D; `background_alt_color` #F4F4F4 → #F4F4F5; `type_primary_font` `inter_n5`; gom 15 token đang ở base.css về `css-variables.liquid`; `--radius-dialog` 24 → 20 | `config/settings_schema.json`, `snippets/css-variables.liquid` |
 
-Token kit lệch code (tóm tắt để lập ticket): space 48 / 2 / 6 và các bậc 20, 40, 64, 80; line-height từng bậc; `--band-inset` 64; `--tab-padding-inline` 24; `badge_new`, `background_alt`. 69 trong 151 token của kit chưa có trong code (danh sách: foundation.md §32.3).
+Bổ sung sau CTO chốt lượt 2 (21/11, mục 10):
+
+| # | Việc | File code |
+| --- | --- | --- |
+| 17 | Control 48 ở mọi mốc: bỏ mức 52 từ 80rem của `--control-height` (button, input, select, stepper, nút Checkout, ô search). Nút tròn 52 và hàng 52 giữ | `snippets/css-variables.liquid`, `assets/base.css`, `assets/critical.css` |
+| 18 | Padding section từ 64rem 120 → 128: `--space-8` / `--space-7xl` = 128 (code đang `space_base` × 30, đổi × 32); đỉnh panel footer từ 80rem theo cùng token | `snippets/css-variables.liquid`, `assets/base.css` |
+| 19 | Khoá locale heading, tiêu đề dialog / drawer, empty state, tab, menu, eyebrow, số đếm về sentence case: bảng `docs/design/content.md` §8.2 (khoảng 45 khoá: `404.heading`, `search.results_title`, `cart.summary_title`, `cart.empty_heading`, `blocks.quiz.*_heading`, `blog.*_heading`, `*.products_count`, `*.item_count_badge`…); cùng quy tắc cho `default_*` trong schema block và preset `templates/*.json` | `locales/en.default.json`, `blocks/*.liquid`, `templates/*.json` |
+| 20 | Nút big offer "View offer" (thay "Shop the offer" / "Shop the deal") | `blocks/*.liquid` (block big offer), `locales/en.default.json` nếu thêm khoá |
+| 21 | Dấu trừ U+2212 cho phần trăm và tiền giảm: `products.card.sale_percent` "-{{ percent }}%" → "−{{ percent }}%", `cart.discount_value` "-{{ amount }}" → "−{{ amount }}"; rà chuỗi "-N%" viết cứng trong Liquid / JS | `locales/en.default.json`, `snippets/price.liquid`, `assets/*.js` |
+| 22 | Chỉ báo tải (spinner thay nhãn nút, skeleton) hiện sau 500 ms thay 300 ms; debounce 300 ms (tìm kiếm, số lượng) giữ. JS là việc BE | `assets/*.js` (collection filters, variant picker, localization, cart) |
+| 23 | Hero bo 16: `hero_corner_radius` mặc định 12 → 16 hoặc hero đọc `--radius-panel` (đã ghi ở mục 9.6) | `config/settings_schema.json`, `assets/base.css` |
+| 24 | Link tóm tắt lỗi form `.form-message__list a`: cao tối thiểu 44 dưới 80rem, 24 từ 80rem | `assets/base.css` |
+
+Cần QA sau các việc trên: đổi assert chuỗi heading / empty state / số đếm ("Your Cart Is Empty", "{n} Items", "Page Not Found"…) và chuỗi "-24%" trong e2e; đo lại chiều cao nút / ô nhập ở 1280, 1920 (48) và khoảng section (128). Cần BA: số 52, 120, 300 ms còn trong AC của `docs/srs.md` (TE-5, TE-6, TE-19), xem dòng "Lượt 2" cuối mục 3 của SRS.
+
+Token kit lệch code (tóm tắt để lập ticket): space 48 / 2 / 6 và các bậc 20, 40, 64, 80; line-height từng bậc; `--band-inset` 64; `--tab-padding-inline` 24; `badge_new`, `background_alt`. 69 trong 150 token của kit chưa có trong code (danh sách: foundation.md §32.3).
 
 ## 4. Cần QA, DevOps, BA, CTO
 
@@ -150,23 +165,25 @@ Bảng duy nhất in tên thật. Tài liệu khác gọi theo giá trị hoặc
 
 ## 6. Còn mở cho CTO
 
+Sau CTO chốt lượt 2 (21/11, mục 10): ĐÃ ĐÓNG các dòng 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 15, 17 (phần 300 / 500 ms). CÒN MỞ: 1 (xác nhận với BGĐ; dòng gốc giữ nguyên chữ), 14, 17 (các mục "Chưa chốt" khác của ES1-T535 lượt 2), 18, 19, 20, 21.
+
 1. Xác nhận với BGĐ: dòng 10/11 (BGĐ) "gốc thiết kế duy nhất" đã chuyển sang mục "Đã thay".
-2. Số bản 2.0.0.
-3. Heading h1–h4, tiêu đề dialog / drawer, empty state, tab, link menu sang sentence case theo M3 / Ant / Fluent 2 / Spectrum (Polaris không nêu). Đang giữ Title Case. Danh sách chuỗi: phụ lục. Làm lượt riêng sau khi chốt.
-4. "Checkout" hay "Check out" trên nút (hiện giữ "Checkout" là thuật ngữ, ngoại lệ của "mở bằng động từ").
-5. Body weight 500 (V05) giữ hay về 400 như M3 / Carbon.
-6. Control 52 từ 80rem về 48 mọi mốc (Carbon có 48, không có 52).
-7. Padding section desktop 120 → 128 hoặc 112 (thang Polaris React; 120 hiện ghi "Thiết kế").
-8. Section dưới 64rem 48 (đã áp theo Polaris) hay giữ nhịp 56 (Spectrum có 56, Polaris không).
+2. ĐÃ ĐÓNG (lượt 2: chốt 2.0.0). Số bản 2.0.0.
+3. ĐÃ ĐÓNG (lượt 2: sentence case, đã áp). Heading h1–h4, tiêu đề dialog / drawer, empty state, tab, link menu sang sentence case theo M3 / Ant / Fluent 2 / Spectrum (Polaris không nêu). Đang giữ Title Case. Danh sách chuỗi: phụ lục. Làm lượt riêng sau khi chốt.
+4. ĐÃ ĐÓNG (lượt 2: giữ "Checkout"). "Checkout" hay "Check out" trên nút (hiện giữ "Checkout" là thuật ngữ, ngoại lệ của "mở bằng động từ").
+5. ĐÃ ĐÓNG (lượt 2: giữ 500, bản sắc thương hiệu). Body weight 500 (V05) giữ hay về 400 như M3 / Carbon.
+6. ĐÃ ĐÓNG (lượt 2: 48 mọi mốc, đã áp). Control 52 từ 80rem về 48 mọi mốc (Carbon có 48, không có 52).
+7. ĐÃ ĐÓNG (lượt 2: 128, đã áp). Padding section desktop 120 → 128 hoặc 112 (thang Polaris React; 120 hiện ghi "Thiết kế").
+8. ĐÃ ĐÓNG (lượt 2: giữ 48). Section dưới 64rem 48 (đã áp theo Polaris) hay giữ nhịp 56 (Spectrum có 56, Polaris không).
 9. Đã đóng trong lượt soát: hero 360 của mockup là 3/4 (khung 360 × 480, Spectrum 3:4), thuộc bộ có tên; tài liệu ghi 4/5 đã sửa.
-10. Card bài viết mất điểm nhấn cam sau khi tag trung tính: xem ảnh trước / sau `h-article`.
-11. Display dưới 48rem 52/60 (đã áp) thay 52/62; từ 48rem giữ line-height 1 nên ở 768 dòng không rơi bội 4.
-12. Các dòng giữ mà lý do gốc là bản vẽ: eyebrow accent (09/11), hover và nhãn card (07/11), hình Tab / Chip (components-09, V41), tiêu đề HOA popup marketing (V71 / V75), nhãn nhóm HOA (V76).
-13. (Cập nhật ở mục 9.4: nay trỏ bằng đường dẫn, còn mở việc đổi tên file.) Tên file `docs/design/figma-handoff.md` chứa chữ "figma" (theo yêu cầu ticket). Tài liệu hiện hành khác trỏ tới nó bằng mô tả "tài liệu handoff trong docs/design/" để phép grep về 0; nếu CTO muốn trỏ bằng đường dẫn thì đổi tên file hoặc cho ngoại lệ.
+10. ĐÃ ĐÓNG (lượt 2: tag trung tính giữ). Card bài viết mất điểm nhấn cam sau khi tag trung tính: xem ảnh trước / sau `h-article`.
+11. ĐÃ ĐÓNG (lượt 2: giữ, nguồn "Thiết kế"). Display dưới 48rem 52/60 (đã áp) thay 52/62; từ 48rem giữ line-height 1 nên ở 768 dòng không rơi bội 4.
+12. ĐÃ ĐÓNG (lượt 2: giữ, ghi là bản sắc thương hiệu). Các dòng giữ mà lý do gốc là bản vẽ: eyebrow accent (09/11), hover và nhãn card (07/11), hình Tab / Chip (components-09, V41), tiêu đề HOA popup marketing (V71 / V75), nhãn nhóm HOA (V76).
+13. ĐÃ ĐÓNG (lượt 2: giữ tên file, được trỏ bằng đường dẫn). (Cập nhật ở mục 9.4: nay trỏ bằng đường dẫn, còn mở việc đổi tên file.) Tên file `docs/design/figma-handoff.md` chứa chữ "figma" (theo yêu cầu ticket). Tài liệu hiện hành khác trỏ tới nó bằng mô tả "tài liệu handoff trong docs/design/" để phép grep về 0; nếu CTO muốn trỏ bằng đường dẫn thì đổi tên file hoặc cho ngoại lệ.
 14. Link artifact trong handoff ghi dạng `https://claude.ai/artifact/CTjTBzFkfDEHcPBGstiK2p` suy từ mã; CTO kiểm link mở được.
-15. Ký tự dấu trừ trên badge phần trăm ("-24%" hay "−24%"): chưa có quy tắc, giữ ký tự đang dùng.
+15. ĐÃ ĐÓNG (lượt 2: dấu trừ U+2212, "−24%", đã áp). Ký tự dấu trừ trên badge phần trăm ("-24%" hay "−24%"): chưa có quy tắc, giữ ký tự đang dùng.
 16. Đã đóng (mục 9): `--line-height-heading` đã xoá khỏi kit, `:root` còn 150 biến.
-17. Mã 300 ms hay 500 ms cho chỉ báo tải và các mục "Chưa chốt" của ES1-T535 lượt 2 vẫn mở.
+17. ĐÃ ĐÓNG phần ngưỡng tải (lượt 2: 500 ms, đã áp); các mục "Chưa chốt" khác của ES1-T535 lượt 2 vẫn mở.
 18. ADR 0001 ("token từ bản vẽ → settings") ngược thứ tự mới (kit → tokens.json → settings phản chiếu): đã ghi dòng cập nhật trong ADR; CTO / Tech Lead quyết viết lại ADR 0001 hay mở ADR mới.
 19. SRS, PRD, charter là tài liệu của BA / PO: Designer đã sửa phần nguồn thiết kế và nhãn nút theo yêu cầu soát; cần BA / PO rà và tăng số bản (chưa tạo ticket, CTO giao).
 20. Component riêng trang chủ (`.level-card`, `.hotspot` / `.stl__*`, `.vcard`, `.tcard`, `.specs`, `.faq__stat`) còn định nghĩa ở file trang (2 file mỗi class), chưa lên kit. Tạm thời handoff §7.1 chỉ file nguồn duy nhất cho từng khổ. Đưa lên kit + thêm section `h-*` ở màn DS: lượt riêng (đụng 3 trang chủ, phải chụp lại 4 khổ).
@@ -174,7 +191,7 @@ Bảng duy nhất in tên thật. Tài liệu khác gọi theo giá trị hoặc
 
 ## 7. Tự soát bước Tài liệu
 
-- Đối chiếu từng số của `docs/tokens.json`, DESIGN.md, foundation.md §1–§2, §32 với `:root` của `kit.css` (151 biến; 3 media query 48 / 64 / 80rem) và với bảng `h-type`, `h-spacing-radius`, `h-token-architecture`, `h-media`, `h-content`, `h-tabs` của foundation.html.
+- Đối chiếu từng số của `docs/tokens.json`, DESIGN.md, foundation.md §1–§2, §32 với `:root` của `kit.css` (151 biến lúc đó, nay 150; 3 media query 48 / 64 / 80rem) và với bảng `h-type`, `h-spacing-radius`, `h-token-architecture`, `h-media`, `h-content`, `h-tabs` của foundation.html.
 - `python3 -c "import json; json.load(open('docs/tokens.json'))"` đạt.
 - grep `figma|DS2|Design System 2|\b1:[0-9]{3,4}\b` (không phân biệt hoa thường): `docs/tokens.json` 0, `DESIGN.md` 0, `docs/ui-spec/foundation.md` 0, `docs/design/content.md` 0, `CONTRIBUTING.md` 0. Không tính: `decisions.md` (sổ lịch sử), `CHANGELOG.md` (2 dòng trỏ file handoff), `figma-handoff.md`, file này, `docs/figma-inventory.md` và `docs/token-compliance.md` (đã đánh dấu lịch sử).
 - Bước này không chụp ảnh (chỉ sửa tài liệu); ảnh soát thuộc bước Kit và bước trang.
@@ -263,9 +280,9 @@ Số đếm ở mục 1, 7, 8 là của thời điểm đó; sau lượt này `:
 
 Cần FE thêm (nối bảng mục 3): chuỗi `cart.error` trong `locales/en.default.json` ("Something went wrong. Refresh the page and try again." → "Check your connection, then try again.", tiêu đề alert "We couldn't update your cart", nút "Try again"); nhãn nút big offer "Shop the offer"; khi đổi locale / `default_*` sang sentence case thì sửa luôn `docs/merchant/bundle-builder.md` (dòng 66, 75, 109: "Add Bundle To Cart", "Browse All Setups", "Add Setup To Cart") và `docs/merchant/pre-publish.md` (dòng 34, 51: "Explore Equipment"…) vì hai file này in giá trị mặc định của code hiện tại (lượt này chưa đổi để khớp code).
 
-### 9.3 Heading và tab đang sentence case (nối mục 6.3, chờ CTO chốt một hướng cho cả hai nhóm)
+### 9.3 Heading và tab đang sentence case (nối mục 6.3)
 
-Không đổi chữ lượt này. Phụ lục chỉ liệt nhóm Title Case; nhóm dưới đã sentence case từ trước:
+ĐÃ ĐÓNG ở lượt 2 (mục 10): CTO chốt sentence case cho cả hai nhóm, nhóm dưới đã đúng từ trước, không đổi:
 
 | Chuỗi | File:dòng |
 | --- | --- |
@@ -288,8 +305,8 @@ Không đổi chữ lượt này. Phụ lục chỉ liệt nhóm Title Case; nh�
 
 ### 9.5 Còn mở thêm
 
-- Mạo từ trong "Shop the offer" (quy tắc nút không mạo từ): giữ, chờ CTO; phương án "Shop offer" / "View offer".
-- h1 48/56 ghi "Thiết kế" (kiến thức đã nạp không có hệ nào nêu cặp 48/56): giữ, chờ CTO nếu muốn đổi dòng.
+- ĐÃ ĐÓNG (lượt 2): nút big offer "View offer".
+- ĐÃ ĐÓNG (lượt 2): h1 48/56 giữ, nguồn "Thiết kế".
 - Số 66 / 15 / 69 token đã có trong code sau khi xoá alias: suy từ số cũ (67 gồm `--line-height-heading` đang có ở `css-variables.liquid`), FE đếm lại khi lập ticket.
 
 ### 9.6 Lượt sửa theo người soát (21/11, lượt 3)
@@ -303,16 +320,75 @@ Không đổi chữ lượt này. Phụ lục chỉ liệt nhóm Title Case; nh�
 | `navigation.html` | Bỏ `outline-offset: -2px` riêng của `.nav-row.is-focus`, về vòng focus kit (offset 2) | Chữ chạm vòng focus; khớp `:focus-visible` thật |
 | `marketing-popups.html`, `quiz-result.html` | "5 items"; chú thích "View all" | Sentence case |
 | Hero trang chủ | Mockup dùng `--radius-panel` 16: foundation.html `h-media`, foundation.md §36, DESIGN.md sửa theo. Cần FE: `hero_corner_radius` mặc định 12 → 16 hoặc hero đọc `--radius-panel` | Mockup là nguồn chuẩn |
-| `figma-handoff.md` | line-h1 / h2 ở 768: 52 / 42; buy bar 72 (360) · 80 (từ 768); §1 ghi PNG ngoài trang chủ là bản trước 2.0.0 | Số lệch 1px; thiếu mốc; 84 PNG chưa chụp lại |
+| `figma-handoff.md` | line-h1 / h2 ở 768: 52 / 42; buy bar 72 (360) · 80 (từ 768) | Số lệch 1px; thiếu mốc |
 | `foundation.md`, `navigation.md`, `content.md` | "Browse all setups"; ảnh ô mega 4 / 3; quy tắc tiêu đề ô ảnh mega | Khớp mockup |
 
-Để lượt sau (không chặn bàn giao): chụp lại 84 PNG; thang kích thước 44 / 52 / 56 / 64 / 80 và token `--ratio-*` trong kit; `.filter-toggle__count` 24 (đang khai trong search.html, đọc `--space-xl` cho kích thước) vào kit hoặc về `--count-badge-size` 20; đổi alias `--space-1…7` trong trang sang tên mới; `--radius-hero` chỉ còn một nơi đọc (marketing-popups.html), cân nhắc xoá.
+Để lượt sau (không chặn bàn giao): thang kích thước 44 / 52 / 56 / 64 / 80 và token `--ratio-*` trong kit; `.filter-toggle__count` 24 (đang khai trong search.html, đọc `--space-xl` cho kích thước) vào kit hoặc về `--count-badge-size` 20; đổi alias `--space-1…7` trong trang sang tên mới; `--radius-hero` chỉ còn một nơi đọc (marketing-popups.html), cân nhắc xoá.
 
-## Phụ lục. Chuỗi Title Case đang giữ, chờ CTO chốt (mục 6.3)
+## 10. CTO chốt lượt 2 (21/11)
 
-Trích tự động từ mockup (trừ ES1-T252, ES1-T174) ngày 21/11, chưa soát tay; chuỗi là tên sản phẩm, tên collection, tên bài viết theo dữ liệu thì không đổi dù CTO chốt sentence case. Số chuỗi: heading h1–h4 110, tiêu đề dialog / drawer 4, tab 2, link menu 4.
+Quyết định: `docs/design/decisions.md` mục "CTO 21/11 lượt 2 — ES1-T567". Ba bước như lượt 1: Kit + màn DS, các trang mockup, Tài liệu (bước này chỉ sửa `docs/**`, DESIGN.md và file này; không sửa `.html`, `kit.css`).
 
-- Heading h1–h4: A Complete Corner Gym, Itemised · All Products · Ativafit Lava 66 lb · Ativafit Lava 66 lb Adjustable · Ativafit Lava 66 lb Adjustable , 2 colors · Ativafit Lava 66 lb Adjustable , 3 colors · Benches & Racks · Browse Categories · Choose Your Training Level · Compact Power Rack · Compact Power Rack R3 · Customer Reviews · Desktop States · Drawer menu < 1280 · Sheet tab Language · Efitco Design System · Efitco Hanoi Warehouse · Efitco Saigon Centre · Empty Menu · Empty, Loading And Error States · Everything You Need to Train. · F1 · Price, unit price, Shop Pay Installments · F5 · Gift card recipient form · F8 · Quick view additions · F9 · Cart page and mini cart lines · Featured Product Edge Cases · Find Your Perfect Gear · FlexFold Adjustable Bench · FlexFold Adjustable Bench , 3 colors · FlexFold Bench · Folds Away In Seconds · Free Weights · Functional Training · Get 15% Off Your First Order · Heading 2 · Choosing Your First Set · Heading 3 · What To Look For · Heading 4 · Sofia 20/24 · Home Starter Kit · Iron Core Kettlebell 16 kg · Iron Core Kettlebell 16 kg , 3 colors · Iron Core Kettlebell 16 kg , 6 colors · Level Up Your Fitness · Marketing Popups · Mega Menu And Menu Drawer · Mini Cart And Quick View · Missing Image Or Image Error · More Training Tips · No Articles On This Topic · No Articles Yet · No Collections Yet · No Exact Match · No JavaScript · No Matching Products · No Products Here Yet · No Products Match These Filters · No Results For "kettlebel" · Nothing In Accessories Yet · Nothing Matches “treadmill” Yet · Olympic Plate Set 100 · Order Summary · Page Not Found · Pairs Well With · Pick Your Kit, Save As You Go · Popular Products · Portable Fitness · Quick Answers Before You Write · Quiz Results · Recovery & Mobility · Recovery Roller Pro · Resistance Band Set · Revllen Pro Speed Rope · Revllen Pro Speed Rope , 3 colors · Revllen Pro Speed Rope , Black, 3 colors · Revllen Pro Speed Rope , Gray, 3 colors · S1. No Search Term Yet · S2. No Results · S4. Filter Drawer Open · S6. Filters Return Nothing, And Update Error · S7. Pagination · S8. Hover And Focus · Search Results · See Real Equipment In Action, Before You Buy · Send Us A Message · Shipping And Returns At A Glance · Smooth Every Single Rep · State 1 · Empty Cart · State 2 · Updating Quantity · State 3 · Errors · State 4 · Sold-Out Line · State 5 · Line Variants · State 6 · Summary Variants · State 7 · Controls · Take 15% Off Your First Order · Training Tips & Inspiration · Versatile Gear For All Exercises · We're Proud To Be The Best At Training · What Our Customers Say? · What People Are Buying? · Why Choose Efitco? · Worth Every Penny · You May Also Like · You May Also Need · You're Already Subscribed · You're On The List · Your Bundle · Your Cart · Your Cart Is Empty · Your Cart Is Saved · Your Efitco Gift Card · Your Gear Shortlist
-- Tiêu đề dialog / drawer: Choose A Color · No Exact Match · Your Cart · Your Gear Shortlist
-- Tab: Portable Fitness · Portable Fitness And Travel Gear
-- Link menu: Collection Free Weights · Our Story · Shop Categories View all products
+### 10.1 Từng câu đã chốt và đã làm
+
+| CTO chốt | Kit + mockup | Tài liệu |
+| --- | --- | --- |
+| Sentence case cho heading h1–h4, tiêu đề section, dialog / drawer / popup, empty state, tab, link menu, nhãn chip lọc; giữ tên thương hiệu, tên sản phẩm / collection / bài viết (dữ liệu merchant), tên riêng, viết tắt; chữ HOA do CSS giữ, chữ nguồn sentence case | foundation.html (31 tiêu đề section, chữ mẫu, menu, footer, bảng `h-content`) và các trang: 166 chuỗi đổi (phụ lục) | content.md §2, §2.1, §2.2 (mới), §5, §6, §8.2 (mới: khoá locale); DESIGN.md mục Typography; foundation.md §6 và mục "Lượt 2"; chuỗi mẫu trong các file `docs/ui-spec/*.md`; handoff §5, §10, §11; chuỗi giao diện trong AC mục 2 của `docs/srs.md` (42 dòng) |
+| "Checkout" giữ (thuật ngữ) | không đổi | content.md §4, §8.1; ghi chú cuối 6 spec trang |
+| "Shop the offer" → "View offer" | foundation.html, marketing-popups.html | content.md §2, §2.1, §4, §8.1; marketing-popups.md (4 chỗ), countdown.md (2 chỗ) |
+| Body weight 500 giữ, bản sắc thương hiệu | không đổi | tokens.json `typography.body.source`; DESIGN.md; foundation.md §1.1; decisions V05 |
+| Control 48 ở mọi mốc (nút tròn 52, hàng 52 giữ) | kit `--control-height` 48, bỏ override ở 80rem | tokens.json `layout.control_height`; DESIGN.md (2 chỗ); foundation.md §1, §1.2, §1.3, §6; handoff §3 (variable), §6 (4 component), checklist; spec trang (404, article, cart, collection, gift-card, index, index-1280, marketing-popups, mini-cart-quickview, page, password, predictive-search, product, quiz-result, search) |
+| Padding section desktop 120 → 128 | kit `--space-7xl` 128 | tokens.json `space.8`, `space.named.7xl`, `layout.section_gap`; DESIGN.md (2 chỗ); foundation.md §1, §1.2, §4 (đỉnh panel footer); handoff (3 chỗ); spec trang có ghi `--section-gap` (404, article, blog, cart, collection, gift-card, index-1280, index-mobile-a, page, product, search) |
+| Section dưới 64rem giữ 48 · tag bài viết trung tính · countdown big offer Compact · h1 48/56, display mobile 52/60 (nguồn "Thiết kế") | không đổi | decisions (đóng mục chờ); CHANGELOG |
+| Bản sắc thương hiệu: eyebrow accent, hover và nhãn card, hình Tab / Chip, tiêu đề HOA popup marketing, nhãn nhóm HOA | chú thích kit, ghi chú màn DS | decisions (khối lượt 2 + ghi chú tại 09/11, 07/11, components-09, V41, V71 / V75, V76); content.md §2, §5; DESIGN.md; marketing-popups.md |
+| Tiêu đề ô ảnh mega "Shop free weights" giữ là link dạng nút | không đổi | content.md §2.1, §5 |
+| Link tóm tắt lỗi form: sàn 44 dưới 80rem | mockup đã đúng; `h-form` thêm câu | DESIGN.md mục touch target; foundation.md §1.3; tokens.json `layout.touch_target.error_summary_link` |
+| Badge giảm giá dấu trừ U+2212 ("−24%") | foundation.html và các trang | content.md §2, §4, §5, §6, §8.2; foundation.md §8, §34; spec trang có badge giảm giá ("−24%", "−N%"); handoff §5 |
+| Dòng lịch sử BGĐ 10/11 giữ nguyên chữ gốc | — | decisions mục "Đã thay" không sửa |
+| Số bản 2.0.0 chốt | đầu màn DS | tokens.json `_version_note`; DESIGN.md; foundation.md đầu file, §40; CHANGELOG; content.md; handoff |
+| Giữ tên `figma-handoff.md`, trỏ bằng đường dẫn | — | không đổi tên; mục 6.13 đóng |
+| Chỉ báo tải hiện sau 500 ms | foundation.html `h-state` | tokens.json `loading.indicator_delay_ms` 500; DESIGN.md; foundation.md §18, §18.1, §36, §38, §39; collection.md, localization.md; handoff §6. Debounce 300 ms (predictive-search, mini cart, localization tìm nước) giữ |
+
+### 10.2 Sửa thêm trong bước Tài liệu
+
+- `docs/ui-spec/foundation.md`: cả 1 303 dòng của file trong nhánh mang một tiền tố lặp 210 ký tự ("`--radius-panel` 16 (hero trang chủ… `--radius-panel` |", lỗi thay chuỗi của lượt 3). Đã gỡ tiền tố ở mọi dòng (file 477 825 byte → còn khoảng một phần ba) và đặt đúng câu đó vào ô bo góc của hàng Hero ở bảng tỉ lệ §36. Nội dung còn lại không đổi.
+- `docs/srs.md`: chỉ đổi chuỗi giao diện trong AC mục 2 (dòng 16, 147, 152–154, 173, 197, 202, 236, 237, 276, 279, 333, 334, 336, 362, 364, 384, 389, 390, 443, 446, 487, 488, 492, 493, 495–497, 536, 561, 570, 574, 591, 601, 605, 624, 667, 673, 682, 703, 710), dòng cập nhật đầu file và thêm một dòng "Lượt 2" ở khối "Chốt CTO 21/11". Không sửa số trong AC (52, 120, 300 ms): ghi cho BA ở dòng đó. Mục 3 (lịch sử) không đổi. `docs/prd.md`: không có chuỗi bị ảnh hưởng, không sửa.
+- Số đếm token: `:root` của kit vẫn 150 biến (đếm lại 21/11 bằng regex trên khối `:root`); lượt 2 không thêm, không xoá token.
+
+### 10.3 Còn mở sau lượt 2
+
+- Xác nhận với BGĐ việc thay dòng 10/11 (CTO).
+- Số trong AC của SRS (control 52, section 120, ngưỡng tải 300 ms): BA sửa ở bản SRS kế tiếp.
+- `docs/merchant/bundle-builder.md`, `pre-publish.md` in giá trị mặc định của code (Title Case): sửa cùng đợt FE đổi locale.
+- Kho kiến thức ai-team và định nghĩa agent / skill của theme còn quy tắc Title Case, control 52: CTO cập nhật (mục 4).
+- Tên trang và mục menu trên store dev ("Our Story", "Contact Us", blog "Training Tips & Inspiration") là dữ liệu merchant: DevOps đổi nếu muốn khớp mockup.
+- Mục 6 dòng 14, 18, 19, 20, 21 và các mục "Chưa chốt" còn lại của ES1-T535 lượt 2 (warning của `.alert` dùng accent, bậc bóng toast, `nowrap` mặc định, font RTL).
+
+### 10.4 Lượt sửa theo người soát (21/11, sau lượt 2)
+
+Đã sửa:
+
+- Tab bestsellers trang chủ (`ES1-T278/index.html`, `ES1-T293/index.html`): "Portable fitness" → "Portable Fitness". Là tên collection (`docs/design/demo-data.json`), Q1 giữ; khớp footer, mega menu, list-collections.
+- `ES1-T251/foundation.html`: `<title>` "Efitco design system"; nút "View offer" của popover big offer bỏ `button--small` (44 → 48, khớp `marketing-popups.html` và `marketing-popups.md` §7). Chụp lại `h-sticky-bar` 360, 1280.
+- `ES1-T263/marketing-popups.html`: chú thích CSS "badge −24%" (U+2212). `ES1-T258/404.html`: comment "padding section 128".
+- Seal featured product (`ES1-T279/index.html`, `ES1-T293/index.html`): `text-transform` chuyển từ inline style sang `.fp__seal text` trong CSS của trang; hình không đổi (đo computed `uppercase`).
+- `docs/ui-spec/foundation.md` §1.3 hàng "2 · Submit form": cột 1280, 1920 "156 × 52" → "156 × 48". `docs/ui-spec/search.md`: "nút chính 48 / 52" → "nút chính 48".
+- File này: mục 6 dòng 17 xoá câu cũ về 300 / 500 ms; mục 3 "69 trong 150 token"; mục 1, 7 thêm "(nay 150)".
+
+Bỏ qua, kèm lý do:
+
+- Mẫu tab dài "Portable fitness and travel gear" ở `h-tabs`: nhãn mẫu để thử tab giãn, không có trong demo-data nên không phải tên collection; giữ sentence case.
+- Seal "Efitco · Feature product ·" không đổi thành "Featured product": chuỗi `blocks.featured_product.seal_label` đã ghi ở `content.md` §8 là "Feature product"; đổi chữ nằm ngoài các câu CTO chốt.
+- `docs/design/decisions.md` dòng "control 48 / 52": dòng lịch sử, đã có câu "THAY 21/11 lượt 2" ngay sau.
+
+Cần CTO chốt (lệch có từ trước lượt này, không tự chọn):
+
+- Tiêu đề drawer mini cart: "Your cart" (`foundation.html` `h-overlay`, `marketing-popups.html`; `foundation.md` §15, `content.md`) hay "Cart" (`mini-cart-quickview.html`, `shopify-features.html`; `mini-cart-quickview.md` §3, §9). Chốt một chuỗi rồi sửa 4 mockup + 2 spec.
+- Menu footer "Information": 4 chỗ có "Our Efitco" (`foundation.html`, `ES1-T279`, `ES1-T293`; `foundation.md` §4, `index-mobile-b.md`), 11 trang còn lại không có mà có "Shipping policy", "Refund policy". Chốt một danh sách rồi đồng bộ.
+
+## Phụ lục. Chuỗi đã đổi sang sentence case (CTO 21/11 lượt 2)
+
+Trích tự động từ diff mockup (trừ ES1-T252, ES1-T174) ngày 21/11: 166 chuỗi, dạng "trước → sau". Tên sản phẩm, collection, bài viết theo dữ liệu không đổi (Free Weights, Functional Training, Benches & Racks, Recovery & Mobility, Portable Fitness, Ativafit Lava…, Iron Core Kettlebell…, Home Starter Kit, Efitco Saigon Centre…). Chuỗi đã sentence case từ trước: mục 9.3.
+
+- Chữ giao diện của trang: 1 Year Warranty → 1 year warranty · 10 Products → 10 products · 12 Products → 12 products · 2 Comments → 2 comments · 2 Products → 2 products · 24 Products → 24 products · 4 Products → 4 products · 5 Products → 5 products · 6 Products → 6 products · 7 Products → 7 products · 90 Day Money Back → 90 day money back · A Complete Corner Gym, Itemised → A complete corner gym, itemised · All Products → All products · Back to Training Tips & Inspiration → Back to Training tips & inspiration · Before You Go → Before you go · Big Offer · −24% → Big offer · −24% · Browse Categories → Browse categories · Choose A Color → Choose a color · Choose Your Training Level → Choose your training level · Contact Us → Contact us · Contact Us – Efitco → Contact us – Efitco · Customer Reviews → Customer reviews · Designed For Athletes: → Designed for athletes: · Desktop States → Desktop states · Efitco Design System → Efitco design system · EFITCO · FEATURE PRODUCT · → Efitco · Feature product · · Empty Menu → Empty menu · Empty, Loading And Error States → Empty, loading and error states · Everything You → Everything you · Everything You Need → Everything you need · Fast Shipping → Fast shipping · Featured Product Edge Cases → Featured product edge cases · Featured Product · Free Weights → Featured product · Free Weights · Find Your Perfect Gear → Find your perfect gear · Folds Away In Seconds → Folds away in seconds · Get 15% Off → Get 15% off · Key Features Of The Lava 66 → Key features of the Lava 66 · Level Up → Level up · Limited Offers → Limited offers · Marketing Popups → Marketing popups · Mega Menu And Menu Drawer → Mega menu and menu drawer · Mini Cart And Quick View → Mini cart and quick view · Missing Image Or Image Error → Missing image or image error · More Training Tips → More training tips · Mục "Fast Shipping" trong hàng cam kết (còn 2 cột) → Mục "Fast shipping" trong hàng cam kết (còn 2 cột) · Need → need · No Articles On This Topic → No articles on this topic · No Articles Yet → No articles yet · No Collections Yet → No collections yet · No Exact Match → No exact match · No Matching Products → No matching products · No Products Here Yet → No products here yet · No Products Match These Filters → No products match these filters · No Results For "kettlebel" → No results for "kettlebel" · Nothing In Accessories Yet → Nothing in Accessories yet · Nothing Matches “treadmill” Yet → Nothing matches “treadmill” yet · Opening Soon → Opening soon · Opening Soon – Efitco → Opening soon – Efitco · Order Summary → Order summary · Our Story → Our story · Our Story (pressed) → Our story (pressed) · Page Not Found → Page not found · Page Not Found – Efitco → Page not found – Efitco · Pairs Well With · loading → Pairs well with · loading · Pick Your Kit, Save As You Go → Pick your kit, save as you go · Popular Products → Popular products · Portable Fitness And Travel Gear → Portable fitness and travel gear · Premium Quality → Premium quality · Questions and Answers → Questions and answers · Quick Answers Before You Write → Quick answers before you write · Quiz Results → Quiz results · Rigorous Testing: → Rigorous testing: · Search Results → Search results · See Real Equipment In Action, Before You Buy → See real equipment in action, before you buy · Send Us A Message → Send us a message · Shipping And Returns At A Glance → Shipping and returns at a glance · Smooth Every Single Rep → Smooth every single rep · Take 15% Off → Take 15% off · Teaser Big Offer → Teaser big offer · to Train. → to train. · Train Hard → Train hard · Training Level → Training level · Training Tips & Inspiration → Training tips & inspiration · Training Tips & Inspiration · Your Cart Is Empty → Training tips & inspiration · Your cart is empty · Training Tips & Inspiration – Efitco → Training tips & inspiration – Efitco · Uncompromising Quality: → Uncompromising quality: · Versatile Gear For All Exercises → Versatile gear for all exercises · We're Proud To Be The Best At Training → We're proud to be the best at training · Weight · Our Story → Weight · Our story · What Our Customers Say? → What our customers say? · What People Are Buying? → What people are buying? · Why Choose → Why choose · Why Choose Efitco? → Why choose Efitco? · Worth Every Penny → Worth every penny · You May Also Like → You may also like · You May Also Need → You may also need · You're Already Subscribed → You're already subscribed · You're On The List → You're on the list · Your $50.00 Gift Card – Efitco → Your $50.00 gift card – Efitco · Your Bundle → Your bundle · Your Cart → Your cart · Your Cart Is Empty → Your cart is empty · Your Cart Is Saved → Your cart is saved · Your Efitco Gift Card → Your Efitco gift card · Your First Order → your first order · Your Fitness → your fitness · Your Gear Shortlist → Your gear shortlist
+- Tiêu đề section của màn mẫu (DS và các trang trạng thái): 1. Grid And Layout → 1. Grid and layout · 1. Menu Drawer: Level 1 → 1. Menu drawer: level 1 · 1. One Popup At A Time → 1. One popup at a time · 1. Shop: Link Columns And Featured Product → 1. Shop: link columns and featured product · 10. Badges And Sold Out → 10. Badges and sold out · 11. Product Card → 11. Product card · 12. Collection Card → 12. Collection card · 12b. Color Schemes And Roles → 12b. Color schemes and roles · 13. Article Card And Row → 13. Article card and row · 14. Inputs And Form States → 14. Inputs and form states · 15. Input Group And Search Field → 15. Input group and search field · 16. Listbox Option → 16. Listbox option · 19. Facet Group → 19. Facet group · 2. Before You Leave: Empty Cart With Code → 2. Before you leave: empty cart with code · 2. Collection: Category Images → 2. Collection: category images · 2. Popup States → 2. Popup states · 20. Selectable Option → 20. Selectable option · 21. Variant Picker → 21. Variant picker · 22. Quantity Stepper → 22. Quantity stepper · 23. Price And Rating → 23. Price and rating · 24. Data Table → 24. Data table · 25. Progress Meter → 25. Progress meter · 26. Sticky Bar, Teaser And Popover → 26. Sticky bar, teaser and popover · 29. Dialog And Bottom Sheet → 29. Dialog and bottom sheet · 3. Big Offer Popup → 3. Big offer popup · 3. Color Tokens → 3. Color tokens · 3. Menu Item States On The Dark Bar → 3. Menu item states on the dark bar · 3. Quick View Trigger On Product Card → 3. Quick view trigger on product card · 30. Empty, Error And Loading States → 30. Empty, error and loading states · 30b. Alerts And Messages → 30b. Alerts and messages · 31. Rich Text → 31. Rich text · 33. Sale Countdown → 33. Sale countdown · 34. Dark Panel → 34. Dark panel · 34b. Content And Voice → 34b. Content and voice · 4. Mini Cart States → 4. Mini cart states · 4. Spacing And Radius → 4. Spacing and radius · 5. Bottom Of The Screen → 5. Bottom of the screen · 5. Elevation And Layers → 5. Elevation and layers · 5. Quick View States → 5. Quick view states · 6c. Token Architecture → 6c. Token architecture · 6d. Right-To-Left → 6d. Right-to-left · 7. Header And Page Banner → 7. Header and page banner · 8. Breadcrumb And Page Title → 8. Breadcrumb and page title · Heading 2 · Choosing Your First Set → Heading 2 · Choosing your first set · Heading 3 · What To Look For → Heading 3 · What to look for · S1 · Page mặc định (templates/page.liquid): Our Story → S1 · Page mặc định (templates/page.liquid): Our story · S1. No Search Term Yet → S1. No search term yet · S2. No Results → S2. No results · S3. Filter Applied (Color: Black) → S3. Filter applied (Color: Black) · S4. Filter Drawer Open → S4. Filter drawer open · S5. Loading (Filter Or Sort Changing) → S5. Loading (filter or sort changing) · S6. Filters Return Nothing, And Update Error → S6. Filters return nothing, and update error · S8. Hover And Focus → S8. Hover and focus · State 1 · Empty Cart → State 1 · Empty cart · State 2 · Updating Quantity → State 2 · Updating quantity · State 4 · Sold-Out Line → State 4 · Sold-out line · State 5 · Line Variants → State 5 · Line variants · State 6 · Summary Variants → State 6 · Summary variants · States: Loading, Missing Image, Product Edge Cases, Empty Menu, No JavaScript → States: loading, missing image, product edge cases, empty menu, no JavaScript

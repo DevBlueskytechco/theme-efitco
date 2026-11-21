@@ -37,12 +37,12 @@ Bộ chọn biến thể chuyển thành component chung PDP / quickview / card:
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
 | --- | --- | --- | --- | --- |
 | 1 | Header | A nền trắng viền dưới, sticky | thanh tối `--color-background-dark` + noise, cao 80, logo 100 × 30, menu trắng 60%, search 20 / account, cart 24; sticky, không đè ảnh | Sổ 10/11; foundation §3 |
-| 2 | Nút trước/sau 52 (gallery, lightbox, You May Also Like) | icon mũi tên 20 × 16 | chevron 11 × 16 trong khung 52 (`slideshow-icon` previous/next); trắng viền border, hover cam | Sổ 09/11; foundation §6 |
+| 2 | Nút trước/sau 52 (gallery, lightbox, You may also like) | icon mũi tên 20 × 16 | chevron 11 × 16 trong khung 52 (`slideshow-icon` previous/next); trắng viền border, hover cam | Sổ 09/11; foundation §6 |
 | 3 | Gallery dính | top = header trắng 80 + 24 | giữ 80 + 24, header tối sticky cùng cao (không đổi số) | foundation §3.1 |
 | 4 | Hàng rating | "4.9" foreground + "341 reviews" gạch chân | "(4.9)" + vạch + "341 reviews" chữ muted 14; gạch chân + foreground khi hover | Kit (`drafts/designer/_kit/kit.css`) |
 | 5 | Card review | sao trên, tiêu đề 600, tên cuối card, bo 12 | hàng đầu tên (trái) + sao (phải), tiêu đề Inter 18/700, quote 16/28 muted, bo 16; bỏ ảnh và sản phẩm đính kèm của testimonial | Kit (`drafts/designer/_kit/kit.css`) |
 | 6 | Footer | newsletter 2 cột, 3 social, wordmark tách hàng | theo foundation vòng 3: ảnh 96 × 120 + chữ + form, panel dải rộng bo 16, 4 social, wordmark giữa hàng cuối với copyright và localization | foundation §4 |
-| 7 | Lựa chọn thiết kế ghi nhận | — | Nút bo 4 (token `--radius-button`); nền xám #E5E5E5 không dùng cho Buy it now vì trùng nút disabled foundation §6; quote #808080 (3.95:1) đổi `--color-muted`; dấu tròn "Feature Product" là trang trí khối trang chủ, không đưa lên gallery | Kit (`drafts/designer/_kit/kit.css`) |
+| 7 | Lựa chọn thiết kế ghi nhận | — | Nút bo 4 (token `--radius-button`); nền xám #E5E5E5 không dùng cho Buy it now vì trùng nút disabled foundation §6; quote #808080 (3.95:1) đổi `--color-muted`; dấu tròn "Feature product" là trang trí khối trang chủ, không đưa lên gallery | Kit (`drafts/designer/_kit/kit.css`) |
 
 Giữ nguyên nội dung, bố cục 2 cột, accordion, trạng thái A–I và settings của vòng 2. Vòng 3b giữ toàn bộ vòng 3, chỉ sửa các mục trong bảng "Thay đổi vòng 3b"; thêm trạng thái J (2048 biến thể) và K (countdown).
 
@@ -66,9 +66,9 @@ Nguồn: sổ quyết định CTO > kit + mockup (`drafts/designer/**`, nguồn 
 | 1 | Header tối (#1A1A1A + noise, cao 80, sticky, không đè ảnh) | `header` | Sổ quyết định 10/11; foundation §3 |
 | 2 | Breadcrumb | — (foundation §5) | Home / {collection} / {product} |
 | 3 | Gallery + buy box (có countdown khi có sale có hạn) | `product-media`, `product-info`, `product-form` | §3–§6 |
-| 4 | Pairs Well With | `product-recommendations` intent complementary | §7 |
-| 5 | Customer Reviews | block mới `product-reviews` (CTO chốt 10/11) | §8, ES1-T264 |
-| 6 | You May Also Like | `product-recommendations` intent related | §9 |
+| 4 | Pairs well with | `product-recommendations` intent complementary | §7 |
+| 5 | Customer reviews | block mới `product-reviews` (CTO chốt 10/11) | §8, ES1-T264 |
+| 6 | You may also like | `product-recommendations` intent related | §9 |
 | 7 | Footer | `footer` | foundation §4 |
 | — | Sticky bar | `product-sticky-bar` | §10 |
 
@@ -88,8 +88,8 @@ Không dùng tab ngang cho mô tả / thông số / review (09 §1 #753). Không
 | Thumbnail | 56 | 64 | 80 | 80 | gap 12; code hiện 64 cố định |
 | h1 | 33 | 43 | 48 | 48 | `--font-size-h1` + `--line-height-h1` (40/48 → 48/56, bội 4; THAY 21/11, ES1-T567) |
 | Giá | 22 | 24 | 27 | 28 | `--font-size-h3`, Inter 600 |
-| Nút, ô số lượng | 48 | 48 | 52 | 52 | `--control-height` |
-| Padding main | 8 / 48 | 8 / 48 | 24 / 120 | 24 / 120 | trên / dưới |
+| Nút, ô số lượng | 48 | 48 | 48 | 48 | `--control-height` (48 mọi mốc) |
+| Padding main | 8 / 48 | 8 / 48 | 24 / 128 | 24 / 128 | trên / dưới |
 | Khoảng trong buy box | 24 | 24 | 24 | 24 | `--space-xl` 24 |
 
 - Từ 64rem gallery dính (`position: sticky`, top = header 80 + 24), buy box cuộn. ĐỀ XUẤT thay code hiện tại (code dính cột chi tiết, xếp dọc mọi ảnh): buy box dài hơn ảnh vì có accordion, nên dính ảnh giữ ảnh trong tầm mắt khi đọc thông số (09 §3 #1217M ảnh và lựa chọn cùng viewport).
@@ -103,7 +103,7 @@ Anatomy: track ảnh (scroll-snap) · nút phóng to (ảnh là link tới bản
 - Thứ tự media: featured media của variant đang chọn trước (code đã có). Đổi variant thì track trượt tới ảnh variant (AC1).
 - Nút 52: chevron 11 × 16 (`snippets/slideshow-icon`), trắng viền `--color-border`, hover nền cam icon trắng + scale 1.06 (sổ quyết định 09/11). Hai nút cách 8. Ở đầu/cuối: cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled`. 360: ẩn nút, vuốt.
 - Thumbnail: nền cream, viền 1px `--color-border`, bo 4 (8 từ 80rem); đang xem viền 2px foreground (ĐỀ XUẤT, code 1px: 1px foreground khó thấy khác hover); hover viền foreground. Thumbnail hiện cả trên mobile (09 §3 #774M). Video: nhãn ▶ đen góc phải dưới; 3D: nhãn "3D". Chỉ hiện khi ≥ 2 media.
-- Không lặp badge giảm giá trên ảnh: -24% đặt cạnh giá (10 §8 không lặp khuyến mãi).
+- Không lặp badge giảm giá trên ảnh: −24% đặt cạnh giá (10 §8 không lặp khuyến mãi).
 - Hover ảnh desktop: con trỏ zoom-in. Không làm hover zoom ở bản này (06 §6 gợi ý; ĐỀ XUẤT để sau vì phải tải ảnh 2048 khi rê chuột, chạm Performance).
 - Video (`video`): poster + nút "Play video" pill đen giữa ảnh (icon ▶ trong tròn trắng 40), `preload="none"`, không tự chạy, có `controls`. Ngoài (YouTube/Vimeo): iframe chỉ chèn khi bấm (code `<template>`). 3D (`model`): poster + nút "View in 3D", `reveal: interaction`. Mockup trạng thái E.
 - Không media (`edge_cases` "Sản phẩm không có media"): 1 ô placeholder cream, icon ảnh `--color-muted-light`, không thumbnail, không nút phóng to. Trạng thái I.
@@ -123,7 +123,7 @@ Thứ tự (CTO 10/11 + 09 §1 thứ tự Baymard): eyebrow vendor → h1 → co
 | Tên | h1 heading 700, đầy đủ không cắt | foreground | AC3 |
 | Giá bán | Inter 600 `--font-size-h3` | `--color-sale` khi giảm (6.38), foreground khi không | ĐỀ XUẤT cỡ ≈ tên (10 §8 #792) chỉ 16px vì là khối trang chủ |
 | Giá gạch | 16/500 line-through | `--color-muted` (8.45) | tăng 1 bậc theo giá bán |
-| Badge -N% | pill 28, 13/600 | sale / sale-foreground | N tính từ compare_at_price |
+| Badge −N% | pill 28, 13/600 | sale / sale-foreground | N tính từ compare_at_price |
 | Rating | 5 sao 16 + "(4.9)" + vạch 1px + "341 reviews", 14/400 | sao `--color-rating`, chữ `--color-muted` (8.45); hover "341 reviews" foreground + gạch chân | metafield `reviews.rating`, `reviews.rating_count` (như featured-product) |
 | Thuế, ship | 14/400 | muted | code (`taxes_included`, `shipping_at_checkout_html`) |
 
@@ -180,12 +180,12 @@ Tồn kho: chấm 8 + chữ 14/500 ngay trên hàng nút. ĐỀ XUẤT chấm `-
 Số lượng + nút:
 - Một hàng: ô số lượng 128 (− 44 · số 40 · + 44) + nút Add to cart lấp phần còn lại, cách 12. Nhãn "Quantity" 14/600 phía trên ô (form có label thật). ĐỀ XUẤT stepper thay `input number` trần (12 §1 #2151D); không JS vẫn gõ số được. − khoá khi = 1.
 - Ô số lượng viền `--color-muted-light` (sổ 09/11), focus viền + outline accent.
-- Add to cart: primary cam, icon túi 20 + "Add to cart" (sentence case, CTO 21/11). Cao 48 / 52, full phần còn lại.
+- Add to cart: primary cam, icon túi 20 + "Add to cart" (sentence case, CTO 21/11). Cao 48, full phần còn lại.
 - Nút thanh toán nhanh có thương hiệu (Shop Pay, Apple Pay, G Pay, PayPal) do Shopify chọn và vẽ: giữ nguyên màu, theme chỉ chỉnh chiều cao/bo qua biến CSS chính thức (foundation §27).
 - Buy it now (`payment_button`, mặc định bật): full width. Nút unbranded theo `.button--secondary` (viền foreground, hover đảo đen) để Add to cart nổi nhất (10 §8 #791). Nút có thương hiệu (Shop Pay…) giữ màu của Shopify. "More payment options" link 14 gạch chân, cao 44, giữa.
 - Pickup (khi có): dưới Buy it now, chữ 14, link "Check availability at other stores" (code có).
 
-Hàng cam kết (ĐỀ XUẤT, 10 §9 #803, #836: thông tin ship/đổi trả gần nút): khung viền `--color-border` bo 12 padding 16; 3 mục icon 24 cam + chữ 14: "Fast Shipping" (link shipping policy), "1 Year Warranty", "90 Day Money Back" (link refund policy). Nội dung lấy từ trust bar footer, không thêm hứa hẹn mới. 360 xếp dọc, 768 và ≥1280 3 cột, 1024–1279 xếp dọc (cột hẹp).
+Hàng cam kết (ĐỀ XUẤT, 10 §9 #803, #836: thông tin ship/đổi trả gần nút): khung viền `--color-border` bo 12 padding 16; 3 mục icon 24 cam + chữ 14: "Fast shipping" (link shipping policy), "1 year warranty", "90 day money back" (link refund policy). Nội dung lấy từ trust bar footer, không thêm hứa hẹn mới. 360 xếp dọc, 768 và ≥1280 3 cột, 1024–1279 xếp dọc (cột hẹp).
 
 Countdown "Sale ends in" ở phần đầu buy box, xem §4.2.
 
@@ -202,29 +202,29 @@ Theo foundation §13 (dấu + cam bên trái , hàng ≥ 56, `<details>`, mở �
 - Tiêu đề cụ thể, không dùng "Details", "Info" (09 §1 #766). Mở sẵn 2 mục (15 §6). Phí ship không giấu: ghi chú ship đã ở dưới giá (15 §6).
 - Bảng thông số = `.data-table--striped` của kit: viền 1px `--color-background-sand`, bo 8, dòng lẻ nền sand; nhãn 14 muted (dòng sand: `--color-background-sand-foreground`), giá trị 16/500 căn phải từ 48rem (360: 14, căn trái, 2 cột 40/60). `<table>` + `<th scope="row">` + caption ẩn. Luôn có đơn vị (10 §7 #857: dữ liệu merchant).
 
-## 7. Pairs Well With (complementary)
+## 7. Pairs well with (complementary)
 
-- Tiêu đề h2 "Pairs Well With" (ĐỀ XUẤT đổi locale mặc định `heading_complementary` sang Title Case như các tiêu đề section khác; tiêu đề giữ Title Case, chờ CTO). Không eyebrow.
+- Tiêu đề h2 "Pairs well with" (sentence case, CTO 21/11 lượt 2; locale mặc định `heading_complementary` đã đúng). Không eyebrow.
 - Thẻ gọn ngang (khác card lưới của §9 để hai khối không lẫn): viền border bo 12 padding 12; ảnh 96 nền cream; tên 16/500 link; giá; nút secondary nhỏ cao 40 "Add to cart" (tên ẩn ": {product}").
 - Lưới: 360 1 cột (4 hàng), 768 2 cột, ≥1280 4 cột. Gap = gutter.
 - ĐỀ XUẤT nút thêm giỏ từng sản phẩm (09 §2 #821): cần BE (JSON recommendations + cart add). Không có nút thì thẻ chỉ là link.
 - Rỗng (0 kết quả, chưa cài Search and Discovery) hoặc lỗi: ẩn cả khối (code có). Đang tải: skeleton 1 hàng đúng kích thước (trạng thái H).
 
-## 8. Customer Reviews (block `product-reviews`, CTO chốt 10/11; app cụ thể ES1-T264)
+## 8. Customer reviews (block `product-reviews`, CTO chốt 10/11; app cụ thể ES1-T264)
 
 Nền cream (section `--color-background-cream`), `id="reviews"` (đích của link rating).
-- Trái (4/12 từ 64rem): h2 "Customer Reviews" · điểm "4.9" heading 800 `--font-size-display` · 5 sao 20 + "Based on 341 reviews" 14 muted · nút secondary "Write a review".
+- Trái (4/12 từ 64rem): h2 "Customer reviews" · điểm "4.9" heading 800 `--font-size-display` · 5 sao 20 + "Based on 341 reviews" 14 muted · nút secondary "Write a review".
 - Phải (8/12): danh sách review của app; mockup dùng thân card testimonial trang chủ: card trắng bo 16 padding 24 · hàng đầu tên 16/400 trái + sao 16 phải · tiêu đề Inter 18/700 (h3) · quote 16/28 `--color-muted` (AA 8.45:1; xám #808080 chỉ 3.95:1, không dùng). Bỏ ảnh và sản phẩm đính kèm (đang ở chính trang sản phẩm). Badge Verified mặc định tắt (sổ 06/11, E9). 2 cột từ 48rem. Nút secondary "Show more reviews" dưới danh sách.
 - 360: xếp dọc, tóm tắt trên.
 - Theme chỉ hiện tóm tắt từ metafield + vùng nhận app block; danh sách, lọc, ảnh khách, phân bố sao (10 §10 #749, #750, #2557) do app. Không metafield và không app: ẩn khối.
 - Tương phản: số "4.9" foreground trên cream 15.9; muted trên trắng 8.45.
 
-## 9. You May Also Like (related)
+## 9. You may also like (related)
 
-- h2 "You May Also Like" (ĐỀ XUẤT Title Case như §7) + nút 52 đầu khối (sổ 09/11 hàng ngang).
+- h2 "You may also like" (sentence case như §7) + nút 52 đầu khối (sổ 09/11 hàng ngang).
 - ≥1280: lưới 4 cột card sản phẩm foundation §9 (không cuộn, ẩn nút và thanh tiến trình). 768: hàng ngang 2.5 card + nút 52 + thanh tiến trình. 360: hàng ngang card 70vw (1.3 card), ẩn nút, vuốt, thanh tiến trình.
 - Setting "Columns on desktop" chỉ áp từ 80rem; info hiện tại ("Mobile shows 2 columns and tablet shows 3") phải sửa theo hàng ngang dưới 80rem.
-- Card theo foundation §9 (badge -N%, New, Sold out, giá sale, "N colors"). Dữ liệu từ Product Recommendations API (AC7). Rỗng/lỗi: ẩn khối.
+- Card theo foundation §9 (badge −N%, New, Sold out, giá sale, "N colors"). Dữ liệu từ Product Recommendations API (AC7). Rỗng/lỗi: ẩn khối.
 
 ## 10. Sticky bar (`product-sticky-bar`)
 
@@ -283,12 +283,12 @@ Hover / focus / active (mọi phần tử): theo foundation §6–§7. Focus: ou
 | product-info | Show sale countdown | checkbox | true | info: "Uses the product metafield custom.sale_ends_at. Hidden when the date has passed, the variant has no compare-at price, or is sold out. The countdown does not end the sale." §4.2 |
 | product-form | Show quantity selector | checkbox | true | 10 §8 #793 |
 | product-form | Show assurance list | checkbox | true | 10 §9 |
-| product-form | Assurance 1–3 text | text | Fast Shipping / 1 Year Warranty / 90 Day Money Back | Kit (`drafts/designer/_kit/kit.css`) |
+| product-form | Assurance 1–3 text | text | Fast shipping / 1 year warranty / 90 day money back | Kit (`drafts/designer/_kit/kit.css`) |
 | product-form | Assurance 1–3 link | url | shipping policy / trống / refund policy | |
 | product-details | Specification 1–4 label | text | Weight range / Footprint / Materials / Assembly | metafield `custom.spec_1..4` |
 | product-details | Open description by default | checkbox | true | 15 §6 |
 | product-details | Show shipping and returns | checkbox | true | 10 §9 #803 |
-| product-reviews | Heading | text | Customer Reviews | ES1-T264 |
+| product-reviews | Heading | text | Customer reviews | ES1-T264 |
 | product-sticky-bar | Show on desktop | checkbox | true | CTO chốt 10/11 (P2) |
 
 Tên sentence case, không ký tự `&`. Không thêm setting màu (dùng token). Bộ chọn biến thể không có setting: ngưỡng > 10 / hiện 7 là hằng chung (sổ M5, variant-picker §11); setting "Options with many values" của vòng 3b đã bỏ.
@@ -320,7 +320,7 @@ Tương phản (tính tay WCAG; L foreground 0.0103, sand 0.796, cream 0.910, ac
 - Live region: `product-form-status` (role status: "Adding to cart", "Added to cart", vòng 3b thêm "Loading {value}") và `product-form-error` (role alert), có sẵn. Lỗi tải biến thể: role alert ngay dưới option.
 - Countdown: `role="timer"` không aria-live, số aria-hidden, câu ngày giờ đầy đủ (§4.2). Bộ chọn biến thể ("+N", focus sau khi mở, live region đang tải/lỗi): variant-picker §7.
 - Alt ảnh: `media.alt`, thiếu thì "{product}, image n of N" (không bịa mô tả ảnh). Thumbnail, ảnh sticky bar, ảnh card gợi ý `alt=""` (tên ở link).
-- Một h1 (tên sản phẩm); h2 cho Pairs Well With, Customer Reviews, You May Also Like; h3 cho tên sản phẩm trong card và tiêu đề review.
+- Một h1 (tên sản phẩm); h2 cho Pairs well with, Customer reviews, You may also like; h3 cho tên sản phẩm trong card và tiêu đề review.
 - Zoom 200%: buy box 1 cột dưới 64rem; hàng ngang có `overflow-x` riêng.
 
 ## 14. Lighthouse
@@ -352,7 +352,7 @@ Chỉ token foundation §2. Dẫn xuất: `--control-height`, `--grid-gap`, `--s
 | Bố cục 2 cột | `.product` 7fr/5fr, `.product__details` sticky | FE: 1fr/1fr, gap 48 → 80 từ 80rem, sticky chuyển sang media |
 | Gallery | `.product-media__*` xếp dọc từ 64rem | FE: 1 ảnh + thumbnail mọi mốc, tỉ lệ 4:3 ở 48–64rem, tràn mép <48rem, đếm ảnh, nút 52 dùng lại `.carousel-nav__button` + `snippets/slideshow-icon`; BE: nút trước/sau, đồng bộ `aria-current` |
 | Lightbox | `.product-media__dialog` | FE: nền cream, đếm, nút 52, thumbnail; BE: chuyển ảnh trong dialog |
-| Giá, rating | `snippets/price`, `snippets/rating-stars` | FE: cỡ giá h3, badge -N%, hàng rating link `#reviews` |
+| Giá, rating | `snippets/price`, `snippets/rating-stars` | FE: cỡ giá h3, badge −N%, hàng rating link `#reviews` |
 | Mô tả | trong `product-info` | FE: chuyển sang accordion `product-details` |
 | Option | `snippets/product-variant-picker.liquid`, `.product-option__value(--swatch)` | theo variant-picker §12 (snippet chung PDP/quickview, bảng lệch code); PDP thêm partial §17 |
 | Countdown | — (featured-product có countdown setting, trang chủ) | FE: khối `product-countdown` trong `product-info`, dùng lại markup/CSS countdown của featured product; BE: đếm tiếp, chuyển K3 khi hết giờ, nằm trong partial đổi variant |
@@ -401,7 +401,7 @@ Câu mới (CTO chốt 10/11 theo đề xuất, docs/design/decisions.md):
 ## Cập nhật 21/11 (ES1-T567, CTO 21/11)
 
 - Nguồn chuẩn là mockup HTML + `drafts/designer/_kit/kit.css`; Designer dựng lại bản vẽ từ mockup. Số trong spec lệch mockup thì mockup thắng.
-- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog, empty state, tab, menu giữ Title Case (chờ CTO). "Checkout" giữ một chữ (thuật ngữ content.md §4, chờ CTO).
+- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog / drawer, empty state, tab, link menu cũng sentence case (CTO 21/11 lượt 2); tên sản phẩm, collection, bài viết theo dữ liệu, tên riêng và viết tắt giữ. "Checkout" giữ một chữ (thuật ngữ, CTO 21/11 lượt 2; content.md §4).
 - Line-height theo bội 4 qua token kit: 16/24 (`--line-height-body`), 14/20 (`--line-height-sm`), 13/20 (`--line-height-label`), 18/28 (`--line-height-title`), h1 40/48 → 48/56, h3 28/36, h4 20/24. Trang không viết line-height bằng số.
 - Giá PDP 28/36 (`.price--xl`), skeleton giá cao 36; quote review 16/28 (`--line-height-reading`); số điểm tổng line-height 1; badge đếm trên thumbnail 24 (trước 22); vùng chạm 44 đọc `--touch-target`, icon đọc `--icon-size-*`.
 - Cần FE: locale `products.product.add_to_cart`, `buy_it_now`, `sold_out`, `choose_options`, `general.try_again`, `show_fewer`, nút review về sentence case.

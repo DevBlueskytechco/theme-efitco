@@ -60,7 +60,7 @@ Cột 2 / 3 / 4 theo ES1-T107 #7 (CTO 06/11). Lưới → footer `--section-gap`
 
 - Hover: ảnh scale 1.04 (500ms), tiêu đề gạch chân 2px (như `.collection-card` trang chủ). Focus: outline 2px accent offset 4 bao cả card (trên `::after`). Active: theo link.
 - Không ảnh: nền `--color-background-cream`, icon ảnh 30% `--color-muted-light`, giữ tỉ lệ 3 / 2 (0 CLS). Code dùng `placeholder_svg_tag 'collection-1'`; ĐỀ XUẤT icon trung tính như card sản phẩm (foundation §9).
-- Rỗng (L2): empty-state foundation §18: h2 "No Collections Yet" · "No collections to show yet. Browse every product in the store instead." (câu đầu là `collections.empty` có sẵn) · primary "Shop all products" (`routes.all_products_collection_url`).
+- Rỗng (L2): empty-state foundation §18: h2 "No collections yet" · "No collections to show yet. Browse every product in the store instead." (câu đầu là `collections.empty` có sẵn) · primary "Shop all products" (`routes.all_products_collection_url`).
 - Phân trang (L1): snippet `pagination` chung theo `docs/ui-spec/pagination.md`: `{% paginate collections by 24, window_size: 1 %}` → `{% render 'pagination', paginate: paginate %}`. Previous/Next tròn 52 chevron (`aria-label="Previous page"` / `"Next page"`); ≥ 768 số trang pill 44, trang hiện tại accent; < 768 "Page X of Y" giữa 2 nút. Trang đầu/cuối: nút giữ chỗ, cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled` (sổ 10/11 audit 5). Store dev 14 collection nên không hiện.
 - Đang tải / lỗi: không có (trang render server, không JS).
 
@@ -101,6 +101,6 @@ CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions
 ## Cập nhật 21/11 (ES1-T567, CTO 21/11)
 
 - Nguồn chuẩn là mockup HTML + `drafts/designer/_kit/kit.css`; Designer dựng lại bản vẽ từ mockup. Số trong spec lệch mockup thì mockup thắng.
-- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog, empty state, tab, menu giữ Title Case (chờ CTO). "Checkout" giữ một chữ (thuật ngữ content.md §4, chờ CTO).
+- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog / drawer, empty state, tab, link menu cũng sentence case (CTO 21/11 lượt 2); tên sản phẩm, collection, bài viết theo dữ liệu, tên riêng và viết tắt giữ. "Checkout" giữ một chữ (thuật ngữ, CTO 21/11 lượt 2; content.md §4).
 - Line-height theo bội 4 qua token kit: 16/24 (`--line-height-body`), 14/20 (`--line-height-sm`), 13/20 (`--line-height-label`), 18/28 (`--line-height-title`), h1 40/48 → 48/56, h3 28/36, h4 20/24. Trang không viết line-height bằng số.
 - Ảnh card collection 3 / 2 (Chuẩn: Carbon aspect ratio 3:2), thay 336 / 220; tên card dưới 48rem 20/24 (`--font-size-h4` + `--line-height-h4`), từ 48rem 28/36. Cần FE: tỉ lệ ảnh card collection trong snippet.

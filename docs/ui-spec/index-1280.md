@@ -1,4 +1,4 @@
-KHÔNG CHẮC: (1) Tỉ lệ ảnh đổi theo bộ tỉ lệ có tên (ES1-T567): hero 2/1 cao hơn bản trước 51 px ở 1280 (640 so với 589) nên tiêu đề "Browse Categories" rơi xuống y ≈ 840, dưới mép màn 800 (§4.2); CTO xem ảnh rồi chốt. (2) Ảnh hero demo `efx-slide-2.jpg`: ≥ 80rem không có lớp tối (sổ 10/11), chữ trắng 16–18 trên tông nền ~#8B8279 chỉ ~3.76:1 (đo ở `index.md` §3.2), cần ảnh có vùng nền trơn, tối sau chữ (xem §4). (3) Độ dài thanh tiến trình trong mockup là ước lượng (88 / 80 / 85%), code tính theo vị trí cuộn. (4) Mockup bỏ `loading="lazy"` để ảnh chụp đủ ảnh; theme vẫn lazy mọi ảnh trừ slide 1 (§4.2). (5) Nút nổi Big offer không vẽ (overlay, `marketing-popups.md` §4). (6) Shop the look ảnh 1/1: cột phải thấp hơn ảnh, panel bám đáy, giữa hàng cuối và panel có khoảng trống ≈ 80 ở 1280; nếu CTO thấy hụt thì đổi ảnh sang 4/3.
+KHÔNG CHẮC: (1) Tỉ lệ ảnh đổi theo bộ tỉ lệ có tên (ES1-T567): hero 2/1 cao hơn bản trước 51 px ở 1280 (640 so với 589) nên tiêu đề "Browse categories" rơi xuống y ≈ 840, dưới mép màn 800 (§4.2); CTO xem ảnh rồi chốt. (2) Ảnh hero demo `efx-slide-2.jpg`: ≥ 80rem không có lớp tối (sổ 10/11), chữ trắng 16–18 trên tông nền ~#8B8279 chỉ ~3.76:1 (đo ở `index.md` §3.2), cần ảnh có vùng nền trơn, tối sau chữ (xem §4). (3) Độ dài thanh tiến trình trong mockup là ước lượng (88 / 80 / 85%), code tính theo vị trí cuộn. (4) Mockup bỏ `loading="lazy"` để ảnh chụp đủ ảnh; theme vẫn lazy mọi ảnh trừ slide 1 (§4.2). (5) Nút nổi Big offer không vẽ (overlay, `marketing-popups.md` §4). (6) Shop the look ảnh 1/1: cột phải thấp hơn ảnh, panel bám đáy, giữa hàng cuối và panel có khoảng trống ≈ 80 ở 1280; nếu CTO thấy hụt thì đổi ảnh sang 4/3.
 
 # UI spec: Trang chủ desktop 1280 (ES1-T293)
 
@@ -31,7 +31,7 @@ Thứ tự nguồn (CTO 21/11): sổ quyết định CTO > `drafts/designer/_kit
 | Lưới 2 cột (featured, why, FAQ) | 580 \| 80 \| 580 | 668 \| 80 \| 668 | `1fr 80 1fr` |
 | Dải rộng (hero, panel footer) | 0 (tràn mép) | 64 | `--band-inset` (F§1) |
 | Mép dải → mép nội dung | 20 | 188 | `--side − --band-inset` |
-| Khoảng giữa section / tiêu đề → nội dung | 120 / 40 | 120 / 40 | `--section-gap`, `--heading-gap` |
+| Khoảng giữa section / tiêu đề → nội dung | 128 / 40 | 128 / 40 | `--section-gap`, `--heading-gap` |
 | h2 khối / display | 48/56 / 80/80 | 48/56 / 100/100 | kit `.h1` (`--font-size-h1`, `--line-height-h1`); R2. Dòng bội 4 (Polaris React line height) |
 
 - R1 Giữ span cột của lưới 12 cột, gutter giữ 24: thẻ co theo cột (level 4 cột, bestseller 3 cột, shop the look 8 + 4, bundle 7 + 5). Lý do: cùng nhịp lưới, không thêm bố cục (03 §1; 06 nhóm 5 §1).
@@ -48,10 +48,10 @@ Số 1920 và 1280 đọc từ mockup ES1-T293 sau ES1-T567. "Như 1920" = cùng
 | --- | --- | --- | --- | --- |
 | 1 | Header | thanh 80 tối noise; logo 100 × 30; 7 mục giữa, gap 40; 3 icon | như 1920, logo x 20, menu giữa logo và icon | Không lệch (F§3) |
 | 2 | Hero | thẻ 1792 × 896 (2/1) lùi 64, bo 16; chữ x 252 (rìa 188); H1 100 2 dòng; mũi tên 52 hai bên giữa dọc, cách mép thẻ 64 | thẻ 1280 × 640 (2/1) tràn mép (`--band-inset` 0), bo 16; chữ x 20; H1 80; câu phụ 18; nút cách 48 (1920: 64); 2 mũi tên gộp góc dưới phải, cách đáy 24, mép phải 24, cách nhau 8 | Ở 1280 rìa thẻ → chữ chỉ 20, không đủ chỗ mũi tên 52 bên trái (cần ≥ 100 = 52 + 24 × 2); nếu giữ chỗ cũ thì mũi tên đè H1. Gộp góc dưới phải như 768 (sổ 10/11 H1). Công tắc bằng `clamp()` theo rìa, không thêm breakpoint (§2.1). Câu CTO 2 |
-| 3 | Browse Categories | card 336 (ảnh 336 × 224 tỉ lệ 3/2, bo 16, tên Sofia 28/36), gap 24; 4 trọn + 228 px card 5 trong lề | card ≈ 271 (ảnh 271 × 180), 4 trọn + 76 px (28%) card 5; nút 52 phải tiêu đề; thanh tiến trình cách 32 | Card 3 cột = 292 sẽ lấp kín 1240, card 5 nằm ngoài màn, mất dấu hiệu cuộn (R4). Nút trắng (cam = trạng thái hover, sổ 09/11) |
-| 4 | Intro + level | display 100 2 dòng, ảnh inline 165 × 94 (1.65em × 0.94em, theo cỡ chữ); cột phải 528 từ x 1140 (đoạn 16/24, link Sofia 28/36 cách 48); level cách 120; 3 card 456 vuông, padding 40, gradient 50% → tối | display 80 (ảnh inline 132 × 75); cột phải 528 từ x 732; 3 card 397 (4 cột), padding 32 | R1, R2. "N Products →" chỉ hiện khi rê/focus (V31) |
+| 3 | Browse categories | card 336 (ảnh 336 × 224 tỉ lệ 3/2, bo 16, tên Sofia 28/36), gap 24; 4 trọn + 228 px card 5 trong lề | card ≈ 271 (ảnh 271 × 180), 4 trọn + 76 px (28%) card 5; nút 52 phải tiêu đề; thanh tiến trình cách 32 | Card 3 cột = 292 sẽ lấp kín 1240, card 5 nằm ngoài màn, mất dấu hiệu cuộn (R4). Nút trắng (cam = trạng thái hover, sổ 09/11) |
+| 4 | Intro + level | display 100 2 dòng, ảnh inline 165 × 94 (1.65em × 0.94em, theo cỡ chữ); cột phải 528 từ x 1140 (đoạn 16/24, link Sofia 28/36 cách 48); level cách 128 (`--section-gap`); 3 card 456 vuông, padding 40, gradient 50% → tối | display 80 (ảnh inline 132 × 75); cột phải 528 từ x 732; 3 card 397 (4 cột), padding 32 | R1, R2. "N products →" chỉ hiện khi rê/focus (V31) |
 | 5 | Bestsellers | eyebrow + h2 trái, 4 tab phải cùng hàng; 4 card 336 (3 cột), viền #E5E5E5 | 4 card 292; tab giữ 40 cao, hàng tiêu đề + tab rộng ~1010 < 1240 | R1 |
-| 6 | Quiz | panel 1416 bo 16, padding 64, 0 padding ngoài (cách khối trên/dưới 120); thẻ trắng 608 (38rem); giới thiệu 632; pill "Our most-loved feature" = `.badge--outline` | panel 1240, padding 48; thẻ giữ 608 (bản đồ 152 + lựa chọn 368); giới thiệu co còn 488 | Ticket nêu panel 1416: giữ thẻ câu hỏi nguyên kích thước (lựa chọn 80 cao, mô tả 1 dòng), phần co là cột giới thiệu (h2 "Find Your Perfect Gear" ~375 vẫn 1 dòng) |
+| 6 | Quiz | panel 1416 bo 16, padding 64, 0 padding ngoài (cách khối trên/dưới 128); thẻ trắng 608 (38rem); giới thiệu 632; pill "Our most-loved feature" = `.badge--outline` | panel 1240, padding 48; thẻ giữ 608 (bản đồ 152 + lựa chọn 368); giới thiệu co còn 488 | Ticket nêu panel 1416: giữ thẻ câu hỏi nguyên kích thước (lựa chọn 80 cao, mô tả 1 dòng), phần co là cột giới thiệu (h2 "Find your perfect gear" ~375 vẫn 1 dòng) |
 | 7 | Shop the look | ảnh 936 × 936 (8 cột, 1/1) + cột 456 (4 cột): ô Fits 100, 4 hàng, panel tổng; gap 24 | ảnh 819 × 819 + cột 397; ô Fits 84, hàng 80 (ảnh 56), gap 16, hàng cách 8, panel padding 24; panel bám đáy (= đáy ảnh) | Giữ 8 + 4 cột (R1). Ảnh 1/1 cao hơn cột phải: panel `margin-block-start: auto` bám đáy ảnh, khoảng trống nằm giữa hàng cuối và panel. Hàng 80 vẫn ≥ 44 chạm |
 | 8 | Make fitness | cao 960 (= 50vw), display 100 3 dòng, "MAKE" foreground, còn lại muted; 3 ảnh rải 280 / 200 / 187 cách mép màn 80 | cao 640 (50vw), display 80; ảnh 187 / 133 / 125 cách mép 53 (theo vw); dòng 2 x 301–979, cách ảnh trái 61, ảnh phải 115 | R2 (lý do chính của R2). Xuống dòng cố định: `<br>` sau "fitness" và "your" trong nội dung, không dựa `balance` |
 | 9 | Bundle | lưới 7 cột: 3 × 2 card ~256; panel 5 cột 576, padding 40; số món = `.badge--outline` "5 items" | card 222 (ảnh 198); panel 503, padding 32 | Ticket nêu 3 × 2 + panel 576: giữ 7 + 5 cột (R1); panel 503 đủ cho tên món dài nhất + giá trên 1 dòng (14px). Số liệu demo thật: 5 món $514.00, −15% $77.10, tổng $436.90 (sổ 06/11 E7) |
@@ -71,7 +71,7 @@ Anatomy, dữ liệu, trạng thái từng khối giữ như `index-mobile-a.md`
 
 ### 2.1 Hero
 - Thẻ: `margin-inline: var(--band-inset)`, `aspect-ratio: 2` (Chuẩn: Carbon aspect ratio 2:1), bo `--radius-panel` (16), nằm ngay dưới header, cách 0 (sổ 10/11). Ảnh `cover`, focal point theo merchant.
-- Nội dung: `padding-inline` = `--side − --band-inset` (20 | 188), giữa dọc; eyebrow 16/800 → 24 → H1 display (R2) → 32 → câu phụ 18/500 → `clamp(48, 3.333vw, 64)` → nút "Explore equipment →" cao 52.
+- Nội dung: `padding-inline` = `--side − --band-inset` (20 | 188), giữa dọc; eyebrow 16/800 → 24 → H1 display (R2) → 32 → câu phụ 18/500 → `clamp(48, 3.333vw, 64)` → nút "Explore equipment →" cao 48.
 - Mũi tên (nút tròn 52, F§6): rìa = `--side − --band-inset`. Rìa ≥ 100: hai bên, giữa dọc, cách mép thẻ 64 (`--space-5xl`). Rìa < 100: gộp góc dưới phải, prev `inset-inline-start: 100% − 136`, next `inset-inline-end: 24`, đáy 24. CSS mẫu (mockup): `--arrow-room: calc(var(--round-button-size) + var(--space-xl) * 2)` (= 100); `inset-block-start: clamp(50% − nửa nút, (--arrow-room − rìa) × 1000, 100% − nút − 24)`; số × 1000 là công tắc âm/dương của `clamp()`. Rìa ≥ 100 từ màn ~1784.
 - Không lớp tối ≥ 80rem (sổ 10/11, chỉ dưới 1280). Không dot (sổ 07/11). Autoplay theo setting, dừng khi rê/focus (15 §5).
 - Slide 2 cùng bố cục, chữ là `<p>` (1 h1 mỗi trang).
@@ -82,7 +82,7 @@ Anatomy, dữ liệu, trạng thái từng khối giữ như `index-mobile-a.md`
 - Tất cả card vừa khung: lưới tĩnh theo cột, không render nút và thanh tiến trình.
 
 ### 2.3 Level card ≥ 80rem
-- Nội dung đáy: nhãn 14/800, tên h3 Sofia 36/44 (`--font-size-h2`, `--line-height-h2`); hàng "N Products →" (gạch trên trắng 24%) ẩn (`max-height: 0; opacity: 0`), hiện khi `:hover` hoặc `:focus-visible` của card, 250 ms; giảm chuyển động thì hiện/ẩn tức thì. Số sản phẩm vẫn trong tên link khi ẩn (đọc "Level fitness Beginner 24 Products").
+- Nội dung đáy: nhãn 14/800, tên h3 Sofia 36/44 (`--font-size-h2`, `--line-height-h2`); hàng "N products →" (gạch trên trắng 24%) ẩn (`max-height: 0; opacity: 0`), hiện khi `:hover` hoặc `:focus-visible` của card, 250 ms; giảm chuyển động thì hiện/ẩn tức thì. Số sản phẩm vẫn trong tên link khi ẩn (đọc "Level fitness Beginner 24 products").
 - Gradient `transparent 50% → --color-background-dark` (AA: chữ trắng trên vùng tối ở đáy card).
 
 ### 2.4 Shop the look
@@ -97,12 +97,12 @@ Anatomy, dữ liệu, trạng thái từng khối giữ như `index-mobile-a.md`
 
 ## 3. Trạng thái ≥ 80rem
 
-Trạng thái là ĐỀ XUẤT, cùng nội dung với `index-mobile-a.md`, `index-mobile-b.md` (skeleton tab, tab rỗng, sheet quiz → dialog ≥ 48rem, hết hàng shop the look/bundle, lỗi thêm giỏ, video lỗi, blog không ảnh). Riêng desktop, vẽ ở mục "Desktop States" cuối mockup:
+Trạng thái là ĐỀ XUẤT, cùng nội dung với `index-mobile-a.md`, `index-mobile-b.md` (skeleton tab, tab rỗng, sheet quiz → dialog ≥ 48rem, hết hàng shop the look/bundle, lỗi thêm giỏ, video lỗi, blog không ảnh). Riêng desktop, vẽ ở mục "Desktop states" cuối mockup:
 
 | Trạng thái | Cách hiện | Nguồn |
 | --- | --- | --- |
 | Hero thiếu ảnh | nền `--color-background-dark`, chữ giữ, thẻ giữ tỉ lệ | DESIGN "Images" |
-| Level card hover/focus | hiện hàng "N Products →", ảnh scale 1.04; focus outline accent 2 px | V31; 05 §3 |
+| Level card hover/focus | hiện hàng "N products →", ảnh scale 1.04; focus outline accent 2 px | V31; 05 §3 |
 | Hàng ngang đầu/cuối | nút cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled`, giữ chỗ; nút kia hover cam | sổ 09/11, 10/11 câu 5, 21/11 |
 | Mũi tên hero hover | nền cam, chữ trắng, scale 1.06 (F§6) | sổ 09/11 |
 | Menu header | Shop, Collection mở dropdown/mega từ 80rem (F§13, `navigation.md`) | sổ 09/11 overlay |
@@ -129,9 +129,9 @@ Trạng thái là ĐỀ XUẤT, cùng nội dung với `index-mobile-a.md`, `ind
 
 ### 4.2 Performance (desktop ≥ 98)
 - LCP: ảnh slide 1 hero, eager + `fetchpriority="high"`, `sizes="(min-width: 80rem) calc(100vw - 2 * var(--band-inset))"` → 1280 tải ~1280w (2x: 2560w), 1920 ~1792w. Ngân sách ≤ 200 KB WebP (DESIGN).
-- Màn đầu 1280 × 800: header 80 + hero 640 = 720; tiêu đề "Browse Categories" ở y ~840 (dưới mép màn 40) → danh mục lộ khi cuộn nhẹ (07 §A, §D). Trước ES1-T567 hero cao 589, tiêu đề ở y ~789; xem KHÔNG CHẮC (1).
+- Màn đầu 1280 × 800: header 80 + hero 640 = 720; tiêu đề "Browse categories" ở y ~840 (dưới mép màn 40) → danh mục lộ khi cuộn nhẹ (07 §A, §D). Trước ES1-T567 hero cao 589, tiêu đề ở y ~789; xem KHÔNG CHẮC (1).
 - Mọi ảnh khác `loading="lazy"` + width/height + `aspect-ratio`; ảnh rải make fitness, why dùng `sizes` theo vw (≤ 300 px). Video chỉ poster, bấm mới tải (sổ 09/11).
-- CLS: khung ảnh có tỉ lệ; tổng bundle/shop the look và đồng hồ in từ Liquid; hàng "N Products" của level card ẩn bằng `max-height` trong card có tỉ lệ cố định (không đẩy khối).
+- CLS: khung ảnh có tỉ lệ; tổng bundle/shop the look và đồng hồ in từ Liquid; hàng "N products" của level card ẩn bằng `max-height` trong card có tỉ lệ cố định (không đẩy khối).
 - 2 họ font (sổ 30/10). `clamp()`/`min()` thuần CSS, không JS đo bề rộng.
 
 ### 4.3 SEO
@@ -159,7 +159,7 @@ Không thêm setting. Dùng sẵn: slideshow (`autoplay`, `overlay_opacity` ch�
 | Bundle | 7 + 5 cột; panel padding `clamp(32, …, 40)` | FE | P3 |
 | Make fitness | ảnh rải theo vw, `min-height: 50vw`; locale heading có xuống dòng cố định (§1 khối 8) | FE | P3 |
 | Why choose | lưới lề + nửa trái; ảnh nhỏ theo vw | FE | P3 |
-| Level card | hàng "N Products" hiện khi hover/focus ≥ 80rem | FE | P3 |
+| Level card | hàng "N products" hiện khi hover/focus ≥ 80rem | FE | P3 |
 | FAQ | ảnh 76.2% phải, ô số 2 × 39.8% đè trái, đáy 40 | FE | P3 |
 | Ảnh hero demo | chọn ảnh có vùng tối/trơn sau chữ (AA 4.5 cho eyebrow, câu phụ) | BA / dữ liệu store | P3 |
 

@@ -63,7 +63,7 @@ Giữ nguyên: nội dung, dữ liệu, 8 trạng thái S1–S8, lưới 2/3/4, 
 Trang có từ khoá, có kết quả (mockup đầu file):
 1. Header tối (foundation §3).
 2. Breadcrumb: Home / Search (foundation §5).
-3. `search-top`: `search-head` (h1 "Search Results" → form (ô search + nút xoá + nút Search) → dòng trạng thái "7 results for “adjustable”" `role="status"`) + `type-nav` 4 link All · Products · Articles · Pages (ĐỀ XUẤT, câu CTO 1); từ 80rem type-nav nằm phải.
+3. `search-top`: `search-head` (h1 "Search results" → form (ô search + nút xoá + nút Search) → dòng trạng thái "7 results for “adjustable”" `role="status"`) + `type-nav` 4 link All · Products · Articles · Pages (ĐỀ XUẤT, câu CTO 1); từ 80rem type-nav nằm phải.
 4. Nhóm Products: đầu nhóm [h2 "Products" + số | toolbar (nút Filter, Sort by)] · chip bộ lọc đang áp · lưới `product-card`.
 5. Nhóm Articles, nhóm Pages: h2 + số · danh sách dòng kết quả. ≥ 64rem hai nhóm đặt cạnh nhau.
 6. Phân trang (khi > 1 trang).
@@ -75,7 +75,7 @@ Overlay: drawer Filter (S4).
 
 ### 3.1 Form tìm kiếm
 - `<form action="{{ routes.search_url }}" method="get" role="search">`. Ô `type="search" name="q"`, giữ `search.terms` (11 §4 #346). Đổi từ khoá thì bỏ filter, sort (không gửi lại `filter.*`, `sort_by`; 11 §4 #350).
-- Kích thước: cao `--control-height` (48 / 52 từ 80rem), max-width 720 (45rem), thẳng mép trái container như h1 (sổ 09/11 hero thẳng mép trái, cùng ngôn ngữ).
+- Kích thước: cao `--control-height` (48 mọi mốc), max-width 720 (45rem), thẳng mép trái container như h1 (sổ 09/11 hero thẳng mép trái, cùng ngôn ngữ).
 - Icon kính lúp 20 trong ô, inline-start 16, màu `--color-muted` (trang trí, `aria-hidden`). 04: search có kính lúp + placeholder cụ thể.
 - Placeholder ĐỀ XUẤT "Search benches, dumbbells…" (11 §1: placeholder nêu loại hàng; thay `search.placeholder` hiện tại "Search articles, pages, or products"). Tối đa 24 ký tự để không cắt ở 360. Màu `--color-muted-light` 5.33:1.
 - Nút xoá × 44 × 44 ở inline-end, chỉ hiện khi ô có chữ (`:placeholder-shown` ẩn), `aria-label="Clear search term"`, xoá xong focus về ô. Ẩn nút cancel mặc định của WebKit.
@@ -104,7 +104,7 @@ Overlay: drawer Filter (S4).
 ### 3.5 Toolbar sản phẩm
 Dùng chung thành phần với collection (ES1-T254 §6), khác: search giữ nút Filter mọi mốc (không có cột lọc, câu CTO 2).
 - < 48rem: 2 cột bằng nhau, gap 12: nút Filter (secondary, icon 20 + "Filter" + badge) | Sort. Cao 48.
-- ≥ 48rem: [Filter auto, padding 24] [Sort 240], gap 12, nằm phải đầu nhóm. Cao 48 / 52.
+- ≥ 48rem: [Filter auto, padding 24] [Sort 240], gap 12, nằm phải đầu nhóm. Cao 48.
 - Badge số bộ lọc: tròn 24, nền accent, chữ 13/700 accent-foreground (5.01:1), chữ ẩn " filter applied"; hover nút (đảo đen) badge nền trắng chữ foreground (08 §6 #488D).
 - Sort: nhãn thật "Sort by" 12/500 `--color-muted` (8.45) nằm trong ô phía trên giá trị (label nổi, 04 §5), giá trị 16/500, viền `--color-muted-light`, chevron phải, chữ dài cắt "…".
 - Sort: `<select name="sort_by">` từ `search.sort_options` (Shopify search chỉ có Relevance, Price low → high, Price high → low). Không đủ 4 lựa chọn của 08 §8 #511D do Shopify; không thêm giả. Đổi giá trị: có JS refresh partial, không JS submit form (nút "Apply" ẩn khi có JS, AC3). Select native = bottom sheet hệ điều hành trên mobile (08 §7: sort dạng popup).
@@ -172,7 +172,7 @@ Label sentence case, không `&`, qua `t:` trong `locales/en.default.schema.json`
 | Form | 320 (ô + nút 48 icon) | 720 max | 720 max | 720 max |
 | type-nav | dưới status, 4 link padding 12, cao 44 | dưới status, padding 24, cao 44 | phải, căn đáy với status, cao 40 | như 1280 |
 | Đầu nhóm Products | h2 / toolbar xếp dọc | h2 trái · toolbar phải | như 768, cách lưới 40 | như 1280 |
-| Toolbar | Filter 154 + Sort 154 | Filter auto + Sort 240 | như 768, cao 52 | như 1280 |
+| Toolbar | Filter 154 + Sort 154 | Filter auto + Sort 240 | như 768 | như 1280 |
 | Lưới | 2 × 152 | 3 × 232 | 4 × 292 | 4 × 336 |
 | Articles / Pages | xếp dọc | xếp dọc | 2 cột cạnh nhau, gap 32 | như 1280 |
 | Dòng kết quả | ảnh 72, tiêu đề 16 | ảnh 96, tiêu đề 18 | như 768 | như 768 |
@@ -182,18 +182,18 @@ Label sentence case, không `&`, qua `t:` trong `locales/en.default.schema.json`
 | Popular products | 2 × 2 | 3 (ẩn sp thứ 4) | 4 | 4 |
 | Footer | foundation §4 | | | panel lùi 64 (`--band-inset`), bo 16 |
 
-Cuối `<main>`: khoảng `--section-gap` (48 / 120) trước footer.
+Cuối `<main>`: khoảng `--section-gap` (48 / 128) trước footer.
 
 ## 6. Trạng thái
 
 | Mã | Khi | Thiết kế | Nguồn |
 | --- | --- | --- | --- |
 | S1 | `search.performed` false (không `q`) | h1 "Search", form trống, "Popular searches" (chip link `?q=`), "Shop by category" (kit `.category-link`, V56: tên 16/600 + "N products" 14 muted + mũi tên; 1 / 2 / 3 cột). Không toolbar, không lưới | ĐỀ XUẤT 11 §4 option 2, 05 §7 |
-| S2 | 0 kết quả | Giữ từ khoá trong ô; status "No results for “treadmill”"; kit `.empty-state` trong trang (ES1-T527 V54, V59: không panel nền alt bo 24): icon 72 + h2 "Nothing Matches “treadmill” Yet" + mẹo 1 câu (không đổ lỗi, 11 §5) + primary "Shop all products" (ES1-T127 #5) + text-link "Read the FAQs" (trang FAQs nếu có); slot phụ: popular searches + 3 collection (dưới, cạnh bên từ 80rem); dưới: tiêu đề section của kit (eyebrow accent "Need inspiration" + heading "Popular Products") + 4 card (lazy) | ES1-T127 #5, 11 §5, foundation §18 |
+| S2 | 0 kết quả | Giữ từ khoá trong ô; status "No results for “treadmill”"; kit `.empty-state` trong trang (ES1-T527 V54, V59: không panel nền alt bo 24): icon 72 + h2 "Nothing matches “treadmill” yet" + mẹo 1 câu (không đổ lỗi, 11 §5) + primary "Shop all products" (ES1-T127 #5) + text-link "Read the FAQs" (trang FAQs nếu có); slot phụ: popular searches + 3 collection (dưới, cạnh bên từ 80rem); dưới: tiêu đề section của kit (eyebrow accent "Need inspiration" + heading "Popular products") + 4 card (lazy) | ES1-T127 #5, 11 §5, foundation §18 |
 | S3 | Có filter | Badge số trên nút Filter, chip + Clear all, filter-note, lưới đã lọc | 08 §6, collection §7 |
 | S4 | Mở Filter | §3.6 | 08 §7, foundation §15 |
 | S5 | Đang refresh (JS) | Lưới `aria-busy="true"` + skeleton foundation §18 đúng ô card; spinner 24 của kit (ES1-T527 V61) + "Updating results…" `role="status"` dưới toolbar; toolbar vẫn dùng được | foundation §18, 05 §6 |
-| S6a | Filter ra 0 sản phẩm | Giữ chip; kit `.empty-state--framed` (viền border bo 12, V54): icon 72 + h3 "No Products Match These Filters" + "Remove a filter or clear them all to see the 5 products for “adjustable”." + secondary "Clear all filters" | 05 §7 |
+| S6a | Filter ra 0 sản phẩm | Giữ chip; kit `.empty-state--framed` (viền border bo 12, V54): icon 72 + h3 "No products match these filters" + "Remove a filter or clear them all to see the 5 products for “adjustable”." + secondary "Clear all filters" | 05 §7 |
 | S6b | Refresh lỗi | Alert foundation §18 "We couldn't update the results" + "Check your connection, then try again. Your filters are saved." + "Try again"; lưới cũ giữ nguyên | foundation §18 |
 | S7 | > 1 trang | §3.9 | 08 #504D |
 | S8 | Hover / focus | type link hover viền foreground; chip lọc và chip gợi ý hover đảo đen; số trang hover viền foreground; nút tròn hover cam, focus offset 3; thẻ danh mục hover viền foreground + mũi tên cam dịch 4; focus outline 2px accent offset 2 cho mọi link, nút, ô (header, footer tối: outline trắng); dòng kết quả outline cả dòng | foundation §3, §6, §19 |
@@ -204,11 +204,11 @@ Không có trong Shopify native: "Did you mean" / tự sửa chính tả (11 §4
 
 ## 7. Accessibility
 
-- Một h1; h2 cho nhóm (Products, Articles, Pages, gợi ý S1/S2, Popular Products); h3 cho tiêu đề card / dòng. Trong mockup, trạng thái dùng h3/h4 vì nằm dưới h2 của bảng trạng thái.
+- Một h1; h2 cho nhóm (Products, Articles, Pages, gợi ý S1/S2, Popular products); h3 cho tiêu đề card / dòng. Trong mockup, trạng thái dùng h3/h4 vì nằm dưới h2 của bảng trạng thái.
 - Landmark: `<nav>` breadcrumb, type-nav (`aria-label="Result type"`), pagination (`aria-label="Pagination"`); form `role="search"`.
 - Tên: ô search (label ẩn), nút xoá ("Clear search term"), nút submit icon ("Search" ẩn), nút Filter + badge ("Filter, 1 filter applied"), Sort (label "Sort by" thật), chip ("Remove filter Color: Black"), Previous/Next tròn ("Previous page", "Next page"), số trang ("Page 1"), đóng drawer ("Close filters"), link card có số màu (", 3 colors"). Next/Previous tắt: `role="link" aria-disabled="true"` + `aria-label`, không `href`.
 - Live: dòng status, "Updating results…", dòng đầu drawer là `role="status"`; lỗi là `role="alert"`. Sau refresh không dời focus; sau "Clear all" focus về nút Filter. (Chuỗi phân trang: `collections.pagination.*` chung, pagination.md §5.)
-- Vùng chạm: mọi link/nút ≥ 44 (pill 40 từ 80rem vẫn ≥ 24), nút chính 48 / 52, nút tròn 52, checkbox hàng 44, icon header 44. Swatch card là chỉ báo `aria-hidden`, không phải control (foundation §9), nên không có đích 16px.
+- Vùng chạm: mọi link/nút ≥ 44 (pill 40 từ 80rem vẫn ≥ 24), nút chính 48, nút tròn 52, checkbox hàng 44, icon header 44. Swatch card là chỉ báo `aria-hidden`, không phải control (foundation §9), nên không có đích 16px.
 - Tương phản (foundation §2, tính tay): chữ chính 17.4; muted trên trắng 8.45 (số nhóm, meta, trích đoạn, gợi ý giá, nhãn Sort, giá trị filter tắt); muted trên alt (#4D4D4D / #F4F4F4) = (0.905 + 0.05) / (0.0743 + 0.05) = 7.68 (chữ panel S2); placeholder + viền input muted-light 5.33; tab, chip gợi ý foreground trên alt 15.8; tab chọn, chip hover 17.4; badge Filter, trang hiện tại, nút primary, nút tròn hover 5.01; menu header trắng 60% trên dark 6.9; footer muted-on-dark 6.11 / panel 5.78; eyebrow cam trên trắng 5.01; icon kính lúp muted 8.45 (≥ 3 phi văn bản).
 - Không chỉ dùng màu: tab chọn có nền đảo + `aria-current`; trang hiện tại nền accent + đậm + `aria-current`; giá sale có chữ ẩn "Sale price"; giá trị filter tắt có `disabled` + gạch ngang + số 0.
 - Bàn phím: Tab qua form → type-nav → Filter → Sort → chip → card; drawer bẫy focus bằng `<dialog>`; Escape đóng.
@@ -225,7 +225,7 @@ Không token mới, không màu literal.
 ## 9. Lighthouse
 
 - LCP: < 48rem và ≥ 48rem đều là ảnh card sản phẩm đầu tiên (ở 360 card 1 nằm y ≈ 520, trong màn đầu 640) hoặc h1 nếu ảnh nhỏ hơn. Chỉ ảnh card 1 `loading="eager"` + `fetchpriority="high"`, `sizes` theo cột (50vw / 33vw / 25vw, tối đa 336px). Không kết quả (S2) và chưa có từ khoá (S1): LCP là chữ (h1 / h2), mọi ảnh lazy.
-- Lazy: card 2 trở đi, ảnh article, 4 card Popular Products, ảnh newsletter footer. Mọi `<img>` có width/height qua `snippets/image` (0 CLS). Noise header/footer là `background-image` 1 file nhỏ đã có, không chặn LCP (foundation §3.4).
+- Lazy: card 2 trở đi, ảnh article, 4 card Popular products, ảnh newsletter footer. Mọi `<img>` có width/height qua `snippets/image` (0 CLS). Noise header/footer là `background-image` 1 file nhỏ đã có, không chặn LCP (foundation §3.4).
 - Font: Sofia Sans Condensed 700 (h1, h2) và 800 (eyebrow, footer), Inter 400/500/600/700; 2 họ, preload 1 (ADR 0003), `font-display: swap`.
 - CLS: header sticky bằng CSS, cao 80 cố định; dòng status cao cố định 24; skeleton cùng ô card; chip render từ server (không chèn bằng JS sau tải); nút Previous/Next tắt vẫn giữ chỗ 52; drawer `position: fixed`.
 - JS: trang chạy không JS; JS BE cho drawer + refresh partial ≤ 8 KB.
@@ -248,14 +248,14 @@ Không token mới, không màu literal.
 `data-testid`: `search-head`, `search-form`, `search-status`, `search-type-nav`, `search-products`, `search-filter-toggle`, `search-sort`, `search-active-filters`, `search-product-grid`, `search-articles`, `search-pages`, `search-pagination`, `search-empty`, `search-error`, `filter-drawer`.
 Partial (BE): `search-products` (toolbar + chip + lưới + phân trang + status), `search-filters` (thân drawer). Sau refresh dispatch sự kiện theo AGENTS (search change) và `history.replaceState` URL.
 
-Chuỗi mới (`locales/en.default.json`, nhóm `search`): `results_title` "Search Results", `placeholder` (đổi), `clear` "Clear search term", `type_nav_label`, `type_all/products/articles/pages`, `filter`, `filters_applied` (one/other), `sort_by`, `remove_filter`, `clear_all`, `filter_note`, `no_results_title`, `no_results_text`, `shop_all`, `popular_searches`, `shop_by_category`, `popular_products`, `filtered_empty_title/text`, `clear_all_filters`, `updating`, `update_error_title/text`, `try_again`, `article_label`, `page_label`, `show_results` (one/other).
+Chuỗi mới (`locales/en.default.json`, nhóm `search`): `results_title` "Search results", `placeholder` (đổi), `clear` "Clear search term", `type_nav_label`, `type_all/products/articles/pages`, `filter`, `filters_applied` (one/other), `sort_by`, `remove_filter`, `clear_all`, `filter_note`, `no_results_title`, `no_results_text`, `shop_all`, `popular_searches`, `shop_by_category`, `popular_products`, `filtered_empty_title/text`, `clear_all_filters`, `updating`, `update_error_title/text`, `try_again`, `article_label`, `page_label`, `show_results` (one/other).
 
 ## 11. Dữ liệu mockup
 
 - q=`adjustable`: 5 sản phẩm khớp tên trong demo-data (2 FlexFold Adjustable Bench, 2 Ativafit Lava 66 lb Adjustable, Adjustable dumbbell pair); % giảm tính từ compare_at (17%, 24%). Article "Set up a perfect home gym in just 15m²" và page FAQs là minh hoạ khớp qua body (KHÔNG CHẮC, ES1-T266); trích đoạn FAQs lấy từ locale `faq_item` của theme.
-- S1, S2 collection: 5 collection danh mục của demo-data (handle trên store dev còn tiền tố cũ, Cần DevOps đổi) với `products_count` thật. Popular Products: Iron Core Kettlebell 16 kg (tag new), Revllen Pro Speed Rope (-22%), Olympic Plate Set 100 (-15%), Compact Power Rack.
+- S1, S2 collection: 5 collection danh mục của demo-data (handle trên store dev còn tiền tố cũ, Cần DevOps đổi) với `products_count` thật. Popular products: Iron Core Kettlebell 16 kg (tag new), Revllen Pro Speed Rope (-22%), Olympic Plate Set 100 (-15%), Compact Power Rack.
 - S3: 3 sản phẩm có màu Black. S4 số đếm Color tính từ options (Black 3, Gray 3, White 2); Availability 5/0 giả định (không có tồn kho). S6a: White + $0–$100 ra 0 thật (2 sản phẩm White đều > $100). S7: q=`efitco` theo vendor (22 + 14 + page Our Efitco = 37), KHÔNG CHẮC cách Shopify tách từ "efitco-ai-dev".
-- Tên trang Our Story, Our Efitco, FAQs, Contact Us: menu Information của footer (foundation §4).
+- Tên trang Our story, Our Efitco, FAQs, Contact us: menu Information của footer (foundation §4).
 
 ## 12. Quyết định CTO đã chốt (10/11)
 

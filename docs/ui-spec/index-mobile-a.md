@@ -42,7 +42,7 @@ Thứ tự nguồn (CTO 21/11): sổ quyết định CTO > `_kit/kit.css` > mock
 | Vùng chạm tối thiểu | 44 | 44 | Sổ 09/11, 14 §2 #1083M |
 | Thứ tự khối | như desktop | như desktop | 06 §2 |
 
-Nền (bảng màu thương hiệu, giữ): header + hero + Browse Categories nằm trên dải tối `--color-background-dark` có noise; intro và Make fitness nền sand `--color-background-sand` (#EBE6E0); bestseller, shop the look nền trắng; quiz là panel `--color-background-panel` (#393942).
+Nền (bảng màu thương hiệu, giữ): header + hero + Browse categories nằm trên dải tối `--color-background-dark` có noise; intro và Make fitness nền sand `--color-background-sand` (#EBE6E0); bestseller, shop the look nền trắng; quiz là panel `--color-background-panel` (#393942).
 
 ---
 
@@ -88,9 +88,9 @@ Trạng thái (ĐỀ XUẤT):
 
 A11y: section `aria-roledescription="carousel"` + `aria-label`; dot "Show slide 1 of 2" + `aria-current`; mũi tên "Previous slide"/"Next slide"; chỉ slide 1 có `<h1>`, slide 2 dùng `<p>` cùng kiểu (một h1 mỗi trang).
 
-## 3. Browse Categories
+## 3. Browse categories
 
-Desktop (mockup ES1-T293): trên dải tối; h2 trắng "Browse Categories" Sofia 700 48; 2 nút tròn 52 phải; 5 card: ảnh 336 × 224 (3/2) bo 16 + tên Sofia 700 28/36 trắng; hàng tràn phải.
+Desktop (mockup ES1-T293): trên dải tối; h2 trắng "Browse categories" Sofia 700 48; 2 nút tròn 52 phải; 5 card: ảnh 336 × 224 (3/2) bo 16 + tên Sofia 700 28/36 trắng; hàng tràn phải.
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -106,7 +106,7 @@ A11y: `<ul aria-label="Product categories" tabindex="0">`; mỗi card 1 link, t�
 
 ## 4. Intro + Shop by level
 
-Desktop (mockup ES1-T293): nền sand, padding 120; trái tiêu đề display 100 uppercase ls −4 "Everything You Need [ảnh 165 × 94 bo 8] to Train." 2 dòng; phải đoạn 16 + link CTA "Become a member →" (Sofia 28/36, `.button--link`); cách 120 xuống "SHOP BY LEVEL" + h2 48 "Choose Your Training Level"; 3 card 456 × 456 bo 16, gradient đen 0 → 80% từ 63% xuống đáy, nhãn "LEVEL FITNESS", tên Sofia 36, hover / focus hiện gạch + "24 Products →" (V31).
+Desktop (mockup ES1-T293): nền sand, padding 128; trái tiêu đề display 100 uppercase ls −4 "Everything you need [ảnh 165 × 94 bo 8] to train." 2 dòng; phải đoạn 16 + link CTA "Become a member →" (Sofia 28/36, `.button--link`); cách 128 xuống "SHOP BY LEVEL" + h2 48 "Choose your training level"; 3 card 456 × 456 bo 16, gradient đen 0 → 80% từ 63% xuống đáy, nhãn "LEVEL FITNESS", tên Sofia 36, hover / focus hiện gạch + "24 products →" (V31).
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -114,17 +114,17 @@ Desktop (mockup ES1-T293): nền sand, padding 120; trái tiêu đề display 10
 | Đoạn + link | xếp dưới tiêu đề, cách 24; đoạn → link 12; đoạn ≤ 34rem | 1 hàng: đoạn `1fr` trái, link phải căn đáy, cách 32 |
 | Intro → level | 48 | 48 |
 | Level | 1 cột, card 320 × 240 (4/3), cách 12 | 3 cột 232 × 232 (1/1 như desktop), cách 16 |
-| Nội dung card | padding 24 / 24 / 16; nhãn 14 Sofia 800; tên h3 22; hàng "N Products →" luôn hiện, cao 44, gạch trên trắng 24% | padding 16; tên 24 |
+| Nội dung card | padding 24 / 24 / 16; nhãn 14 Sofia 800; tên h3 22; hàng "N products →" luôn hiện, cao 44, gạch trên trắng 24% | padding 16; tên 24 |
 | Gradient | ĐỀ XUẤT: 0 → 85% từ 35% dưới 80rem (desktop từ 50%); AA: nhãn + tiêu đề + số sản phẩm luôn trên nền tối | như 360 |
 
 Lý do: màn chạm không có hover nên số sản phẩm luôn hiện (05 §3, 14 §4); card 232 có khối chữ cao ~110 = 47% card, gradient bắt đầu 63% sẽ để nhãn trên ảnh không phủ (06 "Văn bản trên hình ảnh"; 14 #290D). 360 dùng 4/3 thay 1/1 để 3 card không chiếm 1000px (19 §D6; 03 §8). Ảnh `object-position` 50% 15% giữ đầu người.
 Số sản phẩm động: `collection.products_count` (demo: 24 / 12 / 10).
 Trạng thái: hover ảnh 1.04; focus outline accent quanh card. Collection trống: ẩn hàng số sản phẩm, giữ card. < 3 card: lưới giữ cột, card co theo.
-A11y: tiêu đề display là `<h2>` (h1 là hero); ảnh inline `alt=""`; eyebrow `--color-accent-on-sand`; link card đọc "Level fitness Beginner 24 Products".
+A11y: tiêu đề display là `<h2>` (h1 là hero); ảnh inline `alt=""`; eyebrow `--color-accent-on-sand`; link card đọc "Level fitness Beginner 24 products".
 
 ## 5. Bestsellers
 
-Desktop (mockup ES1-T293): eyebrow "BESTSELLERS" accent, h2 48 "What People Are Buying?", 4 tab phải (All, Weight, Portable Fitness, Accessories; cao 40, F§7); 4 card 336 (F§9).
+Desktop (mockup ES1-T293): eyebrow "BESTSELLERS" accent, h2 48 "What people are buying?", 4 tab phải (All, Weight, Portable Fitness, Accessories; cao 40, F§7); 4 card 336 (F§9).
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -136,14 +136,14 @@ Desktop (mockup ES1-T293): eyebrow "BESTSELLERS" accent, h2 48 "What People Are 
 
 Lý do 4 cột: khối mặc định 4 sản phẩm (TE-3 AC1); 3 cột (F§1 lưới collection) để lẻ 1 card hàng 2 và khối cao gấp đôi. 4 × 170 vẫn rộng hơn card 152 của 360. Nếu merchant đặt `products_to_show` không chia hết cho 4 thì 3 cột.
 Dữ liệu demo: P01 −24% ★5.0, P02 New, P03 −17% ★5.0, P04 −22%; swatch theo option Color (Black, Gray, White).
-Trạng thái (ĐỀ XUẤT, F§18): đổi tab → lưới `aria-busy`, skeleton đúng số card + spinner + "Loading Weight products" (`role="status"`); tab rỗng → icon + "Nothing In Accessories Yet" + 1 câu + nút "Shop all products"; tab không có collection → ẩn tab. Card hết hàng: badge Sold out, ảnh 0.6.
+Trạng thái (ĐỀ XUẤT, F§18): đổi tab → lưới `aria-busy`, skeleton đúng số card + spinner + "Loading Weight products" (`role="status"`); tab rỗng → icon + "Nothing in Accessories yet" + 1 câu + nút "Shop all products"; tab không có collection → ẩn tab. Card hết hàng: badge Sold out, ảnh 0.6.
 A11y: `role="tablist"/"tab"/"tabpanel"`, ←/→ đổi tab, tab chưa chọn `tabindex="-1"`; card 1 link, tên đọc thêm ", 3 colors"; swatch `aria-hidden` (F§9, câu CTO 2 của foundation); giá có "Sale price"/"Regular price" ẩn.
 
 ## 6. Quiz
 
 Kết quả quiz (popup sau bước 3, mọi mốc): `docs/ui-spec/quiz-result.md` (ES1-T285).
 
-Desktop (mockup ES1-T293): panel #393942 rộng 1416 bo 16, padding 64; trái pill outline "Our most-loved feature" (`.badge--outline`; Polaris: màu không phân danh mục), h2 48 trắng "Find Your Perfect Gear", câu phụ, 2 ghi chú icon (20 seconds, No sign-up required); phải thẻ trắng 608 × 450 bo 16: thanh tiến độ accent 1/3 + "Step 1 of 3", h3 "Where do you want to focus?", gợi ý, body map 152 × 256 nền sand bo 12, 3 lựa chọn 80 cao (ảnh tròn 44, tên 18/600, mô tả 14, radio phải; chọn: nền sand + dấu check cam).
+Desktop (mockup ES1-T293): panel #393942 rộng 1416 bo 16, padding 64; trái pill outline "Our most-loved feature" (`.badge--outline`; Polaris: màu không phân danh mục), h2 48 trắng "Find your perfect gear", câu phụ, 2 ghi chú icon (20 seconds, No sign-up required); phải thẻ trắng 608 × 450 bo 16: thanh tiến độ accent 1/3 + "Step 1 of 3", h3 "Where do you want to focus?", gợi ý, body map 152 × 256 nền sand bo 12, 3 lựa chọn 80 cao (ảnh tròn 44, tên 18/600, mô tả 14, radio phải; chọn: nền sand + dấu check cam).
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -155,7 +155,7 @@ Desktop (mockup ES1-T293): panel #393942 rộng 1416 bo 16, padding 64; trái pi
 
 Lý do panel tràn mép ở 360: panel + thẻ trắng lồng nhau trong lề 20 chỉ còn 256 cho lựa chọn; tràn mép giữ thẻ 320 và mô tả 1 dòng (19 §D6). Cùng cách hero 360.
 Luồng (TE-11): chọn lựa chọn → sang bước 2, thanh tiến độ cập nhật, focus vào tiêu đề bước mới; kết quả mở popup, < 768 bottom sheet (sổ 09/11; F§16 cỡ L). Không JS: 3 bước hiện dạng form (TE-11 AC1).
-Trạng thái (ĐỀ XUẤT): hover lựa chọn viền foreground; focus outline accent quanh cả hàng; đang tìm kết quả: nút trong sheet `aria-busy` + "Matching your gear" (07 §C); không khớp (`empty_text`): sheet "No Exact Match" + nút "Change answers" (chính) và "Shop all gear" (phụ).
+Trạng thái (ĐỀ XUẤT): hover lựa chọn viền foreground; focus outline accent quanh cả hàng; đang tìm kết quả: nút trong sheet `aria-busy` + "Matching your gear" (07 §C); không khớp (`empty_text`): sheet "No exact match" + nút "Change answers" (chính) và "Shop all gear" (phụ).
 A11y: `<fieldset>` + `<legend>` = câu hỏi, radio thật (ẩn hình, giữ focus), dấu chọn có cả check (không chỉ màu); thanh tiến độ `role="progressbar"` + nhãn; ảnh lựa chọn và body map `alt=""` (nhãn đã đủ).
 Settings: dùng sẵn `eyebrow`, `heading`, `subheading`, `note_1`, `note_2`, `collection`, `results_popup`, `empty_text`.
 
@@ -224,14 +224,14 @@ A11y: ảnh `alt=""` (trang trí), tiêu đề `<h2>` một khối, màu 2 tông
 | Chữ card level trên gradient | trắng / ảnh tối + 50–85% dark | ≥ 4.5 với ảnh demo | Ảnh sáng ở đáy có rủi ro: dùng ảnh tối phần dưới |
 
 - Vùng chạm 360: icon header 44, dot 44, tab 44, hàng số sản phẩm level 44, lựa chọn quiz ≥ 72, điểm nóng 44, link "Browse all setups" và "Become a member" 44, nút 48; khoảng giữa control ≥ 8 (14 §3).
-- Heading: 1 h1 (hero slide 1); h2 mỗi khối (intro có 2 h2: tiêu đề display và "Choose Your Training Level"); h3 trong card và câu hỏi quiz.
+- Heading: 1 h1 (hero slide 1); h2 mỗi khối (intro có 2 h2: tiêu đề display và "Choose your training level"); h3 trong card và câu hỏi quiz.
 - Hàng cuộn có `tabindex="0"` + nhãn; thanh tiến trình `aria-hidden`.
 - Không làm mờ chữ khi loading (Lighthouse tính opacity).
 
 ### 9.2 Performance
 - LCP: ảnh slide 1 (`efx-slide-2.jpg`) eager + `fetchpriority="high"`, hiện ngay khi tải, không reveal (§10). Ảnh `cover` khớp theo chiều cao nên rộng hơn khung: `sizes="(min-width: 80rem) 100vw, (min-width: 48rem) 164vw, 291vw"` (360: 480 × 2.18 = 1047 = 291vw; 768: 576 × 2.18 = 1257 = 164vw); srcset 1080, 1600, 1920w, không vượt 1920 (giới hạn dung lượng LCP mobile). Sửa ES1-T292: `sizes="100vw"` cũ tải ảnh hẹp hơn chỗ hiện, mờ ở DPR 2. Slide 2 lazy.
 - Mọi ảnh dưới màn đầu `loading="lazy"` + width/height; ảnh ẩn ở 360 (body map, ảnh 3 Make fitness) là lazy + `display: none` nên không tải.
-- Màn đầu 360: header 80 + hero 480 = 560, tiêu đề Browse Categories ở ~608 (thấy được trên máy 360 × 740): danh mục chính lộ ngay (07 §D "đường dẫn danh mục chính trên homepage").
+- Màn đầu 360: header 80 + hero 480 = 560, tiêu đề Browse categories ở ~608 (thấy được trên máy 360 × 740): danh mục chính lộ ngay (07 §D "đường dẫn danh mục chính trên homepage").
 - CLS: mọi ảnh có `aspect-ratio`; tổng shop the look in từ Liquid; panel sticky không đổi layout.
 - 2 họ font (sổ 30/10); không video ở màn đầu mobile.
 
@@ -247,7 +247,7 @@ Theo sổ 09/11 và F§19, sửa ES1-T292 (audit A8):
 - Màn đầu (header, hero): ảnh slide 1 và lớp tối KHÔNG có hiệu ứng vào (không opacity, clip-path, scale), hiện ngay khi tải: ảnh là LCP, reveal làm trễ LCP mobile (chỉ tiêu ≥ 90, sổ 09/11). Cùng cách `product.md` §14, `blog.md` §7, `article.md`.
 - Chữ hero (eyebrow, H1, câu phụ, nút): ĐỀ XUẤT hiện dần ngay lúc tải, không chờ cuộn: opacity 0 → 1 + translate 16px → 0, 400ms, lệch 60ms, ease-out; xong trước 700ms (15 §1 "100–500ms"; 15 §3 chỉ tiêu đề, ảnh chính, CTA). Không áp cho ảnh.
 - Chuyển slide: opacity 500ms, chỉ khi người dùng bấm (§2).
-- Từ Browse Categories trở xuống: tiêu đề, card hiện dần khi cuộn tới (`--motion-reveal` 900, lệch `--motion-stagger` 60 mỗi card, 1 lần; sổ 21/11).
+- Từ Browse categories trở xuống: tiêu đề, card hiện dần khi cuộn tới (`--motion-reveal` 900, lệch `--motion-stagger` 60 mỗi card, 1 lần; sổ 21/11).
 - Hover 150–250ms; tab đổi lưới fade 250ms; chỉ transform/opacity/clip-path; tắt khi `prefers-reduced-motion` (chữ hero hiện ngay).
 
 ## 11. Settings merchant
@@ -268,7 +268,7 @@ Không thêm setting. Dùng có sẵn; chỉ đổi mặc định trong template
 | Hero 360 | Căn trái mép 20 (sổ 10/11); dot đáy trái | FE | P2 |
 | Hero 768/360 | `overlay_opacity: 30` | FE (template) | P3 |
 | Intro 768 | Tiêu đề display 70 hai dòng như desktop (đang 1 dòng cỡ nhỏ); đoạn + link một hàng | FE | P3 |
-| Level < 80rem | Gradient từ 35%; "N Products →" luôn hiện | FE | P3 |
+| Level < 80rem | Gradient từ 35%; "N products →" luôn hiện | FE | P3 |
 | Quiz 360 | Panel tràn mép (body map đã ẩn) | FE | P3 |
 | Shop the look 768 | Lưới `1fr 280` dưới ảnh, panel sticky | FE | P2 |
 | Make fitness | Ảnh rải (360: 2 ảnh hàng trên, 768: 3 ảnh) thay hàng 3 ảnh đều | FE | P3 |

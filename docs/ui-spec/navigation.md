@@ -1,4 +1,4 @@
-KHÔNG CHẮC: demo-data không có menu (linklists) và mọi collection có `image` rỗng. Cấu trúc menu cấp 2, 3 và ảnh danh mục (efx-col-1..5.jpg của block Browse Categories trang chủ) trong mockup là đề xuất, đã hỏi BA ở ES1-T271. Ảnh sản phẩm Home Starter Kit (P19) trên store dev là dây nhảy, lệch tên (ES1-T245).
+KHÔNG CHẮC: demo-data không có menu (linklists) và mọi collection có `image` rỗng. Cấu trúc menu cấp 2, 3 và ảnh danh mục (efx-col-1..5.jpg của block Browse categories trang chủ) trong mockup là đề xuất, đã hỏi BA ở ES1-T271. Ảnh sản phẩm Home Starter Kit (P19) trên store dev là dây nhảy, lệch tên (ES1-T245).
 
 # UI spec: Mega menu desktop và menu drawer mobile (ES1-T260, vòng 3)
 
@@ -39,7 +39,7 @@ Hành vi hiện tại (`blocks/header.liquid`, `assets/header-menu.js`, `assets/
 | 1280, 1920 (≥ 80rem) | Menu ngang 7 mục giữa header, mục có cấp con mở mega menu hoặc dropdown | code `.site-header__nav` hiện từ 80rem |
 | 1024, 768, 360 (< 80rem) | Nút menu trái mở drawer 2 cấp | code `.site-header__drawer` ẩn từ 80rem |
 
-Header đóng (kit `.site-header`, sổ 10/11): thanh #1A1A1A có noise cao 80; 7 mục Shop ▾, Collection ▾, Sale, Our Story, Blog, Contact, Help; Inter 16/500, dòng 24 (`--line-height-body`), khoảng cách 40 (Chuẩn: Polaris large-400), chữ trắng 60% (AA: 6.9:1); chevron 9 × 5, cách chữ 4 (Thiết kế: quang học glyph); logo 100 × 30 ở mép trái vùng nội dung; icon: search 20, account 24, cart 24, mỗi icon trong ô 44, ô cách 4. Hero trang chủ bắt đầu y 80, ngay dưới thanh tối.
+Header đóng (kit `.site-header`, sổ 10/11): thanh #1A1A1A có noise cao 80; 7 mục Shop ▾, Collection ▾, Sale, Our story, Blog, Contact, Help; Inter 16/500, dòng 24 (`--line-height-body`), khoảng cách 40 (Chuẩn: Polaris large-400), chữ trắng 60% (AA: 6.9:1); chevron 9 × 5, cách chữ 4 (Thiết kế: quang học glyph); logo 100 × 30 ở mép trái vùng nội dung; icon: search 20, account 24, cart 24, mỗi icon trong ô 44, ô cách 4. Hero trang chủ bắt đầu y 80, ngay dưới thanh tối.
 Mega bắt đầu từ 80rem (menu ngang chỉ có từ 80rem, foundation §14 vòng 3); 1024 dùng drawer.
 
 ## 2. Anatomy
@@ -76,7 +76,7 @@ Menu drawer (< 80rem):
 - B: 5 ô một hàng; 6–10 ô xuống hàng thứ 2. Panel cao tối đa `100dvh − 80`, quá thì panel cuộn riêng.
 - Nhãn "View all …" theo loại link cha (SEO: chữ link mô tả đích, sổ quyết định 09/11): `catalog_link` → "View all products"; `collections_link` → "View all collections"; `collection_link` → "View all {{ title }}"; loại khác → "View all {{ title }}". Không có "View all" trần.
 
-Menu đề xuất cho demo (chờ ES1-T271): Shop (/collections/all) > Categories (5 collection danh mục của demo-data), Training Level (3 collection trình độ của demo-data), Featured (Bundle, Setup, Portable Fitness, Weight) → biến thể A; Collection (/collections) > 5 collection danh mục → biến thể B; Sale, Our Story, Blog, Contact, Help không con.
+Menu đề xuất cho demo (chờ ES1-T271): Shop (/collections/all) > Categories (5 collection danh mục của demo-data), Training Level (3 collection trình độ của demo-data), Featured (Bundle, Setup, Portable Fitness, Weight) → biến thể A; Collection (/collections) > 5 collection danh mục → biến thể B; Sale, Our story, Blog, Contact, Help không con.
 
 ## 4. Settings merchant
 
@@ -87,7 +87,7 @@ Không đổi setting hiện có (`logo`, `logo_width`, `menu`, `customer_accoun
 | Show collection images in menu | `menu_collection_images` | checkbox | true | Tắt thì B thành C (desktop) và hàng không ảnh (drawer) |
 | Featured product in menu | `menu_featured_product` | product | trống | Hiện card ở panel A đầu tiên và cuối cấp 2 tương ứng trong drawer. Trống thì không có card. Demo: sản phẩm Home Starter Kit của demo-data |
 
-Chữ cố định qua locale `blocks.header.*` (không setting): `menu_title` "Menu", `back` "Back", `back_label` "Back to menu", `featured` "Featured", `view_all_products`, `view_all_collections`, `view_all` ("View all {{ title }}"), `sign_in` "Sign in", `currency` "Currency", `language` "Language". Số sản phẩm dùng lại `blocks.level_card.products_count` ("7 Products").
+Chữ cố định qua locale `blocks.header.*` (không setting): `menu_title` "Menu", `back` "Back", `back_label` "Back to menu", `featured` "Featured", `view_all_products`, `view_all_collections`, `view_all` ("View all {{ title }}"), `sign_in` "Sign in", `currency` "Currency", `language` "Language". Số sản phẩm dùng lại `blocks.level_card.products_count` ("7 products").
 
 ## 5. Layout theo mốc
 
@@ -179,7 +179,7 @@ Tất cả trạng thái là ĐỀ XUẤT (05 §3, 05 §6–7, 14 #928M, foundat
 | Link trong panel: hover / focus / current | accent + dịch 4 / outline accent / 600 + gạch chân 2px | — |
 | Đang tải ảnh danh mục | khung đúng tỉ lệ, shimmer `--color-background-alt` → background 1.4s; chữ có sẵn | như desktop, ảnh 56 |
 | Collection không ảnh, ảnh lỗi | nền cream + icon ảnh `--color-muted-light`; không ẩn mục | như desktop |
-| Collection 0 sản phẩm | vẫn hiện, "0 Products" | như desktop |
+| Collection 0 sản phẩm | vẫn hiện, "0 products" | như desktop |
 | Sản phẩm nổi bật không media (edge_cases "Sản phẩm không có media") | placeholder icon | như desktop |
 | Sản phẩm nổi bật hết hàng ("Hết hàng toàn bộ") | badge "Sold out" (foreground/background), ảnh mờ 60%, giá giữ | như desktop |
 | compare_at_price ≤ price ("Sản phẩm có màu sale và màu không sale") | không badge, không giá gạch | như desktop |

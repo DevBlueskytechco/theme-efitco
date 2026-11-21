@@ -22,10 +22,10 @@ Thứ tự nguồn (lúc lập, đã thay): sổ quyết định CTO > AGENTS.md
 | | | 360 | Như 768, icon cách nhau 44 | Không | Giữ như live |
 | 2 | Hero (`home-hero`) | 768 | Khung 728 × 546 bo 12, cách lề 20; chữ trái từ x 112; 2 nút 52 giữa cạnh; 2 dot đáy; lớp tối 0 | (a) Chữ trắng trên nền ảnh ~#8B8279: 3.76:1. Eyebrow 16/800 và câu phụ 16/500 không phải chữ lớn → dưới 4.5 (sổ quyết định 09/11, 19 §A4). (b) Dot vùng chạm 24 × 24, bước 24 (`.slideshow__dot` = `--space-5`); tablet là màn chạm, cần 44 (14 §3, §4) | ĐỀ XUẤT: `overlay_opacity: 30` cho 2 slide (setting có sẵn, DESIGN mặc định 30). Ở ≥ 80rem `.slideshow__overlay` đã `display: none` (base.css dòng 7505) nên desktop không đổi. Dot 44 × 44 như mobile. Mockup §2.1 |
 | | | 360 | Ảnh tràn 360 × 450, không bo; chữ căn giữa; dot 44 | (a) Như 768. (b) Chữ căn giữa, trong khi sổ quyết định 09/11 ghi "nội dung hero thẳng mép trái container (cùng mép logo và khối dưới)"; mọi khối dưới căn trái ở x 20 | ĐỀ XUẤT: lớp tối 30% như 768; chữ căn trái mép 20 (chờ CTO câu 2, vì bản căn giữa đã được duyệt 07/11). Giữ ảnh tràn, không bo, dot 44 (07/11). Mockup §2.1 |
-| 3 | Browse Categories (`home-collection-list`) | 768 | Hàng cuộn, card 307, lộ card thứ 3; nút 52 ở đầu khối; thanh tiến trình | Không | Giữ như live |
+| 3 | Browse categories (`home-collection-list`) | 768 | Hàng cuộn, card 307, lộ card thứ 3; nút 52 ở đầu khối; thanh tiến trình | Không | Giữ như live |
 | | | 360 | Card 252, lộ 1/4 card kế; ẩn nút, vuốt; thanh tiến trình | Không | Giữ như live |
 | 4 | Intro + Shop by level (`home-intro`) | 768 | Tiêu đề display 1 dòng có ảnh inline; level 3 cột 232 | Không | Giữ như live |
-| | | 360 | Tiêu đề 3 dòng; level 1 cột 320 × 240, "N Products →" luôn hiện | Không | Giữ như live |
+| | | 360 | Tiêu đề 3 dòng; level 1 cột 320 × 240, "N products →" luôn hiện | Không | Giữ như live |
 | 5 | Bestsellers (`home-featured-collection`) | 768 | Tab 1 hàng cao 40; lưới 4 cột | Không | Giữ như live |
 | | | 360 | Tab cuộn ngang; lưới 2 cột; swatch nhìn 32 × 16, vùng chạm 44 (`::after`), bước 44 | Không | Giữ như live |
 | 6 | Quiz (`home-quiz`) | 768 | Panel tối; thẻ trắng: body map trái, 3 lựa chọn phải cao 80 | Không | Giữ như live |
@@ -34,7 +34,7 @@ Thứ tự nguồn (lúc lập, đã thay): sổ quyết định CTO > AGENTS.md
 | | | 360 | 1 cột như 768 | Không về bố cục. Panel tổng rỗng khi module JS chưa chạy: `data-bundle-subtotal`, `data-bundle-total` là span rỗng trong Liquid | Giữ bố cục live. ĐỀ XUẤT (FE + BE): Liquid in sẵn số lượng, tạm tính, giảm, tổng theo hàng đang chọn; JS chỉ cập nhật (05 nhóm 4 §6; 14 §2 #928M) |
 | 8 | Inspiration (`home-inspiration`) | 768 | 3 ảnh 200 một hàng trên, tiêu đề display căn giữa, câu phụ, nút | Không | Giữ như live |
 | | | 360 | 3 ảnh 96 một hàng trên, tiêu đề 4 dòng | Không | Giữ như live |
-| 9 | Bundle builder (`home-bundle-builder`) | 768 | Lưới 3 cột; panel "Your Bundle" dưới | Không về bố cục | Giữ như live |
+| 9 | Bundle builder (`home-bundle-builder`) | 768 | Lưới 3 cột; panel "Your bundle" dưới | Không về bố cục | Giữ như live |
 | | | 360 | Lưới 2 cột; panel dưới | Panel rỗng tới khi JS chạy (như khối 7) | Giữ bố cục live; ĐỀ XUẤT in tổng từ Liquid như khối 7 |
 | 10 | Featured product (`home-featured-product`) | 768 | Ảnh 1/1 728 × 712; dưới là thông tin; 2 nút 1 hàng | (a) Ảnh vuông đẩy "Add to cart" tới y ≈ 1362, 1.3 màn iPad dọc (05 nhóm 4 §1.3). (b) Đồng hồ `visibility: hidden` tới khi module chạy (base.css 6923) → ô trống ~100 px giữa tên và giá ở 768, ~150 ở 360 | ĐỀ XUẤT: ảnh 4/3 (728 × 546, ảnh `contain` trên cream, không cắt sản phẩm), dấu tròn 113 cách góc 24; đồng hồ hiện ngay số Liquid đã in (`hours_text`…), JS chỉ chạy tiếp. Nút còn ~ y 1160. Mockup §2.3 |
 | | | 360 | Ảnh 1/1 320; 2 nút xếp dọc full | (b) như 768 | Giữ bố cục live; đồng hồ hiện ngay như 768 |
@@ -101,7 +101,7 @@ Tỉ lệ tính tay: L sRGB → tuyến tính, (L1 + 0.05) / (L2 + 0.05). Lớp 
 | Accent trên nền tối (nếu theo 09/11) | #C8400E / #1E1E1E | 3.33–3.48 | Không đạt chữ 16 → Lighthouse `color-contrast` fail (nền đặc, axe đo được) |
 
 - Chữ trên ảnh: axe để "incomplete" nên Lighthouse không trừ điểm, nhưng sổ quyết định 09/11 đòi AA, nên vẫn tính.
-- Vùng chạm: dot hero 768 lên 44 (live 24). Các control khác trong 32 ảnh đã đạt ≥ 44 ở 360 (icon header, tab, swatch `::after`, hotspot, lựa chọn quiz, hàng accordion, nút 48–52).
+- Vùng chạm: dot hero 768 lên 44 (live 24). Các control khác trong 32 ảnh đã đạt ≥ 44 ở 360 (icon header, tab, swatch `::after`, hotspot, lựa chọn quiz, hàng accordion, nút 48).
 - Hàng cuộn testimonial 768: `<ul aria-label>` + `tabindex="0"`; nút có tên riêng; thanh tiến trình `aria-hidden`.
 - Đồng hồ: `role="timer"`, nhãn đầy đủ, không đọc mỗi giây.
 - Heading: 1 h1 (hero slide 1), h2 mỗi khối, h3 trong card; không đổi.

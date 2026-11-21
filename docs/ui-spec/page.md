@@ -12,11 +12,11 @@ KHÔNG CHẮC: demo-data không có pages, shop.email, shop policies (hỏi BA �
 | 4 | Câu hỏi accordion aside | 16 mọi mốc | 18/28, 600 từ 1280 như câu hỏi accordion FAQ của kit; 16/24 dưới 1280 | foundation §13 |
 | 5 | Breadcrumb, form, RTE, trạng thái S1–S6 | — | giữ nguyên; breadcrumb nằm trên nền trắng ngay dưới thanh tối | foundation §5 |
 
-Mục đích: người mua đọc trang nội dung (Our Story, FAQs, chính sách) dễ đọc trên mọi màn; trên Contact Us gửi được câu hỏi trong 1 form 3 trường, và thấy câu trả lời nhanh trước khi viết. Story TE-9 AC2 (page.contact: form name/email/message có validation và thông báo), AC5 (link chính sách từ `shop.policies`).
+Mục đích: người mua đọc trang nội dung (Our story, FAQs, chính sách) dễ đọc trên mọi màn; trên Contact us gửi được câu hỏi trong 1 form 3 trường, và thấy câu trả lời nhanh trước khi viết. Story TE-9 AC2 (page.contact: form name/email/message có validation và thông báo), AC5 (link chính sách từ `shop.policies`).
 
 Nguồn chuẩn: mockup `drafts/designer/ES1-T258/page.html` + kit (CTO 21/11, ES1-T567). Ngôn ngữ lấy từ header, accordion FAQ, footer của trang chủ. Thành phần theo `docs/ui-spec/foundation.md` (ES1-T251) và `drafts/designer/_kit/kit.css`.
 
-Mockup: `drafts/designer/ES1-T258/page.html` + `page-360|768|1280|1920.png`. Phần chính là Contact Us; cuối file: S1 page mặc định (Our Story, đủ phần tử RTE), S2 form lỗi, S3 đang gửi, S4 gửi thành công, S5 page rỗng, S6 gửi thất bại.
+Mockup: `drafts/designer/ES1-T258/page.html` + `page-360|768|1280|1920.png`. Phần chính là Contact us; cuối file: S1 page mặc định (Our story, đủ phần tử RTE), S2 form lỗi, S3 đang gửi, S4 gửi thành công, S5 page rỗng, S6 gửi thất bại.
 
 ## 1. Template, block
 
@@ -25,22 +25,22 @@ Mockup: `drafts/designer/ES1-T258/page.html` + `page-360|768|1280|1920.png`. Ph�
 | `templates/page.liquid` | container → `<h1>` + `page.content` | container → snippet `breadcrumb` → `.page-title` (h1) → `<div class="rte">page.content</div>`; cột đọc căn giữa |
 | `templates/page.contact.liquid` | chưa có | ĐỀ XUẤT (AGENTS.md "Add a page type": Liquid template, không JSON): container → breadcrumb → h1 → lưới `contact`: cột chính (`.rte` + block `contact-form`) và `<aside>` (5 block `faq-item` + link chính sách) |
 
-Merchant gán template "contact" cho page Contact Us trong Admin. Không thêm JSON template.
+Merchant gán template "contact" cho page Contact us trong Admin. Không thêm JSON template.
 
 ## 2. Anatomy
 
 Page mặc định (S1):
-1. Header (foundation §3 vòng 3: thanh tối + noise, cao 80, không đè nội dung). Menu "Our Story" có `aria-current="page"` khi đúng trang (trắng 100% + gạch chân 2px).
+1. Header (foundation §3 vòng 3: thanh tối + noise, cao 80, không đè nội dung). Menu "Our story" có `aria-current="page"` khi đúng trang (trắng 100% + gạch chân 2px).
 2. Breadcrumb: Home / {page.title} (foundation §5).
 3. Tiêu đề: h1 `--font-size-h1`.
 4. RTE `.rte`: đoạn, h2–h4, link, danh sách, trích dẫn, ảnh + chú thích, bảng, đường kẻ.
 5. Footer (foundation §4).
 
 Contact (phần chính mockup):
-1. Header tối (menu "Contact" `aria-current`), breadcrumb Home / Contact Us, h1 "Contact Us".
+1. Header tối (menu "Contact" `aria-current`), breadcrumb Home / Contact us, h1 "Contact us".
 2. `.rte` intro (page.content).
-3. Form `contact-form`: h2 "Send Us A Message" + ghi chú "* Required fields" · Name* · Email* · Message* + gợi ý "Add your order number if your message is about an order." · câu quyền riêng tư có link Privacy policy (`shop.policies`) · nút primary "Send message" (icon gửi).
-4. Aside: eyebrow "Questions and Answers" (cùng eyebrow section FAQ trang chủ) · h2 "Quick Answers Before You Write" · accordion 5 câu (locale `faq_item`, câu đầu mở) · link "Shipping policy", "Refund policy" (`shop.policies`).
+3. Form `contact-form`: h2 "Send us a message" + ghi chú "* Required fields" · Name* · Email* · Message* + gợi ý "Add your order number if your message is about an order." · câu quyền riêng tư có link Privacy policy (`shop.policies`) · nút primary "Send message" (icon gửi).
+4. Aside: eyebrow "Questions and answers" (cùng eyebrow section FAQ trang chủ) · h2 "Quick answers before you write" · accordion 5 câu (locale `faq_item`, câu đầu mở) · link "Shipping policy", "Refund policy" (`shop.policies`).
 
 Trường đúng SRS TE-9 AC2 (name, email, message); không thêm phone, subject.
 
@@ -48,7 +48,7 @@ Trường đúng SRS TE-9 AC2 (name, email, message); không thêm phone, subjec
 
 | Block | Tên (sentence case) | Kiểu | Default | Giới hạn |
 | --- | --- | --- | --- | --- |
-| `contact-form` | Heading | text | Send Us A Message | trống thì ẩn h2 |
+| `contact-form` | Heading | text | Send us a message | trống thì ẩn h2 |
 | `contact-form` | Show privacy note | checkbox | true | link lấy `shop.policies` privacy; không có policy thì ẩn câu |
 | `faq-item` (đã có) | Question, Answer | text, richtext | locale `faq_item` | 0 item thì ẩn cả aside |
 
@@ -62,10 +62,10 @@ Trường đúng SRS TE-9 AC2 (name, email, message); không thêm phone, subjec
 | Page: đoạn văn | 16/28 (lh 1.75), ≤ 65ch | như 360 | như 360 | như 360 |
 | Contact: lưới | 1 cột: intro → form → aside | 1 cột | 12 cột: form 1–7, aside 9–12 sticky (top 80+24) | như 1280, nội dung 1416 |
 | Form trường | 1 cột, gap 24 | Name + Email 2 cột, Message cả hàng | như 768 | như 768 |
-| Nút "Send message" | full width, cao 48 | auto, min 200, căn trái | cao 52 | cao 52 |
+| Nút "Send message" | full width, cao 48 | auto, min 200, căn trái | cao 48 | cao 48 |
 | Aside | padding 32/24, bo 16, nền alt, câu hỏi 16 | padding 32 | padding 40, câu hỏi 18/600 | như 1280 |
 | Breadcrumb → h1 → nội dung | 16 / 48 | 16 / 48 | 24 / 64 | 24 / 64 |
-| Contact → footer | 48 | 48 | 120 | 120 |
+| Contact → footer | 48 | 48 | 128 | 128 |
 
 Thứ tự DOM = thứ tự nhìn ở mọi mốc (intro → form → aside), focus không nhảy cột (06 §2).
 ĐỀ XUẤT cột đọc 720 căn giữa cho page mặc định: dòng 50–75 ký tự (03 §4, foundation §1 `65ch`); 1416 mép trái sẽ để trống 2/3 màn 1920. Xem câu hỏi CTO 2.
@@ -109,7 +109,7 @@ Spam: Shopify có thể chuyển sang trang hCaptcha `/challenge` sau submit; kh
 - Mọi trường `<label for>`; `autocomplete` name, email; `type="email"`, `spellcheck="false"`; `required` + `aria-required`; dấu * `aria-hidden` và có câu "* Required fields".
 - Không dùng placeholder thay label (04 §5); không chặn dán.
 - Một h1; RTE bắt đầu từ h2. Aside là `<aside aria-labelledby>`.
-- Vùng chạm: input 48/52, nút 48/52, summary accordion ≥ 56, link aside 44, breadcrumb 44.
+- Vùng chạm: input 48, nút 48, summary accordion ≥ 56, link aside 44, breadcrumb 44.
 - Focus: outline 2px accent offset 2 mọi control.
 - Lỗi không chỉ bằng màu: icon + chữ (01, 06).
 
@@ -119,7 +119,7 @@ Spam: Shopify có thể chuyển sang trang hCaptcha `/challenge` sau submit; kh
 
 ## 9. Lighthouse
 
-- LCP: Contact = h1 "Contact Us" (không ảnh trên màn đầu). Page mặc định = h1 hoặc ảnh đầu tiên trong RTE nếu nằm trên màn đầu.
+- LCP: Contact = h1 "Contact us" (không ảnh trên màn đầu). Page mặc định = h1 hoặc ảnh đầu tiên trong RTE nếu nằm trên màn đầu.
 - Header tối: noise là `background-image` nhỏ có sẵn (`assets/noise-dark.png`) trong critical.css, không phải ảnh LCP; ảnh footer 96 × 120 lazy.
 - SEO: page nằm trong phạm vi SEO 100 (sổ 10/11).
 - Ảnh lazy: mọi ảnh trong RTE. Liquid: `page.content | replace: '<img ', '<img loading="lazy" decoding="async" '` (ĐỀ XUẤT; ảnh RTE Shopify không có width/height → rủi ro CLS, CSS `height: auto` + bo góc giữ tỉ lệ khi ảnh đã tải).

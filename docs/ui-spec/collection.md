@@ -20,7 +20,7 @@ Thành phần kit dùng lại: header (kit §3), `.product-card`, `.collection-c
 | --- | --- | --- | --- | --- |
 | 1 | A4, câu CTO 5 | trang 1 không có Previous, trang cuối không có Next; < 768 "Page X of Y" dồn trái khi thiếu nút | luôn có Previous/Next; đầu/cuối mờ 0.35 + `aria-disabled`, giữ chỗ 52 (0 CLS); "Page X of Y" luôn giữa 2 nút | Sổ 10/11 audit (5), `docs/ui-spec/pagination.md` |
 | 2 | A4 | §8 tự mô tả phân trang | §8 trỏ về `pagination.md` (snippet chung) | Sổ 10/11 S3/C3 |
-| 3 | A12 | S7: card cũ mờ 40%, không bấm | không làm mờ: chờ ≤ 300 ms giữ card nguyên; > 300 ms hoặc sang trang bằng JS thì lưới thành skeleton cùng số ô, cùng cỡ card, như search S5 | foundation §18 (không làm mờ chữ, AA mọi trạng thái), search.md §6 S5 |
+| 3 | A12 | S7: card cũ mờ 40%, không bấm | không làm mờ: chờ ≤ 500 ms giữ card nguyên; > 500 ms hoặc sang trang bằng JS thì lưới thành skeleton cùng số ô, cùng cỡ card, như search S5 | foundation §18 (không làm mờ chữ, AA mọi trạng thái), search.md §6 S5 |
 
 Mockup `drafts/designer/ES1-T254/collection.html`: phân trang trang chính (1/2, Previous tắt), S4 (2/2 Next tắt; 5/9), S7 vẽ lại.
 
@@ -86,7 +86,7 @@ Cách tính 1280: cột 12 = (1240 − 11 × 24) / 12 = 81.3; cột lọc 3 cộ
 ĐỀ XUẤT: code đang dùng `minmax(0, 3fr) minmax(0, 9fr)` + gap (cột lọc 304 ở 1280), đổi sang `repeat(12, minmax(0, 1fr))` + span 3 / span 9 để mép cột lọc, lưới card khớp lưới 12 cột của header/footer (03 §1, foundation §1).
 Từ 64rem (1024): cột lọc 234, 3 card × 234.
 
-Khoảng cách dọc: header → breadcrumb 16 (24 từ 64rem), breadcrumb → h1 8 (12 từ 64rem), h1 → thanh công cụ 24 (32 từ 64rem), banner → thanh công cụ 24 (32 từ 64rem), thanh công cụ → chip 16, chip/thanh công cụ → lưới 24, lưới → phân trang 48 (64 từ 80rem), phân trang → footer `--section-gap` 48 / 120.
+Khoảng cách dọc: header → breadcrumb 16 (24 từ 64rem), breadcrumb → h1 8 (12 từ 64rem), h1 → thanh công cụ 24 (32 từ 64rem), banner → thanh công cụ 24 (32 từ 64rem), thanh công cụ → chip 16, chip/thanh công cụ → lưới 24, lưới → phân trang 48 (64 từ 80rem), phân trang → footer `--section-gap` 48 / 128.
 
 ## 4. Đầu trang
 
@@ -144,7 +144,7 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 | Hàng 2 | số kết quả | — | — |
 | Dính | dính dưới header tối (top 80), nền trắng, gạch 1px border tràn màn | như 360 | không dính; gạch 1px foreground |
 
-- Nút Filter: secondary, cao 48 / 52, icon lọc 20 + "Filter" + badge số filter đang áp (tròn 24, nền accent, chữ 13/700 accent-foreground 5.01:1) + chữ ẩn "N filters applied" (code có). Hover nút secondary đảo đen, badge đổi nền trắng chữ đen. Ẩn khi không có filter, ẩn từ 64rem.
+- Nút Filter: secondary, cao 48, icon lọc 20 + "Filter" + badge số filter đang áp (tròn 24, nền accent, chữ 13/700 accent-foreground 5.01:1) + chữ ẩn "N filters applied" (code có). Hover nút secondary đảo đen, badge đổi nền trắng chữ đen. Ẩn khi không có filter, ẩn từ 64rem.
 - Số kết quả: "**36** products" 14, số 600 foreground, chữ muted. ĐỀ XUẤT: luôn hiện cả mobile (08 #531D). Code đang để số trong partial `collection-products`; đặt cùng hàng Sort bằng CSS (`display: contents` + grid area) hoặc partial nhỏ trong thanh công cụ (FE/BE chọn, live region `collection-status` giữ nguyên).
 - Sort: `<select>` gốc (picker hệ điều hành trên mobile), nhãn thật "Sort by" 12/500 muted nằm trong ô phía trên giá trị (04 §5), giá trị 16/500 (không zoom iOS), cao `--control-height`, viền `--color-muted-light` (sổ 09/11; code đang `--color-border`), chevron phải, chữ dài cắt "…". Tuỳ chọn do Shopify trả (`collection.sort_options`; 08 #513D). Giá trị đang chọn hiện trong ô (08 #521D). Hover viền foreground; focus viền + outline accent.
 - Không JS: nút "Apply sort" trong `<noscript>` (code có).
@@ -161,9 +161,9 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 
 ## 8. Lưới card, phân trang
 
-- Card = foundation §9: media 1:1 nền cream bo 12 không viền, badge góc, tiêu đề Inter 16/500 hiện đủ, không cắt (yêu cầu Shopify §7, 11/11), giá, swatch 32 × 16 cách 4. Tiêu đề card h2 (code `heading_level: 'h2'`). Badge một góc: Sold out > -N% > New. Giá luôn hiện kể cả hết hàng (08 #452D).
+- Card = foundation §9: media 1:1 nền cream bo 12 không viền, badge góc, tiêu đề Inter 16/500 hiện đủ, không cắt (yêu cầu Shopify §7, 11/11), giá, swatch 32 × 16 cách 4. Tiêu đề card h2 (code `heading_level: 'h2'`). Badge một góc: Sold out > −N% > New. Giá luôn hiện kể cả hết hàng (08 #452D).
 - Swatch là chỉ báo (foundation §9 vòng 3): `aria-hidden`, không bấm, không focus; tên link đọc thêm ", 3 colors". Nhiều hơn 3 màu: 3 swatch + "N colors" 14 muted.
-- Ca biên (S5, edge_cases): hết hàng toàn bộ → Sold out + ảnh 0.6; không media → placeholder; "Sale giá nhỏ" $0.99 / $1.99 → -50%; compare_at ($100) thấp hơn giá ($200) → không badge, không giá gạch; gift card → "From $10.00".
+- Ca biên (S5, edge_cases): hết hàng toàn bộ → Sold out + ảnh 0.6; không media → placeholder; "Sale giá nhỏ" $0.99 / $1.99 → −50%; compare_at ($100) thấp hơn giá ($200) → không badge, không giá gạch; gift card → "From $10.00".
 - Phân trang 24 / trang (SRS AC1; giữ số trang thay Load more: link thật cho SEO, chạy không JS, 08 #2167D).
 - Dùng snippet `pagination` chung; hình, trạng thái, mốc, A11y theo `docs/ui-spec/pagination.md`: `{% paginate collection.products by 24, window_size: 1 %}` → `{% render 'pagination', paginate: paginate %}` (không `anchor`, không `summary`: số kết quả đã ở thanh công cụ).
 - Tóm tắt: < 768 `[‹ 52]  Page 1 of 2  [› 52]` trải hết hàng; ≥ 768 `[‹]  1 … 4 (5) 6 … 9  [›]` canh giữa, chevron cách số 16. Previous/Next tròn 52 (`aria-label="Previous page"` / `"Next page"`), số pill 44, trang hiện tại accent (ES1-T107 #6).
@@ -174,9 +174,9 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 
 | Trạng thái | Thiết kế | Nguồn |
 | --- | --- | --- |
-| Collection rỗng (S6) | empty-state foundation §18: icon hộp trong tròn 72 · h2 "No Products Here Yet" · "No products in this collection yet. Browse all our gear or pick another category." · primary "Shop all products" (`routes.all_products_collection_url`) + text link "Browse collections" (`routes.collections_url`). Ẩn Filter/Sort khi `all_products_count` = 0. | AGENTS empty state, 05 §7 |
-| Lọc không ra (S6) | chip vẫn hiện để bỏ từng lọc · icon lọc · h2 "No Matching Products" · "No products match these filters. Remove a filter or widen the price range." · primary "Clear filters". | 05 §7 |
-| Đang cập nhật (S7) | Không làm mờ card, không làm mờ chữ (foundation §18: Lighthouse color-contrast tính opacity). Ngay khi lọc/sort/xoá chip: chỗ số kết quả thành spinner 20 + "Updating products…" (`role="status"`). Chờ ≤ 300 ms: card cũ giữ nguyên độ đậm, vẫn bấm được (link sản phẩm còn đúng). Chờ > 300 ms, hoặc sang trang bằng JS: lưới `aria-busy="true"` + skeleton foundation §18 (media 1:1 + 2 dòng 14, dòng 2 rộng 40%), số ô = số card đang hiện, cùng cỡ card (0 CLS), như search S5. Thanh công cụ, chip, cột lọc vẫn dùng được. Ngưỡng 300 ms là ngưỡng chung của design system (foundation §18.1, sổ 21/11 components-14): tránh nháy skeleton khi phản hồi nhanh (05 §3 mục 6, 05 §6 "không delay không rõ lý do"); đổi ngưỡng thì đổi ở foundation, không ghi số riêng ở đây. | foundation §18, search.md §6 S5, 05 §6 |
+| Collection rỗng (S6) | empty-state foundation §18: icon hộp trong tròn 72 · h2 "No products here yet" · "No products in this collection yet. Browse all our gear or pick another category." · primary "Shop all products" (`routes.all_products_collection_url`) + text link "Browse collections" (`routes.collections_url`). Ẩn Filter/Sort khi `all_products_count` = 0. | AGENTS empty state, 05 §7 |
+| Lọc không ra (S6) | chip vẫn hiện để bỏ từng lọc · icon lọc · h2 "No matching products" · "No products match these filters. Remove a filter or widen the price range." · primary "Clear filters". | 05 §7 |
+| Đang cập nhật (S7) | Không làm mờ card, không làm mờ chữ (foundation §18: Lighthouse color-contrast tính opacity). Ngay khi lọc/sort/xoá chip: chỗ số kết quả thành spinner 20 + "Updating products…" (`role="status"`). Chờ ≤ 500 ms: card cũ giữ nguyên độ đậm, vẫn bấm được (link sản phẩm còn đúng). Chờ > 500 ms, hoặc sang trang bằng JS: lưới `aria-busy="true"` + skeleton foundation §18 (media 1:1 + 2 dòng 14, dòng 2 rộng 40%), số ô = số card đang hiện, cùng cỡ card (0 CLS), như search S5. Thanh công cụ, chip, cột lọc vẫn dùng được. Ngưỡng 500 ms là ngưỡng chung của design system (foundation §18.1; CTO 21/11 lượt 2, trước là 300): tránh nháy skeleton khi phản hồi nhanh (05 §3 mục 6, 05 §6 "không delay không rõ lý do"); đổi ngưỡng thì đổi ở foundation, không ghi số riêng ở đây. | foundation §18, search.md §6 S5, 05 §6 |
 | Lỗi tải (S7) | alert foundation §18 trên lưới: icon ! sale · "We couldn't update the products" · "Check your connection, then try again. Your filters are kept." · secondary "Try again". Lưới cũ giữ nguyên. `role="alert"`. | foundation §18, 05 §4 |
 | Lỗi giá (S3) | §5.2 | 05 §4 |
 | Hover / focus / active | card nhấc 4 + ảnh 1.04; chip đảo đen; số trang viền đen; Previous/Next cam; select viền đen; focus outline 2px accent (trên header tối outline trắng) | foundation §3, §6, sổ 07/11, 09/11 |
@@ -200,7 +200,7 @@ Tương phản (L tính tay, foundation §2):
 | trắng 60% / header #1A1A1A | 6.93 | menu header |
 
 - Viền nút tròn `--color-border` 1.26:1 chỉ là trang trí: nút nhận diện bằng chevron foreground 17.4:1 (WCAG 1.4.11 tính icon).
-- Vùng chạm: dòng lọc 44, summary 52, chip 44 (40 desktop), Previous/Next 52, số trang 44, nút Filter, Sort 48 / 52, đóng drawer 48, swatch lọc 24 trong hàng nhãn 44.
+- Vùng chạm: dòng lọc 44, summary 52, chip 44 (40 desktop), Previous/Next 52, số trang 44, nút Filter, Sort 48, đóng drawer 48, swatch lọc 24 trong hàng nhãn 44.
 - Bàn phím: Tab qua nhóm (summary Enter/Space), checkbox Space; drawer `showModal()` bẫy focus, Escape đóng, trả focus về nút Filter (AC4); chip là link; select gốc. Swatch card không nhận focus.
 - Screen reader: số kết quả trong live region `collection-status` sau mỗi lần lọc; badge số `aria-hidden` + chữ ẩn; chip có tên đầy đủ; "Show 4 more" có chữ ẩn tên nhóm; Previous/Next có `aria-label`; số trang `aria-label="Page 2"` (code); số màu trong tên link card.
 - Heading: h1 tên collection → h2 "Filters" → h2 tên card → h2 tiêu đề trạng thái rỗng (mockup S5, S6 dùng h3 vì nằm trong khối demo có h2). Breadcrumb `<nav aria-label="Breadcrumb">`.
@@ -209,7 +209,7 @@ Tương phản (L tính tay, foundation §2):
 
 ## 11. Motion
 
-Chỉ transform/opacity (sổ 09/11). Drawer 250 / 200; chevron nhóm xoay 250; chip hover 150; Previous/Next hover 250 (màu + scale); lưới không mờ khi cập nhật, skeleton shimmer 1.4s sau 300 ms (S7); card reveal khi cuộn chỉ cho trang tải lần đầu, không chạy lại sau khi lọc (tránh nháy). `prefers-reduced-motion`: tắt hết.
+Chỉ transform/opacity (sổ 09/11). Drawer 250 / 200; chevron nhóm xoay 250; chip hover 150; Previous/Next hover 250 (màu + scale); lưới không mờ khi cập nhật, skeleton shimmer 1.4s sau 500 ms (S7); card reveal khi cuộn chỉ cho trang tải lần đầu, không chạy lại sau khi lọc (tránh nháy). `prefers-reduced-motion`: tắt hết.
 
 ## 12. Lighthouse
 
@@ -251,6 +251,6 @@ CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions
 ## Cập nhật 21/11 (ES1-T567, CTO 21/11)
 
 - Nguồn chuẩn là mockup HTML + `drafts/designer/_kit/kit.css`; Designer dựng lại bản vẽ từ mockup. Số trong spec lệch mockup thì mockup thắng.
-- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog, empty state, tab, menu giữ Title Case (chờ CTO). "Checkout" giữ một chữ (thuật ngữ content.md §4, chờ CTO).
+- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog / drawer, empty state, tab, link menu cũng sentence case (CTO 21/11 lượt 2); tên sản phẩm, collection, bài viết theo dữ liệu, tên riêng và viết tắt giữ. "Checkout" giữ một chữ (thuật ngữ, CTO 21/11 lượt 2; content.md §4).
 - Line-height theo bội 4 qua token kit: 16/24 (`--line-height-body`), 14/20 (`--line-height-sm`), 13/20 (`--line-height-label`), 18/28 (`--line-height-title`), h1 40/48 → 48/56, h3 28/36, h4 20/24. Trang không viết line-height bằng số.
 - Nút "Clear all", "Clear all filters" (empty state), "Show 10 products", "Show 4 more", "Shop all products", "Try again" theo sentence case. Cần FE: các khoá locale tương ứng.

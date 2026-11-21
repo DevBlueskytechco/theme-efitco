@@ -41,11 +41,11 @@ Giữ nguyên: cột đọc (ES1-T527 V53: 720 = kit `.reading-column`, thay 46r
    - Nội dung `article.content` (RTE, §4).
    - Cuối bài, gạch trên 1px border: "Topics" + mọi tag dạng tab link (F§7) · link "Back to {blog.title}" (mũi tên trái, chữ mô tả đích).
 4. Bình luận (chỉ khi `blog.comments_enabled?`), gạch trên 1px border:
-   - h2 "{n} Comments" (`article.comments_count`; 0 thì "Comments").
+   - h2 "{n} comments" (`article.comments_count`; 0 thì "Comments").
    - Danh sách `<ol>`: avatar 40 tròn nền alt chữ cái đầu (`aria-hidden`) · tên 16/600 · ngày 14 muted `<time>` · nội dung 16. Gạch giữa các mục.
    - Phân trang bình luận 10 / trang (khi > 10), dưới danh sách cách 24, trên form: `{% paginate article.comments by 10, window_size: 1 %}` → `{% render 'pagination', paginate: paginate, label: blog_comments_pagination_label, anchor: '#comments' %}`. Hình, trạng thái, A11y theo `docs/ui-spec/pagination.md` (nút tròn 52 "Previous page"/"Next page", nav "Comment pages", đầu/cuối cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled`).
    - Form `{% form 'new_comment', article %}`: h2 "Add a comment" (cỡ h3) · ghi chú duyệt (chỉ khi `blog.moderated?`, icon i + "Comments are reviewed before they appear.") · Name*, Email* (gợi ý "Not published."), Comment* · nút primary "Post comment" · "* Required".
-5. Bài liên quan: hàng ngang (sổ quyết định 09/11): eyebrow "From the Efitco blog" · h2 "More Training Tips" (cỡ h1 như tiêu đề block Blog posts trang chủ) · nút chevron tròn 52 next/back ở đầu khối, căn đáy với tiêu đề, cách 8 (F§6, F§11) · `<ul>` card bài viết của kit (title h3) · thanh tiến trình. Nguồn: bài cùng tag đầu, thiếu thì bài mới nhất; bỏ bài đang xem; tối đa theo setting.
+5. Bài liên quan: hàng ngang (sổ quyết định 09/11): eyebrow "From the Efitco blog" · h2 "More training tips" (cỡ h1 như tiêu đề block Blog posts trang chủ) · nút chevron tròn 52 next/back ở đầu khối, căn đáy với tiêu đề, cách 8 (F§6, F§11) · `<ul>` card bài viết của kit (title h3) · thanh tiến trình. Nguồn: bài cùng tag đầu, thiếu thì bài mới nhất; bỏ bài đang xem; tối đa theo setting.
 6. Footer (F§4).
 
 ## 2. Settings merchant
@@ -69,7 +69,7 @@ Giữ nguyên: cột đọc (ES1-T527 V53: 720 = kit `.reading-column`, thay 46r
 | Tên | Kiểu | Default | Giới hạn |
 | --- | --- | --- | --- |
 | Eyebrow | text | From the Efitco blog | trống thì ẩn |
-| Heading | text | More Training Tips | trống thì ẩn |
+| Heading | text | More training tips | trống thì ẩn |
 | Articles to show | range | 4 | 2–8 |
 
 ## 3. Layout theo mốc
@@ -86,7 +86,7 @@ Giữ nguyên: cột đọc (ES1-T527 V53: 720 = kit `.reading-column`, thay 46r
 | Cuối bài → bình luận | 48 + 48 | 48 + 48 | 48 + 48 | 48 + 48 |
 | Form | 1 cột, nút full width | Name, Email 2 cột | 2 cột | 2 cột |
 | Bài liên quan | card 252 × 336, lộ card kế, vuốt, không nút | card 307 × 410, có chevron 52 + tiến trình | 3 card 336 vừa khung: ẩn nút + tiến trình | như 1280 |
-| Cách trên/dưới bài liên quan | 48 | 48 | 120 | 120 |
+| Cách trên/dưới bài liên quan | 48 | 48 | 128 | 128 |
 
 Cột đọc 720 (`.reading-column`), đoạn tối đa 65ch ở chữ 16 (`.rte p`) (F§1 `max-inline-size: 65ch`, 06 §3 dòng 50–75 ký tự). Mọi phần trong cột (đầu bài, nội dung, cuối bài, bình luận) cùng mép trái; bài liên quan và footer về lại container đầy đủ.
 Ảnh bìa dùng focal point của ảnh (snippet `image`); 3 tỉ lệ là cắt khác nhau của cùng 1 ảnh, không cần ảnh mobile riêng. Ảnh bìa rộng bằng container (không dải 1798 như hero) để thẳng mép với cột nội dung, breadcrumb và mọi banner trang con (F§3.3).
@@ -140,11 +140,11 @@ Bình luận dùng form chuẩn Shopify: không cần JS, sau POST trang tải l
 | background-dark-foreground / gradient card | ≥ 5.2 | tiêu đề, meta card bài liên quan (blog.md §6) |
 
 Không chữ nào đặt trên ảnh bìa (tiêu đề, meta nằm dưới ảnh; header là thanh tối riêng), nên tương phản không phụ thuộc ảnh merchant (06 text over images).
-- Heading: h1 tiêu đề → h2 trong bài → h2 "Comments" → h2 "Add a comment" → h2 "More Training Tips" → h3 card → h2 footer.
+- Heading: h1 tiêu đề → h2 trong bài → h2 "Comments" → h2 "Add a comment" → h2 "More training tips" → h3 card → h2 footer.
 - Ảnh bìa có alt = alt Shopify của ảnh (không rỗng: ảnh mang nội dung bài); ảnh card liên quan `alt=""` (tên ở tiêu đề link).
 - Form: `<label for>` thật, `autocomplete="name"`, `"email"`, `required` + dấu * `aria-hidden` + chú thích "* Required"; không chặn dán; nút là `<button type="submit">` có chữ "Post comment" (không "Submit").
 - Breadcrumb cuối `aria-current="page"`; tag link tên = tên tag.
-- Vùng chạm: tag pill 28 cao, vùng chạm 44 bằng `::after`; tab Topics 44; link "Back to…" cao 44; nút 48/52; nút chevron 52 (tên "Previous articles" / "Next articles", đầu/cuối hàng `aria-disabled`); phân trang bình luận chevron 52, số 44 (pagination.md §7).
+- Vùng chạm: tag pill 28 cao, vùng chạm 44 bằng `::after`; tab Topics 44; link "Back to…" cao 44; nút 48; nút chevron 52 (tên "Previous articles" / "Next articles", đầu/cuối hàng `aria-disabled`); phân trang bình luận chevron 52, số 44 (pagination.md §7).
 - Chữ ≥ 14 ở mọi chỗ (SEO ≥ 12).
 
 ## 7. Lighthouse

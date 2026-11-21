@@ -1,4 +1,4 @@
-KHÔNG CHẮC: (1) upsell chưa có AC trong TE-5, câu hỏi ES1-T247 còn mở; (2) ảnh store dev lệch tên (ES1-T245): trong mockup Training Mat 12 mm hiện kệ, Speed rope hiện áo tạ, Resistance Band Set hiện dây thừng, ô Home Starter Kit/Olympic Plate Set/Ativafit Lava hiện dây nhảy/quấn cổ tay/thảm; giữ URL; (3) demo-data không có discount tự động, selling plan, unit price, ngưỡng freeship: tên "Bundle discount (10%)", số tiền giảm và ngưỡng $500 trong mockup là minh hoạ (bậc 10% theo sổ 06/11 E7); (4) trang chủ không có khối cart: panel tóm tắt dùng cùng ngôn ngữ panel "Your Bundle" trang chủ (`.dpanel` của kit), các phần khác phát triển từ ngôn ngữ trang chủ.
+KHÔNG CHẮC: (1) upsell chưa có AC trong TE-5, câu hỏi ES1-T247 còn mở; (2) ảnh store dev lệch tên (ES1-T245): trong mockup Training Mat 12 mm hiện kệ, Speed rope hiện áo tạ, Resistance Band Set hiện dây thừng, ô Home Starter Kit/Olympic Plate Set/Ativafit Lava hiện dây nhảy/quấn cổ tay/thảm; giữ URL; (3) demo-data không có discount tự động, selling plan, unit price, ngưỡng freeship: tên "Bundle discount (10%)", số tiền giảm và ngưỡng $500 trong mockup là minh hoạ (bậc 10% theo sổ 06/11 E7); (4) trang chủ không có khối cart: panel tóm tắt dùng cùng ngôn ngữ panel "Your bundle" trang chủ (`.dpanel` của kit), các phần khác phát triển từ ngôn ngữ trang chủ.
 
 # UI spec: Cart page (ES1-T255, vòng 3)
 
@@ -8,7 +8,7 @@ Mục đích: người mua xem lại giỏ, đổi số lượng, xoá, ghi chú
 
 Thứ tự nguồn: sổ quyết định CTO > kit + mockup (`drafts/designer/**`, nguồn chuẩn CTO 21/11) > DESIGN.md > AGENTS.md > ES1-T93 (bố cục mặc định CTO 05/11) > bộ kiến thức (file NN). Không dùng trang live hay ảnh store làm gốc (sổ 10/11).
 
-Thành phần kit dùng lại: header (kit §3), panel tối `.dpanel` như "Your Bundle" trang chủ (tóm tắt, dòng giảm giá, thanh tiến trình + khoá, Total, CTA), badge đếm, `.product-card`, nút "Add to cart" có icon túi, header khối + `.round-button` 52, footer (kit §4).
+Thành phần kit dùng lại: header (kit §3), panel tối `.dpanel` như "Your bundle" trang chủ (tóm tắt, dòng giảm giá, thanh tiến trình + khoá, Total, CTA), badge đếm, `.product-card`, nút "Add to cart" có icon túi, header khối + `.round-button` 52, footer (kit §4).
 
 ## Thay đổi so với vòng 2
 
@@ -43,9 +43,9 @@ Thứ tự DOM (giữ như code, focus đi theo thứ tự này):
    c. `<ul>` dòng hàng: ảnh · tên (link PDP) · option `dl` · thuộc tính dòng (bỏ key `_`) · selling plan · đơn giá (sale đỏ + giá gạch) · unit price · discount dòng (icon tag + tên + `-$x`, xanh) · bộ số lượng · thành tiền · nút xoá.
    d. Nút "Update" (chỉ khi không JS).
    e. Ghi chú đơn (AC5).
-5. Cột tóm tắt (sticky ≥ 64rem): panel tối: đầu panel (h2 "Order Summary" + badge "4 items") · Subtotal · discount cấp đơn · Shipping "Calculated at checkout" · Total · ghi chú thuế · Checkout → · "Secure checkout" + icon thanh toán.
+5. Cột tóm tắt (sticky ≥ 64rem): panel tối: đầu panel (h2 "Order summary" + badge "4 items") · Subtotal · discount cấp đơn · Shipping "Calculated at checkout" · Total · ghi chú thuế · Checkout → · "Secure checkout" + icon thanh toán.
 6. Accelerated checkout (`content_for_additional_checkout_buttons`, ngoài partial): "or pay with" + nút Shopify.
-7. Upsell (ĐỀ XUẤT, ES1-T247): eyebrow "Complete your setup" · h2 "You May Also Need" · chevron 52 (768–1279) · 4 card + "Add to cart" · thanh tiến trình (< 80rem).
+7. Upsell (ĐỀ XUẤT, ES1-T247): eyebrow "Complete your setup" · h2 "You may also need" · chevron 52 (768–1279) · 4 card + "Add to cart" · thanh tiến trình (< 80rem).
 8. Footer (foundation §4).
 
 ## 2. Layout theo mốc
@@ -64,9 +64,9 @@ Thứ tự DOM (giữ như code, focus đi theo thứ tự này):
 | Panel tóm tắt padding | 24 | 32 | 40 | 40 | `--space-5/6`, `--space-1 × 10` |
 | Panel bo / gap | 16 / 24 | 16 / 24 | 16 / 24 | 16 / 24 | `--radius-card + --space-1`; `--space-5` |
 | Panel sticky | — | — | top 96 | top 96 | `--header-height + --space-4` |
-| Checkout cao | 48 | 48 | 52 | 52 | `--control-height` (Chuẩn: Carbon button 48; 52 từ 80rem) |
+| Checkout cao | 48 | 48 | 48 | 48 | `--control-height` (Chuẩn: Carbon button 48; 48 mọi mốc, CTO 21/11 lượt 2) |
 | Upsell | hàng vuốt, card 45% | 3.25 card + chevron 52 | lưới 4 × 292 | lưới 4 × 336 | foundation §9, §11 |
-| Khoảng trước upsell | 48 | 48 | 120 | 120 | `--section-gap` |
+| Khoảng trước upsell | 48 | 48 | 128 | 128 | `--section-gap` |
 
 Sắp xếp:
 - 360/768: đầu trang → freeship → dòng hàng → ghi chú → panel tóm tắt → accelerated → upsell. Mobile: dòng 1 ảnh | tên, option, giá | xoá; dòng 2 ảnh | bộ số lượng | thành tiền. Xoá góc trên phải (12 §1 audit: icon thùng rác, đặt lên đầu).
@@ -110,14 +110,14 @@ Sắp xếp:
 
 ### 3.6 Panel tóm tắt
 - Nền `--color-background-panel` (#393942), chữ `--color-background-dark-foreground` (11.4), bo 16, padding 24 / 32 / 40, gap 24.
-- Đầu panel: h2 "Order Summary" Inter 700 18/28 ls −0.01em (không dùng Sofia. Thiết kế: cùng kiểu tiêu đề panel "Your Bundle" trang chủ) + badge `.badge--outline` "4 items" (pill 28, 13/20 600, viền + chữ `--color-background-dark-foreground` 11.4:1; tag trung tính, Polaris: màu chỉ trạng thái, không phân danh mục). Gạch dưới 1px `--color-muted` (#4D4D4D), cách 24.
+- Đầu panel: h2 "Order summary" Inter 700 18/28 ls −0.01em (không dùng Sofia. Thiết kế: cùng kiểu tiêu đề panel "Your bundle" trang chủ) + badge `.badge--outline` "4 items" (pill 28, 13/20 600, viền + chữ `--color-background-dark-foreground` 11.4:1; tag trung tính, Polaris: màu chỉ trạng thái, không phân danh mục). Gạch dưới 1px `--color-muted` (#4D4D4D), cách 24.
 - Dòng: Inter 500 16/24 ls −0.01em, cách 24. Subtotal trắng · discount cấp đơn: icon tag 16 + tên, số `-$46.20`, màu `--panel-saving` · Shipping: nhãn trắng, giá trị "Calculated at checkout" 14 `--panel-muted`. ĐỀ XUẤT dòng Shipping: 12 §1 Must "chi phí vận chuyển trước thanh toán".
-- Total: gạch trên 1px muted, padding trên 24; nhãn 500 16, số 700 18. Không phóng to hơn (Thiết kế: cùng cỡ panel "Your Bundle" trang chủ).
+- Total: gạch trên 1px muted, padding trên 24; nhãn 500 16, số 700 18. Không phóng to hơn (Thiết kế: cùng cỡ panel "Your bundle" trang chủ).
 - Ghi chú thuế 14/20 `--panel-muted`: thuế đã gồm (AC4, code) hoặc ĐỀ XUẤT mặc định "Taxes and shipping calculated at checkout.".
 - Checkout: primary full width, chữ `cart.checkout` + mũi tên 16 × 14 sau chữ, cao `--control-height`. Bo `--radius-button` (4) theo kit.
 - Dưới nút: icon khiên 18 + "Secure checkout" 14 `--panel-muted` và icon thanh toán (`shop.enabled_payment_types`, `payment_type_svg_tag`, nền trắng). ĐỀ XUẤT, 12 §1 Must.
 - Focus trong panel: outline trắng 2px (accent trên panel chỉ 2.28:1, giống quy tắc header/footer tối).
-- Không liệt kê lại sản phẩm trong panel (khác panel "Your Bundle" trang chủ): dòng hàng đã ở cột trái, lặp làm dài trang mobile.
+- Không liệt kê lại sản phẩm trong panel (khác panel "Your bundle" trang chủ): dòng hàng đã ở cột trái, lặp làm dài trang mobile.
 - Nút accelerated có thương hiệu giữ nguyên màu Shopify (Shop Pay tím, G Pay đen…), chỉ chỉnh chiều cao/bo qua biến CSS (foundation §27); icon thanh toán full color.
 - Accelerated: "or pay with" giữa 2 gạch (nền trắng, ngoài panel), nút Shopify vẽ; khối chừa `min-height` = control + 32 để không xô layout khi script gắn nút.
 
@@ -140,7 +140,7 @@ Màu dẫn xuất trên panel (không phải token mới, `color-mix` trên toke
 - Đang tải: skeleton 4 card (foundation §18).
 
 ### 3.9 Giỏ rỗng (AC4, State 1)
-- h1 "Cart" giữ. Khối rỗng foundation §18: icon túi 32 trong tròn 72 nền alt · h2 "Your Cart Is Empty" · 1 câu gợi ý · primary "Continue shopping →" + text link "Browse collections" (`routes.collections_url`).
+- h1 "Cart" giữ. Khối rỗng foundation §18: icon túi 32 trong tròn 72 nền alt · h2 "Your cart is empty" · 1 câu gợi ý · primary "Continue shopping →" + text link "Browse collections" (`routes.collections_url`).
 - ĐỀ XUẤT dưới khối: eyebrow "Popular right now" + h2 "Bestsellers" + lưới 4 card từ setting collection (ẩn khi trống). Nguồn 12 §1 Must "động lực mua hàng cho giỏ trống"; header khối như carousel trang chủ.
 - Không freeship, panel, ghi chú, accelerated (code đã ẩn). Câu thuế không hiện khi rỗng (không có tổng), ghi chú cho QA.
 
@@ -170,7 +170,7 @@ Có sẵn (không đổi): `cart_type` Cart type (drawer/page, default drawer); 
 | --- | --- | --- | --- | --- |
 | Show recommendations | checkbox | true | chỉ khi ES1-T247 duyệt | 12 #578D |
 | Recommendations eyebrow | text | Complete your setup | trống thì ẩn | foundation §1 |
-| Recommendations heading | text | You May Also Need | | |
+| Recommendations heading | text | You may also need | | |
 | Products to show | range | 4 | 2–4, bước 1 | 12 #578D |
 | Show recommendations on mobile | checkbox | true | | 12 #578D audit |
 | Empty cart collection | collection | trống | trống thì không có lưới Bestsellers | 12 §1 Must |
@@ -178,7 +178,7 @@ Có sẵn (không đổi): `cart_type` Cart type (drawer/page, default drawer); 
 
 Không thêm setting ẩn ghi chú (AC5 bắt buộc).
 
-Locale mới (ĐỀ XUẤT, nhóm `cart`): `item_count` (one/other "{{ count }} Item(s)" cho badge, "{{ count }} item(s)" cho đầu trang), `summary_title` "Order Summary", `shipping` "Shipping", `shipping_at_checkout` "Calculated at checkout", `taxes_and_shipping_at_checkout`, `updating` "Updating cart…", `note_hint`, `decrease_label` / `increase_label` "Decrease/Increase quantity for {{ title }}", `secure_checkout` "Secure checkout", `express_divider` "or pay with", `line_sold_out`, `empty_hint`, `empty_eyebrow` "Popular right now", `browse_collections`, `reload` "Reload cart", `add_label` "Add {{ title }} to cart". `continue_shopping` dùng cả link đầu trang và nút giỏ rỗng, cùng sentence case "Continue shopping" (CTO 21/11): một key là đủ.
+Locale mới (ĐỀ XUẤT, nhóm `cart`): `item_count` (one/other "{{ count }} item(s)" cho badge, "{{ count }} item(s)" cho đầu trang), `summary_title` "Order summary", `shipping` "Shipping", `shipping_at_checkout` "Calculated at checkout", `taxes_and_shipping_at_checkout`, `updating` "Updating cart…", `note_hint`, `decrease_label` / `increase_label` "Decrease/Increase quantity for {{ title }}", `secure_checkout` "Secure checkout", `express_divider` "or pay with", `line_sold_out`, `empty_hint`, `empty_eyebrow` "Popular right now", `browse_collections`, `reload` "Reload cart", `add_label` "Add {{ title }} to cart". `continue_shopping` dùng cả link đầu trang và nút giỏ rỗng, cùng sentence case "Continue shopping" (CTO 21/11): một key là đủ.
 
 ## 6. Accessibility
 
@@ -202,12 +202,12 @@ Tương phản (WCAG, L tính tay; bảng gốc foundation §2):
 | muted-light / background | 5.33 | viền bộ số lượng, textarea |
 | muted / border | 6.70 | Checkout disabled |
 
-- Vùng chạm: stepper 44 mỗi nút, xoá 44, link quay lại cao 44, Checkout 48/52, nút upsell 44, chevron 52.
+- Vùng chạm: stepper 44 mỗi nút, xoá 44, link quay lại cao 44, Checkout 48, nút upsell 44, chevron 52.
 - Bàn phím: tên → − → ô → + → xoá theo dòng; sau xoá focus về tên dòng kế hoặc h1 khi rỗng.
 - Tên: −/+/xoá/Add chứa tên sản phẩm (không trùng giữa các dòng). Ô số có `<label>` ẩn.
 - Hàng tiêu đề cột `aria-hidden`; thành tiền có chữ ẩn "Line total"; giá có "Sale price"/"Regular price". Badge "4 items" là chữ thường trong panel (không cần `aria-hidden`).
 - Live region: status đọc kết quả đổi số/xoá; alert đọc lỗi; `aria-busy` trên vùng đổi.
-- Heading: h1 Cart → h2 Order Summary → h2 You May Also Need → h3 tên card; rỗng: h1 → h2 Your Cart Is Empty → h2 Bestsellers.
+- Heading: h1 Cart → h2 Order summary → h2 You may also need → h3 tên card; rỗng: h1 → h2 Your cart is empty → h2 Bestsellers.
 - Không chỉ dùng màu: hết hàng có badge + câu + icon; discount có icon tag + dấu trừ; freeship đạt đổi icon + chữ.
 - Reduced motion: spinner đứng yên (kit), tắt nhấc card.
 
@@ -222,7 +222,7 @@ Màu: `--color-background`, `--color-foreground`, `--color-muted`, `--color-mute
 - Lazy: ảnh dòng ≥ 2, ảnh upsell, lưới Bestsellers, ảnh newsletter footer. Upsell nạp sau tải trang, giữ chỗ bằng skeleton (0 CLS).
 - Font: Sofia Sans Condensed 700/800 (h1, h2 upsell, eyebrow, wordmark), Inter 400/500/600/700 (còn lại, gồm tiêu đề panel); 2 họ qua `font_picker`, `swap`.
 - CLS: accelerated chừa `min-height`; live region lỗi rỗng không chiếm chỗ; thanh dính đáy `fixed`; "Updating cart…" thay chỗ ghi chú thuế cùng chiều cao; header sticky CSS, noise là `background-image` nhỏ đã có.
-- A11y rủi ro và cách tránh: chữ xám #999 / xanh #4B824D trên panel trượt AA → màu dẫn xuất 6.56 / 5.82; focus accent trên panel không thấy → outline trắng; làm mờ số khi cập nhật bị tính contrast → không làm mờ; nút icon không tên → `aria-label` có tên sản phẩm; heading nhảy bậc → h2 Order Summary.
+- A11y rủi ro và cách tránh: chữ xám #999 / xanh #4B824D trên panel trượt AA → màu dẫn xuất 6.56 / 5.82; focus accent trên panel không thấy → outline trắng; làm mờ số khi cập nhật bị tính contrast → không làm mờ; nút icon không tên → `aria-label` có tên sản phẩm; heading nhảy bậc → h2 Order summary.
 - Best Practices: ảnh `contain` không méo; 0 lỗi console (mockup 0 lỗi ở 4 mốc).
 - JS: stepper, upsell add, thanh dính đáy thuộc BE (`assets/cart-items.js` hoặc file mới ≤ 8 KB).
 
@@ -250,12 +250,12 @@ Chuyển động: số tiền không animate; dòng bị xoá mờ dần 200ms r
 CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Đổi ô số native (mặc định ES1-T93 #3) sang bộ − ô + 44px cho cart page và drawer? Đề xuất: có (12 #2151D; không đổi luồng, vẫn `updates[]`, cần 1 ticket BE nhỏ).
 2. Upsell trong cart page (ES1-T247 chưa trả lời): làm theo §3.8, intent complementary, tối đa 4, dưới khu giỏ, cùng đợt BE với thanh dính đáy §3.7? Đề xuất: có.
-3. Tóm tắt dùng panel tối như "Your Bundle" trang chủ, chữ phụ trắng 70% (6.56) và xanh giảm giá nhạt (5.82) thay #999 (4.01) và #4B824D (2.50) để đạt AA? Đề xuất: có, áp cả cho bundle builder trang chủ và mini cart ES1-T262.
+3. Tóm tắt dùng panel tối như "Your bundle" trang chủ, chữ phụ trắng 70% (6.56) và xanh giảm giá nhạt (5.82) thay #999 (4.01) và #4B824D (2.50) để đạt AA? Đề xuất: có, áp cả cho bundle builder trang chủ và mini cart ES1-T262.
 
 ## Cập nhật 21/11 (ES1-T567, CTO 21/11)
 
 - Nguồn chuẩn là mockup HTML + `drafts/designer/_kit/kit.css`; Designer dựng lại bản vẽ từ mockup. Số trong spec lệch mockup thì mockup thắng.
-- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog, empty state, tab, menu giữ Title Case (chờ CTO). "Checkout" giữ một chữ (thuật ngữ content.md §4, chờ CTO).
+- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog / drawer, empty state, tab, link menu cũng sentence case (CTO 21/11 lượt 2); tên sản phẩm, collection, bài viết theo dữ liệu, tên riêng và viết tắt giữ. "Checkout" giữ một chữ (thuật ngữ, CTO 21/11 lượt 2; content.md §4).
 - Line-height theo bội 4 qua token kit: 16/24 (`--line-height-body`), 14/20 (`--line-height-sm`), 13/20 (`--line-height-label`), 18/28 (`--line-height-title`), h1 40/48 → 48/56, h3 28/36, h4 20/24. Trang không viết line-height bằng số.
 - Badge đếm "4 items" trên panel tối: `.badge--outline` (tag trung tính; Polaris: màu chỉ trạng thái, không phân danh mục), thay nền accent. Sentence case cho badge.
 - Tên dòng, dòng tóm tắt, Total 16/24 (trước 16/26); ghi chú thuế 14/20; tiêu đề panel 18/28; icon Secure checkout 16 (trước 18). Thanh freeship = `.meter` cao 8 (`--meter-height`).

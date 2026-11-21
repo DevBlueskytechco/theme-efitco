@@ -20,7 +20,7 @@ Bộ chọn biến thể quickview dùng component chung với PDP: `docs/ui-spe
 
 | # | Thành phần | Vòng 3 | Vòng 3b | Nguồn |
 | --- | --- | --- | --- | --- |
-| 1 | Footer drawer | trắng, viền trên + bóng, Total 18/600, Checkout icon khoá | panel tối `--color-background-panel` bo 16, cách mép 12 (16 từ 48rem), padding 24/32; Total Inter 500 16 + số 700 18 trắng; chữ phụ trắng 70% (6.54); discount xanh nhạt (5.84) có icon tag; vạch chia `--color-muted`; Checkout cao 52 + mũi tên 16 × 14; focus viền trắng | Ticket 3b mục 3 (cart G3) |
+| 1 | Footer drawer | trắng, viền trên + bóng, Total 18/600, Checkout icon khoá | panel tối `--color-background-panel` bo 16, cách mép 12 (16 từ 48rem), padding 24/32; Total Inter 500 16 + số 700 18 trắng; chữ phụ trắng 70% (6.54); discount xanh nhạt (5.84) có icon tag; vạch chia `--color-muted`; Checkout cao 48 + mũi tên 16 × 14; focus viền trắng | Ticket 3b mục 3 (cart G3) |
 | 2 | Giá trị option | 1 kiểu "không bán được" (gạch) | 3 kiểu theo lựa chọn hiện tại: còn hàng · hết hàng (gạch chữ, muted) · không tồn tại (gạch + viền nét đứt `--color-muted-light`); swatch gạch chéo, không tồn tại thêm viền nét đứt; tên ẩn ", sold out" / ", unavailable" | Ticket 3b mục 1, sổ 10/11 (2048) |
 | 3 | Option nhiều giá trị | không có | > 10 giá trị: lưới ô 72, hiện 7 + nút "+N" (2 hàng ở mọi mốc), mở tại chỗ, "Show fewer" thu lại; giá trị đang chọn luôn nằm trong 7 ô | Ticket 3b mục 1; 10 §6 #850 (nút, không dropdown) |
 | 4 | Đổi option | không vẽ | khung 5g: lựa chọn nhảy ngay, giá thành skeleton, "Checking availability…", Add to cart `aria-busy`; tải biến thể từ server theo option value | Ticket 3b mục 1; 05 §5 |
@@ -36,7 +36,7 @@ Giữ nguyên: drawer (trừ footer), nút Quick View, quick view vòng 3, mọi
 | # | Thành phần | Vòng 2 | Vòng 3 | Nguồn |
 | --- | --- | --- | --- | --- |
 | 1 | Header sau scrim | override logo, search 24, menu không chevron | nguyên kit vòng 3: thanh tối `--color-background-dark` + noise, cao 80, logo 100 × 30, menu trắng 60% có chevron Shop/Collection, search 20 | Sổ 10/11, foundation §3 |
-| 2 | Badge -N% quick view | góc trái trên ảnh | cùng hàng giá: sale · gạch · badge, cách 8 | kit `.price` + `.badge--sale`; cách 8 = Chuẩn: Polaris small-200 |
+| 2 | Badge −N% quick view | góc trái trên ảnh | cùng hàng giá: sale · gạch · badge, cách 8 | kit `.price` + `.badge--sale`; cách 8 = Chuẩn: Polaris small-200 |
 | 3 | Tiêu đề quick view | Sofia 800 | Sofia 700, ls −0.02em, cỡ h2 32/40 → 36/44 (`--line-height-h2`) | foundation §1; Chuẩn: M3 Headline L 32/40, Display S 36/44 |
 | 4 | Ảnh quick view | bo 12 | bo 16 (`--radius-panel`) | foundation §1 thang bo góc |
 | 5 | Hàng mua quick view | stepper + Add to cart; link chữ "View full details →" bên dưới | hàng "Quantity" riêng; hàng mua = "Add to cart" (accent, icon túi 24) + "View details" (nút xám `--color-border`, mũi tên 16 × 14), cách 12; mobile cả hàng dính đáy sheet | cùng khối mua trang sản phẩm (product.md); kit `.button--tertiary` (V23) |
@@ -66,8 +66,8 @@ Drawer phải (foundation §15), `<dialog>` + `showModal()` như code.
    2. Thanh freeship (`cart-free-shipping`): icon xe 20 · câu `cart.free_shipping_remaining` (số tiền đậm) · thanh 6px bo pill, nền alt, phần đầy accent. Đạt ngưỡng: câu `cart.free_shipping_reached`, thanh + icon `--color-badge-new`.
    3. Danh sách dòng hàng `<ul>`.
    4. Ghi chú đơn `<details>` đóng sẵn: "Add order note" + icon bút; mở ra label "Order note" + textarea 96 + gợi ý.
-   5. Gợi ý "Pairs Well With" (chờ ES1-T247): 2 hàng.
-3. Footer dính đáy = panel tối (vòng 3b, cart G3): nền `--color-background-panel`, bo `--radius-panel` (16), cách mép drawer 12 (< 48rem) / 16, padding 24 / 32, chữ `--color-background-dark-foreground`. Thứ tự: [Subtotal 14/500 trắng 70% · từng discount: icon tag 14 + mã, số "-$x" xanh nhạt 14/500 · vạch 1px `--color-muted`] (chỉ khi có discount cấp giỏ) · Total: nhãn Inter 500 16, số Inter 700 18 · "Taxes and shipping calculated at checkout." 14 trắng 70% · nút Checkout full width cao 52, chữ + mũi tên 16 × 14 bên phải · accelerated checkout (Shopify render, TE-5 AC1 bật mặc định). Focus trong panel: outline 2px trắng. Màu trộn bằng `color-mix` từ token có sẵn, không thêm token: chữ phụ `color-mix(dark-foreground 70%, panel)`, xanh `color-mix(badge-new 50%, dark-foreground)`.
+   5. Gợi ý "Pairs well with" (chờ ES1-T247): 2 hàng.
+3. Footer dính đáy = panel tối (vòng 3b, cart G3): nền `--color-background-panel`, bo `--radius-panel` (16), cách mép drawer 12 (< 48rem) / 16, padding 24 / 32, chữ `--color-background-dark-foreground`. Thứ tự: [Subtotal 14/500 trắng 70% · từng discount: icon tag 14 + mã, số "-$x" xanh nhạt 14/500 · vạch 1px `--color-muted`] (chỉ khi có discount cấp giỏ) · Total: nhãn Inter 500 16, số Inter 700 18 · "Taxes and shipping calculated at checkout." 14 trắng 70% · nút Checkout full width cao 48, chữ + mũi tên 16 × 14 bên phải · accelerated checkout (Shopify render, TE-5 AC1 bật mặc định). Focus trong panel: outline 2px trắng. Màu trộn bằng `color-mix` từ token có sẵn, không thêm token: chữ phụ `color-mix(dark-foreground 70%, panel)`, xanh `color-mix(badge-new 50%, dark-foreground)`.
    Nút accelerated trong panel tối: Shopify vẽ, giữ màu thương hiệu (Shop Pay tím, G Pay đen), không ô nét đứt, không viền thêm (foundation §27).
 
 Dòng hàng (`.cd-line`):
@@ -91,7 +91,7 @@ Theo mốc:
 ĐỀ XUẤT:
 - Drawer phải 90% trên mobile thay vì bottom sheet: foundation §15 đã chọn; 15 §2 #2 cho cả 2 option. Chạm scrim 10% bên trái để đóng. Đã chốt M2 (10/11).
 - "View cart" lên header thay vì dưới nút Checkout: 12 §1 #62.3% (luôn có đường tới giỏ) và 12 §8; để ở footer làm footer 360 cao ~300 (body chỉ còn 1 dòng hàng, đã thử ở nháp).
-- Checkout dùng mũi tên thay icon khoá của vòng 3 (vòng 3b, cùng panel cart G3); tín hiệu bảo mật ở checkout Shopify. Panel 360 cao ~236 (Total 28, ghi chú 20, nút 52, accelerated 44, padding), body còn ≥ 1,5 dòng hàng.
+- Checkout dùng mũi tên thay icon khoá của vòng 3 (vòng 3b, cùng panel cart G3); tín hiệu bảo mật ở checkout Shopify. Panel 360 cao ~232 (Total 28, ghi chú 20, nút 48, accelerated 44, padding), body còn ≥ 1,5 dòng hàng.
 - Câu "Taxes and shipping calculated at checkout." luôn hiện (12 §1 #732D, #544D); khi `cart.taxes_included` thì thay bằng câu có sẵn trong code.
 - Bỏ dòng Subtotal khi không có discount cấp giỏ (chỉ còn Total); có discount: Subtotal → từng discount (sale, "-$x") → Total. Code đang luôn in cả Subtotal và Total.
 - Không hiện payment icons trong drawer (đã có ở footer, 12 §1 "đạt"); giữ chỗ cho dòng hàng.
@@ -114,7 +114,7 @@ Dialog cỡ M (foundation §16), `<dialog>` + `showModal()`, `aria-labelledby` t
 1. Nút đóng tròn 48, góc phải trên cách 24 (12 mobile).
 2. Đầu: eyebrow vendor (accent, Sofia 16/800 uppercase ls 0.04em) · cách 12 · h2 tên sản phẩm Sofia 700 (`--font-heading--weight`), `--font-size-h2`, ls −0.02em, dòng `--line-height-h2` (32/40 → 36/44; dialog dùng h2 thay h1 vì cột chỉ 408), chừa 56 bên phải cho nút đóng.
 3. Media (Shopify §4 rich product media, 11/11: quick view phải hiện video, YouTube/Vimeo, 3D như PDP; dùng chung product-media: poster + nút play 52, 3D poster + nút "View in 3D", bấm mới tải; thumbnail có icon loại media): ảnh chính 1:1 nền cream bo 16 `contain` · cặp chevron tròn 52 (`.round-button`, kit) góc phải dưới cách 16, cách nhau 8: trắng viền border, rê chuột cam; ở ảnh đầu/cuối `aria-disabled` + cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) (code `.carousel-nav__button` còn opacity 0.35: việc FE) · thumbnail 64 (72 từ 80rem) bo 8, đang chọn viền 2px foreground, tối đa 5. Mobile: dải ảnh vuốt (mỗi ảnh 78% bề ngang, lộ ảnh sau, 15 §5) + thanh tiến trình mảnh, không chevron, không thumbnail (sổ 09/11).
-4. Giá (hàng cao 28, cách 8): sale 18/600 đỏ · compare-at 16 gạch muted · badge -N% (pill 28, kit `.badge--sale`). Không lặp badge trên ảnh. Không giá sale: giá foreground, không badge. `price_varies`: giá theo biến thể đang chọn.
+4. Giá (hàng cao 28, cách 8): sale 18/600 đỏ · compare-at 16 gạch muted · badge −N% (pill 28, kit `.badge--sale`). Không lặp badge trên ảnh. Không giá sale: giá foreground, không badge. `price_varies`: giá theo biến thể đang chọn.
 5. Rating (chỉ khi có metafield `reviews.rating`, như card AC-H13): sao 14 + "(4.9)" + gạch đứng + "341 reviews" 14 muted (cách giá 8).
 6. Mô tả (chỉ khi có): Inter 16/500 lh 24 muted, cắt 3 dòng "…". Demo-data không có.
 7. Option (tối đa 3): mỗi option một `<fieldset>` + legend "Color: Black" (giá trị đang chọn ghi trong legend). Màu có `swatch` → tròn 44; còn lại pill 44 (code `.product-option__value`). Trạng thái từng giá trị và option nhiều giá trị: §3.1.
@@ -175,7 +175,7 @@ Phần riêng của quickview:
 | Free shipping threshold | number | 0 | 0 = ẩn thanh (code) | có |
 | Show order note | checkbox | true | drawer + cart page cùng `cart.note`; `<details>` đóng sẵn | Chốt M3 (10/11); AC chờ ES1-T272 |
 | Show product recommendations | checkbox | true | 2 sản phẩm, complementary của dòng đầu | ĐỀ XUẤT (chờ ES1-T247) |
-| Recommendations heading | text | Pairs Well With | ≤ 30 ký tự | ĐỀ XUẤT |
+| Recommendations heading | text | Pairs well with | ≤ 30 ký tự | ĐỀ XUẤT |
 | Empty cart products | collection | trống | trống → chỉ empty state, không hàng gợi ý | ĐỀ XUẤT (12 §1 Must giỏ trống) |
 | Show quick view button | checkbox | true | nhóm Product cards | Chốt M1 (10/11); AC chờ ES1-T272 |
 | Show vendor in quick view | checkbox | true | eyebrow | ĐỀ XUẤT |
@@ -193,7 +193,7 @@ Mini cart:
 | Trạng thái | Thiết kế | Nguồn |
 | --- | --- | --- |
 | Thêm thành công | khung 1: drawer mở, thông báo "Added to cart" + tên · biến thể, số giỏ nhảy | 12 §1, §8; 05 §6 |
-| Giỏ rỗng (4a) | empty state: icon túi trong tròn 72 · h "Your Cart Is Empty" · 1 câu · "Shop bestsellers"; dưới là 2 hàng "Bestsellers" từ setting Empty cart products; không footer, không freeship | foundation §18; 12 §1 Must; TE-5 AC4 |
+| Giỏ rỗng (4a) | empty state: icon túi trong tròn 72 · h "Your cart is empty" · 1 câu · "Shop bestsellers"; dưới là 2 hàng "Bestsellers" từ setting Empty cart products; không footer, không freeship | foundation §18; 12 §1 Must; TE-5 AC4 |
 | Đang cập nhật (4b) | stepper của dòng đang đổi hiện spinner thay số, nút −/+ và thùng rác của dòng disable; tổng dòng + Total thành spinner 16; Checkout `aria-disabled` (không checkout với tổng cũ); `aria-busy` trên body; "Updating cart…" trong `role="status"` (ẩn). Không làm mờ chữ (opacity làm hỏng tương phản) | TE-5 AC2; 05 §5 |
 | Lỗi 422 hết hàng (4c) | alert đầu body "1 item is sold out / Remove it to check out." `role="alert"`; dòng: ảnh mờ 0.6, badge Sold out thay stepper, câu lỗi 14/500 sale + icon dưới dòng | TE-5 AC2; 12 §1 (hết hàng khi để lâu) |
 | Số lượng bị chỉnh (4c) | số về giá trị server, + disable, câu `cart.quantity_adjusted` + icon cảnh báo accent (chữ foreground) dưới dòng | TE-5 AC2; sổ quyết định 09/11 (cảnh báo dùng accent) |
@@ -247,11 +247,11 @@ Tương phản (tính tay WCAG, số từ foundation §2; L muted-light 0.147, a
 | badge-new / alt (thanh đạt) | ~4.15 | phi chữ ≥ 3 |
 | foreground / background (badge Sold out) | 17.4 | |
 
-- Vùng chạm: nút đóng 48; thùng rác, −, +, ô số, View cart, Quick view, swatch, pill, thumbnail 64–72, Add / Choose 44; Checkout, Add to cart 48–52. Hai nút cạnh nhau cách ≥ 8 trong cụm, cụm cách 12–16.
+- Vùng chạm: nút đóng 48; thùng rác, −, +, ô số, View cart, Quick view, swatch, pill, thumbnail 64–72, Add / Choose 44; Checkout, Add to cart 48. Hai nút cạnh nhau cách ≥ 8 trong cụm, cụm cách 12–16.
 - Tên: mọi nút icon có tên riêng kèm tên sản phẩm: "Remove {title}" (`cart.remove_label` có sẵn), "Decrease quantity for {title}", "Increase quantity for {title}", ô số `cart.quantity_label`; "Add" / "Choose" có phần ẩn "{title} to cart" / "options for {title}"; "Quick view" + tên; thumbnail "Show image 2 of 3"; chevron "Previous image" / "Next image"; "View details" + "of {title}"; ô số có `<label>` "Quantity" thật. Không có 2 link/nút cùng tên khác đích.
 - Bàn phím: drawer, dialog dùng `showModal()` (bẫy focus, Escape đóng, nền inert); mở thì focus vào tiêu đề (drawer: h2 "Cart"; quickview: tiêu đề, `tabindex="-1"`), Tab tiếp theo trong drawer: "View cart" → nút đóng (CTO 17/11, ES1-T476; ADR 0007 #5; SRS TE-5 AC15); đóng thì trả focus về nút mở. Thumbnail, option là radio/nút đi bằng Tab, ←/→ trong nhóm radio.
 - Live region: `cart-items-status` (status) và `cart-items-error` (alert) có sẵn; quickview thêm 1 status + 1 alert.
-- Heading: drawer h2 → "Pairs Well With" h3; quickview h2. Không nhảy bậc.
+- Heading: drawer h2 → "Pairs well with" h3; quickview h2. Không nhảy bậc.
 - Màu không đứng một mình: hết hàng có chữ "Sold out", lỗi có icon + câu, đạt freeship có câu.
 - Reduced motion: tắt trượt, fade; spinner vẫn quay chậm thì giữ (chỉ báo trạng thái) hoặc thay bằng chữ status.
 
@@ -277,7 +277,7 @@ Tương phản (tính tay WCAG, số từ foundation §2; L muted-light 0.147, a
 
 Token: chỉ token có sẵn (`--color-*`, `--space-*`, `--radius-*`, `--motion-*`, `--font-*`) + giá trị dẫn xuất foundation §2 (`--overlay-scrim`, `--shadow-overlay`, `--shadow-raised`, `--radius-dialog`, `--control-height`). Không thêm token. Màu swatch lấy từ `value.swatch.color` của Shopify (mockup giả lập bằng token).
 
-Chuỗi mới (đề xuất key, Dev FE thêm vào `locales/en.default.json`): `cart.view_cart` "View cart", `cart.item_count` "{{ count }} item(s)" (one/other), `cart.added` "Added to cart", `cart.shipping_at_checkout` "Taxes and shipping calculated at checkout.", `cart.note_toggle` "Add order note", `cart.note_hint` "Saved with your order.", `cart.line_sold_out` "This item is sold out. Remove it to check out.", `cart.sold_out_summary` "{{ count }} item is sold out", `cart.update_error_title` "We couldn't update your cart", `cart.decrease_label` / `cart.increase_label` "Decrease/Increase quantity for {{ title }}", `cart.empty_heading` "Your Cart Is Empty", `cart.empty_text`, `cart.empty_cta` "Shop bestsellers", `cart.recommendations_add` "Add", `cart.recommendations_choose` "Choose", `products.quick_view.open` "Quick view", `.close` "Close quick view", `.view_detail` "View details", `.previous_image` "Previous image", `.next_image` "Next image", `.quantity` "Quantity", `.image_label` "Show image {{ index }} of {{ count }}", `.loading` "Loading product…", `.load_error_title` "We couldn't load this product", `general.try_again` "Try again". Bộ chọn biến thể (`products.variant.*`: hậu tố ẩn, "+N", "Show fewer", "Checking availability…", "Loading {{ value }}…", lỗi tải): variant-picker §10. Vòng 3b: `cart.subtotal` (có sẵn trong code), `cart.discount_label` ẩn "Discount". Giữ có sẵn: `cart.title`, `cart.checkout`, `cart.free_shipping_*`, `cart.quantity_*`, `cart.remove_label`, `cart.removed`, `cart.error`.
+Chuỗi mới (đề xuất key, Dev FE thêm vào `locales/en.default.json`): `cart.view_cart` "View cart", `cart.item_count` "{{ count }} item(s)" (one/other), `cart.added` "Added to cart", `cart.shipping_at_checkout` "Taxes and shipping calculated at checkout.", `cart.note_toggle` "Add order note", `cart.note_hint` "Saved with your order.", `cart.line_sold_out` "This item is sold out. Remove it to check out.", `cart.sold_out_summary` "{{ count }} item is sold out", `cart.update_error_title` "We couldn't update your cart", `cart.decrease_label` / `cart.increase_label` "Decrease/Increase quantity for {{ title }}", `cart.empty_heading` "Your cart is empty", `cart.empty_text`, `cart.empty_cta` "Shop bestsellers", `cart.recommendations_add` "Add", `cart.recommendations_choose` "Choose", `products.quick_view.open` "Quick view", `.close` "Close quick view", `.view_detail` "View details", `.previous_image` "Previous image", `.next_image` "Next image", `.quantity` "Quantity", `.image_label` "Show image {{ index }} of {{ count }}", `.loading` "Loading product…", `.load_error_title` "We couldn't load this product", `general.try_again` "Try again". Bộ chọn biến thể (`products.variant.*`: hậu tố ẩn, "+N", "Show fewer", "Checking availability…", "Loading {{ value }}…", lỗi tải): variant-picker §10. Vòng 3b: `cart.subtotal` (có sẵn trong code), `cart.discount_label` ẩn "Discount". Giữ có sẵn: `cart.title`, `cart.checkout`, `cart.free_shipping_*`, `cart.quantity_*`, `cart.remove_label`, `cart.removed`, `cart.error`.
 
 ## 10. Lệch giữa code hiện tại và spec (cho Dev FE)
 

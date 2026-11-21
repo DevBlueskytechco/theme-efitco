@@ -27,7 +27,7 @@ Mockup: `drafts/designer/ES1-T258/gift_card.html` + `gift_card-360|768|1280|1920
 ## 2. Anatomy
 
 1. Thanh trên 80: nền `--color-background-dark` + noise; logo trắng 100 × 30 thẳng mép trái container (`settings.logo` hoặc shop.name), link về `shop.url`, `aria-label="Efitco home"`, ô bấm 44. Không menu (trang ngoài layout).
-2. Intro căn giữa: eyebrow "Gift card" · h1 "Your Efitco Gift Card" (`shop.name`) · "Use this gift card at checkout." (locale `gift_card.use_at_checkout`).
+2. Intro căn giữa: eyebrow "Gift card" · h1 "Your Efitco gift card" (`shop.name`) · "Use this gift card at checkout." (locale `gift_card.use_at_checkout`).
 3. Thẻ (chỉ CSS, không ảnh): tỉ lệ 1.586 (thẻ ngân hàng), nền `--color-background-dark` + noise, bo 16, vòng trang trí trắng 6% góc trên · logo trắng + nhãn `.badge--outline` "Gift card" (ES1-T527 V63: pill 28, 13/600, viền + chữ trắng, sentence case) · "Balance" 14 muted-on-dark · số dư `gift_card.balance | money` heading 800 `--font-size-h1` 40 → 48 · nếu balance < initial_value: "of $50.00 initial value".
 4. Panel trắng bo 16:
    - "Gift card code" · mã `gift_card.code | format_code` 18/600 giãn chữ 0.08em trong ô viền đứt muted-light nền alt, `user-select: all` · nút secondary "Copy code" (JS, BE).
@@ -38,7 +38,7 @@ Mockup: `drafts/designer/ES1-T258/gift_card.html` + `gift_card-360|768|1280|1920
 
 ## 3. Settings merchant
 
-Không setting mới (template `layout none`, không block). Dùng `settings.logo` đã có. ĐỀ XUẤT locale mới: `gift_card.title` ("Your {{ shop }} Gift Card"), `gift_card.balance`, `gift_card.initial_value`, `gift_card.of_initial` ("of {{ value }} initial value"), `gift_card.code_label`, `gift_card.copy`, `gift_card.copied`, `gift_card.qr_alt`, `gift_card.qr_title`, `gift_card.qr_text`, `gift_card.expires_label`, `gift_card.start_shopping`, `gift_card.print`, `gift_card.disabled`, `gift_card.expired_text`, `gift_card.contact`.
+Không setting mới (template `layout none`, không block). Dùng `settings.logo` đã có. ĐỀ XUẤT locale mới: `gift_card.title` ("Your {{ shop }} gift card"), `gift_card.balance`, `gift_card.initial_value`, `gift_card.of_initial` ("of {{ value }} initial value"), `gift_card.code_label`, `gift_card.copy`, `gift_card.copied`, `gift_card.qr_alt`, `gift_card.qr_title`, `gift_card.qr_text`, `gift_card.expires_label`, `gift_card.start_shopping`, `gift_card.print`, `gift_card.disabled`, `gift_card.expired_text`, `gift_card.contact`.
 
 ## 4. Bố cục theo mốc
 
@@ -52,7 +52,7 @@ Không setting mới (template `layout none`, không block). Dùng `settings.log
 | Mã + Copy | xếp dọc, nút full | xếp dọc, nút auto trái | như 768 | như 768 |
 | QR + chú thích | 2 cột (144 + chữ) | như 360 | như 360 | như 360 |
 | Hành động | dọc, full width: Wallet → Start shopping → Print | Wallet hàng riêng; Start + Print 2 cột | như 768 | như 768 |
-| Khoảng trên / dưới main | 48 / 48 | 48 / 48 | 48 / 120 | 48 / 120 |
+| Khoảng trên / dưới main | 48 / 48 | 48 / 48 | 48 / 128 | 48 / 128 |
 
 ## 5. Trạng thái
 
@@ -74,7 +74,7 @@ Không setting mới (template `layout none`, không block). Dùng `settings.log
 - Một h1; "Balance" và số dư trong cùng `<p>` để đọc liền.
 - Mã: `aria-labelledby` nhãn "Gift card code"; screen reader đọc từng ký tự nhờ khoảng trắng của `format_code`.
 - QR: `<img>`/`<canvas>` có tên "QR code, scan to redeem gift card".
-- Vùng chạm: nút 48/52, Wallet ≥ 44, logo link 44.
+- Vùng chạm: nút 48, Wallet ≥ 44, logo link 44.
 - Hết hạn báo bằng chữ + icon, không chỉ xám.
 
 ## 7. Token dùng

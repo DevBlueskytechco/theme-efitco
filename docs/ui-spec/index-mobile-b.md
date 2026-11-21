@@ -1,4 +1,4 @@
-KHÔNG CHẮC: (1) Mockup `drafts/designer/ES1-T279/index.html` là nguồn chuẩn cho 768/360 (CTO 21/11, ES1-T567); trạng thái vẫn là ĐỀ XUẤT. Một số cỡ chữ ghi trong bảng là số của lượt trước; số đúng đọc từ `:root` của kit, cần soát lại cả bảng ở lượt riêng. (2) Dấu tròn "Feature Product" và icon play trong mockup là hình vẽ gần đúng; dev dùng `featured-product__seal`, `slideshow-icon` play có sẵn. (3) demo-data không có rating, read time, mô tả, specs: chữ trong mockup là nội dung demo và locale (`blocks.faq_item`, `blocks.testimonial_item`, `image_with_text.why_*`); blog có 4 bài, đã hỏi BA ở ES1-T267. (4) Ảnh sản phẩm lệch tên (ES1-T245); không tính là lỗi bố cục.
+KHÔNG CHẮC: (1) Mockup `drafts/designer/ES1-T279/index.html` là nguồn chuẩn cho 768/360 (CTO 21/11, ES1-T567); trạng thái vẫn là ĐỀ XUẤT. Một số cỡ chữ ghi trong bảng là số của lượt trước; số đúng đọc từ `:root` của kit, cần soát lại cả bảng ở lượt riêng. (2) Dấu tròn "Feature product" và icon play trong mockup là hình vẽ gần đúng; dev dùng `featured-product__seal`, `slideshow-icon` play có sẵn. (3) demo-data không có rating, read time, mô tả, specs: chữ trong mockup là nội dung demo và locale (`blocks.faq_item`, `blocks.testimonial_item`, `image_with_text.why_*`); blog có 4 bài, đã hỏi BA ở ES1-T267. (4) Ảnh sản phẩm lệch tên (ES1-T245); không tính là lỗi bố cục.
 
 # UI spec: Trang chủ 768 và 360, phần B (ES1-T279)
 
@@ -52,7 +52,7 @@ Màu nền (bảng màu thương hiệu, giữ): bundle cream `--color-backgroun
 
 ## 1. Bundle builder
 
-Desktop (mockup ES1-T293): header (eyebrow "Build your bundle", h2 "Pick Your Kit, Save As You Go", link "View preset bundles" phải) · lưới 3 × 2 card trắng ~254 × 317 bo 12 (ảnh 1:1 cream bo 8, dấu chọn tròn 20 góc trên phải, tên, giá) · panel "Your Bundle" 576 × 657 nền `--color-background-panel` bo 16 bên phải.
+Desktop (mockup ES1-T293): header (eyebrow "Build your bundle", h2 "Pick your kit, save as you go", link "View preset bundles" phải) · lưới 3 × 2 card trắng ~254 × 317 bo 12 (ảnh 1:1 cream bo 8, dấu chọn tròn 20 góc trên phải, tên, giá) · panel "Your bundle" 576 × 657 nền `--color-background-panel` bo 16 bên phải.
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -85,7 +85,7 @@ Mockup: `drafts/designer/ES1-T279/index.html` mục States, khung "Mobile 360 ×
 
 Anatomy (`data-testid="bundle-sticky-bar"`, in trong khối bundle ngay sau `<form>`, thuộc tính `hidden` sẵn):
 1. Thanh `position: fixed` đáy màn, tràn 360, nền `--color-background-panel` (cùng panel), bo 16 hai góc trên (= panel), bóng hướng lên `0 -8px 24px foreground 16%`, padding 12 / 20 / 12 + `env(safe-area-inset-bottom)`. Cao 72 (nút 48 + 12 × 2).
-2. Trái, 2 dòng: "{n} items" Inter 14/500 trắng 70% trộn panel (locale `count_one` / `count_other`: "1 item", "5 items") · trên tổng "{total}" Inter 18/700 trắng, số tabular; chữ ẩn "Total" (locale `total`) đứng trước số. Ticket ghi "{n} items · {total}" 1 dòng: ĐỀ XUẤT xếp 2 dòng, bỏ dấu "·", vì 1 dòng ở 320 chỉ còn ~126 px cạnh nút (đo mockup: "5 Items · $436.90" đã xuống dòng, giá "$1,234.56" càng không vừa). Tổng là số sau giảm (cùng dòng Total của panel).
+2. Trái, 2 dòng: "{n} items" Inter 14/500 trắng 70% trộn panel (locale `count_one` / `count_other`: "1 item", "5 items") · trên tổng "{total}" Inter 18/700 trắng, số tabular; chữ ẩn "Total" (locale `total`) đứng trước số. Ticket ghi "{n} items · {total}" 1 dòng: ĐỀ XUẤT xếp 2 dòng, bỏ dấu "·", vì 1 dòng ở 320 chỉ còn ~126 px cạnh nút (đo mockup: "5 items · $436.90" đã xuống dòng, giá "$1,234.56" càng không vừa). Tổng là số sau giảm (cùng dòng Total của panel).
 3. Phải: nút primary "Add bundle to cart" (locale `submit`) cao 48, padding 16, không icon, `type="submit" form="bundle-form-{{ block.id }}"` (mockup `bundle-form`; id theo block để không trùng): gửi đúng form của panel, không cần JS riêng cho việc gửi.
 
 Hiện / ẩn (BE, IntersectionObserver, không nghe scroll):
@@ -143,7 +143,7 @@ Việc FE / BE (theo `fe-be-boundary.md`): FE1 markup thanh (in sẵn `hidden`, 
 
 Rich media (Shopify §4, 11/11): gallery featured product hiện cả video, YouTube/Vimeo, 3D của sản phẩm (cùng product-media PDP: poster + play 52, "View in 3D"), không lọc chỉ ảnh.
 
-Desktop (mockup ES1-T293): 2 cột; trái thẻ ảnh 668 × 668 (1/1) nền cream viền nhạt bo 16, dấu tròn "Efitco · Feature Product" 112 góc trên trái; phải eyebrow "Featured Product · Free Weights", h2 48/56, đồng hồ nền #1A1A1A ("Sale ends in" + 3 ô 44), giá sale + giá gạch + badge -24%, sao (4.9) | 341 reviews, mô tả, bảng 4 thông số xen kẽ sand/trắng, 2 nút "Add to cart" (accent, icon túi) + "View details" (nền xám nhạt viền, mũi tên).
+Desktop (mockup ES1-T293): 2 cột; trái thẻ ảnh 668 × 668 (1/1) nền cream viền nhạt bo 16, dấu tròn "Efitco · Feature product" 112 góc trên trái; phải eyebrow "Featured product · Free Weights", h2 48/56, đồng hồ nền #1A1A1A ("Sale ends in" + 3 ô 44), giá sale + giá gạch + badge −24%, sao (4.9) | 341 reviews, mô tả, bảng 4 thông số xen kẽ sand/trắng, 2 nút "Add to cart" (accent, icon túi) + "View details" (nền xám nhạt viền, mũi tên).
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -162,7 +162,7 @@ Desktop (mockup ES1-T293): 2 cột; trái thẻ ảnh 668 × 668 (1/1) nền cre
 
 ## 3. Video demo
 
-Desktop (mockup ES1-T293): nền trắng; eyebrow "Video demo", h2 "See Real Equipment In Action, Before You Buy"; hàng card 264 × 554 gap 24 (video 9/16 264 × 469 + thanh sản phẩm 84: thumb 56 cream bo 8, tên 16/500, giá), card thứ 6 cắt ở mép phải; nút next/back 52 đầu khối, nút play 52 giữa poster.
+Desktop (mockup ES1-T293): nền trắng; eyebrow "Video demo", h2 "See real equipment in action, before you buy"; hàng card 264 × 554 gap 24 (video 9/16 264 × 469 + thanh sản phẩm 84: thumb 56 cream bo 8, tên 16/500, giá), card thứ 6 cắt ở mép phải; nút next/back 52 đầu khối, nút play 52 giữa poster.
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -180,7 +180,7 @@ Desktop (mockup ES1-T293): nền trắng; eyebrow "Video demo", h2 "See Real Equ
 
 ## 4. Testimonial
 
-Desktop (mockup ES1-T293): nền cream; eyebrow "Testimonial", h2 "What Our Customers Say?"; hàng card trắng 456 × 552 bo 16 (ảnh 456 × 257 tỉ lệ 16/9, Chuẩn: Carbon aspect ratio 16:9; padding 24: tên + Verified + sao phải, tiêu đề 18/28 700 (`.text-title`), câu trích muted, gạch, sản phẩm thumb 56 + tên + giá); card 4 cắt ở mép.
+Desktop (mockup ES1-T293): nền cream; eyebrow "Testimonial", h2 "What our customers say?"; hàng card trắng 456 × 552 bo 16 (ảnh 456 × 257 tỉ lệ 16/9, Chuẩn: Carbon aspect ratio 16:9; padding 24: tên + Verified + sao phải, tiêu đề 18/28 700 (`.text-title`), câu trích muted, gạch, sản phẩm thumb 56 + tên + giá); card 4 cắt ở mép.
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -213,7 +213,7 @@ Desktop (mockup ES1-T293): chia đôi; trái ảnh 920 × 920 (1/1) tràn mép, 
 
 ## 6. Blog
 
-Desktop (mockup ES1-T293): nền trắng; eyebrow "From the Efitco blog", h2 "Training Tips & Inspiration"; hàng card 336 × 448 gap 24 (ảnh phủ bo 16, gradient đáy, tag trung tính góc trên phải (nền trắng, viền `--color-border`, chữ foreground 17.4:1; Polaris: màu chỉ trạng thái, không phân danh mục; THAY 21/11, trước là nền accent), tiêu đề 18/28 700 trắng, "N min read"). Không có nút, không link "View all".
+Desktop (mockup ES1-T293): nền trắng; eyebrow "From the Efitco blog", h2 "Training tips & inspiration"; hàng card 336 × 448 gap 24 (ảnh phủ bo 16, gradient đáy, tag trung tính góc trên phải (nền trắng, viền `--color-border`, chữ foreground 17.4:1; Polaris: màu chỉ trạng thái, không phân danh mục; THAY 21/11, trước là nền accent), tiêu đề 18/28 700 trắng, "N min read"). Không có nút, không link "View all".
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -227,7 +227,7 @@ Desktop (mockup ES1-T293): nền trắng; eyebrow "From the Efitco blog", h2 "Tr
 
 ## 7. FAQ
 
-Desktop (mockup ES1-T293): nền cream; cột trái 668: eyebrow "Questions and Answers", h2, accordion 5 câu (mục 1 mở, icon −/+ bên trái); phải khung 668 × 501 (4/3): ảnh 509 × 501 (≈ 1/1) bo 16 lệch phải, 2 ô số 260 × ~148 (cam "Products 360+", tối "Warranty 12") đè đáy trái ảnh, tràn ra trái.
+Desktop (mockup ES1-T293): nền cream; cột trái 668: eyebrow "Questions and answers", h2, accordion 5 câu (mục 1 mở, icon −/+ bên trái); phải khung 668 × 501 (4/3): ảnh 509 × 501 (≈ 1/1) bo 16 lệch phải, 2 ô số 260 × ~148 (cam "Products 360+", tối "Warranty 12") đè đáy trái ảnh, tràn ra trái.
 
 | | 360 | 768 |
 | --- | --- | --- |
@@ -244,9 +244,9 @@ Desktop (mockup ES1-T293): nền cream; cột trái 668: eyebrow "Questions and 
 ## 8. Footer
 
 Theo foundation §4 (kit.css `.site-footer*`), không đổi:
-- 360: newsletter xếp dọc (ảnh 98 × 123 có 2 thẻ sau, tiêu đề "Get 15% Off Your First Order", mô tả, ô email + nút full), panel tràn mép, menu Shop / Information là accordion đóng (hàng 52, link 44), trust 2 × 2, wordmark "EFITCO" 64 trên cùng hàng cuối, rồi locale + thanh toán, rồi copyright.
+- 360: newsletter xếp dọc (ảnh 98 × 123 có 2 thẻ sau, tiêu đề "Get 15% off your first order", mô tả, ô email + nút full), panel tràn mép, menu Shop / Information là accordion đóng (hàng 52, link 44), trust 2 × 2, wordmark "EFITCO" 64 trên cùng hàng cuối, rồi locale + thanh toán, rồi copyright.
 - 768: ảnh + chữ 2 cột, form dưới full; menu 2 cột mở sẵn, link cách 16; trust 4 cột; wordmark 80.
-- Menu Information: Our Story, Our Efitco, FAQs, Contact Us; ĐỀ XUẤT thêm "Shipping policy", "Refund policy" (14 §1, foundation §4; dữ liệu menu, không đổi giao diện). Mockup này có "Our Efitco".
+- Menu Information: Our story, Our Efitco, FAQs, Contact us; ĐỀ XUẤT thêm "Shipping policy", "Refund policy" (14 §1, foundation §4; dữ liệu menu, không đổi giao diện). Mockup này có "Our Efitco".
 
 ## 9. Lighthouse (sổ 09/11: SEO, A11y, BP 100; Perf desktop ≥ 98, mobile ≥ 90)
 
@@ -276,7 +276,7 @@ Accessibility (tỉ lệ tính tay: L sRGB → tuyến tính, (L1 + 0.05) / (L2 
 
 - Vùng chạm 360: card bundle cả card, link "View preset bundles" 44, nút 48, play cả poster, link sản phẩm video 76, link sản phẩm review ≥ 56, card blog cả card, hàng accordion ≥ 56, footer theo foundation. 768: thêm nút 52.
 - Hàng cuộn: `<ul aria-label tabindex="0">`; nút có tên riêng; tiến trình `aria-hidden`; nút ở đầu/cuối hàng `aria-disabled` + cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11).
-- Heading: h2 mỗi khối; h3 cho "Your Bundle", tiêu đề review, tiêu đề bài viết. Không nhảy bậc.
+- Heading: h2 mỗi khối; h3 cho "Your bundle", tiêu đề review, tiêu đề bài viết. Không nhảy bậc.
 - Không ARIA trên phần tử không role: panel bundle có `role="group"`.
 
 SEO: link mô tả đích ("View preset bundles", "Add bundle to cart", "View details" + phần ẩn, "View about us", tiêu đề bài, tên sản phẩm); ảnh nội dung có alt (sản phẩm bundle, featured, why), ảnh trang trí `alt=""`; chữ nhỏ nhất 13 (badge).

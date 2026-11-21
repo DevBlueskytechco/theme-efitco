@@ -90,8 +90,8 @@
   --space-4xl: 48px;                    /* Chuẩn: Polaris large-500. THAY 21/11 (ES1-T567): trước là 56, ngoài thang */
   --space-5xl: 64px;                    /* Chuẩn: Polaris React space 64px */
   --space-6xl: 80px;                    /* Chuẩn: Polaris React space 80px. Tầng desktop */
-  --space-7xl: 120px;                   /* padding section từ 64rem. Thiết kế: nhịp section desktop, trên lưới 4px (Polaris không nêu khoảng section storefront) */
-  /* Alias cho code theme (setting space_base × 1,2,3,4,6,8,12,30) và trang mockup cũ: KHÔNG dùng cho thành phần mới. */
+  --space-7xl: 128px;                   /* padding section từ 64rem. Chuẩn: Polaris React space 128px. THAY 21/11 lượt 2 (ES1-T567): trước là 120, ngoài thang */
+  /* Alias cho code theme (setting space_base × 1,2,3,4,6,8,12,32; code đang × 30 = 120: Cần FE) và trang mockup cũ: KHÔNG dùng cho thành phần mới. */
   --space-1: var(--space-2xs);
   --space-2: var(--space-xs);
   --space-3: var(--space-sm);
@@ -180,14 +180,14 @@
   /* Dẫn xuất (foundation.md §2): không phải token mới, chỉ là phép tính trên token.
      Lưới: Polaris không nêu lưới cột / container storefront. Chuẩn: Fluent 2 layout (12 cột, gutter đổi theo breakpoint); M3 margin 16 / 24.
      Giá trị nằm trên thang 4px. */
-  --section-gap: var(--space-4xl);              /* 48 dưới 64rem, 120 từ 64rem */
+  --section-gap: var(--space-4xl);              /* 48 dưới 64rem, 128 từ 64rem */
   --heading-gap: var(--space-xl);               /* 24 dưới 80rem, 40 từ 80rem */
   --grid-gap: var(--space-sm);                  /* 12 dưới 48rem, 16 dưới 80rem, 24 từ 80rem */
   --grid-columns: 4;                            /* 4 / 8 / 12 */
   /* Token kích thước (tầng component; KHÔNG trỏ về --space-*: Polaris không dùng space token cho width / height) */
-  --control-height: 48px;               /* nút, ô nhập: 48 dưới 80rem, 52 từ 80rem. Chuẩn: Carbon button 48; Polaris touch target 44 (sàn) */
+  --control-height: 48px;               /* nút, ô nhập, select, stepper: 48 MỌI mốc (CTO 21/11 lượt 2: bỏ mức 52 từ 80rem). Chuẩn: Carbon button 48; Polaris touch target 44 (sàn) */
   --control-height-compact: 44px;       /* 44 mọi mốc: nút small, stepper giỏ, ô tìm trong popover, tab / chip dưới 80rem (V21, V40) */
-  --tab-height-desktop: 40px;           /* tab, chip từ 80rem (chuột). Chuẩn: Carbon button 40. Thiết kế: gọn hơn control 52 */
+  --tab-height-desktop: 40px;           /* tab, chip từ 80rem (chuột). Chuẩn: Carbon button 40. Thiết kế: gọn hơn control 48 */
   --row-height: 52px;                   /* hàng danh sách: drawer menu, footer accordion, facet summary. Thiết kế: 44 + đệm 4 trên dưới */
   --round-button-size: 52px;            /* nút tròn carousel, phân trang (CTO 09/11) */
   --count-badge-size: 20px;             /* số đếm giỏ trên icon header */
@@ -229,7 +229,6 @@
     --grid-columns: 12;
     --grid-gap: var(--space-xl);
     --heading-gap: var(--space-3xl);
-    --control-height: 52px;
     --line-height-h2: 1.2222;      /* 36/44 */
     --line-height-h1: 1.1667;      /* 48/56 */
   }
@@ -379,7 +378,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Polaris Button; CTO 21/11): "Add to cart", "Try again" */
 .button {
   display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs);
-  min-height: var(--control-height); padding: 0 var(--space-2xl); /* 48 / 52 ≥ --touch-target 44; ngang luôn > 44 nhờ đệm 32 × 2 (không đặt min-inline-size: phá min-width auto của flex item) */
+  min-height: var(--control-height); padding: 0 var(--space-2xl); /* 48 mọi mốc ≥ --touch-target 44; ngang luôn > 44 nhờ đệm 32 × 2 (không đặt min-inline-size: phá min-width auto của flex item) */
   border: 1px solid transparent; border-radius: var(--radius-button);
   background: var(--color-accent); color: var(--color-accent-foreground);
   font-size: var(--font-size-base); font-weight: 600; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-body); /* 16/24 */
@@ -632,8 +631,8 @@ select.field__input[aria-expanded='true'], select.field__input.is-open { border-
 .dialog--l { --dialog-width: 1120px; }
 .dialog--m-wide { --dialog-width: 960px; } /* quick view từ 80rem (V69, mini-cart-quickview §3) */
 .dialog__close { position: absolute; inset-block-start: var(--space-sm); inset-inline-end: var(--space-sm); }
-/* Tiêu đề dialog: Sofia 800 cỡ h2 (32/40 → 36/44), Title Case (V71 / V75; chờ CTO chốt sentence case).
-   .dialog__title--caps = HOA. Thiết kế: tiêu đề kiểu display trong dialog marketing (V71 / V75) */
+/* Tiêu đề dialog: Sofia 800 cỡ h2 (32/40 → 36/44), chữ nguồn sentence case (CTO 21/11 lượt 2).
+   .dialog__title--caps = HOA bằng CSS. Bản sắc thương hiệu (CTO 21/11 lượt 2): tiêu đề kiểu display trong dialog marketing (V71 / V75) */
 .dialog__title { margin: 0 0 var(--space-md); padding-inline-end: var(--space-4xl); font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight-display); line-height: var(--line-height-h2); }
 .dialog__title--caps { text-transform: uppercase; }
 /* Icon trạng thái trong dialog/empty: tròn 72, icon 32 (V75) */

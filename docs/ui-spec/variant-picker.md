@@ -111,7 +111,7 @@ Nút "+N":
 Luồng (BE, chung PDP/quickview):
 1. Giá trị vừa bấm chuyển "đang chọn" ngay (< 100ms), legend đổi theo. Mọi option vẫn bấm được; lần bấm sau huỷ request trước (`AbortController`).
 2. Đang tải (ĐỀ XUẤT, 05 §5 phản hồi gần vùng đổi; mockup J3, 5g):
-   - Giá: khối skeleton cùng chiều cao dòng giá (28 PDP 1280 / 22 PDP 360 / 28 quickview), rộng 45%, shimmer 1.4s, tĩnh khi giảm chuyển động. Không làm nhạt giá cũ (chữ nhạt trượt AA, giá cũ dễ đọc nhầm). Badge -N%, countdown (PDP) ẩn theo cùng khối giá.
+   - Giá: khối skeleton cùng chiều cao dòng giá (28 PDP 1280 / 22 PDP 360 / 28 quickview), rộng 45%, shimmer 1.4s, tĩnh khi giảm chuyển động. Không làm nhạt giá cũ (chữ nhạt trượt AA, giá cũ dễ đọc nhầm). Badge −N%, countdown (PDP) ẩn theo cùng khối giá.
    - Dòng tồn: chấm thay bằng spinner 12 (viền `--color-border`, đỉnh foreground), chữ "Checking availability…" `--color-muted` 14. Là spinner duy nhất của trạng thái này.
    - Add to cart: giữ màu primary, nhãn, bề rộng; `aria-disabled="true"`, `cursor: progress`; bấm trong lúc chờ không làm gì. KHÔNG spinner trên nút (spinner trên nút chỉ cho "đang thêm giỏ", product.md §11 C, quickview 5d), không đổi xám (tránh nháy mỗi lần chọn).
    - `aria-busy="true"` trên vùng giá + tồn; `role="status"` ẩn đọc "Loading 120 lb…".
@@ -226,6 +226,6 @@ Lệch code hiện tại (`snippets/product-variant-picker.liquid`):
 ## Cập nhật 21/11 (ES1-T567, CTO 21/11)
 
 - Nguồn chuẩn là mockup HTML + `drafts/designer/_kit/kit.css`; Designer dựng lại bản vẽ từ mockup. Số trong spec lệch mockup thì mockup thắng.
-- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog, empty state, tab, menu giữ Title Case (chờ CTO). "Checkout" giữ một chữ (thuật ngữ content.md §4, chờ CTO).
+- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog / drawer, empty state, tab, link menu cũng sentence case (CTO 21/11 lượt 2); tên sản phẩm, collection, bài viết theo dữ liệu, tên riêng và viết tắt giữ. "Checkout" giữ một chữ (thuật ngữ, CTO 21/11 lượt 2; content.md §4).
 - Line-height theo bội 4 qua token kit: 16/24 (`--line-height-body`), 14/20 (`--line-height-sm`), 13/20 (`--line-height-label`), 18/28 (`--line-height-title`), h1 40/48 → 48/56, h3 28/36, h4 20/24. Trang không viết line-height bằng số.
 - Cần FE: `products.variant.show_fewer` = "Show fewer", `general.try_again` = "Try again" (locale đang Title Case là chỗ lệch).

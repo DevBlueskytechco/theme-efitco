@@ -2,7 +2,7 @@
 
 Một số bản cho cả design system: token (`docs/tokens.json`), component và màn DS (`drafts/designer/_kit/kit.css`, `drafts/designer/ES1-T251/foundation.html`), quy tắc (`DESIGN.md`, `docs/ui-spec/foundation.md`, `docs/design/content.md`). Lập ở ES1-T535 lượt 2 (CTO 21/11, patterns-14). Từ bản 2.0.0 nguồn chuẩn của design system là kit và mockup (CTO 21/11, ES1-T567); các bản 0.1.0–1.3.0 bên dưới là lịch sử, lập khi file thiết kế ngoài repo còn là gốc.
 
-Bản hiện tại: **2.0.0** (đề xuất, chờ CTO duyệt). Số bản ghi ở `docs/tokens.json` `_version`, đầu màn foundation.html và đầu foundation.md.
+Bản hiện tại: **2.0.0** (CTO chốt số bản 21/11 lượt 2). Số bản ghi ở `docs/tokens.json` `_version`, đầu màn foundation.html và đầu foundation.md.
 
 ## Quy tắc đánh số: major.minor.patch
 
@@ -23,7 +23,7 @@ Bản hiện tại: **2.0.0** (đề xuất, chờ CTO duyệt). Số bản ghi 
 
 Các bản trước 1.3.0 được gán số hồi tố từ `docs/design/decisions.md` và notes của từng ticket.
 
-### 2.0.0 — 21/11/2026 — ES1-T567 (đề xuất, chờ CTO duyệt số bản)
+### 2.0.0 — 21/11/2026 — ES1-T567 (CTO chốt số bản 21/11 lượt 2)
 
 CTO 21/11: mockup là nguồn chuẩn, thiết kế theo chuẩn Design System đã nạp (Polaris trước), nhãn nút sentence case. Bản major vì đổi nguồn sự thật, bỏ một token và đổi giá trị nhìn thấy trên mọi trang. Chi tiết: `drafts/designer/ES1-T567/notes.md`; quyết định: `docs/design/decisions.md` mục "CTO 21/11 — ES1-T567".
 
@@ -41,7 +41,15 @@ Sửa giá trị: `--tab-padding-inline` 28 → 24; `--band-inset` 60 → 64 (d�
 
 Tài liệu: gỡ tên file thiết kế cũ, mã node, tên text style / biến của file đó khỏi mockup và tài liệu hiện hành; chú thích nguồn theo 5 dạng (Chuẩn: Polaris … / Chuẩn: hệ khác … / CTO dd/mm / AA: n:1 / Thiết kế: …); tokens.json thêm `_source_notation`, `line_height`, `letter_spacing`, `aspect_ratio`, 6 khoá `component`; thêm `docs/design/figma-handoff.md`.
 
-Không đổi: bảng màu, 2 họ font, cỡ chữ, thang bo góc, lưới và gutter, bề rộng trang, breakpoint, chiều cao control, motion, bóng, lớp.
+Không đổi: bảng màu, 2 họ font, cỡ chữ, thang bo góc, lưới và gutter, bề rộng trang, breakpoint, motion, bóng, lớp.
+
+Bổ sung lượt 2 (CTO chốt 21/11, cùng bản 2.0.0; quyết định: `docs/design/decisions.md` mục "CTO 21/11 lượt 2 — ES1-T567"):
+- Đổi phá vỡ: heading h1–h4, tiêu đề section, dialog / drawer / popup, empty state, tab, link menu, nhãn chip lọc: Title Case → sentence case ("Browse categories", "Your cart", "Our story"). Giữ cách viết của tên thương hiệu, tên sản phẩm / collection / bài viết (dữ liệu merchant), tên riêng, từ viết tắt. Chữ HOA của display, eyebrow, nhãn nhóm, tiêu đề popup marketing do CSS, chữ nguồn sentence case.
+- Sửa giá trị: `--control-height` 48 ở mọi mốc (bỏ 52 từ 80rem; nút tròn 52 và hàng 52 giữ); `--space-7xl` 120 → 128, `--section-gap` từ 64rem = 128 (Polaris React space 128px); ngưỡng chỉ báo tải 300 → 500 ms (`loading.indicator_delay_ms`).
+- Sửa chuỗi: nút big offer "Shop the offer" → "View offer"; badge và chữ phần trăm giảm giá dùng dấu trừ U+2212 ("−24%").
+- Chốt giữ: "Checkout"; body weight 500; section dưới 64rem 48; tag bài viết trung tính; countdown big offer cỡ Compact; h1 48/56, display dưới 48rem 52/60; link tóm tắt lỗi form sàn 44 dưới 80rem. Ghi là bản sắc thương hiệu: eyebrow accent, hover và nhãn card, hình Tab / Chip, tiêu đề HOA popup marketing, nhãn nhóm HOA.
+- Không thêm, không xoá token: `:root` của kit vẫn 150 biến.
+- Tài liệu: `docs/design/content.md` §2.2 (ngoại lệ sentence case), §8.2 (khoá locale heading / dialog / tab / menu / số đếm / ký tự cho FE); sửa lỗi lặp tiền tố ở mọi dòng của `docs/ui-spec/foundation.md`; ảnh PNG mọi trang đã chụp lại.
 
 ### 1.3.0 — 21/11/2026 — ES1-T535 lượt 2 (đề xuất, chờ CTO duyệt)
 

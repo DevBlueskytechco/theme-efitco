@@ -1,6 +1,6 @@
 # Handoff: dựng lại file Figma từ mockup Efitco
 
-Cho Designer người. Lập ở ES1-T567 (CTO 21/11). Bản design system 2.0.0 (đề xuất).
+Cho Designer người. Lập ở ES1-T567 (CTO 21/11). Bản design system 2.0.0 (CTO chốt số bản 21/11 lượt 2).
 
 Quy tắc gốc: mockup HTML là NGUỒN CHUẨN. File Figma mới được dựng TỪ mockup, không theo chiều ngược lại. Khi Figma và mockup lệch nhau: mockup thắng, sửa Figma. Muốn đổi thiết kế: đề xuất trên mockup (ticket Designer), CTO chốt, kit đổi trước, Figma chép sau.
 
@@ -21,7 +21,7 @@ Không mang gì từ file Figma cũ ("Efitco Theme Final / Design System 2", khu
 - Mở file HTML tại máy bằng trình duyệt (cần mạng để tải font Google và ảnh). Đo số bằng DevTools: tab Computed cho cỡ, dòng, khoảng cách; ô `:root` cho giá trị biến.
 - 4 khổ thiết kế: 360, 768, 1280, 1920 (CTO 09/11). Breakpoint trong CSS: 48rem (768), 64rem (1024, chỉ đổi khoảng cách section và bố cục footer), 80rem (1280). Ở 1920 nội dung dừng ở 1416, lề hai bên 252.
 - Link bài viết trong mockup (`/blogs/training/<handle>`) là handle ĐÍCH sau khi DevOps đổi handle trên store dev; `docs/design/demo-data.json` (sinh tự động, không sửa tay) còn handle có tiền tố cũ nên đến khi đổi xong link không mở được trên store dev. DevOps đổi handle rồi chạy lại `ai-team/ops/export_demo_data.py`. Khi dựng lại chỉ cần chữ và ảnh của card, không cần link.
-- Ảnh PNG cạnh mỗi file HTML (`<trang>-360|768|1280|1920.png`) là ảnh chụp để so nhanh; khi PNG và HTML lệch thì HTML thắng. Ở bản 2.0.0 chỉ PNG trang chủ (ES1-T278, T279, T293) đã chụp lại; PNG các trang còn lại là bản TRƯỚC 2.0.0 (trước khi đổi line-height, section 48, sentence case, tag trung tính): chỉ dùng HTML cho các trang đó, không chồng PNG lên frame.
+- Ảnh PNG cạnh mỗi file HTML (`<trang>-360|768|1280|1920.png`) là ảnh chụp để so nhanh; khi PNG và HTML lệch thì HTML thắng. PNG của mọi trang đã chụp lại ở bản 2.0.0 (21/11).
 - Trạng thái (hover, focus, disabled, loading, error) được vẽ tĩnh trong màn DS bằng class `.is-hover`, `.is-focus`, `.is-disabled`, `.is-pending`… và thuộc tính `aria-*`: không cần rê chuột để thấy.
 
 ## 2. Thứ tự làm
@@ -70,7 +70,7 @@ Khoảng cách (kiểu Number, px). Chỉ dùng cho padding, gap (auto layout), 
 | `space/xs` | 8 | `space/4xl` | 48 |
 | `space/sm` | 12 | `space/5xl` | 64 |
 | `space/md` | 16 | `space/6xl` | 80 |
-| `space/lg` | 20 | `space/7xl` | 120 |
+| `space/lg` | 20 | `space/7xl` | 128 |
 
 Không tạo variable cho `--space-1…8` (alias của code theme). 2 và 6 là bậc nửa bước, chỉ cho gap icon.
 
@@ -132,10 +132,10 @@ Giá trị đổi theo khổ. Khổ 1920 dùng mode Desktop; chỉ khung ngoài 
 | --- | --- | --- | --- | --- | --- |
 | `layout/grid-columns` | Number | 4 | 8 | 12 | `--grid-columns` |
 | `layout/grid-gap` | Number | 12 | 16 | 24 | `--grid-gap` |
-| `layout/section-gap` | Number | 48 | 48 | 120 | `--section-gap` (đổi ở 1024) |
+| `layout/section-gap` | Number | 48 | 48 | 128 | `--section-gap` (đổi ở 1024) |
 | `layout/heading-gap` | Number | 24 | 24 | 40 | `--heading-gap` |
 | `layout/band-inset` | Number | 0 | 0 | 0 (64 ở 1920) | `--band-inset` |
-| `size/control-height` | Number | 48 | 48 | 52 | `--control-height` |
+| `size/control-height` | Number | 48 | 48 | 48 | `--control-height` (48 mọi mốc, CTO 21/11 lượt 2) |
 | `size/tab-height` | Number | 44 | 44 | 40 | `--control-height-compact` → `--tab-height-desktop` |
 | `font/size-display` | Number | 52 | 73 | 100 | `--font-size-display` |
 | `font/size-h1` | Number | 40 | 44 | 48 | `--font-size-h1` |
@@ -217,7 +217,7 @@ Tên style = tên kiểu. Dòng ghi px (Figma không nhận line-height không �
 
 - Chữ HOA: gõ thường trong layer, bật Case = Upper trong style (giống CSS `text-transform`). Không gõ tay chữ HOA.
 - Link CTA `.button--link` dùng `Heading/H3`. Tiêu đề popup marketing dùng kiểu display theo mockup marketing-popups.
-- Nhãn nút gõ sentence case ("Add to cart"). Tiêu đề trang, section, dialog, tab, menu đang Title Case (chờ CTO): chép đúng chuỗi trong mockup, không tự đổi.
+- Nhãn nút gõ sentence case ("Add to cart"). Tiêu đề trang, section, dialog / drawer, empty state, tab, link menu cũng sentence case (CTO 21/11 lượt 2); tên sản phẩm, collection, bài viết theo dữ liệu. Chữ HOA (display, eyebrow, nhãn nhóm, tiêu đề popup marketing) đặt bằng thuộc tính Case = UPPER của text style, chữ gõ vẫn sentence case. Badge giảm giá gõ dấu trừ U+2212 ("−24%"). Chép đúng chuỗi trong mockup, không tự đổi.
 
 ## 5. Effect styles, lưới
 
@@ -254,7 +254,7 @@ Mỗi dòng = một component set trong Figma, lấy từ section `h-*` của `f
 
 | Section | Component (class kit) | Variant | Size | State | Ghi chú |
 | --- | --- | --- | --- | --- | --- |
-| `h-button` | `Button` (`.button`) | Primary · Secondary · Tertiary · Link (`--link`) · On dark (`--on-dark`) | Default 48 / 52 · Small 44 · Full (`--full`) · Icon only (`--icon-only`) | Default · Hover · Focus · Active · Disabled · Loading (`aria-busy`) · Pending (`.is-pending`) | Boolean: Icon trước nhãn (`.button__icon`), Wrap (`--wrap`). Padding ngang 32 (small 16), bo 4 |
+| `h-button` | `Button` (`.button`) | Primary · Secondary · Tertiary · Link (`--link`) · On dark (`--on-dark`) | Default 48 · Small 44 · Full (`--full`) · Icon only (`--icon-only`) | Default · Hover · Focus · Active · Disabled · Loading (`aria-busy`) · Pending (`.is-pending`) | Boolean: Icon trước nhãn (`.button__icon`), Wrap (`--wrap`). Padding ngang 32 (small 16), bo 4 |
 | `h-button` | `Round button` (`.round-button`) | Previous · Next | 52 | Default · Hover · Focus · Disabled; Scheme Light, Dark | Chevron 11 × 16 |
 | `h-button` | `Close button` (`.close-button`) | — | 48 | Default · Hover · Focus | Icon close 20 |
 | `h-tabs` | `Tab` (`.tab`) | — | 44 (360, 768) · 40 (1280) | Selected · Default · Hover · Focus · Disabled | Padding ngang 24, bo 4; `Tabs` = hàng cuộn ngang, gap 8 |
@@ -267,17 +267,17 @@ Mỗi dòng = một component set trong Figma, lấy từ section `h-*` của `f
 | `h-collection-card` | `Category link` (`.category-link`) | — | Cao 56 | Default · Hover · Focus | Viền border bo 12, mũi tên 16 |
 | `h-article` | `Article card` (`.article-card`) | Có ảnh · Không ảnh (`--no-image`) | 3 / 4 | Default · Hover · Focus | Bo 16, gradient tối nửa dưới, tag trung tính góc trên |
 | `h-article` | `Card row` + `Carousel nav` + `Carousel progress` | — | — | Đầu hàng (Previous disabled) · Giữa · Cuối | Thanh 4, bo pill; Scheme Light, Dark |
-| `h-form` | `Field` (`.field`, `.field__input`) | Text · Textarea · Select · Compact 44 | 48 / 52 · 44 | Default · Hover · Focus · Filled · Error (`aria-invalid`) · Disabled | Label trên, hint / lỗi dưới (icon 16) |
+| `h-form` | `Field` (`.field`, `.field__input`) | Text · Textarea · Select · Compact 44 | 48 · 44 | Default · Hover · Focus · Filled · Error (`aria-invalid`) · Disabled | Label trên, hint / lỗi dưới (icon 16) |
 | `h-form` | `Choice` (`.choice`) | Checkbox · Radio | Ô 20, hàng 44 | Unchecked · Checked · Focus · Disabled | |
 | `h-form` | `Form message` (`.form-message`) | Error · Warning · Success | — | Inline (`--inline`) · Summary (danh sách link) | |
-| `h-input-group` | `Input group` (`.input-group`) | Search (có chữ, nút xoá) · Email attached · Password attached | 48 / 52 | Default · Focus · Error; Scheme Light, On dark | Dưới 768: nút chỉ icon hoặc xếp dọc (`--stack-mobile`) |
+| `h-input-group` | `Input group` (`.input-group`) | Search (có chữ, nút xoá) · Email attached · Password attached | 48 | Default · Focus · Error; Scheme Light, On dark | Dưới 768: nút chỉ icon hoặc xếp dọc (`--stack-mobile`) |
 | `h-listbox` | `Listbox` (`.listbox`) | — | Hàng 44 | Default · Hover · Selected · Focus · Disabled | Bo 12, Shadow/Raised |
 | `h-acc` | `Accordion` (`.accordion`) | Default · Facet (xem `h-facets`) | Hàng ≥ 56 | Closed · Open · Hover · Focus | Icon + / − 24 bên trái |
 | `h-facets` | `Facet group` (`.facet`) | List · Swatch (`.facet-swatch`) · Price range | Hàng 52 | Closed · Open · "N selected"; swatch Selected · Disabled | |
 | `h-selectable-option` | `Option card` (`.option-card`) | Row · Tile (`--tile`) | — | Default · Hover · Focus · Selected (`.is-selected`) · Disabled | Chọn = viền accent 2 + check tròn 24 |
 | `h-variant-picker` | `Variant pill` (`.variant-pill`) | — | ≥ 56 × 44 | Default · Hover · Focus · Selected · Sold out · Unavailable | Bo pill |
 | `h-variant-picker` | `Variant swatch` (`.variant-swatch`) | — | 44 × 44 | Default · Focus · Selected · Sold out · Unavailable | `Variant more` "+N"; khối Đang tải, Lỗi tải, Dòng tồn (`.stock-line` low / out) |
-| `h-quantity` | `Quantity` (`.quantity`) | — | Default 48 / 52 · Compact 44 | Default · Focus · Min (− disabled) · Max (+ disabled) | Số bảng (tabular) |
+| `h-quantity` | `Quantity` (`.quantity`) | — | Default 48 · Compact 44 | Default · Focus · Min (− disabled) · Max (+ disabled) | Số bảng (tabular) |
 | `h-price-rating` | `Price` (`.price`) | Regular · Sale + giá gạch · From | Default · Large · XL | — | |
 | `h-price-rating` | `Rating` (`.rating`) | Sao + số · Badge trên card | — | — | Sao 14 × 13 |
 | `h-data-table` | `Data table` (`.data-table`) | Default · Striped · Stack (dưới 768) · Has current | — | — | Bo 12; bảng rộng cuộn ngang trong khung |
@@ -288,7 +288,7 @@ Mỗi dòng = một component set trong Figma, lấy từ section `h-*` của `f
 | `h-drawer` | `Drawer` (`.drawer`) | Start (menu, filter) · End (cart, search) · Wide 480 (1280) | — | Mở | Header 72, thân cuộn, chân dính; `Scrim` |
 | `h-dialog` | `Dialog` (`.dialog`) | S · M · M wide 960 · L · Bottom sheet (dưới 768) | — | Mở | Bo 20; padding 32 (48 từ 1280); tiêu đề thường hoặc HOA (`--caps`, chỉ popup marketing) |
 | `h-state` | `Empty state` (`.empty-state`) | In page · Framed · Compact | — | — | `Status icon` tròn 72 |
-| `h-state` | `Skeleton` (`.skeleton`) · `Spinner` (`.spinner`) | Line · Media · Card · Spinner 20 / xs | — | — | Hiện sau 300 ms |
+| `h-state` | `Skeleton` (`.skeleton`) · `Spinner` (`.spinner`) | Line · Media · Card · Spinner 20 / xs | — | — | Hiện sau 500 ms |
 | `h-alert` | `Alert` (`.alert`) | Info · Success · Warning · Error | Section · Page (`--page`) | Có nút đóng · Có action | Error không đóng được |
 | `h-rte` | `Rich text` (`.rte`) | — | Cột đọc 720 | — | h2–h6, đoạn 16 / 28, list, blockquote, bảng, ảnh |
 | `h-pagination` | `Pagination` (`.pagination`) | Số trang · Previous / Next | Nút tròn 52 | Trang đầu · Giữa · Trang cuối · Current | |
@@ -381,13 +381,14 @@ Component
 - [ ] Vùng chạm 44 cho 6 nhóm: link menu chính, submit form, cart, hamburger, đóng modal / drawer, chọn variant.
 - [ ] Disabled dùng cặp màu, không dùng opacity. Focus có vòng 2px (accent trên nền sáng, trắng trên nền tối).
 - [ ] Tag bài viết trung tính; accent chỉ ở nút chính, eyebrow, phần nhấn heading, warning.
-- [ ] Nhãn nút sentence case; chuỗi chép đúng mockup.
+- [ ] Nhãn nút, heading, tiêu đề dialog / drawer, tab, link menu sentence case; chuỗi chép đúng mockup.
+- [ ] Control (button, input, select, stepper) cao 48 ở cả 4 khổ; nút tròn và hàng danh sách 52.
 
 Trang
 - [ ] Mỗi template có đủ 4 frame 360 / 768 / 1280 / 1920; thứ tự khối và bố cục khớp mockup.
 - [ ] Chồng frame lên ảnh chụp mockup cùng khổ (opacity 50%): khối không lệch quá 4px theo chiều dọc ở cuối trang, 1px trong từng khối.
 - [ ] Lưới: 4 / 8 / 12 cột, gutter 12 / 16 / 24, lề 20; nội dung 1416 ở 1920; dải rộng 1792 ở 1920.
-- [ ] Khoảng section 48 (360, 768) và 120 (1280, 1920).
+- [ ] Khoảng section 48 (360, 768) và 128 (1280, 1920).
 - [ ] Tỉ lệ ảnh thuộc bộ có tên; ảnh sản phẩm contain trên cream, ảnh đời sống cover.
 - [ ] Trang chỉ dùng instance, không detach; trạng thái rỗng / lỗi có frame riêng.
 
@@ -395,7 +396,10 @@ Khi phát hiện mockup có lỗi (không phải Figma lệch): không sửa tro
 
 ## 11. Còn mở ảnh hưởng tới file Figma
 
-Các mục chờ CTO ở `docs/design/decisions.md` "Chưa chốt" (ES1-T567). Dựng theo mockup hiện tại; khi CTO chốt khác, mockup đổi trước:
-- Heading, tiêu đề dialog, tab, menu sang sentence case (hiện giữ Title Case).
-- Control 52 từ 1280 về 48; padding section desktop 120 → 128 / 112; body weight 500.
+CTO đã chốt 21/11 lượt 2 (`docs/design/decisions.md` mục "CTO 21/11 lượt 2 — ES1-T567"), mockup đã đổi theo:
+- Heading, tiêu đề dialog / drawer, empty state, tab, link menu: sentence case.
+- Control 48 ở mọi mốc (bỏ 52 từ 1280); padding section desktop 128; body weight 500 giữ (bản sắc thương hiệu).
+- Chỉ báo tải hiện sau 500 ms; badge giảm giá "−24%" (U+2212); nút big offer "View offer".
 - Số bản 2.0.0.
+
+Còn mở (không chặn việc dựng lại): component riêng trang chủ chưa lên kit (§7.1); thang kích thước `--size-*` và token tỉ lệ ảnh chưa có trong kit (`drafts/designer/ES1-T567/notes.md` mục 8.3).

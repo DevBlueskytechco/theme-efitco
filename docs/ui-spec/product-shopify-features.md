@@ -12,7 +12,7 @@ KHÔNG CHẮC: (1) demo-data không có quantity rule, volume pricing, selling p
 | 4 | A20 pickup | product §5: 1 dòng + link; code `<details>` | §7: dòng trạng thái + dialog danh sách cửa hàng (drawer phải ≥ 768, sheet < 768), 4 trạng thái | TE-4 AC4; 15 §2 #7; 10 §9 #804 |
 | 5 | A20, A21 unit price | product §4 1 dòng, cart §1 anatomy; không mockup | §3.1: cùng một dòng ở PDP, card, QV, mini cart, cart, có mockup | TE-3 AC4, TE-4 AC2; 10 §8 #817; edge_cases "Unit price" |
 | 6 | A20 quantity rules + volume pricing (B2B) | không có ở spec nào | §5: dòng quy tắc, bảng giá theo số lượng, lỗi vi phạm, giới hạn đã đủ; PDP, QV, cart, mini cart | CTO 10/11 (4); ticket |
-| 7 | A20 sản phẩm số | product §11 1 câu | §8: ẩn ship, pickup, mục "Fast Shipping"; không thêm câu mới | TE-4 AC9 |
+| 7 | A20 sản phẩm số | product §11 1 câu | §8: ẩn ship, pickup, mục "Fast shipping"; không thêm câu mới | TE-4 AC9 |
 | 8 | A21 card theo variant + combined listing | foundation §9 không có | §9: nhãn biến thể, swatch chọn sẵn, link `?variant=`; combined listing ở card, QV, PDP | TE-3 AC8; sổ 10/11 (2048) |
 
 Không đổi spec khác; điểm cần sửa ở product.md, foundation.md, cart.md, mini-cart-quickview.md ghi ở §15.
@@ -105,7 +105,7 @@ Anatomy (fieldset `product-selling-plans`, legend "Purchase options" 14/600):
 
 Hành vi:
 - Mặc định chọn `product.selected_selling_plan`, không có thì "One-time purchase", `requires_selling_plan` thì plan đầu của nhóm đầu (code có).
-- ĐỀ XUẤT giá chính (hàng giá §3, sticky bar) đổi theo plan đang chọn: giá = `allocation.price`, giá gạch = `variant.price` khi thấp hơn, badge -N% tính lại. Không đổi thì người mua thấy 2 giá khác nhau cho cùng lựa chọn (10 §8 không lặp khuyến mãi, 05 §5 phản hồi). Đổi tại chỗ, không fetch (giá đã có trong `data-*` của từng thẻ).
+- ĐỀ XUẤT giá chính (hàng giá §3, sticky bar) đổi theo plan đang chọn: giá = `allocation.price`, giá gạch = `variant.price` khi thấp hơn, badge −N% tính lại. Không đổi thì người mua thấy 2 giá khác nhau cho cùng lựa chọn (10 §8 không lặp khuyến mãi, 05 §5 phản hồi). Đổi tại chỗ, không fetch (giá đã có trong `data-*` của từng thẻ).
 - Đổi biến thể: partial `product-selling-plans` trả lại giá theo biến thể mới, giữ plan đang chọn theo `plan.id` (BE).
 - Nút vẫn "Add to cart" (CTO 21/11), không đổi thành "Subscribe".
 - Form gửi: radio "One-time purchase" mang `name="selling_plan" value=""`; radio nhóm không mang `name`; select tần suất của nhóm mang `name="selling_plan"` và chỉ bật khi radio nhóm của nó được chọn (JS đổi `disabled`). Nhóm chỉ 1 plan: radio nhóm mang thẳng `name="selling_plan" value="{plan.id}"`.
@@ -115,7 +115,7 @@ Trạng thái (mockup F2):
 | # | Trạng thái | Thiết kế |
 | --- | --- | --- |
 | S1 | One-time chọn (mặc định) | thẻ 1 viền 2px; thẻ nhóm đóng, hiện "from $40.50" 14 muted + badge Save 10% |
-| S2 | Subscription chọn | thẻ nhóm mở: select tần suất, mô tả; giá chính $40.50 + gạch $45.00 + badge -10% |
+| S2 | Subscription chọn | thẻ nhóm mở: select tần suất, mô tả; giá chính $40.50 + gạch $45.00 + badge −10% |
 | S3 | Chỉ bán subscription | không thẻ One-time; câu "This product is sold as a subscription." 14 muted dưới legend |
 | S4 | Đổi biến thể đang tải | giá trên các thẻ skeleton (cao 22), radio vẫn bấm được |
 | — | Không có selling plan | không in fieldset |
@@ -182,7 +182,7 @@ Lỗi (hiện khi rời trường và khi bấm Add to cart; foundation §12):
 
 Bấm Add to cart khi có lỗi: không gửi. Fieldset người nhận là form từ 2 trường nên dù 1 hay nhiều trường lỗi: focus chuyển tới `product-form-error` (khối tóm tắt `.form-message--error`, `role="alert"`, `tabindex="-1"`) ghi "Check 1 field" / "Check {n} fields" + danh sách link tới từng trường lỗi; bấm link thì focus vào ô đó. Không có nhánh "1 trường lỗi thì focus về ô" (điều kiện tính theo số trường của form, foundation §12). Thay "focus trường lỗi đầu" (foundation §12, sổ 21/11 components-10). Trường lỗi viền sale 2px + `aria-invalid` + `aria-describedby` tới câu lỗi.
 
-Sản phẩm gift card không cần ship (`requires_shipping` false): ẩn ghi chú ship, pickup, mục "Fast Shipping" như §8.
+Sản phẩm gift card không cần ship (`requires_shipping` false): ẩn ghi chú ship, pickup, mục "Fast shipping" như §8.
 
 Mini cart, cart page (F9): dòng gift card hiện "To: Alex Tran (alex@example.com)" · "Sends on Nov 24, 2026" · lời nhắn 1 dòng "…" (14 muted), thay vì in thô 4 thuộc tính (code in mọi property không bắt đầu `_`). ĐỀ XUẤT, 12 §1 (thông tin dòng hàng đầy đủ, gọn).
 
@@ -210,7 +210,7 @@ Theo 15 §2 #7: ≥ 768 drawer phải (foundation §15: 420 ở 768, 480 từ 80
 ## 8. Sản phẩm số (F6)
 
 `current_variant.requires_shipping == false` (edge_cases "Sản phẩm số": Operating system iOS / Fire OS / FreeBSD, $343.00):
-- Ẩn: câu "Shipping calculated at checkout." (giữ câu thuế), khối pickup, mục "Fast Shipping" trong hàng cam kết (còn 2 mục: 1 Year Warranty, 90 Day Money Back; 768 và ≥ 1280 chia 2 cột).
+- Ẩn: câu "Shipping calculated at checkout." (giữ câu thuế), khối pickup, mục "Fast shipping" trong hàng cam kết (còn 2 mục: 1 year warranty, 90 day money back; 768 và ≥ 1280 chia 2 cột).
 - Giữ: bộ chọn option, số lượng (ẩn nếu merchant tắt "Show quantity selector", product §12), Buy it now.
 - Không thêm câu mới kiểu "Digital delivery" (AC9 chỉ yêu cầu ẩn; không có nguồn nội dung).
 - Giỏ: freeship bar vẫn tính theo tổng giỏ (code), không đổi.
@@ -260,7 +260,7 @@ Giữ setting có sẵn: product-form "Show dynamic checkout buttons" (true). Li
 - `cart.quantity_rule_short` "Min {{ min }} · Increments of {{ increment }}", `cart.volume_pricing_applied` "Volume pricing applied", `cart.gift_card_to` "To: {{ name }} ({{ email }})", `cart.gift_card_send_on` "Sends on {{ date }}"
 - `products.product.opens_other_product` ", opens another page" (chữ ẩn combined listing)
 
-Copy American English, sentence case cho chữ thân; nhãn nút và link dạng nút cũng sentence case, mở bằng động từ, không dấu câu (CTO 21/11, ES1-T567; Chuẩn: Polaris Button). Tiêu đề section, dialog giữ Title Case (chờ CTO).
+Copy American English, sentence case cho chữ thân; nhãn nút và link dạng nút cũng sentence case, mở bằng động từ, không dấu câu (CTO 21/11, ES1-T567; Chuẩn: Polaris Button). Tiêu đề section, dialog cũng sentence case (CTO 21/11 lượt 2).
 
 ## 14. Accessibility và Lighthouse
 
@@ -318,7 +318,7 @@ Lighthouse (SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90):
 | Quantity rules, volume | input number `min=1` | `min/max/step` từ `quantity_rule`, label in cart, bảng volume, dòng quy tắc, lỗi; giỏ: dòng rút gọn | stepper theo bước, bậc hiện hành, kiểm khi rời ô/submit, Q3 |
 | Gift card | trường có sẵn, `:has(:checked)` | bố cục 2 cột, optional, lỗi, gợi ý mới; giỏ: thuộc tính gọn | kiểm trường, đếm ký tự, `__shopify_offset` (có) |
 | Pickup | partial `product-pickup` + `<details>` | dòng icon, nút, `<dialog>` drawer/sheet, `<details>` cho không JS | mở/đóng dialog, focus |
-| Sản phẩm số | `requires_shipping` ở product-info, pickup | ẩn "Fast Shipping" | — |
+| Sản phẩm số | `requires_shipping` ở product-info, pickup | ẩn "Fast shipping" | — |
 | Card variant | `product-card` param `variant` | dòng `variant.title`, tên link | — |
 | Combined listing | — | `data-product-url`, chữ ẩn | PDP điều hướng; QV tải lại sản phẩm con |
 
@@ -333,7 +333,7 @@ Tách ticket theo `.claude/rules/fe-be-boundary.md`: FE trước (markup, `data-
 ## Cập nhật 21/11 (ES1-T567, CTO 21/11)
 
 - Nguồn chuẩn là mockup HTML + `drafts/designer/_kit/kit.css`; Designer dựng lại bản vẽ từ mockup. Số trong spec lệch mockup thì mockup thắng.
-- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog, empty state, tab, menu giữ Title Case (chờ CTO). "Checkout" giữ một chữ (thuật ngữ content.md §4, chờ CTO).
+- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog / drawer, empty state, tab, link menu cũng sentence case (CTO 21/11 lượt 2); tên sản phẩm, collection, bài viết theo dữ liệu, tên riêng và viết tắt giữ. "Checkout" giữ một chữ (thuật ngữ, CTO 21/11 lượt 2; content.md §4).
 - Line-height theo bội 4 qua token kit: 16/24 (`--line-height-body`), 14/20 (`--line-height-sm`), 13/20 (`--line-height-label`), 18/28 (`--line-height-title`), h1 40/48 → 48/56, h3 28/36, h4 20/24. Trang không viết line-height bằng số.
 - Dòng installments, quy tắc số lượng, pickup, meta dòng giỏ: 14/20 (trước 14/22); tên plan, giá plan 16/24 (trước 16/22); icon dòng giỏ 16 lệch trên 2 (`--space-050`); icon pickup 20 không lệch.
 - Cần FE: chừa `min-height` 20 cho `shopify-payment-terms`; chuỗi "Add to cart", "Buy it now", "View details" trong locale.

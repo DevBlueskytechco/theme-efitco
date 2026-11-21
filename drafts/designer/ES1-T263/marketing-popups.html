@@ -38,7 +38,7 @@
   .popup-stage > .dialog { max-height: calc(100% - var(--space-7)); }
   @media (max-width: 47.99rem) { .popup-stage > .dialog { max-height: 88%; } }
 
-  /* Chữ chung của popup. Thiết kế: tiêu đề kiểu display trong dialog marketing (V71 / V75): Sofia 700, 32/40 → 36/44, −0.02em, uppercase */
+  /* Chữ chung của popup. Bản sắc thương hiệu (CTO 21/11 lượt 2): tiêu đề kiểu display HOA trong dialog marketing, chữ nguồn sentence case: Sofia 700, 32/40 → 36/44, −0.02em, uppercase */
   .popup-title { margin: 0; padding-inline-end: calc(var(--space-1) * 14); font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight); line-height: var(--line-height-h2); letter-spacing: var(--letter-spacing-heading); text-transform: uppercase; }
   .popup-title .accent { color: var(--color-accent); }
   .popup-text { color: var(--color-muted); font-weight: 500; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-body); } /* Inter 500 16/24 */
@@ -126,7 +126,7 @@
   .offer-product__media .product-card__placeholder svg { width: 48%; }
   .offer-product__title { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); line-height: var(--line-height-h3); letter-spacing: var(--letter-spacing-heading); }
   .offer-product__info { display: grid; gap: var(--space-2); }
-  /* Hàng giá: giá sale 16/500 đỏ · giá gạch 14/500 · badge -24% 28, cách 8 */
+  /* Hàng giá: giá sale 16/500 đỏ · giá gạch 14/500 · badge −24% 28, cách 8 */
   .offer-product__price { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
   .offer-product__price .price__compare { font-weight: 500; }
   /* Đếm ngược: dùng thẳng kit .sale-countdown.sale-countdown--compact (countdown.md §2: big offer Compact mọi mốc, CTO 11/11); trang không định nghĩa lại */
@@ -197,7 +197,7 @@
   .bz-bar__variant { display: none; color: var(--color-muted); }
   .buy-bar__info .price { display: flex; gap: var(--space-2); align-items: baseline; margin: 0; font-weight: 500; }
   .buy-bar__info .price__compare { display: none; }
-  .bz-qty { display: none; } /* kit .quantity (V38): 48/52 theo --control-height */
+  .bz-qty { display: none; } /* kit .quantity (V38): 48 mọi mốc theo --control-height */
   .bz-qty output { display: grid; place-items: center; }
   .bz-panel { display: none; z-index: 4; inset-block-start: calc(var(--header-height) + var(--space-5)); inset-inline-end: var(--space-6); width: 340px; gap: var(--space-4); padding: var(--space-5); border-radius: var(--radius-panel); background: var(--color-background-panel); color: var(--color-background-dark-foreground); }
   .bz-panel h4 { margin: 0; font-size: var(--font-size-lg); font-weight: 700; }
@@ -223,7 +223,7 @@
     .bz-consent { padding-inline: var(--space-6); }
   }
   @media (min-width: 64rem) {
-  .bz-qty { display: none; } /* kit .quantity (V38): 48/52 theo --control-height */
+  .bz-qty { display: none; } /* kit .quantity (V38): 48 mọi mốc theo --control-height */
   .bz-qty output { display: grid; place-items: center; }
     .bz-cart-bar { display: none; }
     .bz-panel { display: grid; }
@@ -263,7 +263,7 @@
         <li><a class="site-header__link" href="#">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#">Sale</a></li>
-        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Our story</a></li>
         <li><a class="site-header__link" href="#">Blog</a></li>
         <li><a class="site-header__link" href="#">Contact</a></li>
         <li><a class="site-header__link" href="#">Help</a></li>
@@ -280,13 +280,13 @@
 <main id="main" class="container">
   <div class="sheet-intro">
     <p class="eyebrow">ES1-T263 · Overlay · Round 3b</p>
-    <h1>Marketing Popups</h1>
+    <h1>Marketing popups</h1>
     <p>Newsletter popup, before you leave popup and big offer popup over the round 3 home page (dark header bar, rounded hero card below it). All three are on by default. None of them opens while the page loads: newsletter waits for time and scroll, before you leave waits for exit intent (mouse on desktop, fast scroll up on mobile), big offer opens only when the shopper hovers or taps the offer button. Only one popup shows at a time: the next one waits until the shopper closes the current one.</p>
   </div>
 
   <!-- ===== 1. Hàng đợi: popup 1 hiện → đóng → popup 2 hiện (vòng 3b) ===== -->
   <section class="demo-block" aria-labelledby="b1">
-    <h2 id="b1">1. One Popup At A Time</h2>
+    <h2 id="b1">1. One popup at a time</h2>
     <p class="demo-note">Chuỗi mẫu trên trang chủ, giỏ 2 món: newsletter hiện trước (đủ 10 s và cuộn 50%) → người mua đóng → nghỉ 3 s, không popup nào, nút "Big offer" vẫn ở góc → lần rời trang kế tiếp mở before you leave. Thứ tự ưu tiên khi cùng đủ điều kiện: before you leave (1) &gt; newsletter (2). Mỗi popup tự mở tối đa 1 lần mỗi phiên. Nút "Big offer" không phải popup, không vào hàng đợi; thẻ big offer người mua mở thì chiếm lớp, popup tự mở chờ.</p>
     <ol class="queue" aria-label="Popup queue example">
       <li class="queue__step queue__step--popup"><span class="queue__num" aria-hidden="true">1</span><div><p class="queue__title">Newsletter opens</p><p class="queue__text">10 s on the page and 50% scrolled. Marked as shown for this session.</p></div></li>
@@ -296,20 +296,20 @@
     </ol>
 
     <p class="demo-label">Bước 1 · Popup 1: newsletter</p>
-    <p class="demo-note">Mở sau 10 s VÀ cuộn 50% trang (setting). Mobile: bottom sheet không ảnh, ẩn đoạn mô tả, cao ≤ 60% màn. Từ 48rem: dialog 720, ảnh trái 264 / 288. Chữ và cỡ: tiêu đề Sofia 700 36/44 HOA (Thiết kế: kiểu display trong dialog marketing, V71 / V75), mô tả Inter 500 16/24, nút "Get 15% off" + icon gửi. Nút "Big offer" nằm dưới scrim, không bấm được khi popup mở.</p>
+    <p class="demo-note">Mở sau 10 s VÀ cuộn 50% trang (setting). Mobile: bottom sheet không ảnh, ẩn đoạn mô tả, cao ≤ 60% màn. Từ 48rem: dialog 720, ảnh trái 264 / 288. Chữ và cỡ: tiêu đề Sofia 700 36/44 HOA do CSS, chữ nguồn sentence case (bản sắc thương hiệu, CTO 21/11 lượt 2), mô tả Inter 500 16/24, nút "Get 15% off" + icon gửi. Nút "Big offer" nằm dưới scrim, không bấm được khi popup mở.</p>
     <div class="popup-stage" role="group" aria-label="Step 1: newsletter popup over the home page">
       <div class="stage-page" inert>
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
-          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
           <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="stage-hero">
           <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
-          <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
+          <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level up<br> your fitness</p></div>
         </div>
-        <div class="teaser offer-teaser"><span class="teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">-24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
+        <div class="teaser offer-teaser"><span class="teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">−24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
       </div>
       <div class="scrim"></div>
       <div class="dialog nl" role="dialog" aria-modal="true" aria-labelledby="nl-title" aria-describedby="nl-text">
@@ -318,7 +318,7 @@
           <div class="nl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="Athlete in pink training set stretching before a workout" width="600" height="800"></div>
           <div class="nl__body">
             <div class="popup-stack">
-              <h2 class="popup-title" id="nl-title"><span class="accent">Get 15% Off</span> Your First Order</h2>
+              <h2 class="popup-title" id="nl-title"><span class="accent">Get 15% off</span> your first order</h2>
               <p class="popup-text nl__text" id="nl-text">Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
             </div>
             <form class="nl__form" action="#" novalidate>
@@ -342,11 +342,11 @@
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
-          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
           <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="stage-hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080"></div>
-        <div class="teaser offer-teaser"><span class="teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">-24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
+        <div class="teaser offer-teaser"><span class="teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">−24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
       </div>
     </div>
 
@@ -361,16 +361,16 @@
         </div></div>
         <div class="stage-hero">
           <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
-          <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
+          <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level up<br> your fitness</p></div>
         </div>
-        <div class="teaser offer-teaser"><span class="teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">-24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
+        <div class="teaser offer-teaser"><span class="teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">−24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
       </div>
       <div class="scrim"></div>
       <div class="dialog byl" role="dialog" aria-modal="true" aria-labelledby="byl-title" aria-describedby="byl-text">
         <button class="close-button dialog__close" type="button" aria-label="Close and keep shopping"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         <div class="byl__head">
-          <p class="eyebrow">Before You Go</p>
-          <h2 class="popup-title" id="byl-title">Your Cart Is Saved</h2>
+          <p class="eyebrow">Before you go</p>
+          <h2 class="popup-title" id="byl-title">Your cart is saved</h2>
           <p class="popup-text byl__text" id="byl-text">Your 2 items are still in your cart. Check out in a few steps.</p>
         </div>
         <ul class="byl__lines" aria-label="Items in your cart">
@@ -397,7 +397,7 @@
 
   <!-- ===== 2. Before you leave: giỏ rỗng, có mã ===== -->
   <section class="demo-block" aria-labelledby="b3">
-    <h2 id="b3">2. Before You Leave: Empty Cart With Code</h2>
+    <h2 id="b3">2. Before you leave: empty cart with code</h2>
     <p class="demo-note">Chỉ hiện khi merchant nhập mã ưu đãi. Giỏ rỗng và không có mã: không mở popup. Người mua đã đăng ký newsletter trong phiên (đã có mã 15%): không dùng biến thể này. KHÔNG CHẮC: demo-data không có mã giảm giá, WELCOME15 là mã mẫu (ES1-T273).</p>
     <div class="popup-stage" role="group" aria-label="Before you leave popup with discount code">
       <div class="stage-page" inert>
@@ -408,15 +408,15 @@
         </div></div>
         <div class="stage-hero">
           <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
-          <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
+          <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level up<br> your fitness</p></div>
         </div>
       </div>
       <div class="scrim"></div>
       <div class="dialog byl" role="dialog" aria-modal="true" aria-labelledby="byl2-title" aria-describedby="byl2-text">
         <button class="close-button dialog__close" type="button" aria-label="Close discount popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         <div class="byl__head">
-          <p class="eyebrow">Before You Go</p>
-          <h2 class="popup-title" id="byl2-title"><span class="accent">Take 15% Off</span> Your First Order</h2>
+          <p class="eyebrow">Before you go</p>
+          <h2 class="popup-title" id="byl2-title"><span class="accent">Take 15% off</span> your first order</h2>
           <p class="popup-text" id="byl2-text">Use this code at checkout on your first order.</p>
         </div>
         <div class="code">
@@ -434,7 +434,7 @@
 
   <!-- ===== 3. Big offer ===== -->
   <section class="demo-block" aria-labelledby="b4">
-    <h2 id="b4">3. Big Offer Popup</h2>
+    <h2 id="b4">3. Big offer popup</h2>
     <p class="demo-note">CTO chốt 10/11: nút "Big offer" nổi góc dưới trái mở thẻ deal sản phẩm giảm giá; nút chỉ hiện khi sản phẩm còn hàng, có giá gạch, chưa hết giờ, và sau khi cuộn 25% (không có lúc tải trang). Nút không phải popup, không vào hàng đợi. Desktop có chuột: rê vào 150 ms mở thẻ ưu đãi không modal, rời chuột 300 ms mới đóng; bấm/Enter cũng mở. Mobile, tablet cảm ứng: chạm mở bottom sheet. Thẻ đang mở chiếm lớp: popup tự mở phải chờ thẻ đóng. Audit 10/11 (ES1-T290): không có nút ở trang sản phẩm (mọi mốc) và cart; trang chủ 360 nút nằm trên thanh bundle (mục 5). Hàng giá và thanh đếm ngược dùng cùng số đo với khối mua trang sản phẩm (sản phẩm demo Ativafit Lava bản featured, $379.99 / $499.99).</p>
     <p class="demo-label">Đóng (teaser)</p>
     <div class="popup-stage popup-stage--short" role="group" aria-label="Big offer button closed">
@@ -447,7 +447,7 @@
         <div class="stage-hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080"></div>
       </div>
       <div class="teaser offer-teaser">
-        <button class="teaser__open" type="button" aria-expanded="false" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">-24%</span></button>
+        <button class="teaser__open" type="button" aria-expanded="false" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">−24%</span></button>
         <button class="teaser__close" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
       </div>
     </div>
@@ -457,22 +457,22 @@
         <div class="site-header"><div class="site-header__inner">
           <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
           <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
-          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+          <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
           <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div>
         </div></div>
         <div class="stage-hero">
           <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
-          <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
+          <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level up<br> your fitness</p></div>
         </div>
       </div>
       <div class="teaser offer-teaser">
-        <button class="teaser__open is-hover" type="button" aria-expanded="true" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">-24%</span></button>
+        <button class="teaser__open is-hover" type="button" aria-expanded="true" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">−24%</span></button>
         <button class="teaser__close" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
       </div>
       <div class="scrim offer-scrim"></div>
       <div class="offer-card" id="offer-card" role="dialog" aria-labelledby="offer-title">
         <div class="offer-card__head">
-          <p class="eyebrow">Big Offer</p>
+          <p class="eyebrow">Big offer</p>
           <button class="close-button" type="button" aria-label="Close big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         </div>
         <div class="offer-product">
@@ -481,12 +481,12 @@
             <h2 class="offer-product__title" id="offer-title">Ativafit Lava 66 lb Adjustable</h2>
             <div class="offer-product__price">
               <p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><span class="price__compare">$499.99</span></p>
-              <span class="badge badge--sale">-24%<span class="visually-hidden"> off</span></span>
+              <span class="badge badge--sale">−24%<span class="visually-hidden"> off</span></span>
             </div>
           </div>
         </div>
         <div class="sale-countdown sale-countdown--compact" role="timer"><span class="sale-countdown__label" aria-hidden="true">Sale ends in</span><span class="sale-countdown__units" aria-hidden="true"><span class="sale-countdown__unit">22</span><span class="sale-countdown__unit">36</span><span class="sale-countdown__unit">28</span></span><span class="visually-hidden">Sale ends on <time datetime="2026-11-11T23:59:00-05:00">November 11, 2026 at 11:59 PM EST</time></span></div>
-        <a class="button button--full" href="#">Shop the offer</a>
+        <a class="button button--full" href="#">View offer</a>
       </div>
     </div>
   </section>
@@ -537,7 +537,7 @@
         <div class="state-card" role="status">
           <button class="close-button" type="button" aria-label="Close newsletter popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
           <span class="status-icon status-icon--success"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
-          <h3 class="popup-title">You're On The List</h3>
+          <h3 class="popup-title">You're on the list</h3>
           <p class="popup-text">Thanks for subscribing. Your 15% code is on its way to mike.ross@gmail.com.</p>
           <button class="button button--full" type="button">Continue shopping</button>
         </div>
@@ -547,7 +547,7 @@
         <div class="state-card" role="status">
           <button class="close-button" type="button" aria-label="Close newsletter popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
           <span class="status-icon"><svg aria-hidden="true"><use href="#i-info"/></svg></span>
-          <h3 class="popup-title">You're Already Subscribed</h3>
+          <h3 class="popup-title">You're already subscribed</h3>
           <p class="popup-text">This email is already on our list. Look for your 15% code in your inbox.</p>
           <button class="button button--full" type="button">Continue shopping</button>
         </div>
@@ -627,7 +627,7 @@
               <h3 class="offer-product__title">Ativafit Lava 66 lb Adjustable</h3>
               <div class="offer-product__price">
                 <p class="price"><span class="price__sale">$379.99</span><span class="price__compare">$499.99</span></p>
-                <span class="badge badge--sale">-24%</span>
+                <span class="badge badge--sale">−24%</span>
               </div>
             </div>
           </div>
@@ -642,11 +642,11 @@
               <h3 class="offer-product__title">Ativafit Lava 66 lb Adjustable</h3>
               <div class="offer-product__price">
                 <p class="price"><span class="price__sale">$379.99</span><span class="price__compare">$499.99</span></p>
-                <span class="badge badge--sale">-24%</span>
+                <span class="badge badge--sale">−24%</span>
               </div>
             </div>
           </div>
-          <a class="button button--full" href="#">Shop the offer</a>
+          <a class="button button--full" href="#">View offer</a>
         </div>
       </div>
       <div>
@@ -668,7 +668,7 @@
 
   <!-- ===== 5. Vùng đáy màn hình (ES1-T290, docs/ui-spec/layers.md) ===== -->
   <section class="demo-block" aria-labelledby="b6">
-    <h2 id="b6">5. Bottom Of The Screen</h2>
+    <h2 id="b6">5. Bottom of the screen</h2>
     <p class="demo-note">Audit ES1-T283 A15, A22; CTO chốt 10/11 câu 3. Thứ tự lớp (trên → dưới) và vị trí trong dải đáy theo docs/ui-spec/layers.md. Mỗi trang tối đa 1 thanh đáy. Nút "Big offer" ở làn trái, mép dưới = 16 / 24 + chiều cao thanh đang hiện; làn phải dành cho Shopify Inbox và toast. Không có nút "Big offer" ở trang sản phẩm (mọi mốc) và cart. Focus bàn phím không bị che: scroll-padding trên = header 80 + 16, dưới = thanh đáy + 16.</p>
     <ol class="layer-list" aria-label="Layer order, top to bottom">
       <li><b>Top</b><span>Modal dialogs and drawers (browser top layer): popups, cart, menu, search, filter, quick view, lightbox, quiz result</span></li>
@@ -690,12 +690,12 @@
             <div class="site-header"><div class="site-header__inner">
               <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
               <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
-              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
               <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div>
             </div></div>
             <div class="bz-body">
               <p class="eyebrow" style="margin:0">Build your bundle</p>
-              <h3>Pick Your Kit, Save As You Go</h3>
+              <h3>Pick your kit, save as you go</h3>
               <ul class="bz-cards">
                 <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg?width=480" alt="" width="480" height="480">Adjustable dumbbell pair<span>$259.00</span></li>
                 <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P10.jpg?width=480" alt="" width="480" height="480">Foldable bench<span>$89.00</span></li>
@@ -704,7 +704,7 @@
             </div>
           </div>
           <div class="teaser offer-teaser">
-            <button class="teaser__open" type="button" aria-expanded="false"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">-24%<span class="visually-hidden"> off</span></span></button>
+            <button class="teaser__open" type="button" aria-expanded="false"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">−24%<span class="visually-hidden"> off</span></span></button>
             <button class="teaser__close" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
           </div>
           <aside class="buy-bar bz-home-bar" aria-label="Bundle total">
@@ -721,7 +721,7 @@
             <div class="site-header"><div class="site-header__inner">
               <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
               <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
-              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
               <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div>
             </div></div>
             <div class="bz-body">
@@ -759,11 +759,11 @@
             <div class="site-header"><div class="site-header__inner">
               <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
               <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
-              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
               <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count">4</span></span></div>
             </div></div>
             <div class="bz-body bz-body--cart">
-              <h3>Your Cart</h3>
+              <h3>Your cart</h3>
               <ul class="bz-lines">
                 <li><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="" width="128" height="128">Iron Core Kettlebell 16 kg · Qty 2<span>$238.00</span></li>
                 <li><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png" alt="" width="128" height="128">FlexFold Adjustable Bench<span>$189.00</span></li>
@@ -772,7 +772,7 @@
             </div>
           </div>
           <section class="bz-panel" aria-label="Order summary">
-            <h4>Order Summary</h4>
+            <h4>Order summary</h4>
             <p><span>Total</span><span>$461.99</span></p>
             <a class="button button--full" href="#">Checkout<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
           </section>
@@ -790,12 +790,12 @@
             <div class="site-header"><div class="site-header__inner">
               <span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span>
               <span class="site-header__logo"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></span>
-              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our Story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
+              <div class="site-header__nav"><ul class="site-header__menu"><li><span class="site-header__link">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></span></li><li><span class="site-header__link">Sale</span></li><li><span class="site-header__link">Our story</span></li><li><span class="site-header__link">Blog</span></li><li><span class="site-header__link">Contact</span></li><li><span class="site-header__link">Help</span></li></ul></div>
               <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count">1</span></span></div>
             </div></div>
             <div class="bz-body">
               <p class="eyebrow" style="margin:0">Build your bundle</p>
-              <h3>Pick Your Kit, Save As You Go</h3>
+              <h3>Pick your kit, save as you go</h3>
               <ul class="bz-cards">
                 <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg?width=480" alt="" width="480" height="480">Adjustable dumbbell pair<span>$259.00</span></li>
                 <li class="bz-card"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P10.jpg?width=480" alt="" width="480" height="480">Foldable bench<span>$89.00</span></li>
