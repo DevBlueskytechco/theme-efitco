@@ -41,11 +41,23 @@
   Star and visible number are hidden from assistive tech; a translated
   visually hidden sentence is read instead.
 
+  Quick View button (TE-3 AC9, AC12; mini-cart-quickview.md §4): when the
+  theme setting show_quick_view is on (default), every card gets one, sold out
+  and single-variant products included. It sits in the image corner, above
+  the image link, inside <quick-view-button> (custom element, BE
+  TE-3-R2-BE1) with data-product-url (the card link, ?variant= for a
+  variant card) and data-product-title. The button is type="button", so a
+  click never opens the product page; its name is "Quick View {title}"
+  (aria-label starts with the visible "Quick View", WCAG 2.5.3). From 64rem on
+  a hover device CSS shows it on card hover or focus-within; below 64rem or on
+  touch it is a round 44 icon button, always shown. Without JavaScript
+  (quick-view-button not defined) CSS hides it and the card stays a link.
+
   Test hooks: product-card, product-card-image, product-card-title,
   product-card-variant-title, product-card-swatches, product-card-swatch
   (data-selected on the card variant's value), product-card-swatch-more,
   product-card-badge(-sale|-sold-out), product-card-badge-new,
-  product-card-rating, product-card-rating-value. data-card-link,
+  product-card-rating, product-card-rating-value, product-card-quick-view. data-card-link,
   data-card-image, data-card-price, data-card-badge stay for existing tests
   and assets/product-recommendations.js parity; no script reads them on this
   snippet.
@@ -274,6 +286,26 @@
         <span aria-hidden="true" data-testid="product-card-rating-value">{{ rating_on_five }}</span>
         <span class="visually-hidden">{{ 'products.card.rating_label' | t: rating: rating_on_five }}</span>
       </span>
+    {%- endif -%}
+
+    {%- if settings.show_quick_view -%}
+      {%- assign quick_view_label = 'products.quick_view.open_label' | t: title: product.title -%}
+      <quick-view-button
+        class="product-card__quick-view"
+        data-product-url="{{ card_variant.url | default: product.url }}"
+        data-product-title="{{ product.title | escape }}"
+      >
+        <button
+          type="button"
+          class="product-card__quick-view-button"
+          aria-haspopup="dialog"
+          aria-label="{{ quick_view_label | escape_once }}"
+          data-testid="product-card-quick-view"
+        >
+          {%- render 'header-icon', name: 'bag_add' -%}
+          <span class="product-card__quick-view-label">{{ 'products.quick_view.open' | t }}</span>
+        </button>
+      </quick-view-button>
     {%- endif -%}
   </div>
 
