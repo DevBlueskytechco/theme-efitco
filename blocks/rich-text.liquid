@@ -7,6 +7,15 @@
   and the storefront renders nothing. Text alignment and background come from
   the parent container. Self-contained: callers must leave the body empty.
 
+  Text settings default to empty (ADR 0011 mục 3, D10 of ES1-T307): a fresh
+  install shows no sample copy or claim. The store dev content comes from
+  tests/fixtures/home-figma.json; test templates pass the copy as parameters
+  named like the settings.
+
+  Layout (index-mobile-a.md §4, index-1280.md khối 4): display heading at every
+  width (48 at 360, 70 on two lines at 768, min(display, 6.25vw) from 80rem);
+  from 48rem text and link share one row; from 64rem heading | text and link.
+
   Test hooks: data-testid="rich-text", "rich-text-heading",
   "rich-text-inline-image" (image wrapper), "rich-text-body", "rich-text-button".
 
@@ -48,8 +57,8 @@
             inline: true,
             decorative: true,
             width: 330,
-            widths: '165, 330',
-            sizes: '(min-width: 64rem) 165px, 80px',
+            widths: '80, 165, 240, 330',
+            sizes: '(min-width: 48rem) 165px, 80px',
             loading: 'lazy',
             testid: 'rich-text-inline-image'
           %}
@@ -93,8 +102,7 @@
     {
       "type": "text",
       "id": "heading",
-      "label": "t:labels.rich_text_heading",
-      "default": "Everything You Need"
+      "label": "t:labels.rich_text_heading"
     },
     {
       "type": "image_picker",
@@ -106,8 +114,7 @@
       "type": "text",
       "id": "heading_after_image",
       "label": "t:labels.rich_text_heading_after_image",
-      "info": "t:info.rich_text_heading_after_image",
-      "default": "to Train."
+      "info": "t:info.rich_text_heading_after_image"
     },
     {
       "type": "select",
@@ -129,15 +136,13 @@
     {
       "type": "richtext",
       "id": "body",
-      "label": "t:labels.rich_text_body",
-      "default": "<p>Versatile equipment for home training - strength, mobility, endurance, at every level.</p>"
+      "label": "t:labels.rich_text_body"
     },
     {
       "type": "text",
       "id": "button_label",
       "label": "t:labels.rich_text_button_label",
-      "info": "t:info.slide_button_label",
-      "default": "Become A Member"
+      "info": "t:info.slide_button_label"
     },
     {
       "type": "url",
