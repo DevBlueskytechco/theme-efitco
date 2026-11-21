@@ -75,6 +75,9 @@
   templates pass no collection). Empty state: no source or no products → a hint
   in the theme editor, nothing on the storefront.
 
+  Styles: assets/bundle-builder.css, loaded by the stylesheet_tag line before
+  the root, without preload (ADR 0014).
+
   Self-contained: callers must leave the body empty.
 
   @param {string} [id] - Static block id, so this block keeps its own settings. Also used for the heading, form and input ids. Default: block.id
@@ -135,6 +138,9 @@
   assign label_total = 'blocks.bundle_builder.total' | t
 -%}
 
+{%- if has_products or request.design_mode -%}
+  {{ 'bundle-builder.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if has_products -%}
   {%- liquid
     # Cards first: the panel and the bar print the preselected state (no JS, no layout shift)
@@ -525,12 +531,14 @@
       "type": "text",
       "id": "eyebrow",
       "label": "t:labels.eyebrow",
+      "info": "t:info.sample_default",
       "default": "Build your bundle"
     },
     {
       "type": "inline_richtext",
       "id": "heading",
       "label": "t:labels.heading",
+      "info": "t:info.sample_default",
       "default": "Pick Your Kit, Save As You Go"
     },
     {
