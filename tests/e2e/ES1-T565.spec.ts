@@ -2,7 +2,7 @@
 // - Mỗi file CSS có dòng stylesheet_tag trong blocks/*.liquid (trừ tầng 1–3): gzip ≤ 8 192 B (Node zlib.gzipSync mức mặc định).
 // - File tầng 4 có ≥ 1 block nạp; block cha trong bảng ADR 0014 mục 2 nạp đúng 1 lần, trước root (trước block.shopify_attributes), ngoài {% partial %}.
 // - Không `preload` trên dòng link; không stylesheet_tag trong snippets/.
-// - base.css ≤ 49 152 B (ES1-T566 hạ 40 960); base + file tầng 4 do block trong templates/index.liquid nạp ≤ 53 248 B, ≤ 10 file.
+// - base.css ≤ 49 152 B (ES1-T566 hạ 40 960); base + file tầng 4 do block trong templates/index.liquid nạp ≤ 57 344 B (CTO 21/11 ES1-T569), ≤ 10 file.
 // - Không prelude trùng giữa base.css, file tầng 3, file tầng 4; base.css không còn selector của 5 block đã tách; .quiz-page__breadcrumb ở collection.css.
 // ES1-T566 dùng lại spec này: thêm 6 file vào BLOCK_FILES/PARENTS, hạ BASE_MAX.
 // Chạy: npx playwright test tests/e2e/ES1-T565.spec.ts --project=desktop
@@ -15,7 +15,7 @@ const gz = (path: string) => gzipSync(readFileSync(path)).length;
 
 const BASE_MAX = 49152;
 const BLOCK_MAX = 8192;
-const INDEX_MAX = 53248;
+const INDEX_MAX = 57344; // CTO 21/11 (ES1-T569): chấp nhận overhead nén từng file block
 const INDEX_FILES_MAX = 10;
 const NOT_TIER4 = ['critical', 'base', 'product', 'collection', 'cart', 'aux'];
 const PAGE_FILES = ['product', 'collection', 'cart', 'aux'];
@@ -123,9 +123,7 @@ test.describe('ES1-T565 CSS theo block (tĩnh, ADR 0014)', () => {
   });
 
   // KHÔNG CHẮC: đo thật 55 350 B (base 36 925 + 5 file 18 425), develop 48 641; nén từng file mất ngữ cảnh chung ≈ +1,3 KB/file.
-  // Chờ Tech Lead quyết trần trang chủ ở ES1-T569; bỏ fixme khi có số mới.
-  test('trang chủ: base + file tầng 4 ≤ 53 248', () => {
-    test.fixme(true, 'ES1-T569: trần 53 248 (ADR 0014 mục 5) chưa đạt, chờ Tech Lead');
+  test('trang chủ: base + file tầng 4 ≤ 57 344', () => {
     expect(indexBudget().total).toBeLessThanOrEqual(INDEX_MAX);
   });
 
