@@ -7,6 +7,8 @@ const LINK = `${PAGES} a[href],a${T("collection-filter-clear")},a${T("collection
 const RESULTS = "[data-results-label]";
 const GROUP = "details[data-filter-param]";
 const OPEN = T("collection-filter-open");
+// Search page only (search.md S6b): alert above the results, old grid kept. Without it (collection) a failed refresh loads the page.
+const ERROR = "template[data-results-error]";
 const events = import("https://cdn.shopify.com/storefront/standard-events.js").catch(() => null);
 
 class CollectionFilters extends HTMLElement {
@@ -69,6 +71,7 @@ class CollectionFilters extends HTMLElement {
 			const p = this.hasAttribute("aria-busy") ? (u == this.want ? this.p : this.go(u, 0, 1)) : u == this.shown || this.go(u, 0, 1);
 			Promise.resolve(p).then((ok) => ok && this.hide());
 		} else {
+			if (t.closest?.("[data-retry]") && this.err?.contains(t)) return this.go(...this.args);
 			const o = t.closest?.(OPEN);
 			if (o && !e.defaultPrevented && this.show(o)) return e.preventDefault();
 			const a = t.closest?.(LINK);
@@ -87,6 +90,7 @@ class CollectionFilters extends HTMLElement {
 
 	go(url, page, emit) {
 		this.want = url;
+		this.args = [url, page, emit];
 		return (this.p = this.run(url, page, emit));
 	}
 
@@ -98,6 +102,7 @@ class CollectionFilters extends HTMLElement {
 		// The server always renders the label: still empty after apply = not applied.
 		this.querySelector(RESULTS)?.setAttribute("data-results-label", "");
 		this.setAttribute("aria-busy", "true");
+		this.err?.remove();
 		try {
 			const update = await partials.fetch(this.dataset.resultsPartial || "collection-products", "collection-filters", "collection-filter-count", { url, signal: c.signal });
 			if (c.signal.aborted) return;
@@ -114,14 +119,21 @@ class CollectionFilters extends HTMLElement {
 			const status = this.querySelector(T("collection-status"));
 			if (status) status.textContent = label;
 			if (page) {
-				r.tabIndex = -1;
-				r.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-				r.focus({ preventScroll: true });
+				// data-results-focus: the products group on /search; the label root on collections.
+				const f = r.querySelector("[data-results-focus]") || r;
+				f.tabIndex = -1;
+				f.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+				f.focus({ preventScroll: true });
 			}
 			if (done) done({ productsCount: +(r.dataset.resultsCount ?? label.replace(/\D/g, "")) });
 			return 1;
 		} catch {
-			if (!c.signal.aborted) location.assign(url);
+			if (c.signal.aborted) return;
+			const t = this.querySelector(ERROR);
+			if (!t) return location.assign(url);
+			// Close the drawer so the alert and Try Again are reachable; the ticked filters stay in the form.
+			this.hide();
+			t.after((this.err = t.content.firstElementChild.cloneNode(true)));
 		} finally {
 			if (this.ctrl == c) this.removeAttribute("aria-busy");
 		}
