@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import { env } from './support/store-data';
 import { expectNotChallenged, gotoStore, watchStore, type StoreWatch } from './support/store-guard';
 import { productData } from './support/product-data';
+import { newStoreContext } from './support/store-noise';
 
 const ALL = '/collections/all';
 const LIST = '/collections';
@@ -27,6 +28,11 @@ const MAIN = ENV.collection ? `/collections/${encodeURIComponent(ENV.collection)
 const NO_FILTERS = 'Trang không có collection-filter-group (Search and Discovery tắt, ES1-T105 #2)';
 const NO_PAGES = `${ALL} không quá 24 sản phẩm (store dev có 2 065, ES1-T417)`;
 const WIDTHS = [360, 768, 1280, 1920] as const;
+/** Tuỳ chọn context theo project (thiết bị, baseURL, cookie mật khẩu) cho trang phụ mở bằng browser.newContext. */
+const STORE_CONTEXT = () => {
+  const { baseURL, storageState, viewport, userAgent, deviceScaleFactor, isMobile, hasTouch } = test.info().project.use;
+  return { baseURL, storageState, viewport, userAgent, deviceScaleFactor, isMobile, hasTouch };
+};
 
 const test = base.extend<{ guard: StoreWatch }>({
   guard: async ({ page }, use) => {
@@ -110,12 +116,18 @@ async function lastPage(page: Page) {
   return Number(text.match(/of\s+(\d+)/)?.[1] ?? NaN);
 }
 
-/** Hộp phần tử so với <nav> phân trang: trang 1 và 2 có tên card khác dài nên vị trí tuyệt đối theo trục dọc khác nhau. */
+/**
+ * Hộp nút Previous/Next trong ô của nó: x so với <li> chứa nút, y so với <nav> (trang 1 và 2 có tên card khác dài nên
+ * vị trí tuyệt đối theo trục dọc khác nhau), cộng rộng của <li>. Không so x với <nav>: hàng căn giữa từ 48rem
+ * (pagination.md §4) nên trang 2 có thêm 1 số trang ("1 2 3 … N" so với "1 2 … N") làm cả hàng dịch nửa (44 + gap),
+ * đúng thiết kế. CLS 0 (§3, §7) = nút tắt giữ đúng ô của link, không phải cùng toạ độ giữa 2 trang.
+ */
 const box = (l: Locator) =>
   l.evaluate((el) => {
     const r = el.getBoundingClientRect();
+    const li = el.closest('li')!.getBoundingClientRect();
     const n = el.closest('nav')!.getBoundingClientRect();
-    return { x: r.x - n.x, y: r.y - n.y, w: r.width, h: r.height };
+    return { x: r.x - li.x, y: r.y - n.y, w: r.width, h: r.height, slot: li.width };
   });
 
 // =====================================================================
@@ -792,11 +804,13 @@ test.describe('ES1-T112 AC5 list-collections', () => {
   });
 
   test('TC-50 AC7 list-collections: ?page= vượt → không trang trắng, empty state + "Go to page 1"', async ({ page, guard }) => {
+    // Bug theme, không nới: CI #286 đỏ đúng chỗ này; ES1-T525 #2 mặc định AC7 áp cho list-collections. Gỡ khi ES1-T562 merge.
+    test.fail(true, 'ES1-T562: templates/list-collections.liquid thiếu nhánh ?page= vượt (BUG-ES1-T112-01)');
     const res = await page.goto(`${LIST}?page=9999`);
     expect(res?.status()).toBe(200);
     await expectNotChallenged(page);
     await expect(page.getByTestId('page-title-heading')).toHaveText('Collections');
-    // AC7 + pagination.md §3: mọi danh sách nhiều trang; template chưa có nhánh này (xem bugs/)
+    // AC7 + pagination.md §3: mọi danh sách nhiều trang; template chưa có nhánh này (ES1-T562, drafts/qa/ES1-T112/bugs/)
     const firstPage = page.getByRole('link', { name: 'Go to page 1' });
     await expect(firstPage).toBeVisible();
     await expect(firstPage).toHaveAttribute('href', /\/collections\/?(\?page=1)?$/);
@@ -873,7 +887,7 @@ test.describe('ES1-T112 AC6 phân trang chung', () => {
 
     await gotoStore(page, `${ALL}?page=2`);
     const link = await box(prevLink(page));
-    for (const k of ['x', 'y', 'w', 'h'] as const) expect(Math.abs(link[k] - placeholder[k]), `Previous ${k}`).toBeLessThanOrEqual(1);
+    for (const k of ['x', 'y', 'w', 'h', 'slot'] as const) expect(Math.abs(link[k] - placeholder[k]), `Previous ${k}`).toBeLessThanOrEqual(1);
 
     await gotoStore(page, `${ALL}?page=${last}`);
     await expect(page.getByTestId('pagination-current')).toHaveText(String(last));
@@ -1012,7 +1026,7 @@ test.describe('ES1-T112 nojs', () => {
     void guard;
   });
 
-  test('TC-21 AC2 + AC14 nojs lọc ra 0: "No Matching Products", Clear filters về URL không filter', async ({ page, guard }) => {
+  test('TC-21 AC2 + AC14 nojs lọc ra 0: "No Matching Products", Clear filters về URL không filter', async ({ page, guard, browser }) => {
     test.skip(!ENV.noResultQuery, 'Thiếu TE6_FILTER_NO_RESULT_QUERY (ES1-T105 #3)');
     await gotoStore(page, `${MAIN}?${ENV.noResultQuery}`);
     await expect(page.getByTestId('collection-empty')).toBeVisible();
@@ -1021,7 +1035,17 @@ test.describe('ES1-T112 nojs', () => {
     const clear = page.getByTestId('collection-empty-button');
     await expect(clear).toHaveText('Clear filters');
     await Promise.all([page.waitForURL((u) => ![...u.searchParams.keys()].some((k) => k.startsWith('filter.'))), clear.click()]);
-    await expectAxeClean(page, 'main');
+    // axe chạy script trong trang: context tắt JS làm frame.evaluate treo tới timeout 30s (CI #286). Markup empty state do
+    // Liquid in, giống hệt khi bật JS, nên quét axe ở context bật JS cùng URL lọc ra 0.
+    const context = await newStoreContext(browser, { ...STORE_CONTEXT(), javaScriptEnabled: true });
+    try {
+      const withJs = await context.newPage();
+      await gotoStore(withJs, `${MAIN}?${ENV.noResultQuery}`);
+      await expect(withJs.getByTestId('collection-empty')).toBeVisible();
+      await expectAxeClean(withJs, 'main');
+    } finally {
+      await context.close();
+    }
     void guard;
   });
 
