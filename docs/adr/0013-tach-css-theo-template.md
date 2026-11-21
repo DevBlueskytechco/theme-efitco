@@ -1,8 +1,14 @@
 KHÔNG CHẮC: số gzip "hiện tại" lấy từ ES1-T472 (develop ~51,9 KB sau #210, #217, #230; T317 đưa về 50 102 B), phiên này không chạy được lệnh đo. ES1-T478 ghi bảng đo trước/sau trong PR body. Phần sửa AGENTS.md là đề xuất, CTO áp tay (scope-guard chặn agent, ES1-T310 #2): drafts/techlead/ES1-T479/agents-md.md.
 
 # 0013. Tách CSS theo template: base.css (khung + trang chủ) và 4 file nạp theo template.name
-Ngày: 2026-11-17 | Trạng thái: Chấp nhận (CTO 17/11, ES1-T472 phương án a) | Đảo ES1-T310 #1 (1 file base.css), sửa task-split ES1-T307 D7, bổ sung ADR 0003
+Ngày: 2026-11-17 | Trạng thái: Chấp nhận (CTO 17/11, ES1-T472 phương án a); sửa một phần bởi ADR 0014 (21/11, ES1-T564) | Đảo ES1-T310 #1 (1 file base.css), sửa task-split ES1-T307 D7, bổ sung ADR 0003
 Cập nhật 21/11/2026 (CTO, ES1-T567): nguồn thiết kế là mockup `drafts/designer/**` + `drafts/designer/_kit/kit.css`; tên file thiết kế và mã node trong ADR này là bối cảnh lúc ra quyết định, không còn là căn cứ; quyết định giữ nguyên.
+
+Sửa đổi 21/11 (ADR 0014, CTO chốt hướng ở ES1-T564): `base.css` chạm lại trần (develop 48 641 B, #292 50 104 B) vì mục 1 để "toàn bộ block trang chủ" ở `base.css`.
+- Mục 1: bỏ "toàn bộ block trang chủ" khỏi `base.css`. Block cấp section không ở màn đầu có file `assets/<block>.css`, nạp bằng `stylesheet_tag` trong block (tầng 4, ADR 0014 mục 1–3). 4 file nhóm trang giữ nguyên.
+- Mục 2: thay bằng ADR 0014 mục 4. Câu "`quiz` trên trang chủ để base.css" hết hiệu lực.
+- Mục 4: `base.css` ≤ 49 152 B tới khi ES1-T566 merge, sau đó ≤ 40 960 B. File block ≤ 8 192 B.
+- Mục 3, 5, 6 và Hệ quả, Đo: giữ.
 
 ## Bối cảnh
 - ES1-T310 #1 (11/11) chốt giữ 1 file `assets/base.css`, trần gzip ≤ 49 152 B, nạp chặn render ở mọi trang từ `layout/theme.liquid:28`. Điều kiện mở ADR này là "lhci desktop < 98 do CSS" hoặc không giữ được trần.
