@@ -102,7 +102,7 @@ Chữ cố định qua locale `blocks.header.*` (không setting): `menu_title` "
 | Bề rộng nội dung | 1240 | 1416 | `--content-width` |
 | A: lưới | 3 cột × 266 + card 346, gap 32 | 3 × 307 + card 399 | `repeat(3, 1fr) 1.3fr`, gap `--space-6` |
 | A: tiêu đề cột | 14/600 uppercase, tracking 0.04em, `--color-muted`, cao 40 | | kit `.mega__title` |
-| A: link | Inter 16/400, cao 40, `--color-foreground` | | foundation §14 |
+| A: link | Inter 16/400, cao 44 (`--touch-target`, sổ 21/11), `--color-foreground` | | foundation §14 |
 | A: "View all …" | 16/600, gạch chân, mũi tên 16 × 13 | | 14 §1, 18 C2 |
 | Card sản phẩm | nền cream, bo 12, padding 16; ảnh 3/2 bo 8 nền trắng `contain`; eyebrow 14/800 accent; tên 18/600 hiện đủ, không cắt; giá 16 | ảnh 367 × 245 | `--radius-card`, `--color-background-cream` |
 | B: tiêu đề + View all | heading 700 28 trái; text link phải; cách hàng ô 24 | | `--font-size-h3`, `--space-5` |
@@ -210,7 +210,7 @@ Tương phản (tính tay theo WCAG, L độ sáng tương đối; số chung l�
 | muted-on-dark / dark | 6.11 | chữ menu trống trong theme editor |
 | accent / dark | 3.48 | không dùng (focus trên thanh tối dùng trắng) |
 
-Vùng chạm: mục menu desktop chữ cao 24–26 theo Figma, ô bấm 44 (kit `min-height: 44px`, không đổi bố cục thanh 80). Icon header ô 44. Link trong panel 40 (desktop ≥ 40, 06). Drawer: hàng 52 / 48 / 72, Back 44, × 48, Sign In 44, Currency / Language 44 (14 #1083M). Khoảng cách giữa các link chạm ≥ 0 nhưng vùng chạm không chồng nhau.
+Vùng chạm: mục menu desktop chữ cao 24–26 theo Figma, ô bấm 44 (kit `min-block-size: var(--touch-target)`, nhãn ngắn nở vùng chạm ngang tới 44, không đổi bố cục thanh 80). Icon header ô 44. Link trong panel 44 (`--touch-target`, sổ 21/11 foundations-13; trước là 40). Drawer: hàng 52 / 48 / 72, Back 44, × 48, Sign In 44, Currency / Language 44 (14 #1083M). Khoảng cách giữa các link chạm ≥ 0 nhưng vùng chạm không chồng nhau.
 
 Ngữ nghĩa:
 - `<nav aria-label="Main menu">` (desktop) và `<nav aria-label="Mobile menu">` (drawer): tên khác nhau (code có).

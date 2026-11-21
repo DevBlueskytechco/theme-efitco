@@ -275,7 +275,7 @@ Accessibility (tỉ lệ tính tay: L sRGB → tuyến tính, (L1 + 0.05) / (L2 
 | Chữ trên ô số FAQ | trắng / accent; trắng / dark | 5.01; 17.4 |
 
 - Vùng chạm 360: card bundle cả card, link "View Preset Bundles" 44, nút 48, play cả poster, link sản phẩm video 76, link sản phẩm review ≥ 56, card blog cả card, hàng accordion ≥ 56, footer theo foundation. 768: thêm nút 52.
-- Hàng cuộn: `<ul aria-label tabindex="0">`; nút có tên riêng; tiến trình `aria-hidden`; nút ở đầu/cuối hàng `aria-disabled` + opacity 0.35.
+- Hàng cuộn: `<ul aria-label tabindex="0">`; nút có tên riêng; tiến trình `aria-hidden`; nút ở đầu/cuối hàng `aria-disabled` + cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11).
 - Heading: h2 mỗi khối; h3 cho "Your Bundle", tiêu đề review, tiêu đề bài viết. Không nhảy bậc.
 - Không ARIA trên phần tử không role: panel bundle có `role="group"`.
 

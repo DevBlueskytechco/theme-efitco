@@ -101,7 +101,7 @@ Không dùng tab ngang cho mô tả / thông số / review (09 §1 #753). Không
 Anatomy: track ảnh (scroll-snap) · nút phóng to (ảnh là link tới bản 2048, icon kính lúp 44 trắng góc phải trên, chỉ trang trí) · bộ đếm "1 / 3" (pill trắng, `aria-hidden`) · nút trước/sau tròn 52 góc phải dưới (≥768) · hàng thumbnail.
 
 - Thứ tự media: featured media của variant đang chọn trước (code đã có). Đổi variant thì track trượt tới ảnh variant (AC1).
-- Nút 52: chevron 11 × 16 (`snippets/slideshow-icon`), trắng viền `--color-border`, hover nền cam icon trắng + scale 1.06 (sổ quyết định 09/11, Figma 1:398). Hai nút cách 8. Ở đầu/cuối: mờ 0.35 + `aria-disabled`. 360: ẩn nút, vuốt.
+- Nút 52: chevron 11 × 16 (`snippets/slideshow-icon`), trắng viền `--color-border`, hover nền cam icon trắng + scale 1.06 (sổ quyết định 09/11, Figma 1:398). Hai nút cách 8. Ở đầu/cuối: cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled`. 360: ẩn nút, vuốt.
 - Thumbnail: nền cream, viền 1px `--color-border`, bo 4 (8 từ 80rem); đang xem viền 2px foreground (ĐỀ XUẤT, code 1px: 1px foreground khó thấy khác hover); hover viền foreground. Thumbnail hiện cả trên mobile (09 §3 #774M). Video: nhãn ▶ đen góc phải dưới; 3D: nhãn "3D". Chỉ hiện khi ≥ 2 media.
 - Không lặp badge giảm giá trên ảnh: -24% đặt cạnh giá (Figma 1:783; 10 §8 không lặp khuyến mãi).
 - Hover ảnh desktop: con trỏ zoom-in. Không làm hover zoom ở bản này (06 §6 gợi ý; ĐỀ XUẤT để sau vì phải tải ảnh 2048 khi rê chuột, chạm Performance).

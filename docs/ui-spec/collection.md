@@ -167,7 +167,7 @@ Một `<dialog id="collection-filter-drawer">` + form GET (code hiện có). Dư
 - Phân trang 24 / trang (SRS AC1; giữ số trang thay Load more: link thật cho SEO, chạy không JS, 08 #2167D).
 - Dùng snippet `pagination` chung; hình, trạng thái, mốc, A11y theo `docs/ui-spec/pagination.md`: `{% paginate collection.products by 24, window_size: 1 %}` → `{% render 'pagination', paginate: paginate %}` (không `anchor`, không `summary`: số kết quả đã ở thanh công cụ).
 - Tóm tắt: < 768 `[‹ 52]  Page 1 of 2  [› 52]` trải hết hàng; ≥ 768 `[‹]  1 … 4 (5) 6 … 9  [›]` canh giữa, chevron cách số 16. Previous/Next tròn 52 (`aria-label="Previous page"` / `"Next page"`), số pill 44, trang hiện tại accent (ES1-T107 #6).
-- Trang 1 / trang cuối: Previous / Next vẫn hiện, mờ 0.35 + `aria-disabled`, không link (sổ 10/11 audit 5). Bỏ "Trang 1 không có Previous" của vòng 3.
+- Trang 1 / trang cuối: Previous / Next vẫn hiện, cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled`, không link (sổ 10/11 audit 5). Bỏ "Trang 1 không có Previous" của vòng 3.
 - Sang trang có JS (BE chặn link): vùng kết quả theo S7 (skeleton), cuộn về đầu lưới, focus vào số kết quả (pagination.md §3). Không JS: tải trang mới.
 
 ## 9. Trạng thái

@@ -110,6 +110,30 @@
   .dpanel-pairs { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; font-size: var(--font-size-sm); }
   .dpanel-pairs li { display: flex; align-items: center; gap: var(--space-3); }
   .dpanel-pairs i { flex: none; width: 24px; height: 24px; border-radius: var(--space-1); border: 1px solid var(--color-border); }
+  /* ES1-T535 (CTO 21/11): ma trận scheme × role, bảng vùng chạm, khối nền tối nằm trong section h-dark */
+  /* Bảng 4–7 cột nhiều chữ: màn hẹp xếp mỗi hàng thành thẻ nhãn / giá trị (đọc được trong ảnh tĩnh, không cuộn ngang); đủ rộng thì là bảng */
+  .scheme-table, .touch-table { min-width: 0; }
+  @media (max-width: 47.99rem) {
+    .touch-table thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+    .touch-table tr { display: block; padding-block: var(--space-xs); border-block-end: 1px solid var(--color-border); }
+    .touch-table tr:last-child { border-block-end: 0; }
+    .touch-table tbody th, .touch-table td { display: block; padding-block: var(--space-2xs); border: 0; }
+    .touch-table tbody th { font-size: var(--font-size-base); }
+    .touch-table td::before { content: attr(data-label); display: block; color: var(--color-muted); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  }
+  @media (max-width: 63.99rem) {
+    .scheme-table thead { position: absolute; inline-size: 1px; block-size: 1px; overflow: hidden; clip-path: inset(50%); }
+    .scheme-table tr { display: block; padding-block: var(--space-xs); border-block-end: 1px solid var(--color-border); }
+    .scheme-table tr:last-child { border-block-end: 0; }
+    .scheme-table tbody th, .scheme-table td { display: block; padding-block: var(--space-2xs); border: 0; }
+    .scheme-table tbody th { display: block; font-size: var(--font-size-base); }
+    .scheme-table tbody th br { display: none; }
+    .scheme-table tbody th code { margin-inline-start: var(--space-xs); font-weight: 400; }
+    .scheme-table td::before { content: attr(data-label); display: block; color: var(--color-muted); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  }
+  .scheme-dot { display: inline-block; inline-size: var(--space-md); block-size: var(--space-md); margin-inline-end: var(--space-xs); border: 1px solid var(--color-muted-light); border-radius: var(--radius-xs); vertical-align: -2px; }
+  .demo-block > .dark-demo { width: auto; margin: var(--space-xl) 0 0; border-radius: var(--radius-panel); } /* mọi mốc nằm trong lề section, không tràn sát mép ảnh cắt */
+  .touch-strip { display: inline-flex; align-items: center; padding-inline: var(--space-sm); border-radius: var(--radius-sm); background: var(--color-background-dark) var(--dark-texture); }
 </style>
 </head>
 <body>
@@ -209,14 +233,40 @@
             <tr><th scope="row">Heading → content</th><td>24</td><td>24</td><td>40</td><td>40</td><td><code>--heading-gap</code></td></tr>
             <tr><th scope="row">Header</th><td>80</td><td>80</td><td>80</td><td>80</td><td><code>--header-height</code></td></tr>
             <tr><th scope="row">Control / compact</th><td>48 / 44</td><td>48 / 44</td><td>52 / 44</td><td>52 / 44</td><td><code>--control-height(-compact)</code></td></tr>
-            <tr><th scope="row">Touch target</th><td>44</td><td>44</td><td>≥ 24 (icon 44)</td><td>≥ 24 (icon 44)</td><td><code>--touch-target-min</code></td></tr>
+            <tr><th scope="row">Touch target floor</th><td>44</td><td>44</td><td>≥ 24</td><td>≥ 24</td><td><code>--touch-target-min</code></td></tr>
+            <tr><th scope="row">Touch target, 6 key groups</th><td>44</td><td>44</td><td>44</td><td>44</td><td><code>--touch-target</code></td></tr>
           </tbody>
         </table>
       </div>
+      <p class="demo-label" style="margin-block-start: var(--space-xl)">Touch targets · <code>--touch-target</code> 44 mọi mốc cho đúng 6 nhóm (CTO 21/11) · số = rộng × cao vùng chạm thật, px</p>
+      <div class="states" style="margin-block-end: var(--space-md)">
+        <div class="state"><span class="touch-strip on-dark"><a class="site-header__link" href="#" data-touch="menu">Sale</a></span><small>Menu link</small></div>
+        <div class="state"><form class="search-field" role="search" onsubmit="return false" style="width: 13rem"><label class="visually-hidden" for="tt-search">Search</label><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="tt-search" type="search" value="bench" autocomplete="off"><button class="search-field__submit" type="submit" aria-label="Search" data-touch="search"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button></form><small>Search submit</small></div>
+        <div class="state"><button class="button" type="button" data-touch="atc">Add To Cart</button><small>Add to cart</small></div>
+        <div class="state"><span class="touch-strip on-dark" style="padding-inline: 0"><a class="site-header__icon" href="#" aria-label="Cart, 2 items" data-touch="cart"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a></span><small>Cart</small></div>
+        <div class="state"><span class="touch-strip on-dark" style="padding-inline: 0"><button class="site-header__icon" type="button" aria-label="Open menu" data-touch="menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></button></span><small>Hamburger</small></div>
+        <div class="state"><button class="close-button" type="button" aria-label="Close" data-touch="close"><svg aria-hidden="true"><use href="#i-close"/></svg></button><small>Close</small></div>
+        <div class="state"><div class="variant-option__values"><label class="variant-pill" data-touch="pill"><input type="radio" name="tt-size" checked>S</label><label class="variant-pill"><input type="radio" name="tt-size">20 lb</label><label class="variant-swatch" style="--swatch: var(--color-muted-light)" data-touch="swatch"><input type="radio" name="tt-color"><span class="visually-hidden">Gray</span></label></div><small>Variant pill · swatch</small></div>
+      </div>
+      <div class="table-wrap">
+        <table class="data-table touch-table">
+          <caption class="visually-hidden">Touch targets per breakpoint, width by height in px</caption>
+          <thead><tr><th scope="col">Group</th><th scope="col">Component</th><th scope="col">360</th><th scope="col">768</th><th scope="col">1280</th><th scope="col">1920</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">1 · Main menu link</th><td data-label="Component"><code>.site-header__link</code> · drawer row · <code>.mega__col a</code></td><td data-label="360">Drawer row 52 cao, hết ngang</td><td data-label="768">Drawer row 52 cao, hết ngang</td><td data-label="1280">Link ≥ 44 × 44 (chữ 30–84 rộng, vùng chạm nở tới 44) · mega, dropdown 44 cao</td><td data-label="1920">Link ≥ 44 × 44 (chữ 30–84 rộng, vùng chạm nở tới 44) · mega, dropdown 44 cao</td></tr>
+            <tr><th scope="row">2 · Form submit</th><td data-label="Component"><code>.search-field__submit</code> · <code>.button</code> (Add To Cart)</td><td data-label="360">44 × 44 · 156 × 48</td><td data-label="768">44 × 44 · 156 × 48</td><td data-label="1280">44 × 44 · 156 × 52</td><td data-label="1920">44 × 44 · 156 × 52</td></tr>
+            <tr><th scope="row">3 · Cart</th><td data-label="Component"><code>.site-header__icon</code></td><td data-label="360">44 × 44</td><td data-label="768">44 × 44</td><td data-label="1280">44 × 44</td><td data-label="1920">44 × 44</td></tr>
+            <tr><th scope="row">4 · Hamburger</th><td data-label="Component"><code>.site-header__menu-toggle</code></td><td data-label="360">44 × 44</td><td data-label="768">44 × 44</td><td data-label="1280">Ẩn (menu ngang)</td><td data-label="1920">Ẩn (menu ngang)</td></tr>
+            <tr><th scope="row">5 · Close modal / drawer</th><td data-label="Component"><code>.close-button</code></td><td data-label="360">48 × 48</td><td data-label="768">48 × 48</td><td data-label="1280">48 × 48</td><td data-label="1920">48 × 48</td></tr>
+            <tr><th scope="row">6 · Variant</th><td data-label="Component"><code>.variant-pill</code> · <code>.variant-swatch</code> · <code>.variant-more</code></td><td data-label="360">≥ 56 × 44 · 44 × 44</td><td data-label="768">≥ 56 × 44 · 44 × 44</td><td data-label="1280">≥ 56 × 44 · 44 × 44</td><td data-label="1920">≥ 56 × 44 · 44 × 44</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="demo-note" style="margin-block-start: var(--space-sm)">Link menu ngắn (Sale, Blog, Help) có chữ hẹp hơn 44: vùng chạm nở đều hai bên tới 44, khoảng cách 40 giữa các mục giữ theo Figma 1:365. Tab 40 từ 1280 ngoài 6 nhóm, giữ sàn <code>--touch-target-min</code> 24 (CTO 09/11). Swatch trên card sản phẩm 36 × 24 là chỉ báo không bấm (<code>aria-hidden</code>, CTO 10/11, mục 22 câu 2), không phải control chọn variant nên không thuộc nhóm 6; chọn màu ở trang sản phẩm / quickview bằng <code>.variant-swatch</code> 44 × 44.</p>
       <div class="dos">
         <div class="do"><b>Nên</b>Đặt mọi khối vào <code>.container</code>; dải tràn mép chỉ cho panel footer, hero, banner. Gap lấy từ <code>--grid-gap</code>.</div>
         <div class="dont"><b>Không nên</b>Viết px lẻ cho gutter hay padding section; đổi số cột trong trang.</div>
-        <p class="tokens">Setting: <code>max_page_width</code>, <code>min_page_margin</code>, <code>space_base</code></p>
+        <p class="tokens">Setting: <code>max_page_width</code>, <code>min_page_margin</code>, <code>space_base</code> · Token: <code>--touch-target</code> (44, 6 nhóm), <code>--touch-target-min</code> (24, sàn)</p>
       </div>
     </section>
 
@@ -237,6 +287,7 @@
       <div class="type-row"><small>Common/Label · Inter 600 · 13/20 · −2% · <code>.text-label</code>, badge</small><p class="text-label">Only 2 left in stock</p></div>
       <div class="type-row"><small>Common/Button · Inter 600 · 16/26 · −1% · <code>.button</code></small><p style="font-weight: 600">Add To Cart</p></div>
       <div class="type-row"><small>Group label · Inter 600 14 UPPER +4% muted · nhãn nhóm trong mega, search, mini cart · <code>.group-label</code></small><p class="group-label">Pairs well with</p></div>
+      <p class="demo-note" style="margin-block: var(--space-md) 0">Ngoại lệ (CTO 21/11): line-height giữ theo Figma Design System 2, không theo bội 4 của Polaris (62, 58, 38, 34, 26, 22 không chia hết cho 4). Thang chữ không đổi.</p>
       <div class="dos">
         <div class="do"><b>Nên</b>Dùng class/token của thang; một h1 mỗi trang; UPPER chỉ cho display, eyebrow, nhãn nhóm. Nhãn nút Title Case ("Add To Cart", "Try Again").</div>
         <div class="dont"><b>Không nên</b>Đặt cỡ chữ px trong trang, dùng cỡ 12, viết HOA tiêu đề section h2, đổi họ chữ tiêu đề sang Inter trong khung trạng thái.</div>
@@ -247,7 +298,7 @@
     <!-- 3. Màu -->
     <section class="demo-block" aria-labelledby="h-color">
       <h2 id="h-color">3. Color Tokens</h2>
-      <p class="demo-note">23 token có setting + 3 màu dẫn xuất. Số là tương phản chữ trên nền đó (WCAG). Ngoại lệ có chủ đích so với Figma: accent #C8400E (Figma #D94610 = 4.34), muted-light #6B6B6B (Figma #999/#808080 trượt AA).</p>
+      <p class="demo-note">23 token có setting + 3 màu dẫn xuất + 3 role trạng thái (alias, không thêm giá trị). Số là tương phản chữ trên nền đó (WCAG). Ngoại lệ có chủ đích so với Figma: accent #C8400E (Figma #D94610 = 4.34), muted-light #6B6B6B (Figma #999/#808080 trượt AA).</p>
       <ul class="swatch-grid">
         <li class="color-chip" style="background: var(--color-background)"><b>background</b>#FFFFFF · fg 17.4</li>
         <li class="color-chip" style="background: var(--color-background-alt)"><b>background-alt</b>#F4F4F5 · fg 15.8</li>
@@ -267,8 +318,21 @@
         <li class="color-chip" style="background: var(--color-background-panel); color: var(--panel-muted)"><b>--panel-muted</b>dẫn xuất #C4C4C6 · 6.56</li>
         <li class="color-chip" style="background: var(--color-background-panel); color: var(--panel-saving)"><b>--panel-saving</b>dẫn xuất #A5C0A6 · 5.82</li>
       </ul>
+      <p class="demo-label" style="margin-block-start: var(--space-xl)">Status · role trạng thái là alias trỏ về token sẵn có (CTO 21/11)</p>
+      <div class="table-wrap">
+        <table class="data-table touch-table">
+          <caption class="visually-hidden">Status color roles</caption>
+          <thead><tr><th scope="col">Role</th><th scope="col">Alias</th><th scope="col">Points to</th><th scope="col">Contrast</th><th scope="col">Used by</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><span class="badge" style="background: var(--color-success); color: var(--color-success-foreground)">Success</span></th><td data-label="Alias"><code>--color-success</code><br><code>--color-success-foreground</code></td><td data-label="Points to"><code>--color-badge-new</code> #4B824D<br><code>--color-badge-new-foreground</code></td><td data-label="Contrast">Trắng trên nền 4.57 · icon, viền trên trắng 4.57</td><td data-label="Used by">Toast success, form message success, status icon, meter đạt</td></tr>
+            <tr><th scope="row"><span class="badge" style="background: var(--color-warning); color: var(--color-warning-foreground)">Warning</span></th><td data-label="Alias"><code>--color-warning</code><br><code>--color-warning-foreground</code></td><td data-label="Points to"><code>--color-accent</code> #C8400E<br><code>--color-accent-foreground</code></td><td data-label="Contrast">Trắng trên nền 5.01 · icon, viền trên trắng 5.01</td><td data-label="Used by">Toast warning, form message warning</td></tr>
+            <tr><th scope="row"><span class="badge" style="background: var(--color-critical); color: var(--color-critical-foreground)">Critical</span></th><td data-label="Alias"><code>--color-critical</code><br><code>--color-critical-foreground</code></td><td data-label="Points to"><code>--color-sale</code> #BD1616<br><code>--color-sale-foreground</code></td><td data-label="Contrast">Trắng trên nền 6.38 · chữ lỗi trên trắng 6.38</td><td data-label="Used by">Toast error, form message error, alert, lỗi trường, viền <code>aria-invalid</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="demo-note" style="margin-block: var(--space-sm) 0">Info không có alias: dùng <code>--color-muted</code> (xám, 8.45). Role trạng thái chỉ cho thông báo; badge, giá sale, nút vẫn đọc token gốc. Chữ nội dung thông báo giữ foreground, màu role nằm ở viền + icon và luôn kèm chữ.</p>
       <div class="dos">
-        <div class="do"><b>Nên</b>Chỉ <code>var(--color-*)</code>; accent cho hành động và control đang bật; chữ phụ trên sand dùng muted; trên panel dùng <code>--panel-muted</code>.</div>
+        <div class="do"><b>Nên</b>Chỉ <code>var(--color-*)</code>; thông báo đọc role trạng thái (<code>--color-success / -warning / -critical</code>); accent cho hành động và control đang bật; chữ phụ trên sand dùng muted; trên panel dùng <code>--panel-muted</code>.</div>
         <div class="dont"><b>Không nên</b>Hex lẻ; muted-light trên sand (4.30); muted-on-dark trên panel (4.01); badge-new hay rating làm màu chữ; màu Figma ngoài token (#142521, #CEC2BD, #666666, #CCCCCC).</div>
         <p class="tokens">Setting: <code>&lt;token&gt;_color</code> → <code>--color-&lt;token&gt;</code> (vd <code>accent_color</code>, <code>badge_new_color</code>, <code>background_dark_color</code>)</p>
       </div>
@@ -343,21 +407,36 @@
     <!-- 3d. Motion -->
     <section class="demo-block" aria-labelledby="h-motion">
       <h2 id="h-motion">6. Motion</h2>
-      <p class="demo-note">Chỉ transform / opacity / clip-path; <code>prefers-reduced-motion: reduce</code> tắt hết (sổ 09/11).</p>
+      <p class="demo-note">8 duration + 3 easing, khớp <code>snippets/css-variables.liquid</code>. Chỉ transform / opacity / clip-path; <code>prefers-reduced-motion: reduce</code> tắt hết (sổ 09/11). Không viết thời lượng bằng số trong component.</p>
       <div class="table-wrap">
         <table class="data-table">
-          <caption class="visually-hidden">Motion tokens</caption>
+          <caption>Duration</caption>
           <thead><tr><th scope="col">Token</th><th scope="col" class="is-num">ms</th><th scope="col">Dùng cho</th></tr></thead>
           <tbody>
+            <tr><td><code>--motion-stagger</code></td><td class="is-num">60</td><td>Độ lệch giữa các phần tử vào nối tiếp (× thứ tự): dòng chữ hero</td></tr>
             <tr><td><code>--motion-fast</code></td><td class="is-num">150</td><td>Hover link, chip, icon; đóng dropdown, toast</td></tr>
             <tr><td><code>--motion-base</code></td><td class="is-num">250</td><td>Hover nút, mở drawer, dropdown, toast, bóng header</td></tr>
-            <tr><td><code>--motion-slow</code></td><td class="is-num">500</td><td>Card nhấc, ảnh scale, meter</td></tr>
             <tr><td><code>--motion-accordion</code></td><td class="is-num">350</td><td>Accordion, facet</td></tr>
-            <tr><td><code>--motion-reveal</code></td><td class="is-num">900</td><td>Hiện dần khi cuộn tới, lệch 80/card</td></tr>
-            <tr><td><code>--ease-out</code> · <code>--ease-in-out</code> · <code>--ease-expo</code></td><td class="is-num">—</td><td>vào · accordion · reveal, dialog</td></tr>
+            <tr><td><code>--motion-enter</code></td><td class="is-num">400</td><td>Chữ hero vào, phần tử vào lần đầu</td></tr>
+            <tr><td><code>--motion-slow</code></td><td class="is-num">500</td><td>Card nhấc, ảnh scale, meter</td></tr>
+            <tr><td><code>--motion-reveal</code></td><td class="is-num">900</td><td>Hiện dần khi cuộn tới, lệch <code>--motion-stagger</code> 60 mỗi card · ngoại lệ</td></tr>
+            <tr><td><code>--motion-hero</code></td><td class="is-num">1400</td><td>Vòng lặp tải: 1 vòng spinner, 1 vòng shimmer skeleton · ngoại lệ</td></tr>
           </tbody>
         </table>
       </div>
+      <div class="table-wrap" style="margin-block-start: var(--space-xl)">
+        <table class="data-table">
+          <caption>Easing</caption>
+          <thead><tr><th scope="col">Token</th><th scope="col">Curve</th><th scope="col">Vai trò</th></tr></thead>
+          <tbody>
+            <tr><td><code>--ease-out</code></td><td>cubic-bezier(0.22, 1, 0.36, 1)</td><td>Tương tác người dùng: hover, nhấn, mở drawer / dropdown / toast</td></tr>
+            <tr><td><code>--ease-in-out</code></td><td>cubic-bezier(0.65, 0, 0.35, 1)</td><td>Chuyển do hệ thống, đổi kích thước: accordion, facet, meter</td></tr>
+            <tr><td><code>--ease-expo</code></td><td>cubic-bezier(0.16, 1, 0.3, 1)</td><td>Vào màn nhấn mạnh: reveal khi cuộn, dialog, hero</td></tr>
+            <tr><td><code>linear</code></td><td>từ khoá CSS</td><td>Chỉ vòng lặp tải: spinner, shimmer</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="demo-note" style="margin-block: var(--space-sm) 0">Ngoại lệ (CTO 09/11, 21/11): <code>--motion-reveal</code> 900 và <code>--motion-hero</code> 1400 vượt khung 500ms của Polaris, giữ nguyên. Chỉ dùng cho hiện dần khi cuộn và vòng lặp tải; phản hồi thao tác luôn ≤ 500.</p>
     </section>
 
     <!-- 4. Header -->
@@ -447,7 +526,7 @@
     <!-- 6. Nút -->
     <section class="demo-block" aria-labelledby="h-button">
       <h2 id="h-button">9. Buttons</h2>
-      <p class="demo-note">Cao 48 dưới 1280, 52 từ 1280; small 44 mọi mốc. Mỗi ô ghi trạng thái. Active = scale 0.98 + bỏ bóng (vẽ đậm hơn hover để thấy được). Loading giữ bề rộng, spinner 20.</p>
+      <p class="demo-note">Cao 48 dưới 1280, 52 từ 1280; small 44 mọi mốc. Mỗi ô ghi trạng thái. Active = scale 0.98 + bỏ bóng (vẽ đậm hơn hover để thấy được). Loading giữ bề rộng, spinner 20. Disabled luôn là cặp màu riêng, không dùng opacity (CTO 21/11): nút tròn cuối hàng = viền border + icon muted-light, nền giữ (icon tắt so với icon bật 3.27:1); trên nền tối = nền trong suốt, viền + icon muted-on-dark 6.11.</p>
       <p class="demo-label">Primary · <code>.button</code></p>
       <div class="states">
         <div class="state"><button class="button" type="button">Add To Cart</button><small>Default</small></div>
@@ -510,7 +589,7 @@
         <div class="state"><button class="round-button" type="button" aria-label="Next"><svg aria-hidden="true"><use href="#i-next"/></svg></button><small>Default</small></div>
         <div class="state"><button class="round-button is-hover" type="button" aria-label="Next, hover"><svg aria-hidden="true"><use href="#i-next"/></svg></button><small>Hover</small></div>
         <div class="state"><button class="round-button is-focus" type="button" aria-label="Next, focus"><svg aria-hidden="true"><use href="#i-next"/></svg></button><small>Focus</small></div>
-        <div class="state"><button class="round-button" type="button" aria-label="Next, end of row" aria-disabled="true"><svg aria-hidden="true"><use href="#i-next"/></svg></button><small>End · 0.35</small></div>
+        <div class="state"><button class="round-button" type="button" aria-label="Next, end of row" aria-disabled="true"><svg aria-hidden="true"><use href="#i-next"/></svg></button><small>End · disabled (viền border, icon muted-light 5.33)</small></div>
         <div class="state"><button class="close-button" type="button" aria-label="Close"><svg aria-hidden="true"><use href="#i-close"/></svg></button><small>Close</small></div>
         <div class="state"><button class="close-button is-hover" type="button" aria-label="Close, hover"><svg aria-hidden="true"><use href="#i-close"/></svg></button><small>Close hover</small></div>
         <div class="state"><button class="close-button is-focus" type="button" aria-label="Close, focus"><svg aria-hidden="true"><use href="#i-close"/></svg></button><small>Close focus</small></div>
@@ -524,7 +603,7 @@
       </div>
       <div class="dos">
         <div class="do"><b>Nên</b>1 primary mỗi section. Phụ cạnh primary: secondary. Nút phụ trong card/quick view cạnh primary: tertiary. Dòng gợi ý, lỗi inline: small 44. Nhãn Title Case 2–4 từ mở bằng động từ.</div>
-        <div class="dont"><b>Không nên</b>Nút nền xám không viền (trùng disabled); nút cao 40; chữ sentence case ("Clear filters", "Buy it now"); hover tự định nghĩa trong trang.</div>
+        <div class="dont"><b>Không nên</b>Nút nền xám không viền (trùng disabled); báo disabled bằng opacity; nút cao 40; chữ sentence case ("Clear filters", "Buy it now"); hover tự định nghĩa trong trang.</div>
         <p class="tokens">Setting: <code>accent_color</code>, <code>accent_foreground_color</code>, <code>button_corner_radius</code> · Token: <code>--control-height</code>, <code>--control-height-compact</code></p>
       </div>
     </section>
@@ -533,6 +612,7 @@
     <section class="demo-block" aria-labelledby="h-badge">
       <h2 id="h-badge">10. Badges And Sold Out</h2>
       <p class="demo-note">Pill 28, padding 12, 13/600. Ưu tiên trên card: Sold out &gt; -N% &gt; New. Rating ở góc đối diện. Viền trên nền tối chỉ cho gift card.</p>
+      <p class="demo-note">Ngoại lệ (CTO 21/11): <code>.badge--tag</code> (tag bài viết "Featured", Figma 1:1022) giữ nền accent dù accent chỉ mang nghĩa hành động; cùng nhóm ngoại lệ với eyebrow và toast warning. Badge danh mục khác không dùng accent.</p>
       <div class="demo-row">
         <span class="badge badge--sale">-24%</span>
         <span class="badge badge--new">New</span>
@@ -635,16 +715,33 @@
         <p class="tokens">Token: <code>--radius-panel</code>, <code>--radius-card</code> (menu)</p>
       </div>
     </section>
-  </div>
 
-  <!-- Khối nền tối: Browse Categories (Figma 1:395), collection card dark -->
-  <section class="section--dark dark-demo" aria-labelledby="h-dark" style="border: 0">
+    <!-- Color scheme × role (CTO 21/11, foundations-15) + khối nền tối Browse Categories (Figma 1:395), collection card dark -->
+    <section class="demo-block" aria-labelledby="h-dark">
+      <h2 id="h-dark">12b. Color Schemes And Roles</h2>
+      <p class="demo-note">6 nền (light, alt, cream, sand, dark, panel) là 6 scheme dùng chung một bộ role: background, text, text subdued, border, focus, link. Component đọc role theo ngữ cảnh (<code>.section--*</code>, <code>.on-dark</code>, <code>.dpanel</code>), không tự đặt màu. Tên token viết gọn, bỏ tiền tố <code>--color-</code>. Số = tương phản với nền của scheme (WCAG). Hiện chỉ là tài liệu: chưa có setting <code>color_scheme</code>, giá trị màu không đổi.</p>
+      <div class="table-wrap">
+        <table class="data-table scheme-table">
+          <caption class="visually-hidden">Color scheme by role matrix with contrast ratios</caption>
+          <thead><tr><th scope="col">Scheme</th><th scope="col">Background</th><th scope="col">Text</th><th scope="col">Text subdued</th><th scope="col">Border</th><th scope="col">Focus</th><th scope="col">Link</th></tr></thead>
+          <tbody>
+            <tr><th scope="row"><i class="scheme-dot" style="background: var(--color-background)"></i>Light<br><code>body</code></th><td data-label="Background"><code>background</code> #FFFFFF</td><td data-label="Text"><code>foreground</code> 17.4</td><td data-label="Text subdued"><code>muted</code> 8.45 · <code>muted-light</code> 5.33</td><td data-label="Border"><code>border</code> 1.26 trang trí · viền ô nhập <code>muted-light</code> 5.33</td><td data-label="Focus"><code>accent</code> 5.01</td><td data-label="Link">Foreground gạch chân 17.4 · hover <code>accent</code> 5.01</td></tr>
+            <tr><th scope="row"><i class="scheme-dot" style="background: var(--color-background-alt)"></i>Alt<br><code>.section--alt</code></th><td data-label="Background"><code>background-alt</code> #F4F4F5</td><td data-label="Text"><code>background-alt-foreground</code> 15.8</td><td data-label="Text subdued"><code>muted</code> 7.69 · <code>muted-light</code> 4.85</td><td data-label="Border"><code>border</code> 1.15 trang trí</td><td data-label="Focus"><code>accent</code> 4.55</td><td data-label="Link">Foreground gạch chân 15.8 · hover <code>accent</code> 4.55</td></tr>
+            <tr><th scope="row"><i class="scheme-dot" style="background: var(--color-background-cream)"></i>Cream<br><code>.section--cream</code></th><td data-label="Background"><code>background-cream</code> #F5F5F1</td><td data-label="Text"><code>background-cream-foreground</code> 15.9</td><td data-label="Text subdued"><code>muted</code> 7.73 · <code>muted-light</code> 4.88</td><td data-label="Border"><code>border</code> 1.15 trang trí</td><td data-label="Focus"><code>accent</code> 4.58</td><td data-label="Link">Foreground gạch chân 15.9 · hover <code>accent</code> 4.58</td></tr>
+            <tr><th scope="row"><i class="scheme-dot" style="background: var(--color-background-sand)"></i>Sand<br><code>.section--sand</code></th><td data-label="Background"><code>background-sand</code> #EBE6E0</td><td data-label="Text"><code>background-sand-foreground</code> 14.0</td><td data-label="Text subdued"><code>muted</code> 6.81 · không dùng <code>muted-light</code> (4.30)</td><td data-label="Border"><code>border</code> 1.02 trang trí</td><td data-label="Focus"><code>accent</code> 4.03</td><td data-label="Link">Foreground gạch chân 14.0 · eyebrow <code>accent-on-sand</code> 4.62 · hover <code>accent</code> 4.03 (dưới 4.5, đang mở)</td></tr>
+            <tr><th scope="row"><i class="scheme-dot" style="background: var(--color-background-dark)"></i>Dark<br><code>.section--dark</code>, <code>.on-dark</code></th><td data-label="Background"><code>background-dark</code> #1A1A1A + noise</td><td data-label="Text"><code>background-dark-foreground</code> 17.4</td><td data-label="Text subdued"><code>muted-on-dark</code> 6.11</td><td data-label="Border">Trắng 12% trang trí · viền ô nhập <code>muted-on-dark</code> 6.11</td><td data-label="Focus">Trắng 17.4 · không dùng <code>accent</code> (3.48)</td><td data-label="Link">Trắng gạch chân 17.4 · hover gạch 2px, không đổi màu</td></tr>
+            <tr><th scope="row"><i class="scheme-dot" style="background: var(--color-background-panel)"></i>Panel<br><code>.dpanel</code></th><td data-label="Background"><code>background-panel</code> #393942</td><td data-label="Text"><code>background-dark-foreground</code> 11.4</td><td data-label="Text subdued"><code>--panel-muted</code> 6.56 · không dùng <code>muted-on-dark</code> (4.01)</td><td data-label="Border"><code>muted</code> 1.35 trang trí (vạch tổng)</td><td data-label="Focus">Trắng 11.4</td><td data-label="Link">Trắng gạch chân 11.4 · giảm giá <code>--panel-saving</code> 5.82</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="demo-label" style="margin-block-start: var(--space-xl)">Dark scheme sample · Browse Categories (Figma 1:395) · eyebrow xám, focus trắng · Previous disabled (nền trong suốt, viền + icon muted-on-dark 6.11), Next bật</p>
+      <div class="section--dark dark-demo" role="group" aria-label="Dark scheme sample" style="border: 0">
     <div class="section-header section-header--split">
       <p class="eyebrow">Shop by category</p>
-      <h2 id="h-dark">Browse Categories</h2>
+      <h3 class="h2">Browse Categories</h3>
       <div class="carousel-nav">
-        <button class="round-button" type="button" aria-label="Previous categories"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
-        <button class="round-button is-hover" type="button" aria-label="Next categories"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
+        <button class="round-button" type="button" aria-label="Previous categories" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
+        <button class="round-button" type="button" aria-label="Next categories"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
       </div>
     </div>
     <ul class="card-row cat-row" aria-label="Categories">
@@ -654,9 +751,14 @@
       <li><a class="collection-card collection-card--dark" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="672" height="440"></span><span class="collection-card__title">Recovery &amp; Mobility</span></a></li>
     </ul>
     <div class="carousel-progress" aria-hidden="true"><span class="carousel-progress__thumb" style="--size: 70%"></span></div>
-  </section>
+      </div>
+      <div class="dos">
+        <div class="do"><b>Nên</b>Chọn scheme bằng class ngữ cảnh rồi dùng component kit; kiểm chữ phụ và focus theo đúng hàng của scheme trong bảng.</div>
+        <div class="dont"><b>Không nên</b>Mang chữ phụ của scheme này sang scheme khác (<code>muted-light</code> trên sand, <code>muted-on-dark</code> trên panel); focus accent trên nền tối.</div>
+        <p class="tokens">Setting: <code>background_alt_color</code>, <code>background_cream_color</code>, <code>background_sand_color</code>, <code>background_dark_color</code>, <code>background_panel_color</code>, <code>muted_on_dark_color</code> · Panel chi tiết: mục 34</p>
+      </div>
+    </section>
 
-  <div class="container">
     <!-- 9. Card bài viết + hàng ngang -->
     <section class="demo-block" aria-labelledby="h-article">
       <div class="section-header section-header--split">
@@ -828,7 +930,7 @@
     <!-- Facets -->
     <section class="demo-block" aria-labelledby="h-facets">
       <h2 id="h-facets">19. Facet Group</h2>
-      <p class="demo-note">Biến thể của accordion cho bộ lọc: tiêu đề 16/600, "N selected" muted, chevron phải; hàng 52. Chỉ dùng trong drawer lọc và cột lọc collection/search. Ô màu lọc <code>.facet-swatch</code> tròn 24 trong hàng <code>.choice</code> 44: chọn = vòng foreground cách 2, focus accent (V43).</p>
+      <p class="demo-note">Biến thể của accordion cho bộ lọc: tiêu đề 16/600, "N selected" muted, chevron phải; hàng 52. Chỉ dùng trong drawer lọc và cột lọc collection/search. Ô màu lọc <code>.facet-swatch</code> tròn 24 trong hàng <code>.choice</code> 44: chọn = vòng foreground cách 2, focus accent (V43). Hết kết quả (disabled) = gạch chéo qua ô màu, ô giữ nguyên màu, nhãn muted-light 5.33; không làm mờ (CTO 21/11).</p>
       <div class="facet-demo">
         <details class="facet" open><summary>Availability <small>1 selected</small><svg aria-hidden="true" viewBox="0 0 9 5"><use href="#i-chevron"/></svg></summary><div class="facet__body"><label class="choice"><input type="checkbox" checked> In stock <span class="facet__count">22</span></label><label class="choice"><input type="checkbox"> Out of stock <span class="facet__count">3</span></label></div></details>
         <details class="facet" open><summary class="is-hover">Price <svg aria-hidden="true" viewBox="0 0 9 5"><use href="#i-chevron"/></svg></summary><div class="facet__body"><div class="facet__range"><div class="field"><label class="visually-hidden" for="pr-min">From</label><input class="field__input field__input--compact" id="pr-min" inputmode="decimal" value="$50"></div><span class="text-small text-muted">to</span><div class="field"><label class="visually-hidden" for="pr-max">To</label><input class="field__input field__input--compact" id="pr-max" inputmode="decimal" value="$200"></div></div></div></details>
@@ -836,7 +938,8 @@
           <label class="choice"><span class="facet-swatch" style="--swatch: var(--color-foreground)"><input type="checkbox" checked><span></span></span>Black <span class="facet__count">12</span></label>
           <label class="choice"><span class="facet-swatch is-focus" style="--swatch: var(--color-muted-light)"><input type="checkbox"><span></span></span>Gray · focus <span class="facet__count">7</span></label>
           <label class="choice"><span class="facet-swatch" style="--swatch: var(--color-background)"><input type="checkbox"><span></span></span>White <span class="facet__count">4</span></label>
-          <label class="choice"><span class="facet-swatch" style="--swatch: var(--color-sale)"><input type="checkbox" disabled><span></span></span>Red · 0 <span class="facet__count">0</span></label>
+          <label class="choice"><span class="facet-swatch" style="--swatch: var(--color-sale)"><input type="checkbox" disabled><span></span></span>Red · disabled <span class="facet__count">0</span></label>
+          <label class="choice"><span class="facet-swatch" style="--swatch: var(--color-foreground)"><input type="checkbox" disabled><span></span></span>Charcoal · disabled <span class="facet__count">0</span></label>
         </div></details>
       </div>
     </section>
@@ -1013,12 +1116,29 @@
     <!-- 12. Toast -->
     <section class="demo-block" aria-labelledby="h-toast">
       <h2 id="h-toast">27. Toast</h2>
-      <p class="demo-note">4 loại cố định (CTO 09/11): info xám, success badge-new, warning cam accent, error sale. Màu + icon + chữ. Success/info tự ẩn 6s, dừng khi hover/focus; warning/error đóng tay.</p>
+      <p class="demo-note">4 loại cố định (CTO 09/11): info xám, success <code>--color-success</code>, warning cam <code>--color-warning</code>, error <code>--color-critical</code>. Màu + icon + chữ. Success/info tự ẩn 6s, dừng khi hover/focus; warning/error đóng tay. Tiêu đề toast success tối đa 3 từ và 24 ký tự (1 dòng ở 360), mô tả tối đa 2 dòng.</p>
       <div class="stack" style="max-width: 400px">
         <div class="toast toast--success" role="status"><svg aria-hidden="true"><use href="#i-check"/></svg><div class="toast__body"><strong>Added to cart</strong>Iron Core Kettlebell 16 kg · $119.00</div><button class="toast__close" type="button" aria-label="Dismiss: Added to cart"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
         <div class="toast toast--info" role="status"><svg aria-hidden="true"><use href="#i-info"/></svg><div class="toast__body"><strong>Filters updated</strong>4 products</div><button class="toast__close" type="button" aria-label="Dismiss: Filters updated"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
-        <div class="toast toast--warning" role="alert"><svg aria-hidden="true"><use href="#i-warning"/></svg><div class="toast__body"><strong>Only 2 left</strong>Quantity changed to 2.</div><button class="toast__close" type="button" aria-label="Dismiss: Only 2 left"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
-        <div class="toast toast--error" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="toast__body"><strong>Couldn't add to cart</strong>Hết hàng toàn bộ is sold out.</div><button class="toast__close" type="button" aria-label="Dismiss: Couldn't add to cart"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+        <div class="toast toast--warning" role="alert"><svg aria-hidden="true"><use href="#i-warning"/></svg><div class="toast__body"><strong>Price updated</strong>1 item in your cart has a new price.</div><button class="toast__close" type="button" aria-label="Dismiss: Price updated"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+        <div class="toast toast--error" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="toast__body"><strong>Connection lost</strong>We couldn't save your cart. Check your connection.</div><button class="toast__close" type="button" aria-label="Dismiss: Connection lost"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      </div>
+      <div class="table-wrap" style="margin-block-start: var(--space-xl)">
+        <table class="data-table touch-table">
+          <caption>Chọn mẫu thông báo (CTO 21/11)</caption>
+          <thead><tr><th scope="col">Tình huống</th><th scope="col">Mẫu</th><th scope="col">Ví dụ</th></tr></thead>
+          <tbody>
+            <tr><td data-label="Tình huống">Xác nhận ngắn sau thao tác thành công, tin trung tính</td><td data-label="Mẫu">Toast success / info · <code>role="status"</code>, tự ẩn 6s</td><td data-label="Ví dụ">"Added to cart" · "Link copied" · "Filters updated"</td></tr>
+            <tr><td data-label="Tình huống">Lỗi tại chỗ: trường sai, submit form, 422 thêm giỏ, khối không tải được</td><td data-label="Mẫu"><code>.field__error</code> · <code>.form-message--error</code> (thêm <code>--inline</code> dưới nút / dòng) · <code>.alert</code></td><td data-label="Ví dụ">"Enter an email like name@example.com."</td></tr>
+            <tr><td data-label="Tình huống">Cảnh báo tại chỗ: số lượng bị đổi, gần hết hàng</td><td data-label="Mẫu"><code>.form-message--warning</code> (thêm <code>--inline</code> trong dòng giỏ)</td><td data-label="Ví dụ">"Quantity changed to 2. Only 2 left."</td></tr>
+            <tr><td data-label="Tình huống">Thao tác nền ngoài tầm nhìn thất bại hoặc cần lưu ý (mất kết nối, đồng bộ giỏ)</td><td data-label="Mẫu">Toast error / warning · <code>role="alert"</code>, đóng tay</td><td data-label="Ví dụ">"Connection lost" · "Price updated"</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="dos">
+        <div class="do"><b>Nên</b>Tiêu đề toast success ≤ 3 từ, ≤ 24 ký tự: "Added to cart" (13), "Discount applied" (16), "Link copied" (11). Chi tiết (tên sản phẩm, giá) để ở dòng mô tả.</div>
+        <div class="dont"><b>Không nên</b>"Your item has been added to the cart successfully" (9 từ, 49 ký tự); toast error cho lỗi trường, lỗi submit hay 422 ngay tại nút; quá 3 toast chồng.</div>
+        <p class="tokens">Token: <code>--color-success</code>, <code>--color-warning</code>, <code>--color-critical</code>, <code>--shadow-raised</code>, <code>--layer-toast</code></p>
       </div>
     </section>
 
@@ -1082,6 +1202,7 @@
     <section class="demo-block" aria-labelledby="h-dialog">
       <h2 id="h-dialog">29. Dialog And Bottom Sheet</h2>
       <p class="demo-note">≥ 768: giữa màn, cỡ S 480 / M 720 / M-wide 960 (quick view từ 1280) / L 1120, bo 20 (Figma Radius/20). &lt; 768: bottom sheet ≤ 88%, thanh kéo. Hàng nút bên phải: secondary rồi primary (primary cuối); &lt; 768 xếp dọc, primary trên. Popup marketing dùng text link thay secondary để đóng ("No Thanks"). Tiêu đề Title Case; UPPER chỉ popup marketing.</p>
+      <p class="demo-note">Ngoại lệ (CTO 10/11, ghi nhận 21/11): popup marketing (newsletter, before you leave, big offer) tự mở, là ngoại lệ đã chốt của nguyên tắc "modal chỉ mở do người dùng". Rào: không mở lúc tải trang, mỗi lúc 1 popup, nghỉ 3 s, mỗi popup tự mở tối đa 1 lần / phiên, không ở 404, không confirmshaming. Mọi dialog khác (quick view, xác nhận, quiz) chỉ mở sau thao tác người dùng.</p>
       <div class="demo-stage" role="group" aria-label="Dialog sample" style="min-height: 560px">
         <div class="scrim"></div>
         <div class="dialog dialog--s" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
@@ -1192,7 +1313,7 @@
     <!-- Pagination -->
     <section class="demo-block" aria-labelledby="h-pagination">
       <h2 id="h-pagination">32. Pagination</h2>
-      <p class="demo-note">pagination.md: nút tròn 52 trước/sau, số trang pill 44, trang hiện tại accent; đầu/cuối giữ nút mờ 0.35 + aria-disabled. Dưới 768 chỉ "Page 2 of 3". "Showing x–y of z" chỉ ở search.</p>
+      <p class="demo-note">pagination.md: nút tròn 52 trước/sau, số trang pill 44, trang hiện tại accent; đầu/cuối giữ nút + aria-disabled, hiện bằng cặp màu disabled (viền border, icon muted-light 5.33), không opacity (CTO 21/11). Dưới 768 chỉ "Page 2 of 3". "Showing x–y of z" chỉ ở search.</p>
       <nav class="pagination" aria-label="Pagination" style="margin-block-start: 0">
         <ul class="pagination__list">
           <li class="pagination__item--prev"><a class="round-button pagination__step" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
@@ -1206,6 +1327,19 @@
           <li class="pagination__item--next"><a class="round-button pagination__step" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
         </ul>
         <p class="pagination__summary">Showing 13–24 of 104 results</p>
+      </nav>
+      <p class="demo-label" style="margin-block-start: var(--space-xl)">First page · previous disabled</p>
+      <nav class="pagination" aria-label="Pagination, first page" style="margin-block-start: 0">
+        <ul class="pagination__list">
+          <li class="pagination__item--prev"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></span></li>
+          <li class="pagination__status">Page 1 of 9</li>
+          <li class="pagination__num"><span class="pagination__page" aria-current="page"><span class="visually-hidden">Page </span>1</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 2">2</a></li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 3">3</a></li>
+          <li class="pagination__num"><span class="pagination__gap" aria-hidden="true">…</span></li>
+          <li class="pagination__num"><a class="pagination__page" href="#" aria-label="Page 9">9</a></li>
+          <li class="pagination__item--next"><a class="round-button pagination__step" href="#" aria-label="Next page"><svg aria-hidden="true"><use href="#i-next"/></svg></a></li>
+        </ul>
       </nav>
     </section>
 

@@ -55,7 +55,7 @@ Cửa sổ số: `{% paginate … by N, window_size: 1 %}` → tối đa 7 mục
 | Active (nhấn) | scale 0.94 | — | F§6 |
 | Focus (bàn phím) | outline 2px accent offset 3 | outline 2px accent offset 2 | F§6 |
 | Trang hiện tại | — | nền accent chữ trắng 700, `aria-current="page"`, không link, không hover | ES1-T107 #6 (CTO chấp nhận) |
-| Trang đầu / cuối | nút tương ứng vẫn hiện, opacity 0.35, `<span role="link" aria-disabled="true" aria-label>`, không `href`, không vào thứ tự Tab, không hover, `cursor: default` | — | Sổ 10/11 audit (5): giữ chỗ, 0 CLS |
+| Trang đầu / cuối | nút tương ứng vẫn hiện bằng cặp màu disabled: viền `--color-border`, icon `--color-muted-light` (5.33), nền giữ, KHÔNG opacity; `<span role="link" aria-disabled="true" aria-label>`, không `href`, không vào thứ tự Tab, không hover, `cursor: not-allowed` | — | Sổ 10/11 audit (5): giữ chỗ, 0 CLS; sổ 21/11 (ES1-T535 foundations-12): bỏ mờ 0.35 |
 | 1 trang | không render `<nav>` | — | snippet hiện có |
 | Nhiều trang | dấu "…" theo `paginate.parts` | | Shopify `paginate.parts` |
 | Không JS | mọi mục là link GET thật | | AGENTS "Works without JavaScript", SRS TE-6 AC2 |
@@ -117,7 +117,7 @@ Chuỗi (`locales/en.default.json`, nhóm có sẵn `collections.pagination`): `
 - Tên riêng: Previous/Next qua `aria-label`; số trang `aria-label="Page 4"`; trang hiện tại chữ ẩn "Page " (không đặt `aria-label` lên `<span>` không role: axe `aria-prohibited-attr`).
 - Nút tắt: `<span role="link" aria-disabled="true">` có `aria-label`, không `tabindex`, không `href`: trình đọc vẫn biết có nút, bàn phím bỏ qua.
 - Vùng chạm: chevron 52, số 44 (≥ 44 mobile, ≥ 24 target-size); 2 chevron < 48rem cách nhau ≥ 100.
-- Không chỉ dùng màu: trang hiện tại có nền đảo + đậm + `aria-current`; nút tắt có `aria-disabled` + mất viền nổi (opacity).
+- Không chỉ dùng màu: trang hiện tại có nền đảo + đậm + `aria-current`; nút tắt có `aria-disabled` + icon nhạt hơn (muted-light 5.33, vẫn đạt AA), không hover.
 - RTL: chevron lật bằng `:dir(rtl) .pagination__step svg { scale: -1 1; }`.
 - Zoom 200% (640 CSS px ở 1280): rơi về bố cục < 48rem, không cuộn ngang.
 

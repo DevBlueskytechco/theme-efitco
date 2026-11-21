@@ -21,6 +21,12 @@ foundation.md and `docs/design/decisions.md` win.
 - One accent color means "do something" (buttons, active controls). Do not use
   it for decoration. Why: a single action color keeps CTAs findable and keeps
   contrast checks to one pair.
+  - Decided exceptions (CTO, `docs/design/decisions.md`): eyebrow text on light
+    and sand backgrounds (09/11), the highlighted part of a large heading such
+    as "Get 15% Off" (09/11), the warning toast (09/11) and the warning form message (CTO 21/11,
+    components-06), both through `--color-warning`, and the article tag badge
+    `.badge--tag` (Figma 1:1022; CTO 21/11, ES1-T535). Do not add another:
+    any other category label uses a neutral badge or plain text.
 - Every value comes from a theme setting. Why: merchants and Sidekick change the
   look in theme settings without editing CSS (ADR 0001).
 
@@ -39,7 +45,7 @@ foundation.md and `docs/design/decisions.md` win.
 - Keep contrast at WCAG AA (4.5:1 normal text, 3:1 text ≥ 24px or ≥ 18.66px
   bold). Why: Lighthouse accessibility must stay ≥ 98.
 
-## Color tokens (22 settings + 3 derived)
+## Color tokens (22 settings + 3 derived + 3 status aliases)
 
 Setting id → CSS variable: `<token>_color` → `--color-<token>` (underscores
 become hyphens).
@@ -76,6 +82,33 @@ Derived colors (no setting; computed from tokens with `color-mix()`):
 | `--color-accent-on-sand` | accent 90% + foreground | #B73C0F (4.62 on sand) | Eyebrow and accent text on sand |
 | `--panel-muted` | dark foreground 70% + panel | #C4C4C6 (6.56) | Secondary text on every dark panel |
 | `--panel-saving` | badge_new 50% + dark foreground | #A5C0A6 (5.82) | Discount lines on dark panels, always with a tag icon and U+2212 minus |
+
+Status roles (no setting, no new color value; aliases of existing tokens, CTO
+21/11, ES1-T535):
+
+| Alias | Points to | Ratio | Use |
+| --- | --- | --- | --- |
+| `--color-success`, `--color-success-foreground` | `--color-badge-new`, `--color-badge-new-foreground` | 4.57 white on it; 4.57 as icon or border on white | Success toast, success form message, status icon, meter when the goal is reached |
+| `--color-warning`, `--color-warning-foreground` | `--color-accent`, `--color-accent-foreground` | 5.01 | Warning toast, warning form message |
+| `--color-critical`, `--color-critical-foreground` | `--color-sale`, `--color-sale-foreground` | 6.38 | Error toast, error form message, alert, field error text, `aria-invalid` border |
+
+- Messages read the status alias. Badges, sale prices and buttons keep reading
+  the source token. Why: the alias names the message role, so message styles do not
+  depend on a badge or price token name. Aliases have no setting and no value
+  of their own.
+- Info has no alias: use `--color-muted` (8.45 on white).
+- Message body text stays `foreground`; the status color sits on the bar,
+  border and icon, always next to an icon and words. Why: color alone never
+  carries meaning.
+- On dark backgrounds error text is white with a `critical` icon (`sale` on
+  dark is 2.73:1).
+
+Color schemes: the six backgrounds (light, alt, cream, sand, dark, panel) are
+six schemes that share one set of roles (background, text, text subdued,
+border, focus, link). The scheme × role matrix with contrast ratios is in
+`docs/ui-spec/foundation.md` §2.2 and in the mockup section "12b. Color
+Schemes And Roles". It is documentation only for now: there is no
+`color_scheme` setting and no color value changed (CTO 21/11).
 
 Section backgrounds are set in the template, not in a block setting:
 `{% block 'container', background: 'alt' | 'cream' | 'sand' | 'dark' %}`.
@@ -132,6 +165,9 @@ with `clamp()` from the mobile style at 360 to the desktop style at 1280.
 
 - Headings line-height `--line-height-heading` (1.2); display 1.19 below
   48rem and 1 above; body `--line-height-body` (1.625 = 26/16).
+- Line heights follow Figma Design System 2, not a 4px grid: 62, 58, 38, 34,
+  26 and 22 are not multiples of 4. Decided exception to the Polaris
+  line-height scale (CTO 21/11, ES1-T535); do not "fix" them.
 - Body copy in sentence case. Do not uppercase body text or h2 section
   headings. Why: uppercase is reserved for display headings, eyebrows and
   group labels so they stand out.
@@ -195,8 +231,42 @@ token.
 - Breakpoints (mobile-first from 360): `48rem` (768), `64rem` (1024),
   `80rem` (1280). Mobile type and spacing come from Figma Design System 2
   mobile styles (ES1-T527); tablet interpolates.
-- Touch targets ≥ 44px for buttons and links in controls; ≥ 24px minimum
-  anywhere.
+- Touch targets: `--touch-target` (44px) at every breakpoint for six groups:
+  main menu links, form submit (search, add to cart), cart, hamburger, close
+  buttons of modals and drawers, variant options (pill, swatch). Every other
+  control keeps the floor `--touch-target-min` (24px; 44px below 48rem per
+  CTO 09/11). Sizes per breakpoint: foundation.md §1.3 (CTO 21/11).
+
+## Motion
+
+Eight durations and three easings, the same as
+`snippets/css-variables.liquid`. Do not write a duration as a number in a
+component.
+
+| Variable | ms | Use |
+| --- | --- | --- |
+| `--motion-stagger` | 60 | Offset between elements that enter one after another (× index) |
+| `--motion-fast` | 150 | Hover color, exits |
+| `--motion-base` | 250 | Drawer, dropdown, toast, chevron |
+| `--motion-accordion` | 350 | Accordion and facet open / close |
+| `--motion-enter` | 400 | Hero text entrance, first entrance of an element |
+| `--motion-slow` | 500 | Card lift, image scale, meter |
+| `--motion-reveal` | 900 | Reveal on scroll |
+| `--motion-hero` | 1400 | Loading loops: one spinner turn, one skeleton shimmer cycle |
+
+| Easing | Role |
+| --- | --- |
+| `--ease-out` | User interaction: hover, press, opening a drawer, dropdown or toast |
+| `--ease-in-out` | System-driven change and size change: accordion, facet, meter |
+| `--ease-expo` | Emphasized entrance: reveal on scroll, dialog, hero |
+
+- `linear` (CSS keyword) only for loading loops (spinner, shimmer).
+- Decided exception (CTO 09/11, 21/11): `--motion-reveal` 900 and
+  `--motion-hero` 1400 are longer than Polaris's 500ms ceiling. They are only
+  for reveal on scroll and loading loops; feedback to a user action is always
+  ≤ 500ms.
+- Animate only `transform`, `opacity` and `clip-path`;
+  `prefers-reduced-motion: reduce` turns motion off.
 
 ## Images
 
@@ -228,6 +298,9 @@ confirm them (question ES1-T39).
 - Voice: Title Case, 2–4 words, starts with a verb, says what happens next.
   Figma copy: "Explore Equipment", "Become A Member", "View About Us",
   "Add Setup To Cart", "Add Bundle To Cart". Provisional until ES1-T39.
+  Title Case is a decided brand exception to Polaris sentence case (CTO
+  07/11, confirmed 21/11); the rest of the Polaris rule applies (verb first,
+  no articles, no punctuation).
 - Standard commerce actions ("Add to cart", "Sold out", "Checkout") use the
   theme locale strings, not custom copy. Why: they must match Shopify checkout
   wording and translations.
@@ -251,6 +324,22 @@ confirm them (question ES1-T39).
   element; white on dark backgrounds and dark panels.
 - States for every interactive component: default, hover, focus-visible,
   active, disabled, loading (see foundation.md).
+- Disabled is a color pair, never `opacity`: buttons use a `border`
+  background with `muted` text (6.70); round arrow buttons at the start or
+  end of a row keep their background and use a `border` outline with a
+  `muted_light` icon (5.33), and on dark bands, where the enabled button is
+  a white disc, a transparent background with a `muted_on_dark` outline and
+  icon (6.11); a disabled filter swatch keeps its color and
+  gets a diagonal line, its label in `muted_light` (CTO 21/11). Why:
+  Lighthouse counts opacity in contrast, and a faded control reads as broken.
+- Messages: a toast is for short success or neutral confirmation (success
+  title ≤ 3 words and ≤ 24 characters, for example "Added to cart"). Errors
+  and warnings appear next to their source with `.field__error`,
+  `.form-message` or `.alert`; an error or warning toast is only for a
+  background action the shopper cannot see (CTO 21/11).
+- Dialogs open only after a user action. Decided exception (CTO 10/11,
+  recorded 21/11): the three marketing popups (newsletter, before you leave,
+  big offer) open by themselves, within the limits in foundation.md §16.
 
 ## Direction (RTL-ready)
 

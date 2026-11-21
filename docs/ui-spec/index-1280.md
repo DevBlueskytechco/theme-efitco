@@ -76,7 +76,7 @@ Anatomy, dữ liệu, trạng thái từng khối giữ như `index-mobile-a.md`
 
 ### 2.2 Hàng ngang (danh mục, video, review; blog khi > 4 bài)
 - `<ul tabindex="0" aria-label>` + scroll-snap, `margin-inline-end: −lề`, `padding-inline-end: lề`; card theo R4: danh mục `min(336px, (100vw − lề − 96) / 4.3)`, review `min(456px, (100vw − lề − 72) / 3.3)`, video 264.
-- Nút 52 ở đầu khối, căn đáy tiêu đề; đầu/cuối hàng mờ 0.35 + `aria-disabled` (sổ 10/11 câu 5 áp cho mọi bộ phân trang). Thanh tiến trình 2 px cách 32, `aria-hidden`.
+- Nút 52 ở đầu khối, căn đáy tiêu đề; đầu/cuối hàng cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled` (sổ 10/11 câu 5 áp cho mọi bộ phân trang). Thanh tiến trình 2 px cách 32, `aria-hidden`.
 - Tất cả card vừa khung: lưới tĩnh theo cột Figma, không render nút và thanh tiến trình.
 
 ### 2.3 Level card ≥ 80rem
@@ -101,7 +101,7 @@ Figma không có trạng thái; tất cả là ĐỀ XUẤT, cùng nội dung v�
 | --- | --- | --- |
 | Hero thiếu ảnh | nền `--color-background-dark`, chữ giữ, thẻ giữ tỉ lệ | DESIGN "Images" |
 | Level card hover/focus | hiện hàng "N Products →", ảnh scale 1.04; focus outline accent 2 px | Figma 1:464 card 1; 05 §3 |
-| Hàng ngang đầu/cuối | nút mờ 0.35 + `aria-disabled`, giữ chỗ; nút kia hover cam | sổ 09/11, 10/11 câu 5 |
+| Hàng ngang đầu/cuối | nút cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled`, giữ chỗ; nút kia hover cam | sổ 09/11, 10/11 câu 5, 21/11 |
 | Mũi tên hero hover | nền cam, chữ trắng, scale 1.06 (F§6) | sổ 09/11 |
 | Menu header | Shop, Collection mở dropdown/mega từ 80rem (F§13, `navigation.md`) | sổ 09/11 overlay |
 

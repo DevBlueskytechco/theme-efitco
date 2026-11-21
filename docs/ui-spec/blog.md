@@ -107,7 +107,7 @@ Lọc tag mặc định là link thật, tải lại trang (AGENTS "Works withou
 Dùng snippet `pagination` chung, toàn bộ hình, trạng thái, A11y theo `docs/ui-spec/pagination.md` (sổ 10/11 S3/C3). Thay `default_pagination`.
 - `{% paginate blog.articles by section.settings.articles_per_page, window_size: 1 %}` → `{% render 'pagination', paginate: paginate, anchor: '#blog-grid' %}`.
 - Previous/Next tròn 52 chevron, `aria-label="Previous page"` / `"Next page"`; số pill 44, trang hiện tại accent; < 48rem "Page X of Y" giữa 2 nút dạt 2 mép.
-- Trang đầu/cuối: nút giữ chỗ mờ 0.35 + `aria-disabled` (sổ 10/11 audit 5).
+- Trang đầu/cuối: nút giữ chỗ, cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled` (sổ 10/11 audit 5).
 - Lưới → phân trang 48 / 64 từ 64rem (§3).
 - ĐỀ XUẤT neo `#blog-grid` (id trên lưới) để sau khi tải trang mới rơi thẳng vào lưới (pagination.md §5).
 

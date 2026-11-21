@@ -140,7 +140,7 @@ Dùng chung thành phần với collection (ES1-T254 §6), khác: search giữ n
 - Dùng snippet `pagination` chung; hình, trạng thái, mốc, A11y theo `docs/ui-spec/pagination.md`: `{% paginate search.results by section.settings.results_per_page, window_size: 1 %}` → `{% render 'pagination', paginate: paginate, summary: pagination_summary %}`.
 - Dưới nhóm cuối, cách 48 (64 từ 64rem), căn giữa.
 - Tóm tắt: Previous/Next tròn 52 chevron (`aria-label="Previous page"` / `"Next page"`), cách số 16; số pill 44, trang hiện tại accent (ES1-T107 #6); < 48rem [‹] "Page 2 of 2" [›] trải hết hàng.
-- Đầu/cuối: nút vẫn hiện, opacity 0.35 + `aria-disabled`, không link (sổ 10/11 audit 5).
+- Đầu/cuối: nút vẫn hiện, cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled`, không link (sổ 10/11 audit 5).
 - Dưới hàng: "Showing 25–37 of 37 results" 14 muted (tham số `summary`, chỉ search; 08 #531D).
 - Link thật có `href` (chạy không JS). Không infinite scroll (08 #2167D); không "Load more" (đồng bộ collection).
 

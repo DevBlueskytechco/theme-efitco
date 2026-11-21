@@ -101,7 +101,7 @@ Figma: trên dải tối; h2 trắng "Browse Categories" Sofia 700 48; 2 nút tr
 | Điều khiển | ẩn nút, vuốt; thanh tiến trình 2px cách 32 (sổ 09/11) | nút 52 + thanh tiến trình |
 
 Trên nền tối: nút tròn nền trắng (viền trắng, F§6), hover cam; thanh tiến trình trắng 12% / thumb trắng (F§11).
-Trạng thái: hover ảnh scale 1.04 + tên gạch chân; focus outline trắng quanh card; đầu/cuối hàng nút mờ 0.35 + `aria-disabled`. ĐỀ XUẤT: < 3 collection thì bỏ nút và thanh tiến trình, card xếp lưới tĩnh; 0 collection thì không render khối; collection không ảnh thì ô nền `--color-background-panel` + tên.
+Trạng thái: hover ảnh scale 1.04 + tên gạch chân; focus outline trắng quanh card; đầu/cuối hàng nút cặp màu disabled (viền `--color-border`, icon `--color-muted-light`, không opacity; sổ 21/11) + `aria-disabled`. ĐỀ XUẤT: < 3 collection thì bỏ nút và thanh tiến trình, card xếp lưới tĩnh; 0 collection thì không render khối; collection không ảnh thì ô nền `--color-background-panel` + tên.
 A11y: `<ul aria-label="Product categories" tabindex="0">`; mỗi card 1 link, tên link = tên collection, ảnh `alt=""`; nút "Previous categories"/"Next categories".
 
 ## 4. Intro + Shop by level (Figma 1:453)
@@ -247,7 +247,7 @@ Theo sổ 09/11 và F§19, sửa ES1-T292 (audit A8):
 - Màn đầu (header, hero): ảnh slide 1 và lớp tối KHÔNG có hiệu ứng vào (không opacity, clip-path, scale), hiện ngay khi tải: ảnh là LCP, reveal làm trễ LCP mobile (chỉ tiêu ≥ 90, sổ 09/11). Cùng cách `product.md` §14, `blog.md` §7, `article.md`.
 - Chữ hero (eyebrow, H1, câu phụ, nút): ĐỀ XUẤT hiện dần ngay lúc tải, không chờ cuộn: opacity 0 → 1 + translate 16px → 0, 400ms, lệch 60ms, ease-out; xong trước 700ms (15 §1 "100–500ms"; 15 §3 chỉ tiêu đề, ảnh chính, CTA). Không áp cho ảnh.
 - Chuyển slide: opacity 500ms, chỉ khi người dùng bấm (§2).
-- Từ Browse Categories trở xuống: tiêu đề, card hiện dần khi cuộn tới (900ms, lệch 80ms/card, 1 lần).
+- Từ Browse Categories trở xuống: tiêu đề, card hiện dần khi cuộn tới (`--motion-reveal` 900, lệch `--motion-stagger` 60 mỗi card, 1 lần; sổ 21/11).
 - Hover 150–250ms; tab đổi lưới fade 250ms; chỉ transform/opacity/clip-path; tắt khi `prefers-reduced-motion` (chữ hero hiện ngay).
 
 ## 11. Settings merchant
