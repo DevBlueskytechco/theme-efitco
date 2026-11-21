@@ -5772,7 +5772,9 @@ cart-drawer {
   column-gap: var(--space-3);
   min-block-size: var(--header-height);
   padding: 0 var(--search-gutter);
-  background: var(--color-background-dark) url('noise-dark.png');
+  /* Noise = border-image fill: không là ứng viên LCP (ES1-T494, ES1-T533) */
+  background: var(--color-background-dark);
+  border-image: url('noise-dark.png') 0 fill/0 repeat;
   color: var(--color-background-dark-foreground);
 }
 
@@ -6462,7 +6464,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-footer__wordmark { font-size: 200px; line-height: 180px; letter-spacing: -8px; position: relative; inset-inline-start: -4px; inset-block-start: -1px; }
 
   /* Danh mục */
-  .block-container:has(> .collection-list), .block-container:has(> .slideshow) { background: var(--figma-1a1a1a) url('noise-dark.png'); }
+  .block-container:has(> .collection-list), .block-container:has(> .slideshow) { background: var(--figma-1a1a1a); border-image: url('noise-dark.png') 0 fill/0 repeat; } /* ES1-T533: noise không là ứng viên LCP */
 
   /* Intro + cấp độ */
   .shop-by-level__list { gap: 24px; }

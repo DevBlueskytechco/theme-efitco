@@ -782,7 +782,8 @@ test.describe('ES1-T386 password', () => {
         const body = page.locator('body');
         await expect(body).toHaveClass(/template-password/);
         expect(await css(body, 'background-color')).toBe(await resolveColor(page, 'var(--color-background-dark)'));
-        expect(await css(body, 'background-image')).toContain('noise-dark');
+        // ES1-T533: noise vẽ bằng border-image fill (không là ứng viên LCP)
+        expect(await css(body, 'border-image-source')).toContain('noise-dark');
         for (const id of ['header', 'footer', 'announcement-bar']) await expect(page.getByTestId(id)).toHaveCount(0);
         await expect(page.locator('header, footer')).toHaveCount(0);
         const logo = page.getByTestId('password-logo');
