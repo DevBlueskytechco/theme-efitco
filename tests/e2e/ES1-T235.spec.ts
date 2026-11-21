@@ -11,11 +11,12 @@ test.beforeEach(async ({ page }) => { await autoDeclineConsent(page); });
 test.describe('ES1-T235 trải nghiệm', () => {
   test('hiện dần: phần dưới màn hình chờ, cuộn tới thì hiện đủ', async ({ page }) => {
     await page.addInitScript(asUser);
-    await page.goto('/');
+    // ES1-T406 (ADR 0011 mục 3): FAQ trang chủ chưa cấu hình không render (không copy mẫu); đo trên /?view=figma (literal Figma)
+    await page.goto('/?view=figma');
     await expect(page.locator('html')).toHaveAttribute('data-motion', 'on');
     // ES1-T250: hiện dần theo từng phần (chữ, card, ảnh) thay vì cả khối
-    // ES1-T405: shop-the-look cần dữ liệu fixture (ADR 0011); đo reveal trên FAQ (luôn render, dưới màn hình đầu, khớp 'main h2' của motion.js)
-    const block = page.locator('[data-testid="container-home-faq"] h2').first();
+    // ES1-T405: shop-the-look cần dữ liệu fixture (ADR 0011); đo reveal trên FAQ (dưới màn hình đầu, khớp 'main h2' của motion.js)
+    const block = page.locator('[data-testid="container-figma-faq"] h2').first();
     await expect(block).toHaveAttribute('data-reveal', 'wait');
     await expect(block).toHaveAttribute('data-reveal-kind', 'text');
     await block.scrollIntoViewIfNeeded();
@@ -25,8 +26,9 @@ test.describe('ES1-T235 trải nghiệm', () => {
 
   test('số thống kê chạy từ 0 khi cuộn tới, dừng đúng giá trị', async ({ page }) => {
     await page.addInitScript(asUser);
-    await page.goto('/');
-    const value = page.getByTestId('faq-stat-1').locator('.faq__stat-value');
+    // ES1-T406 (ADR 0011 mục 3): "360+" không còn là default trang chủ; số Figma literal ở /?view=figma
+    await page.goto('/?view=figma');
+    const value = page.getByTestId('container-figma-faq').getByTestId('faq-stat-1').locator('.faq__stat-value');
     await expect(value).toHaveText('0+');
     await value.scrollIntoViewIfNeeded();
     await expect(value).toHaveText('360+', { timeout: 5000 });

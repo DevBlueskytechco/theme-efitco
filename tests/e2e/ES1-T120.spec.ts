@@ -254,14 +254,19 @@ test.describe('ES1-T120 TE-7 image with text', () => {
     await expect(inspiration).toHaveClass(/block-container--sand/);
     await expect(whyChoose).toHaveClass(/block-container--dark/);
 
-    expect(await inspiration.evaluate((el) => {
-      const next = document.querySelector('[data-testid="container-home-testimonials"]')!;
-      return Boolean(el.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING);
-    })).toBeTruthy();
-    expect(await testimonials.evaluate((el) => {
-      const next = document.querySelector('[data-testid="container-home-why-choose"]')!;
-      return Boolean(el.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING);
-    })).toBeTruthy();
+    // ES1-T406 (ADR 0011 mục 3): theme chưa cấu hình không in band testimonials (không review mẫu);
+    // khi có band thì nằm giữa hàng 8 và 13, không có thì hàng 8 vẫn trước hàng 13.
+    const follows = (from: Locator, testid: string) =>
+      from.evaluate((el, id) => {
+        const next = document.querySelector(`[data-testid="${id}"]`)!;
+        return Boolean(el.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING);
+      }, testid);
+    if ((await testimonials.count()) > 0) {
+      expect(await follows(inspiration, 'container-home-testimonials')).toBeTruthy();
+      expect(await follows(testimonials, 'container-home-why-choose')).toBeTruthy();
+    } else {
+      expect(await follows(inspiration, 'container-home-why-choose')).toBeTruthy();
+    }
 
     await expect(page.locator('[data-image-with-text-id="inspiration"]')).toHaveClass(/image-with-text--banner/);
     await expect(page.locator('[data-image-with-text-id="why-choose"]')).toHaveClass(/image-with-text--split/);

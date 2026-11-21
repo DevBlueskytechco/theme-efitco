@@ -1246,6 +1246,11 @@ test.describe('ES1-T99 TE-5 AC17 thanh checkout', () => {
       const cart = await readCart(page);
       await toBottom(page);
       test.skip(!(await panelOut(page)), `${name}: cuộn hết trang panel vẫn trong màn (trang ngắn)`);
+      // Padding đáy body (--bottom-bar-height) chỉ áp khi IntersectionObserver gắn data-bottom-bar sau lần cuộn đầu → trang dài thêm 72px,
+      // cuộn lại tới đáy mới đo được footer có bị che không (race lộ ra khi seed giỏ không bị 429, PR #282/#283 20/11).
+      await expect(html(page)).toHaveAttribute('data-bottom-bar', 'cart');
+      await toBottom(page);
+      await page.waitForFunction(() => Math.abs(scrollY + innerHeight - document.documentElement.scrollHeight) <= 1);
       await expect(bar(page), name).toBeVisible();
       expect(await bar(page).evaluate((el) => el.tagName)).toBe('ASIDE');
       await expect(bar(page)).toHaveAttribute('aria-label', TEXT.sticky);

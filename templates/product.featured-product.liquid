@@ -1,4 +1,5 @@
-{% # TE-13: assets/product-variant-picker.js fetches product-price and product-buy-buttons from ?view=featured-product (drafts/techlead/ES1-T142/task-split.md D4). %}
+{% layout none %}
+{% # TE-13, ADR 0008 item 3: data view, never a page. assets/product-variant-picker.js fetches product-options, product-price and product-buy-buttons from ?view=featured-product&option_values=; with 2+ featured products assets/featured-product.js swap() fetches the whole view. layout none: no header, footer or scripts in the response (ES1-T350 review #4). %}
 {% block 'container', id: 'featured-product-regions', tag: 'div' %}
   {% block 'featured-product', id: 'featured-product', product: product %}{% endblock %}
 {% endblock %}
