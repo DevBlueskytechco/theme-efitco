@@ -48,7 +48,7 @@ Mỗi option một `<fieldset>`:
 3. Nút "+N" / "Show Fewer" (chỉ option > 10 giá trị).
 4. Vùng lỗi tải (`role="alert"`, rỗng khi không lỗi) ngay dưới nhóm giá trị.
 
-Khoảng giữa các fieldset 24 (`--space-5`).
+Khoảng giữa các fieldset 24 (`--space-xl`).
 
 ### 3.1 Pill chữ (option không có swatch: Size, Weight, Pack, Denominations, Operating system)
 

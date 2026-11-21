@@ -160,7 +160,7 @@ Figma không có; tất cả ĐỀ XUẤT (05 §3, §6–7; 14 #928M; foundation
 | L6 | Không kết quả | icon tìm 24 muted-light + câu `country_no_results` 14 muted + text link "Clear search"; danh sách giữ chiều cao (0 nhảy) |
 | L7 | Trigger: default / hover / focus / mở | trắng; hover gạch chân chữ; focus outline trắng 2px offset 2; mở chevron xoay 180° |
 | L8 | Hàng: default / hover / focus / hiện tại / disabled | nền trong / nền alt / outline accent 2px inset −2 / ✓ + 600 + nền alt / chữ muted-light (khi đang đổi) |
-| L9 | Đang đổi | sau khi bấm: hàng được chọn thay tiền tệ bằng spinner 16 + chữ ẩn "Switching to Canada"; các hàng khác `aria-disabled`, chữ muted-light; bảng `aria-busy`; chỉ hiện spinner nếu > 300 ms (tránh chớp). Shopify chuyển trang xong là hết |
+| L9 | Đang đổi | sau khi bấm: hàng được chọn thay tiền tệ bằng spinner 16 + chữ ẩn "Switching to Canada"; các hàng khác `aria-disabled`, chữ muted-light; bảng `aria-busy`; chỉ hiện spinner nếu > 300 ms (tránh chớp; ngưỡng chung foundation §18.1). Shopify chuyển trang xong là hết |
 | L10 | Lỗi | chỉ khi BE gửi bằng fetch và lỗi mạng: hộp `.alert` trên danh sách, viền sale, icon ! sale, câu `error` 14 muted, nút secondary "Try Again" (gửi lại mục vừa chọn); `role="alert"`; hàng trở lại bấm được. Gửi form thường (không JS) thì lỗi mạng là trang lỗi của trình duyệt |
 | L11 | Tên dài ("Saint Vincent & Grenadines") | xuống 2 dòng, hàng cao lên, tiền tệ căn trên |
 | L12 | Ngôn ngữ viết phải sang trái (العربية) | `lang="ar" dir="auto"` trên mục, căn theo hướng chữ |

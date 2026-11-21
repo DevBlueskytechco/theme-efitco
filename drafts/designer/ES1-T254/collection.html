@@ -95,6 +95,9 @@
   .demo-states { padding-block-end: var(--section-gap); }
   .state-pair { display: grid; gap: var(--space-2xl); }
   @media (min-width: 80rem) { .state-pair { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  /* S7: skeleton theo đúng lưới trang (2 cột dưới 48rem, 3 cột từ 48rem), bề ngang = 9 / 12 cột như vùng kết quả cạnh cột lọc */
+  .state-pair--stack { grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 64rem) { .s7-grid { max-inline-size: calc((min(var(--page-width), 100vw) - var(--page-margin) * 2) * 0.75 - var(--grid-gap) * 0.25); } }
   .state-box { padding: var(--space-xl); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
   .sort-options { max-width: 260px; margin-block-start: var(--space-sm); }
   .demo-row--wrap { display: flex; flex-wrap: wrap; gap: var(--space-md); align-items: center; }
@@ -519,12 +522,14 @@
   <!-- S7. Đang tải + lỗi -->
   <section class="demo-block" aria-labelledby="s7">
     <h2 id="s7">S7. Đang cập nhật · Lỗi tải</h2>
-    <div class="state-pair">
+    <div class="state-pair state-pair--stack">
       <div class="state-box results">
         <div class="toolbar" style="position: static; margin: 0; padding-inline: 0">
           <p class="toolbar__count updating" role="status"><span class="spinner" aria-hidden="true"></span>Updating products…</p>
         </div>
-        <ul class="product-grid results__grid" aria-busy="true" aria-label="Loading products" style="grid-template-columns: repeat(2, minmax(0, 1fr))">
+        <ul class="product-grid results__grid s7-grid" aria-busy="true" aria-label="Loading products">
+          <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>
+          <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>
           <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>
           <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>
           <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></li>

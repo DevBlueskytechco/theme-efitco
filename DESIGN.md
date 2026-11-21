@@ -14,6 +14,12 @@ states, do / don't) lives in `docs/ui-spec/foundation.md` and the mockup kit
 `drafts/designer/_kit/kit.css`; when this file and foundation.md disagree,
 foundation.md and `docs/design/decisions.md` win.
 
+Design system version: 1.3.0 (proposed, waiting for CTO approval). The number
+lives in `docs/tokens.json` `_version`; rules and history are in
+`docs/design/CHANGELOG.md`. Writing rules for every string are in
+`docs/design/content.md`. How to propose and land a change is in
+`CONTRIBUTING.md`, section "Changing the design system".
+
 ## Intent
 
 - Athletic, confident, product-first. Large condensed uppercase headings, plain
@@ -39,11 +45,47 @@ foundation.md and `docs/design/decisions.md` win.
   `var(--space-*)`, `var(--radius-*)`. No hex, `rgb()` or `hsl()` literals.
   Tints and shadows use `color-mix()` with a variable. Why: 0 hardcoded colors
   is a release check (ADR 0001).
-- A new token needs, in one change: `docs/tokens.json` → setting in
-  `config/settings_schema.json` → variable in `snippets/css-variables.liquid` →
-  row in this file. Why: the four places drift apart otherwise.
+- A new, renamed or re-valued token is changed in four places in one change,
+  with a changelog line and a version number: (1) setting default in
+  `config/settings_schema.json` (only when the token has a setting), (2)
+  variable in `snippets/css-variables.liquid`, (3) `docs/tokens.json`, (4)
+  this file, `docs/ui-spec/foundation.md` and the mockup kit. Why: the four
+  places drift apart otherwise.
+- Source of truth for a token value: a value that has a line in
+  `docs/design/decisions.md` follows that line in all four places. For a
+  token with no decision line, when the four places disagree the earlier
+  place in that list wins (PROPOSED by the designer in ES1-T535, not yet a
+  CTO decision). Known mismatches waiting for FE, where the decision wins
+  over the setting default: `badge_new_color` #467A48 → #4B824D (V01) and
+  `background_alt_color` #F4F4F4 → #F4F4F5 (V18). Every `:root` variable is
+  declared in `snippets/css-variables.liquid`, not in `assets/base.css`.
 - Keep contrast at WCAG AA (4.5:1 normal text, 3:1 text ≥ 24px or ≥ 18.66px
   bold). Why: Lighthouse accessibility must stay ≥ 98.
+
+## Token tiers
+
+Three tiers, read top to bottom (CTO 21/11, ES1-T535; foundation.md §32).
+
+| Tier | What it is | Examples |
+| --- | --- | --- |
+| 1 · Primitive | Raw value on a scale. Comes from a theme setting or the Figma Design System 2 scale | `accent_color` #C8400E, `--space-md` 16, `--radius-md` 12, `--motion-base` 250, `--icon-size-md` 20 |
+| 2 · Semantic | Named by role, points to tier 1. Components read this tier | `--color-accent`, `--color-warning`, `--radius-card`, `--shadow-raised`, `--layer-overlay`, `--touch-target` |
+| 3 · Component | Value owned by one component, derived from tier 2 or kept at the exact Figma number | `--control-height`, `--toast-color`, `--alert-color`, `--tab-padding-inline`, `--thumb-size` |
+
+- A component reads a semantic token first and a primitive only when no role
+  exists (spacing has no roles, so components read `--space-*` directly). It
+  never reads a hex, a raw px value or a setting. Why: a merchant setting then
+  reaches every component through one chain.
+- Do not name a variable after its value (`--figma-1a1a1a`, `--gray-500`).
+  Why: the name becomes wrong the day the value changes; `--figma-666666`
+  already points to #999999.
+- `--figma-*` variables are legacy. `assets/base.css` still uses 23 of them
+  (85 uses); the table that maps each one to a role token is in foundation.md
+  §32.4. Do not add a new one and do not use them in new code.
+- Token groups and counts (kit `:root`, 134 variables): color 32, typography
+  26, space 12 + 8 aliases, radius 6 + 7 roles, motion 8 + 3 easings, shadow
+  4, layer 8, icon 4, size and layout 15, component 1. Breakpoints (48rem,
+  64rem, 80rem) are constants in media queries, not variables.
 
 ## Color tokens (22 settings + 3 derived + 3 status aliases)
 
@@ -176,9 +218,11 @@ with `clamp()` from the mobile style at 360 to the desktop style at 1280.
 ## Spacing
 
 One setting, `space_base` (default 4px), drives the scale. Why: the
-merchant changes overall density with one control. `--space-1…8` stay for
-theme code; new spacing uses the named steps, which match Figma Space/4…64
-plus a desktop tier.
+merchant changes overall density with one control. There is one naming
+system: the named steps `--space-2xs…7xl`, which match Figma Space/4…64 plus
+a desktop tier (CTO 20/11 V06, CTO 21/11). `--space-1…8` and
+`calc(var(--space-1) * N)` are the old names; they remain only as aliases in
+existing theme code and are not used in new components.
 
 | Named variable | px | Index alias | Typical use |
 | --- | --- | --- | --- |
@@ -195,8 +239,22 @@ plus a desktop tier.
 | `--space-6xl` | 80 | `space_base × 20` | Desktop tier |
 | `--space-7xl` | 120 | `--space-8` | Section padding from 64rem |
 
-`--space-7` (48) is outside the Figma DS2 scale; use it for control heights, and for layout gaps only where the page's Figma Final frame measures exactly 48 (home 1280/1920, CTO 20/11 ES1-T527).
+`--space-7` (48) is outside the Figma DS2 scale and has no named step; use it for control heights, and for layout gaps only where the page's Figma Final frame measures exactly 48 (home 1280/1920, CTO 20/11 ES1-T527).
 Do not write raw px for spacing.
+
+- A value that is off the scale: do not write `calc()` or a raw px value in
+  a component. First round it to the nearest step. If the Figma Final frame
+  requires the exact number, declare one component-tier token with its Figma
+  node (for example `--tab-padding-inline` 28, Figma 1:490). If three or more
+  components need the same value, propose a new step for the CTO to decide.
+- The spacing scale is for padding, gap and margin. Sizes (width, height) use
+  size tokens: `--control-height`, `--touch-target`, `--icon-size-*`.
+- Theme code still needs the steps 20, 40, 56, 64 and 80 as variables; until
+  FE adds them `assets/base.css` has 177 lines with
+  `calc(var(--space-1) * N)` (233 across `assets/*.css`). Factors 11, 12 and
+  13 (44, 48, 52) are sizes, not spacing: they map to `--touch-target` and
+  `--control-height(-compact)`. Old name → new name table: foundation.md
+  §1.2.
 
 ## Corner radius
 
@@ -213,6 +271,75 @@ Scale = Figma Radius/4…20 plus pill. Four settings set the role tokens.
 
 Round controls (slideshow arrows, dots) use `50%`; that is a shape, not a
 token.
+
+- Nested corners: the inner surface is one step smaller than its container
+  (thumbnail 8 in a card 12, card 12 in a panel 16, panel 16 in a dialog 20).
+  Buttons and badges keep their own radius when nested. An inner radius is
+  never larger than the outer one.
+- Components read the role (`--radius-card`, `--radius-panel`,
+  `--radius-dialog`), not the step. Do not write `calc(radius ± space)` and
+  do not use a spacing token as a radius.
+- Off-scale radii still in theme code (2, 18, 24, `--figma-radius-*`,
+  `calc(var(--radius-card) ± var(--space-1))`) map to the scale: 2 and 18 →
+  pill, 8 → `--radius-sm`, 16 → `--radius-panel`, 24 → `--radius-dialog`
+  (20). Full table: foundation.md §1.2.
+
+## Elevation and layers
+
+Three shadow steps plus the bottom-bar shadow, and eight layers (CTO 20/11
+V15). Do not add a fifth shadow step.
+
+| Variable | Value | Use |
+| --- | --- | --- |
+| `--shadow-none` | none | Cards, panels, alerts and tables in the page |
+| `--shadow-raised` | 0 8 24, foreground 12% | Dropdown, popover, toast, teaser, listbox; button hover, article card hover, header after scrolling |
+| `--shadow-overlay` | 0 32 80, foreground 28% | Drawer, dialog, bottom sheet |
+| `--shadow-bar` | 0 −4 24, foreground 10% | Sticky bottom bar (shadow points up) |
+| `--overlay-scrim` | `background_dark` 50% | Behind drawer, dialog, mega menu |
+
+| Variable | z | Use |
+| --- | --- | --- |
+| `--layer-content` | 1 | Badge, card gradient, text on an image |
+| `--layer-sticky` | 4 | Collection toolbar, cart summary, product gallery |
+| `--layer-bottom-bar` | 5 | Sticky add to cart, checkout bar, bundle bar |
+| `--layer-header` | 10 | Header, dropdown, mega menu and its scrim |
+| `--layer-floating` | 15 | Big Offer teaser |
+| `--layer-scrim` | 20 | Fallback scrim |
+| `--layer-overlay` | 21 | Drawer and dialog fallback, popover card, localization from 768 |
+| `--layer-toast` | 30 | Toast |
+
+- Write `box-shadow: var(--shadow-*)` and `z-index: var(--layer-*)`. No
+  hand-written shadow and no numeric `z-index`. Why: a stray shadow or a
+  z-index of 1000 breaks the stacking order with the consent banner and
+  Shopify Inbox.
+- A shadow means "this can be pressed or sits above the page". Do not use it
+  as decoration.
+- Component → shadow → layer table, and the hand-written shadows still in
+  `assets/base.css` with their replacement: foundation.md §31.
+
+## Icons
+
+One set, one style: outlined, single color (`currentColor`), 1.5 stroke on a
+20 × 20 frame with a 16 × 16 safe area (CTO 21/11, ES1-T535; foundation.md
+§33).
+
+| Variable | px | Use |
+| --- | --- | --- |
+| `--icon-size-sm` | 16 | Inside 14px text: field error, form message, chip, small button, stepper |
+| `--icon-size-md` | 20 | Default: buttons, search field, toast, close button |
+| `--icon-size-lg` | 24 | Header (account, cart, menu), alert, compact empty state |
+| `--icon-stroke-width` | 1.5 | Every outlined icon |
+
+- Do not scale an icon outside the three sizes. Sizes kept from Figma inside
+  one component (menu chevron, CTA arrow, the chevron in the 52px round
+  button, stars, social and trust icons) belong to that component.
+- Reserved icons have one meaning each: search, bag (cart), close, arrow
+  (go to the next page or step), trash (remove a cart line). Do not reuse
+  them for anything else.
+- An icon-only button is for a common icon and has an accessible name that
+  names the object ("Cart, 2 items", "Remove filter: Color Black"). An
+  ambiguous icon always has a text label. Status and decorative icons are
+  `aria-hidden` and sit next to words.
 
 ## Page rhythm
 
@@ -293,6 +420,17 @@ component.
 Ratios for blocks not built yet are provisional until Product and Design
 confirm them (question ES1-T39).
 
+- Two fits: `contain` on the cream background for product images (never crop
+  the product), `cover` for lifestyle images. The image radius equals its
+  frame radius.
+- Thumbnails are square, cream, radius 8, `contain`, in four named sizes only:
+  48 (sticky bottom bar), 56 (compact product row, default), 64 (search
+  suggestions, gallery thumbs), 80 (cart line).
+- Missing or failed image: keep the frame and its background (placeholder
+  icon on cream; dark background for hero, banner and dark cards). The frame
+  never collapses.
+- Mockup section "11b. Media" and foundation.md §36 hold the full rules.
+
 ## Calls to action
 
 - Voice: Title Case, 2–4 words, starts with a verb, says what happens next.
@@ -301,7 +439,7 @@ confirm them (question ES1-T39).
   Title Case is a decided brand exception to Polaris sentence case (CTO
   07/11, confirmed 21/11); the rest of the Polaris rule applies (verb first,
   no articles, no punctuation).
-- Standard commerce actions ("Add to cart", "Sold out", "Checkout") use the
+- Standard commerce actions ("Add To Cart", "Sold Out", "Checkout") use the
   theme locale strings, not custom copy. Why: they must match Shopify checkout
   wording and translations.
 - No fake urgency or fake discounts: countdowns hide when the end date passes;
@@ -337,6 +475,39 @@ confirm them (question ES1-T39).
   and warnings appear next to their source with `.field__error`,
   `.form-message` or `.alert`; an error or warning toast is only for a
   background action the shopper cannot see (CTO 21/11).
+- Alerts stay in the page. `.alert` has four tones that read existing roles
+  (info `muted`, success, warning, critical) and two levels: section (1px
+  tone border, white background) and page (`.alert--page`: 4px leading bar
+  and a 6% tint, placed outside sections under the header or breadcrumb).
+  One message and at most one action per alert; an error alert has no close
+  button. Which of banner, inline message or toast to use: foundation.md §35.
+- Form errors: leaving an invalid field shows the error under it and does not
+  move focus. Submitting a form with two or more fields moves focus to the
+  summary at the top of the form (`.form-message--error`, `tabindex="-1"`)
+  when at least one field is in error, even if only one is. The summary
+  names the number of fields ("Check 1 field", "Check 2 fields") and lists
+  each error as a link to its field. A one-field form (newsletter, password)
+  returns focus to the field. Why:
+  Shopify accessibility guidance asks for focus on the error message (CTO
+  21/11, ES1-T535).
+- Loading indicators appear only after 300 ms: before that keep the old
+  content and block repeat actions; after it show a spinner inside the
+  loading area or a skeleton of the same size. One number for buttons,
+  collection filters, the variant picker and localization (foundation.md
+  §18.1; Polaris says 500 ms, open question for the CTO).
+- Tabs, chips and tertiary buttons look alike, so they differ by job: a tab
+  switches the panel right below it, a chip filters or suggests, a tertiary
+  button performs a secondary action. A small tertiary button in the same
+  area as chips gets a 16px icon or its own row (foundation.md §7).
+- Long labels: translated text can be 50% longer and short labels up to
+  three times longer. Buttons grow with the label, the row wraps, and only
+  then `.button--wrap` lets the label wrap inside the button; badges use
+  `.badge--wrap`; tabs scroll; chips wrap. Never truncate with "…" (the
+  breadcrumb is the only exception) and never lock a control width to the
+  English label. Do not build a sentence from several translated strings
+  (foundation.md §37).
+- Tables with two or three columns become a label–value list below 48rem
+  (`.data-table--stack`); wider tables scroll inside a bordered frame.
 - Dialogs open only after a user action. Decided exception (CTO 10/11,
   recorded 21/11): the three marketing popups (newsletter, before you leave,
   big offer) open by themselves, within the limits in foundation.md §16.
@@ -358,3 +529,21 @@ confirm them (question ES1-T39).
 - `layout/theme.liquid` does not set `dir` yet; there is no RTL locale.
   `assets/slideshow.js` still scrolls in LTR terms and needs work before an
   RTL launch.
+- Name sides by `inline-start` / `inline-end`, not left / right: the menu and
+  filter drawers open from inline-start, cart and search from inline-end.
+- RTL is turned on only when all six conditions hold: `dir` on `<html>` from
+  the locale; logical properties everywhere with a `:dir(rtl)` rule for
+  anything directional; carousels and `slideshow.js` scroll by direction;
+  direction icons flip and all other icons stay; a font with glyphs for the
+  RTL language is chosen (Inter and Sofia Sans Condensed have none; CTO
+  decision); QA has run the RTL sample set with labels 50% longer at 360 and
+  1280. What flips, what stays, and who owns each condition: foundation.md
+  §34 and the mockup section "6d. Right-To-Left".
+
+## Component status
+
+Each design system section carries one of four labels (foundation.md §39):
+Proposed (designer proposal, not decided), Approved (decided by the CTO, no
+theme code yet), Built (classes exist in `assets/` or `snippets/`),
+Deprecated (not used on new pages). Check the label before using a
+component in a page: only Approved and Built components go into new pages.

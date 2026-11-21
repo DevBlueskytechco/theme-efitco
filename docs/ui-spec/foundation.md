@@ -13,6 +13,34 @@ Thứ tự nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:3
 
 Quy ước cho Dev FE: kit.css là mockup, không chép vào `assets/`. Theme vẫn theo AGENTS.md: logical properties, 0 màu literal, `var(--*)`, breakpoint `48rem / 64rem / 80rem`. Cột "Code hiện có" chỉ class đã có trong `assets/`.
 
+Bản design system: 1.3.0 (đề xuất, chờ CTO duyệt). Quy tắc đánh số và lịch sử: `docs/design/CHANGELOG.md`; số bản ghi ở `docs/tokens.json` `_version` và đầu màn foundation.html (§40).
+
+## Thay đổi rà soát Polaris-first, lượt 2 (ES1-T535, CTO 21/11: hoàn thiện 19 phát hiện "Lệch chuẩn" và "Còn thiếu")
+
+Quyết định từng mục: `docs/design/decisions.md` mục "CTO 21/11 — ES1-T535", phần "Lượt 2". Không thêm giá trị màu, không thêm font, không đổi hình Tab và Chip, không thêm bậc bóng. Token mới ở `:root` của kit: `--icon-size-sm/md/lg`, `--icon-stroke-width`, `--tab-padding-inline`.
+
+| Mã | Mục | Trước | Sau |
+| --- | --- | --- | --- |
+| foundations-06 | §32 mới, §2 | chỉ cấm `--figma-*` cho thành phần mới, 3 dòng tương đương | 3 tầng primitive → semantic → component; bảng 24 biến `--figma-*` đang dùng → token vai trò; màn `h-token-architecture` |
+| foundations-08 | §1.2 | hai hệ tên song song | một hệ tên `--space-2xs…7xl`; bảng tên cũ → mới; quy tắc giá trị ngoài thang |
+| foundations-09 | §1.2 | thang radius không có quy tắc lồng, không bảng quy đổi | quy tắc con nhỏ hơn cha; bảng radius lẻ trong code → bậc thang |
+| foundations-10 | §31, §3.2, §6 | 3 bóng tự viết, 7 z-index số trong kit | kit chỉ còn `--shadow-*`, `--layer-*`; bảng component → bóng → lớp; bảng bóng viết tay → token |
+| foundations-14 (= components-13) | §33 mới | cỡ icon ghi rải theo component | khung 20, vùng an toàn 16, nét 1.5, 3 cỡ có token, icon dành riêng, tên truy cập, lật RTL; màn `h-icon` |
+| foundations-16 (= patterns-10) | §32.2, §32.3 | 4 nơi giữ token lệch nhau | bảng nhóm token + số đếm, thứ tự nguồn sự thật, tokens.json thêm nhóm thiếu |
+| foundations-17 | §34 mới, §15 | drawer "trái / phải"; không điều kiện bật RTL | inline-start / inline-end; bảng lật / giữ; 6 điều kiện bật; màn `h-rtl` |
+| components-09 | §7, §30.1 | Tab nằm trong màn Button, không bảng phân vai | màn `h-tabs` riêng; bảng phân vai Tab / Chip / Button tertiary; dấu hiệu phân biệt tertiary small |
+| components-10 | §12 | submit lỗi: focus trường lỗi đầu | focus khối tóm tắt có link tới từng trường; bảng 5 tình huống |
+| components-14 (= patterns-09) | §18.1 mới | ngưỡng 300 ms rải ở spec trang | một ngưỡng chung, bảng 5 vùng |
+| components-15 | §35 mới, §18 | `.alert` chỉ có kiểu lỗi | 4 tone × 2 cấp (trang, section), nút đóng 44; bảng chọn Banner / Inline / Toast; màn `h-alert` |
+| components-16 | §30.11 | bảng chỉ cuộn ngang ở mobile | `.data-table--stack` dạng danh sách dưới 48rem; số cột tối đa theo loại bảng |
+| components-17 | §36 mới | quy tắc ảnh rải ở DESIGN.md và card | `.media`, `.thumb` 4 cỡ có tên, bảng tỉ lệ; màn `h-media` |
+| patterns-08 | `docs/design/content.md` mới | quy tắc chữ rải | hướng dẫn nội dung riêng; màn `h-content` |
+| patterns-11 | `CONTRIBUTING.md` | chỉ có phần Skeleton Theme | thêm mục "Changing the design system" |
+| patterns-12 | §38 mới | component thiếu "Dùng khi nào", "Nên / Tránh" | khuôn 6 mục + bảng cho từng component |
+| patterns-13 | §39 mới, §21 | không nhãn trạng thái | 4 trạng thái vòng đời, bảng theo màn DS, nhãn trên màn |
+| patterns-14 | §40 mới, `docs/design/CHANGELOG.md` mới | không số bản | major.minor.patch, bản hiện tại 1.3.0 (đề xuất) |
+| patterns-17 | §37 mới | giới hạn chữ chỉ theo tiếng Anh | quy tắc chuỗi dịch dài theo component, cấm ghép chuỗi |
+
 ## Thay đổi rà soát Polaris-first (ES1-T535, CTO 21/11, báo cáo `ai-team/data/design-audit/efitco-ds-polaris-2026-11-21.md`)
 
 Quyết định từng mục: `docs/design/decisions.md` mục "CTO 21/11 — ES1-T535 (rà soát chuẩn Polaris-first)". Không thêm giá trị màu, không đổi thang chữ.
@@ -107,8 +135,8 @@ Mobile-first. Mốc 360 / 768 / 1280 / 1920 ứng với code `< 48rem`, `48rem`,
 | Lưới sản phẩm | 2 × 154 | 3 × 232 | 4 × 292 | 4 × 336 | gap ngang = gutter, gap dọc 24 → 40 | Figma 1:490 |
 | Card bài viết (hàng ngang) | 252 × 336 | 307 × 410 | 336 × 448 | 336 × 448 | `min(70vw, 336px)` / `min(40vw, 336px)`, 3/4 | Figma 1:1022 |
 | Khoảng giữa section | 56 | 56 | 120 | 120 | `--section-gap` = `--space-4xl` < 64rem, `--space-7xl` | Figma DS2 mobile 56–64 |
-| Tiêu đề section → nội dung | 24 | 24 | 40 | 40 | `--space-5`; `--space-1 × 10` từ 80rem | Figma 1:490 |
-| Eyebrow → tiêu đề | 12 | 12 | 12 | 12 | `--space-3` | Figma 1:490 |
+| Tiêu đề section → nội dung | 24 | 24 | 40 | 40 | `--heading-gap` = `--space-xl`; `--space-3xl` từ 80rem | Figma 1:490 |
+| Eyebrow → tiêu đề | 12 | 12 | 12 | 12 | `--space-sm` | Figma 1:490 |
 | Header | 80 | 80 | 80 | 80 | `--header-height` | Figma 1:362 |
 | Control (nút, input) / compact | 48 / 44 | 48 / 44 | 52 / 44 | 52 / 44 | `--control-height`, `--control-height-compact` | 14 §2; Figma 1:1104 |
 | Vùng chạm, sàn mọi control | 44 | 44 | ≥ 24 | ≥ 24 | `--touch-target-min` 24. Sổ 09/11: ≥ 24, mobile ≥ 44 | AGENTS, 14 §2 |
@@ -147,9 +175,76 @@ Ngoại lệ line-height (sổ 21/11, foundations-18): line-height giữ theo Fi
 
 ### 1.2 Khoảng cách và bo góc (V04, V06)
 
-Khoảng cách: `--space-2xs` 4, `xs` 8, `sm` 12, `md` 16, `lg` 20, `xl` 24, `2xl` 32, `3xl` 40, `4xl` 56, `5xl` 64 (Figma Space/4…64), `6xl` 80, `7xl` 120 (tầng desktop). `--space-1…8` giữ làm alias cho code theme; 48 (`--space-7`) ngoài thang Figma, chỉ cho control.
+Khoảng cách: `--space-2xs` 4, `xs` 8, `sm` 12, `md` 16, `lg` 20, `xl` 24, `2xl` 32, `3xl` 40, `4xl` 56, `5xl` 64 (Figma Space/4…64), `6xl` 80, `7xl` 120 (tầng desktop).
 
-Bo góc: `--radius-xs` 4 (input, nút, chip, tab), `sm` 8 (swatch, thumb), `md` 12 (card, dropdown, popover, bảng), `lg` 16 (`--radius-panel`: banner, card bài viết, card collection, panel footer, panel tối, hộp meter, panel trong trang), `xl` 20 (`--radius-dialog`), `pill`. Không viết `calc(radius + space)`.
+Một hệ tên (sổ 20/11 V06, sổ 21/11 foundations-08; màn `h-spacing-radius`): tên chính là `--space-2xs…7xl`. Kit và mọi thành phần mới CHỈ đọc tên này cho padding, gap, margin. `--space-1…8` và `calc(var(--space-1) * N)` là tên cũ, chỉ còn trong code theme (setting `space_base` × hệ số) và trang mockup cũ; trong kit chúng là alias trỏ về tên chính.
+
+| Tên chính | px | Tên cũ trong code theme | Ghi chú |
+| --- | --- | --- | --- |
+| `--space-2xs` | 4 | `--space-1` | Figma Space/4 |
+| `--space-xs` | 8 | `--space-2` | Figma Space/8 |
+| `--space-sm` | 12 | `--space-3` | Figma Space/12 |
+| `--space-md` | 16 | `--space-4` | Figma Space/16 |
+| `--space-lg` | 20 | `calc(var(--space-1) * 5)` | Cần FE thêm bậc vào `css-variables.liquid` |
+| `--space-xl` | 24 | `--space-5` | Figma Space/24 |
+| `--space-2xl` | 32 | `--space-6` | Figma Space/32 |
+| `--space-3xl` | 40 | `calc(var(--space-1) * 10)` | Cần FE thêm bậc |
+| `--space-4xl` | 56 | `calc(var(--space-1) * 14)` | Cần FE thêm bậc |
+| `--space-5xl` | 64 | `calc(var(--space-1) * 16)` | Cần FE thêm bậc |
+| `--space-6xl` | 80 | `calc(var(--space-1) * 20)` | Cần FE thêm bậc; tầng desktop |
+| `--space-7xl` | 120 | `--space-8` | Padding section desktop |
+| không có tên mới | 48 | `--space-7` | Ngoài thang Figma DS2: chỉ cho control (`--control-height`) và bố cục khi khung Figma Final đo đúng 48 (sổ 20/11) |
+
+`calc(var(--space-1) * N)` trong code theme (đếm trên `origin/develop`: `assets/base.css` 177 dòng; cả `assets/*.css` 233 dòng). Ngoài 5 hệ số có bậc ở bảng trên, các hệ số hay gặp còn lại KHÔNG phải khoảng cách mà là kích thước, quy về token kích thước:
+
+| Hệ số | px | Số lần (assets/*.css) | Dùng |
+| --- | --- | --- | --- |
+| 5 · 10 · 14 · 16 · 20 | 20 · 40 · 56 · 64 · 80 | 36 · 40 · 3 · 17 · 11 | `--space-lg` · `--space-3xl` · `--space-4xl` · `--space-5xl` · `--space-6xl` |
+| 11 | 44 | 25 | `--touch-target` (vùng chạm) hoặc `--control-height-compact` (cao control compact) |
+| 13 | 52 | 18 | `--control-height` từ 80rem; nút tròn 52: token tầng component |
+| 12 | 48 | 11 | `--control-height` dưới 80rem; khoảng cách 48: `--space-7`, chỉ khi Figma Final đo đúng 48 |
+| 7 · 15 · 18 | 28 · 60 · 72 | 11 · 5 · 8 | Kích thước component (nhãn đếm 28, vòng tròn 72…): áp quy tắc giá trị ngoài thang 3 bước bên dưới |
+| còn lại (2.5, 9, 22, 24, 28, 30, 36…) | — | mỗi hệ số 1–3 | Từng chỗ: quy về bậc gần nhất hoặc token tầng component |
+
+Chỗ kit còn đọc `--space-7` (48), có chủ đích (9 rule; ngoài `--control-height`). Giữ hình đã duyệt ở các lượt trước, lượt này không đổi diện mạo; Designer chưa có số đo node Figma cho từng chỗ nên KHÔNG ghi node (Còn mở trong notes: đối chiếu Figma rồi quy về 40 / 56 hoặc token tầng component):
+
+| Rule trong kit | Thuộc tính | Loại |
+| --- | --- | --- |
+| `.page-banner__content` (từ 64rem) | padding 48 | Bố cục |
+| `.page-title` | padding-block-end 48 | Bố cục |
+| `.dialog` (từ 80rem) | padding 48 | Bố cục |
+| `.site-footer__panel` | gap 48, padding-block-start 48 | Bố cục (panel footer Figma 1:1106) |
+| `.empty-state` | padding-block 48 | Bố cục |
+| `select.field__input` | padding-inline-end 48 | Chừa chỗ chevron = bề rộng control 48 |
+| `.search-field .field__input` | padding-inline-end 48 | Chừa chỗ nút submit trong ô |
+| `.dialog` | max-height = 100dvh − 48 | Kích thước |
+| `.demo-block` | padding-block 48 | Khung màn DS, không phải component theme |
+
+Thành phần MỚI không thêm chỗ đọc `--space-7`.
+
+Giá trị ngoài thang: không viết `calc()` hay px lẻ trong component. Thứ tự xử lý:
+1. Quy về bậc gần nhất.
+2. Figma Final buộc giữ đúng số: khai báo một token tầng component trong `:root` kèm node Figma (vd `--tab-padding-inline` 28, Figma 1:490).
+3. Giá trị dùng từ 3 component trở lên: đề xuất thêm bậc, CTO chốt.
+
+Thang khoảng cách chỉ cho padding, gap, margin. Kích thước (rộng, cao) dùng token kích thước: `--control-height`, `--touch-target`, `--icon-size-*`.
+
+Bo góc: `--radius-xs` 4 (input, nút, chip, tab), `sm` 8 (swatch, thumb), `md` 12 (card, dropdown, popover, bảng), `lg` 16 (`--radius-panel`: banner, card bài viết, card collection, panel footer, panel tối, hộp meter, panel trong trang), `xl` 20 (`--radius-dialog`), `pill`. Không viết `calc(radius + space)`; không dùng token space làm bo góc. Component đọc vai trò (`--radius-card`, `--radius-panel`, `--radius-dialog`), không đọc thẳng `--radius-md` cho card.
+
+Bo góc lồng nhau (sổ 21/11, foundations-09): con nhỏ hơn cha một bậc. Thumb 8 trong card 12 (`--radius-sm` trong `--radius-card`); card 12 trong panel 16; panel 16 trong dialog 20. Nút và badge KHÔNG đổi bo khi lồng (nút trong card giữ `--radius-button` 4). Con không bo lớn hơn cha.
+
+Radius lẻ trong code theme → bậc thang (Cần FE, đếm trên `origin/develop` `assets/*.css`: 31 chỗ `--figma-radius-*` = base.css 25 + aux.css 6; 25 chỗ `calc(var(--radius-card) …)` = base.css 20 + aux.css 3 + cart.css 2, gồm `+ space-1` 17, `- space-1` 6, `* 2` 2):
+
+| Trong code theme | px | Dùng | Ghi chú |
+| --- | --- | --- | --- |
+| `--figma-radius-2` | 2 | `--radius-pill` | Thanh cao 4 (tiến trình bundle, tay nắm sheet): bo nửa chiều cao |
+| `--figma-radius-4` | 4 | `--radius-xs` | Đang dùng 2 lần ở `assets/aux.css` (dòng 441, 701): KHÔNG xoá trước khi thay. Hoặc vai trò `--radius-input`, `--radius-button` |
+| `--figma-radius-8` · `calc(var(--radius-card) - var(--space-1))` | 8 | `--radius-sm` | Swatch, thumb, ô countdown |
+| `--figma-radius-12` | 12 | `--radius-card` | Vai trò, không dùng `--radius-md` trực tiếp cho card |
+| `--figma-radius-16` · `calc(var(--radius-card) + var(--space-1))` | 16 | `--radius-panel` | Panel, banner, card bài viết, card collection |
+| `--figma-radius-18` | 18 | `--radius-pill` | Nhãn đếm cao 28: 18 đã lớn hơn nửa chiều cao, hình không đổi |
+| `--figma-radius-24` · `calc(var(--radius-card) * 2)` | 24 | `--radius-dialog` (20) | Sổ 20/11 V04: 24 quy về 20 theo Figma Radius/20; panel lớn trong trang dùng `--radius-xl` |
+| `--figma-radius-999` | 999 | `--radius-pill` | Đã có sẵn |
 
 ### 1.3 Vùng chạm 44 cho 6 nhóm (sổ 21/11, foundations-13; màn `h-grid`)
 
@@ -176,24 +271,25 @@ Token màu trong `snippets/css-variables.liquid` + 3 màu dẫn xuất ghi ở `
 
 Màu: `--color-background`, `--color-foreground`, `--color-muted`, `--color-muted-light`, `--color-border`, `--color-background-alt(-foreground)`, `--color-background-cream(-foreground)`, `--color-background-sand(-foreground)`, `--color-background-dark(-foreground)`, `--color-background-panel`, `--color-muted-on-dark`, `--color-accent(-foreground)`, `--color-accent-on-sand`, `--color-sale(-foreground)`, `--color-badge-new(-foreground)`, `--color-rating`. Role trạng thái (alias, §2.1): `--color-success(-foreground)`, `--color-warning(-foreground)`, `--color-critical(-foreground)`.
 Chữ: `--font-heading--family/weight/weight-display`, `--font-primary--family`, `--font-size-xs..wordmark`, `--line-height-body/heading`.
-Khoảng cách: `--space-1..8`, `--space-2xs..7xl`, `--touch-target-min`, `--touch-target`, `--page-width`, `--page-margin`, `--header-height`, `--control-height(-compact)`. Bo góc: `--radius-xs/sm/md/lg/xl/pill`, vai trò `--radius-input/button/card/hero/swatch/panel/dialog`. Elevation: `--shadow-none/raised/overlay/bar`, `--overlay-scrim`. Lớp: `--layer-*` (§31). Motion: `--motion-fast/base/slow/accordion/reveal/enter/stagger/hero`, `--ease-out/in-out/expo` (§19).
+Khoảng cách: `--space-2xs..7xl` (tên chính; `--space-1..8` là alias cho code theme, §1.2), `--touch-target-min`, `--touch-target`, `--page-width`, `--page-margin`, `--header-height`, `--control-height(-compact)`. Icon: `--icon-size-sm/md/lg`, `--icon-stroke-width` (§33). Tầng component: `--tab-padding-inline` (§7). Bo góc: `--radius-xs/sm/md/lg/xl/pill`, vai trò `--radius-input/button/card/hero/swatch/panel/dialog`. Elevation: `--shadow-none/raised/overlay/bar`, `--overlay-scrim`. Lớp: `--layer-*` (§31). Motion: `--motion-fast/base/slow/accordion/reveal/enter/stagger/hero`, `--ease-out/in-out/expo` (§19).
 Asset: `assets/noise-dark.png` (đang dùng ở base.css cho header trang chủ và footer) là lớp noise của mọi nền tối.
 
-Không dùng `--figma-*` cho thành phần mới. Tương đương: `--figma-1a1a1a` = `--color-background-dark` (mặc định #1A1A1A), `--figma-e5e5e5` = `--color-border`, `--figma-white-60` = `color-mix(--color-background-dark-foreground 60%, --color-background-dark)`.
+Không dùng `--figma-*` ở bất kỳ đâu trong thành phần mới: biến đặt tên theo giá trị không thuộc tầng nào của kiến trúc token. Bảng đổi 24 biến `--figma-*` đang dùng sang token theo vai trò, số token từng nhóm và thứ tự nguồn sự thật: §32.
 
 Giá trị dẫn xuất (không phải token, viết `calc()` hoặc custom property cục bộ):
 
 | Tên trong kit | Giá trị | Dùng cho |
 | --- | --- | --- |
-| `--section-gap` | `--space-7` → `--space-8` từ 64rem | padding-block section |
-| `--heading-gap` | `--space-5` → `--space-1 × 10` từ 80rem | header section → nội dung |
-| `--grid-gap` | `--space-4` → `--space-5` từ 80rem | gutter |
-| `--control-height` | `--space-1 × 12` → `× 13` từ 80rem | nút, input, select |
+| `--section-gap` | `--space-4xl` 56 → `--space-7xl` 120 từ 64rem | padding-block section |
+| `--heading-gap` | `--space-xl` 24 → `--space-3xl` 40 từ 80rem | header section → nội dung |
+| `--grid-gap` | `--space-sm` 12 → `--space-md` 16 từ 48rem → `--space-xl` 24 từ 80rem | gutter |
+| `--control-height` | 48 (`--space-7`) → 52 từ 80rem; `--control-height-compact` 44 mọi mốc | nút, input, select |
 | `--band-side`, `--band-inset` | `(100% − content) / 2`; `max(0, min(60, side − 64))` | panel footer, dải rộng |
 | `--dark-texture` | `url(noise-dark.png)` | header, footer, section tối |
 | `--overlay-scrim` | `color-mix(--color-background-dark 50%, transparent)` | drawer, dialog, mega |
-| `--shadow-raised` | `0 8 24 color-mix(--color-foreground 12%)` | dropdown, toast |
-| `--shadow-overlay` | `0 32 80 color-mix(--color-foreground 28%)` | drawer, dialog |
+| `--shadow-raised` | `0 8 24 color-mix(--color-foreground 12%)` | dropdown, popover, toast, teaser; nút hover, card bài viết hover, header đã cuộn (§31) |
+| `--shadow-overlay` | `0 32 80 color-mix(--color-foreground 28%)` | drawer, dialog, sheet |
+| `--shadow-bar` | `0 −4 24 color-mix(--color-foreground 10%)` | thanh dính đáy, bóng hướng lên |
 | `--radius-dialog` | `--radius-xl` = 20 (Figma Radius/20; trước 24) | dialog, sheet |
 | `--panel-muted` | `color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel))` ≈ #C4C4C6 | chữ phụ trên panel tối: dòng hàng, Subtotal, ghi chú thuế, đếm món, ghi chú quiz |
 | `--panel-saving` | `color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground))` ≈ #A5C0A6 (badge-new #4B824D) | dòng giảm giá trên panel tối, luôn kèm icon tag 16 + dấu "−" (U+2212), số tiền `white-space: nowrap` |
@@ -282,7 +378,7 @@ Nút menu (< 80rem) · logo (link về trang chủ) · menu chính 7 mục (Shop
 - Link menu: mặc định trắng 60% (6.93:1); hover, `aria-expanded="true"` trắng 100%, chevron xoay 180°; trang hiện tại (`aria-current="page"`) trắng 100% + gạch chân 2px offset 0.45em (ĐỀ XUẤT, 04 §3.9: mục đang chọn phải rõ, không chỉ bằng màu).
 - Icon: hover scale 1.08 (base.css). Số giỏ nhảy khi thêm hàng (`[data-bump]`).
 - Focus: outline 2px `--color-background-dark-foreground` offset 2 (accent trên dark 3.48, kém rõ).
-- Đã cuộn (`[data-scrolled]`): giữ nguyên nền, thêm bóng `0 1 8 color-mix(foreground 24%)`. Không đổi chiều cao (0 CLS).
+- Đã cuộn (`[data-scrolled]`): giữ nguyên nền, thêm bóng `--shadow-raised` (trước là bóng viết tay `0 1 8 foreground 24%`; sổ 21/11, foundations-10). Không đổi chiều cao (0 CLS).
 - Dropdown / mega mở: header giữ tối; panel trắng ngay dưới đáy header (§14).
 
 ### 3.3 Trang có ảnh lớn đầu trang (collection có banner, article có ảnh bìa)
@@ -357,12 +453,14 @@ Tiêu đề trang: eyebrow (accent 16/800 uppercase) → h1 → meta 14 muted. P
 | Back (drawer) | cao 44, icon 16, chữ 14 muted | nhỏ, nhạt hơn × | — (ĐỀ XUẤT) | 14 §3 |
 
 Trạng thái (Figma không có; code + ĐỀ XUẤT 05 §3):
-- Hover < 200ms: primary `color-mix(accent 88%, foreground)` + nhấc 1px + bóng; secondary đảo nền foreground; chevron cam + scale 1.06.
+- Hover < 200ms: primary `color-mix(accent 88%, foreground)` + nhấc 1px + bóng `--shadow-raised` (không bóng viết tay, §31); secondary đảo nền foreground; chevron cam + scale 1.06.
 - Active: scale 0.98 (tròn 0.94). Focus: outline 2px accent offset 2 (tròn 3), chỉ `:focus-visible`; trên nền tối outline trắng.
 - Disabled: LUÔN là cặp màu riêng, không dùng opacity (sổ 21/11, foundations-12). Nút: nền `--color-border`, chữ `--color-muted` (6.70), `cursor: not-allowed`. Chevron tròn 52 ở đầu/cuối hàng và phân trang: `aria-disabled`, viền `--color-border`, icon `--color-muted-light` (5.33 trên trắng), nền giữ, không hover, không scale, `cursor: not-allowed` (icon tắt so với icon bật 3.27:1); trên nền tối (`.section--dark`, `.on-dark`): nền trong suốt, viền + icon `--color-muted-on-dark` (6.11), vì nút bật ở đó là đĩa trắng; nút vẫn giữ chỗ (0 CLS). Tab, chip disabled: chữ muted-light, viền border. Ô màu lọc disabled: §30.6. Ảnh sản phẩm hết hàng 0.6 (§9) là ảnh, không phải control, giữ.
 - Loading: `aria-busy="true"`, chữ trong suốt, spinner 20 (trắng trên primary, foreground trên secondary/tertiary), giữ bề rộng, chữ ẩn "Adding".
-- Mọi biến thể đủ 6 ô có nhãn trên foundation.html §9 (V09). Tab có thêm focus và disabled (nền trắng, chữ muted-light).
-- Sold out: primary disabled, chữ "Sold out".
+- Mọi biến thể đủ 6 ô có nhãn trên foundation.html §9 (V09). Tab có màn riêng `h-tabs` (§7).
+- Nhãn dài (chuỗi dịch): nút giãn theo nhãn, không khoá bề rộng; hàng nút xuống dòng, nút rộng 100% dưới 48rem; nhãn vẫn dài hơn khung thì `.button--wrap` (chữ xuống dòng trong nút, nút cao lên). Không cắt "…", không thu cỡ chữ (§37).
+- Tertiary small đứng cùng vùng với hàng chip: bắt buộc có icon 16 trước nhãn, hoặc tách sang hàng riêng (§7, phân biệt với chip).
+- Sold out: primary disabled, nhãn "Sold Out" (badge giữ "Sold out"; `docs/design/content.md` §4, sổ V67).
 
 Quy tắc: 1 primary mỗi section, ≤ 5 mỗi trang (04 §1); nhãn 2–4 từ Title Case mở bằng động từ ("Add To Cart", sổ 07/11), áp cho mọi `<button>` và link dạng nút (kể cả nút đóng có chữ, nút "+N"/thu gọn, nút thử lại): "Keep Shopping", "Show Fewer", "Try Again", "Continue Shopping". Text link trong câu, link menu, link chính sách giữ chữ theo dữ liệu ("Shipping policy"). Nhãn đang lệch: "Keep shopping" (marketing-popups §3), "Show fewer" (mini-cart-quickview §3.1), "Try again" (product §5.1 J3): sửa theo §24 đề xuất trỏ; hai nút cách 16, mobile xếp dọc cách 12–20. Ngoại lệ Title Case (sổ 21/11, components-11): Polaris dùng sentence case cho nhãn nút ("Add menu item"); Efitco giữ Title Case theo Figma và sổ 07/11 là ngoại lệ thương hiệu đã chốt, không đổi; phần còn lại của chuẩn đã theo (mở bằng động từ, không mạo từ thừa, không dấu câu). `<button>` cho hành động, `<a href>` cho điều hướng; nút icon có `aria-label`.
 
@@ -370,8 +468,21 @@ Quy tắc: 1 primary mỗi section, ≤ 5 mỗi trang (04 §1); nhãn 2–4 từ
 
 Figma 1:490: cao 40, padding 7 / 28, gap 8, 16/500, bo 4.
 - Chưa chọn: nền alt, viền border, chữ foreground (15.8). Đang chọn: nền foreground, chữ trắng. Hover: viền foreground.
-- < 80rem: cao 44, một hàng cuộn ngang. ≤ 5 tab, nhãn 1–2 từ.
-- `role="tablist"`/`tab`/`tabpanel`, `aria-selected`, phím ←/→, panel ẩn `hidden`. Code `.featured-collection__tab`.
+- < 80rem: cao 44, một hàng cuộn ngang, không xuống dòng thành hai hàng. 2–7 tab cùng cấp (featured collection ≤ 5), nhãn 1–2 từ. Nhãn dịch dài: tab giãn theo nhãn, hàng cuộn ngang; không cắt chữ (§37).
+- Padding ngang 28 là token tầng component `--tab-padding-inline` (Figma 1:490, giá trị ngoài thang, §1.2).
+- Trạng thái (màn `h-tabs`): selected, default, hover, focus-visible (vòng accent), disabled (nền trắng, viền border, chữ muted-light).
+- `role="tablist"`/`tab`/`tabpanel`, `aria-selected`, `aria-controls`; Tab vào tab đang chọn, ←/→ đổi tab, Home / End; panel ẩn `hidden`; đổi tab không đổi URL, focus ở lại tab. Code `.featured-collection__tab`.
+
+Phân vai Tab / Chip / Button tertiary (sổ 21/11, components-09; màn `h-tabs`). Ba thành phần cùng nền alt, bo 4; hình Tab và Chip giữ theo Figma, phân biệt bằng vai trò, cỡ chữ và vị trí:
+
+| Component | Làm gì | Markup | Bàn phím | Đặt ở đâu | Hình |
+| --- | --- | --- | --- | --- | --- |
+| Tab `.tab` | Đổi panel trong cùng vùng; luôn có đúng 1 tab đang chọn | `role="tablist"` › `role="tab"` + `aria-selected`, `aria-controls` | Tab vào tab đang chọn; ← → đổi tab; Home, End | Ngay trên vùng nội dung nó điều khiển (featured collection, search results) | 16/500, padding 28, cao 44 / 40 từ 80rem |
+| Chip `.chip` | Lọc hoặc gợi ý: bật / tắt nhiều chip cùng lúc, hoặc là link tới kết quả | `<button aria-pressed>` · `<a>` · `.chip--remove` có × | Mỗi chip một điểm Tab; Enter, Space | Trong `.chip-list` tự xuống dòng: bộ lọc đang áp, popular searches | 14/500, padding 16, cao 44 / 40 từ 80rem |
+| Button tertiary `.button--tertiary` | Thực hiện một hành động phụ cạnh nút primary; không có trạng thái "đang chọn" | `<button>` · `<a class="button">` | Enter, Space | Card, quick view, dòng gợi ý; nhãn Title Case mở bằng động từ | 16/600, cao 48 / 52, viền muted-light; small 14/600 cao 44 |
+
+- Dấu hiệu phân biệt bắt buộc: tertiary small (44, 14/600) gần giống chip (44, 14/500). Khi đứng cùng vùng với chip thì thêm icon 16 trước nhãn, hoặc tách sang hàng riêng.
+- Không dùng tab để điều hướng sang trang khác; không dùng chip làm nút hành động ("Add To Cart" dạng chip).
 
 ## 8. Badge
 
@@ -424,7 +535,22 @@ Figma chỉ có input footer 1:1104; còn lại ĐỀ XUẤT theo 04 §5, 05 §4
 - Label 14/600 phía trên cách 8 · `*` đỏ + `required` · input/select/textarea · gợi ý 14 muted · lỗi 14/500 `--color-critical` + icon 16.
 - Input cao CỐ ĐỊNH `--control-height` (`block-size`, V11), padding 16, bo `--radius-input`, chữ 16/400. Lưới form `align-content: start` để ô cạnh ô lỗi không cao lên. Compact 44 `.field__input--compact` (ô tìm nước, khoảng giá). Textarea 144; compact 96 chỉ ghi chú đơn mini cart (V50, V70). Select có chevron; mở = listbox §30.10.
 - Viền: nền sáng `--color-muted-light` (5.33), nền tối `--color-muted-on-dark` (6.11) (sổ 09/11). Hover foreground (tối: trắng). Focus viền accent + outline 2px offset −1 (tối: trắng).
-- Lỗi: hiện khi rời trường hoặc submit; viền `--color-critical` 2px; câu nói cách sửa; `aria-invalid` + `aria-describedby`; tóm tắt đầu form `role="alert"` + focus trường lỗi đầu. Trên nền tối chữ lỗi trắng (§4).
+- Lỗi: hiện khi rời trường hoặc submit; viền `--color-critical` 2px; câu nói cách sửa (khuôn câu: `docs/design/content.md` §3); `aria-invalid` + `aria-describedby`. Trên nền tối chữ lỗi trắng (§4).
+- Focus khi form lỗi (sổ 21/11, components-10; màn `h-form` bảng "Lỗi form: focus đi đâu"). THAY quy tắc cũ "focus trường lỗi đầu":
+
+| Khi nào | Hiện gì | Focus | Đọc lên |
+| --- | --- | --- | --- |
+| Rời một ô đang sai | `.field__error` dưới ô, viền critical 2px, `aria-invalid` | Không chuyển: người dùng đi tiếp | Khi quay lại ô, đọc lỗi qua `aria-describedby` |
+| Submit, form có từ 2 trường, có ít nhất 1 lỗi (kể cả chỉ sai 1 ô) | Khối tóm tắt `.form-message--error` đầu form: tiêu đề nêu số trường lỗi ("Check 1 field", "Check {n} fields") + danh sách `.form-message__list`, mỗi lỗi một link `<a href="#id-trường">` | Chuyển tới khối tóm tắt (`tabindex="-1"`, vòng focus accent 2px offset 2) | `role="alert"` đọc tiêu đề và danh sách |
+| Bấm một link trong tóm tắt | Cuộn tới trường, lỗi của trường vẫn hiện | Vào đúng ô nhập đó | Nhãn + lỗi của ô |
+| Submit, form 1 trường (newsletter, password) | `.field__error` dưới ô; không cần khối tóm tắt | Về chính ô đó | Lỗi qua `aria-describedby` |
+| Submit thành công | `.form-message--success` thay chỗ khối lỗi | Chuyển tới thông báo thành công (`tabindex="-1"`) | `role="status"` |
+
+  - Link trong tóm tắt: chữ foreground 500 gạch chân 1px, cao tối thiểu 24 (`--touch-target-min`), cách nhau 4; dạng "Tên trường: cách sửa" ("Email: enter an email like name@example.com").
+  - Điều kiện tính theo SỐ TRƯỜNG CỦA FORM, không theo số trường đang lỗi: form có từ 2 trường thì luôn focus khối tóm tắt, dù sai 1 hay nhiều ô (contact 3 trường chỉ sai email: vẫn focus khối tóm tắt "Check 1 field", khớp SRS TE-12 AC4). Chỉ form 1 trường mới focus về ô.
+  - Tóm tắt phải nêu số trường lỗi và từng trường; không chỉ ghi "Check the form" hay "Check the recipient details". Không nhảy focus thẳng vào trường lỗi đầu ở form có từ 2 trường.
+  - Áp dụng: contact (page.md §6 S2, SRS AC4: đã đúng), gift card recipient (product-shopify-features.md §6, SRS AC6: tóm tắt "Check {n} fields"), bình luận bài viết (SRS AC12), mọi form từ 2 trường. Newsletter footer, newsletter popup, password: form 1 trường, focus về ô (SRS TE-1 AC12, AC7 giữ nguyên).
+  - Chuyển focus là JS (việc BE). Không JS: Shopify tải lại trang, khối tóm tắt render sẵn ở đầu form.
 - Disabled: nền alt, viền border, chữ muted-light. Thành công: hộp viền trái 4px `--color-success` + icon, `role="status"`. Cảnh báo (đã tự chỉnh, vd số lượng bị đổi): `.form-message--warning`, thanh + icon `--color-warning`, chữ foreground.
 - Checkbox/radio 20, cả nhãn bấm, hàng 44, `accent-color: var(--color-accent)`; trạng thái: chưa chọn, chọn, focus, disabled (chữ muted-light), lỗi (viền `--color-critical` + câu lỗi) (V10). Form 2 cột từ 48rem, cách 24.
 - Select nhãn nổi 12px trong ô (collection/search "Sort by") không thuộc DS (V47): nhãn 14 trên ô hoặc ẩn trực quan.
@@ -448,12 +574,14 @@ Figma chỉ có chevron Shop, Collection (1:362). ĐỀ XUẤT theo 14 §1, 05 �
 
 15 §2, 14 §3; code `.site-header__drawer`, `.cart-drawer__dialog`.
 
-| Drawer | Hướng | Rộng 360 / 768 / 1280+ | Nội dung |
+| Drawer | Cạnh (class kit) | Rộng 360 / 768 / 1280+ | Nội dung |
 | --- | --- | --- | --- |
-| Menu | trái | 90% / 420 / — | menu 2 cấp, account, localization |
-| Filter | trái | 90% / 420 / 420 | nhóm filter, Apply + Clear ở chân |
-| Cart | phải | 90% / 420 / 480 | dòng hàng, tổng, Checkout |
-| Search | phải | 90% / 420 / 480 | ô tìm, gợi ý, kết quả nhanh |
+| Menu | inline-start (`.drawer--start`) | 90% / 420 / — | menu 2 cấp, account, localization |
+| Filter | inline-start (`.drawer--start`) | 90% / 420 / 420 | nhóm filter, Apply + Clear ở chân |
+| Cart | inline-end (`.drawer--end`) | 90% / 420 / 480 | dòng hàng, tổng, Checkout |
+| Search | inline-end (`.drawer--end`) | 90% / 420 / 480 | ô tìm, gợi ý, kết quả nhanh |
+
+Gọi cạnh theo inline-start / inline-end, không gọi "trái / phải" (sổ 21/11, foundations-17): ở LTR inline-start là bên trái, ở RTL là bên phải, drawer tự lật theo `dir` (§34). Spec trang còn ghi "drawer trái / phải" thì đọc là inline-start / inline-end.
 
 - Cart drawer (G3, V13): header "Your Cart" + pill số món + ×; chân là panel tối nổi `.overlay__footer--panel` (lùi 16, bo 16, padding 20, `--panel-muted`, `--panel-saving`): Subtotal, giảm giá, Total, Checkout, link "View Cart". Menu drawer: chân là hàng localization gộp (LC1) + "Sign In" secondary có icon.
 - Header drawer 72 (tiêu đề heading 22–28, × 48 cách mép 12) · body cuộn riêng (`overscroll-behavior: contain`) · footer dính đáy (nút chính full width) · scrim `--overlay-scrim`. Nền drawer trắng (header trang tối không lặp vào drawer).
@@ -509,11 +637,30 @@ Chọn mẫu thông báo (sổ 21/11; màn `h-toast` bảng "Chọn mẫu thông
 ## 18. Trạng thái rỗng, lỗi, đang tải
 
 ĐỀ XUẤT (Figma không có; 05 §6–7, 14 #928M).
-- Đang tải: skeleton `--color-background-alt` đúng kích thước nội dung (card: media 1:1 + 2 dòng 14, dòng 2 rộng 40%), shimmer 1 vòng `--motion-hero` (1400) `linear`, tĩnh khi giảm chuyển động; vùng đổi `aria-busy` + `role="status"` + spinner 24. Không làm mờ chữ (Lighthouse color-contrast tính opacity).
+- Đang tải: spinner thay nhãn nút và skeleton thay nội dung chỉ hiện sau ngưỡng chung 300 ms; chỉ báo nhỏ tại chỗ (spinner 20 cạnh số kết quả) được hiện ngay (§18.1). Skeleton `--color-background-alt` đúng kích thước nội dung (card: media 1:1 + 2 dòng 14, dòng 2 rộng 40%), shimmer 1 vòng `--motion-hero` (1400) `linear`, tĩnh khi giảm chuyển động; vùng đổi `aria-busy` + `role="status"` + spinner 24. Không làm mờ chữ (Lighthouse color-contrast tính opacity).
 - Rỗng (V54), một component 3 biến thể: `.empty-state` trong trang (không khung: blog không bài, search S6), `--framed` trong khung viền bo 12 (giỏ trống, lọc rỗng), `--compact` cho panel hẹp (popup tìm, drawer: căn trái, icon 24 inline, tiêu đề 16/600, nền alt bo 12). Slot phụ `.empty-state__slot` cho chip gợi ý / link danh mục. Không dùng bo 24 nền alt cho panel trong trang (V59). Bản giữa: ≤ 512, icon 32 trong tròn 72 nền alt · h2/h3 rõ ("Your Cart Is Empty") · 1 câu gợi ý · primary cụ thể ("Shop Bestsellers") + text link phụ. Search không kết quả thêm gợi ý (05 §7).
-- Lỗi khối: viền 1px `--color-critical`, bo 12, icon 24 `--color-critical`, tiêu đề 16/600, câu xử lý 14 muted, small secondary "Try Again", `role="alert"`.
-- Chọn component lỗi (V45): trường sai → `.field__error`; submit form → `.form-message--error` đầu form; hành động tại chỗ thất bại (422 thêm giỏ PDP/quick view, cập nhật dòng giỏ cart/mini cart) → `.form-message--error.form-message--inline` ngay dưới nút/dòng, `role="alert"`, cùng một kiểu ở PDP và cart; khối không tải được → `.alert`; cảnh báo tại chỗ (số lượng bị đổi) → `.form-message--warning`; thao tác nền ngoài tầm nhìn → toast error / warning (chỉ ca này, §17).
+- Lỗi khối: `.alert` tone error (mặc định): viền 1px `--color-critical`, bo 12, icon 24 `--color-critical`, tiêu đề 16/600, câu xử lý 14 muted, small secondary "Try Again", `role="alert"`. Ba tone còn lại (info, success, warning) và cấp trang: §35.
+- Chọn component lỗi (V45): trường sai, gồm cả submit form 1 trường (newsletter, password) → `.field__error`, focus về ô; submit form từ 2 trường có ít nhất 1 lỗi (contact, gift card recipient) → `.form-message--error` đầu form có link tới từng trường, focus vào khối tóm tắt (§12); hành động tại chỗ thất bại (422 thêm giỏ PDP/quick view, cập nhật dòng giỏ cart/mini cart) → `.form-message--error.form-message--inline` ngay dưới nút/dòng, `role="alert"`, cùng một kiểu ở PDP và cart; khối không tải được → `.alert`; cảnh báo tại chỗ (số lượng bị đổi) → `.form-message--warning`; thao tác nền ngoài tầm nhìn → toast error / warning (chỉ ca này, §17).
 - Spinner 24 mặc định (V61); 20 trong nút; 12 (`.spinner--xs`) chỉ dòng tồn variant picker. Một vòng quay = `var(--motion-hero)` 1400 `linear` cho cả spinner rời và spinner trong nút (khớp `spinner-turn` của theme). Trường: §12. Thao tác nền: toast error. 404: không popup, có search + link trang chủ (TE-9 AC2).
+
+### 18.1 Ngưỡng hiện chỉ báo tải (sổ 21/11, components-14; màn `h-state`; số 300 ms là ĐỀ XUẤT, chờ CTO chọn 300 hay 500)
+
+Một ngưỡng cho mọi vùng: 300 ms. Giữ số đang dùng ở localization.md L9 và collection.md S7; Polaris nêu 500 ms, CTO chọn giữ 300 hay đổi 500 (câu hỏi mở, đổi thì sửa một số ở đây và `docs/tokens.json` `loading.indicator_delay_ms`). Là hằng số hành vi của JS (việc BE), không phải custom property; spec trang trỏ về mục này, không ghi số riêng.
+
+- 0–300 ms: giữ nội dung cũ, khoá thao tác lặp, KHÔNG hiện spinner thay nhãn hay skeleton.
+- Sau 300 ms: hiện spinner trong vùng đang tải hoặc skeleton đúng kích thước.
+
+| Vùng | Ngay (0 ms) | Sau 300 ms | Xong |
+| --- | --- | --- | --- |
+| Nút gửi (Add To Cart, Send Message) | `aria-busy="true"`, khoá bấm lần hai, giữ bề rộng | Spinner 20 thay nhãn | Nhãn trở lại; kết quả ở drawer, toast hoặc lỗi inline |
+| Lọc, sắp xếp collection | Lưới giữ kết quả cũ + `aria-busy`; spinner 20 tại số kết quả (collection.md S7) | Skeleton lưới đúng số cột | Lưới mới, số kết quả đọc qua vùng live |
+| Variant picker | Nút mua `.is-pending` (giữ màu, không spinner), giá giữ số cũ | Dòng tồn "Checking availability…" + spinner 12; giá thành skeleton dòng | Giá, tồn, ảnh theo biến thể mới |
+| Localization (đổi nước, ngôn ngữ) | Danh sách giữ nguyên, khoá chọn lần hai | Spinner tại hàng vừa chọn (localization.md L9) | Trang tải lại theo lựa chọn |
+| Section tải lần đầu (gợi ý, đã xem) | Chỗ trống đã giữ sẵn chiều cao (0 CLS) | Skeleton card | Nội dung, hoặc `.alert` + "Try Again" khi lỗi |
+
+- Spinner luôn nằm trong vùng đang tải, không phủ cả trang.
+- Chỉ báo nhỏ tại chỗ (spinner 20 cạnh số kết quả) được hiện ngay; spinner thay nhãn nút và skeleton thay nội dung chỉ hiện sau ngưỡng để thao tác nhanh không bị nháy.
+- Ngưỡng này khác các độ trễ nhập liệu (gõ tìm kiếm chờ 300 ms rồi gọi, gộp bấm số lượng 300 ms): đó là debounce, ghi ở spec trang.
 
 ## 19. Motion
 
@@ -581,9 +728,11 @@ Chỉ tiêu (sổ 09/11, phạm vi theo sổ 10/11 BGĐ): A11y 100 desktop và m
 | Dropdown | `.site-header__submenu` | mega menu |
 | Drawer | `.site-header__drawer*`, `.cart-drawer__dialog` | khung drawer chung, filter, search |
 | Dialog | `.quiz__dialog`, `.quiz__dialog-close` | class chung cho mọi popup |
-| Breadcrumb, toast, empty, alert, skeleton | — | tạo mới §5, §17, §18 |
+| Breadcrumb, toast, empty, alert, skeleton | — ở vòng 3 (11/11); nay đã có `.breadcrumb`, `.toast`, `.empty-state`, `.alert`, skeleton trong `assets/base.css` | soát theo §5, §17, §18; alert 4 tone và cấp trang §35 chưa có |
 | Panel tối | `.cart-summary`; `.bundle-builder__panel` có `--bundle-panel-muted` trắng 60% (base.css 747) | 1 cặp `--panel-muted` 70%, `--panel-saving` cho cart, mini cart, bundle, shop the look, quiz (§2); đổi `--bundle-panel-muted` 60% → 70% |
 | Accordion | `.faq-item` | icon +/− `currentColor`, câu đóng `--color-muted` (§13) |
+
+Trạng thái vòng đời của từng component (đề xuất, đã chốt, đã dựng, ngừng dùng): bảng ở §39; cột "Class / file đã có" ở trên là căn cứ cho nhãn "Đã dựng".
 
 Settings merchant: foundation dùng `background_dark_color` có sẵn cho header và footer; thêm 1 theme setting "Popular searches" (§24.1).
 
@@ -673,7 +822,7 @@ Nút `{{ shop | login_button: action: 'follow' }}` (Shopify vẽ, tím, §27) d�
 
 Tất cả ở `drafts/designer/_kit/kit.css` mục 13b, hình ở `drafts/designer/ES1-T251/foundation.html` (section id ghi trong ngoặc). Trang KHÔNG định nghĩa lại các selector này (V57); phép kiểm đề xuất: grep selector của kit trong `<style>` của file trang = 0.
 
-1. Chip (V41, `h-chip`): bo 4 như component Figma "Tabs = chip lọc danh mục"; cao 44 / 40 từ 80rem; 14/500. `.chip` gợi ý (nền alt viền border), `.chip[aria-pressed=true]` chọn được (nền đen), `.chip--remove` bộ lọc đang áp (nền trắng viền đen, × 16, tên ẩn "Remove filter: Color Black"). Trạng thái default/hover/focus/selected/disabled. Bo pill chỉ dành cho variant pill.
+1. Chip (V41, `h-chip`): bo 4 như component Figma "Tabs = chip lọc danh mục"; cao 44 / 40 từ 80rem; 14/500. `.chip` gợi ý (nền alt viền border), `.chip[aria-pressed=true]` chọn được (nền đen), `.chip--remove` bộ lọc đang áp (nền trắng viền đen, × 16, tên ẩn "Remove filter: Color Black"). Trạng thái default/hover/focus/selected/disabled. Bo pill chỉ dành cho variant pill. Chip lọc hoặc gợi ý, không phải hành động và không đổi panel: phân vai với Tab và Button tertiary ở §7. Nhãn dài: hàng chip xuống dòng; chip dài hơn khung thì chữ xuống dòng trong chip (§37).
 2. Selectable option (V26, `h-selectable-option`): `.option-card` (hàng) và `.option-card--tile` (thẻ có ảnh) bọc radio/checkbox thật; chọn = viền accent 2 inset + check tròn accent 22. Quiz, bundle, shop the look dùng chung; không nền sand làm trạng thái chọn.
 3. Variant picker (V39, `h-variant-picker`): theo variant-picker.md; `.variant-pill`, `.variant-swatch`, `.variant-more`, `.variant-option__error`, `.stock-line`. Dialog "Choose A Color", quiz 2F, quick view dùng đúng component này.
 4. Quantity stepper (V38, `h-quantity`): `.quantity` − ô + không vạch ngăn, viền muted-light; cao control (PDP, quick view), `--compact` 44 (cart, mini cart, dòng F9). Trạng thái hover, focus, min/max disabled, loading, lỗi quantity rule.
@@ -683,7 +832,16 @@ Tất cả ở `drafts/designer/_kit/kit.css` mục 13b, hình ở `drafts/desig
 8. Link danh mục (V56): `.category-link` thẻ viền bo 12, tên 16/600, số SP 14, mũi tên; search S1/S2 và 404 dùng chung.
 9. Input group + search field (V55, `h-input-group`): `.input-group`, `.search-field` (icon trái, nút xoá 44), `.input-group--attached` (email, password). Nút submit luôn primary; chữ từ 48rem, icon dưới 48rem.
 10. Listbox option (V68, `h-listbox`): `.listbox__option` hàng 44, hover nền alt, active-descendant nền alt + outline accent inset, hiện tại 600 + ✓. Không viền foreground.
-11. Data table (V46, `h-data-table`): `.data-table` (tiêu đề cột nền alt), `--striped` (sọc sand, Specifications), `.data-table__row--current` (cream + ✓, volume pricing).
+11. Data table (V46, `h-data-table`): `.data-table` (tiêu đề cột nền alt 14/600, ô 14 padding 12 / 16, viền border, cuộn ngang trong `.table-wrap` bo 12), `--striped` (sọc sand, Specifications), `.data-table__row--current` (cream + ✓, volume pricing). Mobile (sổ 21/11, components-16): `.data-table--stack` dưới 48rem biến mỗi hàng thành danh sách cặp nhãn – giá trị (nhãn lấy từ `data-label` của ô, tiêu đề cột ẩn trực quan, hàng hiện tại giữ nền cream + ✓, số căn cuối); `.data-table--stacked` ép dạng danh sách ở mọi mốc (ô hẹp). Mỗi `<td>` của bảng `--stack` phải có `data-label`; tiêu đề cột và giá trị phải có nghĩa khi đứng thành cặp.
+
+    | Loại bảng | Số cột tối đa | Dưới 48rem |
+    | --- | --- | --- |
+    | Specifications | 2 (tên, giá trị) | `--stack` + `--striped`: danh sách |
+    | Volume pricing | 3 (số lượng, giá, tiết kiệm) | `--stack`: danh sách, tiêu đề cột thành nhãn |
+    | Size chart | 6 | Giữ bảng, cuộn ngang trong `.table-wrap` có viền; cột đầu là tên cỡ |
+    | Bảng trong bài viết `.rte` | 4; nhiều hơn thì bọc `.table-wrap` | Chữ xuống dòng trong ô; bảng đã bọc thì cuộn ngang |
+
+    Không để bảng 2 cột cuộn ngang trong accordion hay ở mobile; không bảng hơn 6 cột; trang không tự đặt `min-width: 0`.
 12. Progress meter (V48, `h-progress`): `.meter-box` cream bo 16 + `.meter` cao 8 bo pill track border, fill accent, `--done` `--color-success` (= badge-new); `role="progressbar"` + câu chữ.
 13. Thanh dính đáy, teaser, popover (V34, V71, `h-sticky-bar`): `.buy-bar` 72 / 80, z `--layer-bottom-bar`, `--shadow-bar`; `.teaser` pill tối 48 z 15; `.popover-card` bo 12 shadow-raised 400 z 21 (không bo 20/24).
 14. Dòng sản phẩm gọn (V30): `.product-row` thumb 56 cream bo 8, tên 16/500, giá; placeholder khi thiếu ảnh.
@@ -695,7 +853,418 @@ Tất cả ở `drafts/designer/_kit/kit.css` mục 13b, hình ở `drafts/desig
 
 ## 31. Elevation, lớp, motion (V15, `h-elevation-layers`, `h-motion`)
 
-- Bóng: `--shadow-none` (card, panel trong trang), `--shadow-raised` (dropdown, popover, toast, teaser), `--shadow-overlay` (drawer, dialog, sheet), `--shadow-bar` (thanh đáy, hướng lên). Scrim `--overlay-scrim` 50% dark. Không bóng tự chế trong trang.
+- Bóng: `--shadow-none` (card, panel trong trang), `--shadow-raised` (dropdown, popover, toast, teaser), `--shadow-overlay` (drawer, dialog, sheet), `--shadow-bar` (thanh đáy, hướng lên). Scrim `--overlay-scrim` 50% dark. Không bóng tự chế trong trang, không thêm bậc bóng thứ năm (V15), không dùng bóng để trang trí thứ không bấm được.
 - Lớp: `--layer-content` 1, `--layer-sticky` 4, `--layer-bottom-bar` 5, `--layer-header` 10, `--layer-floating` 15, `--layer-scrim` 20, `--layer-overlay` 21, `--layer-toast` 30 (layers.md §1, nay là token trong kit; code theme: FE thêm vào base.css).
 - Motion: §19. Figma chưa có effect style: Designer người tạo effect style theo 4 bóng trên (V15, V18).
+- Kit không còn bóng viết tay và không còn `z-index` viết số (sổ 21/11, foundations-10): mọi bóng là `var(--shadow-*)`, mọi lớp là `var(--layer-*)`. Cần hơn 1 lớp trong một component thì xếp theo thứ tự DOM, không thêm số.
 
+Component → bậc bóng → lớp (mỗi component một dòng, không tự chọn bậc khác):
+
+| Component | Bóng | Lớp | Ghi chú |
+| --- | --- | --- | --- |
+| Card, panel, alert, bảng trong trang | `--shadow-none` | Không đặt | Phân tầng bằng nền và viền, không bằng bóng |
+| Nút hover · card bài viết hover | `--shadow-raised` | Không đặt | Bóng báo "bấm được"; tắt khi nhấn |
+| Header khi đã cuộn | `--shadow-raised` | `--layer-header` 10 | Chỉ thêm bóng, không đổi nền |
+| Dropdown, mega menu | `--shadow-raised` | `--layer-header` 10 | Cùng lớp header |
+| Listbox, popover card | `--shadow-raised` | `--layer-overlay` 21 | Big Offer, localization từ 768 |
+| Teaser nổi | `--shadow-raised` | `--layer-floating` 15 | Nằm trên thanh dính đáy |
+| Toast | `--shadow-raised` | `--layer-toast` 30 | Sổ 20/11 V15. Polaris đặt toast cao hơn popover một bậc: không đảo, câu hỏi mở cho CTO |
+| Thanh dính đáy | `--shadow-bar` | `--layer-bottom-bar` 5 | Bóng hướng lên |
+| Drawer, dialog, bottom sheet | `--shadow-overlay` | Top layer; dự phòng `--layer-overlay` 21 | Kèm scrim `--layer-scrim` 20 |
+| Badge, gradient, chữ trên ảnh trong card | `--shadow-none` | `--layer-content` 1 | Cần hơn 1 lớp trong component: xếp theo thứ tự DOM |
+
+Bóng viết tay trong code theme → token (Cần FE):
+
+| Trong code theme | Ở đâu | Dùng |
+| --- | --- | --- |
+| `0 6px 16px` foreground 18% | Nút hover, base.css `.button:hover` | `--shadow-raised` |
+| `0 8px 24px` foreground 10% | Testimonial, bundle item hover | `--shadow-raised` |
+| `0 18px 40px` `--figma-000000` 18% | Card bài viết hover | `--shadow-raised` |
+| chưa có token | Thanh dính đáy | Thêm `--shadow-bar` như kit |
+| `--shadow-*`, `--layer-*` khai báo ở khối `:root` của base.css (`--layer-*` dòng 6–13; `--overlay-scrim`, `--shadow-raised`, `--shadow-overlay`, `--radius-dialog` dòng 129–132; `--panel-muted`, `--panel-saving` dòng 134–135) | base.css | Gom về `snippets/css-variables.liquid`, thêm `--shadow-none` |
+
+Đổi 3 bóng về `--shadow-raised` làm bóng nút hover, header đã cuộn, card bài viết hover nhạt và rộng hơn một chút so với trước; hình tĩnh không đổi.
+
+
+## 32. Kiến trúc token (sổ 21/11, foundations-06, foundations-16; màn `h-token-architecture`; thứ tự nguồn sự thật ở §32.3 là ĐỀ XUẤT, chờ CTO)
+
+### 32.1 Ba tầng
+
+Đọc từ trên xuống. Merchant đổi setting thì cả ba tầng đổi theo.
+
+| Tầng | Là gì | Ví dụ | Ai đọc |
+| --- | --- | --- | --- |
+| 1 · Primitive | Giá trị thô theo thang. Nguồn: theme settings và thang Figma Design System 2 | `accent_color` #C8400E · `--space-md` 16 · `--radius-md` 12 · `--motion-base` 250 · `--icon-size-md` 20 | Tầng 2; component chỉ khi chưa có vai trò |
+| 2 · Semantic | Tên theo vai trò, trỏ về tầng 1 | `--color-accent` · `--color-warning` · `--radius-card` · `--shadow-raised` · `--layer-overlay` · `--touch-target` | Component (mặc định) |
+| 3 · Component | Giá trị riêng một component, dẫn xuất từ tầng 2 hoặc giữ đúng số Figma | `--control-height` · `--toast-color` · `--alert-color` · `--tab-padding-inline` · `--thumb-size` | Chỉ component đó |
+
+Chuỗi ví dụ, setting → component:
+- `accent_color` → `--color-accent` → `--color-warning` → `--toast-color` → `.toast--warning`
+- `card_corner_radius` 12 → `--radius-md` → `--radius-card` → `.product-card__media`
+- `space_base` 4 → `--space-md` 16 → `--grid-gap` (768) → `.product-grid`
+- `foreground_color` → `--color-foreground` → `--shadow-raised` (12%) → `.dropdown`, `.toast`
+
+Quy ước:
+- Component đọc tầng semantic trước; chỉ đọc primitive khi chưa có vai trò (khoảng cách đọc thẳng `--space-*` vì thang khoảng cách không có vai trò).
+- Không đọc hex, px thô cho màu, khoảng cách, bo góc, bóng, lớp, thời lượng. Không đọc thẳng setting trong component.
+- Không đặt tên biến theo giá trị (`--figma-1a1a1a`, `--gray-500`). Tên = `--<nhóm>-<vai trò hoặc bậc>(-<biến thể>)`: `--color-background-dark-foreground`, `--radius-panel`, `--space-2xl`, `--icon-size-sm`.
+- Token tầng component khai báo ở cuối `:root` (dùng chung nhiều chỗ của component, vd `--tab-padding-inline`) hoặc là custom property cục bộ trong rule của component (`--alert-color`, `--toast-color`, `--thumb-size`, `--ratio`); luôn ghi nguồn Figma khi giữ số lẻ.
+- Thêm token mới thì thêm ở đúng tầng và ở đủ bốn nơi (§32.3).
+
+### 32.2 Nhóm token và số đếm
+
+`:root` của kit có 134 custom property (đếm 21/11). Cột cuối là hiện trạng trong code theme (`origin/develop`), phần thiếu là việc FE.
+
+| Nhóm | Kit | Tầng | Code theme hôm nay | tokens.json |
+| --- | --- | --- | --- | --- |
+| Color | 32 | 22 primitive có setting · 6 alias trạng thái + 4 dẫn xuất (accent-on-sand, panel-muted, panel-saving, overlay-scrim) semantic | 23 biến `--color-*` ở `css-variables.liquid`; 3 dẫn xuất `--panel-muted`, `--panel-saving`, `--overlay-scrim` đang ở base.css; 6 alias trạng thái chưa có | `color`, `color_status`, `color_derived`, `elevation.scrim` |
+| Typography | 26 | Primitive (họ chữ, cỡ, line-height, letter-spacing) | Có 16 / 26 ở `css-variables.liquid`; thiếu 10: `--font-size-eyebrow`, `--font-size-h4`, `--font-body-weight`, `--letter-spacing-body` / `-heading` / `-display` / `-caps`, `--line-height-sm` / `-label` / `-display` | `font`, `type_scale` |
+| Space | 12 + 8 | 12 bậc primitive · 8 tên cũ là alias | Chỉ có `--space-1…8`; thiếu bậc 20, 40, 56, 64, 80 | `space.named`, `space.1…8` |
+| Radius | 6 + 7 | 6 bậc primitive · 7 vai trò semantic | 4 vai trò (input, button, card, hero) + pill ở `css-variables.liquid`; thiếu xs…xl, `--radius-panel`, `--radius-swatch`; `--radius-dialog` đang ở base.css và là card × 2 = 24 (kit 20, sổ 20/11 V04) | `radius`, `radius.roles` |
+| Motion | 8 + 3 | 8 duration primitive · 3 easing semantic | `css-variables.liquid` (đủ) | `motion`, `easing` |
+| Shadow | 4 | Semantic | base.css (2 trong 4: raised, overlay); thiếu none, bar | `elevation` |
+| Layer | 8 | Semantic | base.css (đủ 8), cần gom về `css-variables.liquid` | `layer` |
+| Icon | 4 | Primitive | Chỉ `--icon-stroke-width`, khai báo cục bộ 2 chỗ trong base.css; thiếu `--icon-size-sm` / `-md` / `-lg` | `icon` (mới) |
+| Size và layout | 15 | Semantic (page width, lề, header, grid, control, touch target, texture) | Có 4 / 15 ở `css-variables.liquid`: `--page-width`, `--page-margin`, `--header-height`, `--touch-target-min`; thiếu 11: `--touch-target`, `--section-gap`, `--heading-gap`, `--grid-gap`, `--grid-columns`, `--control-height`, `--control-height-compact`, `--content-width`, `--band-side`, `--band-inset`, `--dark-texture` | `container`, `layout` |
+| Component | 1 | Component (`--tab-padding-inline`) | Viết số trong base.css | `component` (mới) |
+| Breakpoint | 3 | 48rem, 64rem, 80rem: hằng số trong media query (CSS không cho dùng biến), không tính vào 134 | AGENTS.md | `breakpoint` (mới) |
+
+Đối chiếu 21/11 với `origin/develop`: trong 134 token của kit, 67 có ở `css-variables.liquid`, 15 khai báo ở base.css, 52 chưa có trong code.
+
+Số token màu có setting là 22 (khớp `config/settings_schema.json`, DESIGN.md và màn `h-color`; con số "23" ở bản trước là sai).
+
+### 32.3 Nguồn sự thật
+
+Bốn nơi giữ token. Hai quy tắc, đọc theo thứ tự:
+
+(a) Giá trị đã có dòng trong `docs/design/decisions.md` (sổ CTO) thì SỔ THẮNG cả bốn nơi; nơi nào lệch sổ là lỗi phải sửa, không phải nguồn.
+
+(b) Token KHÔNG có dòng sổ: khi bốn nơi lệch nhau, thứ tự ĐỀ XUẤT của Designer (chờ CTO chốt, `decisions.md` mục "Chưa chốt") là nơi đứng trước thắng:
+
+1. `config/settings_schema.json`: giá trị mặc định merchant thấy.
+2. `snippets/css-variables.liquid`: tên biến và phép dẫn xuất; mọi token `:root` nằm ở đây (không khai báo token ở `assets/base.css`).
+3. `docs/tokens.json`: bản máy đọc, có `_version`, `_tiers`, `_contrast`.
+4. `DESIGN.md` · `docs/ui-spec/foundation.md` · `drafts/designer/_kit/kit.css`: giải thích và bản chép cho mockup.
+
+(c) Đang lệch sổ, chờ FE sửa `config/settings_schema.json`: `badge_new_color` #467A48 → #4B824D (sổ 20/11 V01); `background_alt_color` #F4F4F4 → #F4F4F5 (sổ 20/11 V18). Hai chỗ này sổ thắng: tokens.json, DESIGN.md, kit đã đúng; KHÔNG sửa ngược theo `settings_schema.json`.
+
+- Thứ tự ở (b) do Designer đặt ở ES1-T535 lượt 2; đề xuất foundations-16 của báo cáo chỉ yêu cầu "ghi quy tắc nguồn sự thật", không nêu thứ tự. Chưa phải quyết định CTO.
+- Thêm, đổi tên hoặc đổi giá trị một token là sửa cả bốn nơi trong cùng một thay đổi, kèm dòng changelog và số bản (§40, `CONTRIBUTING.md` mục "Changing the design system").
+- Token mới chỉ ở nơi 3 và 4 (Designer đề xuất, chưa có code) mang trạng thái Đề xuất hoặc Đã chốt, chưa phải Đã dựng (§39). Hiện ở trạng thái đó (52 token, đối chiếu `origin/develop` 21/11):
+  - Color: 6 alias trạng thái `--color-success` / `-critical` / `-warning` (+ `-foreground`).
+  - Typography (10): `--font-size-eyebrow`, `--font-size-h4`, `--font-body-weight`, 4 `--letter-spacing-*`, `--line-height-sm` / `-label` / `-display`.
+  - Space (12): tên `--space-2xs…7xl`, trong đó bậc 20 / 40 / 56 / 64 / 80 chưa có giá trị tương ứng.
+  - Radius (7): `--radius-xs…xl` (5), `--radius-panel`, `--radius-swatch`.
+  - Shadow (2): `--shadow-none`, `--shadow-bar`. Icon (3): `--icon-size-sm` / `-md` / `-lg`.
+  - Size và layout (11): `--touch-target`, `--section-gap`, `--heading-gap`, `--grid-gap`, `--grid-columns`, `--control-height`, `--control-height-compact`, `--content-width`, `--band-side`, `--band-inset`, `--dark-texture`.
+  - Component (1): `--tab-padding-inline`.
+- Có trong code nhưng sai chỗ (15 token ở base.css, cần gom về `css-variables.liquid`): 8 `--layer-*`, `--shadow-raised`, `--shadow-overlay`, `--overlay-scrim`, `--panel-muted`, `--panel-saving`, `--icon-stroke-width` (cục bộ), `--radius-dialog` (đang 24, đổi 20).
+- Thứ tự nguồn cho quyết định thiết kế vẫn là: sổ CTO > AGENTS.md > DESIGN.md > Figma (đầu file).
+- Phép kiểm CI so 4 nơi: việc DevOps (notes ES1-T527 V01, V03; notes ES1-T535 lượt 2).
+
+### 32.4 Biến `--figma-*` → token theo vai trò (Cần FE)
+
+`assets/*.css` dùng 24 biến `--figma-*` khác nhau, 91 lần (đếm trên `origin/develop`: base.css 23 biến / 85 lần + aux.css 2 biến / 6 lần; cart, collection, critical, product.css không dùng). `css-variables.liquid` khai báo 28 biến. FE thay dần theo bảng rồi xoá khối `--figma-*` trong `css-variables.liquid`. Không thêm token màu mới (sổ 20/11 V18).
+
+| Biến | Số lần | Thay bằng | Ghi chú |
+| --- | --- | --- | --- |
+| `--figma-ffffff` | 13 | Nền sáng: `--color-background` · chữ, icon trên nền tối: `--color-background-dark-foreground` · trên accent: `--color-accent-foreground` | Chọn theo vai trò tại chỗ dùng |
+| `--figma-1a1a1a` | 10 | Chữ: `--color-foreground` · nền tối: `--color-background-dark` | Hai setting khác nhau dù cùng mặc định |
+| `--figma-ebe6e0` | 6 | `--color-background-sand` | |
+| `--figma-b2b2b2` | 5 | Trên panel #393942: `--panel-muted` (6.56) · trên nền tối: `--color-muted-on-dark` (6.11) | #B2B2B2 không còn là token; chữ chờ hiện trên nền sáng dùng `--color-muted-light` |
+| `--figma-4d4d4d` | 5 | `--color-muted` | |
+| `--figma-e5e5e5` | 4 | `--color-border` | |
+| `--figma-808080` | 3 | `--color-muted-light` | Đã là alias; tên sai giá trị (#6B6B6B) |
+| `--figma-393942` | 3 | `--color-background-panel` | |
+| `--figma-999999` · `--figma-666666` | 2 + 1 | `--color-muted-on-dark` | `--figma-666666` đang trỏ #999999: tên sai giá trị |
+| `--figma-000000` | 2 | Gradient card: `--color-background-dark` · bóng: `--shadow-raised` | |
+| `--figma-1c1c1c` | 1 | `--color-background-dark` | Lệch 2 đơn vị so với #1A1A1A, gộp |
+| `--figma-f5f5f1` · `--figma-f4f4f5` | 1 + 1 | `--color-background-cream` · `--color-background-alt` | |
+| `--figma-d9d9d9` | 1 | Rãnh tiến trình trên panel: component `.meter` (trắng 20%) | Không thêm màu xám mới |
+| `--figma-333333` | 1 | Viền ô countdown: trắng 12% trên `--color-background-dark` như `.sale-countdown__unit` | Dẫn xuất, không thêm token |
+| `--figma-radius-2…24` | 31 | Bảng radius ở §1.2 | 7 biến đang dùng: 16 (15 lần, 4 ở aux.css), 8 (8), 2 (2), 24 (2), 4 (2, đều ở aux.css dòng 441, 701 → `--radius-xs`), 12 (1), 18 (1) |
+| `--figma-hero-cta-width` | 1 | Bỏ: nút rộng theo nhãn + padding của `.button` | Khoá bề rộng 233 làm tràn chữ khi dịch (§37) |
+| `--figma-4b824d` · `-white-12` · `-white-60` · `-radius-999` | 0 | Xoá ngay | 4 biến khai báo nhưng không dùng ở `assets/*.css`. FE tìm lại trong `snippets/`, `sections/`, `blocks/` trước khi xoá (Designer chỉ đếm `assets/`) |
+
+## 33. Icon (sổ 21/11, foundations-14; màn `h-icon`)
+
+Một bộ, một kiểu: nét viền (outlined), một màu `currentColor`, nét 1.5 trên khung vẽ 20 × 20, vùng an toàn 16 × 16.
+
+| Token | px | Dùng ở |
+| --- | --- | --- |
+| `--icon-size-sm` | 16 | Trong dòng chữ 14: lỗi trường, form message, chip, nút small, stepper, nút xoá của ô tìm, dòng giảm giá |
+| `--icon-size-md` | 20 | Mặc định: nút, ô tìm kiếm, toast, nút đóng, icon search của header |
+| `--icon-size-lg` | 24 | Header (account, cart, menu), alert, empty state compact |
+| `--icon-stroke-width` | 1.5 | Mọi icon nét. Icon tô đặc (logo, sao, cờ, chevron 52 của carousel) không đọc token này |
+
+- Class kit: `.icon` (20), `.icon--sm` (16), `.icon--lg` (24), `.icon--directional` (lật ở RTL).
+- Không kéo giãn icon ra ngoài ba cỡ. Cần to hơn: đặt icon 24 hoặc 32 trong nền tròn (status icon 72 của empty state, dialog).
+- Ngoại lệ kích thước giữ theo Figma, thuộc về component, không thành token: chevron menu 9 × 5 và 12 × 7, mũi tên CTA 16 × 14 (Figma 1:462), chevron 11 × 16 trong nút tròn 52 (Figma 1:398), sao 14 × 13, mạng xã hội 28, cam kết ở footer 32.
+- Bộ icon đang dùng (24, tên = id trong sprite của mockup): search, bag, user, menu, close, trash, arrow, chevron, plus, minus, tick, check, info, warning, alert, tag, copy, send, image, star, shield, truck, award, refresh. Không vẽ icon mới khi bộ đã có icon cùng nghĩa; không trộn icon nét và icon tô đặc trong một hàng; không dùng emoji làm icon.
+
+Icon dành riêng (một nghĩa, không dùng cho việc khác):
+
+| Icon | Chỉ có nghĩa | Tên truy cập | Lật ở RTL |
+| --- | --- | --- | --- |
+| search | Tìm kiếm (mở ô tìm, gửi tìm, gợi ý tìm) | "Search" | Không |
+| bag | Giỏ hàng, thêm vào giỏ | "Cart, 2 items" | Không |
+| close | Đóng lớp phủ, gỡ chip lọc, xoá chữ trong ô tìm | "Close menu" · "Remove filter: Color Black" | Không |
+| arrow | Đi tới trang hoặc bước kế (link CTA, link đầu section, thẻ danh mục) | Luôn đi kèm nhãn chữ, icon `aria-hidden` | Có |
+| trash | Xoá dòng khỏi giỏ | "Remove Iron Core Kettlebell" | Không |
+| chevron trước / sau · back | Chuyển slide, chuyển trang, quay lại cấp trước trong drawer | "Previous" · "Next" · "Back" | Có |
+| chevron xuống · plus · minus · tick · info · warning · alert | Mở rộng, tăng, giảm, đã chọn, 3 mức thông báo | Theo control chứa nó | Không |
+
+Icon và nhãn:
+- Nút chỉ icon: chỉ cho icon phổ biến (search, cart, close, menu); có `aria-label` nói rõ đối tượng; vùng chạm từ 44.
+- Icon mơ hồ hoặc hành động ít gặp (copy, send): luôn kèm nhãn chữ ("Copy Code").
+- Icon trạng thái (info, warning, alert, check): luôn kèm chữ, icon `aria-hidden`.
+- Icon trang trí sau nhãn (mũi tên của "Browse All Setups"): `aria-hidden`.
+
+## 34. RTL (sổ 21/11, foundations-17; màn `h-rtl`)
+
+Theme CHƯA bật RTL: chưa có locale RTL, `<html>` chưa có `dir`. Kit và code đã dùng thuộc tính logic (inline-start / end, block-start / end) nên bố cục tự lật khi đổi `dir`. Màn `h-rtl` đặt cùng một bộ mẫu ở `dir="ltr"` và `dir="rtl"`: header, breadcrumb, section header + nút tròn 52, product card (badge, giá), thanh tiến trình, stepper, link mũi tên, back, select, message, nút nhãn dài, drawer `.drawer--start`.
+
+| Phần tử | Ở RTL | Cách làm |
+| --- | --- | --- |
+| Bố cục, lề, căn chữ, thứ tự cột, vị trí badge, thanh đầu của message | Lật | Tự động nhờ thuộc tính logic; không viết left / right |
+| Drawer | Lật | Gọi theo inline-start (menu, filter) và inline-end (cart, search), không gọi "trái / phải" (§15) |
+| Mũi tên, chevron trước / sau, back, chevron "vào cấp con" | Lật | `:dir(rtl)` + `scale: -1 1`; chiều trượt khi hover đảo dấu |
+| Carousel, thanh tiến trình, slideshow | Lật chiều chạy | CSS: thumb chạy từ inline-start. JS `slideshow.js` phải cuộn theo hướng (việc BE) |
+| Chevron của select, vùng chạm nở của link menu | Lật | Rule `:dir(rtl)` trong kit mục RTL |
+| Search, cart, close, check, plus, minus, sao, logo, cờ, icon thanh toán | Giữ | Không mang nghĩa hướng |
+| Số, giá, mã giảm giá, số điện thoại, email, stepper − số + | Giữ thứ tự chữ số | Trình duyệt xử lý bidi; stepper giữ − bên trái, + bên phải bằng `:dir(rtl) .quantity { direction: ltr }` (kit mục RTL, Cần FE); định dạng tiền và ngày theo locale của Shopify, không tự ghép chuỗi |
+| Ảnh sản phẩm, video, bản đồ | Giữ | Không lật nội dung ảnh |
+
+Điều kiện bật RTL (đủ cả 6 mới bật locale RTL):
+
+| # | Điều kiện | Ai làm | Hiện tại |
+| --- | --- | --- | --- |
+| 1 | `<html dir>` theo locale trong `layout/theme.liquid` | FE | Chưa có |
+| 2 | CSS chỉ dùng thuộc tính logic; mọi rule hướng có `:dir(rtl)` đi kèm | FE | Đạt ở phần đã dựng (DESIGN.md Direction) |
+| 3 | `assets/slideshow.js` và carousel cuộn theo hướng | BE | Còn cuộn theo LTR |
+| 4 | Icon chỉ hướng lật, icon khác giữ (bảng trên, §33) | FE | Đã có cho slideshow, pagination, drawer-loc; kit bổ sung phần còn lại |
+| 5 | Font có glyph cho ngôn ngữ RTL (Inter, Sofia Sans Condensed không có chữ Ả Rập, Do Thái) | CTO chốt font, FE cài | Chưa chọn |
+| 6 | QA chạy bộ 12 mẫu ở màn `h-rtl` + nhãn dài hơn 50% ở 360 và 1280, không tràn, không lệch focus | QA | Chưa chạy |
+
+- Viết `margin-inline-start`, `inset-inline-end`, `text-align: start`; đặt tên theo start / end; thử mọi component mới ở `dir="rtl"` trước khi trình.
+- Không dùng `left`, `right`, `translateX` cố định dấu; không lật logo, số, ảnh sản phẩm; không ghép câu từ nhiều chuỗi dịch (§37).
+- Dấu ✓ của hàng hiện tại, listbox vẽ bằng cạnh vật lý (border-bottom + border-left xoay −45°) để KHÔNG lật ở RTL: đây là ngoại lệ có chủ đích của quy tắc "chỉ thuộc tính logic".
+- Điều kiện 5 thêm họ font là quyết định thương hiệu (sổ 30/10: 2 họ font): Designer không tự chọn, chờ CTO khi có kế hoạch locale RTL.
+
+Chữ Latin và số trong khung RTL (màn `h-rtl`, ghi chú dưới cặp mẫu):
+- Trong `dir="rtl"`, chuỗi Latin có dấu ở đầu hoặc cuối bị trình duyệt đổi chỗ dấu: "-24%" hiện "24%-", "What People Are Buying?" hiện "?What…", dấu chấm cuối câu nhảy lên đầu. Chuỗi Ả Rập, Do Thái thật không bị.
+- Quy tắc cho code (Cần FE khi bật RTL): số có dấu, phần trăm (`-N%` của badge), giá, mã giảm giá, và tên sản phẩm Latin chen trong câu dịch bọc `<bdi>` (hoặc `dir="ltr"` cho ô chỉ chứa số). Không sửa bằng cách đảo ký tự trong chuỗi dịch.
+- Mẫu RTL trên màn DS dùng chữ tiếng Anh để so bố cục, đã bọc `<bdi>` cho badge, tiêu đề, câu message. Breadcrumb cắt "…" phía `inline-end`; với tên Latin trong khung RTL phần bị cắt hiện ở đầu tên, tên Ả Rập thật cắt ở cuối như LTR.
+
+## 35. Alert và message (sổ 21/11, components-15; màn `h-alert`; tone warning dùng accent là ĐỀ XUẤT, chờ CTO)
+
+Thông báo đứng yên trong trang. Một component `.alert`, 4 tone đọc role sẵn có qua custom property cục bộ `--alert-color`; không thêm token màu.
+
+| Tone | Class | `--alert-color` | Icon | role |
+| --- | --- | --- | --- | --- |
+| Info | `.alert--info` | `--color-muted` | info | `status` |
+| Success | `.alert--success` | `--color-success` (= badge-new) | check | `status` |
+| Warning | `.alert--warning` | `--color-warning` (= accent) | warning | `status` |
+| Error | `.alert--error` (mặc định khi không ghi tone) | `--color-critical` (= sale) | alert | `alert` |
+
+| Cấp | Class | Hình | Đặt ở đâu |
+| --- | --- | --- | --- |
+| Section | `.alert` | viền 1px theo tone, nền trắng, bo `--radius-card` 12, padding 16 / 24, icon 24 cách chữ 12 | Trong section, ngay trên nội dung liên quan |
+| Trang (banner) | `.alert.alert--page` | như trên + thanh đầu inline-start 4px theo tone + nền = tone pha 6% với `--color-background` | Ngoài section, ngay dưới header hoặc breadcrumb |
+
+- Anatomy: icon 24 (`--icon-size-lg`, màu tone) · `.alert__body`: tiêu đề 16/600 foreground + 1 dòng 14 muted + tối đa một hành động (nút small hoặc text link, căn trái; nhiều nút thì `.alert__actions`) · nút đóng tuỳ chọn `.alert__close` tròn 44 (`--touch-target`), icon 16, màu muted, hover foreground, tên "Dismiss: {tiêu đề}".
+- Màu chỉ ở viền, thanh và icon; chữ giữ foreground / muted. Luôn có icon + tiêu đề nói rõ chuyện gì (màu không là tín hiệu duy nhất).
+- Tương phản (tính ở bước dựng màn): chữ muted trên nền pha 6% của 4 tone 7.63–7.88; icon / viền trên nền pha 4.26–7.69 (≥ 3 cho thành phần đồ hoạ, WCAG 1.4.11).
+- Mỗi alert một thông tin và tối đa một hành động. Info, warning, error nên có một hành động; success không bắt buộc.
+- Error không có nút đóng và không tự ẩn: chỉ hết khi lỗi được xử lý. Info, success, warning được đóng.
+- Không xếp chồng quá 1 alert cấp trang; không dùng alert để quảng bá (đó là announcement bar); không nền đặc màu tone.
+- Warning dùng accent là mở rộng ngoại lệ accent 09/11 (đã chốt cho Toast; `.form-message--warning` đã dùng): chờ CTO xác nhận cho `.alert`.
+
+Chọn Banner, Inline hay Toast (dựng từ V45, §17, §18):
+
+| Tình huống | Dùng | Ở lại tới khi | Ví dụ |
+| --- | --- | --- | --- |
+| Chuyện ảnh hưởng cả trang hoặc cả phiên | `.alert--page`, ngoài section | Đóng hoặc hết điều kiện | Lịch giao hàng dịp lễ, tài khoản không tải được |
+| Chuyện của một section hoặc một khối | `.alert` trong section | Cùng khối đó | Lưới sản phẩm không tải được, mã giảm giá đã áp |
+| Kết quả submit một form | `.form-message` đầu form | Lần submit kế | Tóm tắt lỗi contact, "Message sent" |
+| Một trường nhập sai | `.field__error` dưới ô | Sửa đúng | Email thiếu @ |
+| Hành động tại chỗ thất bại hoặc bị tự chỉnh | `.form-message--inline` ngay dưới nút / dòng | Thao tác kế | Thêm giỏ lỗi 422, số lượng bị hạ |
+| Xác nhận ngắn, hoặc lỗi của thao tác nền ngoài tầm nhìn | `.toast` | Tự ẩn (success, info) · đóng tay (warning, error) | "Added to cart", mất kết nối khi drawer đóng |
+| Quảng bá, khuyến mãi | Announcement bar (không phải alert) | Theo cấu hình merchant | Free shipping over $99 |
+
+## 36. Media (sổ 21/11, components-17; màn `h-media`)
+
+Chỉ gom quy tắc đã có (DESIGN.md mục Images, §9, §30.14), không đổi token.
+
+- Mọi ảnh nằm trong khung giữ tỉ lệ (0 CLS), render qua `snippets/image.liquid` (srcset 360 / 720 / 1080 / 1440, `sizes`, focal point).
+- `.media`: khung `aspect-ratio: var(--ratio, 1)`, bo `--radius-card` 12, nền cream. Mặc định ảnh `cover`; `.media--contain` cho ảnh sản phẩm (contain + `mix-blend-mode: darken` trên cream); `.media--panel` bo `--radius-panel` 16; `.media--dark` nền `--color-background-dark` cho hero, banner, card tối.
+- Hai kiểu fit: contain trên nền cream cho ảnh sản phẩm (không cắt mất hàng); cover cho ảnh đời sống (collection, bài viết, hero).
+- Placeholder `.media__placeholder`: chưa chọn ảnh (editor) hoặc sản phẩm không ảnh = icon image `--color-muted-light` trên cream (icon rộng 40% khung, tối đa 96).
+- Thiếu ảnh hoặc ảnh lỗi trên storefront ở hero, banner, card tối: chỉ nền tối, chữ vẫn đọc được. Luôn giữ khung và nền; không bao giờ hiện icon ảnh vỡ, khung không co lại.
+- Đang tải: skeleton cùng tỉ lệ, cùng bo, hiện sau ngưỡng 300 ms (§18.1).
+- Bo góc ảnh = bo của khung; không chữ nằm trong ảnh.
+
+Thumbnail `.thumb`: vuông, nền cream, bo `--radius-swatch` 8, ảnh contain. Chỉ 4 cỡ có tên (custom property cục bộ `--thumb-size`):
+
+| Class | px | Dùng ở |
+| --- | --- | --- |
+| `.thumb--bar` | 48 | Thanh dính đáy |
+| `.thumb` (mặc định) | 56 | Dòng sản phẩm gọn (`.product-row`, §30.14) |
+| `.thumb--search` | 64 | Gợi ý tìm kiếm, thumb gallery |
+| `.thumb--cart` | 80 | Dòng giỏ |
+
+Không ảnh: thumb giữ khung, hiện icon image muted-light. Không thumbnail ngoài 4 cỡ.
+
+Tỉ lệ khung theo vị trí (chép từ DESIGN.md mục Images):
+
+| Vị trí | Tỉ lệ | Fit | Bo | Nguồn |
+| --- | --- | --- | --- | --- |
+| Product card, quick view, PDP gallery | 1 / 1 | Contain, nền cream | `--radius-card` 12 | Figma 1:502 |
+| Hero / slideshow | 1798 / 827 từ 1280 · 4 / 3 ở 768 · 4 / 5 dưới 768 | Cover + focal point | `--radius-hero` 12 | Figma 1:422, mobile dẫn xuất |
+| Collection card | 336 / 220 | Cover | `--radius-panel` 16 | Figma 1:395 |
+| Training level card | 1 / 1 | Cover | `--radius-panel` 16 | Figma 1:464 |
+| Blog card | 300 / 448 | Cover + gradient 50% | `--radius-panel` 16 | Figma 1:1022 |
+| Ảnh trong tiêu đề | 165 / 94, co theo em của tiêu đề | Cover | Theo Figma 1:455 | Figma 1:455 |
+| Khối chưa dựng | Tạm tính | — | — | Chờ Product và Design chốt (ES1-T39) |
+
+Tải và alt: luôn có `width`, `height`; ảnh đầu của hero `loading="eager"` + `fetchpriority="high"`, mọi ảnh khác lazy; alt lấy từ alt của ảnh trong Shopify, ảnh trang trí `alt=""`; ảnh hero ≤ 200 KB WebP.
+
+## 37. Chuỗi dài và bản dịch (sổ 21/11, patterns-17; màn `h-button`, `h-tabs`, `h-badge`, `h-chip`, `h-variant-picker`, `h-content`)
+
+Giả định xấu nhất: chuỗi dịch dài hơn tiếng Anh tới 50%; nhãn ngắn (nút, tab, badge) có thể dài gấp 3. Giới hạn độ dài ở §6, §7, §17 là cho bản tiếng Anh; bố cục phải chịu được bản dịch.
+
+| Component | Khi nhãn dài ra | Màn |
+| --- | --- | --- |
+| Button | Giãn theo nhãn → hàng nút xuống dòng, rộng 100% dưới 48rem → `.button--wrap` cho chữ xuống dòng trong nút (nút cao lên, chữ căn giữa) | `h-button` |
+| Tab | Tab giãn, hàng tab cuộn ngang; không xuống dòng | `h-tabs` |
+| Badge | Giãn theo nhãn; dài hơn bề ngang ảnh card thì `.badge--wrap` (tối đa 2 dòng, bo 12 thay pill) | `h-badge` |
+| Chip | Hàng chip xuống dòng; chip dài hơn khung thì chữ xuống dòng trong chip | `h-chip` |
+| Variant pill | Pill giãn, mỗi pill dài chiếm một hàng | `h-variant-picker` |
+| Breadcrumb | Ngoại lệ được cắt "…": mục cuối và mục giữa (tên đầy đủ nằm ở h1 ngay dưới, §5) | `h-title` |
+
+- Không cắt "…", không thu cỡ chữ, không tràn khung cho nút, tab, badge, chip, pill, giá.
+- Không khoá bề rộng control theo nhãn tiếng Anh (bỏ `--figma-hero-cta-width` 233, §32.4); tránh cột hẹp cho nhãn.
+- Nút và badge GIỮ `white-space: nowrap` mặc định; xuống dòng là chọn thêm (`.button--wrap`, `.badge--wrap`) ở khung hẹp. Lý do: cho xuống dòng mặc định làm 6 trang mockup có nút sát khung thành 2 dòng (câu hỏi mở cho CTO, notes ES1-T535 lượt 2).
+- Mỗi mockup mới thử nhãn × 3 ở 360 trước khi trình.
+- Không ghép câu từ nhiều chuỗi ("You have" + số + "items"): dùng một chuỗi có biến (`{{ count }}`) và dạng số ít / số nhiều của locale. Số, tiền, ngày theo định dạng của Shopify.
+- RTL: §34. Hướng dẫn chữ: `docs/design/content.md`.
+
+## 38. Khuôn spec component: Dùng khi nào, Nên / Tránh (sổ 21/11, patterns-12)
+
+Mọi component (ở file này, ở spec riêng §23 và trên màn DS) theo một khuôn 6 mục: (1) Dùng khi nào, (2) Anatomy, (3) Variant và trạng thái, (4) Nên / Tránh, (5) Accessibility, (6) Map sang code. Các mục 2, 3, 5, 6 đã có ở mục riêng của từng component; bảng dưới bổ sung mục 1 và 4, rút từ quy tắc đã chốt (không thêm quy tắc mới). Trên màn DS: đoạn mô tả đầu section = "Dùng khi nào", khối Nên / Không nên = mục 4.
+
+| Component (mục) | Dùng khi | Không dùng khi → dùng gì | Nên | Tránh |
+| --- | --- | --- | --- | --- |
+| Header (§3) | Mọi trang có `layout/theme.liquid` | Password, gift card: không header | Thanh tối 80 + noise, focus trắng, số giỏ trong tên truy cập | Đè ảnh, đổi chiều cao khi cuộn, nền trắng |
+| Banner trang con (§3.3) | Collection có ảnh, bài viết có ảnh bìa | Trang không ảnh → tiêu đề trang §5 | Lớp tối ≥ 60%, chữ trắng, ảnh eager | Chữ xám trên ảnh, banner đè header |
+| Footer (§4) | Mọi trang có layout chính | — | Lỗi newsletter chữ trắng + icon đỏ trên nền tối | Chữ `--color-sale` trên nền tối, tiêu đề cột bằng `<h*>` lệch bậc |
+| Breadcrumb (§5) | Collection, product, article, page | Trang chủ, cart, 404, password: không có | 1 dòng, mục cuối `aria-current`, JSON-LD | Xuống 2 dòng, dòng bắt đầu bằng "/" |
+| Button primary (§6) | Hành động chính của section | Điều hướng trong câu → text link | 1 primary mỗi section, ≤ 5 mỗi trang; nhãn Title Case 2–4 từ mở bằng động từ | Hai primary cạnh nhau, nhãn "Submit", disabled bằng opacity |
+| Button secondary (§6) | Hành động phụ cạnh primary; trên nền tối `.button--on-dark` | Nút phụ trong card cạnh primary → tertiary | Cách primary 16, mobile xếp dọc | Dùng làm hành động chính |
+| Button tertiary (§6) | Nút phụ trong card, quick view, dòng gợi ý | Lọc, gợi ý → chip; đổi panel → tab | Small đứng cùng vùng chip: có icon 16 hoặc tách hàng | Nền xám không viền (đó là disabled); tertiary small không icon sát hàng chip |
+| Link CTA, link đầu section (§6) | Dẫn sang trang khác kèm mũi tên | Hành động tại chỗ → button | Nhãn nói rõ đích ("Browse All Setups") | "Read more", "Learn more" đứng một mình |
+| Nút tròn 52 (§6, §11) | Prev / next của carousel, phân trang | Hành động khác → button | Đầu / cuối giữ nút + `aria-disabled`, cặp màu disabled | Ẩn nút làm nhảy bố cục, mờ bằng opacity |
+| Tab (§7) | Đổi nội dung MỘT vùng ngay bên dưới, 2–7 nhóm cùng cấp | Sang trang khác → link / menu; lọc nhiều lựa chọn → chip | Đúng 1 tab đang chọn, phím ← →, hàng cuộn ngang | Tab xuống 2 hàng, tab làm điều hướng |
+| Badge (§8) | Trạng thái sản phẩm: -N%, New, Sold out; tag bài viết; rating | Thông báo → alert / toast; danh mục khác → badge trung tính hoặc chữ | 1–2 từ, ưu tiên Sold out > -N% > New | Badge có chấm, cao 30, accent cho danh mục khác ngoài tag bài viết |
+| Product card (§9) | Lưới và hàng sản phẩm | Dòng gọn trong drawer, gợi ý → `.product-row` | Một link phủ card, tên hiện đủ, ảnh contain trên cream | Cắt tên sản phẩm, swatch bấm được trên card, viền quanh media |
+| Media, thumbnail (§36) | Mọi ảnh nội dung | Icon → §33 | Khung giữ tỉ lệ, width / height, 1 ảnh eager mỗi trang | Ảnh sản phẩm cover, icon ảnh vỡ, thumb ngoài 4 cỡ |
+| Collection card (§30.7) | Danh mục: Browse Categories, list collections, mega | Link danh mục dạng chữ ở search, 404 → `.category-link` | Ảnh cover 336 / 220 bo 16, đủ trạng thái không ảnh | Bo 24, chữ nằm trong ảnh |
+| Article card (§10) | Bài viết trong blog, hàng ngang trang chủ | — | Tiêu đề hiện đủ, gradient từ 50%, `alt=""` | Cắt tiêu đề, tag không phải accent theo Figma |
+| Hàng ngang + tiến trình (§11) | Video, testimonial, blog, danh mục dạng cuộn ngang | Lưới đủ chỗ → `.product-grid` | Nút ở đầu khối, thanh tiến trình 4, mobile vuốt | Thanh cuộn trình duyệt, nút đặt giữa ảnh |
+| Input, select, textarea (§12) | Nhập dữ liệu trong form | Chọn 1 trong vài lựa chọn nhìn thấy → radio / option card | Label thật, `autocomplete`, lỗi khi rời trường, tóm tắt lỗi nhận focus khi submit | Placeholder thay label, nhãn nổi 12px, viền `--color-border` |
+| Checkbox, radio (§12) | Bật / tắt một lựa chọn; chọn 1 trong nhóm | Lựa chọn có ảnh, mô tả → option card | Cả nhãn bấm được, hàng 44 | Chỉ ô 20 bấm được |
+| Input group, search field (§30.9) | Ô + nút liền nhau: search, email, password | Form nhiều trường → field rời | Submit luôn primary; chữ từ 48rem, icon dưới 48rem | Nút submit secondary, thiếu nút xoá ở search |
+| Listbox (§30.10) | Danh sách chọn của select tuỳ biến, localization | — | Hàng 44, hiện tại 600 + ✓ | Viền foreground quanh option |
+| Accordion (§13) | FAQ, footer mobile, nội dung phụ gập được | Bộ lọc → facet group; thông tin bắt buộc đọc → hiện sẵn | Mở sẵn mục đầu, cho mở nhiều mục, icon + / − bên inline-start | Giấu phí ship, điều kiện KM; icon cam |
+| Chip (§30.1) | Lọc, gợi ý tìm, bộ lọc đang áp | Hành động → button; đổi panel → tab | Hàng chip xuống dòng, × có tên "Remove filter: …" | Bo pill, chip làm nút "Add To Cart" |
+| Facet group (§30.6) | Nhóm lọc trong drawer / cột lọc | Ngoài bộ lọc → accordion | "N selected", ô màu hết kết quả gạch chéo | Làm mờ ô màu disabled |
+| Selectable option (§30.2) | Chọn có ảnh / mô tả: quiz, bundle, shop the look | Chọn biến thể sản phẩm → variant picker | Bọc radio / checkbox thật; chọn = viền accent 2 + check | Nền sand làm trạng thái chọn |
+| Variant picker (§30.3, variant-picker.md) | Chọn option value của sản phẩm | Lọc collection → chip, facet | Pill ≥ 56 × 44, > 10 giá trị hiện 7 + "+N" | Swatch card làm control, pill cắt chữ |
+| Quantity stepper (§30.4) | Số lượng ở PDP, quick view, cart | — | Compact 44 ở cart, min / max disabled | Vạch ngăn giữa nút và ô |
+| Giá, rating (§30.5) | Mọi chỗ hiện giá, đánh giá | — | Chữ ẩn "Sale price" / "Regular price", dấu − U+2212 | Chỉ dùng màu để báo giá sale |
+| Data table (§30.11) | Dữ liệu dạng hàng × cột: specifications, volume pricing, size chart | Bố cục trang → grid | 2–3 cột dùng `--stack` dưới 48rem, số căn cuối | Bảng 2 cột cuộn ngang ở mobile, hơn 6 cột |
+| Progress meter (§30.12) | Tiến độ tới một ngưỡng: freeship, bundle, quiz | Đang tải → spinner / skeleton | `role="progressbar"` + câu chữ, đạt = success | Chỉ thanh màu không chữ |
+| Thanh dính đáy, teaser, popover (§30.13) | Hành động mua luôn trong tầm tay; teaser Big Offer | Thông báo → toast / alert | Bóng `--shadow-bar`, lớp `--layer-bottom-bar`; popover bo 12 + `--shadow-raised` | z-index số, bo 20 / 24 cho popover |
+| Toast (§17) | Xác nhận ngắn sau thao tác; lỗi thao tác nền ngoài tầm nhìn | Lỗi trường, lỗi submit, 422 tại nút → message tại chỗ (§35) | Tiêu đề success ≤ 3 từ, tối đa 3 toast | Toast cho lỗi form, toast error tự ẩn |
+| Alert, banner (§35) | Thông báo đứng yên của trang hoặc section | Kết quả form → form message; quảng bá → announcement bar | Tiêu đề nói chuyện gì, 1 hành động | Chồng 2 banner trang, nền đặc màu tone |
+| Drawer (§15) | Menu, filter, cart, search trên lớp phủ cạnh màn | Xác nhận, nội dung ngắn → dialog | Focus vào tiêu đề khi mở, trả focus khi đóng, footer dính đáy | Gọi "trái / phải", cuộn cả trang phía sau |
+| Dialog, bottom sheet (§16) | Việc cần tập trung: quick view, xác nhận, quiz | Thông báo không cần quyết định → toast / alert | Chỉ mở sau thao tác người dùng (trừ 3 popup marketing đã chốt), một lớp một lúc | Mở lúc tải trang, confirmshaming, popup tự mở thứ tư |
+| Dropdown, mega (§14) | Menu con của header từ 80rem | Dưới 80rem → drawer | Header giữ tối, link 44, ảnh mega tải khi mở | Mở từ 64rem, tiêu đề cột bằng `<h*>` |
+| Empty state (§18) | Vùng không có dữ liệu: giỏ trống, không kết quả | Lỗi tải → alert | Tiêu đề rõ + 1 câu gợi ý + primary cụ thể | Panel nền alt bo 24, empty không có hành động tiếp theo |
+| Skeleton, spinner (§18, §18.1) | Chờ quá 300 ms | Chờ dưới 300 ms → giữ nội dung cũ | Skeleton đúng kích thước, spinner trong vùng đang tải | Làm mờ chữ, spinner phủ cả trang |
+| Rich text `.rte` (§28) | Mọi nội dung merchant nhập | Chữ giao diện → component tương ứng | 16 / 1.7, ≤ 65ch, link gạch chân | Thân bài 18 ở desktop, blockquote nền sand |
+| Pagination (pagination.md) | Danh sách nhiều trang: collection, blog, search | Hàng cuộn ngang → §11 | Trang hiện tại accent, đầu / cuối giữ nút | Ẩn nút ở trang đầu / cuối |
+| Countdown (countdown.md) | "Sale ends in" có ngày thật | Không có ngày hết sale → ẩn | Số render bằng Liquid, hết hạn thì ẩn | Đếm ngược giả, `aria-live` trên số |
+| Panel tối (§2, §30.16) | Tóm tắt cart, bundle, shop the look, quiz | Nền tối cả section → `.section--dark` | Một cặp `--panel-muted`, `--panel-saving`; focus trắng | `--color-muted-on-dark` trên panel, chữ trắng cho dòng giảm giá |
+| Icon (§33) | Nhận biết nhanh hành động, trạng thái | Thay chữ ở hành động ít gặp → kèm nhãn | 3 cỡ token, `currentColor`, tên truy cập cho nút chỉ icon | Icon mới trùng nghĩa, emoji, kéo giãn |
+
+Còn thiếu (ticket sau): các spec riêng ở §23 (variant-picker, pagination, layers, countdown, announcement-bar, localization) thêm hai mục "Dùng khi nào" và "Nên / Tránh" ngay trong file của mình theo khuôn này; hiện mới có ở bảng trên.
+
+## 39. Trạng thái vòng đời component (sổ 21/11, patterns-13)
+
+| Nhãn (màn DS) | Tiếng Việt | Nghĩa | Ai chuyển |
+| --- | --- | --- | --- |
+| Proposed | Đề xuất | Designer đề xuất, chưa chốt; chưa dùng ở trang mới ngoài màn DS | Designer |
+| Approved | Đã chốt | CTO (hoặc BGĐ) đã chốt trong sổ quyết định; chưa có code theme | CTO |
+| Built | Đã dựng | Đã có class trong `assets/` / `snippets/` (có thể còn lệch: xem "Cần FE" trong notes) | Dev FE + QA |
+| Deprecated | Ngừng dùng | Không đưa vào trang mới; ghi thay bằng gì và bản nào bỏ hẳn | CTO |
+
+- Thứ tự: Đề xuất → Đã chốt → Đã dựng → Ngừng dùng. Ngừng dùng một component là thay đổi major khi xoá class hoặc token (§40) và phải báo trước ít nhất một bản minor.
+- Trên màn DS: mỗi section có thuộc tính `data-status` và nhãn cạnh tiêu đề; chú giải ở đầu trang. `h-banner` (page banner) không có tiêu đề `h2` riêng nên không hiện nhãn: nó thuộc dòng `h-header`, cùng trạng thái Đã dựng (43 section, 42 nhãn).
+- "Đã dựng" gán theo việc class đã có trong `assets/` hoặc `snippets/` của nhánh làm việc (Designer đối chiếu bằng tìm tên class, chưa soát từng trạng thái): FE / QA xác nhận lại khi làm ticket.
+
+Trạng thái hiện tại (21/11, bản 1.3.0): 25 Đã dựng, 11 Đã chốt, 6 Đề xuất, 0 Ngừng dùng.
+
+| Màn DS (`id`) | Component / nền tảng | Trạng thái | Mục spec |
+| --- | --- | --- | --- |
+| `h-grid` | Grid, layout, touch target | Đã dựng | §1, §1.3 |
+| `h-type` | Typography | Đã dựng | §1.1 |
+| `h-color` | Color tokens, status roles | Đã dựng | §2, §2.1 |
+| `h-spacing-radius` | Spacing, radius | Đã dựng | §1.2 |
+| `h-elevation-layers` | Elevation, layers | Đã dựng | §31 |
+| `h-motion` | Motion | Đã dựng | §19 |
+| `h-icon` | Icons | Đề xuất | §33 |
+| `h-token-architecture` | Token architecture | Đề xuất | §32 |
+| `h-rtl` | Right-to-left | Đề xuất | §34 |
+| `h-header` (+ `h-banner`) | Header, page banner | Đã dựng | §3 |
+| `h-title` | Breadcrumb, page title | Đã dựng | §5 |
+| `h-button` | Buttons | Đã dựng | §6 |
+| `h-tabs` | Tabs | Đã dựng (`.featured-collection__tab`) | §7 |
+| `h-badge` | Badges, sold out | Đã dựng | §8 |
+| `h-product` | Product card | Đã dựng | §9 |
+| `h-media` | Media, thumbnail | Đề xuất | §36 |
+| `h-collection-card` | Collection card | Đã dựng | §30.7 |
+| `h-dark` | Color schemes and roles | Đã chốt (chỉ tài liệu) | §2.2 |
+| `h-article` | Article card and row | Đã dựng | §10, §11 |
+| `h-form` | Inputs, form states | Đã chốt | §12 |
+| `h-input-group` | Input group, search field | Đã chốt | §30.9 |
+| `h-listbox` | Listbox option | Đã chốt | §30.10 |
+| `h-acc` | Accordion | Đã dựng | §13 |
+| `h-chip` | Chip | Đã chốt | §30.1 |
+| `h-facets` | Facet group | Đã chốt | §30.6 |
+| `h-selectable-option` | Selectable option | Đã chốt | §30.2 |
+| `h-variant-picker` | Variant picker | Đã chốt | §30.3 |
+| `h-quantity` | Quantity stepper | Đã dựng | §30.4 |
+| `h-price-rating` | Price, rating | Đã dựng | §30.5 |
+| `h-data-table` | Data table | Đã chốt (`--stack` là Đề xuất) | §30.11 |
+| `h-progress` | Progress meter | Đã chốt | §30.12 |
+| `h-sticky-bar` | Sticky bar, teaser, popover | Đã chốt | §30.13 |
+| `h-toast` | Toast | Đã dựng | §17 |
+| `h-drawer` | Drawers | Đã dựng | §15 |
+| `h-dialog` | Dialog, bottom sheet | Đã dựng | §16 |
+| `h-state` | Empty, error, loading | Đã dựng (ngưỡng 300 ms là Đề xuất) | §18, §18.1 |
+| `h-alert` | Alerts and messages | Đề xuất | §35 |
+| `h-rte` | Rich text | Đã dựng | §28 |
+| `h-pagination` | Pagination | Đã dựng | pagination.md |
+| `h-countdown` | Sale countdown | Đã dựng | countdown.md |
+| `h-panel` | Dark panel | Đã dựng | §2, §30.16 |
+| `h-content` | Content and voice | Đề xuất | `docs/design/content.md` |
+
+Phần Đề xuất nằm trong màn Đã dựng / Đã chốt của lượt này: focus tóm tắt lỗi form (`h-form`), `.button--wrap`, `.badge--wrap`, quy tắc tertiary small + icon cạnh chip (`h-button`, `h-tabs`), bảng ánh xạ ở `h-spacing-radius`, `h-elevation-layers`. Chuyển sang Đã chốt khi CTO duyệt bản 1.3.0.
+
+## 40. Phiên bản design system (sổ 21/11, patterns-14; số bản 1.3.0 là ĐỀ XUẤT, chờ CTO)
+
+- Một số bản `major.minor.patch` cho cả design system (token + component + quy tắc), ghi ở `docs/tokens.json` `_version`, đầu màn foundation.html và đầu file này. Bản hiện tại: 1.3.0 (đề xuất, chờ CTO duyệt).
+- major: đổi tên hoặc xoá token, setting id, class component (phá theme đã cài hoặc trang đang dùng). minor: thêm token, component, biến thể, màn DS, quy tắc không phá cái cũ. patch: sửa giá trị, sửa lỗi, sửa tài liệu.
+- Mỗi bản CTO / BGĐ duyệt gắn một số; bản đã duyệt không sửa lại, thay đổi tiếp theo ra số mới.
+- Lịch sử và quy tắc đầy đủ: `docs/design/CHANGELOG.md`. Mỗi thay đổi DS thêm một dòng vào đó trong cùng PR.

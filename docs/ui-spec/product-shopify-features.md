@@ -180,7 +180,7 @@ Lỗi (hiện khi rời trường và khi bấm Add To Cart; foundation §12):
 | Message | chạm 200 | không lỗi; gợi ý "0 characters left" chữ foreground 600 |
 | Server 422 | Shopify trả lỗi thuộc tính | câu Shopify trong `product-form-error`; đánh dấu trường nếu khớp tên |
 
-Bấm Add To Cart khi có lỗi: không gửi, focus trường lỗi đầu, `product-form-error` đọc "Check the recipient details." (tóm tắt). Trường lỗi viền sale 2px + `aria-invalid` + `aria-describedby` tới câu lỗi.
+Bấm Add To Cart khi có lỗi: không gửi. Fieldset người nhận là form từ 2 trường nên dù 1 hay nhiều trường lỗi: focus chuyển tới `product-form-error` (khối tóm tắt `.form-message--error`, `role="alert"`, `tabindex="-1"`) ghi "Check 1 field" / "Check {n} fields" + danh sách link tới từng trường lỗi; bấm link thì focus vào ô đó. Không có nhánh "1 trường lỗi thì focus về ô" (điều kiện tính theo số trường của form, foundation §12). Thay "focus trường lỗi đầu" (foundation §12, sổ 21/11 components-10). Trường lỗi viền sale 2px + `aria-invalid` + `aria-describedby` tới câu lỗi.
 
 Sản phẩm gift card không cần ship (`requires_shipping` false): ẩn ghi chú ship, pickup, mục "Fast Shipping" như §8.
 
@@ -256,7 +256,7 @@ Giữ setting có sẵn: product-form "Show dynamic checkout buttons" (true). Li
 - `blocks.product_form.volume_pricing.title` "Volume pricing", `.available` "Volume pricing available", `.quantity` "Quantity", `.price` "Price", `.tier` "{{ quantity }}+", `.each` "{{ price }}/ea", `.current` "Current price", `.show_all` "Show all {{ count }} price breaks"
 - `blocks.product_form.selling_plan.save_percent` "Save {{ percent }}%", `.save_amount` "Save {{ amount }}", `.from` "from {{ price }}", `.frequency` "Delivery frequency", `.per_delivery` "{{ price }} per delivery", `.subscription_only` "This product is sold as a subscription.", `.policy` "Read the subscription policy"
 - `blocks.product_form.pickup.view_store` "View store information", `.dialog_title` "Pickup availability", `.close` "Close pickup availability", `.call` "Call {{ location }}"; sửa `pickup.available` thành "Pickup available, usually ready in {{ time }}" khi có thời gian (giữ bản không thời gian)
-- `blocks.product_form.gift_card.optional` "(optional)", `.characters_left` "{{ count }} characters left", `.error_email_required` "Enter the recipient's email address.", `.error_email` "Enter an email address like name@example.com.", `.error_send_on` "Choose a date between {{ start }} and {{ end }}.", `.error_summary` "Check the recipient details."; sửa `send_on_hint` "Leave blank to send right after checkout, or choose a date up to {{ days }} days from today."
+- `blocks.product_form.gift_card.optional` "(optional)", `.characters_left` "{{ count }} characters left", `.error_email_required` "Enter the recipient's email address.", `.error_email` "Enter an email address like name@example.com.", `.error_send_on` "Choose a date between {{ start }} and {{ end }}.", `.error_summary` dạng số ít / số nhiều: `one` "Check {{ count }} field", `other` "Check {{ count }} fields" (thay "Check the recipient details.", foundation §12: tóm tắt nêu số trường lỗi); sửa `send_on_hint` "Leave blank to send right after checkout, or choose a date up to {{ days }} days from today."
 - `cart.quantity_rule_short` "Min {{ min }} · Increments of {{ increment }}", `cart.volume_pricing_applied` "Volume pricing applied", `cart.gift_card_to` "To: {{ name }} ({{ email }})", `cart.gift_card_send_on` "Sends on {{ date }}"
 - `products.product.opens_other_product` ", opens another page" (chữ ẩn combined listing)
 

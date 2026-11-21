@@ -91,7 +91,7 @@ Dev FE: bọc `<table>` bằng filter/regex không được trong Liquid an toà
 | --- | --- | --- |
 | Input default / hover / focus / disabled | foundation §12 (viền muted-light 5.33; hover foreground; focus viền + outline accent) | quyết định CTO 09/11 viền ô nhập |
 | Lỗi trường (S2) | hiện khi rời trường và khi submit: viền sale 2px + icon ! + câu cách sửa ("Enter your name.", "Enter an email like name@example.com.", "Enter a message.") 14/500; `aria-invalid`, `aria-describedby` | 05 §4, foundation §12 |
-| Lỗi submit (S2) | hộp tóm tắt `role="alert"` đầu form "Check 2 fields" + link nhảy tới từng trường; focus vào hộp | 05 §4.3, foundation §12 |
+| Lỗi submit (S2) | hộp tóm tắt `.form-message--error` `role="alert"` `tabindex="-1"` đầu form "Check 2 fields" + danh sách `.form-message__list`, mỗi lỗi một link "Tên trường: cách sửa" nhảy tới trường; focus vào hộp (vòng accent), KHÔNG vào trường lỗi đầu; bấm link thì focus vào ô đó; rời một ô sai thì không chuyển focus | 05 §4.3, foundation §12 bảng "Focus khi form lỗi" (sổ 21/11, components-10) |
 | Đang gửi (S3) | nút `aria-busy`, spinner, giữ bề rộng; trường `readonly`; status ẩn "Sending your message…" | foundation §6 loading |
 | Thành công (S4) | `form.posted_successfully?`: hộp success (viền trái badge-new + icon check) "Thanks for contacting us" thay form, focus vào hộp, nút secondary "Continue Shopping" | 05 §6, foundation §12 |
 | Gửi thất bại (S6) | `form.errors` chung (spam challenge thất bại, lỗi mạng): `.alert` "Your message wasn't sent" + cách xử lý; giữ dữ liệu đã nhập | 05 §5 không mất dữ liệu |
