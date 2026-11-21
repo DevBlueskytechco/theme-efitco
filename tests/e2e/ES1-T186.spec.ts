@@ -68,11 +68,13 @@ test.describe('ES1-T186 tĩnh', () => {
       const source = readFileSync(file, 'utf8');
       expect(source, file).not.toMatch(/<script|scroll-buttons/);
     }
-    const css = readFileSync('assets/base.css', 'utf8');
+    // ADR 0014 (ES1-T566): CSS shop by level + level-card ở assets/shop-by-level.css, quét cả file; base.css chỉ giữ comment mốc
+    const css = readFileSync('assets/shop-by-level.css', 'utf8');
     const start = css.indexOf('/** Shop by level (TE-15');
-    expect(start).toBeGreaterThan(0);
-    // ES1-T217: chỉ mục của block này, mục kế là Blog posts. Bỏ comment: ghi chú Figma có mã màu không phải giá trị CSS.
-    const section = css.slice(start, css.indexOf('/** Blog posts (TE-16', start)).replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(start).toBe(0);
+    expect(readFileSync('assets/base.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/\.(shop-by-level|level-card)/);
+    // Bỏ comment: ghi chú Figma có mã màu không phải giá trị CSS.
+    const section = css.replace(/\/\*[\s\S]*?\*\//g, '');
     expect(section.length).toBeGreaterThan(0);
     expect(section).not.toMatch(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/i);
     expect(section).not.toMatch(/(^|\s)(left|right|top|bottom|margin-left|margin-right|padding-left|padding-right)\s*:/m);

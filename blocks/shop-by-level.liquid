@@ -9,6 +9,10 @@
   shows a placeholder and the storefront renders nothing, so eyebrow and heading
   never stand alone.
 
+  Styles: assets/shop-by-level.css (this block and level-card), loaded by the
+  stylesheet_tag line before the root, without preload (ADR 0014), only when the
+  block prints markup (a card, or the theme editor).
+
   Test hooks: data-testid="shop-by-level", "shop-by-level-eyebrow",
   "shop-by-level-heading", "shop-by-level-list", "shop-by-level-placeholder".
 
@@ -28,6 +32,9 @@
 
 {%- assign items = content | strip -%}
 
+{%- if items != blank or request.design_mode -%}
+  {{ 'shop-by-level.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if items != blank -%}
   <div
     class="shop-by-level"

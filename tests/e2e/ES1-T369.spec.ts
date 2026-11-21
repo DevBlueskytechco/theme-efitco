@@ -182,14 +182,15 @@ test.describe('ES1-T369 hợp đồng tĩnh', () => {
     expect(keys.length).toBe(new Set(keys).size);
   });
 
-  test('CSS cart: 0 literal màu, chỉ logical, z-index qua --layer-*, base.css ≤ 49 152 B gzip, cart.css ≤ 16 384 B gzip (ES1-T472 a, ES1-T478)', () => {
+  // ADR 0014 mục 5: base.css ≤ 40 960 B gzip sau ES1-T566
+  test('CSS cart: 0 literal màu, chỉ logical, z-index qua --layer-*, base.css ≤ 40 960 B gzip, cart.css ≤ 16 384 B gzip (ES1-T472 a, ES1-T478, ES1-T566)', () => {
     const css = cartCss();
     expect(css.match(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/gi)).toBeNull();
     expect(css.match(/^\s*(left|right|top|bottom|width|height|(margin|padding)-(left|right|top|bottom))\s*:/gm)).toBeNull();
     expect(css.match(/z-index:\s*\d/g)).toBeNull();
     const size = gzipSync(BASE).length;
     test.info().annotations.push({ type: 'base.css gzip', description: String(size) });
-    expect(size).toBeLessThanOrEqual(49152);
+    expect(size).toBeLessThanOrEqual(40960);
     expect(gzipSync(CART).length).toBeLessThanOrEqual(16384);
   });
 });

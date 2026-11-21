@@ -1,0 +1,266 @@
+/** Testimonials (TE-7, Figma 1:885) + testimonial-item: hàng ngang mọi mốc (HD3). Nạp trong blocks/testimonials.liquid (ADR 0014).
+   Nút, tiến trình (.carousel-nav, .carousel-progress), sao (.rating-stars) dùng chung ở base.css */
+.testimonials--placeholder {
+  margin: 0;
+  padding-inline: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+.testimonials__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* Figma 1:893: 48 / 58, letter-spacing -0.96 */
+.testimonials__heading {
+  margin: 0;
+  font-size: var(--font-size-h1);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.testimonial-item {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  text-align: start;
+  scroll-snap-align: start;
+}
+
+.testimonial-item--placeholder {
+  padding: var(--space-5);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+}
+
+/* Figma 1:896: 456 / 270 */
+.testimonial-item__image img {
+  aspect-ratio: 456 / 270;
+  inline-size: 100%;
+  object-fit: cover;
+}
+
+.testimonial-item__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-5);
+  padding: var(--space-5);
+}
+
+/* flex 1 đẩy hàng product xuống đáy để các card cùng hàng thẳng đường kẻ */
+.testimonial-item__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Dưới 80rem sao xuống hàng riêng dưới tên; từ 80rem tên, Verified, sao 1 hàng */
+.testimonial-item__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-1) var(--space-3);
+}
+
+@media (min-width: 80rem) {
+  .testimonial-item__meta {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+}
+
+.testimonial-item__reviewer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-3);
+  min-inline-size: 0;
+}
+
+.testimonial-item__author {
+  margin: 0;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  line-height: 1.625;
+}
+
+.testimonial-item__verified {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--space-1) / 2);
+  margin: 0;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-sm);
+  letter-spacing: -0.01em;
+  line-height: 1.57;
+}
+
+.testimonial-item__verified .icon-trust {
+  inline-size: 22px;
+  block-size: 22px;
+}
+
+
+.testimonial-item__title {
+  margin: 0;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: calc(28 / 18);
+}
+
+.testimonial-item__quote {
+  margin: 0;
+  color: var(--color-muted-light);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+}
+
+/* Đường kẻ nằm trên hàng product: không có product thì mất cả hai */
+.testimonial-item__product {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding-block-start: var(--space-5);
+  border-block-start: 1px solid var(--color-border);
+}
+
+.testimonial-item__thumb {
+  flex: none;
+  inline-size: 64px;
+  block-size: 64px;
+  overflow: hidden;
+  border-radius: 50%;
+  background-color: var(--color-background-alt);
+}
+
+.testimonial-item__thumb img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+.testimonial-item__product-info {
+  min-inline-size: 0;
+}
+
+.testimonial-item__product-link {
+  color: inherit;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+  text-decoration: none;
+}
+
+.testimonial-item__product-link:hover {
+  text-decoration: underline;
+}
+
+/* ==== Trang chủ theo Figma 1:359, khung 1920 (CTO 07/11) ==== */
+@media (min-width: 80rem) {
+  .testimonial-item__product { align-items: flex-start; padding-block-start: 23px; }
+  .testimonial-item__product-info { display: grid; gap: 4px; padding-block-start: 4px; }
+  .testimonials__eyebrow { color: var(--color-accent); }
+  .testimonials__header { margin-block: -3px; }
+  .testimonial-item__quote { color: var(--figma-808080); }
+  .testimonial-item__reviewer { display: flex; align-items: center; gap: 12px; position: relative; inset-inline-start: -1px; }
+  .testimonial-item__author { font-weight: 500; }
+  .testimonial-item__verified { display: flex; align-items: center; gap: 2px; margin: 0; color: var(--figma-808080); font-size: 14px; line-height: 22px; font-weight: 400; letter-spacing: -0.14px; }
+  .testimonial-item__verified .icon-trust { width: 22px; height: 22px; color: var(--color-badge-new); }
+  .testimonials__eyebrow { position: relative; inset-block-start: 1px; }
+  .testimonial-item__title { position: relative; inset-block-start: 1px; }
+}
+
+/* ==== Trải nghiệm mượt ==== */
+@media (prefers-reduced-motion: no-preference) {
+  .testimonial-item { transition: box-shadow var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), background-color var(--motion-base) var(--ease-out), translate var(--motion-base) var(--ease-out); }
+  html[data-motion] .testimonial-item:hover { box-shadow: 0 8px 24px color-mix(in srgb, var(--color-foreground) 10%, transparent); translate: 0 -2px; }
+  .testimonial-item__image { overflow: hidden; }
+  .testimonial-item__image img { transition: scale var(--motion-slow) var(--ease-out); }
+  html[data-motion] .testimonial-item:hover .testimonial-item__image img { scale: 1.05; }
+}
+
+/* ==== Hàng ngang (khung chung ở base.css mục 3): gốc .full-width, card đầu thẳng mép nội dung, hàng tràn mép phải ==== */
+.testimonials {
+  --row-inset: max(var(--page-margin), (100cqi - var(--page-width)) / 2 + var(--page-margin));
+  --row-gap: var(--space-4);
+  --row-card: min(70cqi, var(--row-card-max));
+
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  min-inline-size: 0;
+  padding-block: var(--space-7);
+  text-align: start;
+}
+.testimonials { container-type: inline-size; }
+.testimonials { --row-card: calc((100cqi - 2 * var(--row-inset)) * 0.85); }
+.testimonials__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3) var(--space-4);
+  align-items: end;
+}
+.testimonials__header { padding-inline: var(--row-inset); }
+.testimonials__header > :not(.carousel-nav) { grid-column: 1; }
+.testimonials__eyebrow ~ .carousel-nav { grid-row: 1 / span 2; }
+.testimonials__list {
+  display: flex;
+  gap: var(--row-gap);
+  margin: calc(var(--space-1) * -1) 0;
+  padding-block: var(--space-1);
+  padding-inline: var(--row-inset);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: var(--row-inset);
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  list-style: none;
+}
+.testimonials__list::-webkit-scrollbar { display: none; }
+.testimonials__list:focus-visible { outline-offset: -2px; }
+@media (scripting: none) {
+  .testimonials__list { scrollbar-width: thin; }
+  .testimonials__list::-webkit-scrollbar { display: block; }
+}
+.testimonial-item {
+  flex: 0 0 var(--row-card);
+  min-inline-size: 0;
+  text-align: start;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 48rem) {
+  .testimonials { --row-card: min(40cqi, var(--row-card-max)); }
+}
+@media (min-width: 64rem) {
+  .testimonials { gap: calc(var(--space-1) * 10); padding-block: var(--space-8); }
+}
+@media (min-width: 80rem) {
+  .testimonials { --row-gap: var(--space-5); }
+  .testimonials { --row-card: min(var(--row-card-review-max), (100cqi - var(--row-inset) - 3 * var(--row-gap)) / 3.3); }
+}

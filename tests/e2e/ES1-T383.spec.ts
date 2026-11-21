@@ -40,8 +40,9 @@ const CONTACT_FIXTURE = `
   </aside>
 </div></section>`;
 
+// ADR 0014 (ES1-T566): contact-aside in link assets/faq.css trong body, tức nạp sau aux.css ở <head>; fixture giữ đúng thứ tự đó
 async function fixture(page: Page, body: string) {
-  await page.setContent(`<!doctype html><html lang="en"><head><title>contact</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head><body><main>${body}</main></body></html>`);
+  await page.setContent(`<!doctype html><html lang="en"><head><title>contact</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head><body><main><style>${noComments(read('assets/faq.css'))}</style>${body}</main></body></html>`);
 }
 
 const box = async (page: Page, selector: string) => (await page.locator(selector).first().boundingBox())!;
