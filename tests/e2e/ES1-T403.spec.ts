@@ -40,8 +40,11 @@ test.describe('ES1-T403 tĩnh', () => {
 
   test('D5 line-clamp / ellipsis chỉ còn ở tên shop (critical) và badge article-card__tag', () => {
     const hits: string[] = [];
-    // ES1-T478: quét cả file CSS theo template (ADR 0013); ES1-T565: thêm 5 file block (ADR 0014)
-    const blockFiles = ['quiz', 'shop-the-look', 'bundle-builder', 'featured-product', 'image-with-text'].map((b) => `assets/${b}.css`);
+    // ES1-T478: quét cả file CSS theo template (ADR 0013); ES1-T565: thêm 5 file block, ES1-T566: thêm 6 file (ADR 0014)
+    const blockFiles = [
+      'quiz', 'shop-the-look', 'bundle-builder', 'featured-product', 'image-with-text',
+      'testimonials', 'video-carousel', 'faq', 'shop-by-level', 'multicolumn', 'hello-world',
+    ].map((b) => `assets/${b}.css`);
     for (const file of ['assets/critical.css', 'assets/base.css', 'assets/product.css', 'assets/collection.css', 'assets/cart.css', 'assets/aux.css', ...blockFiles]) {
       const css = noComments(read(file));
       for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {

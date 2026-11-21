@@ -208,8 +208,8 @@ test.describe('ES1-T365 tĩnh', () => {
     expect(cssText).not.toMatch(/z-index:\s*-?\d/);
     expect(cssText).not.toMatch(/\d+ms\b|\d+(\.\d+)?s\b\s*(ease|linear|;)/);
     for (const css of [BASE, COLLECTION]) expect(css).not.toMatch(/\.collection-banner__(image|title)\b|\.collection-products__(count|empty)\b/);
-    // Trần ADR 0013 (ES1-T478): base.css ≤ 49 152 B gzip, collection.css ≤ 16 384 B gzip
-    expect(gzipSync(BASE).length).toBeLessThanOrEqual(49152);
+    // Trần ADR 0013 (ES1-T478): collection.css ≤ 16 384 B gzip; base.css ≤ 40 960 B gzip sau ES1-T566 (ADR 0014 mục 5)
+    expect(gzipSync(BASE).length).toBeLessThanOrEqual(40960);
     expect(gzipSync(COLLECTION).length).toBeLessThanOrEqual(16384);
     expect(Buffer.byteLength(CRITICAL)).toBeLessThanOrEqual(10240);
   });

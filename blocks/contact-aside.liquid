@@ -11,6 +11,11 @@
   panel visible so the merchant can fill the questions. A policy link shows
   only when the shop has that policy.
 
+  Styles: assets/faq.css for the faq-item questions, loaded by the stylesheet_tag
+  line before the root, without preload (ADR 0014), only when the panel or its
+  editor placeholder renders. Panel rules and the contact overrides of faq-item
+  are in assets/aux.css.
+
   Test hooks: data-testid="contact-aside", "contact-aside-heading",
   "contact-aside-list", "contact-aside-policy", "contact-aside-placeholder".
 
@@ -29,6 +34,9 @@
   assign refund_policy = shop.refund_policy
 -%}
 
+{%- if items != blank or request.design_mode -%}
+  {{ 'faq.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if items != blank -%}
   <aside
     class="contact-aside"

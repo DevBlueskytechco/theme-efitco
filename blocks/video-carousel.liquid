@@ -1,8 +1,8 @@
 {% doc %}
   Renders the video demo row (TE-13 AC3, Figma 1:817): eyebrow, heading, optional
   subheading, link and 3 stats, then a list of video-card blocks that scrolls
-  sideways with scroll-snap, touch and keyboard without JavaScript (assets/base.css,
-  "Hàng ngang"). The list runs to the viewport edge, so the first card lines up with
+  sideways with scroll-snap, touch and keyboard without JavaScript
+  (assets/video-carousel.css, "Hàng ngang"). The list runs to the viewport edge, so the first card lines up with
   the heading and the next card shows (TE-13 AC8: 252 at 360, 264 from 768, 4 full
   cards and at least 25% of card 5 at 1280).
 
@@ -18,6 +18,11 @@
   Stats, subheading and link are hidden in Figma (1:826, 1:827), so their defaults
   stay empty. A stat without a value stays hidden; the link needs both a label and
   a URL.
+
+  Styles: assets/video-carousel.css (this block and video-card), loaded by the
+  stylesheet_tag line before the root, without preload (ADR 0014), only when the
+  block prints markup (a card, or the theme editor). Buttons and progress line
+  stay in assets/base.css.
 
   JavaScript hooks are on the video-card block; data-lazy-module on the root is the
   URL of assets/video-carousel.js, read by assets/lazy-module.js. Row hooks: custom
@@ -44,6 +49,9 @@
 
 {%- assign items = content | strip -%}
 
+{%- if items != blank or request.design_mode -%}
+  {{ 'video-carousel.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if items != blank -%}
   {%- capture stats -%}
     {%- for index in (1..3) -%}

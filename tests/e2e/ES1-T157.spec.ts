@@ -71,11 +71,12 @@ test.describe('ES1-T157 tĩnh', () => {
     expect(cardSource).not.toMatch(/<video[^>]*\s(autoplay|muted|poster)/);
     expect(cardSource).not.toMatch(/https:\/\/www\.youtube\.com\/embed/);
 
-    const css = readFileSync('assets/base.css', 'utf8');
+    // ADR 0014 (ES1-T566): CSS video carousel + video-card ở assets/video-carousel.css, quét cả file; base.css không còn rule video
+    const css = readFileSync('assets/video-carousel.css', 'utf8');
     const start = css.indexOf('/** Video carousel (TE-13');
-    const end = css.indexOf('/** Gift card template */');
-    expect(start).toBeGreaterThan(0);
-    const section = css.slice(start, end).replace(/\/\*[\s\S]*?\*\//g, '');
+    expect(start).toBe(0);
+    expect(readFileSync('assets/base.css', 'utf8').replace(/\/\*[\s\S]*?\*\//g, '')).not.toMatch(/\.video-(card|carousel)/);
+    const section = css.replace(/\/\*[\s\S]*?\*\//g, '');
     expect(section).not.toMatch(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(/i);
     expect(section).not.toMatch(/(^|[\s;{])(left|right|top|bottom|margin-left|margin-right|padding-left|padding-right)\s*:/m);
   });

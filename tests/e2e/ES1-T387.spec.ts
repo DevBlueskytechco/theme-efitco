@@ -79,8 +79,8 @@ test.describe('ES1-T387 static', () => {
 
   // Trần 49 152 chưa đạt ở develop (50 805 B sau T332, [Q] ES1-T454; 50 102 B sau ES1-T317; 51 936 B ở develop 32c5ab7 sau T326/T320; 54 814 B ở develop 354e4e9 sau T341/T382/T367; trần tạm 57 344 (CTO 17/11, ES1-T478), [Q] ES1-T472); CTO 13/11: PR này không được tăng base.css so với develop
   // ES1-T472 a: ES1-T478 tách CSS theo template, base.css về trần 49 152 B gzip, hết trần tạm 57 344
-  // ADR 0014 (ES1-T565): CSS quiz ở assets/quiz.css; base.css không còn rule quiz
-  test('CSS: popup cũ (literal figma, px) đã xoá; mục quiz 0 màu literal, 0 z-index số; gzip ≤ 49 152', () => {
+  // ADR 0014 (ES1-T565): CSS quiz ở assets/quiz.css; base.css không còn rule quiz. ES1-T566: base.css ≤ 40 960 (ADR 0014 mục 5)
+  test('CSS: popup cũ (literal figma, px) đã xoá; mục quiz 0 màu literal, 0 z-index số; base gzip ≤ 40 960', () => {
     const base = read('assets/base.css');
     const css = read('assets/quiz.css');
     for (const file of [base, css]) {
@@ -96,7 +96,7 @@ test.describe('ES1-T387 static', () => {
     expect(quizRules).not.toMatch(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(|--figma-/i);
     expect(quizRules).not.toMatch(/z-index\s*:\s*-?\d/);
     expect(quizRules).not.toMatch(/(^|[\s;{])(left|right|top|bottom|margin-left|margin-right|padding-left|padding-right)\s*:/m);
-    expect(gzipSync(base).length).toBeLessThanOrEqual(49152);
+    expect(gzipSync(base).length).toBeLessThanOrEqual(40960);
     expect(gzipSync(css).length).toBeLessThanOrEqual(8192);
   });
 
