@@ -44,21 +44,26 @@ async function noOverflow(page: Page) {
 
 test.describe('ES1-T341 @static', () => {
   test.beforeEach(({}, info) => { test.skip(info.project.name !== 'desktop', 'tĩnh, chạy 1 lần'); });
+  // ADR 0014 (ES1-T565): CSS shop the look, quiz, image with text ở file block; token --panel-* giữ base.css
   const base = read('assets/base.css');
+  const lookCss = read('assets/shop-the-look.css');
+  const quizCss = read('assets/quiz.css');
+  const iwtCss = read('assets/image-with-text.css');
   const look = read('blocks/shop-the-look.liquid');
   const locale = JSON.parse(read('locales/en.default.json'));
 
   test('--panel-muted chung: không còn --look-panel-muted, chữ phụ panel shop the look và ghi chú quiz dùng token chung', () => {
-    expect(base).not.toMatch(/--look-panel-muted|shop-the-look__discount-note/);
-    expect(base).toMatch(/\.shop-the-look__line \{[^}]*color: var\(--panel-muted\)/);
-    expect(base).toMatch(/\.shop-the-look__line--discount \{[^}]*color: var\(--panel-saving\)/);
-    expect(base).toMatch(/\.quiz__note \{[^}]*color: var\(--panel-muted\)/);
+    expect(base).toMatch(/--panel-muted:/);
+    for (const css of [base, lookCss]) expect(css).not.toMatch(/--look-panel-muted|shop-the-look__discount-note/);
+    expect(lookCss).toMatch(/\.shop-the-look__line \{[^}]*color: var\(--panel-muted\)/);
+    expect(lookCss).toMatch(/\.shop-the-look__line--discount \{[^}]*color: var\(--panel-saving\)/);
+    expect(quizCss).toMatch(/\.quiz__note \{[^}]*color: var\(--panel-muted\)/);
   });
 
   test('AC-H19: không dòng ghi chú giảm giá; dòng giảm có icon aria-hidden + dấu trừ', () => {
     expect(look).not.toMatch(/discount_note|discount-note/);
     expect(look).toMatch(/shop-the-look__discount-icon[^>]*aria-hidden="true"/);
-    expect(base).toMatch(/\.shop-the-look__discount:not\(:empty\)::before \{\s*content: '\\2212\\00a0';/);
+    expect(lookCss).toMatch(/\.shop-the-look__discount:not\(:empty\)::before \{\s*content: '\\2212\\00a0';/);
     expect(locale.blocks.shop_the_look.discount_note).toBeUndefined();
   });
 
@@ -68,8 +73,8 @@ test.describe('ES1-T341 @static', () => {
   });
 
   test('Make fitness: min-height 50vw, display min(display, 6.25vw), <br> trong locale heading', () => {
-    expect(base).toMatch(/\.image-with-text--banner \{\s*align-content: center;\s*min-block-size: 50vw;/);
-    expect(base).toMatch(/\.image-with-text--banner \.image-with-text__heading \{\s*font-size: min\(var\(--font-size-display\), 6\.25vw\);/);
+    expect(iwtCss).toMatch(/\.image-with-text--banner \{\s*align-content: center;\s*min-block-size: 50vw;/);
+    expect(iwtCss).toMatch(/\.image-with-text--banner \.image-with-text__heading \{\s*font-size: min\(var\(--font-size-display\), 6\.25vw\);/);
     expect(locale.blocks.image_with_text.banner_heading_html).toMatch(/fitness<br>.*your<br>/);
   });
 });
