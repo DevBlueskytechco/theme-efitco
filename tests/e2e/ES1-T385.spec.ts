@@ -13,7 +13,8 @@
 //   TE385_POST_COMMENT=1 (đăng bình luận thật), TE385_STORE_STATE=configured (AC15), FRESH_THEME_ID (theme mới cài, AC15)
 // Bài có ảnh, bài không ảnh, trang tag tìm lúc chạy từ trang blog, không cứng handle bài.
 // Phần JS do BE còn mở: ES1-T473 (focus hộp lỗi/thành công bình luận, chevron bài liên quan) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T517 (B02, TC-14 360), ES1-T518 (B03), ES1-T520 (B04, TC-33 1280/1920)); khi bug sửa test đỏ lại → gỡ test.fail.
+// Bug đã biết: test.fail gắn mã (ES1-T518 (B03), ES1-T520 (B04, TC-33 1280/1920)); khi bug sửa test đỏ lại → gỡ test.fail.
+// ES1-T517 (B02) đã sửa: hàng chủ đề có :focus-visible thì xuống dòng, bỏ cuộn (aux.css) → TC-14 360 là test thường.
 // ES1-T506 (B01) đã sửa ở #276: khung card là article-card-frame (nền tối 3/4, bo 16), article-card-link chỉ bọc chữ tiêu đề,
 // ::after của link phủ khung và vẽ vòng focus → đo kích thước/nền/vị trí ở frame, outline focus ở ::after của link (ES1-T531).
 // Câu hỏi AC: ES1-T519 [Q] (AC14 bài không ảnh → LCP h1) — CI 20/11 đo LCP là <p>; TC-46b test.fail tới khi CTO chốt.
@@ -514,11 +515,10 @@ test.describe('ES1-T385 blog', () => {
     await expect(page.getByTestId('blog-articles-topics')).toHaveCount(0);
   });
 
-  // TC-14 tách theo mốc: 360 vướng bug ES1-T517 (test.fail), 1280 là test thường.
+  // TC-14 tách theo mốc 360, 1280 (ES1-T517 đã sửa, cả 2 là test thường).
   for (const w of [360, 1280] as const) {
     test(`TC-14 AC3, AC7 bàn phím ${w}: Tab tới chủ đề cuối, outline hiện, link nằm trọn trong khung cuộn`, async ({ page }, ti) => {
       desktopOnly(ti.project.name);
-      test.fail(w === 360, 'ES1-T517 (ES1-T385-B02): 360 Tab tới chủ đề cuối, khung cuộn không cuộn hết, link và outline bị cắt mép phải');
       await openBlog(page, w);
       const links = topicsNav(page).getByRole('link');
       const n = await links.count();

@@ -60,6 +60,13 @@
   outline-offset: calc(var(--space-1) * -1);
 }
 
+/* ES1-T517: Chrome coi tab hiện ≥ 32px là đã thấy, Tab không cuộn tiếp (scroll-padding/-margin không đổi) →
+   tab và outline bị khung cuộn cắt. Bàn phím trong hàng: xuống dòng, bỏ cuộn, mọi tab nằm trọn trong khung. */
+.blog-articles__topic-list:has(:focus-visible) {
+  flex-wrap: wrap;
+  overflow-x: visible;
+}
+
 .blog-articles__featured {
   position: relative;
   display: grid;
