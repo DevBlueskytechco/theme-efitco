@@ -2764,7 +2764,9 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   display: grid;
   grid-template-columns: var(--content-grid);
   margin-block-start: var(--space-7);
-  background: var(--color-background-dark) url('noise-dark.png');
+  /* Noise = border-image fill: không là ứng viên LCP (ES1-T494, ES1-T531) */
+  background: var(--color-background-dark);
+  border-image: url('noise-dark.png') 0 fill/0 repeat;
   color: var(--color-background-dark-foreground);
   font-size: var(--font-size-sm);
 }
