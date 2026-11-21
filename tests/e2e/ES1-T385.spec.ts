@@ -13,7 +13,7 @@
 //   TE385_POST_COMMENT=1 (đăng bình luận thật), TE385_STORE_STATE=configured (AC15), FRESH_THEME_ID (theme mới cài, AC15)
 // Bài có ảnh, bài không ảnh, trang tag tìm lúc chạy từ trang blog, không cứng handle bài.
 // Phần JS do BE còn mở: ES1-T473 (focus hộp lỗi/thành công bình luận, chevron bài liên quan) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T517 (B02, TC-14 360), ES1-T518 (B03), ES1-T520 (B04, TC-33 1280/1920)); khi bug sửa test đỏ lại → gỡ test.fail.
+// Bug đã biết: test.fail gắn mã (ES1-T517 (B02, TC-14 360), ES1-T518 (B03); ES1-T520 (B04, TC-33 1280/1920) đã sửa, gỡ test.fail); khi bug sửa test đỏ lại → gỡ test.fail.
 // ES1-T506 (B01) đã sửa ở #276: khung card là article-card-frame (nền tối 3/4, bo 16), article-card-link chỉ bọc chữ tiêu đề,
 // ::after của link phủ khung và vẽ vòng focus → đo kích thước/nền/vị trí ở frame, outline focus ở ::after của link (ES1-T531).
 // Câu hỏi AC: ES1-T519 [Q] (AC14 bài không ảnh → LCP h1) — CI 20/11 đo LCP là <p>; TC-46b test.fail tới khi CTO chốt.
@@ -834,7 +834,7 @@ test.describe('ES1-T385 bài viết', () => {
   });
 
   // srs TE-10 AC15 (sổ 11/11, TS-FE5 ES1-T403) + foundation §28 (CTO 11/11, "Thay §4 article.md"): đoạn .rte 16px / lh 1.7 mọi mốc.
-  // Văn bản chốt sau thắng bảng mốc cũ article.md §3 (18 / 1.7 ở 1280, 1920). Theme aux.css (.article-main .rte font-size-lg từ 64rem) lệch → bug ES1-T520.
+  // Văn bản chốt sau thắng bảng mốc cũ article.md §3 (18 / 1.7 ở 1280, 1920). ES1-T520 đã bỏ .article-main .rte font-size-lg (64rem) ở aux.css.
   async function rteParagraph(page: Page, w: number, path: string) {
     await openArticle(page, w, path);
     const p = page.getByTestId('article-content').locator('p').first();
@@ -865,7 +865,6 @@ test.describe('ES1-T385 bài viết', () => {
 
   test('TC-33 AC10 1280, 1920: .rte đoạn 16px / 1.7, ≤ 65ch, link gạch chân', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
-    test.fail(true, 'ES1-T520 (ES1-T385-B04): aux.css .article-main .rte font-size-lg từ 64rem → đoạn 18px, srs TE-10 AC15 + foundation §28 chốt 16px');
     const path = await coverArticle(page);
     for (const w of [1280, 1920]) await rteParagraph(page, w, path);
   });
