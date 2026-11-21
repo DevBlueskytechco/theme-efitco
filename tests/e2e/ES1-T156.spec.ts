@@ -131,7 +131,9 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     const picker = tid(band(page, 'b'), 'product-variant-picker');
     await expect(picker).toHaveCount(1);
     await expect(picker).toHaveAttribute('data-fetch-url', /\/products\/.+\?view=featured-product$/);
-    await expect(picker).toHaveAttribute('data-regions', 'product-price product-buy-buttons');
+    // ES1-T350 review #1 (ADR 0008 mục 3): bộ chọn nằm trong partial product-options để server làm mới legend, trạng thái giá trị.
+    await expect(picker).toHaveAttribute('data-regions', 'product-options product-price product-buy-buttons');
+    await expect(picker).toHaveAttribute('data-partials', 'product-options product-price product-buy-buttons');
   });
 
   test('AC2 form đúng hợp đồng product-form.js', async ({ page }) => {
@@ -188,10 +190,13 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     await expect(tid(b, 'featured-product-specs')).toHaveCount(0);
   });
 
-  test('AC2 ?view=featured-product có đúng 2 partial', async ({ page }) => {
+  test('AC2 ?view=featured-product có đúng 3 partial (2 ở block + product-options ở snippet bộ chọn)', async ({ page }) => {
     const liquid = readFileSync('blocks/featured-product.liquid', 'utf8');
     const names = [...liquid.matchAll(/{%-?\s*partial\s+'([^']+)'/g)].map((m) => m[1]).sort();
     expect(names).toEqual(['product-buy-buttons', 'product-price']);
+    expect(liquid).toMatch(/regions: 'product-options product-price product-buy-buttons'/);
+    // Template dữ liệu, không phải trang: không layout (review #4, giảm tải swap() nhiều band).
+    expect(readFileSync('templates/product.featured-product.liquid', 'utf8')).toMatch(/^{%\s*layout none\s*%}/);
 
     const handle = env('TE4_VARIANTS_HANDLE');
     test.skip(!handle, 'Thiếu TE4_VARIANTS_HANDLE');
@@ -199,6 +204,8 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     expect(response?.ok()).toBeTruthy();
     await expect(page.getByTestId('featured-product-price')).toHaveCount(1);
     await expect(page.getByTestId('featured-product-add')).toHaveCount(1);
+    await expect(page.getByTestId('product-variant-picker')).toHaveCount(1);
+    await expect(page.locator('link[rel="stylesheet"]'), 'layout none: không tải CSS/header của theme').toHaveCount(0);
     await expect(page.getByTestId('product-installments')).toHaveCount(0);
     await expect(page.getByTestId('product-pickup')).toHaveCount(0);
     await expect(page.getByTestId('product-selling-plans')).toHaveCount(0);
@@ -259,7 +266,8 @@ test.describe('ES1-T156 TE-13 nojs', () => {
     await expect(thumbs.first()).toHaveAttribute('href', /^#FeaturedMedia-/);
   });
 
-  test('nojs select variant, form POST vào giỏ đúng variant', async ({ page }) => {
+  // ES1-T349 (TE-4 AC13, NFR-7): không còn select liệt kê biến thể; không JS mua biến thể hiện tại qua hidden id.
+  test('nojs không select biến thể, form POST vào giỏ đúng variant hiện tại', async ({ page }) => {
     // ES1-T224: tắt JS thì ảnh lazy tải ngay, nên không chờ load của trang nhiều band (repro R5). Mỗi bước có timeout riêng để CI nêu đúng bước treo; POST bị chặn báo Cloudflare, không thành timeout.
     // ES1-T300 (CTO 11/11 mục 4): run 42805384493, 42978078054 đỏ ở đây do 'bị Cloudflare chặn (cf-mitigated, status 429)' = môi trường store dev → skip có lý do, không fail gate.
     await skipIfStoreBlocked('ES1-T300: store dev chặn POST /cart/add không JS (môi trường)', () => nojsAddToCart(page));
@@ -270,11 +278,11 @@ async function nojsAddToCart(page: Page) {
   await gotoStore(page, TE13, { waitUntil: 'domcontentloaded' });
   const b = band(page, 'b');
   await expect(tid(b, 'product-variant-picker')).toBeHidden();
-  const select = tid(b, 'product-variant-select');
-  await expect(select).toBeVisible();
-  const values = await select.locator('option:not([disabled])').evaluateAll((els) => els.map((el) => (el as HTMLOptionElement).value));
-  test.skip(values.length < 2, 'TE4_VARIANTS_HANDLE cần từ 2 variant còn hàng');
-  await select.selectOption(values[1]);
+  await expect(b.locator('select[name="id"]')).toHaveCount(0);
+  const idInput = b.locator('form input[name="id"]');
+  await expect(idInput).toHaveCount(1);
+  test.skip(await tid(b, 'featured-product-add').isDisabled(), 'Variant hiện tại hết hàng');
+  const values = [await idInput.inputValue()];
   const isCartAdd = (res: Response) => res.request().method() === 'POST' && new URL(res.url()).pathname.endsWith('/cart/add');
   const [post] = await Promise.all([
     page.waitForResponse(isCartAdd, { timeout: 15_000 }),
@@ -286,5 +294,5 @@ async function nojsAddToCart(page: Page) {
   await page.waitForURL((url) => url.pathname.endsWith('/cart'), { waitUntil: 'domcontentloaded', timeout: 15_000 });
   await expectNotChallenged(page);
   const cart = await readCartNoScript<{ items: { variant_id: number }[] }>(page);
-  expect(cart.items.map((i) => String(i.variant_id))).toEqual([values[1]]);
+  expect(cart.items.map((i) => String(i.variant_id))).toEqual([values[0]]);
 }
