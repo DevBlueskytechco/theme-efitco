@@ -16,7 +16,7 @@ Giữ nguyên các mục khác. Mockup `drafts/designer/ES1-T278/index.html` ch�
 
 | # | Mục | Trước | Sau | Nguồn |
 | --- | --- | --- | --- | --- |
-| 1 | §7 Shop the look, panel | chữ phụ trắng 60% (5.27); dòng giảm giá chữ trắng | `--panel-muted` (6.56), `--panel-saving` (5.64) + icon tag, cặp chung foundation §2 | foundation §2; sổ 10/11 G3 |
+| 1 | §7 Shop the look, panel | chữ phụ trắng 60% (5.27); dòng giảm giá chữ trắng | `--panel-muted` (6.56), `--panel-saving` (5.82, V01 ES1-T527) + icon tag, cặp chung foundation §2 | foundation §2; sổ 10/11 G3 |
 
 Chỉ §7 đổi (trỏ màu). Mockup T278 render lại khi chạm khối shop the look; §6 Quiz, §9.1 ghi ở foundation §25.
 
@@ -172,7 +172,7 @@ Figma: eyebrow "SHOP THIS SETUP", h2 48, link "Browse All Setups" phải; ảnh 
 | Panel | padding 24; dòng 14/500 `--panel-muted` (foundation §2, 6.56); tổng 18/700 trắng; nút full cao 48, cách 16 | như 360 |
 
 Lý do 768: nút "Add Setup To Cart" đưa lên ngang danh sách, gần ảnh (05 nhóm 4 §1.3 "CTA rất gần khi cuộn nhẹ"; 19 §D1 tablet tận dụng bề ngang). Panel dính trong khối, không ra ngoài khối.
-Không có dòng ghi chú giảm giá dưới panel (sổ 07/11). Màu panel theo cặp chung của foundation §2 (panel tối G3, sổ 10/11): chữ phụ `--panel-muted`, dòng giảm giá `--panel-saving` (5.64) + icon tag 16 + dấu "−" (xanh Figma chỉ 2.50:1 trên panel; thay chữ trắng của vòng 3 / code ES1-T145 #4 để cùng cart, mini cart, bundle). Bảng §9.1 dòng "dòng phụ panel trắng 60%" không còn áp cho shop the look.
+Không có dòng ghi chú giảm giá dưới panel (sổ 07/11). Màu panel theo cặp chung của foundation §2 (panel tối G3, sổ 10/11): chữ phụ `--panel-muted`, dòng giảm giá `--panel-saving` (5.82, V01 ES1-T527) + icon tag 16 + dấu "−" (xanh Figma chỉ 2.50:1 trên panel; thay chữ trắng của vòng 3 / code ES1-T145 #4 để cùng cart, mini cart, bundle). Bảng §9.1 dòng "dòng phụ panel trắng 60%" không còn áp cho shop the look.
 Trạng thái (ĐỀ XUẤT): bấm điểm nóng → hàng tương ứng viền cam + cuộn tới hàng (360); hàng hết hàng: badge Sold out, ảnh 0.6, không tính vào tổng, số món giảm; tất cả hết hàng: ẩn panel (code đã có); đang thêm: nút `aria-busy` + spinner, giữ bề rộng; lỗi thêm giỏ: hộp lỗi `role="alert"` "Setup Not Added" + "Try Again"; thành công: mở mini cart (TE-5). Tổng nên in sẵn từ Liquid để không có ô trống trước khi JS chạy (như ĐỀ XUẤT ES1-T252 §1 khối 7).
 A11y: điểm nóng 44 × 44 (chấm 20), tên "Show {product} in the list", `aria-pressed`; hàng: 1 link (tên sản phẩm), ảnh `alt=""`; panel `aria-live="polite"` cho tổng; link "Browse All Setups" mô tả đích.
 
