@@ -153,12 +153,15 @@ test.describe('ES1-T347 AC15 đổi biến thể theo option value', () => {
 
     await value.click();
     await expect(radio(value)).toBeChecked();
+    // VP §6.1: legend đổi ngay lúc bấm (client), không chờ partial (response đang bị giữ).
+    await expect(tid(page, T.option).first().locator('[data-option-selected]')).toHaveText(await valueName(value));
     await expect(tid(page, T.form)).toHaveAttribute('aria-busy', 'true');
     const add = tid(page, T.add);
     await expect(add).toHaveAttribute('aria-disabled', 'true');
     await expect(add).not.toHaveAttribute('aria-busy', 'true');
     await expect(add).toBeVisible();
-    await add.click();
+    // Playwright coi aria-disabled="true" là disabled và chờ; force để kiểm đúng việc bấm không thêm giỏ (VP1).
+    await add.click({ force: true });
     await page.waitForTimeout(500);
     expect(adds, 'bấm Add To Cart lúc đang tải không gửi request thêm giỏ').toHaveLength(0);
     await expect(tid(page, T.variantId)).toHaveValue(oldId);
@@ -211,6 +214,8 @@ test.describe('ES1-T347 AC15 đổi biến thể theo option value', () => {
     test.skip(!value, 'Option đầu chỉ có 1 giá trị');
 
     const before = { ids: await checkedOptionIds(page), id: await tid(page, T.variantId).inputValue(), url: page.url() };
+    const legend = tid(page, T.option).first().locator('[data-option-selected]');
+    const oldLegend = ((await legend.textContent()) ?? '').trim();
     const fail = (u: URL) => isOptionRequest(u);
     await page.route(fail, (route) => route.abort('failed'));
 
@@ -226,12 +231,19 @@ test.describe('ES1-T347 AC15 đổi biến thể theo option value', () => {
     await expect(tid(page, T.variantId)).toHaveValue(before.id);
     expect(page.url()).toBe(before.url);
     await expect(tid(page, T.add)).not.toHaveAttribute('aria-disabled', 'true');
+    // Legend về giá trị đã khôi phục; focus ở radio đã khôi phục (VP §6.4).
+    await expect(legend).toHaveText(oldLegend);
+    await expect(fieldset.locator('input[type="radio"]:checked')).toBeFocused();
 
     await page.unroute(fail);
     await retry.click();
     await settled(page);
     await expect(alert).toBeEmpty();
+    await expect(retry).toBeHidden();
     await expect(radio(value)).toBeChecked();
+    // Try Again thành công: nút bị ẩn, focus không rơi về body mà ở radio đang chọn (review #2, VP §6.3–6.4).
+    await expect(radio(value)).toBeFocused();
+    await expect(legend).toHaveText(await valueName(value));
     expect(errors).toEqual([]);
   });
 
