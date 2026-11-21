@@ -14,7 +14,13 @@
   (name must match the JS): snippets/price.liquid for current_variant and a
   submit button with form="product-form-{product.id}", so it submits the main
   form in blocks/product-form.liquid. Sold out → disabled with the Sold out
-  label.
+  label; selected option values form no variant (same rule as
+  blocks/product-form, value.variant blank) → disabled with the Unavailable
+  label and no price (never the fallback variant's price). No variant picker and no loop over the variant list (NFR-7).
+
+  Loading state (TE-4 AC15): the price has data-variant-busy (JS sets
+  aria-busy, CSS shows a skeleton); JS sets aria-disabled on the button
+  while the variant loads, same as the main add button.
 
   Test hooks: product-sticky-bar, product-sticky-bar-title,
   product-sticky-bar-price, product-sticky-bar-add.
@@ -34,6 +40,22 @@
     assign current_variant = product.selected_or_first_available_variant
     assign form_id = 'product-form-' | append: product.id
     assign bar_media = current_variant.featured_media | default: product.featured_media
+
+    assign variant_exists = true
+    unless product.has_only_default_variant
+      for option in product.options_with_values limit: 1
+        for value in option.values
+          if value.selected and value.variant == blank
+            assign variant_exists = false
+          endif
+        endfor
+      endfor
+    endunless
+
+    assign can_buy = false
+    if variant_exists and current_variant.available
+      assign can_buy = true
+    endif
   -%}
 
   <product-sticky-bar
@@ -61,23 +83,28 @@
 
       {% partial 'product-sticky-bar' %}
         <div class="product-sticky-bar__buy">
-          <div class="product-sticky-bar__price" data-testid="product-sticky-bar-price">
-            {% render 'price', product: product, variant: current_variant %}
+          <div class="product-sticky-bar__price" data-variant-busy data-testid="product-sticky-bar-price">
+            <span class="skeleton product-sticky-bar__price-skeleton" aria-hidden="true"></span>
+            {%- if variant_exists -%}
+              {% render 'price', product: product, variant: current_variant %}
+            {%- endif -%}
           </div>
           <button
             class="button product-sticky-bar__add"
             type="submit"
             name="add"
             form="{{ form_id }}"
-            {% unless current_variant.available %}
+            {% unless can_buy %}
               disabled
             {% endunless %}
             data-testid="product-sticky-bar-add"
           >
-            {%- if current_variant.available -%}
+            {%- if can_buy -%}
               {{- 'blocks.product_form.add_to_cart' | t -}}
-            {%- else -%}
+            {%- elsif variant_exists -%}
               {{- 'blocks.product_form.sold_out' | t -}}
+            {%- else -%}
+              {{- 'blocks.product_form.unavailable' | t -}}
             {%- endif -%}
           </button>
         </div>
