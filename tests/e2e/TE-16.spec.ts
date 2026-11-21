@@ -152,7 +152,11 @@ async function checkGrid(page: Page, id: string, count: number) {
   for (const { width, height, card } of GRID) {
     await page.setViewportSize({ width, height });
     await expect(list).toHaveCSS('display', 'grid');
-    for (const [i, box] of (await boxes(cards)).entries()) expectSize(box, card, `${id} ${width} card ${i + 1}`);
+    // ES1-T531: CI 44781858105 (mobile, không JS) đo ngay sau setViewportSize ra 288 thay vì 292, lần chạy lại đạt → chờ bố cục ổn định
+    // (đo lại tới 5 s), giữ nguyên cỡ và sai số TOL; cỡ sai thật vẫn đỏ sau 5 s.
+    await expect(async () => {
+      for (const [i, box] of (await boxes(cards)).entries()) expectSize(box, card, `${id} ${width} card ${i + 1}`);
+    }).toPass({ timeout: 5_000 });
     await expect(root.getByTestId('blog-posts-nav')).toBeHidden();
     await expect(root.getByTestId('carousel-progress')).toBeHidden();
     await noHorizontalOverflow(page, `${id} ${width}`);

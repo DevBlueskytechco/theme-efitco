@@ -4,20 +4,14 @@
   description, spec table, Add to cart and View Detail. Reads the product from
   block.settings.product, never the global product. templates/product.featured-product
   passes the global product as the product parameter, so ?view=featured-product
-  returns the featured-product partial with the same markup for the requested
-  variant (ADR 0008: one partial per context, replaces product-price and
-  product-buy-buttons).
-
-  Partial featured-product: one region from the price summary to the buy
-  buttons (price, rating, description, spec table, variant picker, form, status).
-  It sits inside the custom element and after the countdown, so the countdown
-  node that assets/featured-product.js keeps is never replaced.
+  returns the 3 partials below with the same markup for the requested variant.
 
   Layout (index-mobile-b.md §2, index-1280.md khối 10, TE-13 AC6): below 48rem
   one column, image 1:1 with the product contained, spec rows label above value,
   buttons stacked full width; from 48rem image 4:3, spec rows 2 columns, buttons
   in one row; from 64rem 2 columns 1fr | 80 | 1fr (580 | 80 | 580 at 1280),
-  image 668 / 653.
+  image 668 / 653. View Detail carries a visually hidden " of {product}"
+  (TE-13 AC6) so the link name is unique on the page.
 
   Gallery (ADR 0012, Theme Store rich media): every media type of the product
   (image, video, YouTube/Vimeo, 3D model), 8 at most, scroll-snap, lazy, each
@@ -58,12 +52,22 @@
   minutes, seconds) on each cell with data-countdown-value on its number;
   data-featured-media-id, data-media-id and data-media-type on each media item
   and thumbnail; product-media-gallery with data-product-id and
-  data-media-count (no data-lazy-module yet, TS-BE1 adds it); product-form with
+  data-media-count and data-lazy-module (product-media.js, near viewport); product-form with
   data-product-id, data-product-url, data-cart-add-url, data-cart-url,
   data-cart-type, data-label-add, data-label-added, data-label-sold-out,
-  data-label-unavailable; data-fetch-url and data-regions="featured-product" on
-  product-variant-picker.
-  Partials: featured-product.
+  data-label-unavailable; data-fetch-url and data-regions on product-variant-picker.
+  Partials (ADR 0008 item 3, one featured product per real page):
+  product-options (the picker fieldsets, rendered by
+  snippets/product-variant-picker because regions lists it: the server
+  refreshes the legend and every value state after a change), product-price
+  (data-variant-price; no price and no discount when the selected option
+  values form no variant), product-buy-buttons (add button and
+  snippets/selected-variant-data: one variant, null when the selected option
+  values form no variant; the button then says Unavailable, disabled). With 2+
+  featured products on a page the partial names repeat, so
+  assets/featured-product.js swap() replaces the fieldsets, the price, the
+  JSON and the button of its own band from
+  ?view=featured-product&option_values= (ES1-T169 D4).
 
   Test hooks: featured-product, featured-product-eyebrow, featured-product-title,
   featured-product-media, featured-product-media-item, featured-product-thumbnail,
@@ -73,13 +77,13 @@
   featured-product-countdown-days, featured-product-countdown-hours,
   featured-product-countdown-minutes, featured-product-countdown-seconds,
   featured-product-add, featured-product-view-detail, featured-product-status,
-  featured-product-error, featured-product-placeholder, featured-product-region
-  (wrapper of the featured-product partial, display contents), featured-product-seal
+  featured-product-error, featured-product-placeholder, featured-product-seal
   (snippets/featured-product-seal). Inside media items: product-media-image,
   product-media-video, product-media-external-video,
   product-media-external-video-template, product-media-model
   (snippets/product-media-item). Also product-variant-picker,
-  product-option, product-option-value, product-variant-select and price*.
+  product-option, product-option-value and price*. No select listing
+  variants (TE-4 AC13, NFR-7): without JS the form buys the current variant.
 
   Empty state: no product selected → a hint in the theme editor, nothing on the
   storefront.
@@ -126,6 +130,22 @@
     endif
     if hide_options
       assign has_variant_choice = false
+    endif
+
+    # Tổ hợp đang chọn không tạo thành biến thể: cùng quy tắc blocks/product-form (ADR 0008, ES1-T253)
+    assign variant_exists = true
+    if has_variant_choice
+      for option in featured.options_with_values limit: 1
+        for value in option.values
+          if value.selected and value.variant == blank
+            assign variant_exists = false
+          endif
+        endfor
+      endfor
+    endif
+    assign can_buy = false
+    if variant_exists and current_variant.available
+      assign can_buy = true
     endif
     assign fetch_url = featured.url | append: '?view=featured-product'
 
@@ -226,6 +246,7 @@
         class="featured-product__gallery"
         data-product-id="{{ featured.id }}"
         data-media-count="{{ media_total }}"
+        data-lazy-module="{{ 'product-media.js' | asset_url }}"
       >
         <ul
           class="featured-product__media-list"
@@ -385,136 +406,135 @@
           </div>
         {%- endif -%}
 
-        {%- comment -%} ADR 0008: one region for price and buy buttons; the countdown above stays outside {%- endcomment -%}
-        {% partial 'featured-product' %}
-          <div class="featured-product__region" data-testid="featured-product-region">
-            <div
-              class="featured-product__summary"
-              {% if has_variant_choice %}
-                {% unless request.design_mode or featured.requires_selling_plan %}
-                  data-lazy-module="{{ 'product-variant-picker.js' | asset_url }}"
-                {% endunless %}
-              {% endif %}
-            >
-              <div class="featured-product__price" data-testid="featured-product-price">
+        <div
+          class="featured-product__summary"
+          {% if has_variant_choice %}
+            {% unless request.design_mode or featured.requires_selling_plan %}
+              data-lazy-module="{{ 'product-variant-picker.js' | asset_url }}"
+            {% endunless %}
+          {% endif %}
+        >
+          {% partial 'product-price' %}
+            <div class="featured-product__price" data-variant-price data-testid="featured-product-price">
+              {%- if variant_exists -%}
                 {% render 'price', product: featured, variant: current_variant %}
-                {%- if current_variant.compare_at_price > current_variant.price -%}
-                  {%- assign discount_percent = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
-                  <span class="featured-product__discount" data-testid="featured-product-discount">
-                    {%- if discount_percent > 0 -%}
-                      {{- 'products.card.sale_percent' | t: percent: discount_percent -}}
-                    {%- else -%}
-                      {{- 'products.card.sale' | t -}}
-                    {%- endif -%}
-                  </span>
-                {%- endif -%}
-              </div>
-
-              {%- if rating_value != blank -%}
-                <div class="featured-product__rating" data-testid="featured-product-rating">
-                  {% render 'rating-stars', rating: rating_on_five %}
-                  <span class="featured-product__rating-value">
-                    {{- 'blocks.featured_product.rating_value' | t: rating: rating_on_five -}}
-                  </span>
-                  {%- if rating_count != blank -%}
-                    <span class="featured-product__rating-count" data-testid="featured-product-rating-count">
-                      {{- 'blocks.featured_product.rating_count' | t: count: rating_count_number -}}
-                    </span>
-                  {%- endif -%}
-                </div>
               {%- endif -%}
-
-              {%- if description != blank -%}
-                <p class="featured-product__description" data-testid="featured-product-description">{{ description }}</p>
+              {%- if variant_exists and current_variant.compare_at_price > current_variant.price -%}
+                {%- assign discount_percent = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
+                <span class="featured-product__discount" data-testid="featured-product-discount">
+                  {%- if discount_percent > 0 -%}
+                    {{- 'products.card.sale_percent' | t: percent: discount_percent -}}
+                  {%- else -%}
+                    {{- 'products.card.sale' | t -}}
+                  {%- endif -%}
+                </span>
               {%- endif -%}
             </div>
+          {% endpartial %}
 
-            {%- if spec_rows != blank -%}
-              <table class="featured-product__specs" data-testid="featured-product-specs">
-                <caption class="visually-hidden">{{ 'blocks.featured_product.specs_label' | t }}</caption>
-                <tbody>
-                  {{- spec_rows -}}
-                </tbody>
-              </table>
-            {%- endif -%}
+          {%- if rating_value != blank -%}
+            <div class="featured-product__rating" data-testid="featured-product-rating">
+              {% render 'rating-stars', rating: rating_on_five %}
+              <span class="featured-product__rating-value">
+                {{- 'blocks.featured_product.rating_value' | t: rating: rating_on_five -}}
+              </span>
+              {%- if rating_count != blank -%}
+                <span class="featured-product__rating-count" data-testid="featured-product-rating-count">
+                  {{- 'blocks.featured_product.rating_count' | t: count: rating_count_number -}}
+                </span>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
 
-            {%- if featured.requires_selling_plan -%}
-              <div class="featured-product__actions">
-                <a class="button button--secondary featured-product__view-detail" href="{{ featured.url }}" data-testid="featured-product-view-detail">
-                  {{- 'blocks.featured_product.view_detail' | t -}}
-                  <span class="visually-hidden"> {{ view_detail_suffix }}</span>
-                  {% render 'slideshow-icon', name: 'arrow' %}
-                </a>
-              </div>
-            {%- else -%}
-              <product-form
-                class="featured-product__buy"
-                {% unless request.design_mode %}
-                  data-lazy-module="{{ 'product-form.js' | asset_url }}"
-                {% endunless %}
-                data-product-id="{{ featured.id }}"
-                data-product-url="{{ featured.url }}"
-                data-cart-add-url="{{ routes.cart_add_url }}"
-                data-cart-url="{{ routes.cart_url }}"
-                data-cart-type="{{ cart_type | escape }}"
-                data-label-add="{{ label_add | escape }}"
-                data-label-added="{{ label_added | escape }}"
-                data-label-sold-out="{{ label_sold_out | escape }}"
-                data-label-unavailable="{{ label_unavailable | escape }}"
-              >
-                {%- if has_variant_choice -%}
-                  {%- render 'product-variant-picker',
-                    product: featured,
-                    current_variant: current_variant,
-                    form_id: form_id,
-                    fetch_url: fetch_url,
-                    regions: 'featured-product'
-                  -%}
-                {%- endif -%}
+          {%- if description != blank -%}
+            <p class="featured-product__description" data-testid="featured-product-description">{{ description }}</p>
+          {%- endif -%}
+        </div>
 
-                {%- form 'product', featured, id: form_id, class: 'featured-product__actions' -%}
-                  <input type="hidden" name="id" value="{{ current_variant.id }}">
+        {%- if spec_rows != blank -%}
+          <table class="featured-product__specs" data-testid="featured-product-specs">
+            <caption class="visually-hidden">{{ 'blocks.featured_product.specs_label' | t }}</caption>
+            <tbody>
+              {{- spec_rows -}}
+            </tbody>
+          </table>
+        {%- endif -%}
 
-                  {%- if has_variant_choice -%}
-                    {%- render 'product-variant-select', product: featured, current_variant: current_variant, form_id: form_id -%}
-                  {%- endif -%}
-
-                  <div class="featured-product__add-wrapper">
-                    <button
-                      class="button featured-product__add"
-                      type="submit"
-                      name="add"
-                      {% unless current_variant.available %}
-                        disabled
-                      {% endunless %}
-                      data-testid="featured-product-add"
-                    >
-                      {%- if current_variant.available -%}
-                        {% render 'header-icon', name: 'bag' %}
-                      {%- endif -%}
-                      <span class="product-form__add-label">
-                        {%- if current_variant.available -%}
-                          {{- label_add -}}
-                        {%- else -%}
-                          {{- label_sold_out -}}
-                        {%- endif -%}
-                      </span>
-                    </button>
-                  </div>
-
-                  <a class="button button--secondary featured-product__view-detail" href="{{ featured.url }}" data-testid="featured-product-view-detail">
-                    {{- 'blocks.featured_product.view_detail' | t -}}
-                    <span class="visually-hidden"> {{ view_detail_suffix }}</span>
-                    {% render 'slideshow-icon', name: 'arrow' %}
-                  </a>
-                {%- endform -%}
-
-                <div class="visually-hidden" role="status" aria-live="polite" data-testid="featured-product-status"></div>
-                <div class="product-form__error" role="alert" data-testid="featured-product-error"></div>
-              </product-form>
-            {%- endif -%}
+        {%- if featured.requires_selling_plan -%}
+          <div class="featured-product__actions">
+            <a class="button button--secondary featured-product__view-detail" href="{{ featured.url }}" data-testid="featured-product-view-detail">
+              {{- 'blocks.featured_product.view_detail' | t -}}
+              <span class="visually-hidden"> {{ view_detail_suffix }}</span>
+              {% render 'slideshow-icon', name: 'arrow' %}
+            </a>
           </div>
-        {% endpartial %}
+        {%- else -%}
+          <product-form
+            class="featured-product__buy"
+            {% unless request.design_mode %}
+              data-lazy-module="{{ 'product-form.js' | asset_url }}"
+            {% endunless %}
+            data-product-id="{{ featured.id }}"
+            data-product-url="{{ featured.url }}"
+            data-cart-add-url="{{ routes.cart_add_url }}"
+            data-cart-url="{{ routes.cart_url }}"
+            data-cart-type="{{ cart_type | escape }}"
+            data-label-add="{{ label_add | escape }}"
+            data-label-added="{{ label_added | escape }}"
+            data-label-sold-out="{{ label_sold_out | escape }}"
+            data-label-unavailable="{{ label_unavailable | escape }}"
+          >
+            {%- if has_variant_choice -%}
+              {%- render 'product-variant-picker',
+                product: featured,
+                form_id: form_id,
+                fetch_url: fetch_url,
+                regions: 'product-options product-price product-buy-buttons'
+              -%}
+            {%- endif -%}
+
+            {%- form 'product', featured, id: form_id, class: 'featured-product__actions' -%}
+              <input type="hidden" name="id" value="{{ current_variant.id }}">
+
+              {% partial 'product-buy-buttons' %}
+                <div class="featured-product__add-wrapper">
+                  {%- render 'selected-variant-data', variant: current_variant, exists: variant_exists -%}
+                  <button
+                    class="button featured-product__add"
+                    type="submit"
+                    name="add"
+                    {% unless can_buy %}
+                      disabled
+                    {% endunless %}
+                    data-testid="featured-product-add"
+                  >
+                    {%- if can_buy -%}
+                      {% render 'header-icon', name: 'bag' %}
+                    {%- endif -%}
+                    <span class="product-form__add-label">
+                      {%- if can_buy -%}
+                        {{- label_add -}}
+                      {%- elsif variant_exists -%}
+                        {{- label_sold_out -}}
+                      {%- else -%}
+                        {{- label_unavailable -}}
+                      {%- endif -%}
+                    </span>
+                  </button>
+                </div>
+              {% endpartial %}
+
+              <a class="button button--secondary featured-product__view-detail" href="{{ featured.url }}" data-testid="featured-product-view-detail">
+                {{- 'blocks.featured_product.view_detail' | t -}}
+                <span class="visually-hidden"> {{ view_detail_suffix }}</span>
+                {% render 'slideshow-icon', name: 'arrow' %}
+              </a>
+            {%- endform -%}
+
+            <div class="visually-hidden" role="status" aria-live="polite" data-testid="featured-product-status"></div>
+            <div class="product-form__error" role="alert" data-testid="featured-product-error"></div>
+          </product-form>
+        {%- endif -%}
       </div>
     </s-view-event>
     <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>

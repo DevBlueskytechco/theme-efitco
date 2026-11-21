@@ -53,7 +53,11 @@ test.describe('ES1-T384 @static', () => {
   test('gift card: noindex, hook BE, không script, trạng thái hết hạn/bị tắt tách câu', () => {
     const src = read('templates/gift_card.liquid');
     expect(src).toContain('<meta name="robots" content="noindex">');
-    expect(src).not.toMatch(/<script/);
+    // ES1-T410 (TS-BE1): đúng 2 thẻ script của BE, không thêm.
+    expect(src.match(/<script[^>]*>/g)).toEqual([
+      `<script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer>`,
+      `<script src="{{ 'gift-card-qr.js' | asset_url }}" type="module">`,
+    ]);
     for (const hook of ['data-gift-card-copy', 'data-gift-card-print', 'data-gift-card-status', 'data-testid="gift-card-contact"', "'gift_card.disabled' | t", "'gift_card.expired_text' | t"]) {
       expect(src, hook).toContain(hook);
     }

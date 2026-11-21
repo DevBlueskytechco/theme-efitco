@@ -1,5 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên dev-fe không có PREVIEW_URL, STORE_PASSWORD; globalSetup cần preview); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép sang tests/e2e/ES1-T342.spec.ts.
-// Ticket ES1-T342 TE-17-R2-FE3: featured product, why choose (image-with-text split), FAQ ở 360 / 768 / 1280; partial featured-product (ADR 0008).
+// Ticket ES1-T342 TE-17-R2-FE3: featured product, why choose (image-with-text split), FAQ ở 360 / 768 / 1280.
+// Đổi spec khi merge develop (#281, ADR 0008 mục 3 đã chốt): featured product giữ 3 partial product-options / product-price /
+// product-buy-buttons + swap() (assets/featured-product.js); bỏ partial featured-product và testid featured-product-region của bản trước.
 // AC: TE-13 AC2, AC6 (số đo), AC-H22 (phần markup partial), TE-7 AC2, AC3, AC7.
 // Nguồn số đo: docs/ui-spec/index-mobile-b.md §2, §5, §7; docs/ui-spec/index-1280.md §1 khối 10, 13, 15, §2.6. Sai số 2 px (ES1-T309 #4).
 // Dữ liệu: featured ở /?view=te13-states band a (sản phẩm có ảnh); why ở /?view=te7 band te7-iwt-left; FAQ ở /?view=te7 band te7-faq.
@@ -43,13 +45,12 @@ async function noOverflow(page: Page) {
 test.describe('ES1-T342 @static', () => {
   test.beforeEach(({}, info) => { test.skip(info.project.name !== 'desktop', 'tĩnh, chạy 1 lần'); });
 
-  test('ADR 0008: featured product có đúng 1 partial featured-product, picker xin đúng vùng đó', () => {
+  test('ADR 0008: featured product giữ partial product-price, product-buy-buttons; picker xin 3 vùng', () => {
     const liquid = read('blocks/featured-product.liquid');
     const names = [...liquid.matchAll(/{%-?\s*partial\s+'([^']+)'/g)].map((m) => m[1]);
-    expect(names).toEqual(['featured-product']);
-    expect(liquid).toContain("regions: 'featured-product'");
-    expect(liquid).not.toMatch(/product-price|product-buy-buttons/);
-    expect(read('templates/product.featured-product.liquid')).not.toMatch(/product-price|product-buy-buttons/);
+    expect(names).toEqual(['product-price', 'product-buy-buttons']);
+    expect(liquid).toContain("regions: 'product-options product-price product-buy-buttons'");
+    expect(liquid).not.toContain('featured-product-region');
   });
 
   test('TE-13 AC6: "View Detail" có chữ ẩn " of {product}" từ locale', () => {
@@ -126,15 +127,13 @@ test.describe('ES1-T342 featured product (TE-13 AC6)', () => {
     await expect(tid(scope, 'featured-product-view-detail')).toHaveAccessibleName(`View Detail of ${title}`);
   });
 
-  test('AC-H22 markup: ?view=featured-product trả 1 vùng featured-product-region chứa giá và nút', async ({ page }) => {
+  test('AC-H22 markup: ?view=featured-product trả giá, nút và picker xin 3 vùng ADR 0008', async ({ page }) => {
     const handle = env('TE4_VARIANTS_HANDLE');
     test.skip(!handle, 'Thiếu TE4_VARIANTS_HANDLE');
     await gotoStore(page, `/products/${handle}?view=featured-product`);
-    const region = page.getByTestId('featured-product-region');
-    await expect(region).toHaveCount(1);
-    await expect(tid(region, 'featured-product-price')).toHaveCount(1);
-    await expect(tid(region, 'featured-product-add')).toHaveCount(1);
-    await expect(page.getByTestId('product-variant-picker')).toHaveAttribute('data-regions', 'featured-product');
+    await expect(page.getByTestId('featured-product-price')).toHaveCount(1);
+    await expect(page.getByTestId('featured-product-add')).toHaveCount(1);
+    await expect(page.getByTestId('product-variant-picker')).toHaveAttribute('data-regions', 'product-options product-price product-buy-buttons');
   });
 });
 
