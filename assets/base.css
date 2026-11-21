@@ -2764,9 +2764,15 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   display: grid;
   grid-template-columns: var(--content-grid);
   margin-block-start: var(--space-7);
-  background-color: var(--color-background-dark);
+  background: var(--color-background-dark) url('noise-dark.png');
   color: var(--color-background-dark-foreground);
   font-size: var(--font-size-sm);
+}
+
+/* Focus trắng trên nền tối: accent trên dark chỉ 3.48:1 (foundation §3.2, §4) */
+.site-footer :focus-visible {
+  outline: 2px solid var(--color-background-dark-foreground);
+  outline-offset: 2px;
 }
 
 .site-footer ul {
@@ -2863,7 +2869,12 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 
 .site-footer__form {
   min-width: 0;
-  max-width: 31.125rem;
+  max-width: 31rem;
+}
+
+/* 768: form dưới ảnh + chữ, rộng hết hàng */
+.site-footer__band--media .site-footer__form {
+  max-width: none;
 }
 
 .site-footer__field {
@@ -2877,7 +2888,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   min-width: 0;
   min-height: max(44px, calc(var(--space-1) * 13));
   padding-inline: var(--space-5);
-  border: 1px solid color-mix(in srgb, var(--color-muted-on-dark) 50%, transparent);
+  border: 1px solid var(--color-muted-on-dark);
   border-radius: var(--radius-input);
   background-color: transparent;
   color: var(--color-background-dark-foreground);
@@ -2890,9 +2901,23 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   opacity: 1;
 }
 
+/* Viền 100% muted-on-dark (6.11:1), hover trắng; lỗi 2px sale bằng bóng trong, không đổi kích thước ô */
+.site-footer__input:hover {
+  border-color: var(--color-background-dark-foreground);
+}
+
+.site-footer__input:focus-visible {
+  outline-offset: -1px;
+}
+
+.site-footer__input[aria-invalid='true'] {
+  border-color: var(--color-sale);
+  box-shadow: inset 0 0 0 1px var(--color-sale);
+}
+
 .site-footer__submit {
   display: inline-flex;
-  flex: 1 1 auto;
+  flex: 1 1 100%;
   align-items: center;
   justify-content: center;
   gap: calc(var(--space-1) * 2.5);
@@ -2981,40 +3006,124 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   margin-block-start: calc(var(--space-1) * 8.5);
 }
 
+/* Hộp thông báo form (foundation §4, §12): chữ trắng, thanh 4px + icon mang màu trạng thái */
 .site-footer__message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
   margin-block-start: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent);
+  border-inline-start: var(--space-1) solid var(--color-sale);
+  border-radius: var(--radius-input);
+  color: var(--color-background-dark-foreground);
 }
 
-.site-footer__message--error {
-  padding-inline-start: var(--space-3);
-  border-inline-start: 2px solid var(--color-accent);
+.form-message--success {
+  border-inline-start-color: var(--color-badge-new);
 }
 
+.site-footer__message-body {
+  min-width: 0;
+  margin: 0;
+}
+
+.site-footer__message-body ul {
+  margin: 0;
+}
+
+.site-footer__invalid {
+  display: none;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+  color: var(--color-background-dark-foreground);
+  font-size: var(--font-size-sm);
+}
+
+.site-footer__form[data-invalid] .site-footer__invalid {
+  display: flex;
+}
+
+.site-footer__form[data-invalid] .site-footer__note {
+  display: none;
+}
+
+.site-footer :is(.site-footer__invalid, .site-footer__message--error) .status-icon {
+  color: var(--color-sale);
+}
+
+.site-footer .form-message--success .status-icon {
+  color: var(--color-badge-new);
+}
+
+.site-footer__form .status-icon {
+  flex: none;
+  width: var(--space-4);
+  height: var(--space-4);
+  margin-block-start: calc(var(--space-1) / 2);
+}
+
+/* Menu < 48rem: accordion <details> đóng sẵn, hàng 52, link 44 (foundation §4) */
 .site-footer__nav {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-6) var(--space-5);
+  min-width: 0;
 }
 
 .site-footer__column-heading {
-  margin-block-end: calc(var(--space-1) * 7);
+  display: none;
+  margin-block: 0 calc(var(--space-1) * 7);
   font-family: var(--font-primary--family);
   font-size: var(--font-size-lg);
   font-weight: 700;
 }
 
+.site-footer__menu {
+  border-block-end: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent);
+}
+
+.site-footer__menu-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: calc(var(--space-1) * 13);
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  list-style: none;
+  cursor: pointer;
+}
+
+.site-footer__menu-summary::-webkit-details-marker {
+  display: none;
+}
+
+.site-footer__menu-summary .site-footer__chevron {
+  flex: none;
+  width: var(--space-3);
+  height: calc(var(--space-1) * 1.75);
+}
+
+.site-footer__menu[open] > .site-footer__menu-summary .site-footer__chevron {
+  rotate: 180deg;
+}
+
 .site-footer__list {
   display: grid;
-  gap: calc(var(--space-1) * 2.5);
   color: var(--color-muted-on-dark);
   font-size: var(--font-size-base);
   font-weight: 500;
 }
 
+.site-footer__menu .site-footer__list {
+  padding-block-end: var(--space-4);
+}
+
 .site-footer__link {
   display: inline-flex;
   align-items: center;
-  min-height: 32px;
+  min-height: 44px;
   text-decoration: none;
 }
 
@@ -3023,16 +3132,22 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   text-decoration: underline;
 }
 
-.site-footer__follow-group,
+/* Follow on Shop: hàng riêng dưới social, căn đầu dòng, cách 16 (foundation §29); không rule màu cho nút */
+.site-footer__follow-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+/* < 80rem panel localization neo vào nhóm (rộng nội dung): nhóm căn giữa, neo vào nút thì panel tràn ngang */
 .site-footer__commerce-group {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-5);
-}
-
-.site-footer__commerce-group {
-  column-gap: calc(var(--space-1) * 10);
+  justify-content: center;
+  gap: var(--space-3) calc(var(--space-1) * 10);
 }
 
 /* Lùi 8px: icon 28 giữa vùng bấm 44 vẫn thẳng mép trái với logo */
@@ -3061,10 +3176,6 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   height: calc(var(--space-1) * 7);
 }
 
-.site-footer__localization {
-  position: relative;
-}
-
 .site-footer__summary {
   display: flex;
   align-items: center;
@@ -3075,16 +3186,18 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 .site-footer__panel {
   position: absolute;
   inset-block-end: 100%;
-  inset-inline-start: 0;
+  inset-inline: 0;
   z-index: var(--layer-content);
   display: grid;
   gap: var(--space-5);
-  width: min(32rem, calc(100vw - var(--page-margin) * 2));
+  width: min(32rem, 100%);
+  margin-inline: auto;
   margin-block-end: var(--space-2);
   padding: var(--space-4);
   border: 1px solid var(--color-muted-on-dark);
   border-radius: var(--radius-card);
   background-color: var(--color-background-dark);
+  text-align: start;
 }
 
 .site-footer__panel-heading {
@@ -3129,9 +3242,10 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 /* Cần 2 class: .site-footer ul đặt padding 0 và có độ ưu tiên cao hơn 1 class */
 .site-footer .site-footer__trust {
   display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
   padding-block-start: calc(var(--space-1) * 5);
-  border-block-start: 1px solid color-mix(in srgb, var(--color-muted-on-dark) 20%, transparent);
+  border-block-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent);
   color: var(--color-muted-on-dark);
   font-weight: 500;
 }
@@ -3153,17 +3267,17 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   height: calc(var(--space-1) * 9);
 }
 
-/* Wordmark lên đầu ở màn hẹp bằng order: không có phần tử focus nên thứ tự Tab không đổi */
+/* < 80rem: wordmark, localization + thanh toán, copyright, căn giữa (thứ tự DOM) */
 .site-footer__bottom {
   grid-column: 2;
   display: grid;
   gap: var(--space-5);
   min-width: 0;
   padding-block: calc(var(--space-1) * 10);
+  text-align: center;
 }
 
 .site-footer__wordmark {
-  order: -1;
   overflow-wrap: anywhere;
   font-family: var(--font-heading--family);
   font-size: var(--font-size-wordmark);
@@ -3203,24 +3317,61 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   }
 
   .site-footer .site-footer__trust {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .site-footer__nav {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-6) var(--space-5);
+  }
+
+  .site-footer__list {
+    gap: calc(var(--space-1) * 2.5);
+  }
+
+  .site-footer__link {
+    min-height: calc(var(--space-1) * 8);
   }
 
   .site-footer__panel {
     grid-auto-flow: column;
     grid-auto-columns: minmax(0, 1fr);
-    inset-inline-end: 0;
-    inset-inline-start: auto;
+  }
+}
+
+/* Từ 48rem menu mở sẵn: ép nội dung <details> hiện, summary thay bằng tiêu đề <p>.
+   Trình duyệt chưa có ::details-content giữ accordion (vẫn dùng được) */
+@supports selector(::details-content) {
+  @media (min-width: 48rem) {
+    .site-footer__column-heading {
+      display: block;
+    }
+
+    .site-footer__menu-summary {
+      display: none;
+    }
+
+    .site-footer__menu {
+      border: 0;
+    }
+
+    .site-footer__menu::details-content {
+      content-visibility: visible;
+    }
+
+    .site-footer__menu .site-footer__list {
+      padding-block-end: 0;
+    }
   }
 }
 
 @media (min-width: 80rem) {
   .site-footer__band {
-    grid-template-columns: minmax(0, 1fr) 31.125rem;
+    grid-template-columns: minmax(0, 1fr) 31rem;
   }
 
   .site-footer__band--media {
-    grid-template-columns: auto minmax(0, 1fr) 31.125rem;
+    grid-template-columns: auto minmax(0, 1fr) 31rem;
   }
 
   .site-footer__band--media .site-footer__form {
@@ -3273,16 +3424,27 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 
   .site-footer__copyright {
     grid-column: 1;
+    text-align: start;
   }
 
   .site-footer__wordmark {
-    order: 0;
     grid-column: 2;
   }
 
   .site-footer__commerce-group {
     grid-column: 3;
     justify-content: flex-end;
+  }
+
+  /* Panel căn mép inline-end của nút (localization.md §4.2) */
+  .site-footer__localization {
+    position: relative;
+  }
+
+  .site-footer__panel {
+    inset-inline-start: auto;
+    width: 32rem;
+    margin-inline: 0;
   }
 }
 
@@ -6318,41 +6480,64 @@ cart-drawer {
   text-wrap: balance;
 }
 
-/* Figma bo 16, tỉ lệ 3/4. overflow: clip (không phải scroll container) nên tên dài làm card cao thêm thay vì bị cắt. Nền tối giữ chữ trắng đọc được khi chưa có ảnh */
-.article-card__link {
+/* Figma bo 16, tỉ lệ 3/4. overflow: clip (không phải scroll container) nên tên dài làm card cao thêm thay vì bị cắt. Nền tối giữ chữ trắng đọc được khi chưa có ảnh.
+   isolation + ảnh z-index -1: ảnh nằm dưới chữ mà .article-card__content không cần position, để ::after của link phủ cả khung (ES1-T506) */
+.article-card__frame {
+  --article-card-radius: calc(var(--radius-card) + var(--space-1));
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   aspect-ratio: 3 / 4;
   overflow: clip;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--article-card-radius);
   background-color: var(--color-background-dark);
   color: var(--color-background-dark-foreground);
+}
+
+/* TE-20 AC2: link chỉ bọc chữ tiêu đề (tên link = tiêu đề), ::after phủ khung nên bấm đâu trên card cũng mở bài */
+.article-card__link {
+  color: inherit;
   text-decoration: none;
 }
 
-/* Viền mặc định currentcolor là chữ trắng, không thấy trên nền sáng */
+/* z-index 1: trên nhãn, dòng thời gian đọc (position: relative ở trang chủ) để bấm đâu cũng trúng link */
+.article-card__link::after {
+  content: '';
+  position: absolute;
+  z-index: var(--layer-content);
+  inset: 0;
+  border-radius: var(--article-card-radius);
+}
+
+/* Vòng focus bao cả card, vẽ phía trong vì khung overflow: clip. Màu nhấn: viền chữ trắng không thấy trên nền sáng */
 .article-card__link:focus-visible {
-  outline-color: var(--color-accent);
+  outline: none;
+}
+
+.article-card__link:focus-visible::after {
+  outline: 2px solid var(--color-accent);
+  outline-offset: -2px;
 }
 
 /* 2 class để thắng .image */
-.article-card__link > .article-card__image {
+.article-card__frame > .article-card__image {
   position: absolute;
+  z-index: calc(var(--layer-content) * -1);
   inset: 0;
   width: 100%;
   height: 100%;
 }
 
-.article-card__link > .article-card__image > img {
+.article-card__frame > .article-card__image > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
 /* Gradient 1:1027 từ 63.7% chiều cao tới đáy. Figma #000, dùng token nền tối: 0 màu literal */
-.article-card__link > .article-card__image::after {
+.article-card__frame > .article-card__image::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -6382,14 +6567,13 @@ cart-drawer {
 }
 
 .article-card__content {
-  position: relative;
   display: grid;
   gap: var(--space-1);
   padding-inline: var(--space-4);
   padding-block-end: var(--space-4);
 }
 
-/* Figma 1:1037: Inter 18 / 28, letter-spacing -0.18. Không cắt tên (decisions 11/11 (3)): tên dài thì card cao thêm (overflow: clip ở link) */
+/* Figma 1:1037: Inter 18 / 28, letter-spacing -0.18. Không cắt tên (decisions 11/11 (3)): tên dài thì card cao thêm (overflow: clip ở .article-card__frame) */
 .article-card__title {
   margin: 0;
   font-family: var(--font-primary--family);
@@ -6400,7 +6584,7 @@ cart-drawer {
   overflow-wrap: anywhere;
 }
 
-.article-card__link:hover .article-card__title {
+.article-card__frame:hover .article-card__link {
   text-decoration: underline;
   text-underline-offset: 0.1em;
 }
@@ -8795,7 +8979,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-header__svg-chevron { width: 9px; height: 5px; }
   .site-header__icon svg { display: block; }
 
-  .site-footer__column:first-child li:nth-child(2) .site-footer__link { color: var(--figma-ffffff); }
   .button { font-family: var(--font-primary--family); font-size: 16px; line-height: 26px; font-weight: 600; letter-spacing: -0.16px; padding: 13px 32px; border-width: 0; border-radius: var(--figma-radius-8); gap: 8px; min-height: 52px; }
 
   /* Dải tối: hero + danh mục cùng nền var(--figma-1a1a1a) tới y=1515 */
@@ -8812,7 +8995,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-footer__note { line-height: 22px; letter-spacing: -0.28px; position: relative; inset-inline-start: -1px; }
   .site-footer__submit { line-height: 26px; letter-spacing: -0.16px; }
   .site-footer__trust-item { line-height: 22px; color: var(--figma-666666); position: relative; inset-block-start: -1px; }
-  .site-footer__summary { color: var(--figma-999999); line-height: 22px; letter-spacing: -0.28px; display: inline-flex; align-items: center; gap: 4px; }
+  .site-footer__summary { color: var(--color-muted-on-dark); line-height: 22px; letter-spacing: -0.28px; display: inline-flex; align-items: center; gap: 4px; }
   .site-footer__commerce-group { position: relative; inset-block-start: 8px; inset-inline-start: -2px; }
   .site-footer__wordmark { font-size: 200px; line-height: 180px; letter-spacing: -8px; position: relative; inset-inline-start: -4px; inset-block-start: -1px; }
   .block-container--dark .image-with-text__content { margin-block-start: 8px; }
@@ -8972,26 +9155,17 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .faq-item[open] > .faq-item__summary { color: var(--figma-1a1a1a); }
 
   /* Footer */
-  .site-footer { background: var(--figma-1a1a1a) url('noise-dark.png'); margin-block-start: 0; }
+  .site-footer { margin-block-start: 0; }
   .site-footer__band { padding-block: 45px 46px; align-items: flex-start; }
   .site-footer__newsletter, .site-footer__form { margin-block-start: 14px; }
   .site-footer__main { width: calc(100% - 120px); margin-inline: 60px; padding-block: 120px 24px; border-radius: var(--figma-radius-16); }
   .site-footer__main-top { min-height: 216px; }
   .site-footer__follow-group { min-height: 0; margin-block-start: 40px; position: relative; inset-block-start: 3px; }
   .site-footer__description { letter-spacing: -0.16px; margin-block-start: 39px; position: relative; inset-block-start: 3px; }
-  .site-footer__social, .site-footer__social li { height: 32px; }
   .site-footer__copyright { margin-inline-start: -6px; font-weight: 500; line-height: 22px; position: relative; inset-block-start: -1px; }
   .price__compare { line-height: 22px; position: relative; inset-block-start: -1px; }
   .site-footer__newsletter-heading { letter-spacing: -0.72px; position: relative; inset-block-start: 1px; }
-  .site-footer__social { display: flex; align-items: center; gap: 0; margin: 0; }
-  .site-footer__social-link { display: block; width: auto; height: auto; color: var(--figma-b2b2b2); min-width: 0; min-height: 0; padding: 0; }
-  .site-footer__social li:first-child .site-footer__social-link { color: var(--figma-ffffff); }
-  .site-footer__social .icon-social { width: auto; height: auto; display: block; }
-  .site-footer__social li { display: flex; align-items: center; }
-  .site-footer__social li:nth-child(1) { margin-inline-end: 21px; }
-  .site-footer__social li:nth-child(2) { margin-inline-end: 24px; }
-  .site-footer__social li:nth-child(3) { margin-inline-end: 22px; }
-  .site-footer__trust { border-color: var(--figma-white-12); }
+  /* Social: ô bấm 44 giữ ở mọi mốc, icon muted-on-dark (foundation §4); nhịp icon Figma ~ 22 → gap 0 giữa ô 44 */
   .site-footer__copyright a { text-decoration: none; color: inherit; }
   .site-footer__flag { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }
   .site-footer__chevron { width: 9px; height: 5px; }
@@ -9067,10 +9241,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .video-card:not([data-playing]) .video-card__toggle .slideshow-icon--pause, .video-card[data-playing] .video-card__toggle .slideshow-icon--play { display: none; }
 [data-quiz-title]:focus { outline: 0; }
 .faq__stat-value { font-variant-numeric: tabular-nums; }
-.site-footer__invalid { display: none; margin: 0; color: var(--color-sale); font-size: var(--font-size-sm); }
-.site-footer__form[data-invalid] .site-footer__invalid { display: block; }
-.site-footer__form[data-invalid] .site-footer__note { display: none; }
-.site-footer__form[data-invalid] .site-footer__field { border-color: var(--color-sale); }
 /* Trang hiện tại: gạch chân 2px, không chỉ bằng màu (foundation §3.2, 04 §3.9) */
 .site-header__link[aria-current='page'] { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.45em; }
 .product-card__media { position: relative; }
@@ -9081,9 +9251,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .button[aria-busy='true']::after { content: ''; position: absolute; inset: 0; width: 20px; height: 20px; margin: auto; border: 2px solid var(--color-accent-foreground); border-block-start-color: transparent; border-radius: 50%; }
 :is(.featured-product__add, .bundle-builder__submit, .shop-the-look__submit):disabled:not([aria-busy='true']) { opacity: 0.55; cursor: not-allowed; }
 .button:focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-.site-footer__input:focus-visible { outline: 0; }
-.site-footer__field:focus-within { outline: 2px solid var(--color-accent); outline-offset: -1px; }
-.site-footer__form[data-invalid] .site-footer__field:focus-within { outline-color: var(--color-sale); }
 
 @media (prefers-reduced-motion: no-preference) {
   @view-transition { navigation: auto; }
@@ -9155,8 +9322,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .faq-item[open] > .faq-item__summary::after { display: block; rotate: 90deg; }
 
   /* Form */
-  .site-footer__field, .site-footer__input { transition: border-color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out); }
-  .site-footer__field:focus-within { border-color: var(--color-accent); }
+  .site-footer__input { transition: border-color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out); }
+  .site-footer__menu-summary .site-footer__chevron, .site-footer__link, .site-footer__social-link { transition: rotate var(--motion-base) var(--ease-out), color var(--motion-fast) var(--ease-out); }
 
 
   @keyframes motion-spin { to { rotate: 360deg; } }

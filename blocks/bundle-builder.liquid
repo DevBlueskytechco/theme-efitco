@@ -10,9 +10,11 @@
 
   Discounts are display only (AC2, R8): the real price comes from an automatic
   discount the merchant creates. Liquid never computes a price; it only outputs
-  data-tiers ("2:10,3:15") with the tiers whose percent is above 0. No tier
-  above 0: no data-tiers, discount row, progress bar or note. With a tier above 0
-  the note always shows (AC-H18, R8): an empty setting takes the locale text.
+  data-tiers ("2:10,3:15") with the tiers whose percent is above 0. Every tier
+  percent defaults to 0 (ADR 0011 mục 3, ES1-T406): a fresh install shows no
+  discount, and the total equals the subtotal. No tier above 0: no data-tiers,
+  discount row, progress bar or note. With a tier above 0 the note always shows
+  (AC-H18, R8): an empty setting takes the locale text.
 
   Sold out (product or variant unavailable, AC4): the input is disabled, the
   item has data-sold-out, there is no selection ring and the card keeps its
@@ -367,7 +369,7 @@
       "step": 1,
       "unit": "t:labels.unit_percent",
       "label": "t:labels.tier_1_percent",
-      "default": 10
+      "default": 0
     },
     {
       "type": "range",
@@ -386,7 +388,7 @@
       "step": 1,
       "unit": "t:labels.unit_percent",
       "label": "t:labels.tier_2_percent",
-      "default": 15
+      "default": 0
     },
     {
       "type": "range",

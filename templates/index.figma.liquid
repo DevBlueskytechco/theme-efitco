@@ -14,6 +14,11 @@
 
   Copy stays in the block defaults or, for repeated blocks, in locales passed as
   default_* (plan ES1-T169 D1), same list as templates/index.liquid.
+  Exception (TS-FE4, ES1-T406, ADR 0011 mục 3): Figma copy with claims, figures or
+  sample reviews (slide eyebrow, testimonial items, FAQ) and the Figma spelling of
+  the why-choose eyebrow are literal strings here, never locale keys, because the
+  theme must not ship them as defaults. Bundle and setup tiers (10/15%, 10%) are
+  set here because the schema defaults are 0.
 
   Remove this file before a real store release.
 {% endcomment %}
@@ -131,7 +136,7 @@
   assign fp_rev_3 = all_products['figma-flexfold-adjustable-bench-2']
   assign fp_rev_4 = all_products['figma-revllen-speed-rope']
 
-  assign slide_eyebrow = 'blocks.slideshow_slide.default_eyebrow' | t
+  assign slide_eyebrow = 'Trusted by 10,000+ athletes'
   assign slide_heading = 'blocks.slideshow_slide.default_heading_html' | t
   assign slide_subheading = 'blocks.slideshow_slide.default_text' | t
   assign slide_button_label = 'blocks.slideshow_slide.default_button_label' | t
@@ -139,7 +144,7 @@
   assign banner_heading = 'blocks.image_with_text.banner_heading_html' | t
   assign banner_body = 'blocks.image_with_text.banner_text_html' | t
   assign banner_button_label = 'blocks.image_with_text.banner_button_label' | t
-  assign why_eyebrow = 'blocks.image_with_text.why_eyebrow' | t
+  assign why_eyebrow = 'We aRE about'
   assign why_heading = 'blocks.image_with_text.why_heading_html' | t
   assign why_body = 'blocks.image_with_text.why_text_html' | t
   assign why_button_label = 'blocks.image_with_text.why_button_label' | t
@@ -176,37 +181,37 @@
 
   assign testimonials_eyebrow = 'blocks.testimonials.default_eyebrow' | t
   assign testimonials_heading = 'blocks.testimonials.default_heading' | t
-  assign r1_name = 'blocks.testimonial_item.r1_name' | t
-  assign r1_title = 'blocks.testimonial_item.r1_title' | t
-  assign r1_quote = 'blocks.testimonial_item.r1_quote' | t
-  assign r2_name = 'blocks.testimonial_item.r2_name' | t
-  assign r2_title = 'blocks.testimonial_item.r2_title' | t
-  assign r2_quote = 'blocks.testimonial_item.r2_quote' | t
-  assign r3_name = 'blocks.testimonial_item.r3_name' | t
-  assign r3_title = 'blocks.testimonial_item.r3_title' | t
-  assign r3_quote = 'blocks.testimonial_item.r3_quote' | t
-  assign r4_name = 'blocks.testimonial_item.r4_name' | t
-  assign r4_title = 'blocks.testimonial_item.r4_title' | t
-  assign r4_quote = 'blocks.testimonial_item.r4_quote' | t
+  assign r1_name = 'E. Johnson'
+  assign r1_title = 'Versatile Gear For All Exercises'
+  assign r1_quote = "High quality equipment that doesn't break the bank. I am very impressed with the overall durability."
+  assign r2_name = 'S. Williams'
+  assign r2_title = 'Folds Away In Seconds'
+  assign r2_quote = 'The rack folds flat against the wall. My garage is a garage again between sessions.'
+  assign r3_name = 'M. Anderson'
+  assign r3_title = 'Smooth Every Single Rep'
+  assign r3_quote = 'The dial switches weight fast, no jamming at all. Saves an entire corner of my room.'
+  assign r4_name = 'J. Miller'
+  assign r4_title = 'Worth Every Penny'
+  assign r4_quote = 'Spins so smoothly, no tangling even at high speed. Best rope I have owned.'
 
-  assign faq_eyebrow = 'blocks.faq.default_eyebrow' | t
-  assign faq_heading = 'blocks.faq.default_heading' | t
-  assign faq_stat_1_label = 'blocks.faq.default_stat_1_label' | t
-  assign faq_stat_1_value = 'blocks.faq.default_stat_1_value' | t
-  assign faq_stat_1_text = 'blocks.faq.default_stat_1_text' | t
-  assign faq_stat_2_label = 'blocks.faq.default_stat_2_label' | t
-  assign faq_stat_2_value = 'blocks.faq.default_stat_2_value' | t
-  assign faq_stat_2_text = 'blocks.faq.default_stat_2_text' | t
-  assign faq_answer = 'blocks.faq_item.default_answer_html' | t
-  assign faq_a2 = 'blocks.faq_item.q2_answer_html' | t
-  assign faq_a3 = 'blocks.faq_item.q3_answer_html' | t
-  assign faq_a4 = 'blocks.faq_item.q4_answer_html' | t
-  assign faq_a5 = 'blocks.faq_item.q5_answer_html' | t
-  assign faq_q1 = 'blocks.faq_item.q1_question' | t
-  assign faq_q2 = 'blocks.faq_item.q2_question' | t
-  assign faq_q3 = 'blocks.faq_item.q3_question' | t
-  assign faq_q4 = 'blocks.faq_item.q4_question' | t
-  assign faq_q5 = 'blocks.faq_item.q5_question' | t
+  assign faq_eyebrow = 'Questions and Answers'
+  assign faq_heading = "We're Proud To Be The Best At Training"
+  assign faq_stat_1_label = 'Products'
+  assign faq_stat_1_value = '360+'
+  assign faq_stat_1_text = 'Home gym gear in stock.'
+  assign faq_stat_2_label = 'Warranty'
+  assign faq_stat_2_value = '12'
+  assign faq_stat_2_text = 'Months on every item.'
+  assign faq_answer = '<p>Orders ship within one business day. Standard delivery is 2-4 business days across the continental US, and shipping is free on orders over $99.</p>'
+  assign faq_a2 = '<p>Yes. The dial changes the weight in seconds, from 11 to 66 lb per hand, so you can start light and add load as you get stronger. There are no plates to swap.</p>'
+  assign faq_a3 = "<p>A pair of adjustable dumbbells takes just 0.18 m² and fits under a desk. A complete corner setup fits in 2.4 x 2.0 m and folds flat when you're done.</p>"
+  assign faq_a4 = '<p>Adjustable dumbbells arrive ready to use, with no assembly needed. Other equipment varies, so check the product page before you order.</p>'
+  assign faq_a5 = "<p>Every item comes with a 12-month warranty, and you can return it within 90 days for your money back. Contact us with your order number and we'll help from there.</p>"
+  assign faq_q1 = 'How long does shipping take?'
+  assign faq_q2 = 'Are adjustable dumbbells easy for beginners?'
+  assign faq_q3 = 'How much floor space do i actually need?'
+  assign faq_q4 = 'Does equipment arrive assembled?'
+  assign faq_q5 = "What's covered by the warranty?"
 -%}
 
 <div
@@ -337,7 +342,7 @@
 {% endblock %}
 
 {% block 'container', id: 'figma-shop-the-look', tag: 'div' %}
-  {% block 'shop-the-look', id: 'figma-shop-the-look', image: fi_look, hotspot_1_x: 85.04, hotspot_1_y: 15.3, hotspot_2_x: 26.5, hotspot_2_y: 67.6, hotspot_3_x: 78.2, hotspot_3_y: 64, hotspot_4_x: 46.4, hotspot_4_y: 58.2 %}
+  {% block 'shop-the-look', id: 'figma-shop-the-look', image: fi_look, tier_1_quantity: 4, tier_1_percent: 10, hotspot_1_x: 85.04, hotspot_1_y: 15.3, hotspot_2_x: 26.5, hotspot_2_y: 67.6, hotspot_3_x: 78.2, hotspot_3_y: 64, hotspot_4_x: 46.4, hotspot_4_y: 58.2 %}
     {% block 'shop-the-look-row', id: 'figma-look-row-1', look_row: 1, product: figma_setup_1 %}{% endblock %}
     {% block 'shop-the-look-row', id: 'figma-look-row-2', look_row: 2, product: figma_setup_2 %}{% endblock %}
     {% block 'shop-the-look-row', id: 'figma-look-row-3', look_row: 3, product: figma_setup_3 %}{% endblock %}
@@ -359,7 +364,15 @@
 {% endblock %}
 
 {% block 'container', id: 'figma-bundle-builder', tag: 'div', background: 'cream' %}
-  {% block 'bundle-builder', id: 'figma-bundle-builder', collection: figma_bundle, preselect: ',1,2,3,5,6,' %}{% endblock %}
+  {% block 'bundle-builder',
+    id: 'figma-bundle-builder',
+    collection: figma_bundle,
+    preselect: ',1,2,3,5,6,',
+    tier_1_quantity: 2,
+    tier_1_percent: 10,
+    tier_2_quantity: 3,
+    tier_2_percent: 15
+  %}{% endblock %}
 {% endblock %}
 
 {% block 'container', id: 'figma-featured-product', tag: 'div' %}

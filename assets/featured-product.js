@@ -1,14 +1,11 @@
-// <featured-product> ES1-T158, ES1-T350. No storage, R8.
-const T = "a[data-featured-media-id]";
+// <featured-product> ES1-T158, ES1-T350. No storage, R8. Gallery: product-media.js (ADR 0012).
 class F extends HTMLElement {
 $(s) {
 return this.querySelector(s);
 }
 connectedCallback() {
 this.box = this.$("[data-end]");
-for (const t of ["click", "theme:variant:change"]) this.addEventListener(t, this);
 document.addEventListener("visibilitychange", this);
-this.$(T)?.setAttribute("aria-current", "true");
 if (this.box && this.tick()) {
 new IntersectionObserver((e) => {
 this.seen = e.at(-1).isIntersecting;
@@ -19,12 +16,10 @@ this.dataset.enhanced = "";
 }
 disconnectedCallback() {
 clearInterval(this.t);
+document.removeEventListener("visibilitychange", this);
 }
 handleEvent(e) {
 if (e.type[0] == "v") return this.run();
-if (e.type[0] == "t") return this.show(e.detail.featuredMediaId);
-const a = e.target.closest(T);
-if (a) e.preventDefault(), this.show(a.dataset.featuredMediaId);
 }
 run() {
 clearInterval(this.t);
@@ -43,13 +38,6 @@ c.textContent = String(n[i] | 0).padStart(2, "0");
 if (!i) c.parentNode.hidden = n[0] < 1;
 });
 return 1;
-}
-show(id) {
-const l = this.$("ul");
-const li = this.$(`li[data-featured-media-id="${id}"]`);
-if (!li) return;
-l.scrollTo({ left: li.offsetLeft - l.offsetLeft, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-for (const a of this.querySelectorAll(T)) a.ariaCurrent = a.dataset.featuredMediaId == id ? "true" : null;
 }
 // D4: 2+ bands
 async swap(url, signal) {

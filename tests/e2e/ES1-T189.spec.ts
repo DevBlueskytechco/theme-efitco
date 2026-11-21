@@ -13,7 +13,6 @@ const FIGMA = '/?view=figma';
 const JS_FILE = 'assets/collection-tabs.js';
 const LIQUID_FILE = 'blocks/featured-collection.liquid';
 const MODULE = /\/collection-tabs\.js/;
-const SWATCH = 'input[type="radio"][data-variant-id]';
 const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|cdn\.shopify\.com\/s\/(trekkie|javascripts)/i];
 
 const T = {
@@ -25,6 +24,7 @@ const T = {
   empty: 'featured-collection-tab-empty',
   card: 'product-card',
   swatch: 'product-card-swatch',
+  swatches: 'product-card-swatches',
 };
 
 const block = (page: Page) => page.getByTestId(T.block);
@@ -337,31 +337,28 @@ test.describe('ES1-T189 tab rỗng', () => {
   });
 });
 
+// ES1-T441: bản cũ (card clone được <product-swatch> nâng cấp, chọn màu đổi link) lỗi thời: swatch card là chỉ báo aria-hidden,
+// không bấm (docs/srs.md#TE-3 AC2 0.3, ES1-T337), ES1-T338 xoá product-swatch.js. Kiểm card clone giữ đúng markup chỉ báo.
 test.describe('ES1-T189 swatch sau clone', () => {
-  test('card clone được nâng cấp, chọn màu đổi link card, không reload', async ({ page }) => {
+  test('card clone có hàng chỉ báo aria-hidden, 0 phần tử nhận focus, 1 data-selected, không <product-swatch>', async ({ page }) => {
     await open(page);
     let found = -1;
     for (const i of [1, 2, 3]) {
       await tab(page, i).click();
-      await expect(panel(page, i).locator('product-swatch:not(:defined)')).toHaveCount(0);
-      if (found < 0 && (await panel(page, i).locator(`product-swatch:has(${SWATCH}:nth-of-type(2))`).count())) found = i;
+      if (found < 0 && (await panel(page, i).getByTestId(T.swatches).count())) found = i;
     }
-    test.skip(found < 0, 'Không có card nhiều màu trong tab 2 đến 4 (dữ liệu ES1-T178)');
+    await expect(block(page).locator('product-swatch'), 'không còn custom element product-swatch').toHaveCount(0);
+    test.skip(found < 0, 'Không có card có swatch trong tab 2 đến 4 (dữ liệu ES1-T178)');
 
     await tab(page, found).click();
-    const card = panel(page, found).locator(`product-swatch:has(${SWATCH}:nth-of-type(2))`).first();
-    await card.scrollIntoViewIfNeeded();
-    const radios = card.locator(SWATCH);
-    const count = await radios.count();
-    const checked = await radios.evaluateAll((els) => els.findIndex((e) => (e as HTMLInputElement).checked));
-    const target = (checked + 1) % count;
-    const variantUrl = await radios.nth(target).getAttribute('data-variant-url');
-    const url = page.url();
-
-    await card.getByTestId(T.swatch).nth(target).click();
-    await expect(radios.nth(target)).toBeChecked();
-    await expect(card.locator('a[data-card-link]').first()).toHaveAttribute('href', variantUrl!);
-    expect(page.url()).toBe(url);
+    const rows = panel(page, found).getByTestId(T.swatches);
+    const n = await rows.count();
+    for (let i = 0; i < n; i++) {
+      const row = rows.nth(i);
+      await expect(row).toHaveAttribute('aria-hidden', 'true');
+      await expect(row.locator('input, label, a, button, [tabindex]')).toHaveCount(0);
+      await expect(row.locator(`[data-testid="${T.swatch}"][data-selected]`)).toHaveCount(1);
+    }
   });
 });
 
