@@ -79,19 +79,25 @@ test.describe('ES1-T387 static', () => {
 
   // Trần 49 152 chưa đạt ở develop (50 805 B sau T332, [Q] ES1-T454; 50 102 B sau ES1-T317; 51 936 B ở develop 32c5ab7 sau T326/T320; 54 814 B ở develop 354e4e9 sau T341/T382/T367; trần tạm 57 344 (CTO 17/11, ES1-T478), [Q] ES1-T472); CTO 13/11: PR này không được tăng base.css so với develop
   // ES1-T472 a: ES1-T478 tách CSS theo template, base.css về trần 49 152 B gzip, hết trần tạm 57 344
+  // ADR 0014 (ES1-T565): CSS quiz ở assets/quiz.css; base.css không còn rule quiz
   test('CSS: popup cũ (literal figma, px) đã xoá; mục quiz 0 màu literal, 0 z-index số; gzip ≤ 49 152', () => {
-    const css = read('assets/base.css');
-    expect(css).not.toContain('.quiz__dialog-close');
-    expect(css).not.toContain('quiz-results-title');
-    expect(css).not.toContain('motion-shimmer');
+    const base = read('assets/base.css');
+    const css = read('assets/quiz.css');
+    for (const file of [base, css]) {
+      expect(file).not.toContain('.quiz__dialog-close');
+      expect(file).not.toContain('quiz-results-title');
+      expect(file).not.toContain('motion-shimmer');
+      expect(file).not.toContain('motion-breathe');
+    }
+    expect(noComments(base)).not.toMatch(/\.quiz(__|-page|\s*\{)/);
     const clean = noComments(css);
     // Chỉ mục của ticket này (kết quả, popup, trang); .quiz__form/.quiz__subheading đè Figma ở mục home là việc khác
     const quizRules = clean.split('}').filter((r) => /\.quiz(__results|__answer|__loading|__skeleton|__card|__notice|__quick-view|__shortlist|__dialog|__empty|__error|-page)/.test(r)).join('}');
     expect(quizRules).not.toMatch(/#[0-9a-f]{3,8}\b|\brgba?\(|\bhsla?\(|--figma-/i);
     expect(quizRules).not.toMatch(/z-index\s*:\s*-?\d/);
     expect(quizRules).not.toMatch(/(^|[\s;{])(left|right|top|bottom|margin-left|margin-right|padding-left|padding-right)\s*:/m);
-    expect(css).not.toContain('motion-breathe');
-    expect(gzipSync(css).length).toBeLessThanOrEqual(49152);
+    expect(gzipSync(base).length).toBeLessThanOrEqual(49152);
+    expect(gzipSync(css).length).toBeLessThanOrEqual(8192);
   });
 
   test('index.te11 truyền collection te11-quiz, giữ panel dưới bước (ES1-T139)', () => {
@@ -101,7 +107,7 @@ test.describe('ES1-T387 static', () => {
   });
 });
 
-// Fixture: markup như blocks/quiz.liquid render (popup), base.css thật, token mặc định settings_schema (space_base 4).
+// Fixture: markup như blocks/quiz.liquid render (popup), base.css + quiz.css thật (ADR 0014, nạp sau base), token mặc định settings_schema (space_base 4).
 const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;
 --page-margin:20px;--radius-input:8px;--radius-button:8px;--radius-card:12px;--radius-pill:999px;
 --color-background:#fff;--color-foreground:#1a1a1a;--color-muted:#6b6b6b;--color-muted-light:#808080;--color-border:#e5e5e5;
@@ -138,7 +144,7 @@ const DIALOG = (busy: boolean) => `
 
 async function fixture(page: Page, busy: boolean, width: number) {
   await page.setViewportSize({ width, height: 900 });
-  await page.setContent(`<!doctype html><html lang="en"><head><title>quiz</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${read('assets/base.css')}</style></head><body><main><h1>Home</h1>${DIALOG(busy)}</main></body></html>`);
+  await page.setContent(`<!doctype html><html lang="en"><head><title>quiz</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${read('assets/base.css')}</style><style>${read('assets/quiz.css')}</style></head><body><main><h1>Home</h1>${DIALOG(busy)}</main></body></html>`);
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.evaluate(() => (document.querySelector('dialog') as HTMLDialogElement).showModal());
 }

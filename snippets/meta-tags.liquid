@@ -12,6 +12,11 @@
     assign og_type = 'product'
   elsif request.page_type == 'article'
     assign og_type = 'article'
+    # TE-20 AC14, ui-spec article.md §8: excerpt_or_content bỏ HTML, ≤ 160 ký tự (ES1-T518). '</p> ' giữ khoảng trắng giữa đoạn sau strip_newlines.
+    assign article_description = article.excerpt_or_content | replace: '</p>', '</p> ' | strip_html | strip_newlines | strip | truncate: 160
+    if article_description != blank
+      assign og_description = article_description
+    endif
   elsif request.page_type == 'password'
     assign og_url = request.origin
   endif
