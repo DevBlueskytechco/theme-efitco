@@ -116,7 +116,7 @@ class ProductVariantPicker extends HTMLElement {
 			}
 			const [add] = this.adds();
 			const price = v && this.scope.querySelector("[data-variant-price] .price__current")?.textContent.trim();
-			const availability = (this.root.querySelector(".product-form__inventory") || (add.disabled && add))?.textContent.trim();
+			const availability = (this.root.querySelector(".product-form__inventory") || (add?.disabled ? add : null))?.textContent.trim();
 			this.say(fill(labelLoaded, { value, price, availability }));
 		} catch {
 			if (c.signal.aborted) return;

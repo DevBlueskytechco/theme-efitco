@@ -11,10 +11,10 @@
   wrapping a radio with value = option value id. State per value, computed by
   Shopify from the other selected options (no JS):
   - available: value.available.
-  - sold_out: value.variant exists, not available. Strike-through text, hidden
-    suffix ", sold out".
+  - sold_out: value.variant exists, not available. Strike-through text, radio
+    aria-label "Name, sold out".
   - unavailable: value.variant is blank (no such combination). Strike-through
-    text + dashed border, hidden suffix ", unavailable".
+    text + dashed border, radio aria-label "Name, unavailable".
   Every value stays selectable (no disabled). Swatches only when every value of
   the option has a swatch (VP3); otherwise the whole option uses text pills.
 
@@ -141,6 +141,15 @@
             else
               assign value_state = 'sold_out'
             endif
+            # Hậu tố trạng thái trong tên truy cập qua aria-label: span ẩn (position absolute) làm Chrome chèn
+            # khoảng trắng "Green , sold out" (TE-4 TC-302).
+            assign value_suffix = blank
+            case value_state
+              when 'sold_out'
+                assign value_suffix = label_sold_out
+              when 'unavailable'
+                assign value_suffix = label_unavailable
+            endcase
 
             assign value_hidden = false
             if collapsible and forloop.index > collapse_visible
@@ -177,6 +186,9 @@
               data-option-value-id="{{ value.id }}"
               data-state="{{ value_state }}"
               data-available="{{ value.available }}"
+              {% if value_suffix != blank %}
+                aria-label="{{ value.name | escape }}{{ value_suffix | escape }}"
+              {% endif %}
               {% if value.variant != blank %}
                 data-variant-id="{{ value.variant.id }}"
               {% endif %}
@@ -213,12 +225,6 @@
             {%- endif -%}
             <span class="product-option__text{% if use_swatch %} visually-hidden{% endif %}">
               {{- value.name | escape -}}
-              {%- case value_state -%}
-                {%- when 'sold_out' -%}
-                  <span class="visually-hidden">{{ label_sold_out }}</span>
-                {%- when 'unavailable' -%}
-                  <span class="visually-hidden">{{ label_unavailable }}</span>
-              {%- endcase -%}
             </span>
           </label>
         {%- endfor -%}
