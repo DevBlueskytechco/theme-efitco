@@ -1,4 +1,4 @@
-KHÔNG CHẮC: (1) demo-data không có quantity rule, volume pricing, selling plan, số đo unit price, cửa hàng pickup, combined listing: mọi số trong mockup cho các mục này là minh hoạ, ghi rõ trên khung; BA bổ sung dữ liệu ở ES1-T294. (2) Shop Pay Installments trên cart page: chưa xác nhận `{{ form | payment_terms }}` chạy trong form giỏ; banner PDP đặt dưới giá cần mini form `product` riêng (cách của Dawn), Tech Lead xác nhận (ES1-T295). (3) Tên trường Liquid B2B (`variant.quantity_rule`, `variant.quantity_price_breaks`, giá dòng giỏ khi áp bậc) và link card combined listing: Tech Lead đối chiếu shopify.dev trước khi tách ticket (ES1-T295). (4) Figma không có frame nào cho các tính năng này (figma-inventory chỉ có 1:759 featured product): toàn bộ là ĐỀ XUẤT phát triển từ ngôn ngữ 1:759, foundation và product.md.
+KHÔNG CHẮC: (1) demo-data không có quantity rule, volume pricing, selling plan, số đo unit price, cửa hàng pickup, combined listing: mọi số trong mockup cho các mục này là minh hoạ, ghi rõ trên khung; BA bổ sung dữ liệu ở ES1-T294. (2) Shop Pay Installments trên cart page: chưa xác nhận `{{ form | payment_terms }}` chạy trong form giỏ; banner PDP đặt dưới giá cần mini form `product` riêng (cách của Dawn), Tech Lead xác nhận (ES1-T295). (3) Tên trường Liquid B2B (`variant.quantity_rule`, `variant.quantity_price_breaks`, giá dòng giỏ khi áp bậc) và link card combined listing: Tech Lead đối chiếu shopify.dev trước khi tách ticket (ES1-T295). (4) các tính năng này chưa có bản dựng nào trước mockup: toàn bộ là ĐỀ XUẤT phát triển từ ngôn ngữ khối featured product trang chủ, foundation và product.md.
 
 # UI spec: Tính năng Shopify trên PDP, card, quickview, giỏ (ES1-T288)
 
@@ -12,7 +12,7 @@ KHÔNG CHẮC: (1) demo-data không có quantity rule, volume pricing, selling p
 | 4 | A20 pickup | product §5: 1 dòng + link; code `<details>` | §7: dòng trạng thái + dialog danh sách cửa hàng (drawer phải ≥ 768, sheet < 768), 4 trạng thái | TE-4 AC4; 15 §2 #7; 10 §9 #804 |
 | 5 | A20, A21 unit price | product §4 1 dòng, cart §1 anatomy; không mockup | §3.1: cùng một dòng ở PDP, card, QV, mini cart, cart, có mockup | TE-3 AC4, TE-4 AC2; 10 §8 #817; edge_cases "Unit price" |
 | 6 | A20 quantity rules + volume pricing (B2B) | không có ở spec nào | §5: dòng quy tắc, bảng giá theo số lượng, lỗi vi phạm, giới hạn đã đủ; PDP, QV, cart, mini cart | CTO 10/11 (4); ticket |
-| 7 | A20 sản phẩm số | product §11 1 câu | §8: ẩn ship, pickup, mục "Fast Shipping"; không thêm câu mới | TE-4 AC9 |
+| 7 | A20 sản phẩm số | product §11 1 câu | §8: ẩn ship, pickup, mục "Fast shipping"; không thêm câu mới | TE-4 AC9 |
 | 8 | A21 card theo variant + combined listing | foundation §9 không có | §9: nhãn biến thể, swatch chọn sẵn, link `?variant=`; combined listing ở card, QV, PDP | TE-3 AC8; sổ 10/11 (2048) |
 
 Không đổi spec khác; điểm cần sửa ở product.md, foundation.md, cart.md, mini-cart-quickview.md ghi ở §15.
@@ -23,7 +23,7 @@ Mục đích: Theme Store yêu cầu theme hiển thị đúng các tính năng 
 - Spec này.
 - `drafts/designer/ES1-T288/shopify-features.html` (nhúng `../_kit/kit.css`) + `shopify-features-360|768|1280|1920.png`. Khung F1–F9 theo khối, trùng số mục: F1 §3, F2 §4, F3 §5, F4 §7, F5 §6, F6 §8, F7 §9, F8 QV, F9 giỏ.
 
-Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma > bộ kiến thức. Ngôn ngữ buy box lấy từ product.md (ES1-T253) và Figma 1:759. Thành phần nền theo foundation (§6 nút, §8 badge, §12 form, §15 drawer, §16 dialog, §18 trạng thái).
+Nguồn: sổ quyết định CTO > kit + mockup (`drafts/designer/**`, nguồn chuẩn CTO 21/11) > DESIGN.md > AGENTS.md > bộ kiến thức. Ngôn ngữ buy box lấy từ product.md (ES1-T253) và khối featured product trang chủ. Thành phần nền theo foundation (§6 nút, §8 badge, §12 form, §15 drawer, §16 dialog, §18 trạng thái).
 
 ---
 
@@ -38,9 +38,9 @@ Thứ tự (bổ sung vào product.md §4–§5, giữ phần còn lại):
 | 3 | Bộ chọn option | product-form | product §5.1 |
 | 4 | **Purchase options (selling plan)** | product-form | §4 |
 | 5 | **Volume pricing** (B2B) | product-form | §5 |
-| 6 | Quantity (**N in cart**) + Add To Cart → **dòng quy tắc / lỗi số lượng** | product-form | §5 |
+| 6 | Quantity (**N in cart**) + Add to cart → **dòng quy tắc / lỗi số lượng** | product-form | §5 |
 | 7 | **Form người nhận gift card** | product-form | §6 |
-| 8 | Buy It Now + "More payment options" | product-form | product §5 |
+| 8 | Buy it now + "More payment options" | product-form | product §5 |
 | 9 | **Pickup** | product-form | §7 |
 | 10 | Hàng cam kết, accordion | product-form, product-details | product §5–§6 |
 
@@ -81,11 +81,11 @@ Logo Shop Pay trong banner giữ màu tím Shopify (foundation §27).
 
 Shopify vẽ banner (`{{ form | payment_terms }}` → `shopify-payment-terms`): "Pay in 4 interest-free installments of $58.50 with Shop Pay Learn more". Theme chỉ chỉnh vị trí, cỡ chữ, màu chữ kế thừa; logo và link "Learn more" (mở dialog của Shopify) do Shopify.
 
-- PDP: dòng cuối nhóm giá, dưới ghi chú thuế/ship, cách 4. Chữ 14 `--color-muted` (8.45), lh 22. ĐỀ XUẤT dời khỏi vị trí hiện tại trong form (sau bộ chọn option): đặt sát giá như hướng dẫn Shopify, dùng 1 mini form `product` chỉ chứa `id` + `payment_terms` trong product-info (KHÔNG CHẮC (2)). Nguồn 10 §8 gộp nhóm giá.
-- Chừa `min-height: 22px` cho dòng để banner gắn sau khi script Shopify chạy không xô bố cục (CLS). Shop không bật Installments hoặc giá ngoài khoảng hỗ trợ: Shopify không vẽ chữ, còn lại khoảng 22 trong nhóm giá (chấp nhận, không gây lệch).
+- PDP: dòng cuối nhóm giá, dưới ghi chú thuế/ship, cách 4. Chữ 14 `--color-muted` (8.45), lh 20. ĐỀ XUẤT dời khỏi vị trí hiện tại trong form (sau bộ chọn option): đặt sát giá như hướng dẫn Shopify, dùng 1 mini form `product` chỉ chứa `id` + `payment_terms` trong product-info (KHÔNG CHẮC (2)). Nguồn 10 §8 gộp nhóm giá.
+- Chừa `min-height: 20px` (1 dòng 14/20) cho dòng để banner gắn sau khi script Shopify chạy không xô bố cục (CLS). Shop không bật Installments hoặc giá ngoài khoảng hỗ trợ: Shopify không vẽ chữ, còn lại khoảng 22 trong nhóm giá (chấp nhận, không gây lệch).
 - Đổi biến thể: Shopify tự cập nhật theo input `id`; không cần partial.
 - Cart page: ĐỀ XUẤT 1 dòng dưới panel tóm tắt, trên khối accelerated checkout, nền trắng, căn giữa, 14 muted (KHÔNG CHẮC (2)). Không đặt trong panel tối: logo Shop Pay tím trên `--color-background-panel` không đảm bảo 3:1, và theme không đổi được màu logo. Mini cart: không hiện (chỗ hẹp, 1 CTA mỗi lớp; trả góp đã có ở PDP và cart page).
-- QV: không hiện (QV không có Buy It Now, giữ 1 CTA, mini-cart-quickview §3).
+- QV: không hiện (QV không có Buy it now, giữ 1 CTA, mini-cart-quickview §3).
 
 ## 4. Purchase options: selling plan (F2, F8, F9)
 
@@ -105,9 +105,9 @@ Anatomy (fieldset `product-selling-plans`, legend "Purchase options" 14/600):
 
 Hành vi:
 - Mặc định chọn `product.selected_selling_plan`, không có thì "One-time purchase", `requires_selling_plan` thì plan đầu của nhóm đầu (code có).
-- ĐỀ XUẤT giá chính (hàng giá §3, sticky bar) đổi theo plan đang chọn: giá = `allocation.price`, giá gạch = `variant.price` khi thấp hơn, badge -N% tính lại. Không đổi thì người mua thấy 2 giá khác nhau cho cùng lựa chọn (10 §8 không lặp khuyến mãi, 05 §5 phản hồi). Đổi tại chỗ, không fetch (giá đã có trong `data-*` của từng thẻ).
+- ĐỀ XUẤT giá chính (hàng giá §3, sticky bar) đổi theo plan đang chọn: giá = `allocation.price`, giá gạch = `variant.price` khi thấp hơn, badge −N% tính lại. Không đổi thì người mua thấy 2 giá khác nhau cho cùng lựa chọn (10 §8 không lặp khuyến mãi, 05 §5 phản hồi). Đổi tại chỗ, không fetch (giá đã có trong `data-*` của từng thẻ).
 - Đổi biến thể: partial `product-selling-plans` trả lại giá theo biến thể mới, giữ plan đang chọn theo `plan.id` (BE).
-- Nút vẫn "Add To Cart" (sổ 07/11), không đổi thành "Subscribe".
+- Nút vẫn "Add to cart" (CTO 21/11), không đổi thành "Subscribe".
 - Form gửi: radio "One-time purchase" mang `name="selling_plan" value=""`; radio nhóm không mang `name`; select tần suất của nhóm mang `name="selling_plan"` và chỉ bật khi radio nhóm của nó được chọn (JS đổi `disabled`). Nhóm chỉ 1 plan: radio nhóm mang thẳng `name="selling_plan" value="{plan.id}"`.
 - Không JS: in mọi plan thành radio phẳng `name="selling_plan"` như code hiện tại (vẫn mua đúng plan); bản thẻ nhóm + select là tăng cường khi có `data-enhanced` (AGENTS.md progressive enhancement).
 
@@ -115,13 +115,13 @@ Trạng thái (mockup F2):
 | # | Trạng thái | Thiết kế |
 | --- | --- | --- |
 | S1 | One-time chọn (mặc định) | thẻ 1 viền 2px; thẻ nhóm đóng, hiện "from $40.50" 14 muted + badge Save 10% |
-| S2 | Subscription chọn | thẻ nhóm mở: select tần suất, mô tả; giá chính $40.50 + gạch $45.00 + badge -10% |
+| S2 | Subscription chọn | thẻ nhóm mở: select tần suất, mô tả; giá chính $40.50 + gạch $45.00 + badge −10% |
 | S3 | Chỉ bán subscription | không thẻ One-time; câu "This product is sold as a subscription." 14 muted dưới legend |
 | S4 | Đổi biến thể đang tải | giá trên các thẻ skeleton (cao 22), radio vẫn bấm được |
 | — | Không có selling plan | không in fieldset |
 
 QV (F8): cùng component, thẻ cao ≥ 56, padding 12; select tần suất như PDP; giữ link chính sách (minh bạch điều khoản định kỳ, 15 §1 transparency).
-Card: không thêm nhãn subscription (card giữ Figma 1:502). Sản phẩm `requires_selling_plan`: nút Quick View mở QV ở S3; card không có nút thêm nhanh riêng.
+Card: không thêm nhãn subscription (card giữ `.product-card` của kit). Sản phẩm `requires_selling_plan`: nút Quick view mở QV ở S3; card không có nút thêm nhanh riêng.
 Mini cart, cart (F9): dưới option, icon lặp 14 + `selling_plan_allocation.selling_plan.name` 14 muted (code có tên, thêm icon); giá dòng `allocation.price` + gạch giá một lần (14 muted) khi rẻ hơn.
 
 ## 5. Quantity rules + volume pricing (B2B) (F3, F8, F9)
@@ -139,11 +139,11 @@ Dữ liệu (KHÔNG CHẮC (3)): `variant.quantity_rule.min`, `.max`, `.incremen
 2. Hàng số lượng: label "Quantity" 14/600 + "(12 in cart)" 14 muted khi > 0. Stepper (product §5: 44 · 40 · 44) mặc định = `min`, −/+ nhảy `increment`; − khoá ở `min`; + khoá khi số + trong giỏ = `max`. Input có `min`, `max`, `step` thật (không JS vẫn được trình duyệt kiểm).
 3. Dòng quy tắc ngay dưới hàng số lượng + nút, cách 8: icon info 16 muted + "Minimum of 6 · Maximum of 120 · Increments of 6" 14 muted; chỉ in phần áp dụng (min > 1, có max, bước > 1). `id` dòng này nối `aria-describedby` của ô số.
 
-Vi phạm (05 §4: lỗi ngay dưới trường, nói cách sửa; hiện khi rời ô hoặc khi bấm Add To Cart):
+Vi phạm (05 §4: lỗi ngay dưới trường, nói cách sửa; hiện khi rời ô hoặc khi bấm Add to cart):
 | # | Ca | Hiển thị |
 | --- | --- | --- |
-| Q2 | Gõ số không hợp lệ (dưới min, không chia hết bước, quá max) | dòng quy tắc đổi thành lỗi: icon ! 16 + "Enter a multiple of 6 between 6 and 108." 14/500 `--color-sale` (6.38); max trong câu = max − số trong giỏ; ô số viền sale + `aria-invalid`; bấm Add To Cart: không gửi, focus ô số, `product-form-error` đọc câu lỗi. Nút KHÔNG khoá (khoá thì người mua không biết vì sao, 05 §3) |
-| Q3 | Trong giỏ đã đủ max | stepper khoá (nền alt), dòng: icon info + "You have the maximum of 120 in your cart." + link "View cart" (`routes.cart_url`); Add To Cart disabled, nhãn giữ "Add To Cart" (chữ muted 6.70 trên border) |
+| Q2 | Gõ số không hợp lệ (dưới min, không chia hết bước, quá max) | dòng quy tắc đổi thành lỗi: icon ! 16 + "Enter a multiple of 6 between 6 and 108." 14/500 `--color-sale` (6.38); max trong câu = max − số trong giỏ; ô số viền sale + `aria-invalid`; bấm Add to cart: không gửi, focus ô số, `product-form-error` đọc câu lỗi. Nút KHÔNG khoá (khoá thì người mua không biết vì sao, 05 §3) |
+| Q3 | Trong giỏ đã đủ max | stepper khoá (nền alt), dòng: icon info + "You have the maximum of 120 in your cart." + link "View cart" (`routes.cart_url`); Add to cart disabled, nhãn giữ "Add to cart" (chữ muted 6.70 trên border) |
 | Q4 | Server 422 (quy tắc đổi giữa chừng, tồn kho) | câu lỗi của Shopify trong `product-form-error` (product §11 D), số lượng về giá trị server |
 
 ĐỀ XUẤT không tự làm tròn số khi rời ô: tự đổi số người mua gõ là đổi dữ liệu ngầm (16 Norman: phản hồi rõ, người dùng kiểm soát). Câu lỗi đã nêu khoảng hợp lệ.
@@ -161,7 +161,7 @@ Dòng quy tắc như PDP dưới stepper. Volume pricing: `<details>` đóng s�
 
 Chỉ PDP khi `product.gift_card?` (QV chỉ chọn mệnh giá + câu trỏ về PDP, mini-cart-quickview §3, giữ). Code đã có trường và thuộc tính Shopify (`properties[__shopify_send_gift_card_to_customer]`, `Recipient email`, `Recipient name`, `Message`, `Send on`, `__shopify_offset` do JS); spec này thêm hình, lỗi, bố cục.
 
-Anatomy (sau hàng số lượng, trước Buy It Now):
+Anatomy (sau hàng số lượng, trước Buy it now):
 1. Checkbox `.choice` 20 trong hàng 44: "I want to send this as a gift" 16/500. Mặc định không chọn.
 2. Chọn: fieldset hiện ngay bên dưới (không animate chiều cao; chỉ opacity 150ms), viền trái 2px `--color-border`, padding-inline-start 16, cách 16. Legend ẩn "Recipient information" (code có). Trường (field foundation §12, viền `--color-muted-light`):
    - Recipient email `*` (`type=email`, `required` khi chọn, `autocomplete="off"`).
@@ -171,7 +171,7 @@ Anatomy (sau hàng số lượng, trước Buy It Now):
 3. Bố cục: 360 1 cột; ≥ 768 email | name 2 cột (gap 16), message full, send on nửa cột. Ở 1280 (580) mỗi cột 274.
 4. Bỏ chọn: ẩn fieldset, trường `disabled` (không gửi), giữ chữ đã gõ nếu chọn lại.
 
-Lỗi (hiện khi rời trường và khi bấm Add To Cart; foundation §12):
+Lỗi (hiện khi rời trường và khi bấm Add to cart; foundation §12):
 | Trường | Ca | Câu |
 | --- | --- | --- |
 | Email | trống khi đã chọn | "Enter the recipient's email address." |
@@ -180,9 +180,9 @@ Lỗi (hiện khi rời trường và khi bấm Add To Cart; foundation §12):
 | Message | chạm 200 | không lỗi; gợi ý "0 characters left" chữ foreground 600 |
 | Server 422 | Shopify trả lỗi thuộc tính | câu Shopify trong `product-form-error`; đánh dấu trường nếu khớp tên |
 
-Bấm Add To Cart khi có lỗi: không gửi, focus trường lỗi đầu, `product-form-error` đọc "Check the recipient details." (tóm tắt). Trường lỗi viền sale 2px + `aria-invalid` + `aria-describedby` tới câu lỗi.
+Bấm Add to cart khi có lỗi: không gửi. Fieldset người nhận là form từ 2 trường nên dù 1 hay nhiều trường lỗi: focus chuyển tới `product-form-error` (khối tóm tắt `.form-message--error`, `role="alert"`, `tabindex="-1"`) ghi "Check 1 field" / "Check {n} fields" + danh sách link tới từng trường lỗi; bấm link thì focus vào ô đó. Không có nhánh "1 trường lỗi thì focus về ô" (điều kiện tính theo số trường của form, foundation §12). Thay "focus trường lỗi đầu" (foundation §12, sổ 21/11 components-10). Trường lỗi viền sale 2px + `aria-invalid` + `aria-describedby` tới câu lỗi.
 
-Sản phẩm gift card không cần ship (`requires_shipping` false): ẩn ghi chú ship, pickup, mục "Fast Shipping" như §8.
+Sản phẩm gift card không cần ship (`requires_shipping` false): ẩn ghi chú ship, pickup, mục "Fast shipping" như §8.
 
 Mini cart, cart page (F9): dòng gift card hiện "To: Alex Tran (alex@example.com)" · "Sends on Nov 24, 2026" · lời nhắn 1 dòng "…" (14 muted), thay vì in thô 4 thuộc tính (code in mọi property không bắt đầu `_`). ĐỀ XUẤT, 12 §1 (thông tin dòng hàng đầy đủ, gọn).
 
@@ -190,7 +190,7 @@ Mini cart, cart page (F9): dòng gift card hiện "To: Alex Tran (alex@example.c
 
 Dữ liệu: `current_variant.store_availabilities | where: 'pick_up_enabled'` → `available`, `pick_up_time`, `location.name`, `location.address` (`| format_address`), `location.address.phone`. Chỉ khi `current_variant.requires_shipping` và có ≥ 1 địa điểm bật pickup (code có điều kiện).
 
-### 7.1 Dòng trong buy box (dưới Buy It Now, cách 24)
+### 7.1 Dòng trong buy box (dưới Buy it now, cách 24)
 - Icon 20 trái · cột chữ: dòng 1 14/500 foreground · dòng 2 14 muted · nút mở dialog.
 - P1 còn pickup ở địa điểm đầu: icon check trong tròn `--color-badge-new` (đồ hoạ 4.57), "Pickup available at **Efitco Saigon Centre**", dòng 2 `pick_up_time` ("Usually ready in 24 hours").
 - P2 địa điểm đầu không có: icon × trong tròn viền `--color-muted-light`, "Pickup currently unavailable at **Efitco Saigon Centre**", không dòng 2.
@@ -210,26 +210,26 @@ Theo 15 §2 #7: ≥ 768 drawer phải (foundation §15: 420 ở 768, 480 từ 80
 ## 8. Sản phẩm số (F6)
 
 `current_variant.requires_shipping == false` (edge_cases "Sản phẩm số": Operating system iOS / Fire OS / FreeBSD, $343.00):
-- Ẩn: câu "Shipping calculated at checkout." (giữ câu thuế), khối pickup, mục "Fast Shipping" trong hàng cam kết (còn 2 mục: 1 Year Warranty, 90 Day Money Back; 768 và ≥ 1280 chia 2 cột).
-- Giữ: bộ chọn option, số lượng (ẩn nếu merchant tắt "Show quantity selector", product §12), Buy It Now.
+- Ẩn: câu "Shipping calculated at checkout." (giữ câu thuế), khối pickup, mục "Fast shipping" trong hàng cam kết (còn 2 mục: 1 year warranty, 90 day money back; 768 và ≥ 1280 chia 2 cột).
+- Giữ: bộ chọn option, số lượng (ẩn nếu merchant tắt "Show quantity selector", product §12), Buy it now.
 - Không thêm câu mới kiểu "Digital delivery" (AC9 chỉ yêu cầu ẩn; không có nguồn nội dung).
 - Giỏ: freeship bar vẫn tính theo tổng giỏ (code), không đổi.
 
 ## 9. Card theo variant + combined listing (F7)
 
-Theo foundation §9 (Figma 1:502) và quyết định swatch card là chỉ báo (ES1-T294 cập nhật TE-3 AC2/AC6).
+Theo foundation §9 và quyết định swatch card là chỉ báo (ES1-T294 cập nhật TE-3 AC2/AC6).
 
 ### 9.1 Card theo variant (TE-3 AC8: collection đa nguồn có phần tử là variant)
 `snippets/product-card` nhận `variant` (code có):
 - Ảnh `variant.featured_image`, giá và badge theo variant, link `variant.url` (`?variant=`), swatch của giá trị variant chọn sẵn (viền accent như `.swatch.is-selected`).
-- ĐỀ XUẤT nhãn biến thể: dòng 14 muted `variant.title` ("Gray") giữa tên và giá, 1 dòng "…". Lý do: 2 card cùng sản phẩm đứng cạnh nhau trong lưới (vd Revllen Black và Gray) phải phân biệt được bằng chữ, không chỉ bằng ảnh/màu (01 không chỉ dùng màu; 06 §1 nhất quán dữ liệu). Card thường (không truyền `variant`) không có dòng này, giữ Figma.
+- ĐỀ XUẤT nhãn biến thể: dòng 14 muted `variant.title` ("Gray") giữa tên và giá, 1 dòng "…". Lý do: 2 card cùng sản phẩm đứng cạnh nhau trong lưới (vd Revllen Black và Gray) phải phân biệt được bằng chữ, không chỉ bằng ảnh/màu (01 không chỉ dùng màu; 06 §1 nhất quán dữ liệu). Card thường (không truyền `variant`) không có dòng này, giữ `.product-card` của kit.
 - Tên link đọc "Revllen Pro Speed Rope, Gray, 3 colors".
 - Unit price dưới giá nếu có (§3.1).
 
 ### 9.2 Combined listing
 Sản phẩm cha gộp nhiều sản phẩm con; mỗi giá trị option có thể có `value.product_url` riêng (product §17).
 - Card: hiện như card thường của sản phẩm cha (ảnh, khoảng giá `price_min – price_max` nếu khác nhau, swatch chỉ báo các giá trị). Link: URL sản phẩm con của giá trị đang chọn mặc định (KHÔNG CHẮC (3), Tech Lead xác nhận nguồn URL).
-- QV: chọn giá trị có `product_url` khác sản phẩm đang xem → QV tải lại nội dung của sản phẩm con trong cùng dialog (skeleton như QV 5a ở cột info và ảnh), dialog không đóng, focus giữ trên giá trị vừa chọn; "View Detail" trỏ sang sản phẩm con. Không đổi URL trang nền (sổ 10/11 M4).
+- QV: chọn giá trị có `product_url` khác sản phẩm đang xem → QV tải lại nội dung của sản phẩm con trong cùng dialog (skeleton như QV 5a ở cột info và ảnh), dialog không đóng, focus giữ trên giá trị vừa chọn; "View details" trỏ sang sản phẩm con. Không đổi URL trang nền (sổ 10/11 M4).
 - PDP: chọn giá trị như vậy → điều hướng sang trang sản phẩm con (product §17 bước 4). ĐỀ XUẤT giữ radio (nhóm bàn phím liền mạch với các giá trị khác), BE điều hướng; thêm chữ ẩn ", opens another page" để người dùng trình đọc biết trang sẽ đổi (WCAG 3.2.2: thay đổi ngữ cảnh khi chọn phải báo trước).
 
 ## 10. Quickview (F8)
@@ -256,11 +256,11 @@ Giữ setting có sẵn: product-form "Show dynamic checkout buttons" (true). Li
 - `blocks.product_form.volume_pricing.title` "Volume pricing", `.available` "Volume pricing available", `.quantity` "Quantity", `.price` "Price", `.tier` "{{ quantity }}+", `.each` "{{ price }}/ea", `.current` "Current price", `.show_all` "Show all {{ count }} price breaks"
 - `blocks.product_form.selling_plan.save_percent` "Save {{ percent }}%", `.save_amount` "Save {{ amount }}", `.from` "from {{ price }}", `.frequency` "Delivery frequency", `.per_delivery` "{{ price }} per delivery", `.subscription_only` "This product is sold as a subscription.", `.policy` "Read the subscription policy"
 - `blocks.product_form.pickup.view_store` "View store information", `.dialog_title` "Pickup availability", `.close` "Close pickup availability", `.call` "Call {{ location }}"; sửa `pickup.available` thành "Pickup available, usually ready in {{ time }}" khi có thời gian (giữ bản không thời gian)
-- `blocks.product_form.gift_card.optional` "(optional)", `.characters_left` "{{ count }} characters left", `.error_email_required` "Enter the recipient's email address.", `.error_email` "Enter an email address like name@example.com.", `.error_send_on` "Choose a date between {{ start }} and {{ end }}.", `.error_summary` "Check the recipient details."; sửa `send_on_hint` "Leave blank to send right after checkout, or choose a date up to {{ days }} days from today."
+- `blocks.product_form.gift_card.optional` "(optional)", `.characters_left` "{{ count }} characters left", `.error_email_required` "Enter the recipient's email address.", `.error_email` "Enter an email address like name@example.com.", `.error_send_on` "Choose a date between {{ start }} and {{ end }}.", `.error_summary` dạng số ít / số nhiều: `one` "Check {{ count }} field", `other` "Check {{ count }} fields" (thay "Check the recipient details.", foundation §12: tóm tắt nêu số trường lỗi); sửa `send_on_hint` "Leave blank to send right after checkout, or choose a date up to {{ days }} days from today."
 - `cart.quantity_rule_short` "Min {{ min }} · Increments of {{ increment }}", `cart.volume_pricing_applied` "Volume pricing applied", `cart.gift_card_to` "To: {{ name }} ({{ email }})", `cart.gift_card_send_on` "Sends on {{ date }}"
 - `products.product.opens_other_product` ", opens another page" (chữ ẩn combined listing)
 
-Copy American English, sentence case cho chữ thân; nhãn nút giữ Title Case (sổ 07/11).
+Copy American English, sentence case cho chữ thân; nhãn nút và link dạng nút cũng sentence case, mở bằng động từ, không dấu câu (CTO 21/11, ES1-T567; Chuẩn: Polaris Button). Tiêu đề section, dialog cũng sentence case (CTO 21/11 lượt 2).
 
 ## 14. Accessibility và Lighthouse
 
@@ -275,7 +275,7 @@ Tương phản (tính tay, số theo foundation §2, product §13):
 | border / background (viền thẻ chưa chọn) | 1.26 | chỉ trang trí; radio 20 accent 5.01 mang trạng thái (1.4.11) |
 | badge-new / background | 4.57 | icon check pickup, icon tag volume (đồ hoạ ≥ 3) |
 | muted-light / background | 5.33 | viền ô nhập gift card, icon × pickup (viền trái fieldset gift card dùng border 1.26, chỉ trang trí) |
-| muted / border | 6.70 | Add To Cart disabled (Q3) |
+| muted / border | 6.70 | Add to cart disabled (Q3) |
 | accent / background | 5.01 | focus, radio |
 
 - Vùng chạm: thẻ selling plan ≥ 56 (cả thẻ là label); radio/checkbox trong hàng 44; nút pickup, link chính sách, "Show all … price breaks", "View cart", link điện thoại 44; stepper 44; đóng dialog 48.
@@ -287,7 +287,7 @@ Tương phản (tính tay, số theo foundation §2, product §13):
 
 Lighthouse (SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90):
 - LCP không đổi (ảnh gallery đầu). Không thành phần nào ở đây là ảnh lớn.
-- CLS: installments chừa 22px; pickup, selling plan, bảng volume in từ Liquid (có kích thước ngay lần vẽ đầu); đổi biến thể thay nội dung cùng chiều cao + skeleton; dialog `fixed`.
+- CLS: installments chừa 20px; pickup, selling plan, bảng volume in từ Liquid (có kích thước ngay lần vẽ đầu); đổi biến thể thay nội dung cùng chiều cao + skeleton; dialog `fixed`.
 - Lazy: ảnh 64 trong dialog pickup chỉ tải khi mở (`loading="lazy"` trong dialog đóng = không tải). Không ảnh mới ở card, giỏ.
 - JS: installments là script Shopify (ngoài ngân sách theme, không tránh được khi bật AC4). Phần theme: đổi giá theo plan, bậc hiện hành, đếm ký tự, mở dialog pickup: gộp vào `product-form.js` hiện có hoặc 1 module ≤ 8 KB; không JSON biến thể (sổ 10/11 2048): giá plan và bậc lấy từ `data-*` của biến thể đang chọn.
 - Font: 2 họ, không thêm weight (Inter 400/500/600, Sofia 700 cho tiêu đề dialog).
@@ -318,7 +318,7 @@ Lighthouse (SEO 100, A11y 100, BP 100; Perf desktop ≥ 98, mobile ≥ 90):
 | Quantity rules, volume | input number `min=1` | `min/max/step` từ `quantity_rule`, label in cart, bảng volume, dòng quy tắc, lỗi; giỏ: dòng rút gọn | stepper theo bước, bậc hiện hành, kiểm khi rời ô/submit, Q3 |
 | Gift card | trường có sẵn, `:has(:checked)` | bố cục 2 cột, optional, lỗi, gợi ý mới; giỏ: thuộc tính gọn | kiểm trường, đếm ký tự, `__shopify_offset` (có) |
 | Pickup | partial `product-pickup` + `<details>` | dòng icon, nút, `<dialog>` drawer/sheet, `<details>` cho không JS | mở/đóng dialog, focus |
-| Sản phẩm số | `requires_shipping` ở product-info, pickup | ẩn "Fast Shipping" | — |
+| Sản phẩm số | `requires_shipping` ở product-info, pickup | ẩn "Fast shipping" | — |
 | Card variant | `product-card` param `variant` | dòng `variant.title`, tên link | — |
 | Combined listing | — | `data-product-url`, chữ ẩn | PDP điều hướng; QV tải lại sản phẩm con |
 
@@ -328,4 +328,12 @@ Tách ticket theo `.claude/rules/fe-be-boundary.md`: FE trước (markup, `data-
 
 1. Selling plan dùng thẻ radio theo nhóm + select tần suất, giá chính đổi theo plan đang chọn (thay radio phẳng mọi plan của code)? Đề xuất: có (§4).
 2. Pickup mở dialog (drawer phải ≥ 768, bottom sheet < 768), giữ `<details>` chỉ khi không JS? Đề xuất: có (§7, 15 §2 #7).
-3. Vi phạm quantity rule: Add To Cart vẫn bật, kiểm khi rời ô và khi bấm (lỗi inline + focus ô số), chỉ khoá khi giỏ đã đủ max? Đề xuất: có (§5.1).
+3. Vi phạm quantity rule: Add to cart vẫn bật, kiểm khi rời ô và khi bấm (lỗi inline + focus ô số), chỉ khoá khi giỏ đã đủ max? Đề xuất: có (§5.1).
+
+## Cập nhật 21/11 (ES1-T567, CTO 21/11)
+
+- Nguồn chuẩn là mockup HTML + `drafts/designer/_kit/kit.css`; Designer dựng lại bản vẽ từ mockup. Số trong spec lệch mockup thì mockup thắng.
+- Nhãn nút và link dạng nút: sentence case, mở bằng động từ, không dấu câu (Chuẩn: Polaris Button), thay Title Case 07/11. Tiêu đề section, dialog / drawer, empty state, tab, link menu cũng sentence case (CTO 21/11 lượt 2); tên sản phẩm, collection, bài viết theo dữ liệu, tên riêng và viết tắt giữ. "Checkout" giữ một chữ (thuật ngữ, CTO 21/11 lượt 2; content.md §4).
+- Line-height theo bội 4 qua token kit: 16/24 (`--line-height-body`), 14/20 (`--line-height-sm`), 13/20 (`--line-height-label`), 18/28 (`--line-height-title`), h1 40/48 → 48/56, h3 28/36, h4 20/24. Trang không viết line-height bằng số.
+- Dòng installments, quy tắc số lượng, pickup, meta dòng giỏ: 14/20 (trước 14/22); tên plan, giá plan 16/24 (trước 16/22); icon dòng giỏ 16 lệch trên 2 (`--space-050`); icon pickup 20 không lệch.
+- Cần FE: chừa `min-height` 20 cho `shopify-payment-terms`; chuỗi "Add to cart", "Buy it now", "View details" trong locale.

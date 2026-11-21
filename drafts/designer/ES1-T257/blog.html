@@ -3,11 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Training Tips &amp; Inspiration – Efitco</title>
+<title>Training tips &amp; inspiration – Efitco</title>
 <meta name="description" content="Training tips, home gym setups and nutrition advice from the Efitco team.">
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
-  /* Riêng trang blog (ES1-T257). Spec: docs/ui-spec/blog.md. ES1-T527 (DS check 20/11): chỉ bố cục trang;
+  /* Riêng trang blog (ES1-T257). Spec: docs/ui-spec/blog.md. ES1-T527 (rà soát kit 20/11): chỉ bố cục trang;
      pagination* lấy từ kit (V57), bo 16 = --radius-panel (V04, V59), khoảng meta → tab một token cho mọi trạng thái (V64). */
   .blog-page { padding-block-end: var(--section-gap); }
 
@@ -16,7 +16,7 @@
 
   /* Lọc tag: link thật, dáng tab (foundation §7); đang chọn = aria-current (kit) */
   .topic-nav { margin-block-end: var(--space-2xl); }
-  .topic-nav .tabs { padding: 3px; margin: -3px; }
+  .topic-nav .tabs { padding: var(--space-2xs); margin: calc(var(--space-2xs) * -1); } /* chừa chỗ cho outline focus 2 + offset 2 */
   /* < 48rem: hàng tab tràn sát mép màn để lộ tab kế tiếp (cuộn ngang trong hàng, không cuộn trang) */
   @media (max-width: 47.99rem) { .topic-nav .tabs { margin-inline: calc(var(--page-margin) * -1); padding-inline: var(--page-margin); scroll-padding-inline: var(--page-margin); } }
   .topic-nav .tab { text-decoration: none; }
@@ -28,7 +28,7 @@
   .featured-post__media img { width: 100%; height: 100%; object-fit: cover; transition: scale var(--motion-slow) var(--ease-out); }
   .featured-post:hover .featured-post__media img, .featured-post.is-hover .featured-post__media img { scale: 1.04; }
   .featured-post__body { display: grid; align-content: center; justify-items: start; gap: var(--space-md); }
-  .featured-post__title { font-size: var(--font-size-h2); }
+  .featured-post__title { font-size: var(--font-size-h2); line-height: var(--line-height-h2); }
   .featured-post__title a { text-decoration: none; }
   .featured-post__title a::after { content: ''; position: absolute; inset: 0; z-index: 1; }
   .featured-post__title a:hover, .featured-post.is-hover .featured-post__title a { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.12em; }
@@ -44,15 +44,15 @@
     .featured-post { gap: var(--space-4xl); margin-block-end: var(--space-5xl); }
   }
   @media (min-width: 80rem) {
-    .featured-post__title { font-size: var(--font-size-h1); }
-    .featured-post__excerpt { font-size: var(--font-size-lg); }
+    .featured-post__title { font-size: var(--font-size-h1); line-height: var(--line-height-h1); }
+    .featured-post__excerpt { font-size: var(--font-size-lg); line-height: var(--line-height-title); }
   }
 
-  /* Lưới card (Figma 1:1022): 1 / 2 / 3 / 4 cột */
+  /* Lưới card (kit .article-card): 1 / 2 / 3 / 4 cột */
   .article-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-xl) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
   /* Shopify §7 Blog (11/11): trang blog hiện excerpt_or_content (truncatewords 20) */
   .article-card__excerpt { margin: 0; color: color-mix(in srgb, var(--color-background-dark-foreground) 85%, transparent); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
-  /* ES1-T527 vòng 2: lề 24 từ 48rem, meta chữ trắng + '·', mẫu hover .is-hover đều lấy từ kit article-card (Figma 1:1030) */
+  /* ES1-T527 vòng 2: lề 24 từ 48rem, meta chữ trắng + '·', mẫu hover .is-hover đều lấy từ kit article-card */
   @media (min-width: 48rem) { .article-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 64rem) { .article-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (min-width: 80rem) { .article-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: var(--space-3xl); } }
@@ -90,7 +90,7 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- Header vòng 3: thanh tối #1A1A1A + noise, cao 80, không đè ảnh (sổ 10/11, Figma 1:362, foundation §3) -->
+<!-- Header vòng 3: thanh tối #1A1A1A + noise, cao 80, không đè ảnh (sổ 10/11, foundation §3) -->
 <header class="site-header">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -100,7 +100,7 @@
         <li><a class="site-header__link" href="#">Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#">Collection <svg aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#">Sale</a></li>
-        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Our story</a></li>
         <li><a class="site-header__link" href="#" aria-current="page">Blog</a></li>
         <li><a class="site-header__link" href="#">Contact</a></li>
         <li><a class="site-header__link" href="#">Help</a></li>
@@ -117,12 +117,12 @@
 <main id="main" class="blog-page" data-testid="blog-page">
   <div class="container">
     <nav class="breadcrumb" aria-label="Breadcrumb">
-      <ol><li><a href="#">Home</a></li><li><span aria-current="page">Training Tips &amp; Inspiration</span></li></ol>
+      <ol><li><a href="#">Home</a></li><li><span aria-current="page">Training tips &amp; inspiration</span></li></ol>
     </nav>
 
     <div class="page-title blog-title">
       <p class="eyebrow">From the Efitco blog</p>
-      <h1>Training Tips &amp; Inspiration</h1>
+      <h1>Training tips &amp; inspiration</h1>
       <p class="page-title__meta">4 articles</p>
     </div>
 
@@ -187,17 +187,17 @@
   </div>
 </main>
 
-<!-- Footer vòng 3 (Figma 1:1104, foundation §4): newsletter · panel dải rộng · hàng cuối có wordmark -->
+<!-- Footer vòng 3 (foundation §4): newsletter · panel dải rộng · hàng cuối có wordmark -->
 <footer class="site-footer">
   <div class="container site-footer__band">
     <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
     <div class="site-footer__newsletter">
-      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <h2><span>Get 15% off</span> your first order</h2>
       <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
     <form class="site-footer__form" onsubmit="return false" novalidate>
       <label class="visually-hidden" for="nl-email">Email</label>
-      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% off</button></div>
       <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
@@ -216,14 +216,14 @@
       </div>
       <div class="site-footer__menus">
         <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
       </div>
     </div>
     <ul class="site-footer__trust">
-      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
-      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
-      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
-      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 year warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 day money back</li>
     </ul>
   </div>
   <div class="container site-footer__bottom">
@@ -241,11 +241,11 @@
 
   <section class="demo-block">
     <h2>Trạng thái: lọc theo tag "Diet plans"</h2>
-    <p class="demo-note">URL /blogs/figma-blog/tagged/diet-plans. Khoảng meta → hàng tab = --heading-gap như trạng thái mặc định (V64). Không có bài nổi bật; breadcrumb thêm tag; meta đổi; tab tag có aria-current. Ảnh hàng card đầu eager (LCP khi không có bài nổi bật).</p>
-    <nav class="breadcrumb" aria-label="Breadcrumb, tag sample"><ol><li><a href="#">Home</a></li><li><a href="#">Training Tips &amp; Inspiration</a></li><li><span aria-current="page">Diet plans</span></li></ol></nav>
+    <p class="demo-note">URL /blogs/training/tagged/diet-plans. Khoảng meta → hàng tab = --heading-gap như trạng thái mặc định (V64). Không có bài nổi bật; breadcrumb thêm tag; meta đổi; tab tag có aria-current. Ảnh hàng card đầu eager (LCP khi không có bài nổi bật).</p>
+    <nav class="breadcrumb" aria-label="Breadcrumb, tag sample"><ol><li><a href="#">Home</a></li><li><a href="#">Training tips &amp; inspiration</a></li><li><span aria-current="page">Diet plans</span></li></ol></nav>
     <div class="page-title blog-title">
       <p class="eyebrow">From the Efitco blog</p>
-      <p class="h1">Training Tips &amp; Inspiration</p>
+      <p class="h1">Training tips &amp; inspiration</p>
       <p class="page-title__meta">2 articles tagged Diet plans</p>
     </div>
     <nav class="topic-nav" aria-label="Blog topics, tag sample">
@@ -267,10 +267,10 @@
     <p class="demo-note">Trang rỗng là nội dung, hiện cho người mua (AGENTS empty state). Ẩn lọc tag và meta số bài. 1 CTA chính.</p>
     <div class="empty-state" data-testid="blog-empty">
       <span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-article"/></svg></span>
-      <h3 class="h2">No Articles Yet</h3>
+      <h3 class="h2">No articles yet</h3>
       <p>New training tips are on the way. Until then, find the right gear for your next session.</p>
       <div class="empty-state__actions">
-        <a class="button" href="#">Explore Equipment</a>
+        <a class="button" href="#">Explore equipment</a>
         <a class="text-link" href="#">Back to homepage</a>
       </div>
     </div>
@@ -281,9 +281,9 @@
     <p class="demo-note">Mở URL tag không còn bài (vd tag đã xoá khỏi mọi bài). Giữ lọc tag để chọn chủ đề khác.</p>
     <div class="empty-state">
       <span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-tag"/></svg></span>
-      <h3 class="h2">No Articles On This Topic</h3>
+      <h3 class="h2">No articles on this topic</h3>
       <p>Try another topic above or browse every article.</p>
-      <div class="empty-state__actions"><a class="button" href="#">View All Articles</a></div>
+      <div class="empty-state__actions"><a class="button" href="#">View all articles</a></div>
     </div>
   </section>
 
@@ -307,7 +307,7 @@
       <div class="alert__body">
         <strong>Couldn't load these articles</strong>
         <p>Check your connection, then try again.</p>
-        <div><button class="button button--secondary" type="button">Try Again</button></div>
+        <div><button class="button button--secondary" type="button">Try again</button></div>
       </div>
     </div>
   </section>
@@ -324,7 +324,7 @@
 
   <section class="demo-block">
     <h2>Phân trang (khi số bài &gt; Articles per page)</h2>
-    <p class="demo-note">Snippet pagination chung (docs/ui-spec/pagination.md): Previous/Next tròn 52 chevron, tên "Previous page"/"Next page"; số trang pill 44, trang hiện tại accent; &lt; 768 "Page X of Y". Trang 1 / trang cuối: nút giữ chỗ mờ 0.35 + aria-disabled. Link thật ?page=N#blog-grid, chạy không JS.</p>
+    <p class="demo-note">Snippet pagination chung (docs/ui-spec/pagination.md): Previous/Next tròn 52 chevron, tên "Previous page"/"Next page"; số trang pill 44, trang hiện tại accent; &lt; 768 "Page X of Y". Trang 1 / trang cuối: nút giữ chỗ bằng cặp màu disabled (viền border, icon muted-light, không opacity; sổ 21/11) + aria-disabled. Link thật ?page=N#blog-grid, chạy không JS.</p>
     <nav class="pagination" aria-label="Pagination">
       <ul class="pagination__list" role="list">
         <li class="pagination__item--prev"><a class="round-button pagination__step" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
