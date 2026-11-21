@@ -104,6 +104,13 @@ test.describe('ES1-T410 @static', () => {
       // ES1-T350 D4 (ADR 0008): featured-product.js swap() fetch ?view=featured-product&option_values= khi ≥ 2 band; 2 file media không fetch.
       if (!f.endsWith('featured-product.js')) expect(js, f).not.toMatch(/fetch\(/);
     }
+    // ADR 0008 / ES1-T350 D4: URL do Liquid dựng sẵn và chỉ swap() được gọi fetch, đúng 1 lần.
+    // Cấm searchParams/location: JS không tự ghép query, không đổi URL trang (band trên trang chủ).
+    const fp = read('assets/featured-product.js');
+    expect(fp.match(/fetch\(/g)).toHaveLength(1);
+    const swap = fp.slice(fp.indexOf('async swap('));
+    expect(swap.slice(0, swap.indexOf('\n}\n') + 1)).toMatch(/fetch\(/);
+    expect(fp).not.toMatch(/searchParams|location/);
     expect(read('assets/product-media.js')).toMatch(/customElements\.get\("product-media-gallery"\) \|\|/);
   });
 
