@@ -1,7 +1,9 @@
-// <collection-filters> TE-6 (ES1-T110), reused by /search (ES1-T123 D4).
+// <collection-filters> TE-6 (ES1-T110), reused by /search (ES1-T123 D4, ES1-T380).
 import { partials } from "@shopify/partial-rendering";
 
 const T = (id) => `[data-testid="${id}"]`;
+// /search: the status line sits in the page head, outside this element (templates/search.liquid).
+const STATUS = `${T("collection-status")},${T("search-status")}`;
 const PAGES = T("pagination");
 const LINK = `${PAGES} a[href],a${T("collection-filter-clear")},a${T("collection-empty-clear")}`;
 const RESULTS = "[data-results-label]";
@@ -100,11 +102,17 @@ class CollectionFilters extends HTMLElement {
 		const c = (this.ctrl = new AbortController());
 		const done = emit && this.emit(url);
 		// The server always renders the label: still empty after apply = not applied.
-		this.querySelector(RESULTS)?.setAttribute("data-results-label", "");
+		const r0 = this.querySelector(RESULTS);
+		this.lbl = r0?.dataset.resultsLabel || this.lbl;
+		r0?.setAttribute("data-results-label", "");
 		this.setAttribute("aria-busy", "true");
+		// Try Again is removed with the alert: keep focus on the page.
+		if (this.err?.contains(document.activeElement)) this.querySelector(OPEN)?.focus();
 		this.err?.remove();
+		// /search: the filter badge renders inside the results partial, no collection-filter-count region.
+		const rp = this.dataset.resultsPartial;
 		try {
-			const update = await partials.fetch(this.dataset.resultsPartial || "collection-products", "collection-filters", "collection-filter-count", { url, signal: c.signal });
+			const update = await partials.fetch(...(rp ? [rp, "collection-filters"] : ["collection-products", "collection-filters", "collection-filter-count"]), { url, signal: c.signal });
 			if (c.signal.aborted) return;
 			const open = new Map([...this.querySelectorAll(GROUP)].map((d) => [d.dataset.filterParam, d.open]));
 			await partials.apply(update);
@@ -116,7 +124,7 @@ class CollectionFilters extends HTMLElement {
 			this.shown = location.href;
 			this.sync();
 			for (const d of this.querySelectorAll(GROUP)) d.open = open.get(d.dataset.filterParam) ?? d.open;
-			const status = this.querySelector(T("collection-status"));
+			const status = this.querySelector(STATUS) || document.querySelector(STATUS);
 			if (status) status.textContent = label;
 			if (page) {
 				// data-results-focus: the products group on /search; the label root on collections.
@@ -125,10 +133,14 @@ class CollectionFilters extends HTMLElement {
 				f.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 				f.focus({ preventScroll: true });
 			}
-			if (done) done({ productsCount: +(r.dataset.resultsCount ?? label.replace(/\D/g, "")) });
+			// Leading number only: the search label also holds the terms ("3 results for “66 lb”").
+			if (done) done({ productsCount: +(r.dataset.resultsCount ?? (label.match(/^\d[\d,.]*/)?.[0].replace(/\D/g, "") || 0)) });
 			return 1;
 		} catch {
 			if (c.signal.aborted) return;
+			// Old results stay: give them back their label (status line and the next "not applied" check read it).
+			const r = this.querySelector(RESULTS);
+			if (r && !r.dataset.resultsLabel) r.dataset.resultsLabel = this.lbl || "";
 			const t = this.querySelector(ERROR);
 			if (!t) return location.assign(url);
 			// Close the drawer so the alert and Try Again are reachable; the ticked filters stay in the form.
@@ -151,24 +163,34 @@ class CollectionFilters extends HTMLElement {
 		}
 	}
 
-	// shopify:collection:update, collection pages only (ES1-T123 D4 #3).
+	// Filter or sort change, not a page change (ES1-T124 #3): shopify:collection:update when the form has
+	// the collection hooks (ES1-T123 D4 #3), shopify:search:update when it has the q input (/search, ES1-T380).
 	emit(url) {
 		const f = this.form;
 		const d = f?.dataset;
-		if (!d?.collectionHandle) return;
+		const h = d?.collectionHandle;
+		const query = f?.elements.namedItem("q")?.value;
+		if (!h && query == null) return;
 		let done;
 		const result = new Promise((r) => (done = r));
 		// productFilters is optional and left out (ES1-T249; add under TE-6 if needed).
 		const s = new URL(url).searchParams.get("sort_by")?.split("-")[0];
 		const sortKey = s == "best" ? "BEST_SELLING" : s?.toUpperCase();
-		const collection = { id: d.collectionId ? `gid://shopify/Collection/${d.collectionId}` : null, handle: d.collectionHandle, productsCount: +d.productsCount || 0 };
+		const sort = sortKey && { sortKey };
 		events.then((m) => {
-			const E = m?.CollectionUpdateEvent;
+			const E = m?.[h ? "CollectionUpdateEvent" : "SearchUpdateEvent"];
 			if (!E) return;
 			try {
 				const p = E.createPromise?.();
 				if (p?.resolve) result.then(p.resolve);
-				f.dispatchEvent(new E({ collection, promise: p?.promise || result, ...(sortKey && { sortKey }) }));
+				const promise = p?.promise || result;
+				f.dispatchEvent(
+					new E(
+						h
+							? { collection: { id: d.collectionId ? `gid://shopify/Collection/${d.collectionId}` : null, handle: h, productsCount: +d.productsCount || 0 }, promise, ...sort }
+							: { search: { query, ...sort }, promise },
+					),
+				);
 			} catch {}
 		});
 		return done;
