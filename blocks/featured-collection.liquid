@@ -1,9 +1,15 @@
 {% doc %}
   Renders products from one collection in a grid (Figma 1:490): eyebrow, h2
   heading, optional View all link next to the heading or below the grid, and
-  up to products_to_show product cards. 2 columns below 48rem, 3 columns from
-  48rem (4 when the grid has exactly 4 cards), columns_desktop columns from 80rem.
+  up to products_to_show product cards. 2 columns below 48rem (card 152 at 360),
+  3 columns from 48rem, 4 columns when the card count is a multiple of 4 (170 at
+  768, TE-3 AC17), columns_desktop columns from 80rem (292 at 1280, 336 at 1920).
   No carousel.
+
+  Eyebrow, heading and the labels of tabs 2 to 4 default to empty (ADR 0011
+  mục 3, D10 of ES1-T307): "Bestsellers" over the built-in catalog would be a
+  claim, and a sample tab label would name the merchant's collection wrongly.
+  An empty tab label falls back to the collection title.
 
   Source: the collection setting; when it is empty, collections[default_collection].
   The home page passes 'all' (Shopify's built-in catalog, not demo content; CTO
@@ -73,7 +79,7 @@
   assign heading = block.settings.heading
   assign heading_id = id | default: block.id | append: '-heading'
   assign panel_id_prefix = id | default: block.id | append: '-panel-'
-  assign image_sizes = '(min-width: 1280px) calc(1416px / ' | append: columns | append: '), (min-width: 768px) 33vw, 50vw'
+  assign image_sizes = '(min-width: 80rem) calc(min(100vw - 40px, 1416px) / ' | append: columns | append: '), (min-width: 48rem) 33vw, 50vw'
 
   assign tab_count = 0
   assign first_source = nil
@@ -338,14 +344,12 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "t:labels.eyebrow",
-      "default": "Bestsellers"
+      "label": "t:labels.eyebrow"
     },
     {
       "type": "inline_richtext",
       "id": "heading",
-      "label": "t:labels.heading",
-      "default": "What People Are Buying?"
+      "label": "t:labels.heading"
     },
     {
       "type": "checkbox",
@@ -386,8 +390,7 @@
       "type": "text",
       "id": "tab_2_label",
       "label": "t:labels.featured_collection_tab_2_label",
-      "info": "t:info.featured_collection_tab_label",
-      "default": "Weight"
+      "info": "t:info.featured_collection_tab_label"
     },
     {
       "type": "collection",
@@ -399,8 +402,7 @@
       "type": "text",
       "id": "tab_3_label",
       "label": "t:labels.featured_collection_tab_3_label",
-      "info": "t:info.featured_collection_tab_label",
-      "default": "Portable Fitness"
+      "info": "t:info.featured_collection_tab_label"
     },
     {
       "type": "collection",
@@ -412,8 +414,7 @@
       "type": "text",
       "id": "tab_4_label",
       "label": "t:labels.featured_collection_tab_4_label",
-      "info": "t:info.featured_collection_tab_label",
-      "default": "Accessories"
+      "info": "t:info.featured_collection_tab_label"
     }
   ]
 }
