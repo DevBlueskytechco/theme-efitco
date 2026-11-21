@@ -327,7 +327,10 @@
   aspect-ratio: 1.586;
   padding: var(--space-5);
   border-radius: var(--figma-radius-16);
-  background: var(--color-background-dark) url('noise-dark.png');
+  /* Noise = border-image fill (ES1-T533); border-image không theo radius nên cắt bằng clip-path */
+  background: var(--color-background-dark);
+  border-image: url('noise-dark.png') 0 fill/0 repeat;
+  clip-path: inset(0 round var(--figma-radius-16));
   color: var(--color-background-dark-foreground);
 }
 
@@ -554,6 +557,7 @@
 
   .gift-card__card {
     border: 1px solid var(--color-foreground);
+    border-image: none;
   }
 
   .gift-card__balance-label,
@@ -773,7 +777,9 @@
 
 /** Password (ES1-T384, docs/ui-spec/password.md): dark page with noise, logo bar, content, image card */
 .template-password {
-  background: var(--color-background-dark) url('noise-dark.png');
+  /* Noise = border-image fill trên body (min-height 100svh): không là ứng viên LCP (ES1-T533) */
+  background: var(--color-background-dark);
+  border-image: url('noise-dark.png') 0 fill/0 repeat;
   color: var(--color-background-dark-foreground);
 }
 
