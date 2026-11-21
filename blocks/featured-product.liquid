@@ -81,6 +81,10 @@
   Empty state: no product selected → a hint in the theme editor, nothing on the
   storefront.
 
+  Styles: assets/featured-product.css (this block and the seal), loaded by the
+  stylesheet_tag line before the root, outside every partial, without preload
+  (ADR 0014). Gallery, picker, form and countdown styles stay in assets/base.css.
+
   Self-contained: callers must leave the body empty.
 
   @param {string} [id] - Static block id, needed when a template has more than one featured product
@@ -94,6 +98,7 @@
 
 {%- assign featured = block.settings.product -%}
 
+{{ 'featured-product.css' | asset_url | stylesheet_tag }}
 {%- if featured == blank -%}
   {%- if request.design_mode -%}
     <div

@@ -31,6 +31,9 @@
   strong element in default_heading stays dark and the rest of the heading is muted
   (Figma 1:629). Self-contained: callers must leave the body empty.
 
+  Styles: assets/image-with-text.css, loaded by the stylesheet_tag line before the
+  root, without preload (ADR 0014); 2 blocks on a page load the file once.
+
   Test hooks: data-testid="image-with-text", "image-with-text-image",
   "image-with-text-image-placeholder", "image-with-text-content",
   "image-with-text-accent", "image-with-text-eyebrow", "image-with-text-heading",
@@ -177,6 +180,7 @@
   endif
 -%}
 
+{{ 'image-with-text.css' | asset_url | stylesheet_tag }}
 {%- if show_item -%}
   <div
     class="image-with-text {{ layout_class }}"
