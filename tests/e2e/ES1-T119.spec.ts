@@ -6,7 +6,7 @@ import { test, expect, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
-import { skipUnlessFixture } from './support/home-fixture';
+import { fixtureApplied, skipUnlessFixture } from './support/home-fixture';
 
 const TE7 = '/?view=te7';
 const HOME = '/';
@@ -250,9 +250,28 @@ test.describe('ES1-T119 TE-7 FAQ', () => {
     });
   });
 
-  test('AC5 trang chủ: 5 câu Figma, câu đầu mở, 2 ô stat có 360+, không chữ hướng dẫn, không Lorem', async ({ page }) => {
+  // ES1-T406 (TS-FE4, ADR 0011 mục 3, SRS 0.5 TE-7 AC5, AC-H25, AC-H36): index.liquid không truyền câu hỏi, số liệu mẫu;
+  // theme chưa cấu hình không in band, không khung rỗng. Copy Figma trên / chỉ còn khi store dev đã áp fixture ES1-T331.
+  test('AC5 trang chủ chưa cấu hình: không FAQ mẫu, không 360+, không khung rỗng, 0 console error', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
+    test.skip(await fixtureApplied(page), 'store dev đã áp fixture ES1-T331: FAQ Figma, kiểm ở test fixture');
+    await expect(band(page, 'home-faq')).toHaveCount(0);
+    await expect(tid(page, 'faq')).toHaveCount(0);
+    await expect(tid(page, 'faq-placeholder')).toHaveCount(0);
+    await expect(tid(page, 'faq-item-placeholder')).toHaveCount(0);
+    const text = await page.locator('main').innerText();
+    expect(text).not.toContain('360+');
+    expect(text).not.toContain('How long does shipping take?');
+    expect(text).not.toContain('Add a');
+    await expectNoSeriousAxe(page);
+    expect(errors).toEqual([]);
+  });
+
+  test('AC5 trang chủ đã cấu hình (fixture): 5 câu Figma, câu đầu mở, 2 ô stat có 360+, không chữ hướng dẫn, không Lorem', async ({ page }) => {
+    const errors = watchConsole(page);
+    await page.goto(HOME);
+    await skipUnlessFixture(page);
     const home = band(page, 'home-faq');
     await expect(home).toHaveClass(/block-container--cream/);
     await expect(tid(home, 'faq-heading')).toHaveText("We're Proud To Be The Best At Training");

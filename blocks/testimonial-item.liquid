@@ -5,12 +5,13 @@
   product the customer did not review. Self-contained: callers must leave the body
   empty.
 
-  Sample content (plan ES1-T169 D1): the template passes default_* from locales.
-  They have other names than the settings, so they stay plain variables and a
-  value the merchant saved always wins. Clearing a setting brings the sample back,
-  so show_item is how a merchant hides the review. Text from the t filter may
-  already be escaped, so it goes through escape_once. The Verified label follows
-  the verified setting only, off by default (exception E9, ADR 0011).
+  Template values (plan ES1-T169 D1): a template may pass default_*. They have
+  other names than the settings, so they stay plain variables and a value the
+  merchant saved always wins. Text may already be escaped, so it goes through
+  escape_once. templates/index.liquid passes none (ADR 0011 mục 3, ES1-T406): a
+  sample name, rating or quote would be a fake review, so a fresh install shows no
+  review. Test templates pass literals. The Verified label follows the verified
+  setting only, off by default (exception E9, ADR 0011).
 
   Rating: a number setting, so it can be empty and take default_rating, then 5.
   snippets/rating-stars.liquid rounds it and clamps it to 0-5.
@@ -25,14 +26,13 @@
   "testimonial-placeholder".
 
   @param {string} id - Unique item id within the template, such as 'testimonial-1'
-  @param {string} [default_author] - Sample name used when the customer name setting is empty
-  @param {number} [default_rating] - Sample rating used when the rating setting is empty
-  @param {string} [default_title] - Sample text used when the title setting is empty
-  @param {string} [default_quote] - Sample text used when the quote setting is empty
+  @param {string} [default_author] - Test templates only: name used when the customer name setting is empty
+  @param {number} [default_rating] - Test templates only: rating used when the rating setting is empty
+  @param {string} [default_title] - Test templates only: text used when the title setting is empty
+  @param {string} [default_quote] - Test templates only: text used when the quote setting is empty
 
   @example
-  {% assign sample_author = 'blocks.testimonial_item.r1_name' | t %}
-  {% block 'testimonial-item', id: 'testimonial-1', default_author: sample_author, default_rating: 5 %}{% endblock %}
+  {% block 'testimonial-item', id: 'testimonial-1' %}{% endblock %}
 {% enddoc %}
 
 {%- liquid

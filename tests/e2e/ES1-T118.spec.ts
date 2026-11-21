@@ -7,7 +7,7 @@ import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
-import { skipUnlessFixture } from './support/home-fixture';
+import { fixtureApplied, skipUnlessFixture } from './support/home-fixture';
 
 const TE7 = '/?view=te7';
 const HOME = '/';
@@ -204,9 +204,28 @@ test.describe('ES1-T118 TE-7 testimonials', () => {
     expect(errors).toEqual([]);
   });
 
-  test('AC5 trang chủ: 4 review Figma, Verified tắt, không Lorem, không chữ hướng dẫn', async ({ page }) => {
+  // ES1-T406 (TS-FE4, ADR 0011 mục 3, SRS 0.5 TE-7 AC5, AC-H25, AC-H36): index.liquid không truyền review mẫu;
+  // theme chưa cấu hình không in band, không khung rỗng. Copy Figma trên / chỉ còn khi store dev đã áp fixture ES1-T331.
+  test('AC5 trang chủ chưa cấu hình: không review mẫu, không khung rỗng, 0 console error', async ({ page }) => {
     const errors = watchConsole(page);
     await page.goto(HOME);
+    test.skip(await fixtureApplied(page), 'store dev đã áp fixture ES1-T331: review Figma, kiểm ở test fixture');
+    await expect(band(page, 'home-testimonials')).toHaveCount(0);
+    await expect(tid(page, 'testimonials')).toHaveCount(0);
+    await expect(tid(page, 'testimonial-item')).toHaveCount(0);
+    await expect(tid(page, 'testimonial-placeholder')).toHaveCount(0);
+    const text = await page.locator('main').innerText();
+    expect(text).not.toContain('E. Johnson');
+    expect(text).not.toContain('Customer name');
+    expect(text.toLowerCase()).not.toContain('lorem');
+    await expectNoSeriousAxe(page);
+    expect(errors).toEqual([]);
+  });
+
+  test('AC5 trang chủ đã cấu hình (fixture): 4 review Figma, Verified tắt, không Lorem, không chữ hướng dẫn', async ({ page }) => {
+    const errors = watchConsole(page);
+    await page.goto(HOME);
+    await skipUnlessFixture(page);
     const home = band(page, 'home-testimonials');
     await expect(home).toHaveClass(/block-container--cream/);
     await expect(tid(home, 'testimonials-heading')).toHaveText('What Our Customers Say?');
