@@ -7905,29 +7905,184 @@ cart-drawer {
   color: inherit;
 }
 
-.predictive-search__status,
-.predictive-search__listbox {
-  padding-inline: var(--search-gutter);
+.predictive-search__spinner {
+  align-self: center;
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+  margin-inline: var(--space-3);
 }
 
-.predictive-search__status,
-.predictive-search__group-title,
-.predictive-search__price {
+/* Đang tải: spinner thay nút xoá (§6) */
+.predictive-search__form:has(.predictive-search__spinner:not([hidden])) .predictive-search__clear {
+  display: none;
+}
+
+/* Phần tử có display riêng vẫn ẩn khi [hidden]; BE bật/tắt bằng [hidden] */
+.predictive-search :is(.predictive-search__tabs, .predictive-search__tab, .predictive-search__hint, .predictive-search__skeleton, .predictive-search__notice, .predictive-search__listbox, .predictive-search__discover, .predictive-search__discover-group, .predictive-search__no-products, .predictive-search__spinner, .predictive-search__all, .predictive-search__compare-group, .predictive-search__sold-out)[hidden] {
+  display: none;
+}
+
+/* Ô trống (chưa cần JS): khám phá hiện, không tab, không nút chân (AC11) */
+.predictive-search:has(.predictive-search__input:placeholder-shown) .predictive-search__discover[hidden] {
+  display: grid;
+}
+
+.predictive-search:has(.predictive-search__input:placeholder-shown) :is(.predictive-search__tabs, .predictive-search__all) {
+  display: none;
+}
+
+/* Listbox đang hiện: nút chân hiện dù BE chưa bỏ [hidden] */
+.predictive-search:has(.predictive-search__listbox:not([hidden])):not(:has(.predictive-search__input:placeholder-shown)) .predictive-search__all[hidden] {
+  display: inline-flex;
+}
+
+/* Hàng tab: style tab Figma 1:490 (.featured-collection__tab), cao 44 dưới 80rem, cuộn ngang */
+.predictive-search__tabs {
+  flex: none;
+  margin: 0;
+  padding: var(--space-4) var(--search-gutter) calc(var(--space-1) / 2);
+  scroll-padding-inline: var(--search-gutter);
+}
+
+.predictive-search__tab {
+  min-block-size: calc(var(--space-1) * 11);
+  font-weight: 500;
+}
+
+[data-style='drawer'] .predictive-search__tab {
+  padding-inline: var(--space-5);
+}
+
+/* Bỏ min-width theo vị trí của hàng tab trang chủ (khối Figma 80rem) */
+.predictive-search .predictive-search__tabs .predictive-search__tab {
+  min-inline-size: 0;
+}
+
+.predictive-search__tab-count {
+  margin-inline-start: var(--space-1);
+}
+
+/* Thân: phần duy nhất cuộn */
+.predictive-search__body {
+  display: grid;
+  align-content: start;
+  gap: var(--space-6);
+  padding: var(--space-5) var(--search-gutter);
+}
+
+.predictive-search__hint {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
   color: var(--color-muted);
   font-size: var(--font-size-sm);
 }
 
-.predictive-search__group-title {
-  margin-block: var(--space-5) var(--space-2);
+.predictive-search__hint-icon,
+.predictive-search__icon {
+  display: flex;
+  flex: none;
+  color: var(--color-muted);
+}
+
+.predictive-search__hint-icon svg,
+.predictive-search__icon svg {
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+}
+
+/* Skeleton: dòng gợi ý + hàng ảnh 64 (card từ 80rem ở popup) */
+.predictive-search__skeleton {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.predictive-search__skeleton-lines {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.predictive-search__skeleton-items {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.predictive-search__skeleton-item {
+  grid-template-columns: calc(var(--space-1) * 16) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--space-3);
+}
+
+.predictive-search__skeleton-item > .skeleton--media {
+  grid-row: span 2;
+  margin: 0;
+}
+
+/* 0 kết quả: hộp nền alt, icon 24, tiêu đề 18/600 */
+.predictive-search__notice {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background: var(--color-background-alt);
+  color: var(--color-background-alt-foreground);
+}
+
+.predictive-search__notice-icon {
+  display: flex;
+  color: var(--color-muted);
+}
+
+.predictive-search__notice-icon svg {
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+}
+
+.predictive-search__notice-body {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.predictive-search__notice-title {
+  margin: 0;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+.predictive-search__notice-text,
+.predictive-search__no-products {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  overflow-wrap: anywhere;
+}
+
+/* Nhóm: tiêu đề 14/600 hoa, muted (như .mega__title) */
+.predictive-search__group {
+  padding-block-end: var(--space-6);
+}
+
+.predictive-search__group-title,
+.predictive-search .popular-searches__title {
+  margin-block: 0 var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .predictive-search__option {
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  min-block-size: 44px;
+  min-block-size: calc(var(--space-1) * 11);
   padding: var(--space-1) var(--space-2);
-  font-size: var(--font-size-sm);
   text-decoration: none;
 }
 
@@ -7941,21 +8096,341 @@ cart-drawer {
   outline-offset: -2px;
 }
 
-.predictive-search__image {
+/* Icon trong mẫu link: lưới cho collection, trang cho page và bài không ảnh */
+.predictive-search__icon svg {
+  display: none;
+}
+
+.predictive-search__option--query .predictive-search__icon svg,
+.predictive-search__group--collections .predictive-search__icon svg:first-child,
+.predictive-search__group--pages .predictive-search__icon svg:last-child,
+.predictive-search__group--articles .predictive-search__icon svg:last-child,
+.predictive-search__link .predictive-search__icon svg {
+  display: block;
+}
+
+.predictive-search__group--articles .predictive-search__icon:has(+ .predictive-search__thumb),
+.predictive-search__group--collections .predictive-search__thumb {
+  display: none;
+}
+
+/* Từ khoá: phần đã gõ (<mark>) 400, phần gợi ý thêm 600 */
+.predictive-search__query {
+  font-weight: 600;
+}
+
+.predictive-search__query mark {
+  background: none;
+  color: inherit;
+  font-weight: 400;
+}
+
+/* Sản phẩm dạng hàng: ảnh 64 trên nền cream, không badge */
+.predictive-search__option--product {
+  min-block-size: calc(var(--space-1) * 20);
+}
+
+.predictive-search__media {
+  position: relative;
+  display: block;
   flex: none;
-  inline-size: 64px;
-  block-size: 64px;
+  inline-size: calc(var(--space-1) * 16);
+  aspect-ratio: 1;
+  overflow: hidden;
   border-radius: var(--radius-input);
+  background: var(--color-background-cream);
+}
+
+.predictive-search__image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+  mix-blend-mode: darken;
+}
+
+.predictive-search__option[data-unavailable] .predictive-search__image {
+  opacity: 0.6;
+}
+
+.predictive-search__badge {
+  display: none;
+}
+
+.predictive-search__thumb {
+  flex: none;
+  inline-size: calc(var(--space-1) * 16);
+  block-size: calc(var(--space-1) * 12);
+  border-radius: var(--figma-radius-4);
   object-fit: cover;
 }
 
 .predictive-search__option-text {
   display: grid;
+  min-inline-size: 0;
   overflow-wrap: anywhere;
 }
 
-.predictive-search__all {
+.predictive-search__prices {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 var(--space-2);
+  font-size: var(--font-size-sm);
+}
+
+.predictive-search__option[data-on-sale] .predictive-search__price {
+  color: var(--color-sale);
+}
+
+.predictive-search__meta,
+.predictive-search__compare,
+.predictive-search__sold-out {
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.predictive-search__sold-out::before {
+  content: '· ' / '';
+}
+
+/* Card (tab Products mọi mốc; tab All từ 80rem ở popup): media 1:1 bo card, badge -N%, media → tên 8, tên → giá 4 */
+.predictive-search[data-tab='products'] .predictive-search__group--products .predictive-search__options {
+  display: grid;
+  grid-template-columns: repeat(var(--search-cards, 2), minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.predictive-search[data-tab='products'] .predictive-search__option--product {
+  flex-direction: column;
+  align-items: stretch;
+  gap: var(--space-2);
+  padding: 0;
+}
+
+.predictive-search[data-tab='products'] .predictive-search__option--product .predictive-search__media {
+  inline-size: 100%;
+  border-radius: var(--radius-card);
+}
+
+.predictive-search[data-tab='products'] .predictive-search__option--product .predictive-search__option-text {
+  gap: var(--space-1);
+}
+
+.predictive-search[data-tab='products'] .predictive-search__product-title {
+  font-weight: 500;
+  line-height: calc(26 / 16);
+}
+
+.predictive-search[data-tab='products'] .predictive-search__badge:not([hidden]) {
+  display: inline-flex;
+}
+
+.predictive-search[data-tab='products'] .predictive-search__option--product:hover,
+.predictive-search[data-tab='products'] .predictive-search__option--product[aria-selected='true'] {
+  background: none;
+}
+
+.predictive-search[data-tab='products'] .predictive-search__option--product[aria-selected='true'] {
+  outline-offset: var(--space-1);
+}
+
+.predictive-search[data-tab='products'] .predictive-search__option--product:is(:hover, [aria-selected='true']) .predictive-search__product-title {
+  text-decoration: underline;
+}
+
+/* Khám phá: gần đây, phổ biến, collection | trending */
+.predictive-search__discover {
+  display: grid;
+  align-content: start;
+  gap: var(--space-6);
+}
+
+.predictive-search__no-products {
+  grid-column: 1 / -1;
+}
+
+.predictive-search__discover-side {
+  display: grid;
+  align-content: start;
+  gap: var(--space-6);
+}
+
+.predictive-search__discover-side:not(:has(> :not([hidden]))) {
+  display: none;
+}
+
+.predictive-search__discover-group {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+}
+
+.predictive-search__discover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.predictive-search__discover-head .popular-searches__title {
+  margin: 0;
+}
+
+.predictive-search__text-button {
+  min-block-size: calc(var(--space-1) * 11);
+  padding: 0 var(--space-2);
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: var(--font-size-sm);
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.predictive-search__links,
+.predictive-search__trending-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.predictive-search__link {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: calc(var(--space-1) * 11);
+  padding: var(--space-1) var(--space-2);
+  text-decoration: none;
+}
+
+.predictive-search__link:hover {
+  background-color: var(--color-background-alt);
+}
+
+.predictive-search__link-title {
+  flex: auto;
+  min-inline-size: 0;
+  overflow-wrap: anywhere;
+}
+
+.predictive-search__trending-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+/* Chân: trạng thái (ẩn mắt dưới 48rem và ở drawer, vẫn đọc) + nút primary */
+.predictive-search__footer {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.predictive-search__footer:has(> .predictive-search__all:not([hidden])),
+.predictive-search__footer:has(> .predictive-search__status:not(:empty)),
+.predictive-search:has(.predictive-search__listbox:not([hidden])):not(:has(.predictive-search__input:placeholder-shown)) .predictive-search__footer {
+  padding: var(--space-3) var(--search-gutter) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
   border-block-start: 1px solid var(--color-border);
+}
+
+.predictive-search__status {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.button.predictive-search__all {
+  flex: auto;
+  min-block-size: calc(var(--space-1) * 12);
+  overflow-wrap: anywhere;
+  text-align: center;
+}
+
+.predictive-search__all svg {
+  flex: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .predictive-search__listbox:not([hidden]),
+  .predictive-search__notice:not([hidden]) {
+    animation: predictive-fade var(--motion-fast) var(--ease-out);
+  }
+
+  .predictive-search__option,
+  .predictive-search__link,
+  .search-chip {
+    transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
+  }
+
+  .predictive-search__image {
+    transition: scale var(--motion-slow) var(--ease-out);
+  }
+
+  .predictive-search[data-tab='products'] .predictive-search__option--product:hover .predictive-search__image {
+    scale: 1.04;
+  }
+
+  @keyframes predictive-fade {
+    from {
+      opacity: 0;
+    }
+  }
+}
+
+/* Chip gợi ý (Popular searches, Recent searches): nền alt, viền border, hover viền foreground; 44 cao, 40 từ 80rem */
+.popular-searches {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.popular-searches__title {
+  margin: 0;
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  line-height: var(--line-height-body);
+}
+
+.search-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.search-chip {
+  display: inline-flex;
+  align-items: center;
+  max-inline-size: 100%;
+  min-block-size: calc(var(--space-1) * 11);
+  padding-inline: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--figma-radius-4);
+  background-color: var(--color-background-alt);
+  color: var(--color-background-alt-foreground);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.search-chip:hover {
+  border-color: var(--color-foreground);
+}
+
+.search-chip:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 @media (min-width: 48rem) {
@@ -7965,9 +8440,72 @@ cart-drawer {
     border-end-start-radius: var(--radius-card);
     border-end-end-radius: var(--radius-card);
   }
+
+  .predictive-search[data-tab='products'] {
+    --search-cards: 4;
+  }
+
+  [data-style='drawer'] .predictive-search[data-tab='products'] {
+    --search-cards: 2;
+  }
+
+  /* Tab All popup 768: trái 3 cột (gợi ý, collection, bài, trang) | phải 5 cột sản phẩm */
+  [data-style='popup'] .predictive-search:not([data-tab]) .predictive-search__listbox:not([hidden]),
+  [data-style='popup'] .predictive-search[data-tab='all'] .predictive-search__listbox:not([hidden]) {
+    display: grid;
+  }
+
+  /* display của khám phá theo [hidden] + ô trống ở trên; ở đây chỉ chia cột */
+  [data-style='popup'] .predictive-search:not([data-tab]) .predictive-search__listbox,
+  [data-style='popup'] .predictive-search[data-tab='all'] .predictive-search__listbox,
+  [data-style='popup'] .predictive-search__skeleton,
+  [data-style='popup'] .predictive-search__discover:has(> .predictive-search__discover-side > :not([hidden])) {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 5fr);
+    grid-auto-flow: row dense;
+    align-content: start;
+    column-gap: var(--space-5);
+  }
+
+  [data-style='popup'] .predictive-search__listbox > .predictive-search__group {
+    grid-column: 1;
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__group--products {
+    grid-column: 2;
+    grid-row: 1 / span 4;
+  }
+
+  [data-style='popup'] .predictive-search__listbox:not(:has(> .predictive-search__group--products:not([hidden]))),
+  [data-style='popup'] .predictive-search[data-tab]:not([data-tab='all']) .predictive-search__listbox {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  [data-style='popup'] .predictive-search__listbox:not(:has(> .predictive-search__group:not(.predictive-search__group--products):not([hidden]))) .predictive-search__group--products {
+    grid-column: 1 / -1;
+  }
+
+  [data-style='popup'] .predictive-search__status {
+    position: static;
+    inline-size: auto;
+    block-size: auto;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    color: var(--color-muted);
+    font-size: var(--font-size-sm);
+  }
+
+  [data-style='popup'] .button.predictive-search__all {
+    flex: none;
+    margin-inline-start: auto;
+  }
 }
 
 @media (min-width: 80rem) {
+  .predictive-search-dialog[data-style='popup'] {
+    --search-col: calc((100% - 2 * var(--search-gutter) - 11 * var(--space-5)) / 12);
+  }
+
   [data-style='popup'] .predictive-search__bar {
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: var(--space-5);
@@ -7980,10 +8518,103 @@ cart-drawer {
 
   [data-style='popup'] .predictive-search__form {
     grid-column: 4 / 12;
+    min-block-size: calc(var(--space-1) * 13);
+    font-size: var(--font-size-lg);
   }
 
   .predictive-search__close-form {
     justify-self: end;
+  }
+
+  /* Tab bắt đầu cột 4, thẳng ô tìm */
+  [data-style='popup'] .predictive-search__tabs {
+    padding-block-start: var(--space-5);
+    padding-inline-start: calc(var(--search-gutter) + 3 * (var(--search-col) + var(--space-5)));
+  }
+
+  .predictive-search__tab {
+    min-block-size: calc(var(--space-1) * 10);
+  }
+
+  [data-style='popup'] .predictive-search__body {
+    padding-block: var(--space-6);
+  }
+
+  .predictive-search[data-tab='products'] {
+    --search-cards: 5;
+  }
+
+  /* Tab All popup 1280: trái 3 | phải 9 cột 4 card */
+  [data-style='popup'] .predictive-search:not([data-tab]) .predictive-search__listbox,
+  [data-style='popup'] .predictive-search[data-tab='all'] .predictive-search__listbox,
+  [data-style='popup'] .predictive-search__skeleton,
+  [data-style='popup'] .predictive-search__discover:has(> .predictive-search__discover-side > :not([hidden])) {
+    grid-template-columns: minmax(0, 3fr) minmax(0, 9fr);
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__group--products .predictive-search__options,
+  [data-style='popup'] .predictive-search__skeleton-items {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  [data-style='popup'] .predictive-search__skeleton-item {
+    grid-template-columns: none;
+  }
+
+  [data-style='popup'] .predictive-search__skeleton-item > .skeleton--media {
+    grid-row: auto;
+    margin-block-end: var(--space-1);
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__option--product {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--space-2);
+    padding: 0;
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__option--product .predictive-search__media {
+    inline-size: 100%;
+    border-radius: var(--radius-card);
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__option--product .predictive-search__option-text {
+    gap: var(--space-1);
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__product-title {
+    font-weight: 500;
+    line-height: calc(26 / 16);
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__badge:not([hidden]) {
+    display: inline-flex;
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__option--product:is(:hover, [aria-selected='true']) {
+    background: none;
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__option--product[aria-selected='true'] {
+    outline-offset: var(--space-1);
+  }
+
+  [data-style='popup'] .predictive-search:is(:not([data-tab]), [data-tab='all']) .predictive-search__option--product:is(:hover, [aria-selected='true']) .predictive-search__product-title {
+    text-decoration: underline;
+  }
+
+  [data-style='popup'] .predictive-search__trending-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  [data-style='popup'] .button.predictive-search__all {
+    min-block-size: calc(var(--space-1) * 13);
+  }
+
+  .search-chip {
+    min-block-size: calc(var(--space-1) * 10);
   }
 }
 
