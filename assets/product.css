@@ -268,16 +268,15 @@ product-recommendations {
 /** Đổi biến thể, đang tải (TE-4 AC15, variant-picker.md §6, ES1-T349): JS (TE-4-R2-BE2) gắn aria-busy="true" lên
    [data-variant-busy] (giá product-info, giá sticky bar, dòng tồn) và aria-disabled="true" lên nút thêm giỏ.
    Giá: skeleton cao đúng 1 dòng giá, rộng 45%, không làm nhạt giá cũ. Tồn: spinner 12 + "Checking availability…".
-   Nút: giữ màu, nhãn, bề rộng, không spinner, con trỏ progress. Mặc định (không JS, đã tải xong) ẩn skeleton + dòng kiểm. */
+   Nút: giữ màu, nhãn, bề rộng, không spinner, con trỏ progress. Mặc định (không JS, đã tải xong) ẩn skeleton.
+   Dòng tồn + "Checking availability…" và nút aria-disabled ở base.css (dùng chung quick view, ES1-T373). */
 .product-info__price-skeleton,
-.product-sticky-bar__price-skeleton,
-.product-form__checking {
+.product-sticky-bar__price-skeleton {
   display: none;
 }
 
 .product-info__price[aria-busy='true'] > .price,
-.product-sticky-bar__price[aria-busy='true'] > .price,
-.product-form__stock[aria-busy='true'] > :not(.product-form__checking) {
+.product-sticky-bar__price[aria-busy='true'] > .price {
   display: none;
 }
 
@@ -296,27 +295,6 @@ product-recommendations {
   line-height: var(--line-height-body);
 }
 
-.product-form__stock {
-  display: grid;
-  gap: var(--space-2);
-}
-
-.product-form__stock[aria-busy='true'] > .product-form__checking {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-}
-
-.product-form__checking-spinner {
-  inline-size: var(--space-3);
-  block-size: var(--space-3);
-  border-color: var(--color-border);
-  border-block-start-color: var(--color-foreground);
-}
-
-.product-form__add[aria-disabled='true'],
 .product-sticky-bar__add[aria-disabled='true'] {
   cursor: progress;
 }

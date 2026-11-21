@@ -84,6 +84,110 @@
     {% # No container: the dialog sits outside the page flow, it is not a band. %}
     {% block 'cart-drawer' -%}{%- endblock %}
 
+    {%- if settings.show_quick_view -%}
+      {% comment %}
+        Quick view (TE-3 AC9–AC12, AC14–AC16; mini-cart-quickview.md §3, §6; ADR 0007, 0008, 0012).
+        One shell per page, no container (a layer, not a band). Opens only with JavaScript
+        (<quick-view-button> on each card, BE TE-3-R2-BE1); without it the dialog never opens
+        and cards stay links. Nothing in here loads an image before the first open.
+
+        Hợp đồng cho BE (assets/quick-view.js, nạp lười khi bấm; FE không đặt <script>):
+        - <quick-view>: data-label-loading, data-label-error, data-label-view-product ([title]).
+        - <modal-dialog data-layer="quick-view" data-sheet-below="48rem">: BE đặt data-return-focus /
+          open(nút đã bấm). modal-dialog.js focus phần tử theo aria-labelledby của dialog.
+        - 3 trạng thái trong [data-quick-view-body], đổi bằng thuộc tính hidden, đúng 1 cái hiện:
+          [data-quick-view-loading] (skeleton, tiêu đề qv-loading-title), [data-quick-view-error]
+          (alert, tiêu đề qv-error-title, nút [data-retry] quick-view-retry, link
+          [data-quick-view-link] + [data-quick-view-link-label] tới sản phẩm), [data-quick-view-content]
+          (partial quick-view; tiêu đề qv-title nằm trong partial). Khi đổi trạng thái BE đặt
+          dialog aria-labelledby = qv-loading-title | qv-error-title | qv-title và aria-busy trên body.
+        - Partial quick-view: region rỗng ở đây để partials.apply có chỗ thay; nội dung lấy từ
+          {product.url}?view=quick-view (templates/product.quick-view.liquid), đổi biến thể thêm
+          &option_values=. [data-quick-view-status] (role status) đọc "Loading product…".
+      {% endcomment %}
+      {%- liquid
+        assign quick_view_loading = 'products.quick_view.loading' | t
+        assign quick_view_error = 'products.quick_view.load_error_title' | t
+        assign quick_view_product = 'products.quick_view.view_product' | t: title: '[title]'
+      -%}
+      <quick-view
+        class="quick-view"
+        data-label-loading="{{ quick_view_loading | escape_once }}"
+        data-label-error="{{ quick_view_error | escape_once }}"
+        data-label-view-product="{{ quick_view_product | escape_once }}"
+        data-testid="quick-view"
+      >
+        <modal-dialog data-layer="quick-view" data-sheet-below="48rem">
+          <dialog
+            class="dialog dialog--m quick-view__dialog"
+            aria-labelledby="qv-loading-title"
+            data-testid="quick-view-dialog"
+          >
+            <button
+              type="button"
+              class="close-button dialog__close"
+              aria-label="{{ 'products.quick_view.close' | t }}"
+              data-testid="quick-view-close"
+            >
+              {%- render 'header-icon', name: 'close' -%}
+            </button>
+
+            <div class="dialog__body quick-view__body" data-quick-view-body>
+              <p class="visually-hidden" role="status" data-quick-view-status data-testid="quick-view-status"></p>
+
+              <div class="quick-view__loading" data-quick-view-loading data-testid="quick-view-loading">
+                <h2 id="qv-loading-title" class="visually-hidden">{{ 'products.quick_view.open' | t }}</h2>
+                <div class="quick-view__layout" aria-hidden="true">
+                  <div class="quick-view__header">
+                    <span class="skeleton quick-view__skeleton-title"></span>
+                  </div>
+                  <div class="quick-view__gallery">
+                    <span class="skeleton skeleton--media quick-view__skeleton-media"></span>
+                  </div>
+                  <div class="quick-view__info">
+                    <span class="skeleton skeleton--line quick-view__skeleton-price"></span>
+                    <span class="quick-view__skeleton-values">
+                      <span class="skeleton"></span>
+                      <span class="skeleton"></span>
+                      <span class="skeleton"></span>
+                    </span>
+                    <span class="skeleton quick-view__skeleton-button"></span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="quick-view__error" hidden data-quick-view-error>
+                <div class="alert" role="alert" data-testid="quick-view-error">
+                  <span class="alert__icon">{% render 'status-icon', name: 'error' %}</span>
+                  <div class="alert__body">
+                    <h2 id="qv-error-title" class="alert__title">{{ quick_view_error }}</h2>
+                    <p class="alert__text">{{ 'products.quick_view.load_error_text' | t }}</p>
+                    <div class="alert__actions">
+                      <button type="button" class="button button--secondary" data-retry data-testid="quick-view-retry">
+                        {{- 'general.try_again' | t -}}
+                      </button>
+                      <a
+                        class="empty-state__link"
+                        href="{{ routes.all_products_collection_url }}"
+                        data-quick-view-link
+                        data-testid="quick-view-error-link"
+                      >
+                        <span data-quick-view-link-label>{{ 'blocks.featured_collection.view_all_products' | t }}</span>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="quick-view__content" hidden data-quick-view-content>
+                {% partial 'quick-view' %}{% endpartial %}
+              </div>
+            </div>
+          </dialog>
+        </modal-dialog>
+      </quick-view>
+    {%- endif -%}
+
     {% comment %}
       Toast chung (layers.md §2.4): chỉ dùng khi không có lớp modal mở; phản hồi trong lớp modal
       nằm ở role="status"/role="alert" của chính lớp. JS chèn toast vào đây; toast cảnh báo, lỗi

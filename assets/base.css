@@ -1191,6 +1191,91 @@ modal-dialog {
   line-height: 1;
 }
 
+/* Nút Quick View (TE-3 AC9, AC12; mini-cart-quickview §4). Không JS: element chưa defined → ẩn, card là link.
+   < 64rem hoặc cảm ứng: tròn 44, icon túi +, góc cuối dưới ảnh cách 8, luôn hiện.
+   ≥ 64rem có hover: thanh 44 đáy ảnh cách 16, hiện khi rê/focus card; ẩn bằng opacity (vẫn Tab tới được). */
+quick-view-button:not(:defined) {
+  display: none;
+}
+
+.product-card__quick-view-button {
+  --icon-stroke-width: 1.5;
+
+  position: absolute;
+  inset-block-end: var(--space-2);
+  inset-inline-end: var(--space-2);
+  z-index: var(--layer-content);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  inline-size: calc(var(--space-1) * 11);
+  block-size: calc(var(--space-1) * 11);
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-card__quick-view-button svg {
+  flex: none;
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+}
+
+.product-card__quick-view-label {
+  display: none;
+}
+
+.product-card__quick-view-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .product-card__quick-view-button:hover {
+    border-color: var(--color-foreground);
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+}
+
+@media (min-width: 64rem) and (hover: hover) {
+  .product-card__quick-view-button {
+    inset-inline: var(--space-4);
+    inset-block-end: var(--space-4);
+    inline-size: auto;
+    border-radius: var(--radius-button);
+    opacity: 0;
+    translate: 0 var(--space-2);
+  }
+
+  .product-card__quick-view-label {
+    display: inline;
+  }
+
+  .product-card:is(:hover, :focus-within) .product-card__quick-view-button {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-card__quick-view-button {
+    transition:
+      opacity var(--motion-base) var(--ease-out),
+      translate var(--motion-base) var(--ease-out),
+      background-color var(--motion-base) var(--ease-out),
+      color var(--motion-base) var(--ease-out),
+      border-color var(--motion-base) var(--ease-out);
+  }
+}
+
 /** Featured collection: padding 120, heading → lưới 40, lưới 2 / 3 / --columns */
 .featured-collection {
   display: grid;
@@ -4841,6 +4926,37 @@ product-variant-picker:not(:defined) {
   cursor: not-allowed;
 }
 
+/* Đang tải biến thể (VP1, PDP + quick view): JS gắn aria-busy lên dòng tồn, aria-disabled lên nút.
+   Tồn: spinner 12 + "Checking availability…"; nút giữ màu, nhãn, bề rộng, không spinner. */
+.product-form__stock {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.product-form__checking,
+.product-form__stock[aria-busy='true'] > :not(.product-form__checking) {
+  display: none;
+}
+
+.product-form__stock[aria-busy='true'] > .product-form__checking {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.product-form__checking-spinner {
+  inline-size: var(--space-3);
+  block-size: var(--space-3);
+  border-color: var(--color-border);
+  border-block-start-color: var(--color-foreground);
+}
+
+.product-form__add[aria-disabled='true'] {
+  cursor: progress;
+}
+
 .product-form__payment-button:empty,
 .product-form__installments:empty {
   display: none;
@@ -8383,8 +8499,9 @@ featured-product {
   gap: var(--space-3);
 }
 
-/* Figma 1:771: 16 / 20, 800 */
-.featured-product__eyebrow {
+/* Figma 1:771: 16 / 20, 800. Eyebrow vendor quick view dùng chung (mini-cart-quickview §3) */
+.featured-product__eyebrow,
+.quick-view__vendor {
   margin: 0;
   color: var(--color-accent);
   font-family: var(--font-heading--family);
@@ -8484,7 +8601,8 @@ featured-product[data-design-mode] .featured-product__countdown {
 }
 
 /* Figma 1:785: pill, chữ 13 / 20 600 */
-.featured-product__discount {
+.featured-product__discount,
+.quick-view__discount {
   padding-block: calc(var(--space-1) - 1px);
   padding-inline: var(--space-3);
   border-radius: var(--radius-pill);
@@ -8495,7 +8613,8 @@ featured-product[data-design-mode] .featured-product__countdown {
   line-height: calc(20 / 13);
 }
 
-.featured-product__rating {
+.featured-product__rating,
+.quick-view__rating {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -8505,7 +8624,8 @@ featured-product[data-design-mode] .featured-product__countdown {
   line-height: calc(22 / 14);
 }
 
-.featured-product__rating-count {
+.featured-product__rating-count,
+.quick-view__rating-count {
   margin-inline-start: var(--space-1);
   padding-inline-start: var(--space-3);
   border-inline-start: 1px solid var(--color-muted-light);
@@ -8586,7 +8706,8 @@ featured-product[data-design-mode] .featured-product__countdown {
   min-block-size: 52px;
 }
 
-.featured-product__add svg {
+.featured-product__add svg,
+.quick-view__add svg {
   flex: none;
   inline-size: var(--space-5);
   block-size: var(--space-5);
@@ -8601,7 +8722,8 @@ featured-product[data-design-mode] .featured-product__countdown {
 }
 
 /* Figma 1:816: nền xám trùng --color-border, không viền */
-.featured-product__view-detail {
+.featured-product__view-detail,
+.quick-view__view-detail {
   min-block-size: 52px;
   border-color: transparent;
   background-color: var(--color-border);
@@ -8640,6 +8762,449 @@ featured-product[data-design-mode] .featured-product__countdown {
 
   .featured-product__buy {
     margin-block-start: var(--space-4);
+  }
+}
+
+/** Quick view (TE-3 AC10, AC14–AC16; mini-cart-quickview §3, §3.1, §6). Khung .dialog.dialog--m: sheet
+   < 48rem (cao ≤ 88dvh), 720 từ 48rem, 960 từ 80rem. Vỏ + skeleton: layout/theme.liquid; nội dung: partial
+   quick-view (templates/product.quick-view.liquid). < 48rem 1 cột, hàng mua dính đáy sheet; từ 48rem media trái,
+   đầu + info phải, hàng mua chỉ dính khi BE gắn .qv--long. */
+quick-view {
+  display: contents;
+}
+
+@media (min-width: 80rem) {
+  .quick-view__dialog {
+    --dialog-size: 60rem;
+  }
+}
+
+/* Hàng mua dính (48 + 2 × 16) không che focus trong sheet (layers §3) */
+.quick-view__body {
+  padding-block-end: 0;
+  scroll-padding-block-end: calc(var(--space-1) * 20);
+}
+
+.quick-view__layout,
+.quick-view__info,
+.quick-view__buy,
+.quick-view__form {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  align-content: start;
+}
+
+.quick-view__header {
+  display: grid;
+  gap: var(--space-3);
+  padding-inline-end: calc(var(--close-button-size) + var(--space-2));
+}
+
+.quick-view__title {
+  margin: 0;
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: var(--line-height-heading);
+  overflow-wrap: anywhere;
+}
+
+.quick-view__title:focus:not(:focus-visible) {
+  outline: 0;
+}
+
+/* Media: dải vuốt 78% (< 48rem), 1:1 nền cream bo 16; 1 media 4:3 hết bề ngang */
+.quick-view__gallery {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+  timeline-scope: --qv-media;
+}
+
+.quick-view__media-list {
+  display: flex;
+  grid-area: 1 / 1;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  list-style: none;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  scroll-timeline: --qv-media inline;
+}
+
+.quick-view__media-list:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.quick-view__media-item {
+  display: grid;
+  flex: 0 0 78%;
+  place-items: center;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: calc(var(--radius-card) + var(--space-1));
+  background-color: var(--color-background-cream);
+  color: var(--color-muted-light);
+  scroll-snap-align: start;
+}
+
+:is([data-media-count='0'], [data-media-count='1']) .quick-view__media-item {
+  flex-basis: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+.quick-view__media-item > *,
+.quick-view__media-item .image,
+.quick-view__media-item .product-media__video-tag {
+  inline-size: 100%;
+  block-size: 100%;
+  aspect-ratio: auto;
+}
+
+.quick-view__media-item .image > img,
+.quick-view__media-item .product-media__video-tag {
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.quick-view__media-item--placeholder > svg {
+  inline-size: 25%;
+  block-size: auto;
+}
+
+.quick-view__media-nav,
+.quick-view__thumbnails {
+  display: none;
+}
+
+.quick-view__media-nav {
+  grid-area: 1 / 1;
+  align-self: end;
+  justify-self: end;
+  z-index: var(--layer-content);
+  gap: var(--space-2);
+  margin: var(--space-4);
+}
+
+.quick-view__thumbnails {
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.quick-view__thumbnail[aria-current='true'] {
+  box-shadow: inset 0 0 0 1px var(--color-foreground);
+}
+
+.quick-view__thumbnail:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.quick-view__thumbnail img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  mix-blend-mode: darken;
+}
+
+/* Tiến trình mảnh < 48rem: chạy theo cuộn dải media (CSS scroll timeline), không JS; trình duyệt chưa hỗ trợ thì không có */
+.quick-view__progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .quick-view__progress {
+    position: relative;
+    display: block;
+    block-size: var(--row-progress-size);
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background-color: var(--color-border);
+  }
+
+  .quick-view__progress:dir(rtl) {
+    scale: -1 1;
+  }
+
+  .quick-view__progress-thumb {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    inline-size: calc(100% / var(--qv-media-count));
+    background-color: var(--color-foreground);
+    animation: quick-view-progress linear both;
+    animation-timeline: --qv-media;
+  }
+}
+
+@keyframes quick-view-progress {
+  to {
+    translate: calc((var(--qv-media-count) - 1) * 100%) 0;
+  }
+}
+
+/* Giá: sale 18/600 · gạch 16 · badge, hàng 28; unit price xuống dòng riêng cuối hàng */
+.quick-view__summary {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.quick-view__price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+  min-block-size: calc(var(--space-1) * 7);
+}
+
+.quick-view__price .price {
+  display: contents;
+}
+
+.quick-view__price .price__current {
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+}
+
+.quick-view__price .price__compare {
+  font-size: var(--font-size-base);
+}
+
+.quick-view__price .price__unit {
+  order: 1;
+  font-size: var(--font-size-sm);
+}
+
+.quick-view__price-skeleton,
+.quick-view__price[aria-busy='true'] > :not(.quick-view__price-skeleton) {
+  display: none;
+}
+
+.quick-view__price[aria-busy='true'] > .quick-view__price-skeleton {
+  display: block;
+  inline-size: 45%;
+  block-size: calc(var(--space-1) * 7);
+}
+
+.quick-view__in-cart {
+  color: var(--color-muted);
+  font-weight: 400;
+}
+
+.quick-view__rules {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.quick-view__rules .status-icon {
+  flex: none;
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+}
+
+.quick-view__rules-text > span + span::before {
+  content: ' · ';
+}
+
+/* Volume pricing trong details đóng sẵn (product-shopify-features §5.2) */
+.quick-view__volume-summary {
+  display: flex;
+  align-items: center;
+  min-block-size: calc(var(--space-1) * 11);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.quick-view__volume-table {
+  inline-size: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  font-variant-numeric: tabular-nums;
+}
+
+.quick-view__volume-table :is(th, td) {
+  padding: var(--space-2) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
+  text-align: start;
+}
+
+.quick-view__volume-table :is(th, td):last-child {
+  text-align: end;
+}
+
+.quick-view__volume-table [data-current] {
+  background-color: var(--color-background-cream);
+  color: var(--color-background-cream-foreground);
+  font-weight: 600;
+}
+
+/* Hàng mua: Add To Cart + View Detail cách 12; < 48rem dính đáy sheet, nền trắng, vạch trên */
+.quick-view__actions {
+  position: sticky;
+  inset-block-end: 0;
+  z-index: var(--layer-content);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  margin-inline: calc(-1 * var(--dialog-pad));
+  padding: var(--space-4) var(--dialog-pad) calc(var(--space-4) + env(safe-area-inset-bottom, 0px));
+  border-block-start: 1px solid var(--color-border);
+  background-color: var(--color-background);
+}
+
+.quick-view__add,
+.quick-view__view-detail {
+  flex: 1 1 auto;
+  inline-size: auto;
+  min-block-size: calc(var(--space-1) * 12);
+  padding-inline: var(--space-4);
+}
+
+.quick-view__view-detail .slideshow-icon {
+  flex: none;
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+}
+
+@media (hover: hover) {
+  .quick-view__view-detail:hover {
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+}
+
+/* Đang tải (5a): skeleton tên, ảnh vuông, giá, 3 giá trị, nút */
+.quick-view__skeleton-title {
+  inline-size: 70%;
+  block-size: var(--font-size-h2);
+}
+
+.quick-view__skeleton-price {
+  inline-size: 40%;
+  block-size: calc(var(--space-1) * 7);
+}
+
+.quick-view__skeleton-values {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.quick-view__skeleton-values > .skeleton {
+  inline-size: calc(var(--space-1) * 11);
+  block-size: calc(var(--space-1) * 11);
+  border-radius: var(--radius-pill);
+}
+
+.quick-view__skeleton-button {
+  block-size: calc(var(--space-1) * 12);
+  border-radius: var(--radius-button);
+}
+
+.quick-view__loading,
+.quick-view__error {
+  padding-block-end: var(--dialog-pad);
+}
+
+@media (min-width: 48rem) {
+  .quick-view__body {
+    padding-block-end: var(--dialog-pad);
+  }
+
+  .quick-view__loading,
+  .quick-view__error {
+    padding-block-end: 0;
+  }
+
+  .quick-view__layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 'media header' 'media info';
+    column-gap: var(--space-5);
+  }
+
+  .quick-view__header {
+    grid-area: header;
+  }
+
+  .quick-view__gallery {
+    grid-area: media;
+    align-self: start;
+  }
+
+  .quick-view__info {
+    grid-area: info;
+  }
+
+  .quick-view__media-item,
+  :is([data-media-count='0'], [data-media-count='1']) .quick-view__media-item {
+    flex-basis: 100%;
+    aspect-ratio: 1;
+  }
+
+  .quick-view__media-nav,
+  .quick-view__thumbnails {
+    display: flex;
+  }
+
+  .quick-view__progress {
+    display: none;
+  }
+
+  .quick-view__actions {
+    position: static;
+    margin-inline: 0;
+    padding: 0;
+    border-block-start: 0;
+  }
+
+  .qv--long .quick-view__actions {
+    position: sticky;
+    padding-block: var(--space-4);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .quick-view__add,
+  .quick-view__view-detail {
+    flex: none;
+  }
+}
+
+@media (min-width: 80rem) {
+  .quick-view__layout {
+    column-gap: var(--space-7);
+    row-gap: var(--space-5);
+  }
+
+  .quick-view__info {
+    gap: var(--space-5);
+  }
+
+  .quick-view__thumbnail {
+    inline-size: calc(var(--space-1) * 18);
+    block-size: calc(var(--space-1) * 18);
+  }
+
+  .quick-view__actions {
+    margin-block-start: var(--space-4);
+  }
+
+  .quick-view__add,
+  .quick-view__view-detail {
+    min-block-size: calc(var(--space-1) * 13);
+    padding-inline: var(--space-6);
   }
 }
 
