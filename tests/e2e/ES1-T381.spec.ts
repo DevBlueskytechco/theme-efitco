@@ -64,6 +64,27 @@ test.describe('ES1-T381 tĩnh', () => {
     expect(read('blocks/blog-posts.liquid')).toContain("{% render 'article-card', article: post %}");
   });
 
+  // ES1-T506 (TE-20 AC2, WCAG 2.5.3): link chỉ bọc chữ tiêu đề trong heading, ::after phủ khung để cả card bấm được
+  test('card: link chỉ bọc tiêu đề, không aria-labelledby; ::after phủ khung, khung giữ nền tối 3/4', () => {
+    const card = read('snippets/article-card.liquid');
+    const links = card.match(/<a\b[^>]*>/g) ?? [];
+    expect(links).toHaveLength(1);
+    expect(links[0]).toContain('class="article-card__link"');
+    expect(links[0]).toContain('data-testid="article-card-link"');
+    expect(card).not.toContain('aria-labelledby');
+    expect(card).toMatch(/<\{\{ card_heading \}\} class="article-card__title"[^>]*>\s*<a class="article-card__link"[^>]*>\s*\{\{-? article\.title \| escape -?\}\}\s*<\/a>\s*<\/\{\{ card_heading \}\}>/);
+    const css = noComments(read('assets/base.css'));
+    const rule = (sel: string) => css.match(new RegExp(`(?:^|\\})\\s*${sel.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
+    expect(rule('.article-card__frame')).toMatch(/position:\s*relative/);
+    expect(rule('.article-card__frame')).toMatch(/aspect-ratio:\s*3 \/ 4/);
+    expect(rule('.article-card__frame')).toMatch(/background-color:\s*var\(--color-background-dark\)/);
+    expect(rule('.article-card__link::after')).toMatch(/position:\s*absolute/);
+    expect(rule('.article-card__link::after')).toMatch(/inset:\s*0/);
+    expect(rule('.article-card__link:focus-visible::after')).toMatch(/outline:\s*2px solid/);
+    expect(rule('.article-card__content')).not.toMatch(/position:/);
+    expect(rule('.article-card__title')).not.toMatch(/position:/);
+  });
+
   test('CSS: không line-clamp/ellipsis ở tiêu đề, trích đoạn; override #999 chỉ ở .blog-posts', () => {
     // ES1-T478 (ADR 0013): CSS trang blog ở assets/aux.css; .blog-posts (trang chủ) ở base.css
     const css = noComments(read('assets/base.css') + read('assets/aux.css'));

@@ -21,7 +21,9 @@
   Sample content (plan ES1-T169 D1): the template passes default_eyebrow and
   default_heading from locales. They have other names than the settings, so a value
   the merchant saved always wins. Text from the t filter may already be escaped, so
-  it goes through escape_once.
+  it goes through escape_once. Reviews have no sample (ADR 0011 mục 3, ES1-T406):
+  templates/index.liquid passes nothing to testimonial-item, so a fresh install
+  renders no card and this block renders nothing on the storefront.
 
   Test hooks: data-testid="testimonials", "testimonials-heading",
   "testimonials-nav", "testimonials-prev", "testimonials-next",

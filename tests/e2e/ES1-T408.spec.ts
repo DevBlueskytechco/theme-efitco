@@ -28,14 +28,18 @@ test.describe('ES1-T408 @static', () => {
     expect(src).toMatch(/\{\{ shop\.name \| escape \}\}/);
   });
 
-  test('gift card: khung QR đủ hook, không thẻ script (BE làm ở TS-BE1), 1 viewport', () => {
+  test('gift card: khung QR đủ hook, 2 thẻ script của TS-BE1, 1 viewport', () => {
     const src = read('templates/gift_card.liquid');
     for (const hook of ['data-gift-card-qr', 'data-identifier="{{ gift_card.qr_identifier', "data-label=\"{{ 'gift_card.qr_alt' | t",
       'data-testid="gift-card-qr"', 'data-testid="gift-card-qr-fallback"', 'data-testid="gift-card-code"', 'data-testid="gift-card-wallet"']) {
       expect(src, hook).toContain(hook);
     }
     expect(src).toMatch(/unless gift_card\.expired or gift_card\.enabled == false/);
-    expect(src).not.toMatch(/<script/);
+    // ES1-T410 (TS-BE1) đã đặt script: đúng 2 thẻ, không thêm.
+    expect(src.match(/<script[^>]*>/g)).toEqual([
+      `<script src="{{ 'vendor/qrcode.js' | shopify_asset_url }}" defer>`,
+      `<script src="{{ 'gift-card-qr.js' | asset_url }}" type="module">`,
+    ]);
     // viewport in một lần, qua snippets/meta-tags
     expect(src).toContain("render 'meta-tags'");
     expect(read('snippets/meta-tags.liquid')).toMatch(/<meta name="viewport" content="width=device-width,initial-scale=1">/);
