@@ -24,14 +24,16 @@
   thumbnails carry a play badge, model thumbnails a 3D badge.
   The decorative seal (Figma 1:761) sits on the image corner.
 
-  Countdown: only the countdown_end setting, a real end date the merchant enters
-  (ADR 0009, ADR 0011); no template parameter supplies a date. It is
-  YYYY-MM-DD HH:MM in store time, with the store offset added before it is read as epoch seconds. There is no element at all
-  when the value is empty, malformed or not after now, when the product is sold
-  out, or when the current variant has no compare-at price above its price (R8,
-  ES1-T155 #2). A malformed value shows a warning in the editor only. CSS keeps
-  the frame invisible until the root has data-enhanced (assets/featured-product.js)
-  or data-design-mode; numbers that do not move would be a fake countdown.
+  Countdown (ADR 0009, ADR 0011): snippets/sale-countdown, size regular, between
+  the title and the price. End date from the product metafield
+  custom.sale_ends_at, the countdown_end setting only when the product has none;
+  no template parameter supplies a date. The snippet prints nothing unless the
+  date is valid and after now and the current variant is available with a
+  compare-at price above its price (R8, ES1-T155 #2); numbers show from the
+  first paint, hidden without JavaScript. Editor-only notices for a malformed
+  countdown_end and for a metafield that overrides it. The snippet sits in a
+  div with data-sale-countdown-slot and display contents: always present, so a
+  variant swap can replace it even when one side has no countdown.
 
   Rating: reviews.rating metafield, .value.rating over .value.scale_max, brought
   to a scale of 5. Hidden when the metafield is missing. reviews.rating_count adds
@@ -48,8 +50,10 @@
   data-lazy-module (URL read by assets/lazy-module.js) on featured-product and,
   outside the theme editor, on product-form and on .featured-product__summary for
   the picker, which has display none until defined and so never intersects;
-  data-end (epoch seconds) on the countdown; data-countdown-unit (days, hours,
-  minutes, seconds) on each cell with data-countdown-value on its number;
+  data-sale-countdown-slot around the countdown; sale-countdown, data-sale-countdown,
+  data-end (epoch seconds), data-state, data-size, data-label-ended and
+  data-countdown-unit (days, hours, minutes, seconds) with data-countdown-value
+  (snippets/sale-countdown, assets/sale-countdown.js);
   data-featured-media-id, data-media-id and data-media-type on each media item
   and thumbnail; product-media-gallery with data-product-id and
   data-media-count and data-lazy-module (product-media.js, near viewport); product-form with
@@ -76,7 +80,8 @@
   featured-product-specs, featured-product-spec, featured-product-countdown,
   featured-product-countdown-days, featured-product-countdown-hours,
   featured-product-countdown-minutes, featured-product-countdown-seconds,
-  featured-product-add, featured-product-view-detail, featured-product-status,
+  featured-product-countdown-label, featured-product-countdown-ends-on,
+  featured-product-countdown-notice (snippets/sale-countdown), featured-product-add, featured-product-view-detail, featured-product-status,
   featured-product-error, featured-product-placeholder, featured-product-seal
   (snippets/featured-product-seal). Inside media items: product-media-image,
   product-media-video, product-media-external-video,
@@ -92,7 +97,7 @@
   stylesheet_tag line before the root, outside every partial, without preload
   (ADR 0014), only when the block prints markup (product set, or the theme
   editor) and never in the ?view=featured-product data view. Gallery, picker,
-  form and countdown styles stay in assets/base.css.
+  form and countdown (.sale-countdown) styles stay in assets/base.css.
 
   Self-contained: callers must leave the body empty.
 
@@ -173,45 +178,8 @@
     assign media_total = featured.media.size | at_most: 8
     assign description = featured.description | strip_html | strip | truncatewords: 80
 
-    # Countdown: 16 characters in the shape 0000-00-00 00:00, then a clean read as epoch seconds
-    assign now_epoch = 'now' | date: '%s' | plus: 0
-    assign countdown_text = block.settings.countdown_end | strip
-    assign countdown_invalid = false
-    assign end_epoch = 0
-    if countdown_text != blank
-      assign countdown_invalid = true
-      assign separator_1 = countdown_text | slice: 4
-      assign separator_2 = countdown_text | slice: 7
-      assign separator_3 = countdown_text | slice: 10
-      assign separator_4 = countdown_text | slice: 13
-      assign separators = separator_1 | append: separator_2 | append: separator_3 | append: separator_4
-      assign countdown_digits = countdown_text | remove: '-' | remove: ' ' | remove: ':'
-      assign digits_check = countdown_digits | plus: 0 | append: ''
-      if countdown_text.size == 16 and separators == '-- :' and digits_check == countdown_digits
-        assign store_offset = 'now' | date: '%z'
-        assign countdown_stamp = countdown_text | append: ' ' | append: store_offset
-        assign end_text = countdown_stamp | date: '%s'
-        assign end_check = end_text | plus: 0 | append: ''
-        if end_check == end_text
-          assign end_epoch = end_text | plus: 0
-          assign countdown_invalid = false
-        endif
-      endif
-    endif
-
-    assign show_countdown = false
-    if end_epoch > now_epoch and featured.available and current_variant.compare_at_price > current_variant.price
-      assign show_countdown = true
-      assign remaining = end_epoch | minus: now_epoch
-      assign days = remaining | divided_by: 86400
-      assign days_text = days | append: ''
-      if days < 10
-        assign days_text = days | prepend: '0'
-      endif
-      assign hours_text = remaining | modulo: 86400 | divided_by: 3600 | prepend: '0' | slice: -2, 2
-      assign minutes_text = remaining | modulo: 3600 | divided_by: 60 | prepend: '0' | slice: -2, 2
-      assign seconds_text = remaining | modulo: 60 | prepend: '0' | slice: -2, 2
-    endif
+    # Countdown (ADR 0009): snippets/sale-countdown decides whether it shows
+    assign countdown_id = 'FeaturedCountdown-' | append: block.id
 
     assign rating_data = featured.metafields.reviews.rating.value
     assign rating_value = rating_data.rating
@@ -367,64 +335,17 @@
           <h2 class="featured-product__title" data-testid="featured-product-title">{{ featured.title | escape }}</h2>
         </div>
 
-        {%- if countdown_invalid and request.design_mode -%}
-          <p class="featured-product__notice">{{ 'blocks.featured_product.countdown_invalid' | t }}</p>
-        {%- endif -%}
-
-        {%- if show_countdown -%}
-          <div
-            class="featured-product__countdown"
-            role="timer"
-            {% if block.settings.countdown_label != blank %}
-              aria-labelledby="FeaturedCountdown-{{ featured.id }}"
-            {% endif %}
-            data-end="{{ end_epoch }}"
-            data-testid="featured-product-countdown"
-          >
-            {%- if block.settings.countdown_label != blank -%}
-              <span class="featured-product__countdown-label" id="FeaturedCountdown-{{ featured.id }}">
-                {{- block.settings.countdown_label | escape -}}
-              </span>
-            {%- endif -%}
-            <div class="featured-product__countdown-units">
-              <span
-                class="featured-product__countdown-unit"
-                data-countdown-unit="days"
-                data-testid="featured-product-countdown-days"
-                {% if days == 0 %}
-                  hidden
-                {% endif %}
-              >
-                <span data-countdown-value>{{ days_text }}</span>
-                <span class="visually-hidden">{{ 'blocks.featured_product.countdown_days' | t }}</span>
-              </span>
-              <span
-                class="featured-product__countdown-unit"
-                data-countdown-unit="hours"
-                data-testid="featured-product-countdown-hours"
-              >
-                <span data-countdown-value>{{ hours_text }}</span>
-                <span class="visually-hidden">{{ 'blocks.featured_product.countdown_hours' | t }}</span>
-              </span>
-              <span
-                class="featured-product__countdown-unit"
-                data-countdown-unit="minutes"
-                data-testid="featured-product-countdown-minutes"
-              >
-                <span data-countdown-value>{{ minutes_text }}</span>
-                <span class="visually-hidden">{{ 'blocks.featured_product.countdown_minutes' | t }}</span>
-              </span>
-              <span
-                class="featured-product__countdown-unit"
-                data-countdown-unit="seconds"
-                data-testid="featured-product-countdown-seconds"
-              >
-                <span data-countdown-value>{{ seconds_text }}</span>
-                <span class="visually-hidden">{{ 'blocks.featured_product.countdown_seconds' | t }}</span>
-              </span>
-            </div>
-          </div>
-        {%- endif -%}
+        <div class="sale-countdown-slot" data-sale-countdown-slot>
+          {%- render 'sale-countdown',
+            product: featured,
+            variant: current_variant,
+            fallback_end: block.settings.countdown_end,
+            size: 'regular',
+            label: block.settings.countdown_label,
+            testid: 'featured-product-countdown',
+            id: countdown_id
+          -%}
+        </div>
 
         <div
           class="featured-product__summary"
@@ -581,8 +502,7 @@
       "type": "text",
       "id": "countdown_label",
       "label": "t:labels.countdown_label",
-      "info": "t:info.sample_default",
-      "default": "Sale ends in"
+      "info": "t:info.countdown_label"
     },
     {
       "type": "text",
