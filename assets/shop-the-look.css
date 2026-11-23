@@ -1,0 +1,569 @@
+/* CSS tầng 4 (ADR 0014): nạp bằng stylesheet_tag trong blocks/shop-the-look.liquid, sau base.css. Gồm block con
+   shop-the-look-row. Trần 8 192 B gzip. */
+
+/** Shop the look */
+.shop-the-look {
+  display: grid;
+  gap: var(--space-5);
+  padding-block: var(--space-7);
+}
+
+.shop-the-look [hidden] {
+  display: none;
+}
+
+/* < 48rem link xuống dưới h2, gạch chân, cao 44 */
+.shop-the-look__header {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-3);
+}
+
+.shop-the-look__titles {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+}
+
+.shop-the-look__eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+}
+
+/* 28 ở 360, 32 ở 768, 48 từ 80rem */
+.shop-the-look__heading {
+  margin: 0;
+  font-size: var(--font-size-h2);
+  font-weight: var(--font-heading--weight);
+  letter-spacing: -0.02em;
+  line-height: calc(58 / 48);
+  text-wrap: balance;
+}
+
+.shop-the-look__link {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 44px;
+  color: inherit;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.shop-the-look__body {
+  display: grid;
+  gap: var(--space-5);
+  min-inline-size: 0;
+}
+
+/* Tỉ lệ 936 x 816 là chiều cao tối thiểu; cột phải cao hơn thì ảnh kéo theo, cắt bằng cover */
+.shop-the-look__media {
+  position: relative;
+  min-inline-size: 0;
+  aspect-ratio: 936 / 816;
+  border-radius: calc(var(--radius-card) + var(--space-1));
+  background-color: var(--color-background-cream);
+}
+
+.image.shop-the-look__image {
+  position: absolute;
+  inset: 0;
+  block-size: 100%;
+  border-radius: inherit;
+}
+
+.image.shop-the-look__image > img {
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* Vùng bấm 44, chấm Figma 20; đang chọn là chấm 16 + vòng 24. Vị trí tính trên ảnh nên không lật theo RTL */
+.shop-the-look__hotspot {
+  position: absolute;
+  inset-block-start: calc(var(--hotspot-y) * 1%);
+  inset-inline-start: calc(var(--hotspot-x) * 1%);
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  margin-block-start: -22px;
+  margin-inline-start: -22px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-background);
+  cursor: pointer;
+}
+
+.shop-the-look__hotspot:dir(rtl) {
+  inset-inline-start: calc(100% - var(--hotspot-x) * 1%);
+}
+
+.shop-the-look__hotspot::before {
+  grid-area: 1 / 1;
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+  border-radius: var(--radius-pill);
+  background-color: currentcolor;
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-foreground) 40%, transparent);
+  content: '';
+}
+
+.shop-the-look__hotspot[aria-pressed='true']::before {
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+  box-shadow: none;
+}
+
+.shop-the-look__hotspot[aria-pressed='true']::after {
+  grid-area: 1 / 1;
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+  border: 2px solid currentcolor;
+  border-radius: var(--radius-pill);
+  content: '';
+}
+
+/* Viền tối + quầng sáng: đọc được trên cả vùng sáng và tối của ảnh */
+.shop-the-look__hotspot:focus-visible {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: -2px;
+  box-shadow: inset 0 0 0 4px var(--color-background);
+}
+
+/* Hotspot chỉ có tác dụng khi có row cùng số */
+.shop-the-look:not(:has([data-look-row='1'])) [data-hotspot='1'],
+.shop-the-look:not(:has([data-look-row='2'])) [data-hotspot='2'],
+.shop-the-look:not(:has([data-look-row='3'])) [data-hotspot='3'],
+.shop-the-look:not(:has([data-look-row='4'])) [data-hotspot='4'] {
+  display: none;
+}
+
+.shop-the-look__form {
+  display: grid;
+  align-content: start;
+  gap: var(--space-5);
+  min-inline-size: 0;
+}
+
+/* Nền sand: chữ phụ phải là --color-muted, --color-muted-light chỉ 4.30:1 */
+.shop-the-look__note {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border-radius: calc(var(--radius-card) - var(--space-1));
+  background-color: var(--color-background-sand);
+  color: var(--color-background-sand-foreground);
+}
+
+.shop-the-look__note-icon {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  inline-size: calc(var(--space-1) * 13);
+  block-size: calc(var(--space-1) * 13);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background);
+}
+
+.shop-the-look__note-icon .image {
+  inline-size: var(--space-6);
+  block-size: var(--space-6);
+}
+
+.shop-the-look__note-text {
+  min-inline-size: 0;
+}
+
+.shop-the-look__note-title {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: calc(28 / 18);
+}
+
+.shop-the-look__note-body {
+  margin: 0;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: calc(22 / 14);
+}
+
+.shop-the-look__rows {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shop-the-look-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-inline-size: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: calc(var(--radius-card) - var(--space-1));
+}
+
+/* Đang chọn: viền 2px accent; 1px thêm bằng bóng trong để hàng không đổi cỡ */
+.shop-the-look-row[data-look-active] {
+  border-color: var(--color-accent);
+  box-shadow: inset 0 0 0 1px var(--color-accent);
+}
+
+/* Không ảnh thì không có hotspot, viền chọn không còn nghĩa */
+.shop-the-look__body:not(:has(> .shop-the-look__media)) .shop-the-look-row[data-look-active] {
+  border-color: var(--color-border);
+  box-shadow: none;
+}
+
+.shop-the-look-row--placeholder {
+  border-style: dashed;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.shop-the-look-row__thumb {
+  flex-shrink: 0;
+  overflow: hidden;
+  inline-size: calc(var(--space-1) * 16);
+  block-size: calc(var(--space-1) * 16);
+  border-radius: calc(var(--radius-card) - var(--space-1));
+  background-color: var(--color-background-cream);
+}
+
+.shop-the-look-row[data-sold-out] .shop-the-look-row__thumb {
+  opacity: 0.6;
+}
+
+.shop-the-look-row__info {
+  display: grid;
+  gap: var(--space-1);
+  min-inline-size: 0;
+}
+
+/* Vùng bấm 26 + 2 × 9 = 44 (AC-H35); margin âm giữ nguyên chiều cao hàng */
+.shop-the-look-row__title {
+  justify-self: start;
+  margin-block: calc(var(--space-1) * -2.25);
+  padding-block: calc(var(--space-1) * 2.25);
+  color: inherit;
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+  text-decoration: none;
+}
+
+.shop-the-look-row__title:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.shop-the-look-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-1) var(--space-2);
+}
+
+.shop-the-look-row__badge {
+  display: inline-flex;
+  align-items: center;
+  padding-inline: var(--space-2);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.5;
+}
+
+/* Panel tối: chữ phụ --panel-muted 6.56:1, giảm giá --panel-saving 5.64:1 + icon + dấu − */
+.shop-the-look__panel {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  padding: var(--space-5);
+  border-radius: calc(var(--radius-card) + var(--space-1));
+  background-color: var(--color-background-panel);
+  color: var(--color-background-dark-foreground);
+}
+
+/* Hết hàng toàn bộ: không còn gì để thêm vào giỏ */
+.shop-the-look__form:not(:has([data-bundle-item])) .shop-the-look__panel {
+  display: none;
+}
+
+.shop-the-look:not([data-enhanced]) [data-bundle-live] {
+  visibility: hidden;
+}
+
+/* Không JS: không có số liệu, hotspot không làm gì, không row nào được coi là đang chọn */
+@media (scripting: none) {
+  .shop-the-look [data-bundle-live],
+  .shop-the-look__hotspot {
+    display: none;
+  }
+
+  .shop-the-look-row[data-look-active] {
+    border-color: var(--color-border);
+    box-shadow: none;
+  }
+}
+
+.shop-the-look__summary {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.shop-the-look__line {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-block-size: 1.625em;
+  color: var(--panel-muted);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.625;
+}
+
+.shop-the-look__line--discount {
+  color: var(--panel-saving);
+}
+
+.shop-the-look__discount-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.shop-the-look__discount-icon {
+  flex: none;
+  inline-size: var(--space-4);
+  block-size: var(--space-4);
+}
+
+.shop-the-look__discount:not(:empty)::before {
+  content: '\2212\00a0';
+}
+
+.shop-the-look__line--total {
+  padding-block-start: var(--space-2);
+  border-block-start: 1px solid color-mix(in srgb, var(--color-muted-on-dark) 40%, transparent);
+  color: inherit;
+}
+
+.shop-the-look__total {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  line-height: calc(28 / 18);
+}
+
+/* Cao, padding nút do .button (44, từ 80rem 52) ở base.css, như trước khi tách (ADR 0014) */
+.shop-the-look__submit {
+  inline-size: 100%;
+}
+
+.shop-the-look__submit .slideshow-icon {
+  flex-shrink: 0;
+  inline-size: calc(var(--space-1) * 5);
+  block-size: var(--space-4);
+}
+
+.shop-the-look__error:not(:empty) {
+  margin-block-start: var(--space-3);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.shop-the-look__placeholder {
+  margin-block: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .shop-the-look-row {
+    transition:
+      border-color var(--motion-fast) var(--ease-out),
+      box-shadow var(--motion-fast) var(--ease-out);
+  }
+}
+
+@media (forced-colors: active) {
+  .shop-the-look__hotspot::before {
+    background-color: ButtonText;
+  }
+
+  .shop-the-look__hotspot[aria-pressed='true']::after {
+    border-color: ButtonText;
+  }
+
+  .shop-the-look-row[data-look-active] {
+    border-color: Highlight;
+  }
+}
+
+@media (min-width: 48rem) {
+  .shop-the-look__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4) var(--space-6);
+  }
+
+  .shop-the-look__link {
+    text-decoration: none;
+  }
+
+  .shop-the-look__link:hover {
+    text-decoration: underline;
+  }
+
+  /* index-mobile-a §7 (768): trái Fits + hàng, phải panel 280 dính dưới header, không ra ngoài khối */
+  .shop-the-look__form {
+    grid-template-columns: minmax(0, 1fr) calc(var(--space-1) * 70);
+    align-items: start;
+    gap: var(--space-4);
+  }
+
+  .shop-the-look__form > * {
+    grid-column: 1;
+  }
+
+  .shop-the-look__form > .shop-the-look__panel {
+    position: sticky;
+    inset-block-start: calc(var(--sticky-top) + var(--space-4));
+    grid-row: 1 / span 2;
+    grid-column: 2;
+  }
+}
+
+@media (min-width: 64rem) {
+  .shop-the-look {
+    gap: calc(var(--space-1) * 10);
+    padding-block: var(--space-8);
+  }
+
+  /* R1 index-1280: giữ span 8 + 4 của lưới 12, gutter 24 */
+  .shop-the-look__body:has(> .shop-the-look__media) {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .shop-the-look__media {
+    grid-column: span 8;
+    align-self: stretch;
+    justify-self: stretch;
+  }
+
+  .shop-the-look__media + .shop-the-look__form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    grid-column: span 4;
+    gap: clamp(var(--space-4), 1.25vw, var(--space-5));
+  }
+
+  .shop-the-look__media + .shop-the-look__form > .shop-the-look__panel {
+    position: static;
+    margin-block-start: auto;
+  }
+
+  .shop-the-look__note {
+    min-block-size: clamp(calc(var(--space-1) * 21), 5.2vw, calc(var(--space-1) * 25));
+  }
+
+  .shop-the-look__rows {
+    gap: clamp(var(--space-2), 0.625vw, var(--space-3));
+  }
+
+  /* Figma 1:560: hàng 93 → cột phải 100 + 24 + 408 + 24 + 260 = 816 */
+  .shop-the-look-row {
+    min-block-size: clamp(calc(var(--space-1) * 20), 4.9vw, calc(var(--space-1) * 23.25));
+  }
+
+  .shop-the-look-row__thumb {
+    inline-size: clamp(calc(var(--space-1) * 14), 3.333vw, calc(var(--space-1) * 16));
+    block-size: clamp(calc(var(--space-1) * 14), 3.333vw, calc(var(--space-1) * 16));
+  }
+
+  .shop-the-look__panel {
+    gap: var(--space-5);
+    padding: clamp(var(--space-5), 3.125vw - var(--space-1) * 5, calc(var(--space-1) * 10));
+  }
+
+  .shop-the-look__line {
+    font-size: var(--font-size-base);
+  }
+}
+
+@media (min-width: 80rem) {
+  .shop-the-look__heading {
+    font-size: var(--font-size-h1);
+  }
+}
+
+/* ==== Trang chủ theo Figma 1:359, khung 1920 (CTO 07/11). Số đo lấy từ snapshot, không làm tròn. ==== */
+@media (min-width: 80rem) {
+  .shop-the-look__link { line-height: 28px; align-self: flex-end; min-height: 0; padding: 0; position: relative; inset-block-start: 1px; inset-inline-start: -1px; }
+
+  /* Shop the look */
+  .shop-the-look__eyebrow { color: var(--color-accent); }
+  .shop-the-look__media { width: 100%; aspect-ratio: 936 / 816; border-radius: var(--figma-radius-16); overflow: hidden; }
+  .shop-the-look__image, .shop-the-look__image img { width: 100%; height: 100%; object-fit: cover; }
+  /* Không ảnh: giữ form 1 cột như trước (docblock: list takes the full width) */
+  .shop-the-look__body:not(:has(> .shop-the-look__media)) .shop-the-look__form { display: flex; flex-direction: column; gap: var(--space-5); }
+  .shop-the-look__note { gap: 12px; border-radius: var(--figma-radius-8); background: var(--figma-ebe6e0); align-items: center; }
+  .shop-the-look__note-icon { width: 52px; height: 52px; flex: none; background: none; }
+  .shop-the-look__panel { margin-block-start: auto; border-radius: var(--figma-radius-16); background: var(--figma-393942); color: var(--figma-ffffff); }
+  .shop-the-look__line { letter-spacing: 0; }
+  .shop-the-look__line:first-child { font-size: 14px; line-height: 22px; font-weight: 500; }
+  .shop-the-look__line:first-child > :last-child { font-size: 16px; line-height: 26px; }
+  .shop-the-look__line[data-bundle-discount-row] { font-size: 14px; line-height: 22px; font-weight: 500; }
+  .shop-the-look__discount { font-size: 16px; line-height: 26px; font-weight: 500; }
+  .shop-the-look__total { font-size: 18px; line-height: 28px; font-weight: 700; letter-spacing: -0.18px; }
+  .shop-the-look__submit { width: 100%; background: var(--color-accent); color: var(--figma-ffffff); }
+
+  /* Tinh chỉnh ±px theo so pixel với frame Figma */
+  .shop-the-look__eyebrow { position: relative; inset-block-start: 1px; }
+  .shop-the-look__note-title { position: relative; inset-block-start: 1px; }
+  .shop-the-look__line--total { padding-block-start: 7px; }
+  .shop-the-look__line--total > :first-child { letter-spacing: -0.16px; }
+}
+
+/* ==== Trải nghiệm mượt. Không đổi bố cục tĩnh. ==== */
+.shop-the-look__submit:disabled:not([aria-busy='true']) { opacity: 0.55; cursor: not-allowed; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .shop-the-look-row { transition: box-shadow var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), background-color var(--motion-base) var(--ease-out), translate var(--motion-base) var(--ease-out); }
+  .shop-the-look__hotspot { transition: scale var(--motion-fast) var(--ease-out); }
+  html[data-motion] .shop-the-look__hotspot:hover { scale: 1.2; }
+
+  /* Ảnh lớn: phóng nhẹ khi rê chuột */
+  .shop-the-look__media { overflow: hidden; }
+  .shop-the-look__image img { transition: scale var(--motion-slow) var(--ease-out); }
+  html[data-motion] .shop-the-look__media:hover img { scale: 1.05; }
+}
+

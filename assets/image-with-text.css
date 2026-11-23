@@ -1,0 +1,475 @@
+/* CSS tầng 4 (ADR 0014): nạp bằng stylesheet_tag trong blocks/image-with-text.liquid, sau base.css. Trang chủ có
+   2 instance: 2 thẻ link, 1 lần tải. Trần 8 192 B gzip. */
+
+/** Image with text (TE-7, Figma 1:992 split, 1:625 banner). Từ 80rem kích thước theo khung 1920 (vw), trần là số Figma */
+.image-with-text {
+  --image-with-text-inset: min(calc(var(--space-1) * 20), 4.17vw);
+
+  position: relative;
+  min-inline-size: 0;
+}
+
+.image-with-text--placeholder {
+  padding: var(--space-7) var(--space-4);
+  outline: 1px dashed currentcolor;
+  outline-offset: -1px;
+  font-size: var(--font-size-sm);
+}
+
+/* Accent: nền sáng. Sand, dark không đạt AA với chữ 16px */
+.image-with-text__eyebrow {
+  color: var(--color-accent);
+  font-family: var(--font-heading--family);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.block-container--sand .image-with-text__eyebrow {
+  color: var(--color-muted);
+}
+
+.block-container--dark .image-with-text__eyebrow {
+  color: var(--color-muted-on-dark);
+}
+
+.image-with-text__heading {
+  font-size: var(--font-size-display);
+  font-weight: var(--font-heading--weight-display);
+  letter-spacing: -0.04em;
+  line-height: 1;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.image-with-text__body {
+  color: var(--color-muted);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: calc(26 / 16);
+}
+
+.block-container--dark .image-with-text__body {
+  color: var(--color-muted-on-dark);
+}
+
+.image-with-text__body > * + * {
+  margin-block-start: var(--space-3);
+}
+
+.image-with-text__content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-inline-size: 0;
+}
+
+.image-with-text__content > * + * {
+  margin-block-start: var(--space-5);
+}
+
+.image-with-text__content > .image-with-text__button {
+  margin-block-start: calc(var(--space-1) * 10);
+}
+
+/* Nền sáng: viền focus accent của .button:focus-visible ở base.css. Dải tối: viền trắng */
+.block-container--dark .image-with-text__button:focus-visible {
+  outline-color: var(--color-background-dark-foreground);
+}
+
+.image.image-with-text__accent {
+  overflow: hidden;
+  aspect-ratio: 1;
+  border-radius: var(--radius-card);
+}
+
+.image.image-with-text__accent > img {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* Layout split, Figma 1:992. ::before giữ tỉ lệ 920 / 876 nên band không nhảy khi ảnh tải; band cao hơn thì ảnh cao theo */
+.image-with-text--split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.image-with-text__media {
+  position: relative;
+  min-inline-size: 0;
+  overflow: hidden;
+}
+
+.image-with-text__media::before {
+  content: "";
+  display: block;
+  aspect-ratio: 1;
+}
+
+.image.image-with-text__media > img {
+  position: absolute;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+
+/* Gradient 55% → nền tối (61.3% từ 64rem) */
+.image.image-with-text__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to bottom, transparent 55%, var(--color-background-dark));
+}
+
+.image-with-text__media--empty {
+  background-color: var(--color-background-dark);
+  color: var(--color-muted-on-dark);
+}
+
+.image-with-text__media-hint {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: var(--space-4);
+  outline: 1px dashed currentcolor;
+  outline-offset: -1px;
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.image-with-text__panel {
+  position: relative;
+  min-inline-size: 0;
+}
+
+.image-with-text--split .image-with-text__content {
+  padding-block: var(--space-2) var(--space-7);
+  padding-inline: var(--page-margin);
+}
+
+.image-with-text--split .image-with-text__accents {
+  display: none;
+}
+
+/* 768: chữ chừa 200 cho ảnh nhỏ 168 (đè đáy ảnh 40) và 100 */
+@media (min-width: 48rem) {
+  .image-with-text--split .image-with-text__media::before {
+    aspect-ratio: 4 / 3;
+  }
+
+  .image-with-text--split .image-with-text__content {
+    padding-block-start: var(--space-4);
+    padding-inline-end: calc(var(--page-margin) + var(--space-1) * 50);
+  }
+
+  .image-with-text--split .image-with-text__accents {
+    display: contents;
+  }
+
+  .image-with-text--split .image.image-with-text__accent {
+    position: absolute;
+  }
+
+  .image-with-text--split .image.image-with-text__accent--1 {
+    inset-block-start: calc(var(--space-1) * -10);
+    inset-inline-end: var(--page-margin);
+    inline-size: calc(var(--space-1) * 42);
+  }
+
+  .image-with-text--split .image.image-with-text__accent--2 {
+    inset-block-end: var(--space-7);
+    inset-inline-end: calc(var(--page-margin) + var(--space-6));
+    inline-size: calc(var(--space-1) * 25);
+  }
+}
+
+/* Layout banner, Figma 1:625 */
+.image-with-text--banner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-6);
+  padding-block: var(--space-7);
+  padding-inline: var(--page-margin);
+  text-align: center;
+}
+
+.image-with-text--banner .image-with-text__content {
+  align-items: center;
+}
+
+.image-with-text--banner .image-with-text__heading {
+  max-inline-size: 8.8em;
+}
+
+/* Dòng 2 của Figma dài 8.5em, rộng hơn màn nhỏ: bỏ xuống dòng cố định, để text-wrap chia */
+.image-with-text--banner .image-with-text__heading br {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .image-with-text--banner .image-with-text__heading br {
+    display: inline;
+  }
+}
+
+/* CR-7, Figma 1:629: chữ trong strong giữ màu band, phần còn lại muted. Heading merchant không có strong nên giữ màu band */
+.block-container--sand .image-with-text--banner .image-with-text__heading:has(strong) {
+  color: var(--color-muted);
+}
+
+.block-container--sand .image-with-text--banner .image-with-text__heading strong {
+  color: var(--color-background-sand-foreground);
+  font-weight: inherit;
+}
+
+/* Figma 1:630: 18 / 28, bold; 360 16, ≤ 34ch; 768 ≤ 30ch */
+.image-with-text--banner .image-with-text__body {
+  max-inline-size: 34ch;
+  font-weight: 700;
+  line-height: calc(28 / 18);
+}
+
+.image-with-text--banner .image-with-text__content > .image-with-text__button {
+  margin-block-start: calc(var(--space-1) * 9);
+}
+
+/* index-mobile-a §8: accent 3 = ảnh phải (1:635), accent 2 = dưới trái (1:634), ẩn ở 360 */
+.image-with-text--banner .image-with-text__accents {
+  display: flex;
+  align-items: flex-start;
+}
+
+.image-with-text--banner .image.image-with-text__accent {
+  flex: none;
+  inline-size: calc(var(--space-1) * 28);
+}
+
+.image-with-text--banner .image.image-with-text__accent--3 {
+  order: 1;
+  inline-size: calc(var(--space-1) * 22);
+  margin-block-start: calc(var(--space-1) * 10);
+  margin-inline-start: auto;
+}
+
+.image-with-text--banner .image.image-with-text__accent--2 {
+  display: none;
+}
+
+/* 768: 160 | 128 lệch 64, accent 2 104 đáy trái ngang nút, cách đáy 64 */
+@media (min-width: 48rem) {
+  .image-with-text--banner {
+    gap: var(--space-5);
+    padding-block: calc(var(--space-1) * 16);
+  }
+
+  .image-with-text--banner .image-with-text__body {
+    max-inline-size: 30ch;
+    font-size: var(--font-size-lg);
+  }
+
+  .image-with-text--banner .image.image-with-text__accent--1 {
+    inline-size: calc(var(--space-1) * 40);
+  }
+
+  .image-with-text--banner .image.image-with-text__accent--3 {
+    inline-size: calc(var(--space-1) * 32);
+    margin-block-start: calc(var(--space-1) * 16);
+  }
+
+  .image-with-text--banner .image.image-with-text__accent--2 {
+    position: absolute;
+    display: block;
+    inset-block-end: calc(var(--space-1) * 16);
+    inset-inline-start: var(--page-margin);
+    inline-size: calc(var(--space-1) * 26);
+  }
+}
+
+@media (min-width: 64rem) {
+  /* Figma 920 / 1000 của 1920; ảnh phải đổi bên bằng order */
+  .image-with-text--split {
+    grid-template-columns: minmax(0, 920fr) minmax(0, 1000fr);
+  }
+
+  .image-with-text--image-right {
+    grid-template-columns: minmax(0, 1000fr) minmax(0, 920fr);
+  }
+
+  .image-with-text--image-right .image-with-text__media {
+    order: 2;
+  }
+
+  .image-with-text__panel {
+    display: grid;
+    align-items: center;
+  }
+
+  .image-with-text__panel:only-child {
+    grid-column: 1 / -1;
+  }
+
+  .image-with-text--split .image-with-text__media::before {
+    aspect-ratio: 920 / 876;
+  }
+
+  .image.image-with-text__media::after {
+    background-image: linear-gradient(to bottom, transparent 61.3%, var(--color-background-dark));
+  }
+
+  .image-with-text--split .image-with-text__accents {
+    display: none;
+  }
+
+  .image-with-text--split .image-with-text__content {
+    padding-block: var(--space-7);
+    padding-inline: var(--image-with-text-inset);
+  }
+
+  .image-with-text--split .image-with-text__heading {
+    font-size: min(var(--font-size-display), 5.208vw);
+  }
+
+  .image-with-text--banner {
+    padding-block: var(--space-8);
+  }
+}
+
+@media (min-width: 80rem) {
+  .image-with-text--split .image-with-text__accents,
+  .image-with-text--banner .image-with-text__accents {
+    display: contents;
+  }
+
+  /* Cột ảnh = lề + (nội dung − 80) / 2, chữ cách ảnh 80 */
+  .image-with-text--split {
+    --image-with-text-side: max(var(--page-margin), (100% - var(--page-width)) / 2 + var(--page-margin));
+
+    --image-with-text-media: minmax(0, calc(var(--image-with-text-side) + (100% - 2 * var(--image-with-text-side) - var(--space-1) * 20) / 2));
+
+    grid-template-columns: var(--image-with-text-media) minmax(0, 1fr);
+  }
+
+  .image-with-text--image-right {
+    grid-template-columns: minmax(0, 1fr) var(--image-with-text-media);
+  }
+
+  .image-with-text--split .image-with-text__heading {
+    font-size: min(var(--font-size-display), 6.25vw);
+  }
+
+  /* Hộp chữ dừng trước ảnh nhỏ 1 */
+  .image-with-text--split .image-with-text__content {
+    max-inline-size: calc(100% - var(--image-with-text-inset) - min(201px, 10.47vw));
+    padding-inline: calc(var(--space-1) * 20) 0;
+  }
+
+  .image-with-text--image-right .image-with-text__content {
+    padding-inline: var(--image-with-text-inset) 0;
+  }
+
+  .image.image-with-text__accent {
+    position: absolute;
+  }
+
+  /* Figma 1:1011, 1:1012: cách mép band 78 */
+  .image-with-text--split .image.image-with-text__accent {
+    inset-inline-end: var(--image-with-text-inset);
+  }
+
+  .image-with-text--split .image.image-with-text__accent--1 {
+    inline-size: min(201px, 10.47vw);
+    inset-block-start: min(calc(var(--space-1) * 19.5), 4.06vw);
+  }
+
+  .image-with-text--split .image.image-with-text__accent--2 {
+    inline-size: min(120px, 6.25vw);
+    inset-block-end: min(calc(var(--space-1) * 19.5), 4.06vw);
+  }
+
+  /* index-1280 §2.5: cao 50vw (640 ở 1280, 960 ở 1920), display min(100, 6.25vw) = 80 ở 1280 (R2) */
+  .image-with-text--banner {
+    align-content: center;
+    min-block-size: 50vw;
+  }
+
+  .image-with-text--banner .image-with-text__content {
+    justify-self: center;
+    inline-size: min(1024px, 53.33vw);
+  }
+
+  .image-with-text--banner .image-with-text__heading {
+    font-size: min(var(--font-size-display), 6.25vw);
+  }
+
+  .image-with-text--banner .image-with-text__body {
+    max-inline-size: none;
+  }
+
+  .image-with-text--banner .image-with-text__content > .image-with-text__body {
+    margin-block-start: calc(var(--space-1) * 10);
+  }
+
+  .image-with-text--banner .image-with-text__content > .image-with-text__button {
+    margin-block-start: calc(var(--space-1) * 20);
+  }
+
+  /* Figma 1:633, 1:634, 1:635: tính từ band 960, 2 ảnh trái cách trên và dưới 117.5, ảnh phải cách trên 383.5 */
+  .image-with-text--banner .image.image-with-text__accent--1 {
+    inline-size: min(280px, 14.58vw);
+    inset-block-start: 12.24%;
+    inset-inline-start: var(--image-with-text-inset);
+  }
+
+  .image-with-text--banner .image.image-with-text__accent--2 {
+    inline-size: min(187px, 9.74vw);
+    inset-block-end: 12.24%;
+    inset-inline-start: var(--image-with-text-inset);
+  }
+
+  .image-with-text--banner .image.image-with-text__accent--3 {
+    inline-size: min(200px, 10.42vw);
+    margin: 0;
+    inset-block-start: 39.95%;
+    inset-inline-end: var(--image-with-text-inset);
+  }
+}
+
+/* ==== Trang chủ theo Figma 1:359, khung 1920 (CTO 07/11). Số đo lấy từ snapshot, không làm tròn. ==== */
+@media (min-width: 80rem) {
+  .image-with-text--banner .image-with-text__content { margin-block-start: 34px; }
+  .block-container--dark .image-with-text__content { margin-block-start: 8px; }
+
+  /* Why */
+  .block-container--dark:has(> .image-with-text) { background: var(--figma-1c1c1c); }
+  [data-image-with-text-id$='why-choose'] .image-with-text__body { color: var(--figma-b2b2b2); width: calc(100% + 8px); max-width: 668px; }
+
+  /* Tinh chỉnh ±px theo so pixel với frame Figma */
+  .image-with-text__eyebrow { position: relative; inset-block-start: 1px; }
+  .image-with-text--banner .image-with-text__heading { position: relative; inset-inline-start: -2px; }
+  .image-with-text--banner .image-with-text__body { position: relative; inset-block-start: 1px; }
+  .image-with-text--banner .image-with-text__accent:nth-of-type(n + 2) { translate: 0 -1px; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Ảnh lớn: phóng nhẹ khi rê chuột */
+  .image-with-text__accent, .image-with-text__media { overflow: hidden; }
+  .image-with-text__accent img, .image-with-text__media img { transition: scale var(--motion-slow) var(--ease-out); }
+  html[data-motion] .image-with-text__accent:hover img, html[data-motion] .image-with-text__media:hover img { scale: 1.05; }
+}
+
+/* 4. Eyebrow cam như Figma (CTO 09/11, thay E3). Nền sand dùng cam đậm hơn 10% để chữ nhỏ đạt AA. */
+.image-with-text__eyebrow { color: var(--color-accent); }
+.block-container--sand .image-with-text__eyebrow { color: var(--color-accent-on-sand); }
+
+/* ==== Chuyển động v2 ==== */
+@media (prefers-reduced-motion: no-preference) {
+  /* 6. Make fitness: chữ đậm dần theo cuộn (motion.js đặt --w cho từng chữ) */
+  html[data-motion] .image-with-text__heading[data-scrub] .motion-word { color: color-mix(in srgb, var(--figma-1a1a1a) calc(var(--w, 0) * 100%), var(--figma-b2b2b2)); transition: color 120ms linear; }
+  html[data-motion] .image-with-text__heading[data-scrub] strong { color: inherit; }
+}
+

@@ -380,7 +380,8 @@ test.describe('ES1-T365 nojs', () => {
     await expect(first).toHaveAttribute('aria-label', /^Remove filter .+: .+/);
     await expect(page.getByTestId('collection-chips-clear')).toHaveAttribute('href', /\/collections\//);
     await first.click();
-    expect(new URL(page.url()).searchParams.has(name!)).toBe(false);
+    // ES1-T526: chip refresh partial (TE-6 lọc không tải lại), URL đổi qua replaceState sau fetch → chờ.
+    await expect.poll(() => new URL(page.url()).searchParams.has(name!)).toBe(false);
     await expect(page.getByTestId('collection-active-filters')).toHaveCount(0);
   });
 });
