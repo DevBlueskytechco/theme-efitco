@@ -27,13 +27,13 @@ Mockup: thêm khối "Trạng thái: phân trang bình luận" trong `drafts/des
 | 5 | Footer | bản vòng 2 | markup kit vòng 3 (4 social, panel dải rộng, wordmark giữa hàng cuối) | Figma 1:1104, F§4 |
 | 6 | Câu CTO | 1: chữ không đè ảnh; 2: dải tối 85%; 3: "Post Comment" | câu 2 cũ bỏ (header không còn đè ảnh), thay bằng meta card chữ trắng; câu 1 viết lại thành lệch có chủ đích so với F§3.3 | §10 |
 
-Giữ nguyên: cột đọc 46rem, RTE, bình luận, form, bài liên quan, mọi trạng thái.
+Giữ nguyên: cột đọc (ES1-T527 V53: 720 = kit `.reading-column`, thay 46rem), RTE, bình luận, form, bài liên quan, mọi trạng thái.
 
 ## 1. Anatomy
 
 1. Header tối dùng chung (F§3, sổ 10/11), không đè ảnh, mọi trường hợp (có hay không ảnh bìa).
 2. Ảnh bìa (`article.image`, LCP): thẻ bo 16 nằm dưới header trong container, không có chữ hay lớp tối đè (§10 câu 1).
-3. Cột đọc (`46rem`, căn giữa container), gồm:
+3. Cột đọc (`.reading-column` 45rem = 720, căn giữa container; ES1-T527 V53), gồm:
    - Breadcrumb (F§5): `Home / {blog.title} / {article.title}`; mục cuối cắt "…" 22ch / 48ch.
    - Tag pill (tag đầu, link tới trang tag, vùng chạm 44 bằng `::after`).
    - h1 `{article.title}`.
@@ -78,17 +78,17 @@ Giữ nguyên: cột đọc 46rem, RTE, bình luận, form, bài liên quan, m�
 | --- | --- | --- | --- | --- |
 | Header | tối 80, menu drawer | như 360 | tối 80, menu ngang 7 mục | như 1280, logo x 252 |
 | Ảnh bìa | 320 × 240 (4/3), bo 16, cách header 16 | 728 × 410 (16/9), bo 16, cách 16 | 1240 × 570 (1798/827 như hero 1:361), cách 24 | 1416 × 651 |
-| Cột đọc | 320 | 728 | 736 giữa | 736 giữa |
+| Cột đọc | 320 | 720 | 720 giữa | 720 giữa |
 | Breadcrumb | cách ảnh 20 (8 + 12), 14/20 | như 360 | cách ảnh 28 (16 + 12) | như 1280 |
 | h1 | 33 | 43 | 48/58 | 48/58 |
 | Đầu bài → nội dung | 32 | 32 | 48 | 48 |
-| Chữ nội dung | 16 / 1.7 | 16 / 1.7 | 18 / 1.7 | 18 / 1.7 |
+| Chữ nội dung | 16 / 1.7 | 16 / 1.7 | 16 / 1.7 | 16 / 1.7 (ES1-T527 V53: `.rte` chung foundation §28, bỏ 18) |
 | Cuối bài → bình luận | 48 + 48 | 48 + 48 | 48 + 48 | 48 + 48 |
 | Form | 1 cột, nút full width | Name, Email 2 cột | 2 cột | 2 cột |
 | Bài liên quan | card 252 × 336, lộ card kế, vuốt, không nút | card 307 × 410, có chevron 52 + tiến trình | 3 card 336 vừa khung: ẩn nút + tiến trình | như 1280 |
 | Cách trên/dưới bài liên quan | 48 | 48 | 120 | 120 |
 
-Cột đọc 46rem ≈ 65 ký tự ở chữ 18 (F§1 `max-inline-size: 65ch`, 06 §3 dòng 50–75 ký tự). Mọi phần trong cột (đầu bài, nội dung, cuối bài, bình luận) cùng mép trái; bài liên quan và footer về lại container đầy đủ.
+Cột đọc 720 (`.reading-column`), đoạn tối đa 65ch ở chữ 16 (`.rte p`) (F§1 `max-inline-size: 65ch`, 06 §3 dòng 50–75 ký tự). Mọi phần trong cột (đầu bài, nội dung, cuối bài, bình luận) cùng mép trái; bài liên quan và footer về lại container đầy đủ.
 Ảnh bìa dùng focal point của ảnh (snippet `image`); 3 tỉ lệ là cắt khác nhau của cùng 1 ảnh, không cần ảnh mobile riêng. Ảnh bìa rộng bằng container (không dải 1798 như hero) để thẳng mép với cột nội dung, breadcrumb và mọi banner trang con (F§3.3).
 
 ## 4. Nội dung bài (RTE)

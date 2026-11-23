@@ -7,46 +7,20 @@
 <meta name="description" content="Efitco collections list mockup: collection cards with image, title and product count, pagination and empty state.">
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
-  /* Chỉ cho mockup list-collections (spec docs/ui-spec/list-collections.md) */
+  /* Chỉ bố cục cho mockup list-collections (spec docs/ui-spec/list-collections.md).
+     ES1-T527: card = .collection-card của kit (V14), phân trang = .pagination* của kit (V57). Trang KHÔNG định nghĩa lại selector kit. */
   .site-header.demo-static { position: relative; }
-  .page-title { padding-block-end: var(--space-6); }
-  @media (min-width: 64rem) { .page-title { padding-block-end: var(--space-7); } }
-  .lc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
+  .page-title { padding-block-end: var(--space-2xl); }
+  @media (min-width: 64rem) { .page-title { padding-block-end: var(--space-3xl); } }
+  .lc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2xl) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
   @media (min-width: 48rem) { .lc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (min-width: 80rem) { .lc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: calc(var(--space-1) * 10); } }
-  .lc-card { position: relative; display: grid; gap: var(--space-3); }
-  @media (min-width: 80rem) { .lc-card { gap: var(--space-4); } }
-  .lc-card__media { display: block; aspect-ratio: 336 / 220; overflow: hidden; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-panel); }
-  .lc-card__media img { width: 100%; height: 100%; object-fit: cover; transition: scale var(--motion-slow) var(--ease-out); }
-  .lc-card__media--empty { display: grid; place-items: center; background: var(--color-background-cream); color: var(--color-muted-light); }
-  .lc-card__media--empty svg { width: 30%; height: auto; }
-  .lc-card__title { margin: 0; font-size: var(--font-size-lg); line-height: calc(34 / 28); }
-  @media (min-width: 48rem) { .lc-card__title { font-size: var(--font-size-h3); } }
-  .lc-card__title a { text-decoration: none; }
-  .lc-card__title a::after { content: ''; position: absolute; inset: 0; border-radius: calc(var(--radius-card) + var(--space-1)); }
-  .lc-card__title a:focus-visible { outline: none; }
-  .lc-card__title a:focus-visible::after, .lc-card.is-focus .lc-card__title a::after { outline: 2px solid var(--color-accent); outline-offset: 4px; }
-  .lc-card:hover .lc-card__media img, .lc-card.is-hover .lc-card__media img { scale: 1.04; }
-  .lc-card:hover .lc-card__title a, .lc-card.is-hover .lc-card__title a { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.12em; }
-  .lc-card__meta { margin: calc(var(--space-2) * -1) 0 0; color: var(--color-muted); font-size: var(--font-size-sm); }
-  @media (min-width: 80rem) { .lc-card__meta { margin-block-start: calc(var(--space-3) * -1); } }
+  @media (min-width: 80rem) { .lc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: var(--space-3xl); } }
+  /* 2 cột ở 360: tên h3 28 quá to cho card rộng ~160 → bậc h4 20/24 dưới 48rem (Figma M/H5) */
+  @media (max-width: 47.99rem) { .lc-grid .collection-card { gap: var(--space-sm); } .lc-grid .collection-card__title { font-size: var(--font-size-h4); } .lc-grid .collection-card__count { margin-block-start: calc(var(--space-xs) * -1); } }
+  /* Vòng focus card: cách chữ/mép --space-xs như .product-card (review vòng 2; kit .collection-card để 4px, đề xuất kit nâng lên --space-xs — notes.md) */
+  .lc-grid .collection-card:focus-visible, .lc-grid .collection-card.is-focus { outline-offset: var(--space-xs); }
   .section-end { padding-block-end: var(--section-gap); }
-  /* Phân trang: khối chung docs/ui-spec/pagination.md (ES1-T287) */
-  .pagination__list { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-  .pagination__step { text-decoration: none; }
-  .pagination__step[aria-disabled='true'] { cursor: default; }
-  .pagination__item--prev { margin-inline-end: var(--space-2); }
-  .pagination__item--next { margin-inline-start: var(--space-2); }
-  .pagination__page { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
-  a.pagination__page:hover, .pagination__page.is-hover { border-color: var(--color-foreground); }
-  .pagination__page:focus-visible, .pagination__page.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-  .pagination__page[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
-  .pagination__gap { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 44px; color: var(--color-muted); font-size: var(--font-size-sm); }
-  .pagination__status { font-size: var(--font-size-sm); font-weight: 500; white-space: nowrap; }
-  :dir(rtl) .pagination__step svg { scale: -1 1; }
-  @media (max-width: 47.99rem) { .pagination__num { display: none; } .pagination__list { justify-content: space-between; } .pagination__item--prev, .pagination__item--next { margin: 0; } }
-  @media (min-width: 48rem) { .pagination__status { display: none; } }
-  .state-box { padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
+  .state-box { padding: var(--space-xl); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
 </style>
 </head>
 <body>
@@ -111,27 +85,27 @@
 
   <!-- Thứ tự Shopify (A–Z). Ảnh: collection.featured_image. 5 card đầu trang chủ + 3 trình độ dùng ảnh efx-* minh hoạ (KHÔNG CHẮC); còn lại là ca không ảnh -->
   <ul class="lc-grid" role="list">
-    <li class="lc-card"><span class="lc-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-5.jpg" alt="" width="672" height="440"></span><h2 class="lc-card__title"><a href="#">Accessories</a></h2><p class="lc-card__meta">2 products</p></li>
-    <li class="lc-card"><span class="lc-card__media lc-card__media--empty"><svg aria-hidden="true"><use href="#i-image"/></svg></span><h2 class="lc-card__title"><a href="#">Accessories</a></h2><p class="lc-card__meta">4 products</p></li>
-    <li class="lc-card"><span class="lc-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-3.jpg" alt="" width="672" height="440"></span><h2 class="lc-card__title"><a href="#">Advanced</a></h2><p class="lc-card__meta">10 products</p></li>
-    <li class="lc-card"><span class="lc-card__media lc-card__media--empty"><svg aria-hidden="true"><use href="#i-image"/></svg></span><h2 class="lc-card__title"><a href="#">All</a></h2><p class="lc-card__meta">4 products</p></li>
-    <li class="lc-card is-hover"><span class="lc-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-1.jpg" alt="" width="672" height="440"></span><h2 class="lc-card__title"><a href="#">Beginner</a></h2><p class="lc-card__meta">24 products</p></li>
-    <li class="lc-card"><span class="lc-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-3.jpg" alt="" width="672" height="440"></span><h2 class="lc-card__title"><a href="#">Benches &amp; Racks</a></h2><p class="lc-card__meta">6 products</p></li>
-    <li class="lc-card is-focus"><span class="lc-card__media lc-card__media--empty"><svg aria-hidden="true"><use href="#i-image"/></svg></span><h2 class="lc-card__title"><a href="#">Bundle</a></h2><p class="lc-card__meta">6 products</p></li>
-    <li class="lc-card"><span class="lc-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-1.jpg" alt="" width="672" height="440"></span><h2 class="lc-card__title"><a href="#">Free Weights</a></h2><p class="lc-card__meta">7 products</p></li>
-    <li class="lc-card"><span class="lc-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-2.jpg" alt="" width="672" height="440"></span><h2 class="lc-card__title"><a href="#">Functional Training</a></h2><p class="lc-card__meta">5 products</p></li>
-    <li class="lc-card"><span class="lc-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-2.jpg" alt="" width="672" height="440"></span><h2 class="lc-card__title"><a href="#">Intermediate</a></h2><p class="lc-card__meta">12 products</p></li>
-    <li class="lc-card"><span class="lc-card__media lc-card__media--empty"><svg aria-hidden="true"><use href="#i-image"/></svg></span><h2 class="lc-card__title"><a href="#">Portable Fitness</a></h2><p class="lc-card__meta">4 products</p></li>
-    <li class="lc-card"><span class="lc-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="672" height="440"></span><h2 class="lc-card__title"><a href="#">Recovery &amp; Mobility</a></h2><p class="lc-card__meta">2 products</p></li>
-    <li class="lc-card"><span class="lc-card__media lc-card__media--empty"><svg aria-hidden="true"><use href="#i-image"/></svg></span><h2 class="lc-card__title"><a href="#">Setup</a></h2><p class="lc-card__meta">4 products</p></li>
-    <li class="lc-card"><span class="lc-card__media lc-card__media--empty"><svg aria-hidden="true"><use href="#i-image"/></svg></span><h2 class="lc-card__title"><a href="#">Weight</a></h2><p class="lc-card__meta">4 products</p></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-5.jpg" alt="" width="672" height="440"></span><h2 class="collection-card__title">Accessories</h2><span class="collection-card__count">2 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><h2 class="collection-card__title">Accessories</h2><span class="collection-card__count">4 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-3.jpg" alt="" width="672" height="440"></span><h2 class="collection-card__title">Advanced</h2><span class="collection-card__count">10 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><h2 class="collection-card__title">All</h2><span class="collection-card__count">4 products</span></a></li>
+    <li><a class="collection-card is-hover" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-1.jpg" alt="" width="672" height="440"></span><h2 class="collection-card__title">Beginner</h2><span class="collection-card__count">24 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-3.jpg" alt="" width="672" height="440"></span><h2 class="collection-card__title">Benches &amp; Racks</h2><span class="collection-card__count">6 products</span></a></li>
+    <li><a class="collection-card is-focus" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><h2 class="collection-card__title">Bundle</h2><span class="collection-card__count">6 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-1.jpg" alt="" width="672" height="440"></span><h2 class="collection-card__title">Free Weights</h2><span class="collection-card__count">7 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-2.jpg" alt="" width="672" height="440"></span><h2 class="collection-card__title">Functional Training</h2><span class="collection-card__count">5 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-2.jpg" alt="" width="672" height="440"></span><h2 class="collection-card__title">Intermediate</h2><span class="collection-card__count">12 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><h2 class="collection-card__title">Portable Fitness</h2><span class="collection-card__count">4 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="672" height="440"></span><h2 class="collection-card__title">Recovery &amp; Mobility</h2><span class="collection-card__count">2 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><h2 class="collection-card__title">Setup</h2><span class="collection-card__count">4 products</span></a></li>
+    <li><a class="collection-card" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><h2 class="collection-card__title">Weight</h2><span class="collection-card__count">4 products</span></a></li>
   </ul>
 </main>
 
 <!-- Footer (foundation §4 vòng 3, Figma 1:1104) -->
 <footer class="site-footer">
   <div class="container site-footer__band">
-    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
     <div class="site-footer__newsletter">
       <h2><span>Get 15% Off</span> Your First Order</h2>
       <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>

@@ -93,6 +93,10 @@
 
         Hợp đồng cho BE (assets/quick-view.js, nạp lười khi bấm; FE không đặt <script>):
         - <quick-view>: data-label-loading, data-label-error, data-label-view-product ([title]).
+        - CSS nội dung nạp lười (ES1-T373, ADR 0014 mục 5: giữ trang chủ ≤ 57 344 B): data-stylesheet là URL
+          assets/quick-view.css. Lần mở đầu BE thêm 1 <link rel="stylesheet"> vào <head> (không preload, không
+          lặp nếu đã có), chờ load (lỗi thì vẫn hiện) rồi mới bỏ hidden ở [data-quick-view-content]; trong lúc
+          chờ giữ skeleton. Vỏ + skeleton ở base.css nên đã có style trước khi file tải.
         - <modal-dialog data-layer="quick-view" data-sheet-below="48rem">: BE đặt data-return-focus /
           open(nút đã bấm). modal-dialog.js focus phần tử theo aria-labelledby của dialog.
         - 3 trạng thái trong [data-quick-view-body], đổi bằng thuộc tính hidden, đúng 1 cái hiện:
@@ -115,6 +119,7 @@
         data-label-loading="{{ quick_view_loading | escape_once }}"
         data-label-error="{{ quick_view_error | escape_once }}"
         data-label-view-product="{{ quick_view_product | escape_once }}"
+        data-stylesheet="{{ 'quick-view.css' | asset_url }}"
         data-testid="quick-view"
       >
         <modal-dialog data-layer="quick-view" data-sheet-below="48rem">
