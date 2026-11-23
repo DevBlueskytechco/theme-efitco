@@ -191,7 +191,8 @@ modal-dialog {
 }
 
 /* Nút tròn 52 prev/next, phân trang: trắng, viền border; rê chuột nền accent.
-   Icon: snippets/slideshow-icon previous/next. Đầu/cuối hàng: aria-disabled mờ 0.35 (pagination.md). */
+   Icon: snippets/slideshow-icon previous/next. Đầu/cuối hàng: aria-disabled không làm mờ — nền trắng,
+   viền border, icon muted-light (kit .round-button[aria-disabled], foundation §6); dải tối ở cuối file. */
 .round-button {
   display: inline-flex;
   flex: none;
@@ -225,7 +226,10 @@ modal-dialog {
 }
 
 .round-button:is(:disabled, [aria-disabled='true']) {
-  opacity: 0.35;
+  border-color: var(--color-border);
+  background: var(--color-background);
+  color: var(--color-muted-light);
+  scale: none;
   cursor: not-allowed;
 }
 
@@ -728,7 +732,7 @@ modal-dialog {
     scale: 1.06;
   }
 
-  :is(.round-button, .close-button):active {
+  :is(.round-button, .close-button):not(:disabled, [aria-disabled='true']):active {
     scale: 0.94;
   }
 
@@ -6789,12 +6793,14 @@ scroll-buttons.video-carousel__scroller { display: grid; grid-template-columns: 
 /* visibility giữ chỗ (CLS 0) và bỏ nút khỏi thứ tự Tab, cây a11y */
 scroll-buttons:not([data-enhanced]) .carousel-nav,
 scroll-buttons[data-static] .carousel-nav { visibility: hidden; }
-/* Đầu/cuối hàng: aria-disabled mờ 0.35 qua .round-button. hidden của scroll-buttons.js hiện tại
+/* Đầu/cuối hàng: aria-disabled theo .round-button (không làm mờ). hidden của scroll-buttons.js hiện tại
    vẫn ẩn nút nhưng giữ chỗ để nút kia không nhảy */
 .carousel-nav .round-button[hidden] { display: inline-flex; visibility: hidden; }
 /* Dải tối (danh mục): nút trắng viền trắng, focus trắng; tiến trình trắng 12% / thumb trắng */
 .block-container--dark .round-button { border-color: var(--color-background); }
 .block-container--dark .round-button:focus-visible { outline-color: var(--color-background-dark-foreground); }
+/* Disabled trên nền tối: đĩa trắng không phân biệt được với nút bật → nền trong suốt, viền + icon muted-on-dark (kit) */
+.block-container--dark .round-button:is(:disabled, [aria-disabled='true']) { border-color: var(--color-muted-on-dark); background: transparent; color: var(--color-muted-on-dark); }
 
 .collection-list__track, .testimonials__list, .blog-posts__list, .video-carousel__list {
   display: flex;
