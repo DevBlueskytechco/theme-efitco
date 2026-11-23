@@ -41,8 +41,11 @@ test.describe('ES1-T217 tĩnh', () => {
   });
 
   // ES1-T478 (ADR 0013): base.css + CSS theo template (product, collection, cart, aux)
+  // ES1-T566 (ADR 0014): + 7 file CSS theo block, để rule chuyển khỏi base.css vẫn được quét (CTO 21/11 ES1-T575: testimonials, video, faq, shop-by-level ở base.css)
   const SITE_CSS = () =>
-    ['base', 'product', 'collection', 'cart', 'aux']
+    ['base', 'product', 'collection', 'cart', 'aux',
+      'quiz', 'shop-the-look', 'bundle-builder', 'featured-product', 'image-with-text',
+      'multicolumn', 'hello-world']
       .map((f) => readFileSync(`assets/${f}.css`, 'utf8'))
       .join('\n')
       .replace(/\/\*[\s\S]*?\*\//g, '');

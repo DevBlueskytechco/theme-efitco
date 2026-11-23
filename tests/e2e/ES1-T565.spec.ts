@@ -2,11 +2,13 @@
 // - Mỗi file CSS có dòng stylesheet_tag trong blocks/*.liquid (trừ tầng 1–3): gzip ≤ 8 192 B (Node zlib.gzipSync mức mặc định).
 // - File tầng 4 có ≥ 1 block nạp; block cha trong bảng ADR 0014 mục 2 nạp đúng 1 lần, trước root (trước block.shopify_attributes), ngoài {% partial %}.
 // - Không `preload` trên dòng link; không stylesheet_tag trong snippets/.
-// - base.css ≤ 49 152 B (ES1-T566 hạ 40 960); base + file tầng 4 do block trong templates/index.liquid nạp ≤ 57 344 B (CTO 21/11 ES1-T569), ≤ 10 file.
-// - Không prelude trùng giữa base.css, file tầng 3, file tầng 4; base.css không còn selector của 5 block đã tách; .quiz-page__breadcrumb ở collection.css.
+// - base.css ≤ 49 152 B (ADR 0014 mục 5, CTO 21/11 ES1-T575); base + file tầng 4 do block trong templates/index.liquid nạp ≤ 57 344 B (CTO 21/11 ES1-T569, ES1-T575), ≤ 10 file.
+// - Không prelude trùng giữa base.css, file tầng 3, file tầng 4; base.css không còn selector của 7 block đã tách; .quiz-page__breadcrumb ở collection.css.
 // - Tầng 5 overlay nạp lười (ADR 0014 mục 8, CTO 23/11): quick-view.css (khi có), predictive-search.css gzip ≤ 8 192, có data-stylesheet,
 //   không stylesheet_tag nào nạp, không prelude trùng với base.css / tầng 3 / tầng 4.
-// ES1-T566 dùng lại spec này: thêm 6 file vào BLOCK_FILES/PARENTS, hạ BASE_MAX.
+// ES1-T566: thêm 2 file (multicolumn, hello-world) vào PARENTS; liquid-tips nạp hello-world.css; focus contact-form ở aux.css.
+//   CTO 21/11 ES1-T575: block nhỏ/luôn có ở trang chủ (testimonials, video-carousel, faq, shop-by-level) giữ ở base.css,
+//   bỏ mục tiêu hạ base 40 960; trần base 49 152, tổng trang chủ 57 344 (nén chung trong base.css rẻ hơn nén từng file).
 // Chạy: npx playwright test tests/e2e/ES1-T565.spec.ts --project=desktop
 import { test, expect } from './support/test';
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -15,9 +17,9 @@ import { gzipSync } from 'node:zlib';
 const read = (path: string) => readFileSync(path, 'utf8');
 const gz = (path: string) => gzipSync(readFileSync(path)).length;
 
-const BASE_MAX = 49152;
+const BASE_MAX = 49152; // ADR 0014 mục 5 (CTO 21/11 ES1-T575: bỏ mục tiêu hạ 40 960)
 const BLOCK_MAX = 8192;
-const INDEX_MAX = 57344; // CTO 21/11 (ES1-T569): chấp nhận overhead nén từng file block
+const INDEX_MAX = 57344; // CTO 21/11 (ES1-T569, ES1-T575): chấp nhận overhead nén từng file block
 const INDEX_FILES_MAX = 10;
 const NOT_TIER4 = ['critical', 'base', 'product', 'collection', 'cart', 'aux'];
 const PAGE_FILES = ['product', 'collection', 'cart', 'aux'];
@@ -28,12 +30,16 @@ const PARENTS: Record<string, string[]> = {
   'bundle-builder': ['bundle-builder'],
   'featured-product': ['featured-product'],
   'image-with-text': ['image-with-text'],
+  // ES1-T566 (CTO 21/11 ES1-T575: testimonials, video-carousel, faq, shop-by-level giữ base.css)
+  multicolumn: ['multicolumn'],
+  'hello-world': ['hello-world', 'liquid-tips'],
 };
 const BLOCK_FILES = Object.keys(PARENTS);
 // Block con: không nạp link (block cha đã nạp)
-const CHILDREN = ['quiz-step', 'shop-the-look-row'];
+const CHILDREN = ['quiz-step', 'shop-the-look-row', 'multicolumn-column'];
 // Class block đã tách: không được còn trong prelude nào của base.css
-const MOVED = /\.(quiz|bundle-builder|shop-the-look|featured-product|image-with-text)(?![\w-])|\.(quiz|bundle-builder|shop-the-look|featured-product|image-with-text)[-_]/;
+const MOVED_NAMES = 'quiz|bundle-builder|shop-the-look|featured-product|image-with-text|multicolumn|welcome|highlights|highlight';
+const MOVED = new RegExp(`\\.(${MOVED_NAMES})(?![\\w-])|\\.(${MOVED_NAMES})[-_]`);
 
 // ADR 0014 mục 8 (CTO 23/11): file overlay tầng 5, BE nạp lười từ data-stylesheet. quick-view.css kiểm khi đã có (PR #301 ES1-T373).
 const OVERLAY_REQUIRED = ['predictive-search'];
@@ -73,7 +79,7 @@ test.describe('ES1-T565 CSS theo block (tĩnh, ADR 0014)', () => {
     test.skip(info.project.name !== 'desktop', 'tĩnh, chạy 1 lần');
   });
 
-  test('mỗi file tầng 4 gzip ≤ 8 192 B; đủ 5 file của đợt này', () => {
+  test('mỗi file tầng 4 gzip ≤ 8 192 B; đủ 7 file ADR 0014 mục 2', () => {
     const sizes = Object.fromEntries([...loaders.keys()].map((f) => [`${f}.css`, gz(`assets/${f}.css`)]));
     console.log(`[ES1-T565] gzip tầng 4 ${JSON.stringify(sizes)}`);
     for (const f of BLOCK_FILES) expect(loaders.has(f), `${f}.css có block nạp`).toBe(true);
@@ -129,7 +135,8 @@ test.describe('ES1-T565 CSS theo block (tĩnh, ADR 0014)', () => {
     expect(files.length).toBeLessThanOrEqual(INDEX_FILES_MAX);
   });
 
-  // KHÔNG CHẮC: đo thật 55 350 B (base 36 925 + 5 file 18 425), develop 48 641; nén từng file mất ngữ cảnh chung ≈ +1,3 KB/file.
+  // ES1-T566 lần 1 đo 59 962 B (base 31 892 + 9 file 28 070), vượt 57 344 do nén từng file mất ngữ cảnh chung.
+  // CTO 21/11 ES1-T575: 4 block trang chủ về base.css, còn base 36 217 + 5 file 18 425 = 54 642.
   test('trang chủ: base + file tầng 4 ≤ 57 344', () => {
     expect(indexBudget().total).toBeLessThanOrEqual(INDEX_MAX);
   });
@@ -172,7 +179,22 @@ test.describe('ES1-T565 CSS theo block (tĩnh, ADR 0014)', () => {
     expect([...preludes(read('assets/base.css'))].filter((p) => content.test(p) && !viewAll.test(p))).toEqual([]);
   });
 
-  test('base.css không còn selector 5 block đã tách; breadcrumb quiz ở collection.css; quiz-fade theo quiz.css', () => {
+  test('ES1-T566: focus contact-form ở aux.css; highlight-flash theo hello-world.css; rule contact-aside thắng rule FAQ trang chủ', () => {
+    const base = read('assets/base.css');
+    const aux = read('assets/aux.css');
+    for (const sel of ['.contact-form__summary:focus-visible', '.contact-form__status:focus-visible']) {
+      expect(base, sel).not.toContain(sel);
+      expect(aux, sel).toContain(sel);
+    }
+    expect(base).toMatch(/\.form-status:focus-visible \{/);
+    expect(base).not.toContain('@keyframes highlight-flash');
+    expect(read('assets/hello-world.css')).toContain('@keyframes highlight-flash');
+    // FAQ ở base.css (CTO 21/11 ES1-T575); rule contact giữ (0,3,1) > .faq-item:first-child .faq-item__summary (0,3,0), không phụ thuộc thứ tự nạp
+    expect(aux).toMatch(/\.contact-aside details\.faq-item \.faq-item__summary \{\s*inset-block-start: 0;/);
+    expect(aux).toMatch(/\.contact-aside details\.faq-item \.faq-item__question \{\s*inset-block-start: 0;/);
+  });
+
+  test('base.css không còn selector 7 block đã tách; breadcrumb quiz ở collection.css; quiz-fade theo quiz.css', () => {
     const left = [...preludes(read('assets/base.css'))].filter((p) => MOVED.test(p));
     expect(left).toEqual([]);
     const base = read('assets/base.css');

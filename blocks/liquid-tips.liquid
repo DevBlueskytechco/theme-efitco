@@ -1,12 +1,17 @@
 {% doc %}
-  Renders a "Liquid tips" highlight card. One tip sentence lives in a
-  {% partial %} region so JavaScript can fetch a fresh tip without a full
-  page load, while the heading and refresh control stay intact. This is the
-  theme's canonical partial-refresh example.
+  Renders a "Liquid tips" highlight card. One tip sentence lives in the
+  'liquid-tip' partial region so JavaScript can fetch a fresh tip without a
+  full page load, while the heading and refresh control stay intact. This is
+  the theme's canonical partial-refresh example.
 
-  The {% partial %} region renders on the storefront only when
+  The partial region renders on the storefront only when
   `shop.features.agentic_editor_enabled?` is on and the page is served by
   StorefrontRenderer; otherwise the storefront raises `Unknown tag 'partial'`.
+
+  Styles: assets/hello-world.css (.highlight card and the highlight-flash
+  keyframe used by assets/liquid-tips.js), loaded by the stylesheet_tag line
+  before the root, outside the partial, without preload (ADR 0014). Inside
+  hello-world the same URL loads once.
 
   @param {string[]} [tips] - Translation keys for the tip sentences to choose
     from. One is shown at a time; refreshing the partial picks another.
@@ -20,6 +25,7 @@
   assign seed = 'now' | date: '%N'
 -%}
 
+{{ 'hello-world.css' | asset_url | stylesheet_tag }}
 <div class="highlight" {{ block.shopify_attributes }}>
   <h3>{{ 'hello_world.liquid_tips_title' | t }}</h3>
 

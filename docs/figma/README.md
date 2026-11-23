@@ -1,3 +1,7 @@
+> ĐÃ THAY 21/11/2026 (CTO, ES1-T567) — TÀI LIỆU LỊCH SỬ, KHÔNG CÒN HIỆU LỰC.
+> Nguồn chuẩn thiết kế hiện nay là mockup HTML `drafts/designer/**` cùng `drafts/designer/_kit/kit.css`; bản vẽ được dựng lại từ mockup theo tài liệu handoff trong `docs/design/`.
+> Thư mục này (snapshot, `img/`) giữ để tra lịch sử. Không dùng làm căn cứ thiết kế, không so ảnh hay so token theo thư mục này, agent không đọc node từ snapshot. Lưu trữ thư mục và gỡ MCP đọc snapshot: Cần DevOps / CTO.
+
 # Figma snapshot — nguồn Figma cho agent (không gọi API mỗi lần)
 
 Lý do: file Efitco T10 (Copy) nằm ở plan Starter. Figma REST giới hạn endpoint Tier 1 (GET file, GET nodes, GET image)
