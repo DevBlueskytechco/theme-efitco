@@ -3,8 +3,12 @@
   JavaScript. The parent cannot read its children: the body is a rendered string,
   so there is no column setting. The number of calls in the template decides the
   columns, 2 to 4, and CSS lays them out: 1 column under 48rem, 2 columns from
-  48rem, all on one row from 64rem (assets/base.css). When the body is empty, the
-  editor shows a placeholder and the storefront renders nothing.
+  48rem, all on one row from 64rem (assets/multicolumn.css). When the body is empty,
+  the editor shows a placeholder and the storefront renders nothing.
+
+  Styles: assets/multicolumn.css (this block and multicolumn-column), loaded by the
+  stylesheet_tag line before the root, without preload (ADR 0014), only when the
+  block prints markup (a column, or the theme editor).
 
   Test hooks: data-testid="multicolumn", "multicolumn-heading",
   "multicolumn-list", "multicolumn-placeholder".
@@ -24,6 +28,9 @@
 
 {%- assign columns = content | strip -%}
 
+{%- if columns != blank or request.design_mode -%}
+  {{ 'multicolumn.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if columns != blank -%}
   <div
     class="multicolumn"
