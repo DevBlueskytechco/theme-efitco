@@ -1,0 +1,204 @@
+{% doc %}
+  Renders the country and language lists of the localization picker
+  (TE-1 AC5, AC10; docs/ui-spec/localization.md §2, §6, §7). Shared by the
+  footer popover / bottom sheet and level 2 of the header drawer. Must sit
+  inside {% form 'localization' %}: every row is a submit button
+  (name country_code or language_code), so switching works without
+  JavaScript and there is no Apply button. The current row has
+  aria-current="true" and a tick (CSS), never color alone. Rows have no flag.
+
+  Shown only for the part with more than one entry; the caller renders
+  nothing when both have one entry (AC5).
+
+  Parts that need JavaScript start `hidden` (assets/localization-picker.js,
+  TE-1-R2-BE2):
+  - Tabs (both lists): role="tablist"; CSS shows them only when the
+    <localization-picker> host has data-tabs (sheet, drawer level 2). BE
+    sets role="tabpanel" + aria-labelledby on the groups and `hidden` on the
+    inactive one.
+  - Search (> 10 countries): wrapper [data-localization-search] `hidden`;
+    BE unhides, filters rows (`hidden` on the <li>), prevents Enter from
+    submitting the first row, fills the status. Clear buttons:
+    [data-localization-clear] (× in the field is `hidden` while empty).
+  - No results: [data-localization-empty] `hidden`, text in
+    [data-localization-empty-text] from data-label-no-results.
+  - Error: .alert [data-localization-error] `hidden`, role="alert", text in
+    [data-localization-error-text] from data-label-error, retry button
+    [data-localization-retry].
+  - Switching: aria-busy="true" on the chosen row (spinner replaces the
+    currency), aria-disabled="true" on the others.
+
+  @param {string} id - Id prefix, unique per page ('Footer', 'HeaderDrawer')
+  @param {string} testid - data-testid prefix ('footer', 'header-drawer')
+  @param {boolean} show_countries - More than one country
+  @param {boolean} show_languages - More than one language
+
+  @example
+  {% render 'localization-lists', id: 'Footer', testid: 'footer', show_countries: true, show_languages: true %}
+{% enddoc %}
+
+{%- liquid
+  assign has_search = false
+  if show_countries and localization.available_countries.size > 10
+    assign has_search = true
+  endif
+  assign has_tabs = false
+  if show_countries and show_languages
+    assign has_tabs = true
+  endif
+-%}
+
+<div class="localization{% if has_tabs %} localization--both{% endif %}">
+  <div
+    class="alert localization__error"
+    role="alert"
+    data-localization-error
+    data-testid="{{ testid }}-localization-error"
+    hidden
+  >
+    <span class="alert__icon">{% render 'status-icon', name: 'error' %}</span>
+    <div class="alert__body">
+      <p class="alert__text" data-localization-error-text></p>
+      <button type="button" class="button button--secondary localization__retry" data-localization-retry>
+        {{- 'blocks.footer.try_again' | t -}}
+      </button>
+    </div>
+  </div>
+
+  {%- if has_tabs -%}
+    <div class="localization__tabs" role="tablist" aria-label="{{ 'blocks.footer.localization_title' | t }}">
+      <button
+        type="button"
+        class="localization__tab"
+        role="tab"
+        id="{{ id }}LocalizationTabCountry"
+        aria-controls="{{ id }}CountryGroup"
+        aria-selected="true"
+      >
+        {{- 'blocks.footer.country_label' | t -}}
+      </button>
+      <button
+        type="button"
+        class="localization__tab"
+        role="tab"
+        id="{{ id }}LocalizationTabLanguage"
+        aria-controls="{{ id }}LanguageGroup"
+        aria-selected="false"
+        tabindex="-1"
+      >
+        {{- 'blocks.footer.language_label' | t -}}
+      </button>
+    </div>
+  {%- endif -%}
+
+  {%- if show_countries -%}
+    <div
+      class="localization__group"
+      id="{{ id }}CountryGroup"
+      data-localization-group="country"
+      data-testid="{{ testid }}-country-selector"
+    >
+      {%- if has_search -%}
+        <label class="localization__label" id="{{ id }}CountryLabel" for="{{ id }}CountrySearch">
+          {{- 'blocks.footer.country_label' | t -}}
+        </label>
+        <div class="localization__search" data-localization-search hidden>
+          {%- render 'header-icon', name: 'search' -%}
+          <input
+            class="localization__search-input"
+            id="{{ id }}CountrySearch"
+            type="search"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            placeholder="{{ 'blocks.footer.country_search' | t }}"
+            aria-controls="{{ id }}CountryList"
+            aria-describedby="{{ id }}CountryStatus"
+            data-testid="{{ testid }}-country-search"
+          >
+          <button
+            type="button"
+            class="localization__clear"
+            aria-label="{{ 'blocks.footer.clear_search' | t }}"
+            data-localization-clear
+            hidden
+          >
+            {%- render 'header-icon', name: 'close' -%}
+          </button>
+        </div>
+      {%- else -%}
+        <p class="localization__label" id="{{ id }}CountryLabel">{{ 'blocks.footer.country_label' | t }}</p>
+      {%- endif -%}
+
+      <ul class="localization__list" id="{{ id }}CountryList" aria-labelledby="{{ id }}CountryLabel">
+        {%- for country in localization.available_countries -%}
+          <li>
+            <button
+              class="localization__option"
+              type="submit"
+              name="country_code"
+              value="{{ country.iso_code }}"
+              data-testid="{{ testid }}-country-option"
+              {% if country.iso_code == localization.country.iso_code %}
+                aria-current="true"
+              {% endif %}
+            >
+              <span class="localization__name">{{ country.name | escape }}</span>
+              <span class="localization__currency">
+                {{- country.currency.iso_code }}
+                {{ country.currency.symbol -}}
+              </span>
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+
+      {%- if has_search -%}
+        <div class="localization__empty" data-localization-empty hidden>
+          {%- render 'status-icon', name: 'search' -%}
+          <p class="localization__empty-text" data-localization-empty-text></p>
+          <button type="button" class="localization__empty-clear" data-localization-clear>
+            {{- 'blocks.footer.clear_search' | t -}}
+          </button>
+        </div>
+        <p
+          class="visually-hidden"
+          id="{{ id }}CountryStatus"
+          role="status"
+          data-testid="{{ testid }}-country-status"
+        ></p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if show_languages -%}
+    <div
+      class="localization__group"
+      id="{{ id }}LanguageGroup"
+      data-localization-group="language"
+      data-testid="{{ testid }}-language-selector"
+    >
+      <p class="localization__label" id="{{ id }}LanguageLabel">{{ 'blocks.footer.language_label' | t }}</p>
+      <ul class="localization__list" aria-labelledby="{{ id }}LanguageLabel">
+        {%- for language in localization.available_languages -%}
+          <li>
+            <button
+              class="localization__option"
+              type="submit"
+              name="language_code"
+              value="{{ language.iso_code }}"
+              lang="{{ language.iso_code }}"
+              dir="auto"
+              data-testid="{{ testid }}-language-option"
+              {% if language.iso_code == localization.language.iso_code %}
+                aria-current="true"
+              {% endif %}
+            >
+              <span class="localization__name">{{ language.endonym_name | escape }}</span>
+            </button>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  {%- endif -%}
+</div>
