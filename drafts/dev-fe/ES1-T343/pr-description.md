@@ -29,12 +29,13 @@ AC: TE-4 AC17, TE-13 AC1, AC-H23. ADR 0009 mục 1, 2, 5; docs/ui-spec/countdown
 - `shopify theme check`: 133 file, 0 lỗi, 9 warning. Warning đều có từ trước và không nằm trong file của PR (quiz-step, index.figma, index.liquid, index.te12).
 - `grep -rn "featured-product__countdown\|featured-product__notice\|countdown_days\|countdown_invalid" assets blocks snippets templates layout locales` = 0.
 - Không file JS trong diff. Không `<script>` / `data-lazy-module` mới.
-- gzip base.css (trần 49 152 B), critical.css không đổi: chờ CI, vì sandbox không chạy được gzip/node. Diff base.css +111 dòng, featured-product.css −78 dòng.
+- gzip (zlib.gzipSync, ES1-T565/T478): base.css 37 880 → 38 607 B (≤ 49 152), featured-product.css 3 359 → 2 833 B (≤ 8 192), trang chủ base + 5 file tầng 4 = 56 908 B (≤ 57 344; +201 B so với develop). critical.css không đổi.
+- Vì sao CSS countdown ở base.css: ADR 0014 mục 1 tầng 2 liệt kê "countdown" là component dùng chung (featured, PDP TE-4 AC17, big offer TE-18 AC6); snippet không được nạp `stylesheet_tag` (ADR 0014 mục 3), nên không có file tầng 4 `sale-countdown.css`. Không còn class `.featured-product__*` mới trong base.css.
 - Preview, Playwright, Lighthouse (`/` và `?view=te13-states`), ảnh 360/768/1280: chờ CI.
-- Spec: `drafts/dev-fe/ES1-T343/ES1-T343.spec.ts` (tĩnh + storefront `?view=te13-states`). Chờ Orchestrator chép sang `tests/e2e/ES1-T343.spec.ts`.
+- Spec: `tests/e2e/ES1-T343.spec.ts` (chép từ drafts, tĩnh + storefront `?view=te13-states`; test không JS dùng `test.use({ javaScriptEnabled: false })`). Nhóm tĩnh 4/4 xanh local.
 
 ## Test cũ đỏ đúng chủ đích (ADR 0009 "Hệ quả", ES1-T276)
-- `tests/e2e/ES1-T156.spec.ts:78` "chưa có data-enhanced: khung giữ chỗ nhưng không nhìn thấy": nay số hiện ngay khi tải (decisions 11/11, ES1-T276). QA đổi sang `toBeVisible()`.
+- `tests/e2e/ES1-T156.spec.ts:78` "chưa có data-enhanced: khung giữ chỗ nhưng không nhìn thấy": nay số hiện ngay khi tải (decisions 11/11, ES1-T276). Đã sửa trong PR (CI 45171371642 đỏ ở đây): đổi sang `toBeVisible()` + số Liquid in sẵn, chặn cả `sale-countdown.js`, lý do ghi trong spec.
 - `tests/e2e/ES1-T158.spec.ts:273, 284` (hết giờ thì `hidden`): vẫn xanh với featured-product.js cũ, sẽ đổi sang K3 "This sale has ended" khi BE1 merge. QA sửa cùng BE1.
 - Selector `.visually-hidden` trong ô vẫn còn: chữ đơn vị nằm trong vùng `aria-hidden`, nên không ai đọc. Giữ để khớp locale ADR 0009 mục 5 và ES1-T156/T158.
 

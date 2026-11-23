@@ -1,4 +1,5 @@
-// KHÔNG CHẮC: spec chưa chạy (phiên viết không có preview, chưa type-check); scope-guard chặn dev-fe ghi tests/ → Orchestrator chép sang tests/e2e/ES1-T343.spec.ts.
+// Chép từ drafts/dev-fe/ES1-T343 (scope-guard chặn dev-fe ghi tests/). Nhóm storefront cần PREVIEW_URL; nhóm tĩnh chạy không cần store.
+// Sửa khi chép: test không JS dùng test.use({ javaScriptEnabled: false }) như ES1-T156 nojs, không tự tạo context (support/test.ts ES1-T475).
 // Ticket ES1-T343 TE-13-R2-FE1: snippets/sale-countdown (ADR 0009 mục 1, 2, 5; docs/ui-spec/countdown.md §1–§7). AC TE-4 AC17, TE-13 AC1, AC-H23.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T343.spec.ts
 // Đếm, K3 "This sale has ended" là JS của TE-13-R2-BE1 (assets/sale-countdown.js), không kiểm ở đây.
@@ -108,16 +109,17 @@ test.describe('ES1-T343 storefront', () => {
     // Không tràn ngang khung chứa
     expect((await box.boundingBox())!.width).toBeLessThanOrEqual(hostWidth + 0.5);
   });
+});
 
-  test('không JS: khung không hiện, không chiếm chỗ', async ({ browser }) => {
-    const context = await browser.newContext({ javaScriptEnabled: false });
-    const page = await context.newPage();
+test.describe('ES1-T343 không JS', () => {
+  test.use({ javaScriptEnabled: false });
+
+  test('không JS: khung không hiện, không chiếm chỗ', async ({ page }) => {
     await page.goto(STATES);
     const a = band(page, 'a');
     if (await a.getByTestId(COUNTDOWN).count()) {
       await expect(a.getByTestId(COUNTDOWN)).toBeHidden();
       expect(await a.locator('sale-countdown').boundingBox()).toBeNull();
     }
-    await context.close();
   });
 });
