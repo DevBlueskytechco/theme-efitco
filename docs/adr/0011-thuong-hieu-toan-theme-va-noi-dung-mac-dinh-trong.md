@@ -2,6 +2,7 @@ KHÔNG CHẮC: chưa rõ Shopify lưu setting của static block trong template 
 
 # 0011. Logo, favicon toàn theme và nội dung mặc định trống: template không nhúng tài nguyên demo
 Ngày: 2026-11-11 | Trạng thái: Chấp nhận (CTO 11/11, ES1-T304) | Áp quyết định CTO ES1-T308 #1 và D10 của ES1-T307; bổ sung ADR 0004
+Cập nhật 21/11/2026 (CTO, ES1-T567): nguồn thiết kế là mockup `drafts/designer/**` + `drafts/designer/_kit/kit.css`; tên file thiết kế và mã node trong ADR này là bối cảnh lúc ra quyết định, không còn là căn cứ; quyết định giữ nguyên.
 
 ## Bối cảnh
 - Rà soát Theme Store 11/11 (docs/design/shopify-audit-1111) có các lỗi CHẶN sau:

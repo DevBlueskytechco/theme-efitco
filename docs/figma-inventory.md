@@ -1,3 +1,7 @@
+> ĐÃ THAY 21/11/2026 (CTO, ES1-T567) — TÀI LIỆU LỊCH SỬ, KHÔNG CÒN HIỆU LỰC.
+> Nguồn chuẩn thiết kế hiện nay là mockup HTML `drafts/designer/**` cùng `drafts/designer/_kit/kit.css`; token máy đọc ở `docs/tokens.json`; bản vẽ được dựng lại từ mockup theo `docs/design/figma-handoff.md`.
+> Nội dung bên dưới giữ nguyên để tra lịch sử (kiểm kê khung trang chủ desktop của file thiết kế cũ, 22/10/2026). Không dùng làm căn cứ thiết kế, không so ảnh hay so token theo file này.
+
 # Kiểm kê Figma Efitco T10 — trang chủ
 
 Điền 22/10/2026 bởi Designer Agent (đọc qua Figma REST, token CTO) — Mr Designer rà lại T3 28/10, sửa trực tiếp trong file này qua PR.

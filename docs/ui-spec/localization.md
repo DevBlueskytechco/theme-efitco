@@ -1,4 +1,4 @@
-KHÔNG CHẮC: demo-data không có `localization` (nước, ngôn ngữ đang bán). Danh sách 18 nước, 5 ngôn ngữ trong mockup là ĐỀ XUẤT để vẽ trạng thái "nhiều mục"; đã hỏi BA ở ES1-T296. Figma chỉ có nút đóng ở footer (1:1104: cờ tròn 26 + "USD / EN" + chevron); danh sách, popover, sheet, trạng thái là ĐỀ XUẤT.
+KHÔNG CHẮC: demo-data không có `localization` (nước, ngôn ngữ đang bán). Danh sách 18 nước, 5 ngôn ngữ trong mockup là ĐỀ XUẤT để vẽ trạng thái "nhiều mục"; đã hỏi BA ở ES1-T296. Kit chỉ có nút ở trạng thái đóng trong footer (`.site-footer__locale`: cờ tròn 24 + "USD / EN" + chevron); danh sách, popover, sheet, trạng thái là ĐỀ XUẤT.
 
 # UI spec: Bảng chọn quốc gia và ngôn ngữ (ES1-T289, audit A19)
 
@@ -6,7 +6,7 @@ KHÔNG CHẮC: demo-data không có `localization` (nước, ngôn ngữ đang b
 
 | # | Phần | Trước (develop, vòng 3) | Sau (spec này) | Nguồn |
 | --- | --- | --- | --- | --- |
-| 1 | Nút ở footer | có (Figma 1:1104), panel tối viền xám, 2 nhóm chồng dọc | giữ nút; mở popover trắng 2 cột (≥ 768), bottom sheet 2 tab (< 768) | TE-1 AC9; foundation §14, §16; 15 §2 #9 |
+| 1 | Nút ở footer | có, panel tối viền xám, 2 nhóm chồng dọc | giữ nút; mở popover trắng 2 cột (≥ 768), bottom sheet 2 tab (< 768) | TE-1 AC9; foundation §14, §16; 15 §2 #9 |
 | 2 | Nút ở drawer menu | 2 nút tách Currency, Language (navigation.md §2, §5.3) | 1 hàng gộp "cờ + USD / EN ›", mở cấp 2 "Country and language" trong drawer | TE-1 AC9 "1 nút gộp"; navigation.md cấp 2 + Back; 15 §1 một lớp |
 | 3 | Danh sách | chưa vẽ | hàng 44 (48 mobile), mục hiện tại có dấu ✓ + 600 + nền alt, tiền tệ phải | 05 §3 selected rõ; 14 #1083M |
 | 4 | Ô tìm | không có | hiện khi > 10 nước; lọc khi gõ; ↑ ↓ Enter Esc | 12 #560D; sổ M5 hằng 10 |
@@ -21,7 +21,7 @@ Mục đích: người mua quốc tế đổi nước (tiền tệ, giá, phí s
 - Spec này.
 - `drafts/designer/ES1-T289/localization.html` (nhúng `../_kit/kit.css`) + `localization-360|768|1280|1920.png`. Phần đầu mỗi PNG là thiết kế của mốc đó: ≥ 768 popover mở trên nút footer, 360 bottom sheet. Trạng thái ở cuối file.
 
-Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:1104 (nút) > foundation.md §2, §4, §7, §12, §15, §16, §18 > navigation.md > kiến thức 15, 14, 12, 04, 05, 06.
+Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > mockup `drafts/designer/ES1-T289/localization.html` + `drafts/designer/_kit/kit.css` (nguồn chuẩn thiết kế, CTO 21/11) > foundation.md §2, §4, §7, §12, §15, §16, §18 > navigation.md > kiến thức 15, 14, 12, 04, 05, 06.
 
 ---
 
@@ -29,9 +29,9 @@ Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:1104 (nút) 
 
 | Nơi | Mốc | Trigger | Mở ra |
 | --- | --- | --- | --- |
-| Footer hàng cuối (Figma 1:1104) | mọi mốc | nút "cờ 26 + USD / EN + chevron 9 × 5" | ≥ 768 popover; < 768 bottom sheet |
+| Footer hàng cuối | mọi mốc | nút "cờ 24 + USD / EN + chevron 9 × 5" | ≥ 768 popover; < 768 bottom sheet |
 | Chân drawer menu (navigation.md §5.3) | < 1280 | hàng 52 "cờ 20 + USD / EN + ›" | cấp 2 trong drawer (trượt, Back), cùng nội dung sheet |
-| Header desktop | ≥ 1280 | không có | Figma 1:362 chỉ 7 mục + 3 icon; không thêm |
+| Header desktop | ≥ 1280 | không có | header chỉ 7 mục + 3 icon (sổ 10/11); không thêm |
 
 Một nút gộp ở mỗi nơi (AC9). Không mở sheet chồng lên drawer (15 §1 một lớp popup).
 
@@ -71,7 +71,7 @@ Chữ qua locale `blocks.footer.*` (FE thêm, sentence case, American English):
 | `close` | "Close country and language" | mới |
 | `updating` | "Switching to {{ name }}" | mới: chữ ẩn khi đang đổi |
 | `error` | "We couldn't switch to {{ name }}. Check your connection and try again." | mới |
-| `try_again` | "Try Again" | mới: nút Title Case (DESIGN CTA) |
+| `try_again` | "Try again" | mới: nút sentence case (CTO 21/11; Chuẩn: Polaris Button) |
 
 Tên nước, tiền tệ, endonym lấy từ Shopify (`country.name`, `country.currency.iso_code`, `country.currency.symbol`, `language.endonym_name`), không dịch tay.
 
@@ -82,7 +82,7 @@ Tên nước, tiền tệ, endonym lấy từ Shopify (`country.name`, `country.
 | | 360 | 768 | 1280 | 1920 | Token / nguồn |
 | --- | --- | --- | --- | --- | --- |
 | Vị trí footer | hàng giữa, cùng hàng icon thanh toán, trên copyright | như 360 | cột phải hàng cuối, trái icon thanh toán | như 1280 | foundation §4 |
-| Kích thước | cao 44, cờ 26, gap 8, chữ 14/500 trắng, chevron 9 × 5 | | | | Figma 1:1104; `.site-footer__summary` |
+| Kích thước | cao 44, cờ 24 (THAY 21/11 ES1-T567, trước 26: về lưới 4px), gap 8, chữ 14/500 trắng, chevron 9 × 5 | | | | `.site-footer__summary` |
 | Drawer (< 1280) | hàng 52 trong `.overlay__footer`, cờ 20 tròn, chữ 16/500, › 12 muted, viền `--color-muted-light` bo 4 | như 360 (drawer 420) | — | — | navigation.md §5.3; sổ 09/11 viền ô nhập |
 
 ### 4.2 Popover (≥ 768)
@@ -148,7 +148,7 @@ Chuyển động (foundation §19; chỉ transform / opacity; tắt khi `prefers
 
 ## 6. Trạng thái
 
-Figma không có; tất cả ĐỀ XUẤT (05 §3, §6–7; 14 #928M; foundation §18). Mockup "States" L1–L10.
+Tất cả trạng thái là ĐỀ XUẤT (05 §3, §6–7; 14 #928M; foundation §18). Mockup "States" L1–L10.
 
 | # | Trạng thái | Hiển thị |
 | --- | --- | --- |
@@ -160,8 +160,8 @@ Figma không có; tất cả ĐỀ XUẤT (05 §3, §6–7; 14 #928M; foundation
 | L6 | Không kết quả | icon tìm 24 muted-light + câu `country_no_results` 14 muted + text link "Clear search"; danh sách giữ chiều cao (0 nhảy) |
 | L7 | Trigger: default / hover / focus / mở | trắng; hover gạch chân chữ; focus outline trắng 2px offset 2; mở chevron xoay 180° |
 | L8 | Hàng: default / hover / focus / hiện tại / disabled | nền trong / nền alt / outline accent 2px inset −2 / ✓ + 600 + nền alt / chữ muted-light (khi đang đổi) |
-| L9 | Đang đổi | sau khi bấm: hàng được chọn thay tiền tệ bằng spinner 16 + chữ ẩn "Switching to Canada"; các hàng khác `aria-disabled`, chữ muted-light; bảng `aria-busy`; chỉ hiện spinner nếu > 300 ms (tránh chớp). Shopify chuyển trang xong là hết |
-| L10 | Lỗi | chỉ khi BE gửi bằng fetch và lỗi mạng: hộp `.alert` trên danh sách, viền sale, icon ! sale, câu `error` 14 muted, nút secondary "Try Again" (gửi lại mục vừa chọn); `role="alert"`; hàng trở lại bấm được. Gửi form thường (không JS) thì lỗi mạng là trang lỗi của trình duyệt |
+| L9 | Đang đổi | sau khi bấm: hàng được chọn thay tiền tệ bằng spinner 16 + chữ ẩn "Switching to Canada"; các hàng khác `aria-disabled`, chữ muted-light; bảng `aria-busy`; chỉ hiện spinner nếu > 500 ms (tránh chớp; ngưỡng chung foundation §18.1). Shopify chuyển trang xong là hết |
+| L10 | Lỗi | chỉ khi BE gửi bằng fetch và lỗi mạng: hộp `.alert` trên danh sách, viền sale, icon ! sale, câu `error` 14 muted, nút secondary "Try again" (gửi lại mục vừa chọn); `role="alert"`; hàng trở lại bấm được. Gửi form thường (không JS) thì lỗi mạng là trang lỗi của trình duyệt |
 | L11 | Tên dài ("Saint Vincent & Grenadines") | xuống 2 dòng, hàng cao lên, tiền tệ căn trên |
 | L12 | Ngôn ngữ viết phải sang trái (العربية) | `lang="ar" dir="auto"` trên mục, căn theo hướng chữ |
 | L13 | Theme editor | như storefront; không placeholder (đây là cấu hình Markets, không phải setting block) |

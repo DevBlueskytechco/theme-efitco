@@ -12,14 +12,14 @@
      rating = .rating (V08), thông số = .data-table--striped.data-table--fluid (V46: min-width 0, chữ xuống dòng), nút nhỏ = .button--small 44 (V40), lỗi 422 = .form-message--inline (V45),
      thanh dính = .buy-bar (V34, V51). Trang KHÔNG định nghĩa lại selector kit; chỉ giữ bố cục. */
 
-  /* ---------- Khung 2 cột (Figma 1:759: media 668 · gap 80 · info 670) ---------- */
+  /* ---------- Khung 2 cột (2 cột bằng nhau; gap 80 từ 80rem) ---------- */
   .pdp { display: grid; gap: var(--space-xl); padding-block: var(--space-xs) var(--space-4xl); }
   .pdp > * { min-width: 0; }
   @media (min-width: 64rem) {
     .pdp { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; column-gap: var(--space-3xl); padding-block: var(--space-xl) var(--space-7xl); }
     .pdp__media { position: sticky; inset-block-start: calc(var(--header-height) + var(--space-xl)); }
   }
-  @media (min-width: 80rem) { .pdp { column-gap: var(--space-6xl); } } /* Figma 1:759 gap 80 */
+  @media (min-width: 80rem) { .pdp { column-gap: var(--space-6xl); } } /* gap 80. Chuẩn: Polaris React space 80px */
 
   /* ---------- Gallery ---------- */
   .gallery { display: grid; gap: var(--space-3); }
@@ -29,16 +29,16 @@
   .gallery__zoom { display: block; width: 100%; height: 100%; cursor: zoom-in; }
   .gallery__slide img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
   .gallery__zoom:focus-visible { outline-offset: -4px; }
-  .gallery__zoom-hint { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); pointer-events: none; }
-  .gallery__zoom-hint svg { width: 20px; height: 20px; }
-  .gallery__count { position: absolute; inset-block-end: var(--space-3); inset-inline-start: var(--space-3); padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-xs); font-weight: 600; line-height: 20px; }
+  .gallery__zoom-hint { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); display: grid; place-items: center; width: var(--touch-target); height: var(--touch-target); border-radius: 50%; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); pointer-events: none; }
+  .gallery__zoom-hint svg { width: var(--icon-size-md); height: var(--icon-size-md); }
+  .gallery__count { position: absolute; inset-block-end: var(--space-3); inset-inline-start: var(--space-3); padding: var(--space-1) var(--space-3); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-xs); font-weight: 600; line-height: var(--line-height-label); }
   .gallery__nav { position: absolute; inset-block-end: var(--space-4); inset-inline-end: var(--space-4); }
   .gallery__thumbs { display: flex; gap: var(--space-3); margin: 0; padding: 0; overflow-x: auto; scrollbar-width: none; list-style: none; }
   .gallery__thumb { position: relative; display: block; width: 56px; height: 56px; flex: none; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-input); background: var(--color-background-cream); }
   .gallery__thumb img { width: 100%; height: 100%; object-fit: cover; mix-blend-mode: darken; }
   .gallery__thumb:hover { border-color: var(--color-foreground); }
   .gallery__thumb[aria-current='true'] { border: 2px solid var(--color-foreground); }
-  .gallery__thumb-badge { position: absolute; inset-block-end: var(--space-1); inset-inline-end: var(--space-1); display: grid; place-items: center; min-width: 22px; height: 22px; padding-inline: var(--space-1); border-radius: var(--radius-pill); background: var(--color-foreground); color: var(--color-background); font-size: var(--font-size-xs); font-weight: 700; }
+  .gallery__thumb-badge { position: absolute; inset-block-end: var(--space-1); inset-inline-end: var(--space-1); display: grid; place-items: center; min-width: 24px; height: 24px; padding-inline: var(--space-1); border-radius: var(--radius-pill); background: var(--color-foreground); color: var(--color-background); font-size: var(--font-size-xs); font-weight: 700; }
   .gallery__thumb-badge svg { width: 10px; height: 10px; }
   @media (min-width: 48rem) {
     .gallery__stage { margin-inline: 0; }
@@ -57,20 +57,20 @@
   /* ---------- Buy box ---------- */
   .buy { display: grid; gap: var(--space-xl); align-content: start; }
   .buy__head { display: grid; gap: var(--space-3); }
-  .buy__title { font-size: var(--font-size-h1); line-height: var(--line-height-heading); }
-  .buy__title--h3 { font-size: var(--font-size-h2); }
+  .buy__title { font-size: var(--font-size-h1); line-height: var(--line-height-h1); }
+  .buy__title--h3 { font-size: var(--font-size-h2); line-height: var(--line-height-h2); }
   .buy__meta { display: grid; gap: var(--space-1); }
-  /* Giá PDP = .price.price--xl của kit (28 Inter 600, Figma 1:786); ES1-T527 vòng 2 bỏ bản giá riêng */
-  /* Figma 1:786: sao 16 · "(4.9)" · vạch · "341 reviews", chữ muted 14 (8.45). Link đứng riêng, không trong đoạn văn: gạch chân khi hover */
-  /* .rating của kit (V08); link riêng PDP: sao · (4.9) · vạch · 341 reviews (Figma 1:786) */
-  .pdp-rating__link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; color: var(--color-muted); text-decoration: none; }
+  /* Giá PDP = .price.price--xl của kit (28/36 Inter 600); ES1-T527 vòng 2 bỏ bản giá riêng */
+  /* Hàng rating: sao 16 · "(4.9)" · vạch · "341 reviews", chữ muted 14 (8.45). Link đứng riêng, không trong đoạn văn: gạch chân khi hover */
+  /* .rating của kit (V08); link riêng PDP: sao · (4.9) · vạch · 341 reviews */
+  .pdp-rating__link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--touch-target); color: var(--color-muted); text-decoration: none; }
   .pdp-rating__link:hover .rating__count { color: var(--color-foreground); text-decoration: underline; text-underline-offset: 0.2em; }
   .pdp-rating__sep { width: 1px; height: 16px; background: var(--color-muted-light); }
   .buy__note { color: var(--color-muted); font-size: var(--font-size-sm); }
   .buy__note a { color: inherit; text-decoration: underline; text-underline-offset: 0.2em; }
   .buy__form { display: grid; align-content: start; gap: var(--space-xl); padding-block-start: var(--space-xl); border-block-start: 1px solid var(--color-border); }
 
-  /* ---------- Countdown "Sale ends in" = .sale-countdown của kit (K1–K4, Figma 1:773; Compact < 23rem khung chứa). ES1-T527 vòng 2 bỏ bản riêng ---------- */
+  /* ---------- Countdown "Sale ends in" = .sale-countdown của kit (K1–K4, CTO 10/11; Compact < 23rem khung chứa). ES1-T527 vòng 2 bỏ bản riêng ---------- */
 
   /* ---------- Bộ chọn biến thể: component kit (V39, docs/ui-spec/variant-picker.md). Chỉ bố cục lưới > 10 giá trị ---------- */
   .variant-option__values--grid > .variant-pill { min-width: 0; padding-inline: var(--space-xs); }
@@ -80,30 +80,30 @@
   .vp-key li { display: grid; justify-items: start; gap: var(--space-xs); color: var(--color-muted); font-size: var(--font-size-xs); }
   .vp-key__pair { display: flex; flex-wrap: wrap; gap: var(--space-xs); align-items: center; }
   /* Đang tải biến thể: giá skeleton cùng chiều cao; dòng tồn spinner 12 duy nhất; nút giữ màu, aria-disabled, không spinner */
-  .price-skel { display: block; width: 45%; height: 34px; border-radius: var(--radius-xs); } /* = 1 dòng giá h3 28/34 */
+  .price-skel { display: block; width: 45%; height: 36px; border-radius: var(--radius-xs); } /* = 1 dòng giá h3 28/36 */
   /* nút đang tải = .button.is-pending của kit (VP1) */
-  /* Lỗi tải: .variant-option__error + .button--small "Try Again" 44 (V40) */
+  /* Lỗi tải: .variant-option__error + .button--small "Try again" 44 (V40) */
   .vp-error { display: grid; justify-items: start; gap: var(--space-sm); }
 
 
-  /* Số lượng + Add To Cart */
+  /* Số lượng + Add to cart */
   .buy__purchase { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-xs) var(--space-sm); align-items: end; }
   .buy__purchase > label { grid-column: 1 / -1; }
   .buy__add { width: 100%; }
-  .buy__more { justify-self: center; display: inline-flex; align-items: center; min-height: 44px; color: var(--color-foreground); font-size: var(--font-size-sm); text-decoration: underline; text-underline-offset: 0.2em; }
+  .buy__more { justify-self: center; display: inline-flex; align-items: center; min-height: var(--touch-target); color: var(--color-foreground); font-size: var(--font-size-sm); text-decoration: underline; text-underline-offset: 0.2em; }
   .buy__buttons { display: grid; gap: var(--space-sm); }
 
-  /* Cam kết (Figma 1:1107 trust bar) */
+  /* Cam kết (cùng nội dung trust bar footer) */
   .assure { display: grid; gap: var(--space-sm); margin: 0; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: var(--radius-card); list-style: none; font-size: var(--font-size-sm); }
   .assure li { display: flex; align-items: center; gap: var(--space-sm); }
-  .assure svg { flex: none; width: 24px; height: 24px; color: var(--color-accent); }
+  .assure svg { flex: none; width: var(--icon-size-lg); height: var(--icon-size-lg); color: var(--color-accent); }
   .assure a { color: inherit; font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
   .assure a:hover { color: var(--color-accent); }
   @media (min-width: 48rem) and (max-width: 63.99rem), (min-width: 80rem) { .assure { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 
   /* Accordion trong buy box */
   .buy .accordion details > div { display: grid; gap: var(--space-md); }
-  /* Thông số = .table-wrap + .data-table--striped của kit (V46, Figma 1:798) */
+  /* Thông số = .table-wrap + .data-table--striped của kit (V46) */
   .spec-table td { font-weight: 500; }
   /* Nhãn hàng không ngắt giữa từ (kit --fluid để overflow-wrap:anywhere làm 'Assembl|y' ở 360); giá trị vẫn xuống dòng. Đề xuất kit đổi th sang break-word — notes.md */
   .spec-table th { overflow-wrap: break-word; }
@@ -128,17 +128,17 @@
   @media (min-width: 64rem) { .reviews { grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); align-items: start; gap: var(--space-3xl); } }
   .reviews__summary { display: grid; gap: var(--space-md); justify-items: start; }
   .reviews__score { display: flex; align-items: center; gap: var(--space-md); }
-  .reviews__number { font-family: var(--font-heading--family); font-size: var(--font-size-display); font-weight: var(--font-heading--weight-display); line-height: 0.9; letter-spacing: var(--letter-spacing-display); }
+  .reviews__number { font-family: var(--font-heading--family); font-size: var(--font-size-display); font-weight: var(--font-heading--weight-display); line-height: 1; letter-spacing: var(--letter-spacing-display); }
   .reviews__stars svg { width: 20px; height: 19px; } /* sao lớn riêng khối điểm tổng */
   .reviews__based { color: var(--color-muted); font-size: var(--font-size-sm); }
   .reviews__list { display: grid; gap: var(--grid-gap); margin: 0; padding: 0; list-style: none; }
   @media (min-width: 48rem) { .reviews__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  /* Thân card theo testimonial Figma 1:885: hàng tên (trái) + sao (phải) · tiêu đề Inter 18/700 · quote 16/27. Bỏ ảnh và sản phẩm đính kèm (đang ở chính trang sản phẩm) */
+  /* Thân card review, cùng ngôn ngữ card testimonial trang chủ: hàng tên (trái) + sao (phải) · tiêu đề Inter 18/700 · quote 16/28. Bỏ ảnh và sản phẩm đính kèm (đang ở chính trang sản phẩm) */
   .review { display: grid; gap: var(--space-sm); align-content: start; height: 100%; padding: var(--space-xl); border-radius: var(--radius-panel); background: var(--color-background); }
   .review__head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-xs) var(--space-md); }
   .review__author { font-size: var(--font-size-base); font-weight: 400; }
-  .review__title { margin: 0; font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: var(--letter-spacing-body); line-height: calc(28 / 18); } /* = .text-title */
-  .review__quote { margin: 0; color: var(--color-muted); line-height: calc(27 / 16); } /* Figma #808080 = 3.95:1, trượt AA → --color-muted 8.45 */
+  .review__title { margin: 0; font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-title); } /* = .text-title */
+  .review__quote { margin: 0; color: var(--color-muted); line-height: var(--line-height-reading); } /* AA: --color-muted 8.45:1 (xám #808080 chỉ 3.95:1, không dùng) */
   .reviews__more { margin-block-start: var(--space-xl); }
 
   /* ---------- You may also like ---------- */
@@ -209,7 +209,7 @@
   <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
   <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
-  <!-- Chevron 11 × 16 trong khung 52 (snippets/slideshow-icon, Figma 1:398) — foundation vòng 3 §6 -->
+  <!-- Chevron 11 × 16 trong khung 52 (snippets/slideshow-icon) — foundation vòng 3 §6 -->
   <symbol id="i-prev" viewBox="0 0 52 52"><path d="M29.6958 18.3426C30.1014 18.7482 30.1014 19.4056 29.6958 19.8112L23.5071 26L29.6958 32.1888C30.1014 32.5943 30.1014 33.2518 29.6958 33.6574C29.2903 34.0629 28.6328 34.0629 28.2273 33.6574L21.3042 26.7342C21.1094 26.5396 21 26.2754 21 26C21 25.7246 21.1094 25.4604 21.3042 25.2657L28.2273 18.3426C28.6328 17.9371 29.2903 17.9371 29.6958 18.3426Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-next" viewBox="0 0 52 52"><path d="M23.3042 33.6574C22.8986 33.2518 22.8986 32.5944 23.3042 32.1888L29.4929 26L23.3042 19.8112C22.8986 19.4057 22.8986 18.7482 23.3042 18.3426C23.7097 17.9371 24.3672 17.9371 24.7727 18.3426L31.6958 25.2658C31.8906 25.4604 32 25.7246 32 26C32 26.2754 31.8906 26.5396 31.6958 26.7343L24.7727 33.6574C24.3672 34.0629 23.7097 34.0629 23.3042 33.6574Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></symbol>
   <symbol id="i-star" viewBox="0 0 14 13"><path fill="currentColor" d="m7 0 2.1 4.2 4.6.7-3.3 3.2.8 4.6L7 10.5l-4.2 2.2.8-4.6L.3 4.9l4.6-.7L7 0Z"/></symbol>
@@ -237,7 +237,7 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- ===== Header mọi trang: thanh tối riêng #1A1A1A + noise, cao 80, không đè ảnh (sổ 10/11, Figma 1:362; foundation vòng 3 §3) ===== -->
+<!-- ===== Header mọi trang: thanh tối riêng #1A1A1A + noise, cao 80, không đè ảnh (sổ 10/11; foundation vòng 3 §3) ===== -->
 <header class="site-header" data-testid="header">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -247,7 +247,7 @@
         <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#">Sale</a></li>
-        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Our story</a></li>
         <li><a class="site-header__link" href="#">Blog</a></li>
         <li><a class="site-header__link" href="#">Contact</a></li>
         <li><a class="site-header__link" href="#">Help</a></li>
@@ -309,7 +309,7 @@
             <div class="price price--xl">
               <span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span>
               <span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s>
-              <span class="badge badge--sale">-24%</span>
+              <span class="badge badge--sale">−24%</span>
             </div>
             <div class="rating">
               <a class="pdp-rating__link" href="#reviews">
@@ -342,18 +342,18 @@
               <input class="quantity__input" id="qty-main" type="number" min="1" value="1" inputmode="numeric">
               <button class="quantity__button" type="button" aria-label="Increase quantity for Ativafit Lava 66 lb Adjustable"><svg aria-hidden="true"><use href="#i-plus"/></svg></button>
             </div>
-            <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+            <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add to cart</button>
           </div>
 
           <div class="buy__buttons">
-            <button class="button button--secondary button--full" type="button">Buy It Now</button>
+            <button class="button button--secondary button--full" type="button">Buy it now</button>
             <a class="buy__more" href="#">More payment options</a>
           </div>
 
           <ul class="assure">
-            <li><svg aria-hidden="true"><use href="#i-truck"/></svg><a href="#">Fast Shipping</a></li>
-            <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
-            <li><svg aria-hidden="true"><use href="#i-refresh"/></svg><a href="#">90 Day Money Back</a></li>
+            <li><svg aria-hidden="true"><use href="#i-truck"/></svg><a href="#">Fast shipping</a></li>
+            <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 year warranty</li>
+            <li><svg aria-hidden="true"><use href="#i-refresh"/></svg><a href="#">90 day money back</a></li>
           </ul>
 
           <div class="accordion">
@@ -394,24 +394,24 @@
   <section class="section" style="padding-block-start: 0" aria-labelledby="h-pairs" data-testid="product-recommendations">
     <div class="container">
       <div class="section-header">
-        <h2 id="h-pairs">Pairs Well With</h2>
+        <h2 id="h-pairs">Pairs well with</h2>
       </div>
       <ul class="pairs" aria-labelledby="h-pairs">
         <li class="pair">
           <div class="pair__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=192" width="96" height="96" alt=""></div>
-          <div class="pair__info"><h3 class="pair__title"><a href="#">Training Mat 12 mm</a></h3><div class="price"><span>$69.00</span></div><button class="button button--secondary button--small" type="button">Add To Cart<span class="visually-hidden">: Training Mat 12 mm</span></button></div>
+          <div class="pair__info"><h3 class="pair__title"><a href="#">Training Mat 12 mm</a></h3><div class="price"><span>$69.00</span></div><button class="button button--secondary button--small" type="button">Add to cart<span class="visually-hidden">: Training Mat 12 mm</span></button></div>
         </li>
         <li class="pair">
           <div class="pair__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P10.jpg?width=192" width="96" height="96" alt=""></div>
-          <div class="pair__info"><h3 class="pair__title"><a href="#">Foldable bench</a></h3><div class="price"><span>$89.00</span></div><button class="button button--secondary button--small" type="button">Add To Cart<span class="visually-hidden">: Foldable bench</span></button></div>
+          <div class="pair__info"><h3 class="pair__title"><a href="#">Foldable bench</a></h3><div class="price"><span>$89.00</span></div><button class="button button--secondary button--small" type="button">Add to cart<span class="visually-hidden">: Foldable bench</span></button></div>
         </li>
         <li class="pair">
           <div class="pair__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P21_047720f4-1e97-4c90-8a21-3d8f28490834.png?width=192" width="96" height="96" alt=""></div>
-          <div class="pair__info"><h3 class="pair__title"><a href="#">Resistance Band Set</a></h3><div class="price"><span>$45.00</span></div><button class="button button--secondary button--small" type="button">Add To Cart<span class="visually-hidden">: Resistance Band Set</span></button></div>
+          <div class="pair__info"><h3 class="pair__title"><a href="#">Resistance Band Set</a></h3><div class="price"><span>$45.00</span></div><button class="button button--secondary button--small" type="button">Add to cart<span class="visually-hidden">: Resistance Band Set</span></button></div>
         </li>
         <li class="pair">
           <div class="pair__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P20.jpg?width=192" width="96" height="96" alt=""></div>
-          <div class="pair__info"><h3 class="pair__title"><a href="#">Recovery Roller Pro</a></h3><div class="price"><span>$52.00</span></div><button class="button button--secondary button--small" type="button">Add To Cart<span class="visually-hidden">: Recovery Roller Pro</span></button></div>
+          <div class="pair__info"><h3 class="pair__title"><a href="#">Recovery Roller Pro</a></h3><div class="price"><span>$52.00</span></div><button class="button button--secondary button--small" type="button">Add to cart<span class="visually-hidden">: Recovery Roller Pro</span></button></div>
         </li>
       </ul>
     </div>
@@ -421,7 +421,7 @@
   <section class="section section--cream" id="reviews" aria-labelledby="h-reviews">
     <div class="container reviews">
       <div class="reviews__summary">
-        <h2 id="h-reviews">Customer Reviews</h2>
+        <h2 id="h-reviews">Customer reviews</h2>
         <div class="reviews__score">
           <span class="reviews__number" aria-hidden="true">4.9</span>
           <div>
@@ -429,7 +429,7 @@
             <p class="reviews__based"><span class="visually-hidden">Rated 4.9 out of 5 stars. </span>Based on 341 reviews</p>
           </div>
         </div>
-        <a class="button button--secondary" href="#">Write A Review</a>
+        <a class="button button--secondary" href="#">Write a review</a>
       </div>
       <div>
         <ul class="reviews__list">
@@ -439,7 +439,7 @@
               <span class="rating__stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
               <p class="visually-hidden">Rated 5 out of 5 stars</p>
             </div>
-            <h3 class="review__title">Versatile Gear For All Exercises</h3>
+            <h3 class="review__title">Versatile gear for all exercises</h3>
             <p class="review__quote">High quality equipment that doesn't break the bank. I am very impressed with the overall durability.</p>
           </li>
           <li class="review">
@@ -448,11 +448,11 @@
               <span class="rating__stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span>
               <p class="visually-hidden">Rated 5 out of 5 stars</p>
             </div>
-            <h3 class="review__title">Smooth Every Single Rep</h3>
+            <h3 class="review__title">Smooth every single rep</h3>
             <p class="review__quote">The dial switches weight fast, no jamming at all. Saves an entire corner of my room.</p>
           </li>
         </ul>
-        <button class="button button--secondary reviews__more" type="button">Show More Reviews</button>
+        <button class="button button--secondary reviews__more" type="button">Show more reviews</button>
       </div>
     </div>
   </section>
@@ -461,7 +461,7 @@
   <section class="section related" aria-labelledby="h-related">
     <div class="container">
       <div class="section-header section-header--split">
-        <h2 id="h-related">You May Also Like</h2>
+        <h2 id="h-related">You may also like</h2>
         <div class="carousel-nav">
           <button class="round-button round-button--prev" type="button" aria-label="Previous products" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button>
           <button class="round-button" type="button" aria-label="Next products"><svg aria-hidden="true"><use href="#i-next"/></svg></button>
@@ -473,7 +473,7 @@
           <div class="product-card__info"><h3 class="product-card__title"><a href="#">Adjustable dumbbell pair</a></h3><div class="price"><span>$259.00</span></div></div>
         </article></li>
         <li><article class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=720" width="720" height="720" alt=""><div class="product-card__badges"><span class="badge badge--sale">-15%</span></div></div>
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P18.jpg?width=720" width="720" height="720" alt=""><div class="product-card__badges"><span class="badge badge--sale">−15%</span></div></div>
           <div class="product-card__info"><h3 class="product-card__title"><a href="#">Olympic Plate Set 100</a></h3><div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$289.00</span><span class="visually-hidden">Regular price</span><s class="price__compare">$339.00</s></div></div>
         </article></li>
         <li><article class="product-card">
@@ -481,7 +481,7 @@
           <div class="product-card__info"><h3 class="product-card__title"><a href="#">Iron Core Kettlebell 16 kg<span class="visually-hidden">, 3 colors</span></a></h3><div class="price"><span>$119.00</span></div><ul class="swatches" aria-hidden="true"><li><span class="swatch" style="--swatch: var(--color-foreground)"></span></li><li><span class="swatch" style="--swatch: var(--color-muted-light)"></span></li><li><span class="swatch" style="--swatch: var(--color-background)"></span></li></ul></div>
         </article></li>
         <li><article class="product-card">
-          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=720" width="720" height="720" alt=""><div class="product-card__badges"><span class="badge badge--sale">-17%</span></div></div>
+          <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=720" width="720" height="720" alt=""><div class="product-card__badges"><span class="badge badge--sale">−17%</span></div></div>
           <div class="product-card__info"><h3 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h3><div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$189.00</span><span class="visually-hidden">Regular price</span><s class="price__compare">$229.00</s></div></div>
         </article></li>
       </ul>
@@ -492,14 +492,14 @@
   <!-- ================= TRẠNG THÁI (cuối file theo ticket) ================= -->
   <div class="container">
     <section class="demo-block" aria-labelledby="st-a">
-      <p class="demo-label">Trạng thái A · edge_cases "Hết hàng toàn bộ"</p>
+      <p class="demo-label">Trạng thái A · sản phẩm mẫu hết hàng toàn bộ (edge_cases)</p>
       <h2 id="st-a">Sold out</h2>
-      <p class="demo-note">Mọi variant hết: badge Sold out cạnh giá, swatch gạch chéo nhưng vẫn chọn được, số lượng và nút khoá, ảnh mờ 0.6. Không hiện Buy It Now (Shopify ẩn khi variant không bán được).</p>
+      <p class="demo-note">Mọi variant hết: badge Sold out cạnh giá, swatch gạch chéo nhưng vẫn chọn được, số lượng và nút khoá, ảnh mờ 0.6. Không hiện Buy it now (Shopify ẩn khi variant không bán được).</p>
       <div class="state-pdp is-sold-out">
-        <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, sold out sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=900" width="900" height="900" alt="Hết hàng toàn bộ"></li></ul></div>
+        <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, sold out sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=900" width="900" height="900" alt="Foldable bench"></li></ul></div>
         <div class="buy">
           <div class="buy__head">
-            <h3 class="buy__title buy__title--h3">Hết hàng toàn bộ</h3>
+            <h3 class="buy__title buy__title--h3">Foldable bench</h3>
             <div class="price price--xl"><span>$1,000.00</span><span class="badge badge--sold-out">Sold out</span></div>
           </div>
           <div class="buy__form">
@@ -516,7 +516,7 @@
             <div class="buy__purchase">
               <label for="qty-a">Quantity</label>
               <div class="quantity"><button class="quantity__button" type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" id="qty-a" type="number" value="1" disabled><button class="quantity__button" type="button" aria-label="Increase quantity" disabled><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-              <button class="button buy__add" type="submit" disabled>Sold Out</button>
+              <button class="button buy__add" type="submit" disabled>Sold out</button>
             </div>
             <p class="stock-line stock-line--out">Sold out</p>
           </div>
@@ -525,14 +525,14 @@
     </section>
 
     <section class="demo-block" aria-labelledby="st-b">
-      <p class="demo-label">Trạng thái B · edge_cases "2 option có tổ hợp không tồn"</p>
+      <p class="demo-label">Trạng thái B · edge_cases "Resistance band set"</p>
       <h2 id="st-b">Many variants, unavailable combination</h2>
       <p class="demo-note">Gold + L không có variant (value.exists = false): pill L gạch chữ + viền đứt, chữ muted (variant-picker §4, như quickview 5c; hết hàng chỉ gạch chữ); nút "Unavailable" khoá, gợi ý chọn cỡ khác ngay dưới nút. Size dùng pill (không dropdown, 10 §6 #850); Color là swatch khi có value.swatch, không có thì pill chữ.</p>
       <div class="state-pdp">
-        <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, variant sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=900" width="900" height="900" alt="2 option có tổ hợp không tồn"></li></ul></div>
+        <div class="gallery__stage"><ul class="gallery__track" aria-label="Product media, variant sample"><li class="gallery__slide"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=900" width="900" height="900" alt="Resistance band set"></li></ul></div>
         <div class="buy">
           <div class="buy__head">
-            <h3 class="buy__title buy__title--h3">2 option có tổ hợp không tồn</h3>
+            <h3 class="buy__title buy__title--h3">Resistance band set</h3>
             <div class="price price--xl"><span>$30.00</span></div>
           </div>
           <div class="buy__form">
@@ -571,7 +571,7 @@
           <div class="buy__purchase">
             <label for="qty-c">Quantity</label>
             <div class="quantity"><button class="quantity__button" type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" id="qty-c" type="number" value="1" disabled><button class="quantity__button" type="button" aria-label="Increase quantity" disabled><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-            <button class="button buy__add" type="submit" aria-busy="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+            <button class="button buy__add" type="submit" aria-busy="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add to cart</button>
           </div>
           <p class="visually-hidden" role="status">Adding to cart</p>
         </div>
@@ -579,7 +579,7 @@
           <div class="buy__purchase">
             <label for="qty-d">Quantity</label>
             <div class="quantity"><button class="quantity__button" type="button" aria-label="Decrease quantity"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" id="qty-d" type="number" value="6"><button class="quantity__button" type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-            <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+            <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add to cart</button>
           </div>
           <div class="form-message form-message--error form-message--inline" role="alert">
             <svg aria-hidden="true"><use href="#i-alert"/></svg>
@@ -642,18 +642,18 @@
     <section class="demo-block" aria-labelledby="st-g">
       <p class="demo-label">Trạng thái G · product-sticky-bar + toast lỗi khi nút chính đã khuất</p>
       <h2 id="st-g">Sticky add to cart bar</h2>
-      <p class="demo-note">Mọi mốc (CTO 10/11, "Show on desktop" mặc định bật). Hiện khi nút Add To Cart chính ra khỏi màn, ẩn khi quay lại; fixed đáy (0 CLS). 360: ảnh 48, tên 1 dòng + giá, nút. ≥768: thêm biến thể đang chọn + giá gạch. ≥1024: thêm ô số lượng 48. Không có select biến thể (2048 biến thể). Lựa chọn hiện tại không mua được: nút "Choose Options" cuộn về bộ chọn và đặt focus vào option đầu tiên. Lỗi thêm giỏ từ thanh: toast error vì vùng lỗi trong form đang khuất. Thanh thật của trang nằm ở đáy mockup.</p>
+      <p class="demo-note">Mọi mốc ("Show on desktop" mặc định bật). Hiện khi nút Add to cart chính ra khỏi màn, ẩn khi quay lại; fixed đáy (0 CLS). 360: ảnh 48, tên 1 dòng + giá, nút. ≥768: thêm biến thể đang chọn + giá gạch. ≥1024: thêm ô số lượng 48. Không có select biến thể (2048 biến thể). Lựa chọn hiện tại không mua được: nút "Choose options" cuộn về bộ chọn và đặt focus vào option đầu tiên. Lỗi thêm giỏ từ thanh: toast error vì vùng lỗi trong form đang khuất. Thanh thật của trang nằm ở đáy mockup.</p>
       <div class="mini-frame mini-frame--page">
         <p class="demo-label">Màn sau khi cuộn qua nút chính · lựa chọn không mua được</p>
-        <h2 style="margin: 0">Customer Reviews</h2>
+        <h2 style="margin: 0">Customer reviews</h2>
         <div class="buy-bar">
             <img class="buy-bar__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg?width=112" width="56" height="56" alt="">
             <div class="buy-bar__info">
-              <p class="buy-bar__title">2 option có tổ hợp không tồn</p>
+              <p class="buy-bar__title">Resistance band set</p>
               <p class="pdp-bar__variant">Gold / L · Unavailable</p>
               <div class="price"><span>$30.00</span></div>
             </div>
-            <button class="button button--secondary" type="button">Choose Options</button></div>
+            <button class="button button--secondary" type="button">Choose options</button></div>
       </div>
       <div class="mini-frame">
         <div class="toast-region">
@@ -667,25 +667,25 @@
               <div class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="pdp-bar__compare"><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s></span></div>
             </div>
             <div class="quantity pdp-bar__qty"><button class="quantity__button" type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" type="number" min="1" value="1" aria-label="Quantity"><button class="quantity__button" type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-            <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button></div>
+            <button class="button" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add to cart</button></div>
       </div>
     </section>
 
     <section class="demo-block" aria-labelledby="st-h">
       <p class="demo-label">Trạng thái H, I · đang tải gợi ý, sản phẩm không có media</p>
       <h2 id="st-h">Loading recommendations and product without media</h2>
-      <p class="demo-note">H: khối gợi ý có kết quả thì hiện skeleton 1 hàng đúng kích thước trong lúc fetch; 0 kết quả hoặc lỗi thì ẩn cả khối (không hiện trạng thái rỗng). I: edge_cases "Sản phẩm không có media": 1 ô placeholder cream, không thumbnail, không nút phóng to.</p>
+      <p class="demo-note">H: khối gợi ý có kết quả thì hiện skeleton 1 hàng đúng kích thước trong lúc fetch; 0 kết quả hoặc lỗi thì ẩn cả khối (không hiện trạng thái rỗng). I: edge_cases "Training mat": 1 ô placeholder cream, không thumbnail, không nút phóng to.</p>
       <div class="demo-pair">
         <div>
-          <p class="demo-label">Pairs Well With · loading</p>
+          <p class="demo-label">Pairs well with · loading</p>
           <div class="skeleton-row" aria-busy="true">
             <div class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line"></span></div>
             <div class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line"></span></div>
           </div>
         </div>
         <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--space-4); align-items: start">
-          <div class="placeholder-tile" role="img" aria-label="Sản phẩm không có media, no image"><svg aria-hidden="true"><use href="#i-image"/></svg></div>
-          <div class="buy__head"><h3 class="buy__title buy__title--h3">Sản phẩm không có media</h3><div class="price price--xl"><span>$34.00</span></div></div>
+          <div class="placeholder-tile" role="img" aria-label="Training mat, no image"><svg aria-hidden="true"><use href="#i-image"/></svg></div>
+          <div class="buy__head"><h3 class="buy__title buy__title--h3">Training mat</h3><div class="price price--xl"><span>$34.00</span></div></div>
         </div>
       </div>
     </section>
@@ -748,7 +748,7 @@
             <div class="buy__purchase">
               <label for="qty-j1">Quantity</label>
               <div class="quantity"><button class="quantity__button" type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" id="qty-j1" type="number" min="1" value="1"><button class="quantity__button" type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-              <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+              <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add to cart</button>
             </div>
           </div>
         </div>
@@ -756,7 +756,7 @@
 
       <div class="demo-pair" style="margin-block-start: var(--space-5)">
         <div class="demo-card">
-          <p class="demo-label">J2 · bấm "+33": mở hết 40 giá trị tại chỗ, đúng thứ tự gốc; focus vào 35 lb (giá trị đầu tiên vừa hiện, không chọn nó); "Show Fewer" ô cuối 2 cột, thu lại thì focus về "+33"</p>
+          <p class="demo-label">J2 · bấm "+33": mở hết 40 giá trị tại chỗ, đúng thứ tự gốc; focus vào 35 lb (giá trị đầu tiên vừa hiện, không chọn nó); "Show fewer" ô cuối 2 cột, thu lại thì focus về "+33"</p>
           <div class="buy">
             <div class="buy__head"><div class="price price--xl"><span>$189.00</span></div></div>
             <div class="buy__form" style="border: 0; padding: 0">
@@ -803,14 +803,14 @@
                   <label class="variant-pill"><input type="radio" name="j2w"><span class="opt__text">190 lb</span></label>
                   <label class="variant-pill is-unavailable"><input type="radio" name="j2w"><span class="opt__text">195 lb</span><span class="visually-hidden">, unavailable</span></label>
                   <label class="variant-pill is-unavailable"><input type="radio" name="j2w"><span class="opt__text">200 lb</span><span class="visually-hidden">, unavailable</span></label>
-                  <button class="variant-more variant-more--less" type="button" aria-expanded="true" aria-controls="j2-weight">Show Fewer<span class="visually-hidden"> Weight options</span><svg aria-hidden="true"><use href="#i-caret"/></svg></button>
+                  <button class="variant-more variant-more--less" type="button" aria-expanded="true" aria-controls="j2-weight">Show fewer<span class="visually-hidden"> Weight options</span><svg aria-hidden="true"><use href="#i-caret"/></svg></button>
                 </div>
               </fieldset>
               <p class="stock-line">In stock</p>
               <div class="buy__purchase">
                 <label for="qty-j2">Quantity</label>
                 <div class="quantity"><button class="quantity__button" type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" id="qty-j2" type="number" min="1" value="1"><button class="quantity__button" type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-                <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+                <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add to cart</button>
               </div>
             </div>
           </div>
@@ -846,12 +846,12 @@
                 <div class="buy__purchase">
                   <label for="qty-j3">Quantity</label>
                   <div class="quantity"><button class="quantity__button" type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" id="qty-j3" type="number" min="1" value="1"><button class="quantity__button" type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-                  <button class="button buy__add is-pending" type="submit" aria-disabled="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+                  <button class="button buy__add is-pending" type="submit" aria-disabled="true"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add to cart</button>
                 </div>
                 <p class="visually-hidden" role="status">Loading Single…</p>
               </div>
             </div>
-            <p class="demo-note" style="margin: 0">Lựa chọn nhảy ngay; giá thành skeleton (không làm nhạt giá cũ); dòng tồn là spinner duy nhất; Add To Cart giữ màu, aria-disabled, không spinner (spinner trên nút chỉ cho đang thêm giỏ, trạng thái C). Trạng thái Weight giữ cũ tới khi server trả.</p>
+            <p class="demo-note" style="margin: 0">Lựa chọn nhảy ngay; giá thành skeleton (không làm nhạt giá cũ); dòng tồn là spinner duy nhất; Add to cart giữ màu, aria-disabled, không spinner (spinner trên nút chỉ cho đang thêm giỏ, trạng thái C). Trạng thái Weight giữ cũ tới khi server trả.</p>
           </div>
 
           <div class="demo-card">
@@ -867,18 +867,18 @@
                   </div>
                   <div class="vp-error" id="j4-error" role="alert">
                     <p class="variant-option__error"><svg aria-hidden="true"><use href="#i-alert"/></svg>Couldn't load Single. Check your connection.</p>
-                    <button class="button button--secondary button--small" type="button">Try Again</button>
+                    <button class="button button--secondary button--small" type="button">Try again</button>
                   </div>
                 </fieldset>
                 <p class="stock-line">In stock</p>
                 <div class="buy__purchase">
                   <label for="qty-j4">Quantity</label>
                   <div class="quantity"><button class="quantity__button" type="button" aria-label="Decrease quantity" disabled><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" id="qty-j4" type="number" min="1" value="1"><button class="quantity__button" type="button" aria-label="Increase quantity"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
-                  <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
+                  <button class="button buy__add" type="submit"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add to cart</button>
                 </div>
               </div>
             </div>
-            <p class="demo-note" style="margin: 0">Chữ lỗi đỏ 6.38 + icon, role alert; "Try Again" secondary cao 44 gửi lại đúng lựa chọn lỗi. Focus ở lại radio đã khôi phục (Pair). Không dropdown cho option nhiều giá trị (sổ M5).</p>
+            <p class="demo-note" style="margin: 0">Chữ lỗi đỏ 6.38 + icon, role alert; "Try again" secondary cao 44 gửi lại đúng lựa chọn lỗi. Focus ở lại radio đã khôi phục (Pair). Không dropdown cho option nhiều giá trị (sổ M5).</p>
           </div>
         </div>
       </div>
@@ -886,24 +886,24 @@
 
     <!-- ===== Vòng 3b: countdown ===== -->
     <section class="demo-block" aria-labelledby="st-k">
-      <p class="demo-label">Trạng thái K · countdown "Sale ends in" (Figma 1:773) · metafield custom.sale_ends_at (date_time)</p>
+      <p class="demo-label">Trạng thái K · countdown "Sale ends in" · metafield custom.sale_ends_at (date_time)</p>
       <h2 id="st-k">Sale countdown states</h2>
-      <p class="demo-note">Đặt giữa tên và giá (thứ tự Figma 1:769). Hiện khi: có ngày, chưa hết giờ, variant đang chọn có giá gạch, còn hàng. Ô ngày chỉ hiện khi còn ≥ 24 giờ (như TE-13 AC1). Số in từ Liquid, JS đếm tiếp mỗi giây; số aria-hidden, trình đọc màn hình đọc câu ngày giờ đầy đủ; không aria-live. Khung cao 60 cố định, ô tabular-nums: số đổi không xô bố cục.</p>
+      <p class="demo-note">Đặt giữa tên và giá. Hiện khi: có ngày, chưa hết giờ, variant đang chọn có giá gạch, còn hàng. Ô ngày chỉ hiện khi còn ≥ 24 giờ (như TE-13 AC1). Số in từ Liquid, JS đếm tiếp mỗi giây; số aria-hidden, trình đọc màn hình đọc câu ngày giờ đầy đủ; không aria-live. Khung cao 60 cố định, ô tabular-nums: số đổi không xô bố cục.</p>
       <div class="demo-cols--k">
         <div class="demo-card sale-countdown-host">
           <p class="demo-label">K1 · còn ≥ 24 giờ: 4 ô ngày, giờ, phút, giây</p>
           <p class="sale-countdown" role="timer"><span class="sale-countdown__label" aria-hidden="true">Sale ends in</span><span class="visually-hidden">Sale ends on November 13, 2026 at 4:00 AM EST</span><span class="sale-countdown__units" aria-hidden="true"><span class="sale-countdown__unit">02</span><span class="sale-countdown__unit">14</span><span class="sale-countdown__unit">36</span><span class="sale-countdown__unit">28</span></span></p>
-          <div class="price price--xl"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s><span class="badge badge--sale">-24%</span></div>
+          <div class="price price--xl"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s><span class="badge badge--sale">−24%</span></div>
         </div>
         <div class="demo-card sale-countdown-host">
           <p class="demo-label">K2 · sắp hết (&lt; 1 giờ): ô nền cam</p>
           <p class="sale-countdown" data-state="ending" role="timer"><span class="sale-countdown__label" aria-hidden="true">Sale ends in</span><span class="visually-hidden">Sale ends today at 11:59 PM EST, in less than one hour</span><span class="sale-countdown__units" aria-hidden="true"><span class="sale-countdown__unit">00</span><span class="sale-countdown__unit">42</span><span class="sale-countdown__unit">17</span></span></p>
-          <div class="price price--xl"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s><span class="badge badge--sale">-24%</span></div>
+          <div class="price price--xl"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s><span class="badge badge--sale">−24%</span></div>
         </div>
         <div class="demo-card sale-countdown-host">
           <p class="demo-label">K3 · hết giờ khi đang xem: giữ khung, đổi chữ</p>
           <p class="sale-countdown sale-countdown--ended" data-state="ended"><span class="sale-countdown__ended">This sale has ended</span></p>
-          <div class="price price--xl"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s><span class="badge badge--sale">-24%</span></div>
+          <div class="price price--xl"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s><span class="badge badge--sale">−24%</span></div>
         </div>
         <div class="demo-card sale-countdown-host">
           <p class="demo-label">K4 · không countdown: không ngày, quá hạn lúc render, không giảm giá, hoặc hết hàng · không chừa chỗ</p>
@@ -915,17 +915,17 @@
   </div>
 </main>
 
-<!-- ===== Footer (Figma 1:1104; foundation vòng 3 §4) ===== -->
+<!-- ===== Footer (foundation vòng 3 §4) ===== -->
 <footer class="site-footer">
   <div class="container site-footer__band">
     <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
     <div class="site-footer__newsletter">
-      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <h2><span>Get 15% off</span> your first order</h2>
       <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
     <form class="site-footer__form" onsubmit="return false" novalidate>
       <label class="visually-hidden" for="nl-email">Email</label>
-      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% off</button></div>
       <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
@@ -943,15 +943,15 @@
         <a class="shop-follow" href="#">Follow on <b>shop</b></a>
       </div>
       <div class="site-footer__menus">
-        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches &amp; Racks</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
       </div>
     </div>
     <ul class="site-footer__trust">
-      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
-      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
-      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
-      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 year warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 day money back</li>
     </ul>
   </div>
   <div class="container site-footer__bottom">
@@ -964,6 +964,6 @@
   </div>
 </footer>
 
-<!-- ===== product-sticky-bar thật (.buy-bar kit): fixed đáy mọi mốc, chỉ hiện khi nút Add To Cart chính ra khỏi màn. Mockup KHÔNG đặt thanh fixed (ES1-T527 V51: che nội dung khi chụp toàn trang); hình và markup ở trạng thái G ===== -->
+<!-- ===== product-sticky-bar thật (.buy-bar kit): fixed đáy mọi mốc, chỉ hiện khi nút Add to cart chính ra khỏi màn. Mockup KHÔNG đặt thanh fixed (ES1-T527 V51: che nội dung khi chụp toàn trang); hình và markup ở trạng thái G ===== -->
 </body>
 </html>
