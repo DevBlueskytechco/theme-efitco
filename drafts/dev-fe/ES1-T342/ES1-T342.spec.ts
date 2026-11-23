@@ -21,9 +21,14 @@ const TE7 = '/?view=te7';
 type Box = { x: number; y: number; width: number; height: number };
 const tid = (scope: Page | Locator, id: string) => scope.getByTestId(id);
 const band = (page: Page, id: string) => page.getByTestId(`container-${id}`);
+// Toạ độ theo trang (cộng scrollX/Y): boundingBox() theo viewport, mỗi lần scrollIntoViewIfNeeded đổi scroll nên so 2 hộp
+// đo ở 2 lần cuộn khác nhau là sai (CI 45113171667: ở 360 ảnh FAQ "trên" accordion, chữ why "trên" ảnh dù bố cục đúng).
 const box = async (l: Locator): Promise<Box> => {
   await l.scrollIntoViewIfNeeded();
-  const b = await l.boundingBox();
+  const b = await l.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    return r.width || r.height ? { x: r.x + scrollX, y: r.y + scrollY, width: r.width, height: r.height } : null;
+  });
   expect(b, 'phần tử có hộp hiển thị').not.toBeNull();
   return b!;
 };
