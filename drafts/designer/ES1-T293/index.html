@@ -16,6 +16,8 @@
   Kích thước khối (width / height) viết px hoặc rem, bội 4, không dùng token khoảng cách (Polaris: space token không dùng cho width / height).
   ES1-T527 (rà soát kit 20/11): component dùng chung lấy từ kit (.collection-card, .option-card, .dpanel,
   .product-row, .rating, .meter, .section-link, .button--secondary, .badge); file này chỉ còn bố cục trang.
+  ES1-T573 (kit 2.1.0): 7 component riêng trang chủ lên kit (.level-card, .stl__* + .hotspot, .vcard, .tcard, .specs, .faq__stats,
+  .quiz-opt; màn DS h-level-card … h-quiz-opt); aspect-ratio chỉ đọc var(--ratio-*); --display-fluid là token kit.
   100vw dùng thay 100% vì biến được thay thế ở chỗ dùng (mockup không có thanh cuộn dọc).
 */
 :root {
@@ -24,13 +26,11 @@
   --inset: max(0px, min(var(--space-5xl), calc(var(--side) - var(--space-5xl))));         /* = --band-inset của kit: 0 | 64 */
   --gut: calc(var(--side) - var(--inset));                                                          /* mép dải → mép nội dung: 20 | 188 */
   --vis: calc(100vw - var(--side));                                                                 /* mép trái container → mép phải màn */
-  --display-fluid: min(var(--font-size-display), 6.25vw);                                           /* 80 | 100 (display co theo cột ở 1280; dòng = cỡ, 80 và 100 đều bội 4) */
-  --pad-fluid: clamp(var(--space-2xl), 2.0833vw, var(--space-3xl));                                 /* 32 | 40 */
 }
 body { overflow-x: hidden; }
 .section--flush-end { padding-block-end: 0; }
 /* Tiêu đề section = kit .h1 trên thẻ h2 (48/56 ở 1280) */
-.display { font-size: var(--display-fluid); }  /* kit .display, chỉ co cỡ theo cột 1280 */
+.display { font-size: var(--display-fluid); }  /* kit .display, cỡ đọc token kit --display-fluid (80 | 100; 2.1.0) */
 .g12 { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); }
 .shead { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-xl); margin-block-end: var(--heading-gap); }
 .shead__text { display: grid; gap: var(--space-sm); }
@@ -46,7 +46,7 @@ body { overflow-x: hidden; }
 
 /* ===== 2. Hero — dải tối chứa header, hero, danh mục. Ảnh 2/1 (Chuẩn: Carbon aspect ratio 2:1) ===== */
 .top-band { background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); }
-.hero { position: relative; margin-inline: var(--inset); aspect-ratio: 2; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); }
+.hero { position: relative; margin-inline: var(--inset); aspect-ratio: var(--ratio-2-1); overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); }
 .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 60% 20%; }
 .hero__content { position: relative; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; height: 100%; padding-inline: var(--gut); }
 .hero__eyebrow { margin-block-end: var(--space-xl); color: inherit; } /* kit .eyebrow; trắng trên ảnh. AA: ảnh tối, chữ trắng; accent trên ảnh không đủ 4.5:1 */
@@ -64,25 +64,13 @@ body { overflow-x: hidden; }
 .cat { --card: min(21rem, calc((var(--vis) - 4 * var(--grid-gap)) / 4.3)); background: none; }
 .cat .round-button { border-color: var(--color-background); }
 
-/* ===== 4. Intro + Shop by level: card 1/1 ===== */
+/* ===== 4. Intro + Shop by level: kit .level-card (1/1 từ 48rem; h-level-card) ===== */
 .intro__top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 33rem); gap: var(--space-4xl); align-items: start; }
 .intro__img { display: inline-block; width: 1.65em; height: 0.94em; margin-inline: 0.04em; vertical-align: -0.1em; border-radius: var(--radius-sm); object-fit: cover; }
 .intro__aside { display: grid; justify-items: start; gap: var(--space-4xl); padding-block-start: var(--space-2xs); }
 .level { margin-block-start: var(--section-gap); }
 .level-grid { margin: 0; padding: 0; list-style: none; row-gap: var(--grid-gap); }
 .level-grid > li { grid-column: span 4; }
-.level-card { position: relative; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); color: var(--color-background-dark-foreground); text-decoration: none; }
-.level-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; transition: scale var(--motion-slow) var(--ease-out); }
-.level-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 50%, var(--color-background-dark)); }
-.level-card:focus-visible, .level-card.is-focus { outline-color: var(--color-accent); }
-.level-card__body { position: relative; z-index: 2; display: grid; gap: var(--space-2xs); padding: var(--pad-fluid); }
-.level-card__label { font-family: var(--font-heading--family); font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
-/* V27: tiêu đề luôn heading Sofia 700 (kể cả khung trạng thái, thẻ span) */
-.level-card__title { color: inherit; font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight); letter-spacing: var(--letter-spacing-heading); line-height: var(--line-height-h2); }
-/* V31: ≥ 80rem 3 card cùng trạng thái mặc định; "N products →" chỉ hiện khi rê/focus, không chiếm chỗ (< 64rem luôn hiện, xem T278) */
-.level-card__foot { display: flex; align-items: center; justify-content: space-between; max-height: 0; margin-block-start: 0; overflow: hidden; border-block-start: 1px solid transparent; font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: 500; opacity: 0; transition: max-height var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out), margin var(--motion-base) var(--ease-out); }
-.level-card:hover .level-card__foot, .level-card:focus-visible .level-card__foot, .level-card.is-hover .level-card__foot { max-height: var(--space-5xl); margin-block-start: var(--space-md); padding-block-start: var(--space-md); border-color: color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); opacity: 1; }
-.level-card:hover img, .level-card.is-hover img { scale: 1.04; }
 
 /* ===== 5. Bestsellers ===== */
 .best .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: var(--grid-gap); }
@@ -104,32 +92,9 @@ body { overflow-x: hidden; }
 .quiz__body { display: grid; grid-template-columns: 152px minmax(0, 1fr); gap: var(--space-xl); margin-block-start: var(--space-xl); }
 .quiz__map { width: 152px; height: 100%; min-height: 256px; border-radius: var(--radius-card); background: var(--color-background-sand); object-fit: contain; }
 .quiz__options { display: grid; gap: var(--space-xs); min-width: 0; margin: 0; padding: 0; border: 0; }
-/* V26: hàng câu trả lời = kit .option-card (viền accent 2 + check accent); trang chỉ thêm cột ảnh 44 */
-.quiz-opt { grid-template-columns: 44px minmax(0, 1fr); align-items: center; column-gap: var(--space-sm); min-height: 80px; }
-.quiz-opt__thumb { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: var(--color-background-sand); }
-.quiz-opt__text { display: grid; }
+/* V26: hàng câu trả lời = kit .option-card.quiz-opt (h-quiz-opt, 2.1.0) */
 
-/* ===== 7. Shop the look: ảnh 8 cột 1/1 | cột phải 4 cột ===== */
-.stl__media { grid-column: span 8; position: relative; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); }
-.stl__media img { width: 100%; height: 100%; object-fit: cover; }
-.hotspot { position: absolute; width: var(--touch-target); height: var(--touch-target); margin: calc(var(--touch-target) / -2) 0 0 calc(var(--touch-target) / -2); padding: 0; border: 0; background: none; cursor: pointer; }
-.hotspot::before { content: ''; position: absolute; inset: var(--space-sm); border-radius: 50%; background: var(--color-background); box-shadow: 0 0 0 var(--space-2xs) color-mix(in srgb, var(--color-background) 40%, transparent); }
-.hotspot[aria-pressed='true']::before { inset: var(--space-xs); box-shadow: 0 0 0 var(--space-050) var(--color-foreground), 0 0 0 var(--space-150) color-mix(in srgb, var(--color-background) 60%, transparent); }
-.stl__side { grid-column: span 4; display: flex; flex-direction: column; gap: clamp(var(--space-md), 1.25vw, var(--space-xl)); }
-.stl__fits { display: flex; align-items: center; gap: var(--space-md); min-height: clamp(84px, 5.2vw, 100px); padding-inline: var(--space-xl); border-radius: var(--radius-sm); background: var(--color-background-sand); }
-.stl__fits-icon { display: grid; flex: none; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--color-background); }
-.stl__fits-icon svg { width: 28px; height: 28px; }
-.stl__fits b { display: block; font-size: var(--font-size-lg); line-height: var(--line-height-title); }
-.stl__fits span { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
-.stl__rows { display: grid; gap: var(--space-xs); margin: 0; padding: 0; list-style: none; }
-/* V26/V30: dòng = kit .option-card (đang xem = is-checked) chứa kit .product-row; cả dòng là link */
-.stl-row .product-row__title a { text-decoration: none; }
-.stl-row .product-row__title a::after { content: ''; position: absolute; inset: 0; }
-.stl-row .product-row__title a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
-.stl__side .dpanel { margin-block-start: auto; }
-/* Review vòng 2: viền accent = đang xem (hotspot), không vòng check (tổng tiền tính cả 4 món) */
-.stl-row { padding-inline-end: var(--space-md); }
-/* V30: ô cream bọc thumb = kit .product-row__media (ES1-T527 vòng 3 đưa vào kit) */
+/* ===== 7. Shop the look: kit .stl (h-stl, 2.1.0): ảnh 8 cột 1/1 | cột phải 4 cột ===== */
 
 /* ===== 8. Make fitness: ảnh 1/1 rải theo vw, chữ giữa ===== */
 .mf { position: relative; display: grid; place-items: center; min-height: 50vw; overflow: hidden; }
@@ -153,7 +118,7 @@ body { overflow-x: hidden; }
 
 /* ===== 10. Featured product: 2 cột 1fr | 80 | 1fr, ảnh 1/1 ===== */
 .fp { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-6xl); align-items: start; }
-.fp__media { position: relative; aspect-ratio: 1; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-panel); background: var(--color-background-cream); }
+.fp__media { position: relative; aspect-ratio: var(--ratio-1-1); overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-panel); background: var(--color-background-cream); }
 .fp__media img { width: 100%; height: 100%; padding: 12%; object-fit: contain; mix-blend-mode: darken; }
 .fp__seal { position: absolute; inset-block-start: var(--space-xl); inset-inline-start: var(--space-xl); width: 112px; height: 112px; color: var(--color-muted-light); }
   .fp__seal text { text-transform: uppercase; }
@@ -166,46 +131,18 @@ body { overflow-x: hidden; }
 .fp__rating { margin-block-start: calc(var(--space-xs) * -1); }
 .fp__rating .sep { width: 1px; height: var(--icon-size-sm); background: var(--color-muted-light); }
 .fp__desc { color: var(--color-muted); }
-.specs { width: 100%; margin: var(--space-xs) 0 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
-.specs > div { display: flex; justify-content: space-between; align-items: center; gap: var(--space-md); min-height: 44px; padding: var(--space-xs) var(--space-xl); }
-.specs > div:nth-child(odd) { background: var(--color-background-sand); }
-.specs dt { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
-.specs dd { margin: 0; text-align: end; }
+/* Bảng thông số = kit .specs (h-specs, 2.1.0) */
 .fp__actions { display: flex; gap: var(--space-sm); margin-block-start: var(--space-xl); }
 
-/* ===== 11. Video demo: card 264, ảnh 9/16 (Chuẩn: M3 carousel 9:16) ===== */
+/* ===== 11. Video demo: card 264 = kit .vcard (h-vcard, 2.1.0) ===== */
 .video { --card: 16.5rem; }
-.vcard { display: grid; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); }
-.vcard__media { position: relative; aspect-ratio: 9 / 16; background: var(--color-background-dark); }
-.vcard__media img { width: 100%; height: 100%; object-fit: cover; }
-.vcard__play { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
-.vcard__play span { display: grid; place-items: center; width: var(--round-button-size); height: var(--round-button-size); border-radius: 50%; background: color-mix(in srgb, var(--color-background) 92%, transparent); color: var(--color-foreground); transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out); }
-.vcard__play svg { width: 16px; height: 18px; margin-inline-start: var(--space-050); } /* Thiết kế: quang học glyph play 16 × 18 */
-.vcard__play:hover span { scale: 1.06; background: var(--color-accent); color: var(--color-accent-foreground); }
-/* V30: dòng sản phẩm = kit .product-row (thumb 56 cream bo 8) */
-.vcard__product { position: relative; min-height: 84px; padding: var(--space-sm) var(--space-md); }
-.vcard__product .product-row__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.vcard__product a, .tcard__product a { text-decoration: none; }
-.vcard__product a::after, .tcard__product a::after { content: ''; position: absolute; inset: 0; }
-.vcard__product a:hover, .tcard__product a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
 
-/* ===== 12. Testimonials: card min(456, 3.3 card), ảnh 16/9 ===== */
+/* ===== 12. Testimonials: card min(456, 3.3 card) = kit .tcard (h-tcard, 2.1.0) ===== */
 .reviews { --card: min(28.5rem, calc((var(--vis) - 3 * var(--grid-gap)) / 3.3)); }
-.tcard { display: flex; flex-direction: column; height: 100%; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background); }
-.tcard > img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-.tcard__body { display: flex; flex: 1; flex-direction: column; gap: var(--space-sm); padding: var(--space-xl); }
-.tcard__meta { display: flex; align-items: center; gap: var(--space-sm); }
-.tcard__name { font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: 600; }
-.tcard__verified { display: inline-flex; align-items: center; gap: var(--space-2xs); color: var(--color-muted-light); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
-.tcard__verified svg { width: var(--icon-size-sm); height: var(--icon-size-sm); color: var(--color-badge-new); }
-.tcard__meta .rating__stars { margin-inline-start: auto; }
-.tcard__title { font-family: var(--font-primary--family); } /* kit .text-title (18/28, Inter 700) */
-.tcard__quote { flex: 1; color: var(--color-muted); }
-.tcard__product { position: relative; margin-block-start: var(--space-xs); padding-block-start: var(--space-xl); border-block-start: 1px solid var(--color-border); }
 
 /* ===== 13. Why choose: ảnh 1/1 = lề + nửa trái lưới 2 cột; .on-dark của kit (eyebrow xám, focus trắng — V24) ===== */
 .why { position: relative; display: grid; grid-template-columns: calc(var(--side) + (var(--cw) - var(--space-6xl)) / 2) minmax(0, 1fr); column-gap: var(--space-6xl); background: var(--color-background-dark) var(--dark-texture); }
-.why__media { position: relative; aspect-ratio: 1; }
+.why__media { position: relative; aspect-ratio: var(--ratio-1-1); }
 .why__media img { width: 100%; height: 100%; object-fit: cover; object-position: 40% 30%; }
 .why__media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 70%, color-mix(in srgb, var(--color-background-dark) 80%, transparent)); }
 .why__content { display: grid; align-content: center; justify-items: start; padding-inline-end: var(--side); }
@@ -225,21 +162,15 @@ body { overflow-x: hidden; }
 /* ===== 15. FAQ: 2 cột 1fr | 80 | 1fr; accordion kit (V37). Khung ảnh 4/3, ảnh chiếm 76% bề ngang nên ra gần 1/1 ===== */
 .faq { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: var(--space-6xl); }
 .faq .accordion { border-block-start: 0; }
-.faq__aside { position: relative; align-self: start; aspect-ratio: 4 / 3; }
+.faq__aside { position: relative; align-self: start; aspect-ratio: var(--ratio-4-3); }
 .faq__image { position: absolute; inset-block: 0; inset-inline-end: 0; width: 76.2%; height: 100%; object-fit: cover; border-radius: var(--radius-panel); }
-.faq__stats { position: absolute; inset-block-end: var(--space-3xl); inset-inline-start: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); width: 79.6%; margin: 0; padding: 0; list-style: none; }
-.faq__stat { display: grid; gap: var(--space-2xs); padding: var(--space-xl); border-radius: var(--radius-sm); color: var(--color-background-dark-foreground); }
-.faq__stat:first-child { background: var(--color-accent); }
-.faq__stat:last-child { background: var(--color-background-dark); }
-.faq__stat-label { font-family: var(--font-heading--family); font-size: var(--font-size-eyebrow); line-height: var(--line-height-eyebrow); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
-.faq__stat-value { font-family: var(--font-heading--family); font-size: var(--font-size-h1); font-weight: var(--font-heading--weight-display); line-height: 1; letter-spacing: var(--letter-spacing-heading); }
-.faq__stat-text { font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: 500; }
+/* 2 ô số liệu = kit .faq__stats (h-faq-stats, 2.1.0) */
 
 /* ===== Trạng thái (ĐỀ XUẤT) ===== */
 .states__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-2xl); }
 .state { display: grid; align-content: start; gap: var(--space-sm); }
 .state__box { padding: var(--space-xl); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); }
-.hero-mini { position: relative; display: grid; place-items: center start; aspect-ratio: 2; padding-inline: var(--space-2xl); border-radius: var(--radius-panel); background: var(--color-background-dark); color: var(--color-background-dark-foreground); }
+.hero-mini { position: relative; display: grid; place-items: center start; aspect-ratio: var(--ratio-2-1); padding-inline: var(--space-2xl); border-radius: var(--radius-panel); background: var(--color-background-dark); color: var(--color-background-dark-foreground); }
 .hero-mini .display { font-size: var(--font-size-h1); line-height: var(--line-height-h1); }
 .diff-note { margin-block-start: var(--space-xs); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
 </style></head>
@@ -420,7 +351,7 @@ body { overflow-x: hidden; }
         <div class="shead__text"><p class="eyebrow">Shop this setup</p><h2 class="h1" id="stl-h">A complete corner gym, itemised</h2></div>
         <a class="section-link" href="#">Browse all setups<svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
-      <div class="g12">
+      <div class="stl">
         <div class="stl__media">
           <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-look.jpg?width=1440" alt="Corner home gym with adjustable bench, dumbbells and storage cart" width="1872" height="1632">
           <button class="hotspot" type="button" style="left:85.04%;top:15.3%" aria-pressed="true" aria-label="Show Ativafit Lava 66 lb in the list"></button>
@@ -428,7 +359,8 @@ body { overflow-x: hidden; }
           <button class="hotspot" type="button" style="left:78.2%;top:64%" aria-pressed="false" aria-label="Show Compact Power Rack R3 in the list"></button>
           <button class="hotspot" type="button" style="left:46.4%;top:58.2%" aria-pressed="false" aria-label="Show Training Mat 12 mm in the list"></button>
         </div>
-        <div class="stl__side">
+        <div class="stl__body">
+          <div class="stl__list">
           <div class="stl__fits"><span class="stl__fits-icon" aria-hidden="true"><svg><use href="#i-ruler"/></svg></span><p><b>Fits: 2.4×2.0 m</b><span>Folds flat when you're done.</span></p></div>
           <ul class="stl__rows">
             <li class="option-card stl-row is-checked" aria-current="true"><div class="product-row"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=160" alt="" width="128" height="128"></span><div><p class="product-row__title"><a href="#">Ativafit Lava 66 lb</a></p><p class="price">$379.99</p></div></div></li>
@@ -436,7 +368,8 @@ body { overflow-x: hidden; }
             <li class="option-card stl-row"><div class="product-row"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=160" alt="" width="128" height="128"></span><div><p class="product-row__title"><a href="#">Compact Power Rack R3</a></p><p class="price">$549.00</p></div></div></li>
             <li class="option-card stl-row"><div class="product-row"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P16_b6c798cf-e03c-4995-b522-1737773992d2.png?width=160" alt="" width="128" height="128"></span><div><p class="product-row__title"><a href="#">Training Mat 12 mm</a></p><p class="price">$69.00</p></div></div></li>
           </ul>
-          <div class="dpanel dpanel--lg" aria-live="polite">
+          </div>
+          <div class="dpanel dpanel--lg stl__summary" aria-live="polite">
             <p class="dpanel__row dpanel__row--muted"><span>4 items</span><span>$1,187.98</span></p>
             <p class="dpanel__row dpanel__row--saving"><span><svg viewBox="0 0 20 20" aria-hidden="true"><use href="#i-tag"/></svg>Setup discount (10%)</span><span>−$118.80</span></p>
             <p class="dpanel__row dpanel__row--total"><span>Total</span><span>$1,069.18</span></p>
@@ -671,7 +604,7 @@ body { overflow-x: hidden; }
       </div>
       <div class="state">
         <p class="demo-label">Level card: hover or keyboard focus</p>
-        <a class="level-card is-hover" href="#" style="aspect-ratio:4/3"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-2.jpg?width=720" alt="" width="912" height="912"><span class="level-card__body"><span class="level-card__label">Level fitness</span><span class="level-card__title">Intermediate</span><span class="level-card__foot">12 products <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></span></span></a>
+        <a class="level-card is-hover" href="#" style="aspect-ratio: var(--ratio-4-3)"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-2.jpg?width=720" alt="" width="912" height="912"><span class="level-card__body"><span class="level-card__label">Level fitness</span><span class="level-card__title">Intermediate</span><span class="level-card__foot">12 products <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></span></span></a>
       </div>
       <div class="state">
         <p class="demo-label">Row: first and last page</p>
