@@ -29,6 +29,23 @@ jobs:
           shopify theme check --output json --fail-level error > "$RUNNER_TEMP/check.json" || rc=$?
           scripts/shopify-cli.sh check-report "$RUNNER_TEMP/check.json" || rc=1
           exit $rc
+  # ES1-T530, ADR 0015 mục 4: token 4 nơi so kit.css (nguồn chuẩn) + mockup không định nghĩa lại component kit.
+  # Không gọi Shopify, không secret, chạy song song theme-check. Chưa là required check: CTO đưa vào khi FAIL = 0 trên develop
+  # (sau ES1-T585). Khi known_mismatches còn 0: thêm --strict vào bước token (ADR 0015 mục Đo).
+  design-lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - name: Test check-tokens + check-mockup-kit trên fixture
+        run: bash scripts/check-tokens.test.sh
+      - name: Token 4 nơi so kit.css (FAIL chặn, WARN là annotation)
+        run: node scripts/check-tokens.mjs
+      - name: Mockup không định nghĩa lại component kit
+        if: always()
+        run: node scripts/check-mockup-kit.mjs
   preview:
     needs: theme-check
     runs-on: ubuntu-latest
