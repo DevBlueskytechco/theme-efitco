@@ -4,7 +4,7 @@
 // customElements.whenDefined + picker tải xong lựa chọn (aria-busy trên product-form gỡ) rồi mới dựng FormData.
 // id không đổi sau khi chờ (lỗi tải, tổ hợp không tồn tại, 9 s không có picker) → không POST.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T602.spec.ts
-// POST /cart/add.js luôn bị mock 422 (đếm body, không đụng giỏ thật của store).
+// POST thêm giỏ (Cart API add) luôn bị mock 422 (đếm body, không đụng giỏ thật của store).
 import { readFileSync, statSync } from 'node:fs';
 import { test, expect, type Locator, type Page } from './support/test';
 import { CART_GLOB } from './support/cart-api';
@@ -40,7 +40,7 @@ async function holdPicker(page: Page) {
   return () => release();
 }
 
-/** Mock 422 cho /cart/add.js, trả danh sách body đã POST. */
+/** Mock 422 cho Cart API add, trả danh sách body đã POST. */
 async function mockAdd(page: Page) {
   const posted: string[] = [];
   await page.route(CART_GLOB.add, (route) => {
