@@ -17,7 +17,7 @@ Figma đối chiếu: header 1:362, panel "Your Bundle" 1:718 (tóm tắt, dòng
 | 1 | Header | biến thể A nền trắng viền dưới | thanh tối `--color-background-dark` + noise, cao 80, logo 100 × 30, menu trắng 60%, search 20, số giỏ pill trắng | Sổ 10/11, Figma 1:362, foundation §3 |
 | 2 | Tóm tắt | nền `--color-background-alt` bo 12, h2 Sofia cỡ h3, Total Sofia cỡ h3 | panel `--color-background-panel` bo 16, padding 24/32/40; đầu panel: tiêu đề Inter 700 18/28 + badge cam "4 Items"; gạch 1px `--color-muted`; dòng Inter 500 16/26 cách 24; Total nhãn 500 16, số 700 18 | Figma 1:718, 1:719, 1:721, 1:740 |
 | 3 | Chữ phụ trên panel | — | trắng 70% trên panel (6.56:1) thay #999 Figma (4.01:1, trượt AA chữ 14) | Figma 1:753; sổ 09/11 AA |
-| 4 | Giảm giá | chữ đỏ `--color-sale` | xanh như "Bundle discount" Figma: dòng trên nền trắng `--color-badge-new` (4.57); trên panel `badge-new` 50% trắng (5.81) thay #4B824D (2.50) | Figma 1:746, 1:747 |
+| 4 | Giảm giá | chữ đỏ `--color-sale` | xanh như "Bundle discount" Figma: dòng trên nền trắng `--color-badge-new` (4.57); trên panel `badge-new` 50% trắng (5.82) thay #4B824D (2.50) | Figma 1:746, 1:747 |
 | 5 | Nút Checkout | icon khoá trước chữ | chữ + mũi tên 16 × 14 sau chữ, full width trong panel | Figma 1:758 |
 | 6 | Freeship | thanh 8 bo pill, xe tải 24, câu 16 | thanh 4 bo 2 ở trên, dưới là icon khoá 12 × 16 + câu 14/500 muted, số tiền 700 foreground; hộp cream bo 16; vẫn ở đầu danh sách | Figma 1:749, 1:751; ES1-T93 |
 | 7 | Nút prev/next upsell | mũi tên 20 × 16 | chevron 11 × 16 trong tròn 52, trắng viền border, hover cam | Sổ 09/11, Figma 1:398, foundation §6 |
@@ -123,7 +123,7 @@ Sắp xếp:
 
 Màu dẫn xuất trên panel (không phải token mới, `color-mix` trên token như menu header 60% của foundation §2):
 - `--panel-muted` = `color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel))` ≈ #C4C4C6, 6.56:1.
-- `--panel-saving` = `color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground))` ≈ #A5C1A6, 5.81:1.
+- `--panel-saving` = `color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground))` ≈ #A5C0A6, 5.82:1 (V01 ES1-T527: badge-new #4B824D).
 
 ### 3.7 Thanh checkout dính đáy mobile (ĐỀ XUẤT, State 6)
 - < 64rem, khi panel tóm tắt ra khỏi màn hình: thanh nền panel dính đáy, bóng trên, padding 12 / lề trang + `env(safe-area-inset-bottom)`; trái "Total" 14 `--panel-muted` + số 18/700 trắng, phải nút Checkout → (flex 1, cao 48).
@@ -193,7 +193,7 @@ Tương phản (WCAG, L tính tay; bảng gốc foundation §2):
 | badge-new (#4B824D, L 0.180) / background | 4.57 | discount dòng 14/500 |
 | dark-foreground / panel (#393942, L 0.0419) | 11.4 | chữ panel, Total |
 | `--panel-muted` (~#C4C4C6, L 0.553) / panel | 6.56 | Shipping, ghi chú thuế, Secure checkout, "Updating cart…", nhãn Total thanh đáy |
-| `--panel-saving` (~#A5C1A6, L 0.484) / panel | 5.81 | discount trong panel |
+| `--panel-saving` (~#A5C0A6) / panel | 5.82 | discount trong panel |
 | (Figma #999 / panel) | 4.01 | không dùng, trượt AA chữ 14 |
 | (Figma #4B824D / panel) | 2.50 | không dùng |
 | accent-foreground / accent | 5.01 | Checkout, badge "4 Items" |
@@ -222,7 +222,7 @@ Màu: `--color-background`, `--color-foreground`, `--color-muted`, `--color-mute
 - Lazy: ảnh dòng ≥ 2, ảnh upsell, lưới Bestsellers, ảnh newsletter footer. Upsell nạp sau tải trang, giữ chỗ bằng skeleton (0 CLS).
 - Font: Sofia Sans Condensed 700/800 (h1, h2 upsell, eyebrow, wordmark), Inter 400/500/600/700 (còn lại, gồm tiêu đề panel); 2 họ qua `font_picker`, `swap`.
 - CLS: accelerated chừa `min-height`; live region lỗi rỗng không chiếm chỗ; thanh dính đáy `fixed`; "Updating cart…" thay chỗ ghi chú thuế cùng chiều cao; header sticky CSS, noise là `background-image` nhỏ đã có.
-- A11y rủi ro và cách tránh: chữ #999/xanh Figma trên panel trượt AA → màu dẫn xuất 6.56 / 5.81; focus accent trên panel không thấy → outline trắng; làm mờ số khi cập nhật bị tính contrast → không làm mờ; nút icon không tên → `aria-label` có tên sản phẩm; heading nhảy bậc → h2 Order Summary.
+- A11y rủi ro và cách tránh: chữ #999/xanh Figma trên panel trượt AA → màu dẫn xuất 6.56 / 5.82; focus accent trên panel không thấy → outline trắng; làm mờ số khi cập nhật bị tính contrast → không làm mờ; nút icon không tên → `aria-label` có tên sản phẩm; heading nhảy bậc → h2 Order Summary.
 - Best Practices: ảnh `contain` không méo; 0 lỗi console (mockup 0 lỗi ở 4 mốc).
 - JS: stepper, upsell add, thanh dính đáy thuộc BE (`assets/cart-items.js` hoặc file mới ≤ 8 KB).
 
@@ -250,4 +250,4 @@ Chuyển động: số tiền không animate; dòng bị xoá mờ dần 200ms r
 CTO chốt cả các câu dưới đây theo đề xuất (docs/design/decisions.md, 10/11).
 1. Đổi ô số native (mặc định ES1-T93 #3) sang bộ − ô + 44px cho cart page và drawer? Đề xuất: có (12 #2151D; không đổi luồng, vẫn `updates[]`, cần 1 ticket BE nhỏ).
 2. Upsell trong cart page (ES1-T247 chưa trả lời): làm theo §3.8, intent complementary, tối đa 4, dưới khu giỏ, cùng đợt BE với thanh dính đáy §3.7? Đề xuất: có.
-3. Tóm tắt dùng panel tối như "Your Bundle" 1:718, chữ phụ trắng 70% (6.56) và xanh giảm giá nhạt (5.81) thay #999 (4.01) và #4B824D (2.50) của Figma để đạt AA? Đề xuất: có, áp cả cho bundle builder trang chủ và mini cart ES1-T262.
+3. Tóm tắt dùng panel tối như "Your Bundle" 1:718, chữ phụ trắng 70% (6.56) và xanh giảm giá nhạt (5.82) thay #999 (4.01) và #4B824D (2.50) của Figma để đạt AA? Đề xuất: có, áp cả cho bundle builder trang chủ và mini cart ES1-T262.

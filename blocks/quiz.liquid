@@ -11,8 +11,12 @@
   Works without JavaScript: all steps show, and the form submits the chosen
   tags to the search page. With scripting enabled, CSS shows a step only after
   the previous steps have an answer, and the submit button only after the last
-  one (assets/base.css). A script takes over by setting data-enhanced on the
+  one (assets/quiz.css). A script takes over by setting data-enhanced on the
   root. In the theme editor, data-design-mode keeps every step visible.
+
+  Styles: assets/quiz.css (quiz, quiz-step, results page), loaded by the
+  stylesheet_tag line before the root, outside every partial, without preload
+  (ADR 0014); the results page breadcrumb is in assets/collection.css.
 
   Form parameters without JavaScript (drafts/techlead/ES1-T132/task-split.md D4,
   ES1-T133 #2, #3): hidden q=* and type=product, plus one filter.p.tag per
@@ -225,6 +229,9 @@
   endif
 -%}
 
+{%- if steps != blank or results_only or request.design_mode -%}
+  {{ 'quiz.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if steps != blank or results_only -%}
   <{{ root_tag }}
     class="{{ root_class }}"

@@ -7,103 +7,77 @@
 <meta name="description" content="A short cool-down routine for the muscles you just worked, and how long to hold each stretch.">
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
-  /* Riêng trang bài viết (ES1-T257). Spec: docs/ui-spec/article.md */
+  /* Riêng trang bài viết (ES1-T257). Spec: docs/ui-spec/article.md.
+     ES1-T527 (DS check 20/11): rte và .reading-column (720) lấy từ kit, thân bài 16/1.7 mọi khổ (V53);
+     pagination* từ kit (V57); bo 16 = --radius-panel (V04). Trang chỉ giữ bố cục. */
 
   /* Ảnh bìa (LCP), vòng 3: thẻ bo 16 NẰM DƯỚI header tối, trong container (khung .page-banner foundation §3.3,
      tỉ lệ hero Figma 1:361 1798/827 từ 80rem). Không chữ đè ảnh → không lớp tối, ảnh giữ màu thật */
-  .article-cover { width: var(--content-width); margin: var(--space-4) auto 0; aspect-ratio: 4 / 3; overflow: hidden; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-dark); }
+  .article-cover { width: var(--content-width); margin: var(--space-md) auto 0; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); }
   .article-cover img { width: 100%; height: 100%; object-fit: cover; }
   @media (min-width: 48rem) { .article-cover { aspect-ratio: 16 / 9; } }
-  @media (min-width: 64rem) { .article-cover { margin-block-start: var(--space-5); } }
+  @media (min-width: 64rem) { .article-cover { margin-block-start: var(--space-xl); } }
   @media (min-width: 80rem) { .article-cover { aspect-ratio: 1798 / 827; } }
 
-  /* Cột đọc */
-  .article-column { width: min(100%, 46rem); margin-inline: auto; }
-  .article-header { display: grid; justify-items: start; gap: var(--space-3); padding-block: var(--space-2) var(--space-6); }
-  .article-header .breadcrumb { padding-block-start: var(--space-3); }
-  .article-header h1 { margin-block-start: var(--space-1); }
-  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); line-height: calc(22 / 14); }
-  .meta > span + span::before { content: '·'; margin-inline-end: var(--space-2); color: var(--color-muted-light); }
+  /* Đầu bài trong cột đọc (.reading-column của kit) */
+  .article-header { display: grid; justify-items: start; gap: var(--space-sm); padding-block: var(--space-xs) var(--space-2xl); }
+  .article-header .breadcrumb { width: 100%; padding-block-start: var(--space-sm); }
+  .article-header h1, .article-header .h1 { margin-block-start: var(--space-2xs); }
+  .meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .meta > span + span::before { content: '·'; margin-inline-end: var(--space-xs); color: var(--color-muted-light); }
   .tag-link { position: relative; text-decoration: none; }
-  .tag-link::after { content: ''; position: absolute; inset: -8px -4px; } /* vùng chạm 44 */
+  .tag-link::after { content: ''; position: absolute; inset: calc(var(--space-xs) * -1) calc(var(--space-2xs) * -1); } /* vùng chạm 44 */
   .tag-link:hover { background: color-mix(in srgb, var(--color-accent) 88%, var(--color-foreground)); }
-  @media (min-width: 64rem) { .article-header { padding-block: var(--space-4) var(--space-7); } }
+  @media (min-width: 64rem) { .article-header { padding-block: var(--space-md) var(--space-4xl); } }
 
-  /* Nội dung bài (article.content, RTE) */
-  .rte { font-size: var(--font-size-base); line-height: 1.7; }
-  .rte > * + * { margin-block-start: var(--space-5); }
-  .rte h2 { margin-block-start: var(--space-7); font-size: var(--font-size-h2); }
-  .rte h3 { margin-block-start: var(--space-6); font-size: var(--font-size-h3); }
-  .rte h2 + *, .rte h3 + * { margin-block-start: var(--space-4); }
-  .rte ul, .rte ol { padding-inline-start: var(--space-5); }
-  .rte li + li { margin-block-start: var(--space-2); }
-  .rte li::marker { color: var(--color-accent); }
-  .rte a { font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
-  .rte a:hover { color: var(--color-accent); }
-  .rte blockquote { margin-inline: 0; padding-inline-start: var(--space-5); border-inline-start: 4px solid var(--color-accent); font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: -0.02em; line-height: 1.25; }
-  .rte strong { font-weight: 600; }
-  @media (min-width: 64rem) { .rte { font-size: var(--font-size-lg); } }
-
-  .article-end { display: grid; gap: var(--space-5); margin-block-start: var(--space-7); padding-block-start: var(--space-5); border-block-start: 1px solid var(--color-border); }
-  .article-topics { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); }
+  .article-end { display: grid; gap: var(--space-xl); margin-block-start: var(--space-4xl); padding-block-start: var(--space-xl); border-block-start: 1px solid var(--color-border); }
+  .article-topics { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-sm); }
   .article-topics > span { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; }
   .article-topics .tab { text-decoration: none; }
-  .back-link { display: inline-flex; align-items: center; gap: var(--space-3); min-height: 44px; font-weight: 600; text-decoration: none; justify-self: start; }
+  .back-link { display: inline-flex; align-items: center; gap: var(--space-sm); min-height: 44px; font-weight: 600; text-decoration: none; justify-self: start; }
   .back-link svg { width: 20px; height: 16px; scale: -1 1; transition: translate var(--motion-base) var(--ease-out); }
   .back-link:hover span { text-decoration: underline; text-underline-offset: 0.2em; }
-  .back-link:hover svg { translate: calc(var(--space-1) * -1) 0; }
+  .back-link:hover svg { translate: calc(var(--space-2xs) * -1) 0; }
 
   /* Bình luận */
-  .comments { margin-block-start: var(--space-7); padding-block-start: var(--space-7); border-block-start: 1px solid var(--color-border); }
-  .comment-form .field { align-content: start; }
+  .comments { margin-block-start: var(--space-4xl); padding-block-start: var(--space-4xl); border-block-start: 1px solid var(--color-border); }
   .comments > h2 { font-size: var(--font-size-h2); }
-  .comment-list { margin: var(--space-5) 0 0; padding: 0; list-style: none; border-block-start: 1px solid var(--color-border); }
-  .comment { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: var(--space-2) var(--space-4); padding-block: var(--space-5); border-block-end: 1px solid var(--color-border); }
+  .comment-list { margin: var(--space-xl) 0 0; padding: 0; list-style: none; border-block-start: 1px solid var(--color-border); }
+  .comment { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: var(--space-xs) var(--space-md); padding-block: var(--space-xl); border-block-end: 1px solid var(--color-border); }
   .comment__avatar { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--color-background-alt); font-weight: 600; }
-  .comment__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-1) var(--space-3); }
+  .comment__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-2xs) var(--space-sm); }
   .comment__author { font-weight: 600; }
   .comment__date { color: var(--color-muted); font-size: var(--font-size-sm); }
   .comment__body { grid-column: 2; color: var(--color-foreground); }
-  .comments__none { margin-block-start: var(--space-4); color: var(--color-muted); }
-  .comment-form { display: grid; gap: var(--space-5); margin-block-start: var(--space-7); }
+  .comments__none { margin-block-start: var(--space-md); color: var(--color-muted); }
+  .comment-form { display: grid; gap: var(--space-xl); margin-block-start: var(--space-4xl); }
   .comment-form h2 { font-size: var(--font-size-h3); }
-  .comment-form__note { display: flex; gap: var(--space-2); align-items: flex-start; color: var(--color-muted); font-size: var(--font-size-sm); }
-  .comment-form__note svg { flex: none; width: 16px; height: 16px; margin-block-start: 2px; }
-  .comment-form__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); }
+  .comment-form__note { display: flex; gap: var(--space-xs); align-items: flex-start; color: var(--color-muted); font-size: var(--font-size-sm); }
+  .comment-form__note svg { flex: none; width: 16px; height: 16px; margin-block-start: 3px; }
+  .comment-form__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md); }
   .comment-form__required { color: var(--color-muted); font-size: var(--font-size-sm); }
   @media (max-width: 47.99rem) { .comment-form__actions .button { width: 100%; } }
-  /* Phân trang bình luận: khối chung docs/ui-spec/pagination.md (ES1-T287); dưới danh sách, cách 24 */
-  .comments .pagination { margin-block-start: var(--space-5); }
-  .pagination__list { display: flex; align-items: center; justify-content: center; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
-  .pagination__step { text-decoration: none; }
-  .pagination__step[aria-disabled='true'] { cursor: default; }
-  .pagination__item--prev { margin-inline-end: var(--space-2); }
-  .pagination__item--next { margin-inline-start: var(--space-2); }
-  .pagination__page { display: inline-flex; align-items: center; justify-content: center; min-width: 44px; height: 44px; padding-inline: var(--space-2); border: 1px solid var(--color-border); border-radius: var(--radius-pill); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: none; transition: border-color var(--motion-fast) var(--ease-out); }
-  a.pagination__page:hover, .pagination__page.is-hover { border-color: var(--color-foreground); }
-  .pagination__page:focus-visible, .pagination__page.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
-  .pagination__page[aria-current='page'] { border-color: var(--color-accent); background: var(--color-accent); color: var(--color-accent-foreground); font-weight: 700; }
-  .pagination__gap { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 44px; color: var(--color-muted); font-size: var(--font-size-sm); }
-  .pagination__status { font-size: var(--font-size-sm); font-weight: 500; white-space: nowrap; }
-  :dir(rtl) .pagination__step svg { scale: -1 1; }
-  @media (max-width: 47.99rem) { .pagination__num { display: none; } .pagination__list { justify-content: space-between; } .pagination__item--prev, .pagination__item--next { margin: 0; } }
-  @media (min-width: 48rem) { .pagination__status { display: none; } }
+  /* Phân trang bình luận: kit pagination (docs/ui-spec/pagination.md, PG1), không định nghĩa lại (V57) */
 
   /* Bài liên quan: hàng ngang (sổ quyết định 09/11) */
   .related { margin-block-start: var(--section-gap); padding-block-end: var(--section-gap); }
   .related .card-row > li { display: flex; }
   .related .article-card { flex: 1; }
-  /* Card Figma 1:1022: padding 24 từ 48rem (1:1030, như base.css); meta chữ trắng như code ES1-T174 */
-  .related .article-card__meta { color: var(--color-background-dark-foreground); }
-  .related .article-card__meta span + span::before { content: '·'; margin-inline: var(--space-2); }
-  @media (min-width: 48rem) { .related .article-card__content { padding: 0 var(--space-5) var(--space-5); } }
-  .related h2 { font-size: var(--font-size-h1); line-height: calc(58 / 48); }
+  /* Card Figma 1:1022/1:1030: lề 24 từ 48rem, meta trắng + '·' lấy từ kit article-card (ES1-T527 vòng 2) */
+  .related h2 { font-size: var(--font-size-h1); }
   /* 1280+: 3 card vừa khung, không tràn → ẩn nút và thanh tiến trình (như AC-H9) */
   @media (min-width: 80rem) { .related .carousel-nav, .related .carousel-progress { display: none; } }
+  /* ES1-T527 vòng 2: 1280+ 3 card chia đều hết khung (không chừa ~184px trống bên phải) */
+  /* Skeleton bài liên quan (.related-skeleton) chia đều cùng quy tắc với hàng thật để không CLS (ES1-T527 vòng 3) */
+  @media (min-width: 80rem) { .related .card-row > *, .related-skeleton > * { flex: 1 1 0; } }
 
-  .demo-states { padding-block: var(--space-7); }
+  .skeleton--card { display: block; aspect-ratio: 3 / 4; border-radius: var(--radius-panel); }
+  .demo-states { padding-block: var(--space-4xl); }
+  /* Mẫu trạng thái trong cột đọc: tiêu đề + chú thích cách nội dung mẫu như .demo-block > .demo-note của kit */
+  .demo-block > .reading-column > h2 { margin-block-end: var(--space-2); }
+  .demo-block > .reading-column > .demo-note { margin-block-end: var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
   .demo-stage > .demo-plain-header { position: relative; }
-  .demo-stage .site-header__inner { width: auto; padding-inline: var(--space-5); }
+  .demo-stage .site-header__inner { width: auto; padding-inline: var(--space-xl); }
 </style></head>
 <body>
 <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -164,7 +138,7 @@
     </div>
 
     <div class="container">
-      <div class="article-column">
+      <div class="reading-column">
         <header class="article-header">
           <nav class="breadcrumb" aria-label="Breadcrumb">
             <ol><li><a href="#">Home</a></li><li><a href="#">Training Tips &amp; Inspiration</a></li><li><span aria-current="page">How to stretch properly after training</span></li></ol>
@@ -239,9 +213,9 @@
       </div>
     </div>
     <ul class="card-row" aria-label="More training tips">
-      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960" loading="lazy"><span class="badge badge--tag">Featured</span><div class="article-card__content"><h3 class="article-card__title">Set up a perfect home gym in just 15m²</h3><p class="article-card__meta"><span><time datetime="2026-11-04">Nov 4, 2026</time></span><span>5 min read</span></p></div></a></li>
-      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960" loading="lazy"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__meta"><span><time datetime="2026-11-02">Nov 2, 2026</time></span><span>7 min read</span></p></div></a></li>
-      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=720" alt="" width="720" height="960" loading="lazy"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>5 min read</span></p></div></a></li>
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Featured</span><div class="article-card__content"><h3 class="article-card__title">Set up a perfect home gym in just 15m²</h3><p class="article-card__meta"><span><time datetime="2026-11-04">Nov 4, 2026</time></span><span>5 min read</span></p></div></a></li>
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><p class="article-card__meta"><span><time datetime="2026-11-02">Nov 2, 2026</time></span><span>7 min read</span></p></div></a></li>
+      <li><a class="article-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=720" alt="" width="720" height="960"><span class="badge badge--tag">Diet plans</span><div class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><p class="article-card__meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>5 min read</span></p></div></a></li>
     </ul>
     <div class="carousel-progress" aria-hidden="true"><span class="carousel-progress__thumb" style="--size: 77%"></span></div>
   </section>
@@ -250,7 +224,7 @@
 <!-- Footer vòng 3 (Figma 1:1104, foundation §4): newsletter · panel dải rộng · hàng cuối có wordmark -->
 <footer class="site-footer">
   <div class="container site-footer__band">
-    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
     <div class="site-footer__newsletter">
       <h2><span>Get 15% Off</span> Your First Order</h2>
       <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
@@ -310,11 +284,11 @@
           <div class="site-header__icons" style="margin-inline-start: auto"><a class="site-header__icon site-header__icon--search" href="#" aria-label="Search, sample"><svg aria-hidden="true"><use href="#i-search"/></svg></a><a class="site-header__icon" href="#" aria-label="Cart, 2 items, sample"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count" aria-hidden="true">2</span></a></div>
         </div>
       </header>
-      <div class="article-column" style="padding-inline: var(--space-4)">
+      <div class="reading-column" style="padding-inline: var(--space-md)">
         <div class="article-header">
           <nav class="breadcrumb" aria-label="Breadcrumb, no cover sample"><ol><li><a href="#">Home</a></li><li><a href="#">Training Tips &amp; Inspiration</a></li><li><span aria-current="page">Rubber vs urethane: which plates last longer</span></li></ol></nav>
           <a class="badge badge--tag tag-link" href="#">Diet plans</a>
-          <p class="h1" style="font-family: var(--font-heading--family); font-weight: var(--font-heading--weight); letter-spacing: -0.02em; text-wrap: balance">Rubber vs urethane: which plates last longer</p>
+          <p class="h1">Rubber vs urethane: which plates last longer</p>
           <p class="meta"><span><time datetime="2026-11-01">Nov 1, 2026</time></span><span>By Efitco Team</span><span>5 min read</span></p>
         </div>
       </div>
@@ -322,16 +296,16 @@
   </section>
 
   <section class="demo-block">
-    <div class="article-column">
+    <div class="reading-column">
       <h2>Trạng thái: chưa có bình luận</h2>
       <p class="demo-note">article.comments_count = 0: tiêu đề "Comments", một câu mời, form ngay dưới.</p>
-      <p class="h2" style="font-family: var(--font-heading--family); font-weight: var(--font-heading--weight)">Comments</p>
+      <p class="h2">Comments</p>
       <p class="comments__none">No comments yet. Share how you cool down after training.</p>
     </div>
   </section>
 
   <section class="demo-block">
-    <div class="article-column comments" style="margin: 0; padding: 0; border: 0">
+    <div class="reading-column comments" style="margin-block: 0; padding: 0; border: 0">
       <h2>Trạng thái: phân trang bình luận (&gt; 10 bình luận)</h2>
       <p class="demo-note">10 / trang, snippet pagination chung (docs/ui-spec/pagination.md): nav "Comment pages", link ?page=N#comments, nằm dưới danh sách, trên form. Trang 1: Previous giữ chỗ mờ 0.35 + aria-disabled; trang cuối: Next như vậy. Danh sách bình luận minh hoạ (demo-data không có bình luận, ES1-T267).</p>
       <ol class="comment-list">
@@ -365,7 +339,7 @@
   </section>
 
   <section class="demo-block">
-    <div class="article-column">
+    <div class="reading-column">
       <h2>Trạng thái: bình luận chờ duyệt (gửi thành công, blog.moderated?)</h2>
       <p class="demo-note">Sau POST trang tải lại về #comments; hộp thành công role="status" đầu form, focus vào hộp; ô nhập rỗng. Blog không duyệt: "Your comment is posted." và bình luận hiện cuối danh sách.</p>
       <div class="comment-form" style="margin: 0">
@@ -379,7 +353,7 @@
   </section>
 
   <section class="demo-block">
-    <div class="article-column">
+    <div class="reading-column">
       <h2>Trạng thái: lỗi gửi bình luận</h2>
       <p class="demo-note">form.errors: hộp tóm tắt role="alert" đầu form + lỗi inline dưới từng trường (aria-invalid, aria-describedby); focus vào hộp tóm tắt; giữ chữ đã nhập. Không dùng default_errors.</p>
       <div class="comment-form" style="margin: 0">
@@ -395,7 +369,7 @@
   </section>
 
   <section class="demo-block">
-    <div class="article-column">
+    <div class="reading-column">
       <h2>Trạng thái: đang gửi · hover · focus · lỗi mạng</h2>
       <p class="demo-note">Đang gửi: aria-busy, spinner, bề rộng giữ nguyên, không bấm lại (05 §5; cần JS nhỏ, không JS thì form gửi thường). Lỗi mạng/captcha: toast error (foundation §17).</p>
       <div class="demo-row">
@@ -404,7 +378,7 @@
         <button class="button is-focus" type="button">Post Comment</button>
         <input class="field__input is-focus" style="max-width: 16rem" type="text" aria-label="Name, focus sample" value="Minh T.">
       </div>
-      <div class="alert" role="alert" style="margin-block-start: var(--space-5)">
+      <div class="alert" role="alert" style="margin-block-start: var(--space-xl)">
         <svg aria-hidden="true"><use href="#i-alert"/></svg>
         <div class="alert__body"><strong>Couldn't post your comment</strong><p>Check your connection, then post again. Your text is kept.</p></div>
       </div>
@@ -414,10 +388,10 @@
   <section class="demo-block">
     <h2>Trạng thái: bài liên quan đang tải · thiếu bài</h2>
     <p class="demo-note">Bài liên quan render từ server (không tải riêng). Skeleton chỉ dùng nếu BE tải muộn hàng này. Blog chỉ có 1 bài: không render khối. 1–2 bài: hiện số có, ẩn nút và thanh tiến trình.</p>
-    <ul class="card-row" aria-busy="true" aria-label="Loading related articles">
-      <li><span class="skeleton" style="display:block; aspect-ratio: 3 / 4; border-radius: calc(var(--radius-card) + var(--space-1))"></span></li>
-      <li><span class="skeleton" style="display:block; aspect-ratio: 3 / 4; border-radius: calc(var(--radius-card) + var(--space-1))"></span></li>
-      <li><span class="skeleton" style="display:block; aspect-ratio: 3 / 4; border-radius: calc(var(--radius-card) + var(--space-1))"></span></li>
+    <ul class="card-row related-skeleton" aria-busy="true" aria-label="Loading related articles">
+      <li><span class="skeleton skeleton--card"></span></li>
+      <li><span class="skeleton skeleton--card"></span></li>
+      <li><span class="skeleton skeleton--card"></span></li>
     </ul>
   </section>
 </div>

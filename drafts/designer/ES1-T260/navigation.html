@@ -22,7 +22,7 @@
   .nav-stage--scroll { height: 1290px; }
   @media (min-width: 80rem) { .nav-stage { height: 640px; } .nav-stage--tall { height: 700px; } }
   .nav-stage > .site-header { position: absolute; inset-inline: 0; inset-block-start: 0; z-index: 2; }
-  .nav-stage > .site-header.is-open { z-index: 23; }
+  .nav-stage > .site-header.is-open { z-index: calc(var(--layer-overlay) + 2); }
   .nav-stage > .scrim { position: absolute; inset: 0; }
   @media (min-width: 80rem) { .nav-stage > .scrim { inset-block-start: var(--header-height); } }
   .nav-stage > .drawer { position: absolute; }
@@ -33,35 +33,35 @@
   .page-hero { position: relative; height: 100%; margin-inline: var(--band-inset); overflow: hidden; background: var(--color-background-dark); }
   .page-hero img { width: 100%; height: 100%; object-fit: cover; }
   .page-hero::after { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--color-background-dark) 30%, transparent); }
-  @media (min-width: 80rem) { .page-hero { border-radius: calc(var(--radius-card) + var(--space-1)); } }
+  @media (min-width: 80rem) { .page-hero { border-radius: var(--radius-panel); } }
 
   /* Header: phần thiếu trong kit */
   button.site-header__link { padding: 0; border: 0; background: none; cursor: pointer; }
-  .site-header__link.is-focus { outline: 2px solid var(--color-background-dark-foreground); outline-offset: 2px; border-radius: 2px; }
+  .site-header__link.is-focus { outline: 2px solid var(--color-background-dark-foreground); outline-offset: 2px; border-radius: var(--radius-xs); }
   .site-header__icon.is-focus { outline: 2px solid var(--color-background-dark-foreground); outline-offset: -2px; border-radius: 50%; }
   .site-header__placeholder { margin: 0 auto; color: var(--color-muted-on-dark); font-size: var(--font-size-sm); }
 
   /* ===== Mega menu (≥ 80rem): nền trắng ngay dưới thanh tối ===== */
-  .mega-panel { position: absolute; inset-inline: 0; inset-block-start: var(--header-height); z-index: 22; padding-block: calc(var(--space-1) * 10) var(--space-7); border-block-start: 1px solid var(--color-border); background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); }
+  .mega-panel { position: absolute; inset-inline: 0; inset-block-start: var(--header-height); z-index: calc(var(--layer-overlay) + 1); padding-block: calc(var(--space-1) * 10) var(--space-7); border-block-start: 1px solid var(--color-border); background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); }
   .mega-panel__inner { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.3fr); gap: var(--space-6); width: var(--content-width); margin-inline: auto; }
   .mega-panel__inner--tiles { display: block; }
   .mega-col { display: grid; align-content: start; }
-  .mega-col__title { display: inline-flex; align-items: center; justify-self: start; min-height: 40px; margin-block-end: var(--space-1); color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: 0.04em; text-decoration: none; text-transform: uppercase; }
+  .mega-col__title { display: inline-flex; align-items: center; justify-self: start; min-height: 40px; margin-block-end: var(--space-1); text-decoration: none; }
   .mega-col__title:hover, .mega-col__title.is-hover { color: var(--color-foreground); text-decoration: underline; text-underline-offset: 0.25em; }
   .mega-col ul { display: grid; margin: 0; padding: 0; list-style: none; }
   .mega-link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 40px; color: var(--color-foreground); text-decoration: none; transition: color var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
   .mega-link:hover, .mega-link.is-hover { color: var(--color-accent); translate: var(--space-1) 0; }
-  .mega-link.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: 2px; }
+  .mega-link.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; border-radius: var(--radius-xs); }
   .mega-link[aria-current='page'] { font-weight: 600; text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 0.3em; }
   .mega-link--all { font-weight: 600; text-decoration: underline; text-underline-offset: 0.25em; }
   .mega-link svg { width: 16px; height: 13px; }
   .mega-tiles-head { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--space-4); margin-block-end: var(--space-5); }
-  .mega-tiles-head p { font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: -0.02em; line-height: 1.1; }
+  .mega-tiles-head p { font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: var(--letter-spacing-heading); line-height: var(--line-height-heading); }
 
-  /* ===== Danh mục có ảnh: hàng (< 80rem) / ô (≥ 80rem, Figma 1:404 ảnh 336/220 bo 16) ===== */
+  /* ===== Danh mục có ảnh: hàng 56 (< 80rem, drawer) / ô = kit .collection-card--menu (≥ 80rem, V14) ===== */
   .cat-list { display: grid; margin: 0; padding: 0; list-style: none; }
   .cat-list a { display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: var(--space-4); min-height: 72px; padding-block: var(--space-2); border-block-end: 1px solid var(--color-border); color: var(--color-foreground); text-decoration: none; }
-  .cat-list__media { display: grid; place-items: center; width: 56px; aspect-ratio: 1; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); color: var(--color-muted-light); }
+  .cat-list__media { display: grid; place-items: center; width: 56px; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-swatch); background: var(--color-background-cream); color: var(--color-muted-light); }
   .cat-list__media img { width: 100%; height: 100%; object-fit: cover; transition: scale var(--motion-slow) var(--ease-out); }
   .cat-list__media svg { width: 50%; height: auto; }
   .cat-list__media .skeleton { width: 100%; height: 100%; border-radius: 0; }
@@ -70,40 +70,12 @@
   .cat-list__count { color: var(--color-muted); font-size: var(--font-size-sm); }
   .cat-list a:hover .cat-list__name, .cat-list a.is-hover .cat-list__name { text-decoration: underline; text-underline-offset: 0.2em; }
   .cat-list a.is-active { background: var(--color-background-alt); }
-  @media (min-width: 80rem) {
-    .cat-list { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-5); }
-    .cat-list a { grid-template-columns: minmax(0, 1fr); align-items: start; gap: var(--space-3); min-height: 0; padding: 0; border: 0; }
-    .cat-list__media { width: auto; aspect-ratio: 336 / 220; border-radius: calc(var(--radius-card) + var(--space-1)); }
-    .cat-list__media svg { width: 20%; }
-    .cat-list a:hover img, .cat-list a.is-hover img { scale: 1.04; }
-    .cat-list__name { font-weight: 600; }
-  }
 
-  /* ===== Card sản phẩm nổi bật trong menu ===== */
-  .menu-promo { position: relative; display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: var(--space-4); padding: var(--space-3); border-radius: var(--radius-card); background: var(--color-background-cream); color: var(--color-foreground); text-decoration: none; }
-  .menu-promo__media { position: relative; display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; border-radius: var(--space-2); background: var(--color-background); color: var(--color-muted-light); }
-  .menu-promo__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; transition: scale var(--motion-slow) var(--ease-out); }
-  .menu-promo__media svg { width: 40%; height: auto; }
-  .menu-promo__media .badge { position: absolute; inset-block-start: var(--space-1); inset-inline-start: var(--space-1); min-height: 22px; padding-inline: var(--space-2); }
-  .menu-promo__body { display: grid; gap: var(--space-1); min-width: 0; }
-  .menu-promo__eyebrow { color: var(--color-accent); font-family: var(--font-heading--family); font-size: var(--font-size-sm); font-weight: var(--font-heading--weight-display); letter-spacing: 0.04em; text-transform: uppercase; }
-  .menu-promo__title { font-weight: 600; line-height: 1.375; }
-  .menu-promo:hover .menu-promo__title, .menu-promo.is-hover .menu-promo__title { text-decoration: underline; text-underline-offset: 0.2em; }
-  .menu-promo:hover img, .menu-promo.is-hover img { scale: 1.04; }
-  .menu-promo .price { font-size: var(--font-size-sm); }
-  .menu-promo.is-sold-out img { opacity: 0.6; }
-  @media (min-width: 80rem) {
-    .menu-promo { grid-template-columns: minmax(0, 1fr); align-items: start; align-self: start; gap: var(--space-4); padding: var(--space-4); }
-    .menu-promo__media { aspect-ratio: 3 / 2; border-radius: var(--space-2); }
-    .menu-promo__media .badge { inset-block-start: var(--space-3); inset-inline-start: var(--space-3); min-height: 28px; padding-inline: var(--space-3); }
-    .menu-promo__title { font-size: var(--font-size-lg); }
-    .menu-promo .price { font-size: var(--font-size-base); }
-  }
 
   /* ===== Menu drawer (< 80rem): kit .drawer.drawer--start (90% / 420) + .overlay__* ===== */
   .nav-drawer .overlay__header--sub { justify-content: space-between; padding-inline-start: var(--space-3); }
   .nav-drawer__body { padding-block-start: var(--space-2); }
-  .nav-drawer__level-title { margin: var(--space-4) 0 var(--space-2); font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight-display); text-transform: uppercase; letter-spacing: -0.02em; }
+  .nav-drawer__level-title { margin: var(--space-4) 0 var(--space-2); font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-heading); } /* Title Case (V75) */
   .nav-rows { margin: 0; padding: 0; list-style: none; }
   /* Hàng cấp 1 = .drawer-menu của kit (52, chữ 18/500) + chevron › */
   .nav-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); width: 100%; min-height: 52px; padding: 0; border: 0; border-block-end: 1px solid var(--color-border); background: none; color: var(--color-foreground); font-size: var(--font-size-lg); font-weight: 500; text-align: start; text-decoration: none; cursor: pointer; }
@@ -114,17 +86,10 @@
   .nav-row--all { font-size: var(--font-size-base); font-weight: 600; text-decoration: underline; text-underline-offset: 0.25em; }
   .nav-row--all svg { width: 16px; height: 13px; rotate: none; color: currentColor; }
   .nav-group { padding-block-start: var(--space-5); }
-  .nav-group__title { display: inline-flex; align-items: center; min-height: 44px; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: 0.04em; text-decoration: none; text-transform: uppercase; }
+  .nav-group__title { display: inline-flex; align-items: center; min-height: 44px; text-decoration: none; }
   .nav-sub { margin: 0; padding: 0; list-style: none; }
   .nav-sub a { display: flex; align-items: center; min-height: 48px; color: var(--color-foreground); text-decoration: none; }
-  .nav-drawer .menu-promo { margin-block-start: var(--space-6); }
   .nav-drawer__foot { gap: var(--space-2); padding-block-start: var(--space-3); }
-  .nav-drawer__account { display: inline-flex; align-items: center; gap: var(--space-3); min-height: 44px; color: var(--color-foreground); font-weight: 500; text-decoration: none; }
-  .nav-drawer__account svg { width: 24px; height: 24px; }
-  .locale-row { display: flex; flex-wrap: wrap; gap: var(--space-2); }
-  .locale-btn { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; padding: 0 var(--space-3); border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); cursor: pointer; }
-  .locale-btn span { color: var(--color-muted); }
-  .locale-btn svg { width: 9px; height: 5px; }
   .nav-drawer .back-button { gap: var(--space-2); padding-inline: var(--space-2); }
   .nav-drawer .back-button svg { width: 12px; height: 7px; rotate: 90deg; scale: 1; }
   .back-button.is-focus, .close-button.is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; }
@@ -157,6 +122,23 @@
     .site-header__inner:has(.site-header__placeholder) { flex-wrap: wrap; }
     .site-header__logo + .site-header__placeholder { flex-basis: 100%; order: 3; margin: 0 0 var(--space-3); }
   }
+
+  /* ===== ES1-T527: kit .group-label (V76), .collection-card--menu (V14), .product-card / .product-row (V72), Sign In secondary + hàng localization gộp (V65) ===== */
+  .menu-tiles { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--grid-gap); margin: 0; padding: 0; list-style: none; }
+  .menu-tiles.desktop-only-inline { display: none; }
+  @media (min-width: 80rem) { .menu-tiles.desktop-only-inline { display: grid; } }
+  .menu-tiles__skeleton { width: 100%; height: 100%; border-radius: 0; }
+  .menu-featured { display: grid; align-content: start; gap: var(--space-sm); max-width: 18rem; }
+  .menu-featured--row { max-width: none; margin-block-start: var(--space-xl); }
+  /* Hàng sản phẩm nổi bật trong drawer: 2 cột như .popover-card (ảnh 56 + chữ), giá + badge -N% dưới tên để tên 1 dòng ở 360 (review vòng 2) */
+  .menu-featured__text { display: grid; gap: 2px; min-width: 0; }
+  .menu-featured__text .price { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2xs) var(--space-xs); }
+  .product-row__thumb.is-sold-out { opacity: 0.6; } /* như .product-card.is-sold-out (V67) */
+  .edge-rows { display: grid; gap: var(--space-md); }
+  @media (min-width: 80rem) { .edge-rows.mobile-only-inline { display: none; } }
+  .nav-drawer__foot .button { width: 100%; }
+  .menu-featured > .group-label { display: flex; align-items: center; min-height: 40px; }
+  .state-card .product-card { max-width: 18rem; }
 </style></head>
 <body>
 <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
@@ -165,6 +147,7 @@
   <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
   <symbol id="i-menu" viewBox="0 0 20 20"><path d="M3 5.5h14M3 10h14M3 14.5h14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></symbol>
   <symbol id="i-close" viewBox="0 0 20 20"><path d="m5 5 10 10M15 5 5 15" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 26 26"><clipPath id="flag-c"><circle cx="13" cy="13" r="13"/></clipPath><g clip-path="url(#flag-c)"><rect width="26" height="26" fill="#fff"/><path d="M0 0h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0zm0 4h26v2H0z" fill="#b22234"/><rect width="13" height="14" fill="#3c3b6e"/></g></symbol>
   <symbol id="i-chevron" viewBox="0 0 9 5"><path fill="currentColor" d="M.2.2a.7.7 0 0 1 .9 0l3.4 3.3L7.9.2a.7.7 0 0 1 .9.9L5 4.8a.7.7 0 0 1-1 0L.2 1.1A.6.6 0 0 1 .2.2Z"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 20 16"><path d="M1 8h17M11.5 1.5 18 8l-6.5 6.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></symbol>
   <symbol id="i-image" viewBox="0 0 48 48"><g fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="9" width="38" height="30" rx="3"/><circle cx="17" cy="19" r="3.5"/><path d="m7 36 11-11 8 8 6-6 10 10"/></g></symbol>
@@ -213,7 +196,7 @@
       <div class="mega-panel" id="mega-shop">
         <div class="mega-panel__inner">
           <div class="mega-col">
-            <a class="mega-col__title" href="#" id="mc-cat">Categories</a>
+            <a class="group-label mega-col__title" href="#" id="mc-cat">Categories</a>
             <ul aria-labelledby="mc-cat">
               <li><a class="mega-link mega-link--all" href="#">View all products <svg aria-hidden="true"><use href="#i-arrow"/></svg></a></li>
               <li><a class="mega-link" href="#">Free Weights</a></li>
@@ -224,7 +207,7 @@
             </ul>
           </div>
           <div class="mega-col">
-            <a class="mega-col__title" href="#" id="mc-lvl">Training Level</a>
+            <a class="group-label mega-col__title" href="#" id="mc-lvl">Training Level</a>
             <ul aria-labelledby="mc-lvl">
               <li><a class="mega-link" href="#">Beginner</a></li>
               <li><a class="mega-link" href="#">Intermediate</a></li>
@@ -232,7 +215,7 @@
             </ul>
           </div>
           <div class="mega-col">
-            <a class="mega-col__title" href="#" id="mc-feat">Featured</a>
+            <a class="group-label mega-col__title" href="#" id="mc-feat">Featured</a>
             <ul aria-labelledby="mc-feat">
               <li><a class="mega-link" href="#">Bundle</a></li>
               <li><a class="mega-link" href="#">Setup</a></li>
@@ -240,14 +223,9 @@
               <li><a class="mega-link" href="#">Weight</a></li>
             </ul>
           </div>
-          <a class="menu-promo" href="#">
-            <span class="menu-promo__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png" alt="" width="600" height="400"><span class="badge badge--sale">-22%</span></span>
-            <span class="menu-promo__body">
-              <span class="menu-promo__eyebrow">Featured</span>
-              <span class="menu-promo__title">Home Starter Kit</span>
-              <span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$399.00</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$512.00</s></span>
-            </span>
-          </a>
+          <div class="menu-featured"><p class="group-label">Featured</p>
+            <div class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png" alt="" width="600" height="600"></div><div class="product-card__badges"><span class="badge badge--sale">-22%</span></div><div class="product-card__info"><p class="product-card__title"><a href="#">Home Starter Kit</a></p><p class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$399.00</span><span class="visually-hidden">Regular price</span><s class="price__compare">$512.00</s></p></div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -299,12 +277,12 @@
             <p>Collection</p>
             <a class="text-link" href="#">View all collections</a>
           </div>
-          <ul class="cat-list">
-            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-1.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Free Weights</span><span class="cat-list__count">7 Products</span></span></a></li>
-            <li><a href="#" class="is-hover"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-2.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Functional Training</span><span class="cat-list__count">5 Products</span></span></a></li>
-            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-3.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Benches &amp; Racks</span><span class="cat-list__count">6 Products</span></span></a></li>
-            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Recovery &amp; Mobility</span><span class="cat-list__count">2 Products</span></span></a></li>
-            <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-5.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Accessories</span><span class="cat-list__count">2 Products</span></span></a></li>
+          <ul class="menu-tiles">
+            <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-1.jpg" alt="" width="672" height="440"></span><span class="collection-card__title">Free Weights</span><span class="collection-card__count">7 Products</span></a></li>
+            <li><a class="collection-card collection-card--menu is-hover" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-2.jpg" alt="" width="672" height="440"></span><span class="collection-card__title">Functional Training</span><span class="collection-card__count">5 Products</span></a></li>
+            <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-3.jpg" alt="" width="672" height="440"></span><span class="collection-card__title">Benches &amp; Racks</span><span class="collection-card__count">6 Products</span></a></li>
+            <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="672" height="440"></span><span class="collection-card__title">Recovery &amp; Mobility</span><span class="collection-card__count">2 Products</span></a></li>
+            <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-5.jpg" alt="" width="672" height="440"></span><span class="collection-card__title">Accessories</span><span class="collection-card__count">2 Products</span></a></li>
           </ul>
         </div>
       </div>
@@ -348,7 +326,7 @@
   <section class="only-mobile" aria-labelledby="m1">
     <div class="container stage-head">
       <h2 id="m1">1. Menu Drawer: Level 1</h2>
-      <p>Trang chủ phía sau: thanh tối 80, hero tràn mép dưới header (sổ 07/11, 10/11). Drawer trắng (kit .drawer--start) rộng 90% (360) / 420 (768, 1024), cao toàn màn, phủ cả thanh tối; scrim 50%. Mở thì focus vào nút đóng. Mục có cấp con là nút có chevron ›, mục không có là link. Chân drawer: Sign In, tiền tệ, ngôn ngữ.</p>
+      <p>Trang chủ phía sau: thanh tối 80, hero tràn mép dưới header (sổ 07/11, 10/11). Drawer trắng (kit .drawer--start) rộng 90% (360) / 420 (768, 1024), cao toàn màn, phủ cả thanh tối; scrim 50%. Mở thì focus vào nút đóng. Mục có cấp con là nút có chevron ›, mục không có là link. Hàng cuối danh sách: localization gộp "cờ + USD / EN ›" (LC1, localization §4.4); chân drawer: Sign In secondary full (DS Drawers, V65).</p>
     </div>
     <div class="nav-stage" role="group" aria-label="Menu drawer, level 1">
       <div class="page-behind"><div class="page-hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1080" height="1350"></div></div>
@@ -378,14 +356,11 @@
             <li><a class="nav-row" href="#">Blog</a></li>
             <li><a class="nav-row" href="#">Contact</a></li>
             <li><a class="nav-row" href="#">Help</a></li>
+            <li><button class="drawer-loc" type="button" data-testid="header-drawer-localization" aria-label="Country and language: United States, USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span>USD / EN</span><svg aria-hidden="true" viewBox="0 0 9 5"><use href="#i-chevron"/></svg></button></li>
           </ul>
         </nav>
         <div class="overlay__footer nav-drawer__foot">
-          <a class="nav-drawer__account" href="#"><svg aria-hidden="true"><use href="#i-user"/></svg>Sign In</a>
-          <div class="locale-row">
-            <button class="locale-btn" type="button"><span>Currency</span> USD $ <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
-            <button class="locale-btn" type="button"><span>Language</span> English <svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
-          </div>
+          <a class="button button--secondary" href="#"><svg class="button__icon" aria-hidden="true"><use href="#i-user"/></svg>Sign In</a>
         </div>
       </div>
     </div>
@@ -418,23 +393,22 @@
           <h3 class="nav-drawer__level-title" id="dr2-title">Shop</h3>
           <a class="nav-row nav-row--all" href="#">View all products <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
           <div class="nav-group">
-            <a class="nav-group__title" href="#" id="g-cat">Categories</a>
+            <a class="group-label nav-group__title" href="#" id="g-cat">Categories</a>
             <ul class="nav-sub" aria-labelledby="g-cat">
               <li><a href="#">Free Weights</a></li><li><a href="#">Functional Training</a></li><li><a href="#">Benches &amp; Racks</a></li><li><a href="#">Recovery &amp; Mobility</a></li><li><a href="#">Accessories</a></li>
             </ul>
           </div>
           <div class="nav-group">
-            <a class="nav-group__title" href="#" id="g-lvl">Training Level</a>
+            <a class="group-label nav-group__title" href="#" id="g-lvl">Training Level</a>
             <ul class="nav-sub" aria-labelledby="g-lvl"><li><a href="#">Beginner</a></li><li><a href="#">Intermediate</a></li><li><a href="#">Advanced</a></li></ul>
           </div>
           <div class="nav-group">
-            <a class="nav-group__title" href="#" id="g-feat">Featured</a>
+            <a class="group-label nav-group__title" href="#" id="g-feat">Featured</a>
             <ul class="nav-sub" aria-labelledby="g-feat"><li><a href="#">Bundle</a></li><li><a href="#">Setup</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Weight</a></li></ul>
           </div>
-          <a class="menu-promo" href="#">
-            <span class="menu-promo__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png" alt="" width="192" height="192"><span class="badge badge--sale">-22%</span></span>
-            <span class="menu-promo__body"><span class="menu-promo__eyebrow">Featured</span><span class="menu-promo__title">Home Starter Kit</span><span class="price"><span class="price__sale"><span class="visually-hidden">Sale price</span>$399.00</span><s class="price__compare"><span class="visually-hidden">Regular price</span>$512.00</s></span></span>
-          </a>
+          <div class="menu-featured menu-featured--row"><p class="group-label">Featured product</p>
+            <a class="product-row" href="#"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png" alt="" width="112" height="112"><span class="menu-featured__text"><span class="product-row__title">Home Starter Kit</span><span class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$399.00</span><span class="visually-hidden">Regular price</span><s class="price__compare">$512.00</s><span class="badge badge--sale">-22%</span></span></span></a>
+          </div>
         </nav>
       </div>
     </div>
@@ -494,43 +468,53 @@
       <div class="state-card">
         <h3>Loading</h3>
         <p class="demo-note">Ảnh danh mục đang tải khi vừa mở: khung giữ đúng tỉ lệ (0 CLS), shimmer nền alt → trắng 1.4s; giảm chuyển động thì tĩnh. Tên và số sản phẩm hiện ngay.</p>
-        <ul class="cat-list" aria-label="Loading sample">
+        <ul class="cat-list mobile-only-inline" aria-label="Loading sample">
           <li><a href="#"><span class="cat-list__media"><span class="skeleton"></span></span><span class="cat-list__text"><span class="cat-list__name">Free Weights</span><span class="cat-list__count">7 Products</span></span></a></li>
           <li><a href="#"><span class="cat-list__media"><span class="skeleton"></span></span><span class="cat-list__text"><span class="cat-list__name">Functional Training</span><span class="cat-list__count">5 Products</span></span></a></li>
           <li><a href="#"><span class="cat-list__media"><span class="skeleton"></span></span><span class="cat-list__text"><span class="cat-list__name">Benches &amp; Racks</span><span class="cat-list__count">6 Products</span></span></a></li>
           <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Recovery &amp; Mobility</span><span class="cat-list__count">2 Products</span></span></a></li>
           <li><a href="#"><span class="cat-list__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-5.jpg" alt="" width="672" height="440"></span><span class="cat-list__text"><span class="cat-list__name">Accessories</span><span class="cat-list__count">2 Products</span></span></a></li>
         </ul>
+        <ul class="menu-tiles desktop-only-inline" aria-label="Loading sample, desktop">
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><span class="skeleton menu-tiles__skeleton"></span></span><span class="collection-card__title">Free Weights</span><span class="collection-card__count">7 Products</span></a></li>
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><span class="skeleton menu-tiles__skeleton"></span></span><span class="collection-card__title">Functional Training</span><span class="collection-card__count">5 Products</span></a></li>
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><span class="skeleton menu-tiles__skeleton"></span></span><span class="collection-card__title">Benches &amp; Racks</span><span class="collection-card__count">6 Products</span></a></li>
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-4.jpg" alt="" width="672" height="440"></span><span class="collection-card__title">Recovery &amp; Mobility</span><span class="collection-card__count">2 Products</span></a></li>
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-col-5.jpg" alt="" width="672" height="440"></span><span class="collection-card__title">Accessories</span><span class="collection-card__count">2 Products</span></a></li>
+        </ul>
       </div>
 
       <div class="state-card">
         <h3>Missing Image Or Image Error</h3>
         <p class="demo-note">Collection chưa có ảnh (cả 14 collection trong demo-data đang rỗng) hoặc ảnh lỗi: nền cream + icon ảnh muted-light, không ảnh vỡ, không ẩn mục. Collection rỗng (0 sản phẩm) vẫn hiện, ghi "0 Products".</p>
-        <ul class="cat-list" aria-label="Missing image sample">
+        <ul class="cat-list mobile-only-inline" aria-label="Missing image sample">
           <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Bundle</span><span class="cat-list__count">6 Products</span></span></a></li>
           <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Setup</span><span class="cat-list__count">4 Products</span></span></a></li>
           <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Portable Fitness</span><span class="cat-list__count">4 Products</span></span></a></li>
           <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Weight</span><span class="cat-list__count">4 Products</span></span></a></li>
           <li><a href="#"><span class="cat-list__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="cat-list__text"><span class="cat-list__name">Accessories</span><span class="cat-list__count">4 Products</span></span></a></li>
         </ul>
+        <ul class="menu-tiles desktop-only-inline" aria-label="Missing image sample, desktop">
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><span class="collection-card__title">Bundle</span><span class="collection-card__count">6 Products</span></a></li>
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><span class="collection-card__title">Setup</span><span class="collection-card__count">4 Products</span></a></li>
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><span class="collection-card__title">Portable Fitness</span><span class="collection-card__count">4 Products</span></a></li>
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><span class="collection-card__title">Weight</span><span class="collection-card__count">4 Products</span></a></li>
+          <li><a class="collection-card collection-card--menu" href="#"><span class="collection-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></span><span class="collection-card__title">Accessories</span><span class="collection-card__count">4 Products</span></a></li>
+        </ul>
       </div>
 
       <div class="state-card">
         <h3>Featured Product Edge Cases</h3>
-        <p class="demo-note">Dữ liệu edge_cases. Không media: placeholder. Hết hàng: badge Sold out, ảnh mờ 60%, giá giữ. compare_at_price thấp hơn giá: không badge, không giá gạch. Tên dài: tối đa 2 dòng. Không chọn sản phẩm: không có card, cột link giãn đủ chỗ.</p>
-        <div class="state-grid state-grid--2 state-grid--3">
-          <a class="menu-promo" href="#">
-            <span class="menu-promo__media"><svg aria-hidden="true"><use href="#i-image"/></svg></span>
-            <span class="menu-promo__body"><span class="menu-promo__eyebrow">Featured</span><span class="menu-promo__title">Sản phẩm không có media</span><span class="price"><span>$34.00</span></span></span>
-          </a>
-          <a class="menu-promo is-sold-out" href="#">
-            <span class="menu-promo__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg" alt="" width="600" height="400"><span class="badge badge--sold-out">Sold out</span></span>
-            <span class="menu-promo__body"><span class="menu-promo__eyebrow">Featured</span><span class="menu-promo__title">Hết hàng toàn bộ</span><span class="price"><span>$1,000.00</span></span></span>
-          </a>
-          <a class="menu-promo" href="#">
-            <span class="menu-promo__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg" alt="" width="600" height="400"></span>
-            <span class="menu-promo__body"><span class="menu-promo__eyebrow">Featured</span><span class="menu-promo__title">Sản phẩm có màu sale và màu không sale</span><span class="price"><span>$200.00</span></span></span>
-          </a>
+        <p class="demo-note">Dữ liệu edge_cases. Không media: placeholder. Hết hàng: badge Sold out, ảnh mờ 60%, giá giữ. compare_at_price thấp hơn giá: không badge, không giá gạch. Tên dài: tối đa 2 dòng. Cùng dữ liệu: ≥ 1280 card dọc (mega), &lt; 1280 hàng .product-row (drawer, review vòng 2 V72). Không chọn sản phẩm: không có card, cột link giãn đủ chỗ.</p>
+        <div class="state-grid state-grid--2 state-grid--3 desktop-only-inline">
+          <div class="product-card"><div class="product-card__media"><span class="product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span></div><div class="product-card__info"><p class="product-card__title"><a href="#">Sản phẩm không có media</a></p><p class="price">$34.00</p></div></div>
+          <div class="product-card is-sold-out"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg" alt="" width="600" height="600"></div><div class="product-card__badges"><span class="badge badge--sold-out">Sold out</span></div><div class="product-card__info"><p class="product-card__title"><a href="#">Hết hàng toàn bộ</a></p><p class="price">$1,000.00</p></div></div>
+          <div class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg" alt="" width="600" height="600"></div><div class="product-card__info"><p class="product-card__title"><a href="#">Sản phẩm có màu sale và màu không sale</a></p><p class="price">$200.00</p></div></div>
+        </div>
+        <div class="edge-rows mobile-only-inline">
+          <a class="product-row" href="#"><span class="product-row__thumb product-card__placeholder"><svg aria-hidden="true"><use href="#i-image"/></svg></span><span class="menu-featured__text"><span class="product-row__title">Sản phẩm không có media</span><span class="price">$34.00</span></span></a>
+          <a class="product-row" href="#"><img class="product-row__thumb is-sold-out" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_be22b218-58ad-4231-b85d-a65b54b30482.jpg" alt="" width="112" height="112"><span class="menu-featured__text"><span class="product-row__title">Hết hàng toàn bộ</span><span class="price">$1,000.00<span class="badge badge--sold-out">Sold out</span></span></span></a>
+          <a class="product-row" href="#"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/AAUvwnj0ICORVuxs41ODOvnhvedArLiSV20df7r8XBjEUQ_s900-c-k-c0x00ffffff-no-rj_55b575b4-e130-450d-919b-fd2b4bdc73ba.jpg" alt="" width="112" height="112"><span class="menu-featured__text"><span class="product-row__title">Sản phẩm có màu sale và màu không sale</span><span class="price">$200.00</span></span></a>
         </div>
       </div>
 
