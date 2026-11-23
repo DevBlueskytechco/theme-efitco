@@ -21,7 +21,7 @@
   .site-footer__end { position: relative; }
 
   /* ---------- Popover ≥ 48rem (spec §4.2) ---------- */
-  .loc__panel { position: absolute; inset-block-end: calc(100% + var(--space-2)); inset-inline-start: 50%; z-index: 5; display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-5); width: calc(var(--space-1) * 150); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); font-size: var(--font-size-base); font-weight: 400; text-align: start; translate: -50% 0; }
+  .loc__panel { position: absolute; inset-block-end: calc(100% + var(--space-2)); inset-inline-start: 50%; z-index: var(--layer-floating); display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-5); width: calc(var(--space-1) * 150); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); font-size: var(--font-size-base); font-weight: var(--font-body-weight); text-align: start; translate: -50% 0; }
   .loc__panel--one { grid-template-columns: minmax(0, 1fr); width: calc(var(--space-1) * 80); }
   @media (min-width: 64rem) { .loc__panel { inset-inline: auto 0; translate: none; } }
   @media (max-width: 47.99rem) { .site-footer .loc__panel { display: none; } }
@@ -29,48 +29,26 @@
   @media (max-width: 47.99rem) { .loc__panel--static { grid-template-columns: minmax(0, 1fr); width: 100%; } }
 
   .loc__group { display: grid; align-content: start; gap: var(--space-3); min-width: 0; }
-  .loc__label { margin: 0; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 600; letter-spacing: 0.04em; line-height: 20px; text-transform: uppercase; }
 
-  .loc__search { position: relative; }
-  .loc__search > svg { position: absolute; inset-block-start: 50%; inset-inline-start: var(--space-3); width: 20px; height: 20px; color: var(--color-muted); translate: 0 -50%; pointer-events: none; }
-  .loc__search .field__input { min-height: 44px; padding-inline: calc(var(--space-1) * 10) 44px; }
-  .loc__clear { position: absolute; inset-block: 0; inset-inline-end: 0; display: inline-flex; align-items: center; justify-content: center; width: 44px; padding: 0; border: 0; background: none; color: var(--color-muted); cursor: pointer; }
-  .loc__clear svg { width: 16px; height: 16px; }
 
   .loc__list { position: relative; display: grid; gap: 0; max-height: calc(var(--space-1) * 80); margin: 0; padding: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; }
-  .loc__option { display: flex; align-items: center; gap: var(--space-2); width: 100%; min-height: 44px; padding: var(--space-2) var(--space-3); border: 0; border-radius: var(--radius-input); background: none; color: var(--color-foreground); font-size: var(--font-size-base); line-height: 1.5; text-align: start; cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out); }
-  .loc__option:hover, .loc__option.is-hover { background: var(--color-background-alt); }
-  .loc__option:focus-visible, .loc__option.is-focus { outline: 2px solid var(--color-accent); outline-offset: -2px; }
-  .loc__option[aria-current='true'] { background: var(--color-background-alt); font-weight: 600; }
-  .loc__option[aria-disabled='true'] { color: var(--color-muted-light); cursor: not-allowed; }
-  .loc__option[aria-disabled='true'] .loc__meta { color: var(--color-muted-light); }
-  .loc__check { flex: none; width: 16px; height: 16px; visibility: hidden; }
-  .loc__option[aria-current='true'] .loc__check { visibility: visible; }
   .loc__name { flex: 1; min-width: 0; }
   .loc__name b { font-weight: 600; }
-  .loc__meta { flex: none; align-self: flex-start; padding-block-start: 2px; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
-  .loc__spinner { flex: none; width: 16px; height: 16px; border: 2px solid var(--color-border); border-block-start-color: var(--color-foreground); border-radius: 50%; animation: kit-spin 700ms linear infinite; }
+  .loc__meta { flex: none; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: var(--font-body-weight); }
 
-  .loc__empty { display: grid; justify-items: center; gap: var(--space-2); min-height: calc(var(--space-1) * 50); align-content: center; padding: var(--space-4); color: var(--color-muted); font-size: var(--font-size-sm); text-align: center; }
-  .loc__empty > svg { width: 24px; height: 24px; color: var(--color-muted-light); }
-  .loc__empty .text-link { display: inline-flex; align-items: center; min-height: 44px; border: 0; background: none; color: var(--color-foreground); font-size: var(--font-size-sm); cursor: pointer; }
 
-  .loc .alert { padding: var(--space-3) var(--space-4); }
-  .loc .alert > svg { width: 20px; height: 20px; }
-  .alert .button { justify-self: start; min-height: 44px; padding-inline: var(--space-5); }
 
   /* ---------- Bottom sheet < 48rem (spec §4.3) ---------- */
   .site-footer { position: relative; }
-  .loc-scrim { position: absolute; inset: 0; z-index: 6; background: var(--overlay-scrim); }
-  .loc-sheet { position: absolute; inset-inline: 0; inset-block-end: 0; z-index: 7; display: flex; flex-direction: column; gap: var(--space-4); height: 704px; padding: var(--space-6) var(--space-4) var(--space-5); border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); text-align: start; }
+  .loc-scrim { position: absolute; inset: 0; z-index: var(--layer-scrim); background: var(--overlay-scrim); }
+  .loc-sheet { position: absolute; inset-inline: 0; inset-block-end: 0; z-index: var(--layer-overlay); display: flex; flex-direction: column; gap: var(--space-4); height: 704px; padding: var(--space-6) var(--space-4) var(--space-5); border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); text-align: start; }
   .loc-sheet::before { content: ''; position: absolute; inset-block-start: var(--space-2); inset-inline-start: calc(50% - 20px); width: 40px; height: 4px; border-radius: 2px; background: var(--color-border); }
   .loc-sheet .dialog__title { margin: 0; padding-inline-end: calc(var(--space-1) * 14); }
   .loc-sheet .dialog__close { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); }
-  .loc-sheet .loc__search .field__input { min-height: 48px; }
   .loc-sheet .loc__list { flex: 1; max-height: none; }
-  .loc-sheet .loc__option { min-height: 48px; }
-  .loc-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); }
-  .loc-tabs .tab { justify-content: center; padding-inline: var(--space-3); }
+  .loc-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+  /* 2 tab chia đều, không tràn mép ở drawer 360 (review vòng 2): nhãn dài xuống dòng trong tab cao ≥ 44 */
+  .loc-tabs .tab { justify-content: center; min-width: 0; padding: var(--space-2xs) var(--space-xs); white-space: normal; overflow-wrap: anywhere; text-align: center; line-height: 1.25; } /* + <wbr> sau '/': "Country/region" có chỗ ngắt, giữ lề trong 8 (ES1-T527 vòng 3) */
   @media (min-width: 48rem) { .site-footer .loc-scrim, .site-footer .loc-sheet { display: none; } }
   .loc-sheet--static { position: relative; height: 640px; }
   .loc-sheet--short { height: auto; }
@@ -79,17 +57,10 @@
   .drawer-stage { position: relative; overflow: hidden; width: 360px; max-width: 100%; height: 680px; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background-dark) var(--dark-texture); }
   .drawer-stage .scrim, .drawer-stage .drawer { position: absolute; }
   .drawer-stage .drawer { width: 90%; }
-  .drawer-loc { display: flex; align-items: center; gap: var(--space-2); min-height: 52px; padding-inline: var(--space-4); border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); background: none; font-size: var(--font-size-base); font-weight: 500; cursor: pointer; }
-  .drawer-loc .flag { width: 20px; height: 20px; }
-  .drawer-loc > span { flex: 1; text-align: start; }
-  .drawer-loc > svg:last-child { width: 12px; height: 7px; color: var(--color-muted); rotate: -90deg; }
-  .drawer-account { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 44px; font-weight: 500; text-decoration: none; }
-  .drawer-account svg { width: 24px; height: 24px; }
+  /* Hàng localization gộp = kit .drawer-loc (V65, LC1): hàng cuối danh sách cấp 1, không khung; bỏ bản riêng (review vòng 2) */
   .level2__top { display: flex; align-items: center; justify-content: space-between; min-height: 72px; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5); border-block-end: 1px solid var(--color-border); }
   .level2__body { display: flex; flex: 1; flex-direction: column; gap: var(--space-4); min-height: 0; padding: var(--space-4) var(--space-5) var(--space-5); }
-  .level2__body h2 { font-size: var(--font-size-h2); font-weight: var(--font-heading--weight-display); text-transform: uppercase; }
   .level2__body .loc__list { flex: 1; max-height: none; }
-  .level2__body .loc__option { min-height: 48px; }
 
   /* ---------- States layout ---------- */
   .demo-states { padding-block: var(--space-7); }
@@ -101,6 +72,19 @@
   .stage-dark :focus-visible { outline-color: var(--color-background-dark-foreground); }
   .stage-stack { display: grid; gap: var(--space-3); }
   .phone-stage { position: relative; overflow: hidden; width: 360px; max-width: 100%; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--overlay-scrim); padding-block-start: var(--space-7); }
+
+  /* ---------- ES1-T527: kit .group-label (V76), .search-field + .field__input--compact 44 trong popover (V21),
+     .listbox__option (V68: hover nền alt, focus outline accent inset, hiện tại 600 + ✓), .empty-state--compact (V54),
+     .spinner, .button--small. Trang chỉ giữ bố cục + reset nút. ---------- */
+  :where(.loc__option) { width: 100%; border: 0; background: none; font-size: var(--font-size-base); text-align: start; }
+  .loc__option:focus-visible { outline-offset: -2px; }
+  .loc__option[aria-disabled='true'] .loc__meta { color: var(--color-muted-light); }
+  .loc__option .spinner { flex: none; }
+  .loc-sheet .loc__option, .level2__body .loc__option { min-height: var(--control-height); }
+  .loc__empty { min-height: calc(var(--space-1) * 50); align-content: center; }
+  .loc__text-button { min-height: 44px; padding: 0; border: 0; background: none; cursor: pointer; }
+  .loc__retry { justify-self: start; }
+  .level2__title { font-size: var(--font-size-h2); font-weight: var(--font-heading--weight-display); }
 </style>
 </head>
 <body>
@@ -161,7 +145,7 @@
 
 <footer class="site-footer">
   <div class="container site-footer__band">
-    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246" loading="lazy"></div>
+    <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
     <div class="site-footer__newsletter">
       <h2><span>Get 15% Off</span> Your First Order</h2>
       <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
@@ -206,38 +190,38 @@
           <summary class="site-footer__locale loc-trigger" data-testid="footer-localization-toggle"><span class="visually-hidden">Change country and language: </span><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">USD / EN</span><span class="visually-hidden">, United States, English</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></summary>
           <div class="loc__panel" data-testid="footer-localization-panel">
             <div class="loc__group" data-testid="footer-country-selector">
-              <label class="loc__label" for="loc-search" id="loc-country-label">Country/region</label>
-              <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="loc-search" type="search" placeholder="Search countries" autocomplete="off" aria-controls="loc-countries" aria-describedby="loc-status" data-testid="footer-country-search"></div>
+              <label class="group-label" for="loc-search" id="loc-country-label">Country/region</label>
+              <div class="search-field"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input field__input--compact" id="loc-search" type="search" placeholder="Search countries" autocomplete="off" aria-controls="loc-countries" aria-describedby="loc-status" data-testid="footer-country-search"></div>
               <p class="visually-hidden" id="loc-status" role="status" data-testid="footer-country-status">18 countries</p>
               <ul class="loc__list" id="loc-countries" aria-labelledby="loc-country-label" data-scroll-current>
-                <li><button class="loc__option" type="submit" name="country_code" value="AU" data-testid="footer-country-option"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="AT"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="BE"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="CA"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="DK"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Denmark</span><span class="loc__meta">DKK kr.</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="FR"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">France</span><span class="loc__meta">EUR €</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="DE"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Germany</span><span class="loc__meta">EUR €</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="IE"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Ireland</span><span class="loc__meta">EUR €</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="IT"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Italy</span><span class="loc__meta">EUR €</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="JP"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Japan</span><span class="loc__meta">JPY ¥</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="NL"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Netherlands</span><span class="loc__meta">EUR €</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="NZ"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">New Zealand</span><span class="loc__meta">NZD $</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="SG"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Singapore</span><span class="loc__meta">SGD $</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="ES"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Spain</span><span class="loc__meta">EUR €</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="SE"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Sweden</span><span class="loc__meta">SEK kr</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="GB"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="US" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
-                <li><button class="loc__option" type="submit" name="country_code" value="VN"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Vietnam</span><span class="loc__meta">VND ₫</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="AU" data-testid="footer-country-option"><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="AT"><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="BE"><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="CA"><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="DK"><span class="loc__name">Denmark</span><span class="loc__meta">DKK kr.</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="FR"><span class="loc__name">France</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="DE"><span class="loc__name">Germany</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="IE"><span class="loc__name">Ireland</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="IT"><span class="loc__name">Italy</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="JP"><span class="loc__name">Japan</span><span class="loc__meta">JPY ¥</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="NL"><span class="loc__name">Netherlands</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="NZ"><span class="loc__name">New Zealand</span><span class="loc__meta">NZD $</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="SG"><span class="loc__name">Singapore</span><span class="loc__meta">SGD $</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="ES"><span class="loc__name">Spain</span><span class="loc__meta">EUR €</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="SE"><span class="loc__name">Sweden</span><span class="loc__meta">SEK kr</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="GB"><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="US" aria-current="true"><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="country_code" value="VN"><span class="loc__name">Vietnam</span><span class="loc__meta">VND ₫</span></button></li>
               </ul>
             </div>
             <div class="loc__group" data-testid="footer-language-selector">
-              <p class="loc__label" id="loc-language-label">Language</p>
+              <p class="group-label" id="loc-language-label">Language</p>
               <ul class="loc__list" aria-labelledby="loc-language-label">
-                <li><button class="loc__option" type="submit" name="language_code" value="en" lang="en" aria-current="true" data-testid="footer-language-option"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">English</span></button></li>
-                <li><button class="loc__option" type="submit" name="language_code" value="fr" lang="fr"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Français</span></button></li>
-                <li><button class="loc__option" type="submit" name="language_code" value="de" lang="de"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Deutsch</span></button></li>
-                <li><button class="loc__option" type="submit" name="language_code" value="es" lang="es"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Español</span></button></li>
-                <li><button class="loc__option" type="submit" name="language_code" value="vi" lang="vi"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Tiếng Việt</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="language_code" value="en" lang="en" aria-current="true" data-testid="footer-language-option"><span class="loc__name">English</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="language_code" value="fr" lang="fr"><span class="loc__name">Français</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="language_code" value="de" lang="de"><span class="loc__name">Deutsch</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="language_code" value="es" lang="es"><span class="loc__name">Español</span></button></li>
+                <li><button class="listbox__option loc__option" type="submit" name="language_code" value="vi" lang="vi"><span class="loc__name">Tiếng Việt</span></button></li>
               </ul>
             </div>
           </div>
@@ -253,31 +237,31 @@
     <h2 class="dialog__title" id="sheet-title">Country and language</h2>
     <button class="close-button dialog__close" type="button" aria-label="Close country and language"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
     <div class="loc-tabs" role="tablist" aria-label="Country and language">
-      <button class="tab" type="button" role="tab" aria-selected="true" id="tab-country" aria-controls="panel-country">Country/region</button>
+      <button class="tab" type="button" role="tab" aria-selected="true" id="tab-country" aria-controls="panel-country">Country/<wbr>region</button>
       <button class="tab" type="button" role="tab" aria-selected="false" id="tab-language" aria-controls="panel-language" tabindex="-1">Language</button>
     </div>
     <div class="loc__group" role="tabpanel" id="panel-country" aria-labelledby="tab-country" style="flex:1;min-height:0;display:flex;flex-direction:column">
       <label class="visually-hidden" for="sheet-search">Search countries</label>
-      <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="sheet-search" type="search" placeholder="Search countries" autocomplete="off" aria-controls="sheet-countries"></div>
+      <div class="search-field"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="sheet-search" type="search" placeholder="Search countries" autocomplete="off" aria-controls="sheet-countries"></div>
       <ul class="loc__list" id="sheet-countries" aria-label="Countries" data-scroll-current style="flex:1;margin-block-start:var(--space-2)">
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Denmark</span><span class="loc__meta">DKK kr.</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">France</span><span class="loc__meta">EUR €</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Germany</span><span class="loc__meta">EUR €</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Ireland</span><span class="loc__meta">EUR €</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Italy</span><span class="loc__meta">EUR €</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Japan</span><span class="loc__meta">JPY ¥</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Netherlands</span><span class="loc__meta">EUR €</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">New Zealand</span><span class="loc__meta">NZD $</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Singapore</span><span class="loc__meta">SGD $</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Spain</span><span class="loc__meta">EUR €</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Sweden</span><span class="loc__meta">SEK kr</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
-        <li><button class="loc__option" type="button" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
-        <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Vietnam</span><span class="loc__meta">VND ₫</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Denmark</span><span class="loc__meta">DKK kr.</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">France</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Germany</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Ireland</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Italy</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Japan</span><span class="loc__meta">JPY ¥</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Netherlands</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">New Zealand</span><span class="loc__meta">NZD $</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Singapore</span><span class="loc__meta">SGD $</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Spain</span><span class="loc__meta">EUR €</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Sweden</span><span class="loc__meta">SEK kr</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
+        <li><button class="listbox__option loc__option" type="button" aria-current="true"><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+        <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Vietnam</span><span class="loc__meta">VND ₫</span></button></li>
       </ul>
     </div>
   </div>
@@ -297,12 +281,12 @@
         <div class="stage-dark"><p class="demo-label">L2 · Trigger chỉ tiền tệ</p><button class="site-footer__locale is-open" type="button" aria-label="Change country: USD, United States, sample L2"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">USD</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
         <div class="loc__panel loc__panel--static loc__panel--one">
           <div class="loc__group">
-            <p class="loc__label" id="l2-label">Country/region</p>
+            <p class="group-label" id="l2-label">Country/region</p>
             <ul class="loc__list" aria-labelledby="l2-label">
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
-              <li><button class="loc__option" type="button" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
+              <li><button class="listbox__option loc__option" type="button" aria-current="true"><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
             </ul>
           </div>
         </div>
@@ -311,12 +295,12 @@
         <div class="stage-dark"><p class="demo-label">L3 · Trigger chỉ ngôn ngữ</p><button class="site-footer__locale is-open" type="button" aria-label="Change language: EN, English, sample L3"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span class="loc-trigger__text">EN</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button></div>
         <div class="loc__panel loc__panel--static loc__panel--one">
           <div class="loc__group">
-            <p class="loc__label" id="l3-label">Language</p>
+            <p class="group-label" id="l3-label">Language</p>
             <ul class="loc__list" aria-labelledby="l3-label">
-              <li><button class="loc__option" type="button" lang="en" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">English</span></button></li>
-              <li><button class="loc__option" type="button" lang="fr"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Français</span></button></li>
-              <li><button class="loc__option" type="button" lang="vi"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Tiếng Việt</span></button></li>
-              <li><button class="loc__option" type="button" lang="ar" dir="auto"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">العربية</span></button></li>
+              <li><button class="listbox__option loc__option" type="button" lang="en" aria-current="true"><span class="loc__name">English</span></button></li>
+              <li><button class="listbox__option loc__option" type="button" lang="fr"><span class="loc__name">Français</span></button></li>
+              <li><button class="listbox__option loc__option" type="button" lang="vi"><span class="loc__name">Tiếng Việt</span></button></li>
+              <li><button class="listbox__option loc__option" type="button" lang="ar" dir="auto"><span class="loc__name">العربية</span></button></li>
             </ul>
           </div>
         </div>
@@ -330,21 +314,21 @@
     <div class="state-grid">
       <div class="loc__panel loc__panel--static loc__panel--one">
         <div class="loc__group">
-          <label class="loc__label" for="l5-search" id="l5-label">Country/region</label>
-          <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input is-focus" id="l5-search" type="search" value="land" autocomplete="off"><button class="loc__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+          <label class="group-label" for="l5-search" id="l5-label">Country/region</label>
+          <div class="search-field"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input field__input--compact is-focus" id="l5-search" type="search" value="land" autocomplete="off"><button class="search-field__clear" type="button" aria-label="Clear search"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
           <p class="visually-hidden" role="status">3 countries found</p>
           <ul class="loc__list" aria-labelledby="l5-label">
-            <li><button class="loc__option is-hover" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Ire<b>land</b></span><span class="loc__meta">EUR €</span></button></li>
-            <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Nether<b>land</b>s</span><span class="loc__meta">EUR €</span></button></li>
-            <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">New Zea<b>land</b></span><span class="loc__meta">NZD $</span></button></li>
+            <li><button class="listbox__option loc__option is-hover" type="button"><span class="loc__name">Ire<b>land</b></span><span class="loc__meta">EUR €</span></button></li>
+            <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Nether<b>land</b>s</span><span class="loc__meta">EUR €</span></button></li>
+            <li><button class="listbox__option loc__option" type="button"><span class="loc__name">New Zea<b>land</b></span><span class="loc__meta">NZD $</span></button></li>
           </ul>
         </div>
       </div>
       <div class="loc__panel loc__panel--static loc__panel--one">
         <div class="loc__group">
-          <label class="loc__label" for="l6-search">Country/region</label>
-          <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="l6-search" type="search" value="brazil" autocomplete="off"><button class="loc__clear" type="button" aria-label="Clear search, sample L6"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
-          <div class="loc__empty" role="status"><svg aria-hidden="true"><use href="#i-search"/></svg><p>No countries match “brazil”. Check the spelling or clear the search.</p><button class="text-link" type="button">Clear search</button></div>
+          <label class="group-label" for="l6-search">Country/region</label>
+          <div class="search-field"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input field__input--compact" id="l6-search" type="search" value="brazil" autocomplete="off"><button class="search-field__clear" type="button" aria-label="Clear search, sample L6"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
+          <div class="empty-state empty-state--compact loc__empty" role="status"><span class="empty-state__icon"><svg aria-hidden="true"><use href="#i-search"/></svg></span><p class="empty-state__title">No countries match “brazil”</p><p>Check the spelling or clear the search.</p><div class="empty-state__actions"><button class="text-link loc__text-button" type="button">Clear search</button></div></div>
         </div>
       </div>
     </div>
@@ -352,7 +336,7 @@
 
   <div class="demo-block">
     <h2>L7–L8 · Trigger và hàng: các trạng thái</h2>
-    <p class="demo-note">Trigger trên footer tối: hover gạch chân chữ, focus outline trắng, mở chevron xoay 180°. Hàng: hover nền alt, focus outline cam inset, hiện tại ✓ + 600 + nền alt, disabled chữ muted-light (khi đang đổi).</p>
+    <p class="demo-note">Trigger trên footer tối: hover gạch chân chữ, focus outline trắng, mở chevron xoay 180°. Hàng: hover nền alt, focus outline cam inset, hiện tại 600 + ✓ cuối hàng (kit .listbox__option, V68), disabled chữ muted-light (khi đang đổi).</p>
     <div class="state-grid">
       <div class="stage-dark">
         <p class="demo-label">L7 · Default · Hover · Focus · Mở</p>
@@ -363,13 +347,13 @@
       </div>
       <div class="loc__panel loc__panel--static loc__panel--one">
         <div class="loc__group">
-          <p class="loc__label" id="l8-label">L8 · Hàng</p>
+          <p class="group-label" id="l8-label">L8 · Hàng</p>
           <ul class="loc__list" aria-labelledby="l8-label">
-            <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada · default</span><span class="loc__meta">CAD $</span></button></li>
-            <li><button class="loc__option is-hover" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Denmark · hover</span><span class="loc__meta">DKK kr.</span></button></li>
-            <li><button class="loc__option is-focus" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">France · focus</span><span class="loc__meta">EUR €</span></button></li>
-            <li><button class="loc__option" type="button" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States · current</span><span class="loc__meta">USD $</span></button></li>
-            <li><button class="loc__option" type="button" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Vietnam · disabled</span><span class="loc__meta">VND ₫</span></button></li>
+            <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Canada · default</span><span class="loc__meta">CAD $</span></button></li>
+            <li><button class="listbox__option loc__option is-hover" type="button"><span class="loc__name">Denmark · hover</span><span class="loc__meta">DKK kr.</span></button></li>
+            <li><button class="listbox__option loc__option is-focus" type="button"><span class="loc__name">France · focus</span><span class="loc__meta">EUR €</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" aria-current="true"><span class="loc__name">United States · current</span><span class="loc__meta">USD $</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" aria-disabled="true"><span class="loc__name">Vietnam · disabled</span><span class="loc__meta">VND ₫</span></button></li>
           </ul>
         </div>
       </div>
@@ -382,32 +366,32 @@
     <div class="state-grid">
       <div class="loc__panel loc__panel--static loc__panel--one" aria-busy="true">
         <div class="loc__group">
-          <p class="loc__label" id="l9-label">Country/region</p>
+          <p class="group-label" id="l9-label">Country/region</p>
           <ul class="loc__list" aria-labelledby="l9-label">
-            <li><button class="loc__option" type="button" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
-            <li><button class="loc__option is-hover" type="button" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name" style="color:var(--color-foreground)">Canada</span><span class="loc__spinner" aria-hidden="true"></span><span class="visually-hidden">Switching to Canada</span></button></li>
-            <li><button class="loc__option" type="button" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
-            <li><button class="loc__option" type="button" aria-current="true" aria-disabled="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" aria-disabled="true"><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+            <li><button class="listbox__option loc__option is-hover" type="button" aria-disabled="true"><span class="loc__name" style="color:var(--color-foreground)">Canada</span><span class="spinner" aria-hidden="true"></span><span class="visually-hidden">Switching to Canada</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" aria-disabled="true"><span class="loc__name">United Kingdom</span><span class="loc__meta">GBP £</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" aria-current="true" aria-disabled="true"><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
           </ul>
         </div>
       </div>
       <div class="stage-stack">
         <div class="loc__panel loc__panel--static loc__panel--one">
           <div class="loc__group">
-            <div class="alert" role="alert" data-testid="footer-localization-error"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><p>We couldn't switch to Canada. Check your connection and try again.</p><button class="button button--secondary" type="button">Try Again</button></div></div>
-            <p class="loc__label" id="l10-label">Country/region</p>
+            <div class="alert" role="alert" data-testid="footer-localization-error"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><p>We couldn't switch to Canada. Check your connection and try again.</p><button class="button button--secondary button--small loc__retry" type="button">Try Again</button></div></div>
+            <p class="group-label" id="l10-label">Country/region</p>
             <ul class="loc__list" aria-labelledby="l10-label">
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
-              <li><button class="loc__option" type="button" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+              <li><button class="listbox__option loc__option" type="button" aria-current="true"><span class="loc__name">United States</span><span class="loc__meta">USD $</span></button></li>
             </ul>
           </div>
         </div>
         <div class="loc__panel loc__panel--static loc__panel--one">
           <div class="loc__group">
-            <p class="loc__label" id="l11-label">L11 · Tên dài</p>
+            <p class="group-label" id="l11-label">L11 · Tên dài</p>
             <ul class="loc__list" aria-labelledby="l11-label">
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Saint Vincent &amp; Grenadines</span><span class="loc__meta">XCD $</span></button></li>
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Bosnia &amp; Herzegovina</span><span class="loc__meta">BAM KM</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Saint Vincent &amp; Grenadines</span><span class="loc__meta">XCD $</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Bosnia &amp; Herzegovina</span><span class="loc__meta">BAM KM</span></button></li>
             </ul>
           </div>
         </div>
@@ -417,7 +401,7 @@
 
   <div class="demo-block">
     <h2>Drawer menu &lt; 1280 · Sheet tab Language</h2>
-    <p class="demo-note">Chân drawer: 1 hàng gộp thay 2 nút Currency / Language (đề xuất trỏ navigation.md §5.3). Chạm hàng → cấp 2 trượt vào trong drawer (Back + ×), cùng nội dung sheet; không mở sheet chồng drawer. Sheet tab Language: danh sách ngắn, sheet giữ cao 88dvh khi có ô tìm để không nhảy khi đổi tab.</p>
+    <p class="demo-note">Drawer (V65, khớp DS Drawers §28 và ES1-T260 navigation): hàng gộp kit <code>.drawer-loc</code> (cờ 26 + USD / EN ›) là hàng CUỐI danh sách cấp 1, không khung, thay 2 nút Currency / Language; chân chỉ Sign In secondary full. Chạm hàng → cấp 2 trượt vào trong drawer (Back + ×), cùng nội dung sheet; không mở sheet chồng drawer. Sheet tab Language: danh sách ngắn, sheet giữ cao 88dvh khi có ô tìm để không nhảy khi đổi tab.</p>
     <div class="state-grid">
       <div class="drawer-stage">
         <div class="scrim" aria-hidden="true"></div>
@@ -430,11 +414,13 @@
               <li><a href="#">Sale</a></li>
               <li><a href="#">Our Story</a></li>
               <li><a href="#">Blog</a></li>
+              <li><a href="#">Contact</a></li>
+              <li><a href="#">Help</a></li>
+              <li><button class="drawer-loc" type="button" data-testid="header-drawer-localization" aria-label="Country and language: United States, USD, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span>USD / EN</span><svg aria-hidden="true" viewBox="0 0 9 5"><use href="#i-chevron"/></svg></button></li>
             </ul>
           </div>
           <div class="overlay__footer">
-            <a class="drawer-account" href="#"><svg aria-hidden="true"><use href="#i-user"/></svg>Sign In</a>
-            <button class="drawer-loc" type="button" data-testid="header-drawer-localization" aria-label="Change country and language: USD / EN, United States, English"><svg class="flag" aria-hidden="true"><use href="#i-flag"/></svg><span>USD / EN</span><svg aria-hidden="true"><use href="#i-chevron"/></svg></button>
+            <a class="button button--secondary" href="#"><svg class="button__icon" aria-hidden="true"><use href="#i-user"/></svg>Sign In</a>
           </div>
         </div>
       </div>
@@ -443,21 +429,21 @@
         <div class="drawer drawer--start" role="dialog" aria-modal="true" aria-labelledby="dr2-title">
           <div class="level2__top"><button class="back-button" type="button" aria-label="Back to menu"><svg aria-hidden="true"><use href="#i-arrow"/></svg>Back</button><button class="close-button" type="button" aria-label="Close menu, sample level 2"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
           <div class="level2__body">
-            <h2 id="dr2-title">Country and language</h2>
+            <h2 class="level2__title" id="dr2-title">Country and language</h2>
             <div class="loc-tabs" role="tablist" aria-label="Country and language, drawer">
-              <button class="tab" type="button" role="tab" aria-selected="true">Country/region</button>
+              <button class="tab" type="button" role="tab" aria-selected="true">Country/<wbr>region</button>
               <button class="tab" type="button" role="tab" aria-selected="false" tabindex="-1">Language</button>
             </div>
             <label class="visually-hidden" for="dr-search">Search countries</label>
-            <div class="loc__search"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="dr-search" type="search" placeholder="Search countries" autocomplete="off"></div>
+            <div class="search-field"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="dr-search" type="search" placeholder="Search countries" autocomplete="off"></div>
             <ul class="loc__list" aria-label="Countries, drawer">
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Denmark</span><span class="loc__meta">DKK kr.</span></button></li>
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">France</span><span class="loc__meta">EUR €</span></button></li>
-              <li><button class="loc__option" type="button"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Germany</span><span class="loc__meta">EUR €</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Canada</span><span class="loc__meta">CAD $</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Denmark</span><span class="loc__meta">DKK kr.</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">France</span><span class="loc__meta">EUR €</span></button></li>
+              <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Germany</span><span class="loc__meta">EUR €</span></button></li>
             </ul>
           </div>
         </div>
@@ -468,15 +454,15 @@
           <h2 class="dialog__title" id="sheet2-title">Country and language</h2>
           <button class="close-button dialog__close" type="button" aria-label="Close country and language, sample"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
           <div class="loc-tabs" role="tablist" aria-label="Country and language, sample">
-            <button class="tab" type="button" role="tab" aria-selected="false" tabindex="-1">Country/region</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" tabindex="-1">Country/<wbr>region</button>
             <button class="tab" type="button" role="tab" aria-selected="true">Language</button>
           </div>
           <ul class="loc__list" aria-label="Languages">
-            <li><button class="loc__option" type="button" lang="en" aria-current="true"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">English</span></button></li>
-            <li><button class="loc__option" type="button" lang="fr"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Français</span></button></li>
-            <li><button class="loc__option" type="button" lang="de"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Deutsch</span></button></li>
-            <li><button class="loc__option" type="button" lang="es"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Español</span></button></li>
-            <li><button class="loc__option" type="button" lang="vi"><svg class="loc__check" aria-hidden="true"><use href="#i-check"/></svg><span class="loc__name">Tiếng Việt</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" lang="en" aria-current="true"><span class="loc__name">English</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" lang="fr"><span class="loc__name">Français</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" lang="de"><span class="loc__name">Deutsch</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" lang="es"><span class="loc__name">Español</span></button></li>
+            <li><button class="listbox__option loc__option" type="button" lang="vi"><span class="loc__name">Tiếng Việt</span></button></li>
           </ul>
         </div>
       </div>

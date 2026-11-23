@@ -13,7 +13,7 @@
 //   TE385_POST_COMMENT=1 (đăng bình luận thật), TE385_STORE_STATE=configured (AC15), FRESH_THEME_ID (theme mới cài, AC15)
 // Bài có ảnh, bài không ảnh, trang tag tìm lúc chạy từ trang blog, không cứng handle bài.
 // Phần JS do BE còn mở: ES1-T473 (focus hộp lỗi/thành công bình luận, chevron bài liên quan) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T518 (B03), ES1-T520 (B04, TC-33 1280/1920)); khi bug sửa test đỏ lại → gỡ test.fail.
+// Bug đã biết: test.fail gắn mã (ES1-T520 (B04, TC-33 1280/1920)); khi bug sửa test đỏ lại → gỡ test.fail.
 // ES1-T517 (B02) đã sửa: hàng chủ đề có :focus-visible thì xuống dòng, bỏ cuộn (aux.css) → TC-14 360 là test thường.
 // ES1-T506 (B01) đã sửa ở #276: khung card là article-card-frame (nền tối 3/4, bo 16), article-card-link chỉ bọc chữ tiêu đề,
 // ::after của link phủ khung và vẽ vòng focus → đo kích thước/nền/vị trí ở frame, outline focus ở ::after của link (ES1-T531).
@@ -1133,7 +1133,6 @@ test.describe('ES1-T385 bài viết', () => {
 
   test('TC-45b AC14: meta description bài ≤ 160 ký tự', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
-    test.fail(true, 'ES1-T518 (ES1-T385-B03): meta-tags dùng page_description (~320 ký tự), chưa cắt excerpt_or_content về 160');
     const d = await discover(page);
     const paths = [d.withCover, d.noCover].filter((p): p is string => !!p);
     test.fixme(paths.length === 0, 'không có bài');

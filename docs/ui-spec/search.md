@@ -108,7 +108,7 @@ Dùng chung thành phần với collection (ES1-T254 §6), khác: search giữ n
 - Badge số bộ lọc: tròn 24, nền accent, chữ 13/700 accent-foreground (5.01:1), chữ ẩn " filter applied"; hover nút (đảo đen) badge nền trắng chữ foreground (08 §6 #488D).
 - Sort: nhãn thật "Sort by" 12/500 `--color-muted` (8.45) nằm trong ô phía trên giá trị (label nổi, 04 §5), giá trị 16/500, viền `--color-muted-light`, chevron phải, chữ dài cắt "…".
 - Sort: `<select name="sort_by">` từ `search.sort_options` (Shopify search chỉ có Relevance, Price low → high, Price high → low). Không đủ 4 lựa chọn của 08 §8 #511D do Shopify; không thêm giả. Đổi giá trị: có JS refresh partial, không JS submit form (nút "Apply" ẩn khi có JS, AC3). Select native = bottom sheet hệ điều hành trên mobile (08 §7: sort dạng popup).
-- Chip bộ lọc đang áp (08 §6 #488D; collection §7): `<ul aria-label="Active filters">` dưới đầu nhóm, cách 16 / lưới 24. Chip cao 44 (40 từ 80rem), padding 16 / 12, bo pill, nền trắng, viền 1px foreground, chữ 14/500: tên nhóm muted "Color:" + giá trị foreground, × 14; hover nền foreground chữ trắng (17.4). Là link `value.url_to_remove`, `aria-label="Remove filter Color: Black"`. Cuối hàng "Clear all" (text-link, URL `?q=…` không filter, giữ `sort_by`). Xuống dòng, không cuộn ngang.
+- Chip bộ lọc đang áp (08 §6 #488D; collection §7): `<ul aria-label="Active filters">` dưới đầu nhóm, cách 16 / lưới 24. Chip = kit `.chip--remove` (ES1-T527 V41): cao 44 (40 từ 80rem), padding 16 / 12, bo 4, nền trắng, viền 1px foreground, chữ 14/500: tên nhóm muted "Color:" + giá trị foreground, × 14; hover nền foreground chữ trắng (17.4). Là link `value.url_to_remove`, `aria-label="Remove filter Color: Black"`. Cuối hàng "Clear all" (text-link, URL `?q=…` không filter, giữ `sort_by`). Xuống dòng, không cuộn ngang.
 - Chip gợi ý (S1, S2 "Popular searches") khác vai trò nên khác dáng: nền alt, viền border (foreground trên alt 15.8), hover đảo đen.
 - Khi có filter: thêm dòng `filter-note` (icon i 16 + 14 muted) "Filters apply to products only. Clear them to see articles and pages." vì Shopify trả về chỉ sản phẩm khi có filter (BE xác nhận khi dựng).
 
@@ -131,7 +131,7 @@ Dùng chung thành phần với collection (ES1-T254 §6), khác: search giữ n
 - `<ul class="result-list">` gạch đầu 1px border; mỗi `<li>` gạch đáy, padding 16, cao ≥ 104 (128 từ 48rem).
 - Lưới `72 | 1fr` gap 16 (< 48rem), `96 | 1fr` gap 24 (≥ 48rem).
 - Media: article có ảnh → `article.image` vuông, `object-fit: cover`, bo 12, `alt=""` (tên đã ở link), lazy. Article không ảnh và page → ô nền cream (như media card Figma 1:502) + icon tài liệu 28 `--color-muted`.
-- Meta 13/600 uppercase tracking 0.04em `--color-muted` (8.45:1): "Article · Nov 4, 2026" (`<time>`), "Page".
+- Meta 14 muted chữ thường (foundation §5; ES1-T527 V62) `--color-muted` (8.45:1): "Article · Nov 4, 2026" (`<time>`), "Page".
 - Tiêu đề h3 Inter 16 → 18 từ 48rem, 600, là link; `::after` phủ cả dòng (1 link mỗi dòng, foundation §9).
 - Trích đoạn 14 muted, tối đa 2 dòng: `item.excerpt_or_content | strip_html | truncatewords: 30` (article), `page.content | strip_html | truncatewords: 30`. Rỗng thì ẩn. ĐỀ XUẤT tô đậm từ khoá bằng filter `highlight: search.terms` (`<strong>` 600, không đổi màu).
 - Hover: tiêu đề gạch chân, ảnh scale 1.05 (500ms). Focus: outline 2px accent quanh cả dòng (`:focus-within`).
@@ -188,12 +188,12 @@ Cuối `<main>`: khoảng `--section-gap` (48 / 120) trước footer.
 
 | Mã | Khi | Thiết kế | Nguồn |
 | --- | --- | --- | --- |
-| S1 | `search.performed` false (không `q`) | h1 "Search", form trống, "Popular searches" (chip link `?q=`), "Shop by category" (thẻ link: tên 16/600 + "N products" 14 muted + mũi tên; 1 / 2 / 3 cột). Không toolbar, không lưới | ĐỀ XUẤT 11 §4 option 2, 05 §7 |
-| S2 | 0 kết quả | Giữ từ khoá trong ô; status "No results for “treadmill”"; panel nền alt bo 24: icon 72 + h2 "Nothing Matches “treadmill” Yet" + mẹo 1 câu (không đổ lỗi, 11 §5) + primary "Shop All Products" (ES1-T127 #5) + text-link "Read the FAQs" (trang FAQs nếu có); cạnh bên: popular searches + 3 collection; dưới: tiêu đề kiểu Figma 1:490 (eyebrow cam "Need inspiration" + heading "Popular Products") + 4 card (lazy). Chip và thẻ trong panel nền trắng | ES1-T127 #5, 11 §5, foundation §18, Figma 1:490 |
+| S1 | `search.performed` false (không `q`) | h1 "Search", form trống, "Popular searches" (chip link `?q=`), "Shop by category" (kit `.category-link`, V56: tên 16/600 + "N products" 14 muted + mũi tên; 1 / 2 / 3 cột). Không toolbar, không lưới | ĐỀ XUẤT 11 §4 option 2, 05 §7 |
+| S2 | 0 kết quả | Giữ từ khoá trong ô; status "No results for “treadmill”"; kit `.empty-state` trong trang (ES1-T527 V54, V59: không panel nền alt bo 24): icon 72 + h2 "Nothing Matches “treadmill” Yet" + mẹo 1 câu (không đổ lỗi, 11 §5) + primary "Shop All Products" (ES1-T127 #5) + text-link "Read the FAQs" (trang FAQs nếu có); slot phụ: popular searches + 3 collection (dưới, cạnh bên từ 80rem); dưới: tiêu đề kiểu Figma 1:490 (eyebrow cam "Need inspiration" + heading "Popular Products") + 4 card (lazy) | ES1-T127 #5, 11 §5, foundation §18, Figma 1:490 |
 | S3 | Có filter | Badge số trên nút Filter, chip + Clear all, filter-note, lưới đã lọc | 08 §6, collection §7 |
 | S4 | Mở Filter | §3.6 | 08 §7, foundation §15 |
-| S5 | Đang refresh (JS) | Lưới `aria-busy="true"` + skeleton foundation §18 đúng ô card; spinner 16 + "Updating results…" `role="status"` dưới toolbar; toolbar vẫn dùng được | foundation §18, 05 §6 |
-| S6a | Filter ra 0 sản phẩm | Giữ chip; khối viền border bo 12: h3 "No Products Match These Filters" + "Remove a filter or clear them all to see the 5 products for “adjustable”." + secondary "Clear All Filters" | 05 §7 |
+| S5 | Đang refresh (JS) | Lưới `aria-busy="true"` + skeleton foundation §18 đúng ô card; spinner 24 của kit (ES1-T527 V61) + "Updating results…" `role="status"` dưới toolbar; toolbar vẫn dùng được | foundation §18, 05 §6 |
+| S6a | Filter ra 0 sản phẩm | Giữ chip; kit `.empty-state--framed` (viền border bo 12, V54): icon 72 + h3 "No Products Match These Filters" + "Remove a filter or clear them all to see the 5 products for “adjustable”." + secondary "Clear All Filters" | 05 §7 |
 | S6b | Refresh lỗi | Alert foundation §18 "We couldn't update the results" + "Check your connection, then try again. Your filters are saved." + "Try Again"; lưới cũ giữ nguyên | foundation §18 |
 | S7 | > 1 trang | §3.9 | 08 #504D |
 | S8 | Hover / focus | type link hover viền foreground; chip lọc và chip gợi ý hover đảo đen; số trang hover viền foreground; nút tròn hover cam, focus offset 3; thẻ danh mục hover viền foreground + mũi tên cam dịch 4; focus outline 2px accent offset 2 cho mọi link, nút, ô (header, footer tối: outline trắng); dòng kết quả outline cả dòng | foundation §3, §6, §19 |

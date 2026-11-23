@@ -26,7 +26,7 @@
   .stage-hero::after { content: ''; position: absolute; inset: 0; background: color-mix(in srgb, var(--color-background-dark) 30%, transparent); } /* sổ 10/11: lớp 30% chỉ dưới 1280 */
   .stage-hero__content { position: relative; z-index: 1; display: grid; gap: var(--space-3); padding-inline: var(--page-margin); }
   .stage-hero .eyebrow { color: var(--color-background-dark-foreground); }
-  .stage-hero__title { font-family: var(--font-heading--family); font-size: var(--font-size-display); font-weight: var(--font-heading--weight-display); line-height: 1; letter-spacing: -0.04em; text-transform: uppercase; }
+  .stage-hero__title { font-family: var(--font-heading--family); font-size: var(--font-size-display); font-weight: var(--font-heading--weight-display); line-height: var(--line-height-display); letter-spacing: var(--letter-spacing-display); text-transform: uppercase; }
   @media (min-width: 48rem) {
     .stage-page .site-header__inner { padding-inline: var(--space-6); }
     .stage-hero { margin: 0 var(--space-4) var(--space-4); border-radius: var(--radius-hero); }
@@ -39,7 +39,7 @@
   @media (max-width: 47.99rem) { .popup-stage > .dialog { max-height: 88%; } }
 
   /* Chữ chung của popup: Figma 1:1148 Sofia 700, 36/44, −0.02em, uppercase */
-  .popup-title { margin: 0; padding-inline-end: calc(var(--space-1) * 14); font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight); line-height: calc(44 / 36); letter-spacing: -0.02em; text-transform: uppercase; }
+  .popup-title { margin: 0; padding-inline-end: calc(var(--space-1) * 14); font-family: var(--font-heading--family); font-size: var(--font-size-h2); font-weight: var(--font-heading--weight); line-height: var(--line-height-heading); letter-spacing: var(--letter-spacing-heading); text-transform: uppercase; }
   .popup-title .accent { color: var(--color-accent); }
   .popup-text { color: var(--color-muted); font-weight: 500; letter-spacing: -0.01em; line-height: 1.625; } /* Figma 1:1149 Inter 500 16/26 */
   .popup-stack { display: grid; gap: var(--space-2); } /* Figma 1:1147 itemSpacing 8 */
@@ -77,7 +77,7 @@
   .byl__lines { margin: 0; padding: 0; border-block: 1px solid var(--color-border); list-style: none; }
   .byl__line { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: var(--space-4); padding-block: var(--space-3); }
   .byl__line + .byl__line { border-block-start: 1px solid var(--color-border); }
-  .byl__media { width: 64px; height: 64px; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); }
+  .byl__media { width: 64px; height: 64px; overflow: hidden; border-radius: var(--radius-swatch); background: var(--color-background-cream); }
   .byl__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
   .byl__name { font-weight: 500; letter-spacing: -0.01em; line-height: 1.4; text-decoration: none; }
   .byl__name:hover { text-decoration: underline; text-underline-offset: 0.2em; }
@@ -111,34 +111,30 @@
   .code__status svg { flex: none; width: 16px; height: 16px; color: var(--color-badge-new); }
 
   /* 3. Offer: nút gợi ý (teaser) + thẻ ưu đãi. Mobile sheet có scrim; từ 48rem popover không modal */
-  .offer-teaser { position: absolute; z-index: 15; inset-block-end: var(--space-4); inset-inline-start: var(--space-4); display: flex; align-items: center; border-radius: var(--radius-pill); background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); box-shadow: var(--shadow-raised); }
-  .offer-teaser__open { display: inline-flex; align-items: center; gap: var(--space-2); min-height: 48px; padding-inline: var(--space-4) var(--space-3); border: 0; border-radius: var(--radius-pill) 0 0 var(--radius-pill); background: none; color: inherit; font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out); }
-  .offer-teaser__open > svg { width: 20px; height: 20px; }
-  .offer-teaser__open:hover, .offer-teaser__open.is-hover { background: color-mix(in srgb, var(--color-background-dark-foreground) 14%, transparent); }
-  .offer-teaser__hide { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 48px; padding: 0; border: 0; border-inline-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); border-radius: 0 var(--radius-pill) var(--radius-pill) 0; background: none; color: inherit; cursor: pointer; }
-  .offer-teaser__hide svg { width: 16px; height: 16px; }
-  .offer-teaser :focus-visible, .offer-teaser .is-focus { outline: 2px solid var(--color-accent); outline-offset: 2px; box-shadow: 0 0 0 2px var(--color-background); }
+  /* Teaser = kit .teaser (V34, V71); trang chỉ đặt vị trí trong khung */
+  .offer-teaser .teaser__open > svg { flex: none; width: 16px; height: 16px; }
+  .offer-teaser { position: absolute; inset-block-end: var(--space-4); inset-inline-start: var(--space-4); }
   @media (min-width: 48rem) { .offer-teaser { inset-block-end: var(--space-5); inset-inline-start: var(--space-5); } }
 
-  .offer-card { position: absolute; z-index: 21; inset-block: auto 0; inset-inline: 0; display: grid; gap: var(--space-5); padding: var(--space-6) var(--space-4) var(--space-5); border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); }
+  .offer-card { position: absolute; z-index: var(--layer-overlay); inset-block: auto 0; inset-inline: 0; display: grid; gap: var(--space-5); padding: var(--space-6) var(--space-4) var(--space-5); border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); }
   .offer-card::before { content: ''; position: absolute; inset-block-start: var(--space-2); inset-inline-start: calc(50% - 20px); width: 40px; height: 4px; border-radius: 2px; background: var(--color-border); }
   .offer-card__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-block-end: calc(var(--space-2) * -1); }
   .offer-product { display: grid; grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: var(--space-4); }
   /* Ảnh như Figma 1:760: nền cream, bo 16, ảnh contain */
-  .offer-product__media { position: relative; display: block; aspect-ratio: 1; overflow: hidden; border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-cream); }
+  .offer-product__media { position: relative; display: block; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); }
   .offer-product__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
   .offer-product__media .product-card__placeholder svg { width: 48%; }
-  .offer-product__title { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); line-height: 1.2; letter-spacing: -0.02em; }
+  .offer-product__title { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); line-height: var(--line-height-heading); letter-spacing: var(--letter-spacing-heading); }
   .offer-product__info { display: grid; gap: var(--space-2); }
   /* Hàng giá như Figma 1:783: giá sale 16/500 đỏ · giá gạch 14/500 · badge -24% 28, cách 8 */
   .offer-product__price { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
   .offer-product__price .price__compare { font-weight: 500; }
   /* Đếm ngược như Figma 1:773: thanh #1A1A1A cao 60, bo 8, padding 24, "Sale ends in" Inter 500 16/26, ô 44 × 44 bo 8 viền #333, số Inter 700 18/28, cách 12, không dấu ":" */
-  .offer-countdown { display: flex; align-items: center; gap: var(--space-4); width: fit-content; max-width: 100%; min-height: 60px; padding-inline: var(--space-5); border-radius: var(--space-2); background: var(--color-background-dark); color: var(--color-background-dark-foreground); font-size: var(--font-size-base); font-weight: 500; letter-spacing: -0.01em; line-height: calc(26 / 16); }
+  .offer-countdown { display: flex; align-items: center; gap: var(--space-4); width: fit-content; max-width: 100%; min-height: 60px; padding-inline: var(--space-5); border-radius: var(--radius-sm); background: var(--color-background-dark); color: var(--color-background-dark-foreground); font-size: var(--font-size-base); font-weight: 500; letter-spacing: -0.01em; line-height: calc(26 / 16); }
   .offer-countdown__cells { display: flex; gap: var(--space-3); }
-  .offer-countdown__cells b { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 11%, var(--color-background-dark)); border-radius: var(--space-2); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: -0.01em; line-height: calc(28 / 18); }
+  .offer-countdown__cells b { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 11%, var(--color-background-dark)); border-radius: var(--radius-sm); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: -0.01em; line-height: calc(28 / 18); }
   @media (min-width: 48rem) {
-    .offer-card { inset-block: auto calc(var(--space-5) + 48px + var(--space-3)); inset-inline: var(--space-5) auto; width: 400px; padding: var(--space-5); border-radius: var(--radius-dialog); }
+    .offer-card { inset-block: auto calc(var(--space-5) + 48px + var(--space-3)); inset-inline: var(--space-5) auto; width: 400px; padding: var(--space-5); border-radius: var(--radius-card); border: 1px solid var(--color-border); box-shadow: var(--shadow-raised); } /* popover không modal: bo 12 + shadow-raised (V71) */
     .offer-card::before { display: none; }
     .offer-card .close-button { width: 40px; height: 40px; }
     .offer-product { grid-template-columns: 120px minmax(0, 1fr); }
@@ -164,17 +160,13 @@
   .state-card { position: relative; display: grid; align-content: start; gap: var(--space-4); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-dialog); background: var(--color-background); box-shadow: var(--shadow-raised); }
   .state-card .popup-title { font-size: var(--font-size-h3); }
   .state-card .close-button { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); }
-  .result-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--color-background-alt); }
-  .result-icon svg { width: 28px; height: 28px; }
-  .result-icon--success { color: var(--color-badge-new); }
-  .result-icon--info { color: var(--color-muted); }
   .note-card { display: grid; gap: var(--space-2); padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-dialog); color: var(--color-muted); font-size: var(--font-size-sm); }
   .note-card strong { color: var(--color-foreground); font-size: var(--font-size-base); }
   .field__input[readonly] { background: var(--color-background-alt); }
 
   /* 5. Vùng đáy màn hình (ES1-T290, docs/ui-spec/layers.md §2). Mép dưới teaser = --edge + chiều cao thanh đáy */
   .layer-list { display: grid; gap: var(--space-2); margin: 0 0 var(--space-6); padding: 0; list-style: none; counter-reset: layer; }
-  .layer-list li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: var(--space-3); align-items: center; min-height: 44px; padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--space-2); font-size: var(--font-size-sm); }
+  .layer-list li { display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: var(--space-3); align-items: center; min-height: 44px; padding: var(--space-2) var(--space-3); border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-size: var(--font-size-sm); }
   .layer-list b { display: grid; place-items: center; height: 28px; border-radius: var(--radius-pill); background: var(--color-background-alt); font-weight: 600; }
   @media (min-width: 48rem) { .layer-list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 80rem) { .layer-list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
@@ -185,50 +177,39 @@
   .bz-stage--cream .stage-page { background: var(--color-background-cream); }
   .bz-body { flex: 1; display: grid; align-content: start; gap: var(--space-4); overflow: hidden; padding: var(--space-5) var(--page-margin) 0; }
   @media (min-width: 48rem) { .bz-body { padding-inline: var(--space-6); } }
-  .bz-body h3 { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: -0.02em; line-height: 1.15; text-transform: uppercase; }
+  .bz-body h3 { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: var(--letter-spacing-heading); line-height: var(--line-height-heading); text-transform: uppercase; }
   .bz-cards { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-4); margin: 0; padding: 0; list-style: none; }
   @media (min-width: 48rem) { .bz-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .bz-card { display: grid; gap: var(--space-1); padding: var(--space-2); border-radius: var(--radius-card); background: var(--color-background); font-size: var(--font-size-sm); font-weight: 500; }
-  .bz-card img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: var(--space-2); background: var(--color-background-cream); mix-blend-mode: darken; }
+  .bz-card img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: var(--radius-swatch); background: var(--color-background-cream); mix-blend-mode: darken; }
   .bz-card:nth-child(n + 3) { display: none; }
   @media (min-width: 48rem) { .bz-card:nth-child(3) { display: grid; } }
   .bz-lines { display: grid; margin: 0; padding: 0; border-block: 1px solid var(--color-border); list-style: none; }
   .bz-lines li { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: var(--space-4); padding-block: var(--space-3); }
   .bz-lines li + li { border-block-start: 1px solid var(--color-border); }
-  .bz-lines img { width: 64px; height: 64px; object-fit: contain; border-radius: var(--space-2); background: var(--color-background-cream); mix-blend-mode: darken; }
+  .bz-lines img { width: 64px; height: 64px; object-fit: contain; border-radius: var(--radius-swatch); background: var(--color-background-cream); mix-blend-mode: darken; }
   .bz-lines span { font-weight: 500; }
   .bz-pdp { display: grid; gap: var(--space-3); }
   .bz-pdp p { margin: 0; color: var(--color-muted); }
 
-  .bz-stage > .bz-bar, .bz-stage > .toast-region, .bz-stage > .bz-consent, .bz-stage > .bz-panel { position: absolute; }
-  .bz-bar { z-index: 5; inset-inline: 0; inset-block-end: 0; display: flex; align-items: center; gap: var(--space-3); min-height: 72px; padding: var(--space-3) var(--page-margin); }
-  .bz-bar .button { min-height: 48px; }
-  .bz-bar--panel { background: var(--color-background-panel); color: var(--color-background-dark-foreground); box-shadow: 0 calc(var(--space-1) * -1) var(--space-4) color-mix(in srgb, var(--color-foreground) 16%, transparent); }
-  .bz-bar--panel .button { flex: 1; }
-  .bz-bar--panel :focus-visible { outline-color: var(--color-background-dark-foreground); }
-  .bz-bar__sum { display: grid; color: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel)); font-size: var(--font-size-sm); line-height: 1.4; }
-  .bz-bar__sum b { color: var(--color-background-dark-foreground); font-size: var(--font-size-lg); }
-  .bz-bar--light { border-block-start: 1px solid var(--color-border); background: var(--color-background); box-shadow: 0 calc(var(--space-1) * -1) var(--space-4) color-mix(in srgb, var(--color-foreground) 10%, transparent); }
-  .bz-bar--light .button { flex: none; padding-inline: var(--space-4); }
-  .bz-bar--light .button svg { display: none; }
-  .bz-bar__media { flex: none; width: 48px; height: 48px; overflow: hidden; border-radius: var(--space-2); background: var(--color-background-cream); }
-  .bz-bar__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
-  .bz-bar__info { display: grid; flex: 1; min-width: 0; }
-  .bz-bar__name { overflow: hidden; font-size: var(--font-size-sm); font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
-  .bz-bar__variant { display: none; color: var(--color-muted); font-size: var(--font-size-sm); }
-  .bz-bar__info .price { display: flex; gap: var(--space-2); align-items: baseline; margin: 0; font-size: var(--font-size-sm); font-weight: 500; }
-  .bz-bar__info .price__compare { display: none; }
-  .bz-qty { display: none; align-items: center; height: 48px; border: 1px solid var(--color-muted-light); border-radius: var(--radius-input); }
-  .bz-qty button { width: 44px; height: 46px; border: 0; background: none; color: var(--color-foreground); font-size: var(--font-size-lg); cursor: pointer; }
-  .bz-qty output { min-width: 24px; text-align: center; font-weight: 500; }
-  .bz-panel { display: none; z-index: 4; inset-block-start: calc(var(--header-height) + var(--space-5)); inset-inline-end: var(--space-6); width: 340px; gap: var(--space-4); padding: var(--space-5); border-radius: calc(var(--radius-card) + var(--space-1)); background: var(--color-background-panel); color: var(--color-background-dark-foreground); }
+  .bz-stage > .buy-bar, .bz-stage > .toast-region, .bz-stage > .bz-consent, .bz-stage > .bz-panel { position: absolute; }
+  /* ES1-T527 vòng 3 (V34, V51, Figma Final/DS): 3 thanh đáy = kit .buy-bar (nền trắng, viền trên, --shadow-bar, 72 / 80 từ 48rem),
+     bỏ .bz-bar riêng và bản panel tối. Mockup đặt thanh trong khung (absolute thay fixed). Trang chỉ thêm dòng tổng, biến thể, số lượng. */
+  .bz-sum { color: var(--color-muted); }
+  .bz-sum b { display: block; color: var(--color-foreground); font-size: var(--font-size-lg); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .bz-bar__variant { display: none; color: var(--color-muted); }
+  .buy-bar__info .price { display: flex; gap: var(--space-2); align-items: baseline; margin: 0; font-weight: 500; }
+  .buy-bar__info .price__compare { display: none; }
+  .bz-qty { display: none; } /* kit .quantity (V38): 48/52 theo --control-height */
+  .bz-qty output { display: grid; place-items: center; }
+  .bz-panel { display: none; z-index: 4; inset-block-start: calc(var(--header-height) + var(--space-5)); inset-inline-end: var(--space-6); width: 340px; gap: var(--space-4); padding: var(--space-5); border-radius: var(--radius-panel); background: var(--color-background-panel); color: var(--color-background-dark-foreground); }
   .bz-panel h4 { margin: 0; font-size: var(--font-size-lg); font-weight: 700; }
   .bz-panel p { display: flex; justify-content: space-between; margin: 0; padding-block-start: var(--space-4); border-block-start: 1px solid var(--color-muted); font-weight: 500; }
   .bz-panel :focus-visible { outline-color: var(--color-background-dark-foreground); }
 
   /* Teaser trang chủ: 360 nằm trên thanh bundle 72 (16 + 72 = 88); từ 48rem không thanh, mép 24 */
   .bz-stage--home .offer-teaser { inset-block-end: calc(var(--space-4) + 72px); }
-  .bz-stage .toast-region { z-index: 30; inset-block-end: calc(var(--space-4) + 72px); inset-inline: var(--space-4); }
+  .bz-stage .toast-region { z-index: var(--layer-toast); inset-block-end: calc(var(--space-4) + 72px); inset-inline: var(--space-4); }
   .bz-stage .toast-region .toast { margin: 0; }
   .bz-consent { z-index: 40; inset-inline: 0; inset-block-end: 0; display: grid; gap: var(--space-2); padding: var(--space-5) var(--page-margin); border-block-start: 2px dashed var(--color-muted-light); background: var(--color-background-alt); color: var(--color-muted); font-size: var(--font-size-sm); }
   .bz-consent strong { color: var(--color-foreground); font-size: var(--font-size-base); }
@@ -236,22 +217,18 @@
   .bz-consent__ph span { flex: 1; height: 44px; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-button); }
   .bz-stage--consent .toast-region { inset-block-end: calc(var(--space-4) + 196px); } /* mockup: số đo banner giả; theme dùng --consent-height đo thật */
   @media (min-width: 48rem) {
-    .bz-bar { min-height: 80px; gap: var(--space-4); padding-inline: var(--space-6); }
-    .bz-bar--panel { min-height: 72px; }
-    .bz-bar--home { display: none; }
+    .bz-home-bar { display: none; } /* thanh bundle chỉ < 48rem (index-mobile-b, CTO 10/11 H4) */
     .bz-stage--home .offer-teaser { inset-block-end: var(--space-5); }
-    .bz-bar__media { width: 56px; height: 56px; }
-    .bz-bar__name { font-size: var(--font-size-base); }
     .bz-bar__variant { display: block; }
-    .bz-bar__info .price__compare { display: inline; }
-    .bz-bar--light .button svg { display: inline; }
+    .buy-bar__info .price__compare { display: inline; }
     .bz-stage .toast-region { inset-block-end: calc(var(--space-5) + 80px); inset-inline: auto var(--space-5); width: 400px; }
     .bz-stage--consent .toast-region { inset-block-end: calc(var(--space-5) + 148px); }
     .bz-consent { padding-inline: var(--space-6); }
   }
   @media (min-width: 64rem) {
-    .bz-qty { display: inline-flex; }
-    .bz-bar--cart { display: none; }
+  .bz-qty { display: none; } /* kit .quantity (V38): 48/52 theo --control-height */
+  .bz-qty output { display: grid; place-items: center; }
+    .bz-cart-bar { display: none; }
     .bz-panel { display: grid; }
     .bz-body--cart { padding-inline-end: calc(340px + var(--space-6) * 2); }
   }
@@ -335,13 +312,13 @@
           <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
           <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
         </div>
-        <div class="offer-teaser"><span class="offer-teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="offer-teaser__hide"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
+        <div class="teaser offer-teaser"><span class="teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
       </div>
       <div class="scrim"></div>
       <div class="dialog nl" role="dialog" aria-modal="true" aria-labelledby="nl-title" aria-describedby="nl-text">
         <button class="close-button dialog__close" type="button" aria-label="Close newsletter popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         <div class="nl__grid">
-          <div class="nl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="Athlete in pink training set stretching before a workout" width="600" height="800" loading="lazy"></div>
+          <div class="nl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="Athlete in pink training set stretching before a workout" width="600" height="800"></div>
           <div class="nl__body">
             <div class="popup-stack">
               <h2 class="popup-title" id="nl-title"><span class="accent">Get 15% Off</span> Your First Order</h2>
@@ -372,7 +349,7 @@
           <div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-user"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg><span class="site-header__count">2</span></span></div>
         </div></div>
         <div class="stage-hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080"></div>
-        <div class="offer-teaser"><span class="offer-teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="offer-teaser__hide"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
+        <div class="teaser offer-teaser"><span class="teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
       </div>
     </div>
 
@@ -389,7 +366,7 @@
           <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080">
           <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
         </div>
-        <div class="offer-teaser"><span class="offer-teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="offer-teaser__hide"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
+        <div class="teaser offer-teaser"><span class="teaser__open"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
       </div>
       <div class="scrim"></div>
       <div class="dialog byl" role="dialog" aria-modal="true" aria-labelledby="byl-title" aria-describedby="byl-text">
@@ -401,12 +378,12 @@
         </div>
         <ul class="byl__lines" aria-label="Items in your cart">
           <li class="byl__line">
-            <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="128" height="128" loading="lazy"></div>
+            <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="128" height="128"></div>
             <div><a class="byl__name" href="#">Ativafit Lava 66 lb Adjustable</a><p class="byl__meta">Black · Qty 1</p></div>
             <p class="byl__price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s>$499.99</s></p>
           </li>
           <li class="byl__line">
-            <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="128" height="128" loading="lazy"></div>
+            <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="128" height="128"></div>
             <div><a class="byl__name" href="#">Iron Core Kettlebell 16 kg</a><p class="byl__meta">Black · Qty 1</p></div>
             <p class="byl__price">$119.00</p>
           </li>
@@ -472,9 +449,9 @@
         </div></div>
         <div class="stage-hero"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-slide-1.jpg" alt="" width="1920" height="1080"></div>
       </div>
-      <div class="offer-teaser">
-        <button class="offer-teaser__open" type="button" aria-expanded="false" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></button>
-        <button class="offer-teaser__hide" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+      <div class="teaser offer-teaser">
+        <button class="teaser__open" type="button" aria-expanded="false" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></button>
+        <button class="teaser__close" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
       </div>
     </div>
     <p class="demo-label" style="margin-block-start: var(--space-5)">Mở (rê chuột / chạm)</p>
@@ -491,9 +468,9 @@
           <div class="stage-hero__content"><p class="eyebrow">Trusted by 10,000+ athletes</p><p class="stage-hero__title">Level Up<br> Your Fitness</p></div>
         </div>
       </div>
-      <div class="offer-teaser">
-        <button class="offer-teaser__open is-hover" type="button" aria-expanded="true" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></button>
-        <button class="offer-teaser__hide" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+      <div class="teaser offer-teaser">
+        <button class="teaser__open is-hover" type="button" aria-expanded="true" aria-controls="offer-card"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></button>
+        <button class="teaser__close" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
       </div>
       <div class="scrim offer-scrim"></div>
       <div class="offer-card" id="offer-card" role="dialog" aria-labelledby="offer-title">
@@ -502,7 +479,7 @@
           <button class="close-button" type="button" aria-label="Close big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
         </div>
         <div class="offer-product">
-          <span class="offer-product__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="" width="240" height="240" loading="lazy"></span>
+          <span class="offer-product__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="" width="240" height="240"></span>
           <div class="offer-product__info">
             <h2 class="offer-product__title" id="offer-title">Ativafit Lava 66 lb Adjustable</h2>
             <div class="offer-product__price">
@@ -562,7 +539,7 @@
         <p class="demo-label">Newsletter · thành công</p>
         <div class="state-card" role="status">
           <button class="close-button" type="button" aria-label="Close newsletter popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
-          <span class="result-icon result-icon--success"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
+          <span class="status-icon status-icon--success"><svg aria-hidden="true"><use href="#i-check"/></svg></span>
           <h3 class="popup-title">You're On The List</h3>
           <p class="popup-text">Thanks for subscribing. Your 15% code is on its way to mike.ross@gmail.com.</p>
           <button class="button button--full" type="button">Continue Shopping</button>
@@ -572,7 +549,7 @@
         <p class="demo-label">Newsletter · email đã đăng ký</p>
         <div class="state-card" role="status">
           <button class="close-button" type="button" aria-label="Close newsletter popup"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
-          <span class="result-icon result-icon--info"><svg aria-hidden="true"><use href="#i-info"/></svg></span>
+          <span class="status-icon"><svg aria-hidden="true"><use href="#i-info"/></svg></span>
           <h3 class="popup-title">You're Already Subscribed</h3>
           <p class="popup-text">This email is already on our list. Look for your 15% code in your inbox.</p>
           <button class="button button--full" type="button">Continue Shopping</button>
@@ -618,12 +595,12 @@
         <div class="state-card">
           <ul class="byl__lines" aria-label="Items in your cart" style="display:block">
             <li class="byl__line" style="display:grid">
-              <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="128" height="128" loading="lazy"></div>
+              <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="Ativafit Lava 66 lb Adjustable" width="128" height="128"></div>
               <div><a class="byl__name" href="#">Ativafit Lava 66 lb Adjustable</a><p class="byl__meta">Black · Qty 1</p></div>
               <p class="byl__price"><span class="price__sale">$379.99</span><s>$499.99</s></p>
             </li>
             <li class="byl__line" style="display:grid">
-              <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="128" height="128" loading="lazy"></div>
+              <div class="byl__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="Iron Core Kettlebell 16 kg" width="128" height="128"></div>
               <div><a class="byl__name" href="#">Iron Core Kettlebell 16 kg</a><p class="byl__meta">Black · Qty 1</p></div>
               <p class="byl__price">$119.00</p>
             </li>
@@ -663,7 +640,7 @@
         <p class="demo-label">Big offer · thẻ tĩnh, đếm ngược ẩn (ngày sai định dạng)</p>
         <div class="state-card">
           <div class="offer-product">
-            <span class="offer-product__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="" width="240" height="240" loading="lazy"></span>
+            <span class="offer-product__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="" width="240" height="240"></span>
             <div class="offer-product__info">
               <h3 class="offer-product__title">Ativafit Lava 66 lb Adjustable</h3>
               <div class="offer-product__price">
@@ -729,12 +706,12 @@
               </ul>
             </div>
           </div>
-          <div class="offer-teaser">
-            <button class="offer-teaser__open" type="button" aria-expanded="false"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%<span class="visually-hidden"> off</span></span></button>
-            <button class="offer-teaser__hide" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
+          <div class="teaser offer-teaser">
+            <button class="teaser__open" type="button" aria-expanded="false"><svg aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%<span class="visually-hidden"> off</span></span></button>
+            <button class="teaser__close" type="button" aria-label="Hide big offer"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
           </div>
-          <aside class="bz-bar bz-bar--panel bz-bar--home" aria-label="Bundle total">
-            <p class="bz-bar__sum" style="margin:0">5 Items<b>$436.90</b></p>
+          <aside class="buy-bar bz-home-bar" aria-label="Bundle total">
+            <p class="buy-bar__info bz-sum">5 Items<b>$436.90</b></p>
             <button class="button" type="button">Add Bundle To Cart</button>
           </aside>
         </div>
@@ -765,14 +742,14 @@
               <button class="toast__close" type="button" aria-label="Dismiss: We couldn't add this item"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
             </div>
           </div>
-          <aside class="bz-bar bz-bar--light" aria-label="Quick add to cart">
-            <span class="bz-bar__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="" width="112" height="112" loading="lazy"></span>
-            <span class="bz-bar__info">
-              <span class="bz-bar__name">Ativafit Lava 66 lb Adjustable</span>
+          <aside class="buy-bar" aria-label="Quick add to cart">
+            <img class="buy-bar__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg" alt="" width="56" height="56">
+            <span class="buy-bar__info">
+              <span class="buy-bar__title">Ativafit Lava 66 lb Adjustable</span>
               <span class="bz-bar__variant">Black</span>
               <span class="price"><span class="visually-hidden">Sale price</span><span class="price__sale">$379.99</span><span class="visually-hidden">Regular price</span><s class="price__compare">$499.99</s></span>
             </span>
-            <span class="bz-qty"><button type="button" aria-label="Decrease quantity">−</button><output aria-label="Quantity">1</output><button type="button" aria-label="Increase quantity">+</button></span>
+            <span class="quantity bz-qty"><button class="quantity__button" type="button" aria-label="Decrease quantity">−</button><output class="quantity__input" aria-label="Quantity">1</output><button class="quantity__button" type="button" aria-label="Increase quantity">+</button></span>
             <button class="button" type="button"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
           </aside>
         </div>
@@ -802,8 +779,8 @@
             <p><span>Total</span><span>$461.99</span></p>
             <a class="button button--full" href="#">Checkout<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
           </section>
-          <aside class="bz-bar bz-bar--panel bz-bar--cart" aria-label="Cart total and checkout">
-            <p class="bz-bar__sum" style="margin:0">Total<b>$461.99</b></p>
+          <aside class="buy-bar bz-cart-bar" aria-label="Cart total and checkout">
+            <p class="buy-bar__info bz-sum">Total<b>$461.99</b></p>
             <a class="button" href="#">Checkout<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
           </aside>
         </div>
