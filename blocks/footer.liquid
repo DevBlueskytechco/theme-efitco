@@ -22,6 +22,23 @@
   logo, then the theme logo (Theme settings, Logo and favicon), then the shop
   name as text. Self-contained: callers must leave the body empty.
 
+  Localization (TE-1 AC5, AC10; localization.md; contract TE-1-R2-FE5 /
+  TE-1-R2-BE2): only when Shopify Markets sells more than one country or
+  language, no setting. Hooks for assets/localization-picker.js:
+  - <localization-picker> wraps the localization form. data-country-count,
+    data-label-status ("[count] countries found"), data-label-status-one,
+    data-label-no-results ("[query]"), data-label-error ("[name]"),
+    data-label-updating ("[name]"). data-tabs on the host (set by BE) shows
+    the tabs: sheet and drawer level 2 only.
+  - footer-localization-toggle: <summary id="FooterLocalizationToggle">.
+    From 48rem BE keeps the <details> popover and syncs aria-expanded
+    (page-layers); Esc, click outside, focusout close it.
+  - footer-localization-panel: <dialog class="dialog"> inside
+    <modal-dialog data-layer="localization" data-sheet-below="48rem">.
+    Below 48rem BE sets details.open = true, then modal-dialog.open(summary):
+    :modal turns it into the bottom sheet with title and close button.
+  - Lists, search, status, error: snippets/localization-lists.liquid.
+
   @example
   {% block 'footer' -%}{%- endblock %}
 {% enddoc %}
@@ -64,6 +81,26 @@
   if localization.available_languages.size > 1
     assign show_languages = true
   endif
+
+  # Button text: only the part with more than one entry (localization.md §2)
+  assign locale_code = ''
+  if show_countries
+    assign locale_code = localization.country.currency.iso_code
+  endif
+  if show_countries and show_languages
+    assign locale_code = locale_code | append: ' / '
+  endif
+  if show_languages
+    assign language_code = localization.language.iso_code | upcase
+    assign locale_code = locale_code | append: language_code
+  endif
+
+  # Labels for assets/localization-picker.js; [count], [query], [name] are replaced in JS
+  assign label_status = 'blocks.footer.country_results' | t: total: '[count]'
+  assign label_status_one = 'blocks.footer.country_result_one' | t
+  assign label_no_results = 'blocks.footer.country_no_results' | t: query: '[query]'
+  assign label_error = 'blocks.footer.error' | t: name: '[name]'
+  assign label_updating = 'blocks.footer.updating' | t: name: '[name]'
 
   assign show_payment_icons = false
   if block.settings.show_payment_icons and shop.enabled_payment_types.size > 0
@@ -317,71 +354,68 @@
 
     <div class="site-footer__commerce-group">
       {%- if show_countries or show_languages -%}
-        {%- form 'localization', id: 'footer-localization', class: 'site-footer__localization' -%}
-          <details class="site-footer__disclosure">
-            <summary class="site-footer__summary" data-testid="footer-localization-toggle">
-              <span class="site-footer__hidden-label">{{ 'blocks.footer.localization_label' | t }}</span>
-              {{ localization.country | image_url: width: 52 | image_tag: class: 'site-footer__flag', width: 26, height: 26, alt: '', loading: 'lazy' }}
-              <span>{{ localization.country.currency.iso_code }} / {{ localization.language.iso_code | upcase }}</span>
-              <svg aria-hidden="true" focusable="false" class="site-footer__chevron" width="9" height="5" viewBox="0 0 9 5" fill="none"><path d="M0.17192 0.168975C0.401146 -0.0563249 0.77273 -0.0563249 1.00196 0.168975L4.49999 3.60715L7.998 0.168975C8.22722 -0.056325 8.59887 -0.056325 8.82809 0.168975C9.0573 0.394275 9.0573 0.759568 8.82809 0.984845L4.91501 4.831C4.80497 4.93923 4.65565 5 4.49999 5C4.34433 5 4.19501 4.93923 4.08497 4.831L0.17192 0.984845C-0.0573072 0.759568 -0.0573072 0.394275 0.17192 0.168975Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>
-            </summary>
+        {% comment %}
+          Localization (TE-1 AC5, AC10; localization.md). One combined button: the text shows only
+          the part with more than one entry (USD, EN or USD / EN). Without JS, and from 48rem, the
+          <details> opens the white panel as a popover above the button (2 columns when both
+          lists, 1 otherwise). Below 48rem with JS, BE (localization-picker.js) opens the same
+          <dialog> with showModal() as a bottom sheet (.dialog), with tabs when both lists.
+        {% endcomment %}
+        <localization-picker
+          data-country-count="{{ localization.available_countries.size }}"
+          data-label-status="{{ label_status | escape }}"
+          data-label-status-one="{{ label_status_one | escape }}"
+          data-label-no-results="{{ label_no_results | escape }}"
+          data-label-error="{{ label_error | escape }}"
+          data-label-updating="{{ label_updating | escape }}"
+        >
+          {%- form 'localization', id: 'footer-localization', class: 'site-footer__localization' -%}
+            <details class="site-footer__disclosure">
+              <summary
+                class="site-footer__summary"
+                id="FooterLocalizationToggle"
+                aria-controls="FooterLocalizationPanel"
+                data-testid="footer-localization-toggle"
+              >
+                <span class="site-footer__hidden-label">{{ 'blocks.footer.localization_label' | t }}</span>
+                {{ localization.country | image_url: width: 52 | image_tag: class: 'site-footer__flag', width: 26, height: 26, alt: '', loading: 'lazy' }}
+                <span class="site-footer__locale-code">{{ locale_code }}</span>
+                <span class="site-footer__hidden-label">
+                  , {{ localization.country.name | escape }}, {{ localization.language.endonym_name | escape -}}
+                </span>
+                <svg aria-hidden="true" focusable="false" class="site-footer__chevron" width="9" height="5" viewBox="0 0 9 5" fill="none"><path d="M0.17192 0.168975C0.401146 -0.0563249 0.77273 -0.0563249 1.00196 0.168975L4.49999 3.60715L7.998 0.168975C8.22722 -0.056325 8.59887 -0.056325 8.82809 0.168975C9.0573 0.394275 9.0573 0.759568 8.82809 0.984845L4.91501 4.831C4.80497 4.93923 4.65565 5 4.49999 5C4.34433 5 4.19501 4.93923 4.08497 4.831L0.17192 0.984845C-0.0573072 0.759568 -0.0573072 0.394275 0.17192 0.168975Z" fill-rule="evenodd" clip-rule="evenodd" fill="currentColor"/></svg>
+              </summary>
 
-            <div class="site-footer__panel">
-              {%- if show_countries -%}
-                <div class="site-footer__panel-group" data-testid="footer-country-selector">
-                  <p class="site-footer__panel-heading" id="footer-country-heading">
-                    {{- 'blocks.footer.country_label' | t -}}
-                  </p>
-                  <ul class="site-footer__options" aria-labelledby="footer-country-heading">
-                    {%- for country in localization.available_countries -%}
-                      <li>
-                        <button
-                          class="site-footer__option"
-                          type="submit"
-                          name="country_code"
-                          value="{{ country.iso_code }}"
-                          data-testid="footer-country-option"
-                          {% if country.iso_code == localization.country.iso_code %}
-                            aria-current="true"
-                          {% endif %}
-                        >
-                          {{- country.name | escape }} ({{ country.currency.iso_code }} {{ country.currency.symbol -}})
-                        </button>
-                      </li>
-                    {%- endfor -%}
-                  </ul>
-                </div>
-              {%- endif -%}
-
-              {%- if show_languages -%}
-                <div class="site-footer__panel-group" data-testid="footer-language-selector">
-                  <p class="site-footer__panel-heading" id="footer-language-heading">
-                    {{- 'blocks.footer.language_label' | t -}}
-                  </p>
-                  <ul class="site-footer__options" aria-labelledby="footer-language-heading">
-                    {%- for language in localization.available_languages -%}
-                      <li>
-                        <button
-                          class="site-footer__option"
-                          type="submit"
-                          name="language_code"
-                          value="{{ language.iso_code }}"
-                          lang="{{ language.iso_code }}"
-                          data-testid="footer-language-option"
-                          {% if language.iso_code == localization.language.iso_code %}
-                            aria-current="true"
-                          {% endif %}
-                        >
-                          {{- language.endonym_name | escape -}}
-                        </button>
-                      </li>
-                    {%- endfor -%}
-                  </ul>
-                </div>
-              {%- endif -%}
-            </div>
-          </details>
-        {%- endform -%}
+              <modal-dialog data-layer="localization" data-sheet-below="48rem" data-return-focus="FooterLocalizationToggle">
+                <dialog
+                  class="dialog site-footer__panel{% if show_countries and show_languages %} site-footer__panel--both{% endif %}{% if localization.available_countries.size > 10 %} site-footer__panel--tall{% endif %}"
+                  id="FooterLocalizationPanel"
+                  aria-labelledby="FooterLocalizationTitle"
+                  data-testid="footer-localization-panel"
+                >
+                  <div class="dialog__header site-footer__panel-header">
+                    <p class="dialog__title" id="FooterLocalizationTitle">{{ 'blocks.footer.localization_title' | t }}</p>
+                    <button
+                      type="button"
+                      class="close-button dialog__close"
+                      aria-label="{{ 'blocks.footer.close' | t }}"
+                    >
+                      {%- render 'header-icon', name: 'close' -%}
+                    </button>
+                  </div>
+                  <div class="dialog__body site-footer__panel-body">
+                    {%- render 'localization-lists',
+                      id: 'Footer',
+                      testid: 'footer',
+                      show_countries: show_countries,
+                      show_languages: show_languages
+                    -%}
+                  </div>
+                </dialog>
+              </modal-dialog>
+            </details>
+          {%- endform -%}
+        </localization-picker>
       {%- endif -%}
 
       {%- if show_payment_icons -%}

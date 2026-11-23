@@ -1,4 +1,4 @@
-KHÔNG CHẮC: Figma không có announcement bar (docs/figma-inventory.md dòng 13, 67) nên mọi kích thước, màu, trạng thái là ĐỀ XUẤT. demo-data không có chữ announcement: mockup dùng "Up to 24% off selected gear" (24% = Ativafit Lava 66 lb Adjustable 379.99 / 499.99, có thật trong demo-data) trỏ /collections/sale; đã hỏi BA ở ES1-T296. Ảnh card trong trang nền mockup dùng đúng URL demo nhưng lệch tên sản phẩm (ES1-T245), không ảnh hưởng thiết kế bar.
+KHÔNG CHẮC: announcement bar chưa có quyết định CTO riêng nên mọi kích thước, màu, trạng thái là ĐỀ XUẤT (nguồn chuẩn: mockup `drafts/designer/ES1-T289/announcement-bar.html` + kit, CTO 21/11). demo-data không có chữ announcement: mockup dùng "Up to 24% off selected gear" (24% = Ativafit Lava 66 lb Adjustable 379.99 / 499.99, có thật trong demo-data) trỏ /collections/sale; đã hỏi BA ở ES1-T296. Ảnh card trong trang nền mockup dùng đúng URL demo nhưng lệch tên sản phẩm (ES1-T245), không ảnh hưởng thiết kế bar.
 
 # UI spec: Announcement bar (ES1-T289, audit A18)
 
@@ -9,9 +9,9 @@ KHÔNG CHẮC: Figma không có announcement bar (docs/figma-inventory.md dòng 
 | 1 | Spec | chưa có, chỉ có code `blocks/announcement-bar.liquid` + `critical.css` 131–159 | spec đủ 4 mốc, trạng thái, a11y | Ticket ES1-T289, SRS TE-1 AC4 |
 | 2 | Vị trí so với header tối 80 dính | chưa ghi | trên header, cuộn đi; header dính top 0 khi bar đã khuất; mega menu, scrim bám đáy header, không bám y 80 | §4, AGENTS Composition model |
 | 3 | Chiều cao | ~37 (padding 8 + chữ 14 × 1.5) | tối thiểu 44 mọi mốc (link chạm 44 trên mobile) | Sổ 09/11 vùng chạm mobile ≥ 44 |
-| 4 | Nền | `--color-background-dark` phẳng | `--color-background-dark` + noise (liền với header 1:362) + gạch đáy 1px trắng 12% | Figma 1:360, 1:362; foundation §2 `--dark-texture` |
+| 4 | Nền | `--color-background-dark` phẳng | `--color-background-dark` + noise (liền với header) + gạch đáy 1px trắng 12% | foundation §2 `--dark-texture` |
 | 5 | Link | cả câu là link, gạch chân | giữ cả câu là link; thêm mũi tên 16 × 13 cuối câu, hover gạch 2px + mũi tên dịch 4 | DESIGN `.button--link`; 04 §3.9 hover/active rõ |
-| 6 | Chữ | 14/400 | 14/500 lh 20 | foundation §1 chữ nhỏ 14; Figma 1:365 menu Inter 500 |
+| 6 | Chữ | 14/400 | 14/500 lh 20 | foundation §1 chữ nhỏ 14/20 (`--line-height-sm`; Chuẩn: Polaris React body 14/20); weight 500 như link menu header |
 
 Giữ nguyên: 2 setting `text`, `link`; rỗng thì không render; placeholder trong theme editor; `<aside aria-label>`; `data-testid` hiện có.
 
@@ -21,7 +21,7 @@ Mục đích: báo 1 ưu đãi hoặc tin toàn site ở dạng tĩnh, không ph
 - Spec này.
 - `drafts/designer/ES1-T289/announcement-bar.html` (nhúng `../_kit/kit.css`) + `announcement-bar-360|768|1280|1920.png`. Phần đầu mỗi PNG là đầu trang collection Sale có bar; trạng thái ở cuối file.
 
-Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > Figma 1:360, 1:362 (thanh tối, chỉ desktop) > foundation.md §1–3, §19–20 > kiến thức 14, 15, 04, 05, 06, 03.
+Nguồn: sổ quyết định CTO > AGENTS.md > DESIGN.md > mockup `drafts/designer/ES1-T289/announcement-bar.html` + `drafts/designer/_kit/kit.css` (nguồn chuẩn thiết kế, CTO 21/11) > foundation.md §1–3, §19–20 > kiến thức 14, 15, 04, 05, 06, 03.
 
 ---
 
@@ -45,7 +45,7 @@ Không thêm setting. Giữ:
 
 ĐỀ XUẤT đổi chữ info `t:info.announcement_text` (nguồn: 18 chữ link mô tả đích; §3 mốc 360): "Leave empty to hide the announcement bar. Under 40 characters fits one line on phones. With a link, say where it goes (for example: Up to 24% off selected gear)."
 
-Chữ demo (ĐỀ XUẤT, chờ ES1-T296): `text` "Up to 24% off selected gear", `link` /collections/sale (collection Sale có trong menu Figma 1:365). Không dùng "Shop now", "Click here" (sổ 09/11 SEO).
+Chữ demo (ĐỀ XUẤT, chờ ES1-T296): `text` "Up to 24% off selected gear", `link` /collections/sale (collection Sale có trong menu header). Không dùng "Shop now", "Click here" (sổ 09/11 SEO).
 
 ## 3. Layout theo mốc
 
@@ -75,7 +75,7 @@ Code: `layout/theme.liquid` gọi `announcement-bar` trong container riêng trư
 
 ## 5. Trạng thái
 
-Figma không có; tất cả ĐỀ XUẤT (05 §3, foundation §3.2, §18). Mockup: phần "States".
+Tất cả trạng thái là ĐỀ XUẤT (05 §3, foundation §3.2, §18). Mockup: phần "States".
 
 | # | Trạng thái | Hiển thị | Nguồn |
 | --- | --- | --- | --- |

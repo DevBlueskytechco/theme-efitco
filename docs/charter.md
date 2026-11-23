@@ -1,11 +1,13 @@
 # Charter — theme-efitco · bản 0.2 · 11/11/2026 · Chủ: PO (bản 0.1: 22/10/2026)
 
+Cập nhật CTO 21/11/2026 (ES1-T567): baseline thiết kế là mockup HTML `drafts/designer/**` + `drafts/designer/_kit/kit.css`; chỗ ghi "giống / theo / khớp" bản vẽ đọc là "khớp mockup"; mã node và tên file thiết kế cũ là ghi chép lịch sử, không còn là căn cứ; nhãn nút sentence case (Polaris).
+
 Quyết định CTO 22/10/2026: (1) kiến trúc = Skeleton block-first, không sections/JSON template, `{% partial %}` cho vùng động; (2) dev store của team đã chạy chế độ Canvas, ADR 0002 giữ nguyên.
-Quyết định CTO 27/10/2026 (từ kiểm kê Figma): giữ các block trang chủ như thiết kế, thêm TE-11..TE-13; Dev FE tự suy mobile; font heading Sofia Sans Condensed (có trong Shopify font library); xám chữ phụ nền sáng #6B6B6B đạt AA.
+Quyết định CTO 27/10/2026 (từ kiểm kê bản vẽ trang chủ): giữ các block trang chủ như thiết kế, thêm TE-11..TE-13; Dev FE tự suy mobile; font heading Sofia Sans Condensed (có trong Shopify font library); xám chữ phụ nền sáng #6B6B6B đạt AA.
 Bản 0.2 (CR phạm vi, ES1-T399, REQ-0002 BGĐ duyệt thiết kế 11/11): quyết định CTO 11/11 ở ES1-T301, ES1-T308, ES1-T309, ES1-T310, ES1-T311, ES1-T413 và comment CTO trên ES1-T304, ES1-T399. Đổi gì, vì sao: `drafts/po/ES1-T399/cr.md`.
 
 ## Mục tiêu đo được
-1. R1: theme mở, sửa và publish được trong Shopify Canvas trên store thật tuần 11 (28/12/2026); 10 yêu cầu Sidekick mẫu đều cho ra theme check 0 lỗi; trang chủ giống Figma (TE-17 AC-H3, đo trên store dev đã cấu hình nội dung Figma).
+1. R1: theme mở, sửa và publish được trong Shopify Canvas trên store thật tuần 11 (28/12/2026); 10 yêu cầu Sidekick mẫu đều cho ra theme check 0 lỗi; trang chủ khớp mockup (TE-17 AC-H3, đo trên store dev đã cấu hình nội dung demo).
 2. Chỉ tiêu nghiệm thu NFR-1 (SRS 0.4), đo Lighthouse desktop và mobile trên demo store dev: Accessibility 100 và Best Practices 100 ở mọi trang đo (mặc định 14 template trong phạm vi, ES1-T419); SEO 100 ở home, collection, product, blog, article, page; Performance desktop ≥ 98, mobile ≥ 90. Best Practices ghi tách phần do theme và phần do nền tảng Shopify. Bug P1/P2 = 0 khi lên Canvas. Ngưỡng CI chặn merge (ES1-T301): perf desktop ≥ 0,96, mobile ≥ 0,9, accessibility 1,0; Best Practices warn 0,78; SEO warn 1.
 3. Toàn bộ 9 vai trò có agent chạy nháp song song với người, tích ≥ 300 bản ghi eval đến tuần 12 (mục tiêu của chương trình team agent).
 
@@ -15,10 +17,10 @@ Chủ shop hàng thủ công / quà tặng, dưới 200 SKU, 1–3 người, t�
 ## Phạm vi
 Trong (R1):
 - Trang (14 template): home (`index`), collection, list-collections, product, cart, search, blog, article, page, page.contact, 404, password, gift card (`gift_card`), quiz result (`collection.quiz`, `?view=quiz`). Mỗi trang theo `docs/ui-spec/*.md` trên develop 11/11, kể cả dòng ĐỀ XUẤT (ES1-T309 #1).
-- Trang chủ theo Figma Efitco T10: block và thứ tự theo `docs/ui-spec/index.md`, `index-1280.md`, `index-mobile-a/b.md`; không chốt số block trong charter.
+- Trang chủ theo mockup (`drafts/designer/ES1-T293`, `ES1-T278`, `ES1-T279`): block và thứ tự theo `docs/ui-spec/index.md`, `index-1280.md`, `index-mobile-a/b.md`; không chốt số block trong charter.
 - Thành phần dùng chung: header/footer/navigation (menu 3 cấp, breadcrumb; TE-22 trừ mega menu ảnh/sản phẩm), announcement bar, localization, phân trang chung, lớp/consent (`layers.md`), cart drawer + quickview, predictive search + recent searches (TE-8-R2-BE3), tính năng Shopify trên PDP (rating từ metafield).
 - Tuân thủ chuẩn Theme Store nội bộ: mọi task CHẶN của ES1-T304 (ES1-T401..T412).
-- 1 preset (settings_data mặc định); nội dung mặc định trống (ADR 0011, ES1-T308 #1): không bậc giảm, không claim/mã giảm, không handle `figma-*`; nội dung Figma chỉ cấu hình trên store dev.
+- 1 preset (settings_data mặc định); nội dung mặc định trống (ADR 0011, ES1-T308 #1): không bậc giảm, không claim/mã giảm, không handle demo của store dev (tiền tố cũ, bảng tên ở `drafts/designer/ES1-T567/notes.md` mục 5); nội dung demo chỉ cấu hình trên store dev.
 - Tài liệu merchant cho Canvas.
 Ngoài R1:
 - Nhóm Should cắt (CTO 11/11, ES1-T399): TE-18 popup marketing, TE-19 upsell giỏ hàng, TE-22-R2-FE3 mega menu ảnh/sản phẩm, TE-4-R2-FE7/BE7 B2B quantity rule + volume.
