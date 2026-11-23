@@ -19,11 +19,6 @@
   take the full row. When the body is empty, the editor shows a placeholder and the
   storefront renders nothing.
 
-  Styles: assets/faq.css (this block and faq-item), loaded by the stylesheet_tag
-  line before the root, without preload (ADR 0014), only when the block prints
-  markup (a question, or the theme editor). blocks/contact-aside.liquid loads the
-  same file for its faq-item questions.
-
   Test hooks: data-testid="faq", "faq-heading", "faq-list", "faq-placeholder",
   "faq-image", "faq-stat-1", "faq-stat-2".
 
@@ -93,9 +88,6 @@
   endif
 -%}
 
-{%- if items != blank or request.design_mode -%}
-  {{ 'faq.css' | asset_url | stylesheet_tag }}
-{%- endif -%}
 {%- if items != blank -%}
   <div
     class="faq{% if has_media %} faq--with-media{% endif %}"

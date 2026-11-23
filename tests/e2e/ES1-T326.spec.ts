@@ -124,8 +124,7 @@ test.describe('ES1-T326 tĩnh', () => {
     expect(cssText).not.toMatch(/z-index|text-overflow|line-clamp/);
     expect(cssText).toMatch(/color-mix\(in srgb, var\(--color-background-dark\) 75%, transparent\),\s*color-mix\(in srgb, var\(--color-background-dark\) 60%, transparent\) 50%/);
     // Trần 49 152 B gzip (CTO 17/11, ES1-T472 a): ES1-T478 tách CSS theo template, hết trần tạm 57 344
-    // ADR 0014 mục 5: sau ES1-T566 (CSS 6 block trang chủ ra file block) trần 40 960
-    expect(gzipSync(BASE).length).toBeLessThanOrEqual(40960);
+    expect(gzipSync(BASE).length).toBeLessThanOrEqual(49152);
     expect(Buffer.byteLength(CRITICAL)).toBeLessThanOrEqual(10240);
   });
 

@@ -17,8 +17,7 @@ const shell = (body: string) => `<!doctype html><html lang="en"><head><meta char
 const CHALLENGE = '<!doctype html><html><head><title>Just a moment...</title><meta http-equiv="refresh" content="360"></head><body><div id="challenge-stage">Enable JavaScript and cookies to continue</div></body></html>';
 const PNG = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M/wHwAEAQH/7yMK/gAAAABJRU5ErkJggg==', 'base64');
 
-// ADR 0014 (ES1-T566): block testimonials in link assets/testimonials.css ngay trước root, trang giả làm y như vậy.
-const REVIEWS = `<div class="block-container"><link rel="stylesheet" href="/testimonials.css"><div class="testimonials"><div class="testimonials__header"><h2 data-testid="testimonials-heading">Reviews</h2></div>
+const REVIEWS = `<div class="block-container"><div class="testimonials"><div class="testimonials__header"><h2 data-testid="testimonials-heading">Reviews</h2></div>
 <ul class="testimonials__list" role="list" tabindex="0" data-testid="testimonials-list">${[1, 2, 3, 4].map((n) => `<li class="testimonial-item" data-testid="testimonial-item">Review ${n}</li>`).join('')}</ul></div></div><div style="height:3000px"></div>`;
 // ADR 0014 (ES1-T565): block image-with-text in link assets/image-with-text.css ngay trước root, trang giả làm y như vậy.
 const BANNER = '<link rel="stylesheet" href="/image-with-text.css"><div class="image-with-text image-with-text--banner"><h2 class="image-with-text__heading" data-testid="heading"><strong>Make</strong> fitness a<br> natural part of<br> your everyday life !</h2></div>';

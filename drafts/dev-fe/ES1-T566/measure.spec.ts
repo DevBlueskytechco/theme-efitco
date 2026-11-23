@@ -4,8 +4,9 @@ import { readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { gzipSync } from 'node:zlib';
 
-const FILES = ['base', 'critical', 'aux', 'collection', 'product', 'cart', 'quiz', 'shop-the-look', 'bundle-builder', 'featured-product', 'image-with-text', 'testimonials', 'video-carousel', 'faq', 'shop-by-level', 'multicolumn', 'hello-world'];
-const INDEX = ['quiz', 'shop-the-look', 'bundle-builder', 'featured-product', 'image-with-text', 'testimonials', 'video-carousel', 'faq', 'shop-by-level'];
+const FILES = ['base', 'critical', 'aux', 'collection', 'product', 'cart', 'quiz', 'shop-the-look', 'bundle-builder', 'featured-product', 'image-with-text', 'multicolumn', 'hello-world'];
+// CTO 21/11 ES1-T575: testimonials, video-carousel, faq, shop-by-level ở base.css
+const INDEX = ['quiz', 'shop-the-look', 'bundle-builder', 'featured-product', 'image-with-text'];
 const strip = (s: string) => s.replace(/\/\*[\s\S]*?\*\//g, '');
 const dev = (f: string) => {
   try { return execFileSync('git', ['show', `HEAD:assets/${f}.css`]); } catch { return null; }
@@ -24,6 +25,6 @@ test('đo', () => {
     rows.push(`${f}\tthô ${b.length}\tgzip ${g}\tgzip-bỏ-comment ${gs}\tdevelop thô ${d ? d.length : '-'}\tdevelop gzip ${d ? gzipSync(d).length : '-'}`);
     if (f === 'base' || INDEX.includes(f)) { idx += g; idxStrip += gs; }
   }
-  rows.push(`index base+9 file: ${idx} | bỏ comment: ${idxStrip}`);
+  rows.push(`index base+5 file: ${idx} | bỏ comment: ${idxStrip}`);
   console.log(rows.join('\n'));
 });
