@@ -6,10 +6,9 @@
   768, TE-3 AC17), columns_desktop columns from 80rem (292 at 1280, 336 at 1920).
   No carousel.
 
-  Eyebrow, heading and the labels of tabs 2 to 4 default to empty (ADR 0011
-  mục 3, D10 of ES1-T307): "Bestsellers" over the built-in catalog would be a
-  claim, and a sample tab label would name the merchant's collection wrongly.
-  An empty tab label falls back to the collection title.
+  Eyebrow, heading and the labels of tabs 2 to 4 keep a sample default with
+  info 'sample default' (Dawn style; ADR 0011 mục 3 ngoại lệ, CTO 23/11,
+  ES1-T336/ES1-T430). An empty tab label falls back to the collection title.
 
   Source: the collection setting; when it is empty, collections[default_collection].
   The home page passes 'all' (Shopify's built-in catalog, not demo content; CTO
@@ -344,12 +343,16 @@
     {
       "type": "text",
       "id": "eyebrow",
-      "label": "t:labels.eyebrow"
+      "label": "t:labels.eyebrow",
+      "info": "t:info.sample_default",
+      "default": "Bestsellers"
     },
     {
       "type": "inline_richtext",
       "id": "heading",
-      "label": "t:labels.heading"
+      "label": "t:labels.heading",
+      "info": "t:info.sample_default",
+      "default": "What People Are Buying?"
     },
     {
       "type": "checkbox",
@@ -390,7 +393,8 @@
       "type": "text",
       "id": "tab_2_label",
       "label": "t:labels.featured_collection_tab_2_label",
-      "info": "t:info.featured_collection_tab_label"
+      "info": "t:info.featured_collection_tab_label",
+      "default": "Weight"
     },
     {
       "type": "collection",
@@ -402,7 +406,8 @@
       "type": "text",
       "id": "tab_3_label",
       "label": "t:labels.featured_collection_tab_3_label",
-      "info": "t:info.featured_collection_tab_label"
+      "info": "t:info.featured_collection_tab_label",
+      "default": "Portable Fitness"
     },
     {
       "type": "collection",
@@ -414,7 +419,8 @@
       "type": "text",
       "id": "tab_4_label",
       "label": "t:labels.featured_collection_tab_4_label",
-      "info": "t:info.featured_collection_tab_label"
+      "info": "t:info.featured_collection_tab_label",
+      "default": "Accessories"
     }
   ]
 }

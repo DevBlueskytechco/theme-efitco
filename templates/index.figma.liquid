@@ -19,8 +19,6 @@
   the why-choose eyebrow are literal strings here, never locale keys, because the
   theme must not ship them as defaults. Bundle and setup tiers (10/15%, 10%) are
   set here because the schema defaults are 0.
-  Same for the intro rich-text, the bestseller eyebrow and heading, and tab labels
-  2 to 4 (TE-17-R2-FE1, ES1-T336): their schema defaults are empty.
 
   Remove this file before a real store release.
 {% endcomment %}
@@ -260,13 +258,7 @@
 {% endblock %}
 
 {% block 'container', id: 'figma-intro', background: 'sand' %}
-  {% block 'rich-text',
-    heading: 'Everything You Need',
-    inline_image: fi_inline,
-    heading_after_image: 'to Train.',
-    body: '<p>Versatile equipment for home training - strength, mobility, endurance, at every level.</p>',
-    button_label: 'Become A Member'
-  %}{% endblock %}
+  {% block 'rich-text', inline_image: fi_inline %}{% endblock %}
   {% block 'shop-by-level' %}
     {% block 'level-card', id: 'figma-level-card-1', handle: 'figma-level-beginner', image: fi_lvl_1, default_label: level_label %}{% endblock %}
     {% block 'level-card', id: 'figma-level-card-2', handle: 'figma-level-intermediate', image: fi_lvl_2, default_label: level_label %}{% endblock %}
@@ -278,14 +270,9 @@
   {% block 'featured-collection',
     id: 'figma-featured-collection',
     collection: figma_featured_collection,
-    eyebrow: 'Bestsellers',
-    heading: 'What People Are Buying?',
     default_tab_2_collection: 'figma-tab-weight',
-    tab_2_label: 'Weight',
     default_tab_3_collection: 'figma-tab-portable-fitness',
-    tab_3_label: 'Portable Fitness',
-    default_tab_4_collection: 'figma-tab-accessories',
-    tab_4_label: 'Accessories'
+    default_tab_4_collection: 'figma-tab-accessories'
   %}{% endblock %}
 {% endblock %}
 
