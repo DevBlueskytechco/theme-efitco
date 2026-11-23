@@ -1248,7 +1248,6 @@
 @media (min-width: 64rem) {
   .image.article-main__cover { margin-block-start: var(--space-5); }
   .article-main__header { padding-block: var(--space-4) var(--space-7); }
-  .article-main .rte { font-size: var(--font-size-lg); }
 }
 @media (min-width: 80rem) { .image.article-main__cover { aspect-ratio: 1798 / 827; } }
 
@@ -1350,6 +1349,13 @@
   min-block-size: calc(var(--space-1) * 11);
 }
 
+/* Hộp tóm tắt lỗi, trạng thái gửi nhận focus bằng script (ES1-T566: chuyển từ base.css, ADR 0014) */
+.contact-form__summary:focus-visible,
+.contact-form__status:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
 .contact-form__submit {
   inline-size: 100%;
   min-block-size: calc(var(--space-1) * 12);
@@ -1381,14 +1387,15 @@
   border-block-end-color: var(--color-border);
 }
 
-.contact-aside .faq-item .faq-item__summary {
+/* details.faq-item (0,3,1) thắng .faq-item:first-child .faq-item__summary (0,3,0) của FAQ trang chủ ở base.css, không phụ thuộc thứ tự nạp (ADR 0014, CTO 21/11 ES1-T575) */
+.contact-aside details.faq-item .faq-item__summary {
   inset-block-start: 0;
   min-block-size: calc(var(--space-1) * 14);
   margin-block: 0;
   padding-block: var(--space-2);
 }
 
-.contact-aside .faq-item .faq-item__question {
+.contact-aside details.faq-item .faq-item__question {
   inset-block-start: 0;
   font-size: var(--font-size-base);
   font-weight: 600;
@@ -1469,7 +1476,7 @@
     padding: calc(var(--space-1) * 10);
   }
 
-  .contact-aside .faq-item .faq-item__question {
+  .contact-aside details.faq-item .faq-item__question {
     font-size: var(--font-size-lg);
   }
 }

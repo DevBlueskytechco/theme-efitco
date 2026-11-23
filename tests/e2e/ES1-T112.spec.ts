@@ -673,6 +673,9 @@ test.describe('ES1-T112 AC4 drawer lọc', () => {
     const closeWays: [string, () => Promise<void>][] = [
       ['Esc', () => page.keyboard.press('Escape')],
       ['scrim', async () => {
+        // ES1-T583: drawer trượt vào 250 ms (--motion-base); đo boundingBox giữa lúc trượt ra x âm → điểm chạm rơi vào thân drawer khi trượt xong.
+        // Chờ transition xong rồi mới đo, hợp đồng không đổi (chạm ngoài drawer = scrim).
+        await drawer.evaluate((el) => Promise.allSettled(el.getAnimations().map((a) => a.finished)));
         const d = (await drawer.boundingBox())!;
         const vp = page.viewportSize()!;
         await page.mouse.click(Math.min(vp.width - 4, d.x + d.width + 12), vp.height / 2);

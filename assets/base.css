@@ -823,109 +823,7 @@ modal-dialog {
   }
 }
 
-/** Hello world block */
-.welcome {
-  display: grid;
-  grid-template-columns: var(--content-grid);
-  background-color: var(--color-background-alt);
-  color: var(--color-background-alt-foreground);
-  padding: var(--space-7) 0;
-}
-
-.welcome-content {
-  grid-column: 2;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: var(--space-4);
-  width: 100%;
-  padding: 0 var(--space-5);
-}
-
-.welcome-description {
-  max-width: 80ch;
-  margin-block-start: var(--space-5);
-}
-
-.icon {
-  width: 300px;
-}
-
-.highlights {
-  display: grid;
-  gap: var(--space-6);
-  grid-template-columns: 1fr;
-  margin-block-start: var(--space-7);
-}
-
-@media (min-width: 80rem) {
-  .highlights {
-    grid-template-columns: repeat(4, 1fr);
-  }
-}
-
-.highlight {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding: var(--space-5);
-  border-radius: var(--radius-card);
-  background-color: var(--color-background-cream);
-  color: var(--color-muted);
-}
-
-.highlight > * + * {
-  margin-block-start: var(--space-4);
-}
-
-.highlight h3 {
-  font-size: var(--font-size-base);
-  color: var(--color-background-cream-foreground);
-}
-
-.highlight-description {
-  flex: 1 1;
-}
-
-/**
- * Flashes a liquid-tip after the "show another tip" button swaps in fresh
- * content through partial rendering. The brief highlight pulse draws the
- * eye to the new tip so the change is noticeable without a page reload.
- */
-@keyframes highlight-flash {
-  from {
-    background-color: var(--color-border);
-  }
-  to {
-    background-color: transparent;
-  }
-}
-
-.highlight-description--flash {
-  animation: highlight-flash 0.6s ease-out;
-  border-radius: var(--radius-input);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .highlight-description--flash {
-    animation: none;
-  }
-}
-
-.highlight a,
-.welcome-content a {
-  display: flex;
-  align-items: center;
-  width: fit-content;
-  min-height: 44px;
-  background-color: var(--color-background);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-button);
-  color: var(--color-foreground);
-  padding: var(--space-2) var(--space-4);
-  text-decoration: none;
-  cursor: pointer;
-}
+/** Hello world block: rule ở assets/hello-world.css, nạp trong blocks/hello-world.liquid, liquid-tips.liquid (ADR 0014). Mốc giữ lại: hết mục khung lớp (ES1-T313) */
 
 /** <s-view-event>: bọc card, cần hộp block để trigger intersect quan sát được */
 .product-card__view {
@@ -5855,135 +5753,7 @@ cart-drawer {
   text-decoration: underline;
 }
 
-/** Multicolumn: dưới 48rem 1 cột, 48rem 2 cột, từ 64rem mọi cột 1 hàng.
-   Cha không đếm được con nên từ 64rem dùng cột tự sinh, 2-4 cột do số dòng gọi trong template */
-.multicolumn {
-  display: grid;
-  gap: var(--space-5);
-  min-inline-size: 0;
-  padding-block: var(--space-7);
-}
-
-.multicolumn--placeholder {
-  margin: 0;
-  padding-inline: var(--space-4);
-  outline: 1px dashed var(--color-border);
-  outline-offset: -1px;
-  color: var(--color-muted-light);
-  font-size: var(--font-size-sm);
-}
-
-.multicolumn__header {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.multicolumn__eyebrow {
-  margin: 0;
-  color: var(--color-accent);
-  font-family: var(--font-heading--family);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-heading--weight-display);
-  letter-spacing: 0.04em;
-  line-height: 1.25;
-  text-transform: uppercase;
-}
-
-/* Accent không đạt AA trên sand và dark */
-.block-container--sand .multicolumn__eyebrow {
-  color: var(--color-muted);
-}
-
-.block-container--dark .multicolumn__eyebrow {
-  color: var(--color-muted-on-dark);
-}
-
-.multicolumn__heading {
-  margin: 0;
-  font-size: var(--font-size-h1);
-  font-weight: var(--font-heading--weight);
-  letter-spacing: -0.02em;
-  line-height: calc(58 / 48);
-  text-wrap: balance;
-}
-
-.multicolumn__list {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--space-6) var(--space-5);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.multicolumn-column {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  min-inline-size: 0;
-}
-
-.multicolumn-column--placeholder {
-  padding: var(--space-5);
-  outline: 1px dashed var(--color-border);
-  outline-offset: -1px;
-  color: var(--color-muted-light);
-  font-size: var(--font-size-sm);
-}
-
-.multicolumn-column__image {
-  border-radius: var(--radius-card);
-}
-
-.multicolumn-column__image img {
-  aspect-ratio: 3 / 2;
-  inline-size: 100%;
-  object-fit: cover;
-}
-
-/* --text-align từ container: start, center, end hợp lệ cho cả justify-content và align-self */
-.multicolumn-column__icon {
-  display: flex;
-  justify-content: var(--text-align, start);
-}
-
-.multicolumn-column__icon .icon-trust {
-  inline-size: 40px;
-  block-size: 40px;
-}
-
-.multicolumn-column__heading {
-  margin: 0;
-  font-size: var(--font-size-h3);
-  letter-spacing: -0.02em;
-  line-height: calc(34 / 28);
-}
-
-.multicolumn-column__text > * {
-  margin-block: 0;
-}
-
-.multicolumn-column__text > * + * {
-  margin-block-start: var(--space-2);
-}
-
-/* margin auto đẩy link xuống đáy để các cột cùng hàng thẳng link */
-.multicolumn-column__link {
-  display: inline-flex;
-  align-self: var(--text-align, start);
-  align-items: center;
-  gap: var(--space-2);
-  min-block-size: 44px;
-  margin-block-start: auto;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  text-decoration: none;
-}
-
-.multicolumn-column__link:hover .multicolumn-column__link-label {
-  text-decoration: underline;
-}
-
+/** Multicolumn: rule ở assets/multicolumn.css, nạp trong blocks/multicolumn.liquid (ADR 0014, ES1-T566) */
 .custom-liquid--placeholder {
   margin: 0;
   padding: var(--space-4);
@@ -5991,25 +5761,6 @@ cart-drawer {
   outline-offset: -1px;
   color: var(--color-muted-light);
   font-size: var(--font-size-sm);
-}
-
-@media (min-width: 48rem) {
-  .multicolumn__list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (min-width: 64rem) {
-  .multicolumn {
-    gap: calc(var(--space-1) * 10);
-    padding-block: var(--space-8);
-  }
-
-  .multicolumn__list {
-    grid-template-columns: none;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
-  }
 }
 
 /* Predictive search: snippets/predictive-search.liquid */
@@ -6693,9 +6444,7 @@ video-card {
   border-inline-start-color: var(--color-sale);
 }
 
-.form-status:focus-visible,
-.contact-form__summary:focus-visible,
-.contact-form__status:focus-visible {
+.form-status:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 2px;
 }
@@ -7126,8 +6875,8 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
 [data-scroll-track][data-dragging] * { pointer-events: none; }
 
 /* 4. Eyebrow cam như Figma (CTO 09/11, thay E3). Nền sand dùng cam đậm hơn 10% để chữ nhỏ đạt AA. */
-.shop-by-level__eyebrow, .multicolumn__eyebrow { color: var(--color-accent); }
-.block-container--sand :is(.shop-by-level__eyebrow, .multicolumn__eyebrow) { color: var(--color-accent-on-sand); }
+.shop-by-level__eyebrow { color: var(--color-accent); }
+.block-container--sand .shop-by-level__eyebrow { color: var(--color-accent-on-sand); }
 
 
 /* ==== Chuyển động v2: mở trang, hiện dần theo cuộn, cuộn gắn tiến trình. Chỉ transform, opacity, clip-path. ==== */

@@ -3,8 +3,12 @@
   highlights. This is the theme's signature starter block: the index
   template composes it inside a container block. Caller-supplied content
   is rendered as additional highlight cards via {{ content }}.
+
+  Styles: assets/hello-world.css (this block and liquid-tips), loaded by the
+  stylesheet_tag line before the root, without preload (ADR 0014).
 {% enddoc %}
 
+{{ 'hello-world.css' | asset_url | stylesheet_tag }}
 <div class="welcome full-width" {{ block.shopify_attributes }}>
   <div class="welcome-content">
     <div>
