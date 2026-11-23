@@ -6,19 +6,19 @@ KHÔNG CHẮC: banner consent (Shopify Customer Privacy) và Shopify Inbox do Sh
 
 | # | Audit | Thiếu / lệch (ES1-T283) | Sửa trong spec này | Nguồn |
 | --- | --- | --- | --- | --- |
-| 1 | A15 | Teaser Big Offer chỉ ẩn trên PDP < 48rem nhưng thanh mua dính mọi mốc; trang chủ 360 teaser đè thanh bundle; cart không nói | §2.3: teaser không render ở PDP (mọi mốc) và cart; trang chủ 360 teaser nằm trên thanh bundle (đáy = thanh + 16) | Sổ 10/11 audit (3); marketing-popups §4 |
+| 1 | A15 | Teaser big offer chỉ ẩn trên PDP < 48rem nhưng thanh mua dính mọi mốc; trang chủ 360 teaser đè thanh bundle; cart không nói | §2.3: teaser không render ở PDP (mọi mốc) và cart; trang chủ 360 teaser nằm trên thanh bundle (đáy = thanh + 16) | Sổ 10/11 audit (3); marketing-popups §4 |
 | 2 | A16 | Danh sách lớp thiếu lightbox, drawer lọc, kết quả quiz, localization, consent | §4: danh sách lớp đủ 15 loại, mỗi loại ghi modal hay không, có chặn popup tự mở không | 15 §1 (một lớp một lúc); 22 §6 #5 |
 | 3 | A17 | Không có `scroll-padding` cho header dính và thanh đáy (WCAG 2.2 SC 2.4.11) | §3: `scroll-padding-block-start/end` theo biến chiều cao, gồm cả khung cuộn trong drawer, sheet | WCAG 2.4.11, kỹ thuật C43; sổ 09/11 "focus nhìn thấy" |
 | 4 | A22 | Chưa có quy tắc với banner consent | §5: banner là lớp, popup tự mở chờ; phần tử đáy của theme không đè banner | Sổ 09/11 (popup không mở lúc tải); 15 §1 |
-| 5 | Câu CTO 3 | Big Offer ẩn PDP mọi mốc, cart; 360 trang chủ trên thanh bundle | §2.3, §6; marketing-popups §4 sửa theo | Sổ 10/11 audit (3) |
+| 5 | Câu CTO 3 | Big offer ẩn PDP mọi mốc, cart; 360 trang chủ trên thanh bundle | §2.3, §6; marketing-popups §4 sửa theo | Sổ 10/11 audit (3) |
 
 Mục đích: một chỗ duy nhất quy định phần tử nào nằm trên phần tử nào (trục z), phần tử nào ở đâu trong dải đáy màn hình (trục dọc), lớp nào chặn popup tự mở, và cách giữ focus bàn phím không bị che. Spec trang (product, cart, index-mobile-b, collection, search, navigation, mini-cart-quickview, marketing-popups) trỏ về đây thay vì tự đặt số.
 
-Story: TE-9 (overlay toàn theme), TE-10 AC6 (Inbox không che sticky add-to-cart, cart drawer ở 360 và 1280). Figma: không có (Figma 1:359 chỉ có trang chủ desktop tĩnh). Mọi quy tắc dưới là `ĐỀ XUẤT:` theo nguồn ghi từng dòng, trừ phần đã chốt trong sổ quyết định.
+Story: TE-9 (overlay toàn theme), TE-10 AC6 (Inbox không che sticky add-to-cart, cart drawer ở 360 và 1280). Nguồn chuẩn: mockup `drafts/designer/ES1-T263/marketing-popups.html` mục 5 + `drafts/designer/_kit/kit.css` (`--layer-*`, CTO 21/11). Mọi quy tắc dưới là `ĐỀ XUẤT:` theo nguồn ghi từng dòng, trừ phần đã chốt trong sổ quyết định.
 
 Đầu ra:
 - Spec này.
-- Mockup: `drafts/designer/ES1-T263/marketing-popups.html` mục 5 "Bottom Of The Screen" + `marketing-popups-360|768|1280|1920.png` (ticket chỉ cho sửa thư mục ES1-T263; không có mockup riêng ES1-T290).
+- Mockup: `drafts/designer/ES1-T263/marketing-popups.html` mục 5 "Bottom of the screen" + `marketing-popups-360|768|1280|1920.png` (ticket chỉ cho sửa thư mục ES1-T263; không có mockup riêng ES1-T290).
 
 ---
 
@@ -33,7 +33,7 @@ Story: TE-9 (overlay toàn theme), TE-10 AC6 (Inbox không che sticky add-to-car
 | Toast | 30 | `.toast-region` | Chỉ dùng khi không có lớp modal mở (§2.4) | foundation §17 |
 | Lớp nổi không modal | 21 | thẻ big offer ≥ 48rem (`show()`), bảng localization ≥ 48rem | Trên teaser, dưới toast | marketing-popups §4 |
 | Scrim dự phòng | 20 | `.scrim` khi lớp không dùng `showModal` (mega menu dùng scrim riêng trong header) | — | kit `.scrim` |
-| Teaser | 15 | nút Big Offer | Trên thanh đáy | marketing-popups §4 |
+| Teaser | 15 | nút Big offer | Trên thanh đáy | marketing-popups §4 |
 | Header | 10 | header dính 80 + dropdown, mega menu và scrim 50% của mega (cùng ngữ cảnh xếp của header) | Mega mở thì scrim của nó phủ thanh đáy (5) | foundation §3, §14 |
 | Thanh đáy | 5 | sticky add to cart, thanh checkout cart, thanh bundle 360 | Không bao giờ trùng vùng với "dính trong trang" (một ở trên, một ở đáy) | product §10; cart §3.7; index-mobile-b §1 |
 | Dính trong trang | 4 | thanh công cụ collection/search (< 64rem, top 80), panel tóm tắt cart (≥ 64rem, top 96), gallery PDP (≥ 64rem, top 104) | Dưới header để dropdown header phủ lên | collection §5.1; cart §3; product §3 |
@@ -58,7 +58,7 @@ Story: TE-9 (overlay toàn theme), TE-10 AC6 (Inbox không che sticky add-to-car
 
 | Thanh | Trang | Mốc | Cao (+ safe area) | Hiện khi | Spec |
 | --- | --- | --- | --- | --- | --- |
-| Sticky add to cart | product | 360 | 72 | nút Add To Cart chính ra khỏi màn | product §10 |
+| Sticky add to cart | product | 360 | 72 | nút Add to cart chính ra khỏi màn | product §10 |
 | | | 768, 1280, 1920 | 80 | như trên; "Show on desktop" mặc định BẬT | product §10; sổ 10/11 |
 | Checkout bar | cart | < 64rem (360, 768) | 72 | panel tóm tắt ra khỏi màn, giỏ có hàng | cart §3.7 |
 | Bundle bar | trang chủ | 360 | 72 | lưới bundle trong màn, panel chưa vào | index-mobile-b §1; sổ 10/11 (H, thanh dính bundle 360) |
@@ -70,7 +70,7 @@ Thanh hiện: `body { padding-block-end: var(--bottom-bar-height) }` để foote
 | Phần tử | Làn | Mép dưới | Ẩn khi | Nguồn |
 | --- | --- | --- | --- | --- |
 | Thanh đáy | cả bề ngang | 0 | lớp có scrim mở; banner consent đang hiện | product §10 ĐỀ XUẤT ẩn khi overlay mở; §5 |
-| Teaser Big Offer | trái | `--edge + --bottom-bar-height` | trang product (mọi mốc), cart: không render; lớp có scrim mở; banner consent hiện; < 48rem khi toast đang hiện | Sổ 10/11 audit (3); 15 §1 (một lớp) |
+| Teaser big offer | trái | `--edge + --bottom-bar-height` | trang product (mọi mốc), cart: không render; lớp có scrim mở; banner consent hiện; < 48rem khi toast đang hiện | Sổ 10/11 audit (3); 15 §1 (một lớp) |
 | Thẻ big offer ≥ 48rem | trái, trên teaser | `--edge + 48 + 12` | — | marketing-popups §4 |
 | Nút Shopify Inbox | phải | của Inbox + `--bottom-bar-height` (theme dịch lên, câu CTO 1) | do Inbox | SRS TE-10 AC6; 14 §1 #940D (chat góc dưới phải) |
 | Toast < 48rem | cả bề ngang (lề 16) | `--edge + --bottom-bar-height + --inbox-clearance` | — | foundation §17; product §10 (toast trên thanh 72 + 16) |
@@ -91,7 +91,7 @@ Lớp modal (top layer) làm toast-region bên ngoài bị inert và nằm dư�
 
 ### 2.6 Nút back-to-top
 
-SRS TE-10 AC6 nhắc "back-to-top" nhưng không spec, Figma nào có. ĐỀ XUẤT không thêm: header dính 80 luôn có đường về đầu trang (logo, phím Home), mỗi phần tử đáy thêm là một rủi ro che (A15). Nếu CTO muốn thêm: làn phải, trên làn Inbox, `--edge + --bottom-bar-height + --inbox-clearance`, toast đẩy lên thêm 56.
+SRS TE-10 AC6 nhắc "back-to-top" nhưng không spec hay mockup nào có. ĐỀ XUẤT không thêm: header dính 80 luôn có đường về đầu trang (logo, phím Home), mỗi phần tử đáy thêm là một rủi ro che (A15). Nếu CTO muốn thêm: làn phải, trên làn Inbox, `--edge + --bottom-bar-height + --inbox-clearance`, toast đẩy lên thêm 56.
 
 ## 3. Focus không bị che (WCAG 2.2 SC 2.4.11, kỹ thuật C43)
 
@@ -106,7 +106,7 @@ html {
 | --- | --- |
 | `--sticky-top` | 0 khi `sticky_header` tắt; `--header-height` (80) khi bật; + chiều cao thanh công cụ dính collection/search dưới 64rem (đặt cố định theo bố cục collection §5.1, không đo) |
 
-- Áp cho: Tab tuần tự, link neo (`#reviews`, skip link, link lỗi form → trường), `scrollIntoView` của BE (cuộn về bộ chọn khi "Choose Options", product §10). Trình duyệt cuộn phần tử nhận focus vào vùng trừ padding.
+- Áp cho: Tab tuần tự, link neo (`#reviews`, skip link, link lỗi form → trường), `scrollIntoView` của BE (cuộn về bộ chọn khi "Choose options", product §10). Trình duyệt cuộn phần tử nhận focus vào vùng trừ padding.
 - Khung cuộn riêng có phần dính: `scroll-padding-block-end` bằng chiều cao phần dính đáy khung: drawer có chân dính (foundation §15, chân cao nút + 2 × 16), drawer lọc (chân "Clear all" + "Show N products"), quickview sheet (hàng mua 48 + 2 × 16, mini-cart-quickview §3.1), predictive search (chân dính). `scroll-padding-block-start` bằng header khung khi header khung dính (quickview sheet nút đóng dính).
 - Thanh đáy và teaser tự thân không bao giờ che focus của chúng; focus ở nội dung dưới thanh thì scroll-padding đẩy lên.
 - Kiểm (QA): Tab qua footer PDP 360 khi sticky bar hiện, Tab qua dòng giỏ cart 360 khi checkout bar hiện, Tab qua card bundle 360 khi bundle bar hiện: viền focus luôn thấy đủ. Phóng 200% ở 1280 lặp lại.
@@ -168,11 +168,11 @@ Số mép dưới chưa cộng `--inbox-clearance` (toast) và safe area. Teaser
 
 ## 7. Trạng thái
 
-Figma không có. ĐỀ XUẤT, mockup ES1-T263 mục 5.
+ĐỀ XUẤT, mockup ES1-T263 mục 5.
 
 | Trạng thái | Hiển thị |
 | --- | --- |
-| Trang chủ 360, bundle bar hiện | teaser trượt lên 72, đáy 88; bundle bar "5 Items · $436.90" + "Add Bundle To Cart" (dữ liệu index-mobile-b §1) |
+| Trang chủ 360, bundle bar hiện | teaser trượt lên 72, đáy 88; bundle bar "5 items · $436.90" + "Add bundle to cart" (dữ liệu index-mobile-b §1) |
 | Trang chủ 360, toast | teaser ẩn; toast full width trên thanh |
 | PDP mọi mốc | sticky ATC "Ativafit Lava 66 lb Adjustable" $379.99 / $499.99; không teaser |
 | Cart < 64rem | checkout bar "Total $461.99" + "Checkout →" (cart §3.7); không teaser |
@@ -210,7 +210,7 @@ Mockup: ảnh card bundle P09/P10 (kettlebell, dây thừng) lệch tên "Adjust
 ## 11. Đề xuất cho file ngoài phạm vi ticket (không sửa ở đây)
 
 - `docs/ui-spec/foundation.md` §16, §17: thêm dòng trỏ `layers.md` (hàng đợi, vị trí toast theo biến, toast trong lớp modal); §21 thêm thang z.
-- `docs/ui-spec/product.md` §10: thay "ĐỀ XUẤT ẩn thanh khi drawer…" bằng trỏ `layers.md` §4; ghi "trang sản phẩm không có teaser Big Offer (sổ 10/11)".
+- `docs/ui-spec/product.md` §10: thay "ĐỀ XUẤT ẩn thanh khi drawer…" bằng trỏ `layers.md` §4; ghi "trang sản phẩm không có teaser Big offer (sổ 10/11)".
 - `docs/ui-spec/cart.md` §3.7: trỏ `layers.md` §2 (biến chung, không teaser).
 - `docs/ui-spec/index-mobile-b.md` §1: bundle bar dùng `data-bottom-bar="bundle"`, cao 72; teaser nằm trên (layers §2.3).
 - `docs/ui-spec/navigation.md`: header thôi dính khi `max-height: 30rem` nếu CTO duyệt câu 3.
