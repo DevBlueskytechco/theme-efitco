@@ -291,16 +291,6 @@ test.describe('ES1-T45 RTL (ES1-T37 D6, TE-14 AC4)', () => {
     await disclosure.locator('summary').click();
     const panel = page.locator('.site-footer__panel');
     await expect(panel).toBeVisible();
-    // ES1-T324: < 48rem có JS, localization-picker nâng panel thành bottom sheet modal (docs/ui-spec/localization.md §4.3, §5):
-    // sheet ở top layer, không có offsetParent → kiểm sheet phủ hết bề ngang khung nhìn ở cả LTR và RTL thay cho bám inline-start.
-    const sheet = disclosure.locator('dialog').first();
-    if (await sheet.count() && await expect.poll(() => sheet.evaluate((d) => d.matches(':modal'))).toBe(true).then(() => true, () => false)) {
-      const span = () => sheet.evaluate((d) => { const b = d.getBoundingClientRect(); return { left: Math.round(b.left), right: Math.round(innerWidth - b.right) }; });
-      expect(await span()).toEqual({ left: 0, right: 0 });
-      await setDir(page, 'rtl');
-      expect(await span()).toEqual({ left: 0, right: 0 });
-      return;
-    }
     const edges = () =>
       panel.evaluate(el => {
         const p = el.getBoundingClientRect();
@@ -318,7 +308,10 @@ test.describe('ES1-T45 RTL (ES1-T37 D6, TE-14 AC4)', () => {
     }
   });
 
-  test('R-05 dưới 48rem: panel bám inline-start, đổi phía khi RTL', async ({ page }, ti) => {
+  // ES1-T324: < 48rem có JS, localization-picker mở panel bằng showModal() thành bottom sheet (docs/ui-spec/localization.md §4.3, §5).
+  // Sheet ở top layer (position fixed, không offsetParent) → kiểm sheet phủ hết bề ngang khung nhìn ở cả LTR và RTL.
+  // Picker nạp lười khi tương tác: summary mở <details> trước, picker nâng lên sheet khi module chạy → chờ :modal.
+  test('R-05 dưới 48rem: panel là bottom sheet phủ bề ngang, giữ nguyên khi RTL', async ({ page }, ti) => {
     test.skip(isDesktop(ti), 'mobile');
     await openRtlReady(page);
     const disclosure = page.locator('.site-footer__disclosure');
@@ -326,15 +319,15 @@ test.describe('ES1-T45 RTL (ES1-T37 D6, TE-14 AC4)', () => {
     await disclosure.locator('summary').click();
     const panel = page.locator('.site-footer__panel');
     await expect(panel).toBeVisible();
-    const edges = () =>
-      panel.evaluate(el => {
-        const p = el.getBoundingClientRect();
-        const r = ((el as HTMLElement).offsetParent as HTMLElement).getBoundingClientRect();
-        return { left: Math.round(p.left - r.left), right: Math.round(r.right - p.right) };
+    await expect.poll(() => panel.evaluate(d => d.matches(':modal')), 'localization-picker mở sheet bằng showModal()').toBe(true);
+    const span = () =>
+      panel.evaluate(d => {
+        const b = d.getBoundingClientRect();
+        return { left: Math.round(b.left), right: Math.round(innerWidth - b.right) };
       });
-    expect((await edges()).left).toBe(0);
+    expect(await span(), 'LTR: sheet phủ mép trái tới mép phải').toEqual({ left: 0, right: 0 });
     await setDir(page, 'rtl');
-    expect((await edges()).right).toBe(0);
+    expect(await span(), 'RTL: sheet phủ mép trái tới mép phải').toEqual({ left: 0, right: 0 });
   });
 
   test('R-06 RTL: CTA mũi tên nằm bên trái nhãn', async ({ page }) => {
