@@ -81,8 +81,8 @@ if (click) for (const h of this.querySelectorAll("[data-hotspot]")) h.setAttribu
 for (const r of this.querySelectorAll("[data-look-row]")) r.toggleAttribute("data-look-active", r.dataset.lookRow == n);
 }
 lock(on) {
-this.btn.disabled = on;
-this.btn.ariaBusy = on ? "true" : null;
+this.btn.ariaDisabled = (this.busy = on) || null;
+this.idle = on ? window.busyLater?.(this.btn) : this.idle?.();
 }
 async emit(items) {
 const E = (await Promise.race([events, new Promise((r) => setTimeout(r, 500))]))?.CartLinesUpdateEvent;
@@ -105,7 +105,7 @@ e.preventDefault();
 const d = this.dataset;
 const qty = new Map();
 for (const { value } of this.picked()) qty.set(value, (qty.get(value) || 0) + 1);
-if (this.btn.disabled || !qty.size) return;
+if (this.busy || !qty.size) return;
 const items = [...qty].map(([id, quantity]) => ({ id: +id, quantity }));
 const { signal } = (this.ctrl = new AbortController());
 this.set("error", "");

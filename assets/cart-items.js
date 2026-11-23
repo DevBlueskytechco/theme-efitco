@@ -15,6 +15,8 @@ import("https://cdn.shopify.com/storefront/standard-events.js").then((m) => (E =
 class CartItems extends HTMLElement {
   timers = new Map();
   queue = new Map();
+  // Line being written → cancel of its aria-busy (ES1-T555: −/+/remove locked now, spinner after delay).
+  held = new Map();
   // Refresh hides −/+.
   mo = new MutationObserver(() => this.enhance());
 
@@ -67,7 +69,7 @@ class CartItems extends HTMLElement {
     const p = l.querySelector("[data-cart-line-error]");
     for (const b of l.querySelectorAll(CTRL)) {
       const s = b.dataset.cartStep;
-      b.ariaDisabled = l.ariaBusy || (s < 0 ? +i.value <= minOf(i) : s > 0 && i.max && +i.value >= +i.max) || null;
+      b.ariaDisabled = this.held.has(l) || (s < 0 ? +i.value <= minOf(i) : s > 0 && i.max && +i.value >= +i.max) || null;
     }
     // Rule inputs have step.
     if (invalid == null || !i.step) return;
@@ -91,7 +93,8 @@ class CartItems extends HTMLElement {
   hold(i, on) {
     for (const b of this.querySelectorAll('[name="checkout"]')) b.ariaDisabled = on;
     if (!i) return;
-    i.closest(LINE).ariaBusy = on;
+    const l = i.closest(LINE);
+    if (on && !this.held.has(l)) this.held.set(l, window.busyLater?.(l));
     this.paint(i);
   }
 
@@ -123,6 +126,8 @@ class CartItems extends HTMLElement {
     } catch {
       this.say("alert", d.labelError);
     } finally {
+      for (const f of this.held.values()) f?.();
+      this.held.clear();
       for (const i of this.querySelectorAll(QTY)) this.hold(i);
       this.say("status", this.note);
       this.ariaBusy = null;
