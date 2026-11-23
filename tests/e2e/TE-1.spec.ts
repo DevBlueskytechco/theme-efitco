@@ -201,6 +201,18 @@ async function openLocalization(page: Page) {
   expect(cover, `nút gộp localization bị ${cover} che`).toBeNull();
   await summary.click({ timeout: 10_000 });
   await expect(form.locator('details').first(), 'details localization không mở sau khi bấm nút gộp').toHaveAttribute('open', '');
+  // ES1-T324: < 48rem có JS, localization-picker (nạp lười khi chạm) nâng details đang mở thành bottom sheet modal 2 tab
+  // (docs/ui-spec/localization.md §4.3, §5). Chờ sheet xong rồi mới kiểm danh sách; không JS: popover, không tab.
+  const js = await page.evaluate(() => !!customElements.get('modal-dialog')).catch(() => false);
+  if (js && page.viewportSize()!.width < 768) {
+    await expect.poll(() => form.locator('dialog').first().evaluate((d) => d.matches(':modal')), 'sheet localization < 48rem không mở modal').toBe(true);
+  }
+}
+
+// Sheet 2 tab (< 48rem có JS): danh sách ở tab chưa chọn là tabpanel ẩn → chọn tab của nó, như người dùng (localization.md §4.3).
+async function showTab(page: Page, group: Locator) {
+  if ((await group.getAttribute('role')) !== 'tabpanel' || (await group.isVisible())) return;
+  await page.locator(`[role="tab"][aria-controls="${await group.getAttribute('id')}"]`).click();
 }
 
 // Đích: preferred nếu có và chưa chọn; không thì lựa chọn đầu tiên chưa chọn. Trả null khi không có gì để đổi.
@@ -218,6 +230,7 @@ async function choose(page: Page, optId: string, value: string) {
   const option = optionOf(page, optId, value);
   await expect(option, `không có ${optId} value=${value}`).toHaveCount(1);
   await openLocalization(page);
+  await showTab(page, option.locator('xpath=ancestor::*[@data-localization-group][1]'));
   await expect(option, `${optId} ${value} không hiện sau khi mở nút gộp`).toBeVisible();
   await option.scrollIntoViewIfNeeded();
   const cover = await coveredBy(option);
@@ -815,7 +828,11 @@ test.describe('ES1-T23', () => {
     for (const l of lists) await expect(l).toHaveCount(1);
     for (const l of lists) await expect(l).toBeHidden();
     await openLocalization(page);
-    for (const l of lists) await expect(l).toBeVisible();
+    // < 48rem có JS: sheet 2 tab, mỗi lúc 1 danh sách (localization.md §4.3) → kiểm từng tab
+    for (const l of lists) {
+      await showTab(page, l);
+      await expect(l).toBeVisible();
+    }
   });
 
   test.fixme('TC-46 AC9 hero thật TE-2: header trong suốt đè hero, chữ trắng', async ({ page }) => {
