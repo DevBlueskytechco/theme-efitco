@@ -148,5 +148,27 @@
     --figma-ffffff: #fff;
     --figma-white-12: rgb(255 255 255 / 0.12);
     --figma-white-60: rgb(255 255 255 / 0.6);
+
+    /* Lớp (ADR 0007, foundation §31): mọi z-index dùng var(--layer-*) */
+    --layer-content: 1;
+    --layer-sticky: 4;
+    --layer-bottom-bar: 5;
+    --layer-header: 10;
+    --layer-floating: 15;
+    --layer-scrim: 20;
+    --layer-overlay: 21;
+    --layer-toast: 30;
+
+    /* Elevation 4 bậc (foundation §31): none card/panel, raised dropdown/hover/header cuộn, overlay drawer/dialog, bar thanh đáy */
+    --overlay-scrim: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
+    --shadow-none: none;
+    --shadow-raised: 0 var(--space-2) var(--space-5) color-mix(in srgb, var(--color-foreground) 12%, transparent);
+    --shadow-overlay: 0 var(--space-6) calc(var(--space-1) * 20) color-mix(in srgb, var(--color-foreground) 28%, transparent);
+    --shadow-bar: 0 calc(-1 * var(--space-1)) var(--space-5) color-mix(in srgb, var(--color-foreground) 10%, transparent);
+
+    /* Panel tối: chữ phụ 70% (6.56:1), dòng giảm giá (5.64:1, luôn kèm icon + dấu −) */
+    --panel-muted: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel));
+    --panel-saving: color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground));
+    --round-button-size: calc(var(--space-1) * 13);
   }
 {% endstyle %}
