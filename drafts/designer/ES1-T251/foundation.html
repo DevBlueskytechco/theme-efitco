@@ -280,11 +280,8 @@
       </ol>
     </nav>
     <div class="sheet-intro">
-      <p class="eyebrow">ES1-T251 · Foundation · ES1-T567 Polaris-first 21/11</p>
+      <p class="eyebrow">ES1-T251 · Foundation · ES1-T567 Polaris-first</p>
       <h1>Efitco design system</h1>
-      <p>Nguồn chuẩn thiết kế của theme Efitco (CTO 21/11): bộ mockup HTML ở drafts/designer/** cùng token và component ở drafts/designer/_kit/kit.css. Designer dựng lại bản vẽ TỪ màn này và các trang mockup, không theo chiều ngược lại; cách bàn giao ở tài liệu handoff trong docs/design/. Chuẩn áp dụng: Polaris trước (thang 4px, token 3 tầng, vùng chạm 44, nhãn nút sentence case); điều Polaris không nêu thì ghi rõ hệ dùng thay (Carbon, Material 3, Fluent 2, Spectrum, Ant) hoặc "Thiết kế" kèm lý do. Mỗi section có đủ số đo (cỡ, khoảng cách, bo, màu token) để dựng lại, ma trận trạng thái có nhãn và khối Nên / Không nên kèm setting id. Quyết định của CTO: docs/design/decisions.md; spec chữ: docs/ui-spec/foundation.md.</p>
-      <p class="ds-meta"><span><b>Version 2.0.0</b> · 21/11/2026 · ES1-T567 (CTO chốt 21/11)</span><span>Status:</span><span class="ds-status ds-status--proposed">Proposed</span><span class="ds-status">Approved</span><span class="ds-status ds-status--built">Built</span><span class="ds-status ds-status--deprecated">Deprecated</span></p>
-      <p class="ds-meta" style="margin-block-start: var(--space-xs)">Proposed = mới đề xuất, chưa chốt · Approved = CTO đã chốt, chưa có code theme · Built = đã có trong code theme (có thể còn lệch, xem "Cần FE") · Deprecated = ngừng dùng, không đưa vào trang mới.</p>
     </div>
 
     <!-- 1. Lưới -->
@@ -314,7 +311,7 @@
           </tbody>
         </table>
       </div>
-      <p class="demo-label" style="margin-block-start: var(--space-xl)">Touch targets · <code>--touch-target</code> 44 mọi mốc cho đúng 6 nhóm (CTO 21/11) · số = rộng × cao vùng chạm thật, px</p>
+      <p class="demo-label" style="margin-block-start: var(--space-xl)">Touch targets · <code>--touch-target</code> 44 mọi mốc cho đúng 6 nhóm · số = rộng × cao vùng chạm thật, px</p>
       <div class="states" style="margin-block-end: var(--space-md)">
         <div class="state"><span class="touch-strip on-dark"><a class="site-header__link" href="#" data-touch="menu">Sale</a></span><small>Menu link</small></div>
         <div class="state"><form class="search-field" role="search" onsubmit="return false" style="width: 13rem"><label class="visually-hidden" for="tt-search">Search</label><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="tt-search" type="search" value="bench" autocomplete="off"><button class="search-field__submit" type="submit" aria-label="Search" data-touch="search"><svg aria-hidden="true"><use href="#i-arrow"/></svg></button></form><small>Search submit</small></div>
@@ -338,11 +335,11 @@
           </tbody>
         </table>
       </div>
-      <p class="demo-note" style="margin-block-start: var(--space-sm)">Link menu ngắn (Sale, Blog, Help) có chữ hẹp hơn 44: vùng chạm nở đều hai bên tới 44, khoảng cách 40 giữa các mục giữ (Polaris large-400). Tab 40 từ 1280 ngoài 6 nhóm, giữ sàn <code>--touch-target-min</code> 24 (CTO 09/11). Swatch trên card sản phẩm 36 × 24 là chỉ báo không bấm (<code>aria-hidden</code>, CTO 10/11, mục 22 câu 2), không phải control chọn variant nên không thuộc nhóm 6; chọn màu ở trang sản phẩm / quickview bằng <code>.variant-swatch</code> 44 × 44.</p>
+      <p class="demo-note" style="margin-block-start: var(--space-sm)">Link menu ngắn (Sale, Blog, Help) có chữ hẹp hơn 44: vùng chạm nở đều hai bên tới 44, khoảng cách 40 giữa các mục giữ (Polaris large-400). Tab 40 từ 1280 ngoài 6 nhóm, giữ sàn <code>--touch-target-min</code> 24. Swatch trên card sản phẩm 36 × 24 là chỉ báo không bấm (<code>aria-hidden</code>), không phải control chọn variant nên không thuộc nhóm 6; chọn màu ở trang sản phẩm / quickview bằng <code>.variant-swatch</code> 44 × 44.</p>
       <div class="dos">
         <div class="do"><b>Nên</b>Đặt mọi khối vào <code>.container</code>; dải tràn mép chỉ cho panel footer, hero, banner. Gap lấy từ <code>--grid-gap</code>.</div>
         <div class="dont"><b>Không nên</b>Viết px lẻ cho gutter hay padding section; đổi số cột trong trang; dùng token <code>--space-*</code> cho chiều rộng, chiều cao (Polaris: kích thước có token riêng).</div>
-        <p class="tokens">Setting: <code>max_page_width</code>, <code>min_page_margin</code>, <code>space_base</code> · Token: <code>--touch-target</code> (44, 6 nhóm), <code>--touch-target-min</code> (24, sàn), <code>--control-height</code> 48 mọi mốc (CTO 21/11 lượt 2, bỏ mức 52 từ 1280. Chuẩn: Carbon button 48; sàn 44 của Polaris), <code>--row-height</code> 52, <code>--round-button-size</code> 52, <code>--tab-height-desktop</code> 40</p>
+        <p class="tokens">Setting: <code>max_page_width</code>, <code>min_page_margin</code>, <code>space_base</code> · Token: <code>--touch-target</code> (44, 6 nhóm), <code>--touch-target-min</code> (24, sàn), <code>--control-height</code> 48 mọi mốc (Chuẩn: Carbon button 48; sàn 44 của Polaris), <code>--row-height</code> 52, <code>--round-button-size</code> 52, <code>--tab-height-desktop</code> 40</p>
       </div>
     </section>
 
@@ -355,14 +352,14 @@
       <div class="type-row"><small>h2 · Sofia 700 · 32/40 → 36/44 · −2% · <code>--font-size-h2</code> · <code>--line-height-h2</code> 1.25 → 1.2222</small><p class="h2">Training tips &amp; inspiration</p></div>
       <div class="type-row"><small>h3 · Sofia 700 · 28/36 · −2% · <code>--font-size-h3</code> · <code>--line-height-h3</code> 1.2857</small><p class="h3">Choose your training level</p></div>
       <div class="type-row"><small>h4 · Sofia 700 · 20/24 · −2% · <code>--font-size-h4</code> · <code>--line-height-h4</code> 1.2</small><p class="h4">Key features of the Lava 66</p></div>
-      <div class="type-row"><small>Eyebrow · Sofia 800 HOA +4% · 14/20 → 16/20 · cam trên nền sáng, xám trên nền tối · bản sắc thương hiệu (CTO 21/11 lượt 2) · <code>.eyebrow</code> · <code>--line-height-eyebrow</code> 20 cố định</small><p class="eyebrow">Bestsellers</p></div>
+      <div class="type-row"><small>Eyebrow · Sofia 800 HOA +4% · 14/20 → 16/20 · cam trên nền sáng, xám trên nền tối · bản sắc thương hiệu · <code>.eyebrow</code> · <code>--line-height-eyebrow</code> 20 cố định</small><p class="eyebrow">Bestsellers</p></div>
       <div class="type-row"><small>Title · Inter 700 · 18/28 · −1% · <code>.text-title</code> · <code>--line-height-title</code> 1.5556</small><p class="text-title">Bounce-resistant construction keeps the ball low.</p></div>
       <div class="type-row"><small>Body · Inter 500 · 16/24 · −1% · <code>body</code> · <code>--line-height-body</code> 1.5 · văn bản dài <code>.rte</code> 16/28 (<code>--line-height-reading</code> 1.75)</small><p>Bounce-resistant construction means the ball doesn't come back at your face.</p></div>
       <div class="type-row"><small>Body small · Inter 500 · 14/20 · <code>.text-small</code> · <code>--line-height-sm</code> 1.4286</small><p class="text-small">Ships in 1–2 business days. Free returns within 90 days.</p></div>
       <div class="type-row"><small>Form · Inter 400 · 14/20 (giá trị ô nhập giữ 16 để iOS không phóng to) · <code>.field__input</code></small><p class="text-small" style="font-weight: 400">Order and shipping</p></div>
       <div class="type-row"><small>Label · Inter 600 · 13/20 · −2% · <code>.text-label</code>, badge · <code>--line-height-label</code> 1.5385 · <code>--letter-spacing-label</code></small><p class="text-label">Only 2 left in stock</p></div>
       <div class="type-row"><small>Button · Inter 600 · 16/24 · −1% · sentence case · <code>.button</code> · small 14/20</small><p style="font-weight: 600">Add to cart</p></div>
-      <div class="type-row"><small>Group label · Inter 600 · 14/20 HOA +4% muted · nhãn nhóm trong mega, search, mini cart · HOA là bản sắc thương hiệu (CTO 21/11 lượt 2) · <code>.group-label</code></small><p class="group-label">Pairs well with</p></div>
+      <div class="type-row"><small>Group label · Inter 600 · 14/20 HOA +4% muted · nhãn nhóm trong mega, search, mini cart · HOA là bản sắc thương hiệu · <code>.group-label</code></small><p class="group-label">Pairs well with</p></div>
       <div class="type-row"><small>Price · Inter, số bảng (tabular-nums) · 16/24 500 <code>.price</code> · 20/28 700 <code>.price--lg</code> (<code>--line-height-price-lg</code> 1.4) · 28/36 600 <code>.price--xl</code></small><p class="price price--lg"><span class="price__sale">$379.99</span><s class="price__compare">$499.99</s></p></div>
       <div class="table-wrap" style="margin-block-start: var(--space-md)">
         <table class="data-table stack-table">
@@ -384,7 +381,7 @@
           </tbody>
         </table>
       </div>
-      <p class="demo-note" style="margin-block: var(--space-md) 0">Line-height viết số không đơn vị, riêng eyebrow là dòng cố định 20 (1.25rem) vì cỡ nội suy 14 → 16. h1 và h2 đổi tỉ lệ ở 1280: hai đầu 360 và 1280 đúng bội 4, giữa hai mốc h1 lệch tối đa 1.6px, h2 1px. Letter-spacing: thân −1%, nhãn −2%, heading −2%, display −3% / −4%, chữ HOA +4%. Độ đậm: thân 500 (CTO 20/11), ô nhập 400, nhãn và nút 600, tiêu đề nhỏ 700, heading 700, display và eyebrow 800. Wordmark footer 64 → 200 là tài sản thương hiệu, không tính vào 12 kiểu. Tên cũ line-height chung 1.2 cho h1–h4 đã xoá khỏi kit, thay bằng token từng bậc.</p>
+      <p class="demo-note" style="margin-block: var(--space-md) 0">Line-height viết số không đơn vị, riêng eyebrow là dòng cố định 20 (1.25rem) vì cỡ nội suy 14 → 16. h1 và h2 đổi tỉ lệ ở 1280: hai đầu 360 và 1280 đúng bội 4, giữa hai mốc h1 lệch tối đa 1.6px, h2 1px. Letter-spacing: thân −1%, nhãn −2%, heading −2%, display −3% / −4%, chữ HOA +4%. Độ đậm: thân 500, ô nhập 400, nhãn và nút 600, tiêu đề nhỏ 700, heading 700, display và eyebrow 800. Wordmark footer 64 → 200 là tài sản thương hiệu, không tính vào 12 kiểu. Tên cũ line-height chung 1.2 cho h1–h4 đã xoá khỏi kit, thay bằng token từng bậc.</p>
       <div class="dos">
         <div class="do"><b>Nên</b>Dùng class/token của thang; một h1 mỗi trang; chữ HOA chỉ cho display, eyebrow, nhãn nhóm (kiểu chữ thương hiệu). Nhãn nút sentence case ("Add to cart", "Try again").</div>
         <div class="dont"><b>Không nên</b>Đặt cỡ chữ px hay line-height viết số trong trang, dùng cỡ 12, viết HOA tiêu đề section h2, đổi họ chữ tiêu đề sang Inter trong khung trạng thái.</div>
@@ -395,7 +392,7 @@
     <!-- 3. Màu -->
     <section class="demo-block" aria-labelledby="h-color" data-status="built">
       <h2 id="h-color">3. Color tokens</h2>
-      <p class="demo-note">22 token có setting + 3 màu dẫn xuất + 3 role trạng thái (alias, không thêm giá trị). Số là tương phản chữ trên nền đó (WCAG). Màu đã chỉnh để đạt AA (CTO 07/11, 20/11): accent #C8400E (trước #D94610 = 4.34), muted-light #6B6B6B (trước #999 / #808080 trượt AA). Bảng màu là bản sắc thương hiệu, không chép màu admin của Polaris; ngưỡng: chữ 4.5:1 (Polaris), chữ lớn và UI 3:1 (M3 / Carbon).</p>
+      <p class="demo-note">22 token có setting + 3 màu dẫn xuất + 3 role trạng thái (alias, không thêm giá trị). Số là tương phản chữ trên nền đó (WCAG). Màu đã chỉnh để đạt AA: accent #C8400E, muted-light #6B6B6B. Bảng màu là bản sắc thương hiệu, không chép màu admin của Polaris; ngưỡng: chữ 4.5:1 (Polaris), chữ lớn và UI 3:1 (M3 / Carbon).</p>
       <ul class="swatch-grid">
         <li class="color-chip" style="background: var(--color-background)"><b>background</b>#FFFFFF · fg 17.4</li>
         <li class="color-chip" style="background: var(--color-background-alt)"><b>background-alt</b>#F4F4F5 · fg 15.8</li>
@@ -415,7 +412,7 @@
         <li class="color-chip" style="background: var(--color-background-panel); color: var(--panel-muted)"><b>--panel-muted</b>dẫn xuất #C4C4C6 · 6.56</li>
         <li class="color-chip" style="background: var(--color-background-panel); color: var(--panel-saving)"><b>--panel-saving</b>dẫn xuất #A5C0A6 · 5.82</li>
       </ul>
-      <p class="demo-label" style="margin-block-start: var(--space-xl)">Status · role trạng thái là alias trỏ về token sẵn có (CTO 21/11)</p>
+      <p class="demo-label" style="margin-block-start: var(--space-xl)">Status · role trạng thái là alias trỏ về token sẵn có</p>
       <div class="table-wrap">
         <table class="data-table touch-table">
           <caption class="visually-hidden">Status color roles</caption>
@@ -438,7 +435,7 @@
     <!-- 3b. Khoảng cách + bo góc -->
     <section class="demo-block" aria-labelledby="h-spacing-radius" data-status="built">
       <h2 id="h-spacing-radius">4. Spacing and radius</h2>
-      <p class="demo-note">Thang khoảng cách lưới 4px. Chuẩn: Polaris web spacing 2 / 4 / 6 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 (small-500…large-500); 64, 80 và 128 có trong Polaris React space; 128 là padding section desktop (CTO 21/11 lượt 2, trước là 120). Một hệ tên <code>--space-050…7xl</code> cho mọi thành phần; <code>--space-1…8</code> chỉ còn là alias cho code theme (setting <code>space_base</code> × hệ số). Bậc 2 và 6 là nửa bước, chỉ cho gap icon và nudge. Bo góc 4 / 8 / 12 / 16 / 20 + pill. Chuẩn: Polaris React border radius (admin, tham chiếu) và M3 shape đều có 4, 8, 12, 16, 20.</p>
+      <p class="demo-note">Thang khoảng cách lưới 4px. Chuẩn: Polaris web spacing 2 / 4 / 6 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 (small-500…large-500); 64, 80 và 128 có trong Polaris React space; 128 là padding section desktop. Một hệ tên <code>--space-050…7xl</code> cho mọi thành phần; <code>--space-1…8</code> chỉ còn là alias cho code theme (setting <code>space_base</code> × hệ số). Bậc 2 và 6 là nửa bước, chỉ cho gap icon và nudge. Bo góc 4 / 8 / 12 / 16 / 20 + pill. Chuẩn: Polaris React border radius (admin, tham chiếu) và M3 shape đều có 4, 8, 12, 16, 20.</p>
       <ul class="space-list" aria-label="Spacing scale">
         <li><i style="inline-size: var(--space-050)"></i><code>--space-050</code> 2 · nửa bước</li>
         <li><i style="inline-size: var(--space-2xs)"></i><code>--space-2xs</code> 4</li>
@@ -463,7 +460,7 @@
         <li><i style="border-radius: var(--radius-xl)"></i><code>--radius-xl</code> 20 · dialog, sheet</li>
         <li><i style="border-radius: var(--radius-pill)"></i><code>--radius-pill</code> 999 (nửa chiều cao) · badge, variant pill</li>
       </ul>
-      <p class="demo-label">Một hệ tên (CTO 20/11 V06, CTO 21/11) · tên chính <code>--space-050…7xl</code> · <code>--space-1…8</code> và <code>calc(var(--space-1) * N)</code> chỉ còn là tên cũ trong code theme</p>
+      <p class="demo-label">Một hệ tên (V06) · tên chính <code>--space-050…7xl</code> · <code>--space-1…8</code> và <code>calc(var(--space-1) * N)</code> chỉ còn là tên cũ trong code theme</p>
       <div class="table-wrap">
         <table class="data-table stack-table name-nowrap">
           <caption class="visually-hidden">Spacing names: old to new</caption>
@@ -479,15 +476,15 @@
             <tr><th scope="row"><code>--space-xl</code></th><td class="is-num" data-label="px">24</td><td data-label="Old name"><code>--space-5</code></td><td data-label="Note">Chuẩn: Polaris large-200</td></tr>
             <tr><th scope="row"><code>--space-2xl</code></th><td class="is-num" data-label="px">32</td><td data-label="Old name"><code>--space-6</code></td><td data-label="Note">Chuẩn: Polaris large-300</td></tr>
             <tr><th scope="row"><code>--space-3xl</code></th><td class="is-num" data-label="px">40</td><td data-label="Old name"><code>calc(var(--space-1) * 10)</code></td><td data-label="Note">Chuẩn: Polaris large-400 · Cần FE thêm bậc</td></tr>
-            <tr><th scope="row"><code>--space-4xl</code></th><td class="is-num" data-label="px">48</td><td data-label="Old name"><code>--space-7</code></td><td data-label="Note">Chuẩn: Polaris large-500 · THAY 21/11 (ES1-T567): trước là 56, ngoài thang. <code>--space-7</code> giờ là alias của bậc này</td></tr>
+            <tr><th scope="row"><code>--space-4xl</code></th><td class="is-num" data-label="px">48</td><td data-label="Old name"><code>--space-7</code></td><td data-label="Note">Chuẩn: Polaris large-500 (ES1-T567). <code>--space-7</code> là alias của bậc này</td></tr>
             <tr><th scope="row"><code>--space-5xl</code></th><td class="is-num" data-label="px">64</td><td data-label="Old name"><code>calc(var(--space-1) * 16)</code></td><td data-label="Note">Chuẩn: Polaris React space 64px · Cần FE thêm bậc</td></tr>
             <tr><th scope="row"><code>--space-6xl</code></th><td class="is-num" data-label="px">80</td><td data-label="Old name"><code>calc(var(--space-1) * 20)</code></td><td data-label="Note">Chuẩn: Polaris React space 80px · Cần FE thêm bậc · tầng desktop</td></tr>
-            <tr><th scope="row"><code>--space-7xl</code></th><td class="is-num" data-label="px">128</td><td data-label="Old name"><code>--space-8</code></td><td data-label="Note">Padding section từ 1024. Chuẩn: Polaris React space 128px. THAY 21/11 lượt 2: trước là 120, ngoài thang</td></tr>
+            <tr><th scope="row"><code>--space-7xl</code></th><td class="is-num" data-label="px">128</td><td data-label="Old name"><code>--space-8</code></td><td data-label="Note">Padding section từ 1024. Chuẩn: Polaris React space 128px</td></tr>
             <tr><th scope="row">Không phải khoảng cách</th><td class="is-num" data-label="px">44 · 48 · 52 · 40</td><td data-label="Old name"><code>calc(var(--space-1) * 11 | 12 | 13 | 10)</code></td><td data-label="Note">Là kích thước (Polaris: space token không dùng cho width / height): <code>--touch-target</code>, <code>--control-height-compact</code> (44) · <code>--control-height</code> (48 mọi mốc) · <code>--row-height</code>, <code>--round-button-size</code> (52) · <code>--tab-height-desktop</code> (40) · <code>--count-badge-size</code> (20) · <code>--progress-height</code> (4) · <code>--meter-height</code> (8)</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="demo-note" style="margin-block: var(--space-sm) var(--space-xl)">Giá trị ngoài thang: không viết <code>calc()</code> hay px lẻ trong component. Thứ tự xử lý: (1) quy về bậc gần nhất (Carbon: lệch thang "should be avoided whenever possible"), ví dụ padding ngang tab 28 → 24 (<code>--tab-padding-inline</code>), đệm toast 10 → 12, lề ảnh footer 15 → 16, đáy dải footer 46 → 48; (2) giá trị dùng từ 3 component trở lên mà chưa có bậc thì đề xuất thêm bậc, CTO chốt. Thang khoảng cách chỉ cho padding, gap, margin; kích thước (rộng, cao) dùng token kích thước (<code>--control-height</code>, <code>--touch-target</code>, <code>--row-height</code>, <code>--icon-size-*</code>). Ngoại lệ có tên: toạ độ nét vẽ glyph (chevron 9 × 5, 12 × 7, mũi tên 16 × 14, sao 14 × 13, dấu ✓) và nút do Shopify / Apple render.</p>
+      <p class="demo-note" style="margin-block: var(--space-sm) var(--space-xl)">Giá trị ngoài thang: không viết <code>calc()</code> hay px lẻ trong component. Thứ tự xử lý: (1) quy về bậc gần nhất (Carbon: lệch thang "should be avoided whenever possible"), ví dụ padding ngang tab 28 → 24 (<code>--tab-padding-inline</code>), đệm toast 10 → 12, lề ảnh footer 15 → 16, đáy dải footer 46 → 48; (2) giá trị dùng từ 3 component trở lên mà chưa có bậc thì đề xuất thêm bậc, chờ chốt. Thang khoảng cách chỉ cho padding, gap, margin; kích thước (rộng, cao) dùng token kích thước (<code>--control-height</code>, <code>--touch-target</code>, <code>--row-height</code>, <code>--icon-size-*</code>). Ngoại lệ có tên: toạ độ nét vẽ glyph (chevron 9 × 5, 12 × 7, mũi tên 16 × 14, sao 14 × 13, dấu ✓) và nút do Shopify / Apple render.</p>
       <p class="demo-label">Bo góc lồng nhau · con nhỏ hơn cha một bậc · nút và badge không đổi bo khi lồng</p>
       <div class="nest-demo">
         <div class="nest-card"><span style="border-radius: var(--radius-sm)">thumb 8</span>Card 12 chứa thumb 8<br><code>--radius-card</code> › <code>--radius-sm</code></div>
@@ -507,7 +504,7 @@
             <tr><th scope="row">Biến bo cũ, giá trị 12</th><td class="is-num" data-label="px">12</td><td data-label="Use"><code>--radius-card</code></td><td data-label="Note">Role, không dùng <code>--radius-md</code> trực tiếp cho card</td></tr>
             <tr><th scope="row">Biến bo cũ, giá trị 16 · <code>calc(var(--radius-card) + var(--space-1))</code></th><td class="is-num" data-label="px">16</td><td data-label="Use"><code>--radius-panel</code></td><td data-label="Note">Panel, banner, card bài viết, card collection</td></tr>
             <tr><th scope="row">Biến bo cũ, giá trị 18</th><td class="is-num" data-label="px">18</td><td data-label="Use"><code>--radius-pill</code></td><td data-label="Note">Nhãn đếm cao 28: 18 đã lớn hơn nửa chiều cao, hình không đổi</td></tr>
-            <tr><th scope="row">Biến bo cũ, giá trị 24 · <code>calc(var(--radius-card) * 2)</code></th><td class="is-num" data-label="px">24</td><td data-label="Use"><code>--radius-dialog</code> (20)</td><td data-label="Note">CTO 20/11 V04: 24 quy về 20, bậc lớn nhất của thang; panel lớn trong trang dùng <code>--radius-xl</code></td></tr>
+            <tr><th scope="row">Biến bo cũ, giá trị 24 · <code>calc(var(--radius-card) * 2)</code></th><td class="is-num" data-label="px">24</td><td data-label="Use"><code>--radius-dialog</code> (20)</td><td data-label="Note">V04: 24 quy về 20, bậc lớn nhất của thang; panel lớn trong trang dùng <code>--radius-xl</code></td></tr>
             <tr><th scope="row">Biến bo cũ, giá trị 999</th><td class="is-num" data-label="px">999</td><td data-label="Use"><code>--radius-pill</code></td><td data-label="Note">Đã có sẵn</td></tr>
           </tbody>
         </table>
@@ -558,7 +555,7 @@
             <tr><th scope="row">Dropdown, mega menu</th><td data-label="Shadow"><code>--shadow-raised</code></td><td data-label="Layer"><code>--layer-header</code> 10</td><td data-label="Note">Cùng lớp header</td></tr>
             <tr><th scope="row">Listbox, popover card</th><td data-label="Shadow"><code>--shadow-raised</code></td><td data-label="Layer"><code>--layer-overlay</code> 21</td><td data-label="Note">Big Offer, localization từ 768</td></tr>
             <tr><th scope="row">Teaser nổi</th><td data-label="Shadow"><code>--shadow-raised</code></td><td data-label="Layer"><code>--layer-floating</code> 15</td><td data-label="Note">Nằm trên thanh dính đáy</td></tr>
-            <tr><th scope="row">Toast</th><td data-label="Shadow"><code>--shadow-raised</code></td><td data-label="Layer"><code>--layer-toast</code> 30</td><td data-label="Note">CTO 20/11 V15 (Polaris đặt toast cao hơn popover một bậc: xem câu hỏi mở)</td></tr>
+            <tr><th scope="row">Toast</th><td data-label="Shadow"><code>--shadow-raised</code></td><td data-label="Layer"><code>--layer-toast</code> 30</td><td data-label="Note">V15 (Polaris đặt toast cao hơn popover một bậc: xem câu hỏi mở)</td></tr>
             <tr><th scope="row">Thanh dính đáy</th><td data-label="Shadow"><code>--shadow-bar</code></td><td data-label="Layer"><code>--layer-bottom-bar</code> 5</td><td data-label="Note">Bóng hướng lên</td></tr>
             <tr><th scope="row">Drawer, dialog, bottom sheet</th><td data-label="Shadow"><code>--shadow-overlay</code></td><td data-label="Layer">Top layer · dự phòng <code>--layer-overlay</code> 21</td><td data-label="Note">Kèm scrim <code>--layer-scrim</code> 20</td></tr>
             <tr><th scope="row">Badge, gradient, chữ trên ảnh trong card</th><td data-label="Shadow"><code>--shadow-none</code></td><td data-label="Layer"><code>--layer-content</code> 1</td><td data-label="Note">Cần hơn 1 lớp trong component: xếp theo thứ tự DOM</td></tr>
@@ -588,7 +585,7 @@
     <!-- 3d. Motion -->
     <section class="demo-block" aria-labelledby="h-motion" data-status="built">
       <h2 id="h-motion">6. Motion</h2>
-      <p class="demo-note">8 duration + 3 easing, khớp <code>snippets/css-variables.liquid</code>. Chỉ transform / opacity / clip-path; <code>prefers-reduced-motion: reduce</code> tắt hết (sổ 09/11). Không viết thời lượng bằng số trong component.</p>
+      <p class="demo-note">8 duration + 3 easing, khớp <code>snippets/css-variables.liquid</code>. Chỉ transform / opacity / clip-path; <code>prefers-reduced-motion: reduce</code> tắt hết. Không viết thời lượng bằng số trong component.</p>
       <div class="table-wrap">
         <table class="data-table">
           <caption>Duration</caption>
@@ -617,7 +614,7 @@
           </tbody>
         </table>
       </div>
-      <p class="demo-note" style="margin-block: var(--space-sm) 0">Ngoại lệ (CTO 09/11, 21/11): <code>--motion-reveal</code> 900 và <code>--motion-hero</code> 1400 vượt khung 500ms của Polaris, giữ nguyên. Chỉ dùng cho hiện dần khi cuộn và vòng lặp tải; phản hồi thao tác luôn ≤ 500.</p>
+      <p class="demo-note" style="margin-block: var(--space-sm) 0">Ngoại lệ: <code>--motion-reveal</code> 900 và <code>--motion-hero</code> 1400 vượt khung 500ms của Polaris, giữ nguyên. Chỉ dùng cho hiện dần khi cuộn và vòng lặp tải; phản hồi thao tác luôn ≤ 500.</p>
     </section>
 
     <!-- 6b. Icon (ES1-T535 lượt 2, foundations-14) -->
@@ -735,8 +732,8 @@
           </tbody>
         </table>
       </div>
-      <p class="demo-note" style="margin-block: var(--space-sm) 0">Đối chiếu 21/11 với <code>origin/develop</code>: trong 150 token của kit, 66 có ở css-variables.liquid, 15 khai báo ở base.css (cần gom), 69 chưa có trong code (17 token thêm ở ES1-T567). Giá trị kit đã đổi mà code chưa theo (Cần FE): <code>--space-4xl</code> 48, line-height thân 1.5 và từng bậc heading, <code>--band-inset</code> 64, <code>--tab-padding-inline</code> 24.</p>
-      <p class="demo-label" style="margin-block-start: var(--space-xl)">Nguồn chuẩn · kit và mockup là gốc (CTO 21/11, ES1-T567) · sổ quyết định ghi lý do</p>
+      <p class="demo-note" style="margin-block: var(--space-sm) 0">Đối chiếu với <code>origin/develop</code>: trong 150 token của kit, 66 có ở css-variables.liquid, 15 khai báo ở base.css (cần gom), 69 chưa có trong code (17 token thêm ở ES1-T567). Giá trị kit đã đổi mà code chưa theo (Cần FE): <code>--space-4xl</code> 48, line-height thân 1.5 và từng bậc heading, <code>--band-inset</code> 64, <code>--tab-padding-inline</code> 24.</p>
+      <p class="demo-label" style="margin-block-start: var(--space-xl)">Nguồn chuẩn · kit và mockup là gốc (ES1-T567) · sổ quyết định ghi lý do</p>
       <p class="demo-note">Giá trị trong <code>:root</code> của kit là giá trị chuẩn; các nơi còn lại chép theo, lệch thì ghi "Cần FE". Đang lệch, chờ FE sửa setting: <code>badge_new_color</code> #467A48 → #4B824D (V01) · <code>background_alt_color</code> #F4F4F4 → #F4F4F5 (V18).</p>
       <ol class="chain-list">
         <li><b>1</b><code>drafts/designer/_kit/kit.css</code><i>nguồn chuẩn: token <code>:root</code> và component</i></li>
@@ -772,7 +769,7 @@
         </table>
       </div>
       <div class="dos">
-        <div class="do"><b>Nên</b>Đọc role (<code>--color-critical</code>, <code>--radius-card</code>, <code>--shadow-raised</code>); thêm token mới ở đúng tầng; ghi nguồn theo 5 dạng ở đầu kit.css ("Chuẩn: Polaris …", "Chuẩn: Carbon …", "CTO dd/mm", "AA: n:1", "Thiết kế: …").</div>
+        <div class="do"><b>Nên</b>Đọc role (<code>--color-critical</code>, <code>--radius-card</code>, <code>--shadow-raised</code>); thêm token mới ở đúng tầng; ghi nguồn theo các dạng ở đầu kit.css ("Chuẩn: Polaris …", "Chuẩn: Carbon …", "AA: n:1", "Thiết kế: …").</div>
         <div class="dont"><b>Không nên</b>Đặt tên biến theo giá trị hay theo nguồn (<code>--gray-500</code>, <code>--black-1a</code>); để component đọc thẳng setting; thêm token ở một nơi mà bỏ ba nơi còn lại; sửa kit ngược theo setting đang lệch; ghi "Chuẩn: Polaris" cho điều Polaris không nêu.</div>
       </div>
     </section>
@@ -872,7 +869,7 @@
             <tr><th scope="row">2 · CSS chỉ dùng thuộc tính logic; mọi rule hướng có <code>:dir(rtl)</code> đi kèm</th><td data-label="Owner">FE</td><td data-label="Now">Đạt ở phần đã dựng (DESIGN.md Direction)</td></tr>
             <tr><th scope="row">3 · <code>assets/slideshow.js</code> và carousel cuộn theo hướng</th><td data-label="Owner">BE</td><td data-label="Now">Còn cuộn theo LTR</td></tr>
             <tr><th scope="row">4 · Icon chỉ hướng lật, icon khác giữ (bảng trên, mục 6b)</th><td data-label="Owner">FE</td><td data-label="Now">Đã có cho slideshow, pagination, drawer-loc; kit bổ sung phần còn lại</td></tr>
-            <tr><th scope="row">5 · Font có glyph cho ngôn ngữ RTL (Inter, Sofia Sans Condensed không có chữ Ả Rập, Do Thái)</th><td data-label="Owner">CTO chốt font, FE cài</td><td data-label="Now">Chưa chọn</td></tr>
+            <tr><th scope="row">5 · Font có glyph cho ngôn ngữ RTL (Inter, Sofia Sans Condensed không có chữ Ả Rập, Do Thái)</th><td data-label="Owner">Cần chốt font, FE cài</td><td data-label="Now">Chưa chọn</td></tr>
             <tr><th scope="row">6 · QA chạy 12 mẫu ở trên + nhãn dài hơn 50% ở 360 và 1280, không tràn, không lệch focus</th><td data-label="Owner">QA</td><td data-label="Now">Chưa chạy</td></tr>
           </tbody>
         </table>
@@ -970,7 +967,7 @@
     <!-- 6. Nút -->
     <section class="demo-block" aria-labelledby="h-button" data-status="built">
       <h2 id="h-button">9. Buttons</h2>
-      <p class="demo-note">Cao 48 ở mọi mốc (<code>--control-height</code>; CTO 21/11 lượt 2 bỏ mức 52 từ 1280); padding ngang 32; chữ 16/24 600; bo 4; icon 20 cách chữ 8. Small: cao 44 mọi mốc, padding 16, chữ 14/20 600, icon 16. Nhãn sentence case, mở bằng động từ, không dấu câu (Polaris Button). Mỗi ô ghi trạng thái. Active = scale 0.98 + bỏ bóng (vẽ đậm hơn hover để thấy được). Loading giữ bề rộng, spinner 20. Disabled luôn là cặp màu riêng, không dùng opacity (CTO 21/11): nút tròn cuối hàng = viền border + icon muted-light, nền giữ (icon tắt so với icon bật 3.27:1); trên nền tối = nền trong suốt, viền + icon muted-on-dark 6.11.</p>
+      <p class="demo-note">Cao 48 ở mọi mốc (<code>--control-height</code>); padding ngang 32; chữ 16/24 600; bo 4; icon 20 cách chữ 8. Small: cao 44 mọi mốc, padding 16, chữ 14/20 600, icon 16. Nhãn sentence case, mở bằng động từ, không dấu câu (Polaris Button). Mỗi ô ghi trạng thái. Active = scale 0.98 + bỏ bóng (vẽ đậm hơn hover để thấy được). Loading giữ bề rộng, spinner 20. Disabled luôn là cặp màu riêng, không dùng opacity: nút tròn cuối hàng = viền border + icon muted-light, nền giữ (icon tắt so với icon bật 3.27:1); trên nền tối = nền trong suốt, viền + icon muted-on-dark 6.11.</p>
       <p class="demo-label">Primary · <code>.button</code></p>
       <div class="states">
         <div class="state"><button class="button" type="button">Add to cart</button><small>Default</small></div>
@@ -1054,7 +1051,7 @@
     <!-- 9b. Tabs (ES1-T535 lượt 2, components-09): tách khỏi màn Buttons -->
     <section class="demo-block" aria-labelledby="h-tabs" data-status="built">
       <h2 id="h-tabs">9b. Tabs</h2>
-      <p class="demo-note">Tab đổi nội dung của MỘT vùng ngay bên dưới, không rời trang. Cao 44 dưới 1280, 40 từ 1280 (<code>--tab-height-desktop</code>); padding ngang 24 (<code>--tab-padding-inline</code>, Polaris large-200; trước ES1-T567 là 28); khoảng cách tab 8; bo 4; viền 1 border; nền alt; chữ 16/24 500; đang chọn nền đen chữ trắng. Hàng tab cuộn ngang khi không đủ chỗ, không xuống dòng. Hình Tab và Chip là bản sắc thương hiệu, giữ (CTO 21/11 lượt 2, components-09); nhãn tab sentence case, dưới 15 ký tự (Ant; CTO 21/11 lượt 2), tab là tên collection thì theo dữ liệu; ba thành phần phân biệt bằng vai trò, cỡ chữ và vị trí.</p>
+      <p class="demo-note">Tab đổi nội dung của MỘT vùng ngay bên dưới, không rời trang. Cao 44 dưới 1280, 40 từ 1280 (<code>--tab-height-desktop</code>); padding ngang 24 (<code>--tab-padding-inline</code>, Polaris large-200; trước ES1-T567 là 28); khoảng cách tab 8; bo 4; viền 1 border; nền alt; chữ 16/24 500; đang chọn nền đen chữ trắng. Hàng tab cuộn ngang khi không đủ chỗ, không xuống dòng. Hình Tab và Chip là bản sắc thương hiệu, giữ (components-09); nhãn tab sentence case, dưới 15 ký tự (Ant), tab là tên collection thì theo dữ liệu; ba thành phần phân biệt bằng vai trò, cỡ chữ và vị trí.</p>
       <div class="states" role="tablist" aria-label="Tab states">
         <div class="state"><button class="tab" role="tab" aria-selected="true" type="button">All</button><small>Selected</small></div>
         <div class="state"><button class="tab" role="tab" aria-selected="false" type="button" tabindex="-1">Weight</button><small>Default</small></div>
@@ -1102,7 +1099,7 @@
     <section class="demo-block" aria-labelledby="h-badge" data-status="built">
       <h2 id="h-badge">10. Badges and sold out</h2>
       <p class="demo-note">Pill cao 28, padding ngang 12, chữ 13/20 600 −2%, bo pill. Ưu tiên trên card: Sold out &gt; -N% &gt; New. Rating ở góc đối diện. Viền trên nền tối chỉ cho gift card.</p>
-      <p class="demo-note">Polaris: màu badge chỉ TRẠNG THÁI (sale đỏ, new xanh, sold out đen), không phân DANH MỤC. <code>.badge--tag</code> (tag bài viết "Featured", "Exercises"; nhãn nổi bật) là nhãn không mang trạng thái nên dùng tone trung tính: nền trắng, viền 1 <code>--color-border</code>, chữ foreground (17.4:1). THAY 21/11 (ES1-T567): trước là nền accent. Trên nền tối và panel tối dùng <code>.badge--outline</code>.</p>
+      <p class="demo-note">Polaris: màu badge chỉ TRẠNG THÁI (sale đỏ, new xanh, sold out đen), không phân DANH MỤC. <code>.badge--tag</code> (tag bài viết "Featured", "Exercises"; nhãn nổi bật) là nhãn không mang trạng thái nên dùng tone trung tính: nền trắng, viền 1 <code>--color-border</code>, chữ foreground (17.4:1; ES1-T567). Trên nền tối và panel tối dùng <code>.badge--outline</code>.</p>
       <div class="demo-row">
         <span class="badge badge--sale">−24%</span>
         <span class="badge badge--new">New</span>
@@ -1142,7 +1139,7 @@
     <!-- 8. Card sản phẩm -->
     <section class="demo-block" aria-labelledby="h-product" data-status="built">
       <h2 id="h-product">11. Product card</h2>
-      <p class="demo-note">Ảnh 1 / 1 nền cream bo 12 (<code>--radius-card</code>), KHÔNG viền; ảnh cách chữ 8; tên 16/24 500; giá 16/24 500 số bảng, cách tên 4; giá gạch 14 muted cách giá 8; badge cách mép ảnh 8, 16 từ 1024; hover card nhấc 4, ảnh phóng 1.04 (hover và nhãn card là bản sắc thương hiệu, CTO 21/11 lượt 2); swatch 32 × 16 bo 8 cách 4 là chỉ báo (aria-hidden, không có trạng thái chọn); &gt; 4 màu hiện 3 + "+N" (VP2). Ảnh luôn contain trong khung bo (kể cả ảnh ngang).</p>
+      <p class="demo-note">Ảnh 1 / 1 nền cream bo 12 (<code>--radius-card</code>), KHÔNG viền; ảnh cách chữ 8; tên 16/24 500; giá 16/24 500 số bảng, cách tên 4; giá gạch 14 muted cách giá 8; badge cách mép ảnh 8, 16 từ 1024; hover card nhấc 4, ảnh phóng 1.04 (hover và nhãn card là bản sắc thương hiệu); swatch 32 × 16 bo 8 cách 4 là chỉ báo (aria-hidden, không có trạng thái chọn); &gt; 4 màu hiện 3 + "+N" (VP2). Ảnh luôn contain trong khung bo (kể cả ảnh ngang).</p>
       <ul class="product-grid">
         <li class="product-card">
           <div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P01.jpg" alt="Ativafit Lava 66 lb Adjustable" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">−24%</span><span class="badge badge--neutral"><svg aria-hidden="true"><use href="#i-star"/></svg>5.0<span class="visually-hidden"> out of 5 stars</span></span></div></div>
@@ -1376,7 +1373,7 @@
       </form>
       <div class="table-wrap" style="margin-block-start: var(--space-xl)">
         <table class="data-table stack-table">
-          <caption>Lỗi form: focus đi đâu (CTO 21/11)</caption>
+          <caption>Lỗi form: focus đi đâu</caption>
           <thead><tr><th scope="col">When</th><th scope="col">Shows</th><th scope="col">Focus</th><th scope="col">Announces</th></tr></thead>
           <tbody>
             <tr><th scope="row">Rời một ô đang sai</th><td data-label="Shows"><code>.field__error</code> dưới ô, viền critical 2px, <code>aria-invalid</code></td><td data-label="Focus">Không chuyển: người dùng đi tiếp</td><td data-label="Announces">Khi quay lại ô, đọc lỗi qua <code>aria-describedby</code></td></tr>
@@ -1458,7 +1455,7 @@
     <!-- Chip -->
     <section class="demo-block" aria-labelledby="h-chip" data-status="approved">
       <h2 id="h-chip">18. Chip</h2>
-      <p class="demo-note">Cùng hình với tab (bản sắc thương hiệu, CTO 21/11 lượt 2): bo 4, viền 1 border, nền alt; cao 44 dưới 1280, 40 từ 1280; padding ngang 16; chữ 14/20 500; khoảng cách chip 8. 3 biến thể: gợi ý (nền alt), chọn được (đang chọn nền đen như tab), xoá được (nền trắng viền đen + ×).</p>
+      <p class="demo-note">Cùng hình với tab (bản sắc thương hiệu): bo 4, viền 1 border, nền alt; cao 44 dưới 1280, 40 từ 1280; padding ngang 16; chữ 14/20 500; khoảng cách chip 8. 3 biến thể: gợi ý (nền alt), chọn được (đang chọn nền đen như tab), xoá được (nền trắng viền đen + ×).</p>
       <p class="demo-label">Gợi ý · popular searches, link danh mục</p>
       <div class="states">
         <div class="state"><a class="chip" href="#"><svg aria-hidden="true"><use href="#i-search"/></svg>Adjustable bench</a><small>Default</small></div>
@@ -1492,7 +1489,7 @@
     <!-- Facets -->
     <section class="demo-block" aria-labelledby="h-facets" data-status="approved">
       <h2 id="h-facets">19. Facet group</h2>
-      <p class="demo-note">Biến thể của accordion cho bộ lọc: tiêu đề 16/600, "N selected" muted, chevron phải; hàng 52. Chỉ dùng trong drawer lọc và cột lọc collection/search. Ô màu lọc <code>.facet-swatch</code> tròn 24 trong hàng <code>.choice</code> 44: chọn = vòng foreground cách 2, focus accent (V43). Hết kết quả (disabled) = gạch chéo qua ô màu, ô giữ nguyên màu, nhãn muted-light 5.33; không làm mờ (CTO 21/11).</p>
+      <p class="demo-note">Biến thể của accordion cho bộ lọc: tiêu đề 16/600, "N selected" muted, chevron phải; hàng 52. Chỉ dùng trong drawer lọc và cột lọc collection/search. Ô màu lọc <code>.facet-swatch</code> tròn 24 trong hàng <code>.choice</code> 44: chọn = vòng foreground cách 2, focus accent (V43). Hết kết quả (disabled) = gạch chéo qua ô màu, ô giữ nguyên màu, nhãn muted-light 5.33; không làm mờ.</p>
       <div class="facet-demo">
         <details class="facet" open><summary>Availability <small>1 selected</small><svg aria-hidden="true" viewBox="0 0 9 5"><use href="#i-chevron"/></svg></summary><div class="facet__body"><label class="choice"><input type="checkbox" checked> In stock <span class="facet__count">22</span></label><label class="choice"><input type="checkbox"> Out of stock <span class="facet__count">3</span></label></div></details>
         <details class="facet" open><summary class="is-hover">Price <svg aria-hidden="true" viewBox="0 0 9 5"><use href="#i-chevron"/></svg></summary><div class="facet__body"><div class="facet__range"><div class="field"><label class="visually-hidden" for="pr-min">From</label><input class="field__input field__input--compact" id="pr-min" inputmode="decimal" value="$50"></div><span class="text-small text-muted">to</span><div class="field"><label class="visually-hidden" for="pr-max">To</label><input class="field__input field__input--compact" id="pr-max" inputmode="decimal" value="$200"></div></div></div></details>
@@ -1687,7 +1684,7 @@
     <!-- Progress meter -->
     <section class="demo-block" aria-labelledby="h-progress" data-status="approved">
       <h2 id="h-progress">25. Progress meter</h2>
-      <p class="demo-note">Freeship / mục tiêu bundle: track cao 8 (<code>--meter-height</code>) bo pill nền border, fill accent; đạt = <code>--color-success</code> + icon 16. Hộp cream bo 16, đệm 16, chữ 14/20, chữ cách thanh 8. <code>role="progressbar"</code> + câu chữ. Khác thanh tiến trình carousel: cao 4 (<code>--progress-height</code>), bo pill, cách hàng card 32, <code>aria-hidden</code> (CTO 09/11: thanh mảnh, không dùng thanh cuộn trình duyệt). Polaris không nêu chiều cao thanh tiến trình; 4 và 8 nằm trên lưới 4px và là token kích thước, không phải token khoảng cách.</p>
+      <p class="demo-note">Freeship / mục tiêu bundle: track cao 8 (<code>--meter-height</code>) bo pill nền border, fill accent; đạt = <code>--color-success</code> + icon 16. Hộp cream bo 16, đệm 16, chữ 14/20, chữ cách thanh 8. <code>role="progressbar"</code> + câu chữ. Khác thanh tiến trình carousel: cao 4 (<code>--progress-height</code>), bo pill, cách hàng card 32, <code>aria-hidden</code> (thanh mảnh, không dùng thanh cuộn trình duyệt). Polaris không nêu chiều cao thanh tiến trình; 4 và 8 nằm trên lưới 4px và là token kích thước, không phải token khoảng cách.</p>
       <div class="two-col">
         <div class="meter-box"><p>Spend <strong>$26.00</strong> more for free shipping</p><div class="meter" role="progressbar" aria-label="Free shipping progress" aria-valuemin="0" aria-valuemax="150" aria-valuenow="124"><span class="meter__fill" style="--value: 83%"></span></div></div>
         <div class="meter-box"><p class="meter-box__done"><svg aria-hidden="true"><use href="#i-check"/></svg>You've unlocked free shipping</p><div class="meter meter--done" role="progressbar" aria-label="Free shipping progress" aria-valuemin="0" aria-valuemax="150" aria-valuenow="150"><span class="meter__fill" style="--value: 100%"></span></div></div>
@@ -1720,7 +1717,7 @@
     <!-- 12. Toast -->
     <section class="demo-block" aria-labelledby="h-toast" data-status="built">
       <h2 id="h-toast">27. Toast</h2>
-      <p class="demo-note">4 loại cố định (CTO 09/11): info xám, success <code>--color-success</code>, warning cam <code>--color-warning</code>, error <code>--color-critical</code>. Màu + icon + chữ. Success/info tự ẩn 6s, dừng khi hover/focus; warning/error đóng tay. Tiêu đề toast sentence case; success tối đa 3 từ (Polaris Toast: "three words or fewer") và 24 ký tự (1 dòng ở 360), mô tả tối đa 2 dòng, 60 ký tự (Fluent). Số đo: đệm dọc 12 + dòng 14/20 = hàng 44 bằng nút đóng 44; icon 20; thanh màu trái 4; bo 4; tiêu đề 16/24; rộng 400 từ 768.</p>
+      <p class="demo-note">4 loại cố định: info xám, success <code>--color-success</code>, warning cam <code>--color-warning</code>, error <code>--color-critical</code>. Màu + icon + chữ. Success/info tự ẩn 6s, dừng khi hover/focus; warning/error đóng tay. Tiêu đề toast sentence case; success tối đa 3 từ (Polaris Toast: "three words or fewer") và 24 ký tự (1 dòng ở 360), mô tả tối đa 2 dòng, 60 ký tự (Fluent). Số đo: đệm dọc 12 + dòng 14/20 = hàng 44 bằng nút đóng 44; icon 20; thanh màu trái 4; bo 4; tiêu đề 16/24; rộng 400 từ 768.</p>
       <div class="stack" style="max-width: 400px">
         <div class="toast toast--success" role="status"><svg aria-hidden="true"><use href="#i-check"/></svg><div class="toast__body"><strong>Added to cart</strong>Iron Core Kettlebell 16 kg · $119.00</div><button class="toast__close" type="button" aria-label="Dismiss: Added to cart"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
         <div class="toast toast--info" role="status"><svg aria-hidden="true"><use href="#i-info"/></svg><div class="toast__body"><strong>Filters updated</strong>4 products</div><button class="toast__close" type="button" aria-label="Dismiss: Filters updated"><svg aria-hidden="true"><use href="#i-close"/></svg></button></div>
@@ -1729,7 +1726,7 @@
       </div>
       <div class="table-wrap" style="margin-block-start: var(--space-xl)">
         <table class="data-table touch-table">
-          <caption>Chọn mẫu thông báo (CTO 21/11)</caption>
+          <caption>Chọn mẫu thông báo</caption>
           <thead><tr><th scope="col">Tình huống</th><th scope="col">Mẫu</th><th scope="col">Ví dụ</th></tr></thead>
           <tbody>
             <tr><td data-label="Tình huống">Xác nhận ngắn sau thao tác thành công, tin trung tính</td><td data-label="Mẫu">Toast success / info · <code>role="status"</code>, tự ẩn 6s</td><td data-label="Ví dụ">"Added to cart" · "Link copied" · "Filters updated"</td></tr>
@@ -1809,8 +1806,8 @@
     <!-- 14. Dialog -->
     <section class="demo-block" aria-labelledby="h-dialog" data-status="built">
       <h2 id="h-dialog">29. Dialog and bottom sheet</h2>
-      <p class="demo-note">≥ 768: giữa màn, cỡ S 480 / M 720 / M-wide 960 (quick view từ 1280) / L 1120, bo 20 (<code>--radius-dialog</code>), đệm 24 / 32 từ 768 / 48 từ 1280 (cỡ S giữ 32). &lt; 768: bottom sheet ≤ 88%, thanh kéo. Hàng nút bên phải: secondary rồi primary (primary cuối); &lt; 768 xếp dọc, primary trên. Popup marketing dùng text link thay secondary để đóng ("No thanks"). Tiêu đề Sofia 800 cỡ h2 (32/40 → 36/44), chữ nguồn sentence case (CTO 21/11 lượt 2); chữ HOA bằng CSS chỉ ở popup marketing (bản sắc thương hiệu, CTO 21/11 lượt 2: tiêu đề kiểu display, V71 / V75).</p>
-      <p class="demo-note">Ngoại lệ (CTO 10/11, ghi nhận 21/11): popup marketing (newsletter, before you leave, big offer) tự mở, là ngoại lệ đã chốt của nguyên tắc "modal chỉ mở do người dùng". Rào: không mở lúc tải trang, mỗi lúc 1 popup, nghỉ 3 s, mỗi popup tự mở tối đa 1 lần / phiên, không ở 404, không confirmshaming. Mọi dialog khác (quick view, xác nhận, quiz) chỉ mở sau thao tác người dùng.</p>
+      <p class="demo-note">≥ 768: giữa màn, cỡ S 480 / M 720 / M-wide 960 (quick view từ 1280) / L 1120, bo 20 (<code>--radius-dialog</code>), đệm 24 / 32 từ 768 / 48 từ 1280 (cỡ S giữ 32). &lt; 768: bottom sheet ≤ 88%, thanh kéo. Hàng nút bên phải: secondary rồi primary (primary cuối); &lt; 768 xếp dọc, primary trên. Popup marketing dùng text link thay secondary để đóng ("No thanks"). Tiêu đề Sofia 800 cỡ h2 (32/40 → 36/44), chữ nguồn sentence case; chữ HOA bằng CSS chỉ ở popup marketing (bản sắc thương hiệu: tiêu đề kiểu display, V71 / V75).</p>
+      <p class="demo-note">Ngoại lệ: popup marketing (newsletter, before you leave, big offer) tự mở, là ngoại lệ đã chốt của nguyên tắc "modal chỉ mở do người dùng". Rào: không mở lúc tải trang, mỗi lúc 1 popup, nghỉ 3 s, mỗi popup tự mở tối đa 1 lần / phiên, không ở 404, không confirmshaming. Mọi dialog khác (quick view, xác nhận, quiz) chỉ mở sau thao tác người dùng.</p>
       <div class="demo-stage" role="group" aria-label="Dialog sample" style="min-height: 560px">
         <div class="scrim"></div>
         <div class="dialog dialog--s" role="dialog" aria-modal="true" aria-labelledby="dlg-title">
@@ -1837,7 +1834,7 @@
     <!-- 15. Trạng thái dùng chung -->
     <section class="demo-block" aria-labelledby="h-state" data-status="built">
       <h2 id="h-state">30. Empty, error and loading states</h2>
-      <p class="demo-note">Đang tải: skeleton đúng kích thước (0 CLS). Spinner 3 cỡ (V61): 24 rời trong vùng tải, 20 trong nút và cạnh số kết quả, 12 (<code>.spinner--xs</code>) chỉ ở dòng tồn của variant picker. Spinner thay nhãn nút và skeleton thay nội dung chỉ hiện sau ngưỡng 500 ms (CTO 21/11 lượt 2); chỉ báo nhỏ tại chỗ được hiện ngay. Rỗng: 3 biến thể của một component. Lỗi: chọn component theo bảng dưới.</p>
+      <p class="demo-note">Đang tải: skeleton đúng kích thước (0 CLS). Spinner 3 cỡ (V61): 24 rời trong vùng tải, 20 trong nút và cạnh số kết quả, 12 (<code>.spinner--xs</code>) chỉ ở dòng tồn của variant picker. Spinner thay nhãn nút và skeleton thay nội dung chỉ hiện sau ngưỡng 500 ms; chỉ báo nhỏ tại chỗ được hiện ngay. Rỗng: 3 biến thể của một component. Lỗi: chọn component theo bảng dưới.</p>
       <p class="demo-label">Loading · product grid</p>
       <ul class="product-grid skeleton-grid" aria-busy="true" aria-label="Loading products">
         <li class="skeleton-card"><span class="skeleton skeleton--media"></span><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line"></span></li>
@@ -1881,7 +1878,7 @@
           <p class="demo-row" role="status"><span class="spinner" aria-hidden="true"></span><span>Updating cart…</span></p>
         </div>
       </div>
-      <p class="demo-label" style="margin-block-start: var(--space-2xl)">Ngưỡng hiện chỉ báo tải · 500 ms (CTO 21/11 lượt 2; trước là 300 ms) · một quy tắc cho nút, lọc, variant picker, localization</p>
+      <p class="demo-label" style="margin-block-start: var(--space-2xl)">Ngưỡng hiện chỉ báo tải · 500 ms · một quy tắc cho nút, lọc, variant picker, localization</p>
       <div class="load-timeline" aria-hidden="true"><span>0–500 ms · giữ nội dung cũ, khoá thao tác lặp, không thay nội dung bằng spinner hay skeleton (chỉ báo nhỏ tại chỗ được hiện ngay)</span><span>Sau 500 ms · hiện spinner trong vùng đang tải hoặc skeleton đúng kích thước</span></div>
       <div class="load-scale" aria-hidden="true"><span>0 ms</span><span>500 ms</span></div>
       <div class="table-wrap">
@@ -1897,7 +1894,7 @@
           </tbody>
         </table>
       </div>
-      <p class="demo-note" style="margin-block: var(--space-sm) 0">Spinner luôn nằm trong vùng đang tải, không phủ cả trang. Chỉ báo nhỏ tại chỗ (spinner 20 cạnh số kết quả) được hiện ngay; spinner thay nhãn nút và skeleton thay nội dung chỉ hiện sau ngưỡng để thao tác nhanh không bị nháy. Polaris nêu 500 ms: CTO chọn giữ 300 hay đổi 500 (câu hỏi mở); đổi thì sửa một số ở đây.</p>
+      <p class="demo-note" style="margin-block: var(--space-sm) 0">Spinner luôn nằm trong vùng đang tải, không phủ cả trang. Chỉ báo nhỏ tại chỗ (spinner 20 cạnh số kết quả) được hiện ngay; spinner thay nhãn nút và skeleton thay nội dung chỉ hiện sau ngưỡng để thao tác nhanh không bị nháy. Chuẩn: Polaris 500 ms; đổi thì sửa một số ở đây.</p>
       <div class="table-wrap" style="margin-block-start: var(--space-2xl)">
         <table class="data-table stack-table">
           <caption>Loại lỗi → component (V45)</caption>
@@ -1982,7 +1979,7 @@
     <!-- Pagination -->
     <section class="demo-block" aria-labelledby="h-pagination" data-status="built">
       <h2 id="h-pagination">32. Pagination</h2>
-      <p class="demo-note">pagination.md: nút tròn 52 trước/sau, số trang pill 44, trang hiện tại accent; đầu/cuối giữ nút + aria-disabled, hiện bằng cặp màu disabled (viền border, icon muted-light 5.33), không opacity (CTO 21/11). Dưới 768 chỉ "Page 2 of 3". "Showing x–y of z" chỉ ở search.</p>
+      <p class="demo-note">pagination.md: nút tròn 52 trước/sau, số trang pill 44, trang hiện tại accent; đầu/cuối giữ nút + aria-disabled, hiện bằng cặp màu disabled (viền border, icon muted-light 5.33), không opacity. Dưới 768 chỉ "Page 2 of 3". "Showing x–y of z" chỉ ở search.</p>
       <nav class="pagination" aria-label="Pagination" style="margin-block-start: 0">
         <ul class="pagination__list">
           <li class="pagination__item--prev"><a class="round-button pagination__step" href="#" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></a></li>
@@ -2116,13 +2113,13 @@
           <caption>Viết hoa và độ dài theo loại chuỗi</caption>
           <thead><tr><th scope="col">String</th><th scope="col">Case</th><th scope="col">Length</th><th scope="col">Example</th></tr></thead>
           <tbody>
-            <tr><th scope="row">Nút, link dạng nút, link CTA, link "View all …"</th><td data-label="Case">Sentence case (Polaris Button; CTO 21/11, thay Title Case 07/11)</td><td data-label="Length">2–4 từ (link CTA 2–5), mở bằng động từ, không mạo từ, không dấu câu</td><td data-label="Example">Add to cart · Try again · Clear all · View all articles</td></tr>
-            <tr><th scope="row">Toast, tiêu đề alert</th><td data-label="Case">Sentence case (Polaris; CTO 21/11)</td><td data-label="Length">Tiêu đề toast ≤ 3 từ, ≤ 24 ký tự; mô tả ≤ 2 dòng, ≤ 60 ký tự</td><td data-label="Example">Added to cart · We couldn't load these products</td></tr>
+            <tr><th scope="row">Nút, link dạng nút, link CTA, link "View all …"</th><td data-label="Case">Sentence case (Polaris Button)</td><td data-label="Length">2–4 từ (link CTA 2–5), mở bằng động từ, không mạo từ, không dấu câu</td><td data-label="Example">Add to cart · Try again · Clear all · View all articles</td></tr>
+            <tr><th scope="row">Toast, tiêu đề alert</th><td data-label="Case">Sentence case (Polaris)</td><td data-label="Length">Tiêu đề toast ≤ 3 từ, ≤ 24 ký tự; mô tả ≤ 2 dòng, ≤ 60 ký tự</td><td data-label="Example">Added to cart · We couldn't load these products</td></tr>
             <tr><th scope="row">Badge, dòng tồn kho</th><td data-label="Case">Sentence case (Polaris Badge)</td><td data-label="Length">1–2 từ, thì quá khứ khi là trạng thái</td><td data-label="Example">Sold out · New · Only 2 left</td></tr>
             <tr><th scope="row">Label trường, thân bài, mô tả, gợi ý, lỗi</th><td data-label="Case">Sentence case; label không dấu chấm cuối (Ant)</td><td data-label="Length">Câu lỗi ≤ 2 câu</td><td data-label="Example">Email address · Enter an email like name@example.com.</td></tr>
-            <tr><th scope="row">Tiêu đề trang, section, dialog, drawer, empty state</th><td data-label="Case">Sentence case (CTO 21/11 lượt 2, thay Title Case). Chuẩn: M3, Ant, Fluent 2, Spectrum (Polaris không nêu). Chỉ viết hoa chữ đầu và danh từ riêng</td><td data-label="Length">Tối đa 2 dòng ở 360; không dấu chấm cuối</td><td data-label="Example">Training tips &amp; inspiration · Your cart is empty</td></tr>
-            <tr><th scope="row">Tab, link menu (header, mega, drawer, footer)</th><td data-label="Case">Sentence case (CTO 21/11 lượt 2). Mục là tên collection / sản phẩm / bài viết: theo dữ liệu</td><td data-label="Length">1–2 từ, dưới 15 ký tự (Ant: Tabs, Top Navigation); breadcrumb không quá 5 cấp</td><td data-label="Example">Weight · Our story</td></tr>
-            <tr><th scope="row">Display, eyebrow, nhãn nhóm</th><td data-label="Case">Gõ sentence case, CSS đổi sang HOA (bản sắc thương hiệu, CTO 21/11 lượt 2)</td><td data-label="Length">1–3 từ</td><td data-label="Example">Bestsellers → BESTSELLERS</td></tr>
+            <tr><th scope="row">Tiêu đề trang, section, dialog, drawer, empty state</th><td data-label="Case">Sentence case. Chuẩn: M3, Ant, Fluent 2, Spectrum (Polaris không nêu). Chỉ viết hoa chữ đầu và danh từ riêng</td><td data-label="Length">Tối đa 2 dòng ở 360; không dấu chấm cuối</td><td data-label="Example">Training tips &amp; inspiration · Your cart is empty</td></tr>
+            <tr><th scope="row">Tab, link menu (header, mega, drawer, footer)</th><td data-label="Case">Sentence case. Mục là tên collection / sản phẩm / bài viết: theo dữ liệu</td><td data-label="Length">1–2 từ, dưới 15 ký tự (Ant: Tabs, Top Navigation); breadcrumb không quá 5 cấp</td><td data-label="Example">Weight · Our story</td></tr>
+            <tr><th scope="row">Display, eyebrow, nhãn nhóm</th><td data-label="Case">Gõ sentence case, CSS đổi sang HOA (bản sắc thương hiệu)</td><td data-label="Length">1–3 từ</td><td data-label="Example">Bestsellers → BESTSELLERS</td></tr>
             <tr><th scope="row">Tên riêng, viết tắt, nút có thương hiệu</th><td data-label="Case">Giữ nguyên cách viết gốc</td><td data-label="Length">—</td><td data-label="Example">View FlexFold Adjustable Bench · United States USD $ · Shop Pay · Follow on Shop</td></tr>
           </tbody>
         </table>
@@ -2138,10 +2135,10 @@
           <thead><tr><th scope="col">Use</th><th scope="col">Not</th><th scope="col">Note</th></tr></thead>
           <tbody>
             <tr><th scope="row">Cart</th><td data-label="Not">Bag, Basket, Shopping cart</td><td data-label="Note">Nút: "Add to cart", "View cart"</td></tr>
-            <tr><th scope="row">Checkout</th><td data-label="Not">Check Out, Pay now, Proceed</td><td data-label="Note">Thuật ngữ, ngoại lệ của quy tắc "mở bằng động từ" (CTO 21/11 lượt 2: giữ "Checkout"). Nút thanh toán nhanh do Shopify vẽ, không đổi chữ</td></tr>
+            <tr><th scope="row">Checkout</th><td data-label="Not">Check Out, Pay now, Proceed</td><td data-label="Note">Thuật ngữ, ngoại lệ của quy tắc "mở bằng động từ" (giữ "Checkout"). Nút thanh toán nhanh do Shopify vẽ, không đổi chữ</td></tr>
             <tr><th scope="row">Sold out</th><td data-label="Not">Out of stock, Unavailable (khi còn biến thể khác)</td><td data-label="Note">Badge và nút đều "Sold out"; "Unavailable" chỉ cho tổ hợp biến thể không tồn tại</td></tr>
             <tr><th scope="row">View all</th><td data-label="Not">See all, Show all, More</td><td data-label="Note">Link đầu section: "View all articles" (Spectrum: "View all" thay "See all")</td></tr>
-            <tr><th scope="row">Sale · Save $120.00</th><td data-label="Not">Discounted, Promo, Deal</td><td data-label="Note">Badge phần trăm và tiền giảm dùng dấu trừ − (U+2212): "−24%", không gõ dấu nối "-" (CTO 21/11 lượt 2)</td></tr>
+            <tr><th scope="row">Sale · Save $120.00</th><td data-label="Not">Discounted, Promo, Deal</td><td data-label="Note">Badge phần trăm và tiền giảm dùng dấu trừ − (U+2212): "−24%", không gõ dấu nối "-"</td></tr>
             <tr><th scope="row">Try again</th><td data-label="Not">Retry, Reload, Refresh</td><td data-label="Note">Nút duy nhất trong alert lỗi tải</td></tr>
             <tr><th scope="row">Clear all</th><td data-label="Not">Reset, Remove all filters</td><td data-label="Note">Bộ lọc collection, search</td></tr>
           </tbody>
@@ -2165,7 +2162,7 @@
       <p class="demo-note" style="margin-block: var(--space-sm) 0">Giả định xấu nhất: chuỗi dịch dài hơn tiếng Anh tới 50%; nhãn ngắn (nút, tab, badge) có thể dài gấp 3. Mỗi mockup mới thử nhãn × 3 ở 360 trước khi trình. Không ghép câu từ nhiều chuỗi ("You have" + số + "items"): dùng một chuỗi có biến (<code>{{ count }}</code>) và dạng số ít / số nhiều của locale.</p>
       <div class="dos">
         <div class="do"><b>Nên</b>Nhãn nút và link dạng nút sentence case, mở bằng động từ ("Add to cart", "Shop bestsellers"); link nói rõ đích ("Read the full guide", "See shipping dates"); <code>aria-label</code> chứa đúng chữ đang hiển thị; số và tiền theo định dạng của Shopify; dấu "…" (U+2026), dấu trừ "−" (U+2212), khoảng giá "$50–$200" (en dash).</div>
-        <div class="dont"><b>Không nên</b>"Read more", "Learn more", "Click here" đứng một mình (CTO 09/11); chữ HOA gõ tay; nhãn nút Title Case ("Add To Cart", "Try Again"), có mạo từ hay dấu câu; "Please", "Sorry", "Oops" thừa; từ kỹ thuật ("invalid", "error 422"); cắt "…" cho nút, tab, badge, giá.</div>
+        <div class="dont"><b>Không nên</b>"Read more", "Learn more", "Click here" đứng một mình; chữ HOA gõ tay; nhãn nút Title Case ("Add To Cart", "Try Again"), có mạo từ hay dấu câu; "Please", "Sorry", "Oops" thừa; từ kỹ thuật ("invalid", "error 422"); cắt "…" cho nút, tab, badge, giá.</div>
       </div>
     </section>
   </div>
