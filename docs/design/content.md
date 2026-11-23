@@ -38,7 +38,7 @@ Sentence case = chỉ viết hoa chữ đầu chuỗi và danh từ riêng. Titl
 - `aria-label` của nút chứa đúng chữ đang hiển thị (Polaris): nút hiện "Add to cart" thì tên truy cập là "Add to cart" hoặc "Add to cart: Iron Core Kettlebell".
 - Text link trong câu, link chính sách giữ chữ theo dữ liệu ("Shipping policy").
 - Chữ HOA do CSS tạo (`text-transform: uppercase`), không gõ tay chữ HOA trong locale: chữ nguồn luôn sentence case ("Get 15% off your first order" hiện HOA ở footer). Chỉ display, eyebrow, nhãn nhóm và tiêu đề popup marketing (`.dialog__title--caps`) viết HOA.
-- `aria-label`, `alt`, `title` của heading, dialog, tab, menu theo cùng quy tắc ("Your cart", "Close menu", "Main menu").
+- `aria-label`, `alt`, `title` của heading, dialog, tab, menu theo cùng quy tắc ("Close cart", "Close menu", "Main menu").
 - Không dấu chấm cuối ở nút, tab, badge, label, tiêu đề, tiêu đề toast. Câu lỗi, mô tả, gợi ý là câu đầy đủ, có dấu chấm.
 - Độ dài trên là cho bản tiếng Anh; bố cục phải chịu được bản dịch dài hơn (§7).
 
@@ -63,7 +63,7 @@ Sentence case = chỉ viết hoa chữ đầu chuỗi và danh từ riêng. Titl
 | Browse Categories · Choose Your Training Level | Browse categories · Choose your training level | Tiêu đề section |
 | What People Are Buying? · Training Tips & Inspiration | What people are buying? · Training tips & inspiration | Tiêu đề section |
 | You May Also Like · Pairs Well With · Customer Reviews | You may also like · Pairs well with · Customer reviews | Tiêu đề section PDP |
-| Your Cart · Order Summary · Your Bundle | Your cart · Order summary · Your bundle | Tiêu đề drawer, panel |
+| Your Cart · Order Summary · Your Bundle | Cart · Order summary · Your bundle | Tiêu đề drawer, panel (drawer mini cart rút còn "Cart", CTO 23/11) |
 | Choose A Color · Your Gear Shortlist | Choose a color · Your gear shortlist | Tiêu đề dialog |
 | Your Cart Is Empty · No Exact Match · No Articles Yet | Your cart is empty · No exact match · No articles yet | Empty state |
 | Page Not Found · Search Results · Opening Soon | Page not found · Search results · Opening soon | h1, eyebrow |
@@ -130,7 +130,7 @@ Khuôn: chuyện gì sai + cách sửa. Đặt lỗi ngay cạnh chỗ cần s�
 | Empty state | Tiêu đề sentence case nói rõ trạng thái + 1 câu gợi ý + nút primary sentence case | Your cart is empty · Shop bestsellers |
 | Label trường | Danh từ, sentence case, không dấu chấm; trường bắt buộc có `*`; không placeholder thay label | Email · Order number |
 | Tên truy cập nút icon | Nói rõ đối tượng, kèm số khi có | Cart, 2 items · Close menu · Remove Iron Core Kettlebell |
-| Dialog, drawer | Tiêu đề sentence case, nói đúng việc đang làm | Choose a color · Your cart · Country and language |
+| Dialog, drawer | Tiêu đề sentence case, nói đúng việc đang làm | Choose a color · Cart · Country and language |
 | Dialog marketing | Dưới 50 từ; tiêu đề gõ sentence case, HOA do CSS (bản sắc thương hiệu); nút từ chối là text link trung tính, không confirmshaming | Before you go · No thanks · Keep shopping |
 
 ## 6. Chuỗi cấm và ký tự
@@ -224,7 +224,7 @@ Chuỗi sentence case trong mockup và spec trang là ĐÚNG. Chuỗi Title Case
 | `products.card.sale_percent` | K | "-{{ percent }}%" (dấu nối) | "−{{ percent }}%" (U+2212) |
 | `cart.discount_value` | K | "-{{ amount }}" (dấu nối) | "−{{ amount }}" (U+2212) |
 
-- Heading, tiêu đề dialog, tab, menu không có khoá locale mà nằm ở `default_*` của schema block, preset trong `templates/*.json` hoặc dữ liệu store dev: cùng quy tắc. Chuỗi mockup cần khớp: "Browse categories", "Choose your training level", "What people are buying?", "Training tips & inspiration", "Pick your kit, save as you go", "See real equipment in action, before you buy", "You may also like", "You may also need", "Pairs well with", "Customer reviews", "More training tips", "Popular products", "Get 15% off your first order", "Take 15% off your first order", "Before you go", "Your cart is saved", "You're on the list", "You're already subscribed", "Your cart" (tiêu đề cart drawer), "Choose a color"; cam kết "1 year warranty", "Fast shipping", "Premium quality", "90 day money back".
+- Heading, tiêu đề dialog, tab, menu không có khoá locale mà nằm ở `default_*` của schema block, preset trong `templates/*.json` hoặc dữ liệu store dev: cùng quy tắc. Chuỗi mockup cần khớp: "Browse categories", "Choose your training level", "What people are buying?", "Training tips & inspiration", "Pick your kit, save as you go", "See real equipment in action, before you buy", "You may also like", "You may also need", "Pairs well with", "Customer reviews", "More training tips", "Popular products", "Get 15% off your first order", "Take 15% off your first order", "Before you go", "Your cart is saved", "You're on the list", "You're already subscribed", "Cart" (tiêu đề cart drawer), "Choose a color"; cam kết "1 year warranty", "Fast shipping", "Premium quality", "90 day money back".
 - Menu của store dev (Navigation): "Our story", "Contact us" (DevOps đổi tên mục menu và tiêu đề trang nếu muốn khớp mockup); mục trỏ tới collection giữ tên collection.
 - Đã sentence case từ trước, không đổi: "Add a comment", "Country and language", "Popular searches", "Shop by category", "Popular collections", "Trending now", "Recent searches", "Pickup availability", tab "Country/region".
 - Chuỗi mặc định trong settings của block (`default_*` trong schema) theo cùng quy tắc.
