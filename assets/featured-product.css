@@ -7,6 +7,18 @@ featured-product {
   display: block;
 }
 
+/* ADR 0010: picker giữ chỗ (CLS 0), hiện khi featured-product defined, trước module picker */
+@media (scripting: enabled) {
+  featured-product product-variant-picker:not(:defined) {
+    display: grid;
+    visibility: hidden;
+  }
+
+  featured-product:defined product-variant-picker:not(:defined) {
+    visibility: visible;
+  }
+}
+
 .featured-product {
   padding-block: var(--space-7);
 }
