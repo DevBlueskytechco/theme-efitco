@@ -1,3 +1,6 @@
+> CẬP NHẬT 21/11/2026 (CTO, ES1-T567) — TÀI LIỆU LỊCH SỬ (bản rà 11/11).
+> Nguồn chuẩn thiết kế hiện nay là mockup HTML `drafts/designer/**` cùng `drafts/designer/_kit/kit.css`. Chỗ bên dưới nhắc file thiết kế cũ hoặc mã node là ghi chép lúc rà, không còn là căn cứ; kết luận tuân thủ Shopify giữ nguyên.
+
 # Audit B — Theme Store: mục 5, 7 (Collection, List collections, Page/contact, Blog, Article, Search, 404), 10, 11, 13, 17, 22
 
 Repo: `/Users/taocom/Documents/CLAUDE/Shopify_Canvas/theme-efitco`. Đọc thư mục làm việc ngày 11/11/2026, không chạy git nên chưa xác nhận đây đúng là develop mới nhất. Chỉ đọc, không sửa file.

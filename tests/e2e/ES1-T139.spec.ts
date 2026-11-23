@@ -106,11 +106,14 @@ test.describe('ES1-T139 TE-11 quiz-finder', () => {
   test('AC2 trang kết quả riêng không nạp module, không có hook lazy', async ({ page }) => {
     const loaded: string[] = [];
     page.on('request', (request) => {
-      if (/\/(quiz-finder|lazy-module)\.js/.test(request.url())) loaded.push(request.url());
+      if (MODULE.test(request.url())) loaded.push(request.url());
     });
     await page.goto(`${QUIZ_PATH ?? '/collections/all'}?view=quiz`); // ES1-T417
     await page.waitForLoadState('load');
     await expect(tid(page, 'quiz')).not.toHaveAttribute('data-lazy-module', /./);
+    // ES1-T324 (ADR 0010 "lười theo tương tác, mọi trang": localization-picker): footer nạp lazy-module.js ở mọi trang có
+    // localization, nên không cấm lazy-module.js toàn trang nữa; quiz kết quả vẫn không mang hook, không thẻ lazy-module, không quiz-finder.js.
+    await expect(tid(page, 'quiz').locator('script[src*="lazy-module"]')).toHaveCount(0);
     expect(loaded).toEqual([]);
   });
 
