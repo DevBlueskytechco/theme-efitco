@@ -63,12 +63,14 @@ const report = (form) => {
   return true;
 };
 
-// Sending: spinner on the button (.button[aria-busy='true'] keeps its width), fields readonly
-// (still posted, unlike disabled), hidden status line
+// Sending: button aria-disabled at once (label, width kept), spinner (.button[aria-busy='true'])
+// only after the loading delay (ES1-T555); fields readonly (still posted, unlike disabled), hidden status line
+const idle = new WeakMap();
 const busy = (form, on) => {
   const button = form.querySelector('[type="submit"]');
-  if (on) button?.setAttribute("aria-busy", "true");
-  else button?.removeAttribute("aria-busy");
+  if (button) button.ariaDisabled = on || null;
+  idle.get(form)?.();
+  idle.set(form, on ? window.busyLater?.(button) : null);
   for (const el of form.querySelectorAll('input:not([type="hidden"]), textarea')) el.readOnly = on;
   const live = form.querySelector("[data-contact-live]");
   if (live) live.textContent = on ? form.dataset.labelSending || "" : "";
@@ -89,7 +91,7 @@ addEventListener(
 addEventListener("submit", (e) => {
   const form = e.target;
   if (!form.matches?.(FORM)) return;
-  if (form.querySelector('[type="submit"][aria-busy="true"]')) {
+  if (form.querySelector('[type="submit"][aria-disabled="true"]')) {
     // Second click or Enter while sending: one message; requestSubmit() without submitter goes on
     if (e.submitter) e.preventDefault();
     return;

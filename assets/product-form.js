@@ -45,14 +45,12 @@ class ProductForm extends HTMLElement {
     if (this.fields) this.fields.disabled = !this.gift.checked;
   }
 
+  // ES1-T555 lock now, aria-busy after delay.
   lock(on) {
-    this.busy = on;
-    if (on) this.locked = [...document.querySelectorAll(ADD)].filter((b) => b.form === this.form).map((b) => [b, b.disabled]);
-    for (const [b, was] of this.locked || []) {
-      b.disabled = on || was;
-      if (on) b.setAttribute("aria-busy", "true");
-      else b.removeAttribute("aria-busy");
-    }
+    const all = [...document.querySelectorAll(ADD)].filter((b) => b.form === this.form);
+    if ((this.busy = on)) this.locked = all.map((b) => [b, b.ariaDisabled]);
+    for (const [b, was] of this.locked) b.ariaDisabled = on ? "true" : was;
+    this.idle = on ? window.busyLater?.(...all) : this.idle?.();
   }
 
   say(el, text = "") {

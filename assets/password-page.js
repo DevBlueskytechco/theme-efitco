@@ -1,7 +1,8 @@
-// ES1-T443 (TE-21 AC11): eye toggle, busy submit, no resend.
+// ES1-T443 eye toggle, no resend; ES1-T555 aria-busy after delay.
 const sel = "[data-password-toggle]";
 const $$ = (s) => document.querySelectorAll(s);
 const reveal = () => $$(sel).forEach((b) => (b.hidden = false));
+let idle;
 reveal();
 addEventListener("shopify:section:load", reveal);
 addEventListener("click", ({ target }) => {
@@ -17,7 +18,10 @@ addEventListener("click", ({ target }) => {
 addEventListener("submit", (e) => {
   const b = e.submitter;
   if (!b || e.defaultPrevented) return;
-  if (b.hasAttribute("aria-busy")) return e.preventDefault();
-  b.setAttribute("aria-busy", "true");
+  if (b.ariaDisabled) return e.preventDefault();
+  b.ariaDisabled = "true";
+  idle = window.busyLater?.(b);
 });
-addEventListener("pageshow", (e) => e.persisted && $$("[aria-busy]").forEach((b) => b.removeAttribute("aria-busy")));
+addEventListener("pageshow", (e) => {
+  if (e.persisted) idle = idle?.(), $$("[aria-busy],[aria-disabled]").forEach((b) => (b.ariaBusy = b.ariaDisabled = null));
+});

@@ -72,8 +72,11 @@ class ProductVariantPicker extends HTMLElement {
 		return [...this.form.elements].filter((el) => el.name == "add");
 	}
 
+	// ES1-T555: buy aria-disabled now; skeleton, stock spinner after delay.
 	pending(on) {
-		for (const el of [this.root, ...this.scope.querySelectorAll("[data-variant-busy]"), ...this.adds()]) el[el.name == "add" ? "ariaDisabled" : "ariaBusy"] = on ? "true" : null;
+		for (const el of [this.root, ...this.adds()]) el[el.name == "add" ? "ariaDisabled" : "ariaBusy"] = on ? "true" : null;
+		if (on) this.idle ||= window.busyLater?.(...this.scope.querySelectorAll("[data-variant-busy]"));
+		else this.idle = this.idle?.();
 	}
 
 	fail(f, text = "") {
