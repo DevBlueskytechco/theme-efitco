@@ -22,7 +22,7 @@ blocks/header.liquid
 
 assets/base.css
 - Thay toàn bộ CSS localization cũ: panel tối viền xám, `.site-footer__panel-heading/options/option`, `.site-header__drawer-option/currency`, focus `.site-header__drawer-option`.
-- Popover (không JS, ≥ 48rem: `details[open] .site-footer__panel:not(:modal)`): nền trắng, viền border, bo card, bóng raised, padding 24, 320 một danh sách / 600 hai cột 1.4fr · 1fr (gap 24); < 80rem căn giữa nhóm, ≥ 80rem căn mép inline-end của nút; danh sách cuộn riêng 320 (14rem dưới 48rem), `overscroll-behavior: contain`; vào bằng `motion-fade` (opacity + translate 8).
+- Popover (không JS, ≥ 48rem: `details[open] .site-footer__panel:not(:modal)`): nền trắng, viền border, bo card, bóng raised, padding 24, dưới 48rem rộng hết nhóm commerce (100vw − 40, §4.3 không JS; ES1-T45 R-05 bám inline-start), từ 48rem 320 một danh sách / 600 hai cột 1.4fr · 1fr (gap 24); 48–80rem căn giữa nhóm, ≥ 80rem căn mép inline-end của nút; danh sách cuộn riêng 320 (14rem dưới 48rem), `overscroll-behavior: contain`; vào bằng `motion-fade` (opacity + translate 8).
 - Sheet (`:modal`, BE mở dưới 48rem): khung `.dialog` sẵn có (thanh kéo, bo trên, 88dvh tối đa, trượt từ đáy); > 10 nước cao cố định 88dvh; hàng 48, ô tìm 48.
 - Hàng 44 (48 ở sheet, drawer), tên dài xuống dòng, tiền tệ căn trên; hover nền alt (`hover: hover`); focus trong panel outline accent 2px inset (không dùng outline trắng của footer); đang đổi `aria-busy` spinner 16 thay tiền tệ, hàng khác `aria-disabled` muted-light.
 - Tab 44 chia đôi, đang chọn nền foreground chữ background; ô tìm viền muted-light, kính lúp 20, × 44.

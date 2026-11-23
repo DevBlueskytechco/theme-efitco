@@ -2286,7 +2286,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 }
 
 /* Panel localization footer là <dialog class="dialog">. Không :modal (không JS, ≥ 48rem): popover trắng neo trên nút,
-   1 danh sách 320, 2 danh sách 600 (localization.md §4.2). :modal (BE showModal < 48rem): bottom sheet của .dialog (§4.3). */
+   < 48rem rộng hết nhóm (100vw − 40, §4.3; ES1-T45 R-05), ≥ 48rem 1 danh sách 320, 2 danh sách 600 (§4.2). :modal (BE showModal < 48rem): bottom sheet của .dialog (§4.3). */
 .site-footer__disclosure[open] .site-footer__panel:not(:modal) {
   position: absolute;
   inset-block: auto 100%;
@@ -2294,7 +2294,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   z-index: var(--layer-content);
   display: flex;
   flex-direction: column;
-  inline-size: min(calc(var(--space-1) * 80), 100%);
+  inline-size: 100%;
   max-block-size: none;
   margin: 0 auto var(--space-2);
   overflow: visible;
@@ -2439,6 +2439,10 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 
   .site-footer__link {
     min-height: calc(var(--space-1) * 8);
+  }
+
+  .site-footer__disclosure[open] .site-footer__panel:not(:modal) {
+    inline-size: min(calc(var(--space-1) * 80), 100%);
   }
 
   .site-footer__disclosure[open] .site-footer__panel--both:not(:modal) {
