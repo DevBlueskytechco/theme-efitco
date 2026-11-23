@@ -195,7 +195,7 @@ Thêm: `placeholder` "Search benches, kettlebells, mats…" (04 §3.7, 11 §1: p
 
 | Thành phần | Vào | Ra | Thuộc tính | Nguồn |
 | --- | --- | --- | --- | --- |
-| Popup | 300ms `--ease-out`, trượt 24px từ trên + opacity | 200ms | translate, opacity | foundation §19 (dialog 300/200), 15 §3.7 |
+| Popup | 250ms (`--motion-base`) `--ease-out`, trượt 24px từ trên + opacity | 150ms (`--motion-fast`) | translate, opacity | foundation §19 (base 250 / fast 150: `--motion-base` / `--motion-fast`), 15 §3.7 |
 | Drawer | 250ms trượt từ inline-end | 200ms | translate | foundation §15, 15 §4 |
 | Scrim | 250ms | 200ms | opacity | |
 | Kết quả mới | 150ms fade | — | opacity | 11 §3 (không giật) |

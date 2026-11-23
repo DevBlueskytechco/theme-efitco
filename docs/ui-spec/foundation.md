@@ -182,7 +182,7 @@ Mobile-first. Mốc 360 / 768 / 1280 / 1920 ứng với code `< 48rem`, `48rem`,
 | Control (nút, input) / compact | 48 / 44 | 48 / 44 | 48 / 44 | 48 / 44 | `--control-height`, `--control-height-compact` | Chuẩn: Carbon button 48; Polaris touch target 44 (sàn). 48 mọi mốc (CTO 21/11 lượt 2: bỏ mức 52 từ 80rem) |
 | Tab, chip | 44 | 44 | 40 | 40 | `--control-height-compact`; `--tab-height-desktop` từ 80rem | Chuẩn: Carbon button 40 |
 | Hàng danh sách · nút tròn | 52 · 52 | 52 · 52 | 52 · 52 | 52 · 52 | `--row-height` · `--round-button-size` | Thiết kế: 44 + đệm 4 trên dưới · CTO 09/11 |
-| Vùng chạm, sàn mọi control | 44 | 44 | ≥ 24 | ≥ 24 | dưới 80rem `--touch-target` 44 (màn chạm); từ 80rem `--touch-target-min` 24. Sổ 09/11: ≥ 24, mobile ≥ 44 | AGENTS, 14 §2 |
+| Vùng chạm, sàn mọi control | 44 | ≥ 24 | ≥ 24 | ≥ 24 | dưới 48rem `--touch-target` 44; từ 48rem `--touch-target-min` 24 (riêng `.form-message__list a`: 44 dưới 80rem). Sổ 09/11: ≥ 24, mobile ≥ 44 | AGENTS, 14 §2 |
 | Vùng chạm, 6 nhóm chính (§1.3) | 44 | 44 | 44 | 44 | `--touch-target` 44 | Chuẩn: Polaris touch target 44 × 44; sổ 21/11 (foundations-13) |
 | display | 52/60 | 73 | 100/100 | 100/100 | `--font-size-display`, `--line-height-display` 1.1538 → 1 từ 48rem | Thiết kế: kiểu chữ thương hiệu |
 | h1 | 40/48 | 44 | 48/56 | 48/56 | `--font-size-h1`, `--line-height-h1` | 40/48 Chuẩn: Polaris React font 40, line height 48 · 48/56 Thiết kế (Polaris không nêu dòng 56); cỡ 48 có ở Carbon |

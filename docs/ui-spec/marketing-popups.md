@@ -301,8 +301,8 @@ Thứ tự focus khi popup tự mở: focus vào tiêu đề h2 (`tabindex="-1"`
 
 | Thành phần | Vào | Ra | Thuộc tính | Nguồn |
 | --- | --- | --- | --- | --- |
-| Dialog newsletter, before you leave | 300 ms `--ease-expo`: fade + nhấc 24 + scale 0.97 | 200 ms | opacity, transform | foundation §16, §19; 15 §3 #7 |
-| Bottom sheet | 300 ms trượt từ đáy | 200 ms | transform | 15 §2 |
+| Dialog newsletter, before you leave | 250 ms (`--motion-base`) `--ease-expo`: fade + nhấc 24 + scale 0.97 | 150 ms (`--motion-fast`) | opacity, transform | foundation §16, §19; 15 §3 #7 |
+| Bottom sheet | 250 ms (`--motion-base`) trượt từ đáy | 150 ms (`--motion-fast`) | transform | 15 §2 |
 | Scrim | 250 ms | 200 ms | opacity | |
 | Teaser xuất hiện | 250 ms fade + 8px | 150 ms | opacity, transform | |
 | Thẻ big offer (popover) | 250 ms fade + 8px lên | 150 ms | opacity, transform | foundation §19 dropdown |

@@ -6,7 +6,8 @@ structure; this file covers visual decisions. When they disagree, `AGENTS.md`
 wins.
 
 Source of truth (CTO 21/11, ES1-T567): the HTML mockups in
-`drafts/designer/**` and the kit `drafts/designer/_kit/kit.css` (tokens in
+`drafts/designer/**` (except `drafts/designer/ES1-T252` and `ES1-T174`: old
+comparison copies, not a source of truth) and the kit `drafts/designer/_kit/kit.css` (tokens in
 `:root`, shared components). `docs/tokens.json`, this file and
 `docs/ui-spec/*.md` follow the kit; theme code (`config/settings_schema.json`,
 `snippets/css-variables.liquid`) mirrors the kit `:root`. The human designer
@@ -265,7 +266,7 @@ brand asset.
 - Headings h1–h4, section titles, dialog and drawer titles, empty states,
   tabs, menu links (header, mega menu, drawer, footer) and filter chip labels
   that are interface text use sentence case: capitalise only the first word
-  and proper nouns ("Browse categories", "Your cart", "Our story"; CTO 21/11
+  and proper nouns ("Browse categories", "Order summary", "Our story"; CTO 21/11
   round 2). Keep as written: the brand name, product, collection and article
   titles (merchant data such as "Free Weights"), proper names (Shop Pay,
   Apple Pay) and abbreviations (FAQ, USD).

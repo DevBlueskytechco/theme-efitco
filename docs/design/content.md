@@ -27,7 +27,7 @@ Sentence case = chỉ viết hoa chữ đầu chuỗi và danh từ riêng. Titl
 | Label trường | Sentence case, không dấu chấm cuối | Ant (bỏ dấu chấm ở Label, Title) | 1–3 từ, danh từ | Email address · Order number |
 | Thân bài, mô tả, gợi ý, câu lỗi | Sentence case, câu đầy đủ có dấu chấm | Polaris | Câu lỗi ≤ 2 câu | Enter an email like name@example.com. |
 | Tiêu đề trang, section (h1–h4), dialog, drawer, popup, empty state | Sentence case | CTO 21/11 lượt 2 (thay Title Case của patterns-08, V71 / V75). Chuẩn: M3, Ant, Fluent 2, Spectrum (Polaris không nêu) | Tối đa 2 dòng ở 360; không dấu chấm cuối | Browse categories · What people are buying? · Your cart is empty · Choose a color |
-| Tab, link menu (header, mega, drawer, footer), nhãn chip lọc là chữ giao diện | Sentence case. Mục là tên collection / sản phẩm / bài viết: theo dữ liệu (§2.2) | CTO 21/11 lượt 2; độ dài theo Ant (Tabs, Top Navigation dưới 15 ký tự) | 1–2 từ, dưới 15 ký tự cho nhãn tab và mục menu cấp 1 | Weight · Our story · Contact us · In stock |
+| Tab, link menu (header, mega, drawer, footer), nhãn chip lọc là chữ giao diện | Sentence case. Mục là tên collection / sản phẩm / bài viết: theo dữ liệu (§2.2) | CTO 21/11 lượt 2; độ dài theo Ant (Tabs, Top Navigation dưới 15 ký tự) | 1–2 từ, dưới 15 ký tự cho nhãn tab và mục menu cấp 1 | Weight · Our story · Contact (header, drawer: tiết kiệm bề rộng) · Contact us (footer) · In stock |
 | Breadcrumb | Theo tên trang: tên collection / sản phẩm / bài viết theo dữ liệu; trang do theme đặt tên thì sentence case | Ant (tốt nhất dưới 3, không quá 5 cấp) | Không quá 5 cấp | Home › Free Weights › Iron Core Kettlebell · Home › Your gear shortlist |
 | Display, eyebrow, nhãn nhóm, tiêu đề popup marketing | Gõ sentence case, CSS đổi sang HOA | Bản sắc thương hiệu (CTO 21/11 lượt 2 giữ). Spectrum, Fluent 2 không khuyến nghị all-caps trong component nên không mở rộng ra chỗ khác | 1–3 từ (display, tiêu đề popup: tối đa 2 dòng) | Bestsellers → BESTSELLERS · Train hard → TRAIN HARD |
 | Tên riêng, viết tắt, nút có thương hiệu | Giữ nguyên cách viết gốc | CTO 11/11 (nút do Shopify / Apple render) | — | View FlexFold Adjustable Bench · United States USD $ · Shop Pay · Follow on Shop · Add to Apple Wallet |
@@ -67,7 +67,7 @@ Sentence case = chỉ viết hoa chữ đầu chuỗi và danh từ riêng. Titl
 | Choose A Color · Your Gear Shortlist | Choose a color · Your gear shortlist | Tiêu đề dialog |
 | Your Cart Is Empty · No Exact Match · No Articles Yet | Your cart is empty · No exact match · No articles yet | Empty state |
 | Page Not Found · Search Results · Opening Soon | Page not found · Search results · Opening soon | h1, eyebrow |
-| Our Story · Contact Us | Our story · Contact us | Link menu (header, drawer, footer) |
+| Our Story · Contact Us | Our story · Contact (header, drawer) · Contact us (footer) | Link menu (header, drawer, footer) |
 | 1 Year Warranty · Fast Shipping · 90 Day Money Back | 1 year warranty · Fast shipping · 90 day money back | Cam kết (footer, PDP) |
 | 24 Products · 5 Items · 2 Comments | 24 products · 5 items · 2 comments | Số đếm trên card, badge, heading |
 | Get 15% Off Your First Order | Get 15% off your first order | Heading newsletter (hiện HOA do CSS) |
@@ -122,7 +122,7 @@ Khuôn: chuyện gì sai + cách sửa. Đặt lỗi ngay cạnh chỗ cần s�
 | Link CTA, link đầu section | Sentence case, 2–5 từ, nói rõ đích | Read the full guide · See shipping dates · Browse all setups |
 | Ô ảnh trong mega menu (`.collection-card--menu`) | Tiêu đề mở bằng động từ là lời kêu gọi (link dạng nút): sentence case. Chỉ là tên collection (không động từ) thì theo dữ liệu, giữ cách merchant viết (CTO 21/11 lượt 2: "Shop free weights" giữ là link dạng nút) | Shop free weights · Free Weights |
 | Tab | 1–2 từ, danh từ, dưới 15 ký tự; sentence case; tab là tên collection / tag blog theo dữ liệu | All · Weight · Recovery · Country/region |
-| Link menu (header, mega, drawer, footer) | Sentence case; mục trỏ tới collection lấy tên collection | Our story · Contact us · Free Weights |
+| Link menu (header, mega, drawer, footer) | Sentence case; mục trỏ tới collection lấy tên collection | Our story · Contact (header, drawer: tiết kiệm bề rộng) · Contact us (footer) · Free Weights |
 | Chip | Giá trị lọc hoặc cụm tìm, theo dữ liệu; chip gỡ có tên ẩn chứa nguyên chữ đang hiện, khuôn locale `remove_filter`: "Remove filter Color: Black" | Kettlebell · Color: Black |
 | Badge | 1–2 từ sentence case; giảm giá "−N%" với dấu trừ U+2212; màu chỉ trạng thái, tag danh mục trung tính | New · Sold out · −24% |
 | Toast | Sentence case; tiêu đề success ≤ 3 từ và ≤ 24 ký tự; chi tiết (tên sản phẩm, giá) ở dòng mô tả ≤ 60 ký tự | Added to cart · Link copied · Discount applied |

@@ -35,7 +35,7 @@ CTO 21/11: mockup là nguồn chuẩn, thiết kế theo chuẩn Design System �
 - Tag bài viết `.badge--tag`: nền accent → trung tính.
 - Tỉ lệ ảnh về bộ có tên: hero từ 80rem 1798/827 → 2/1, collection card 336/220 → 3/2, các khung trang chủ → 1/1, 4/3, 16/9, 9/16.
 
-Thêm token (17): `--space-050` 2, `--space-150` 6; `--letter-spacing-label`; `--line-height-h1`, `-h2`, `-h3`, `-h4`, `-eyebrow`, `-title`, `-reading`, `-price-lg`; `--tab-height-desktop` 40, `--row-height` 52, `--round-button-size` 52, `--count-badge-size` 20, `--progress-height` 4, `--meter-height` 8. `:root` của kit: 134 → 151 biến.
+Thêm token (17): `--space-050` 2, `--space-150` 6; `--letter-spacing-label`; `--line-height-h1`, `-h2`, `-h3`, `-h4`, `-eyebrow`, `-title`, `-reading`, `-price-lg`; `--tab-height-desktop` 40, `--row-height` 52, `--round-button-size` 52, `--count-badge-size` 20, `--progress-height` 4, `--meter-height` 8. `:root` của kit: 134 → 150 biến (thêm 17, bỏ `--line-height-heading`).
 
 Sửa giá trị: `--tab-padding-inline` 28 → 24; `--band-inset` 60 → 64 (dải rộng 1798 → 1792 ở 1920); đệm toast 10 → 12; footer 15 → 16, 45 / 46 → 48, 14 → 16, ảnh chồng 98 × 123 → 96 × 120, logo 86 × 26 → 80 × 24, cờ 26 → 24; số đếm giỏ 18 → 20; check option card 22 → 24; link menu header letter-spacing −0.04em → −0.01em; `--control-height` khai báo 48 trực tiếp; `tabular-nums` cho giá, dòng tổng, stepper, số trang; `.price--lg` 20/28, `.price--xl` 28/36.
 

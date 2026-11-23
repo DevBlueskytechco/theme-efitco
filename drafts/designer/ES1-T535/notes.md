@@ -1,3 +1,5 @@
+> Tài liệu lịch sử (ES1-T535, trước ES1-T567). Mã node và nhắc bản vẽ cũ giữ để truy vết; nguồn chuẩn hiện là mockup + kit.
+
 # ES1-T535 — Sửa Thiết kế theo rà soát chuẩn Polaris-first (CTO chốt 21/11)
 
 Báo cáo: `ai-team/data/design-audit/efitco-ds-polaris-2026-11-21.md` mục "CTO chốt 21/11" (10 phát hiện, làm đúng như đề xuất). Quyết định từng mục: `docs/design/decisions.md` mục "CTO 21/11 — ES1-T535 (rà soát chuẩn Polaris-first)". Nhánh `feature/ai-ES1-T535`, chồng lên `feature/ai-ES1-T527`.
