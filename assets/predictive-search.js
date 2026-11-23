@@ -1,12 +1,9 @@
 /**
- * <predictive-search> (ES1-T130, TE-8 AC1, NFR-4). Imported by search-loader.js after
- * the dialog opens, so it reads the value already typed on connect.
- * API (ES1-T124 #1): GET {data-url}.json, resources.results.{products, collections,
- * pages, articles}; price is a decimal string in the shop currency.
+ * <predictive-search> (ES1-T130, TE-8 AC1, NFR-4), imported by search-loader.js after
+ * the dialog opens: reads the value already typed on connect.
+ * API (ES1-T124 #1): GET {data-url}.json, resources.results; price is a decimal string.
  * https://shopify.dev/docs/api/ajax/reference/predictive-search
- * No event: shopify:search:update is for submit, filter, sort only (ES1-T124 #3).
- * https://shopify.dev/docs/api/storefront-events-and-actions/events/search-update
- * No partial: predictive_search needs Section Rendering (ES1-T124 #2).
+ * No shopify:search:update event (submit, filter, sort only, #3); no partial (#2).
  */
 
 const PARAMS = {
@@ -43,6 +40,17 @@ class PredictiveSearch extends HTMLElement {
     on(form, 'reset', () => (this.hide(), this.input.focus()));
     on(dialog, 'close', () => this.hide());
     on(this.closest('modal-dialog'), 'modal:open', () => this.update());
+    // ADR 0014 §8: CSS on first open, skeleton until load/error
+    const href = this.dataset.stylesheet,
+      sk = $('[data-predictive-skeleton]');
+    const l =
+      href &&
+      (document.querySelector(`link[href="${href}"]`) ||
+        document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href })));
+    if (l && !l.sheet) {
+      if (sk) sk.hidden = false;
+      this.css = new Promise((r) => (l.onload = l.onerror = r)).then(() => sk && (sk.hidden = true));
+    }
     if (dialog?.open) this.update();
   }
 
@@ -77,6 +85,7 @@ class PredictiveSearch extends HTMLElement {
       // 429 and other errors: no retry, the form still submits
       if (!res.ok) throw res;
       const { results } = (await res.json()).resources;
+      await this.css;
       if (ac == this.ac) this.render(q, results);
     } catch {
       // AbortError: whoever aborted owns the state

@@ -168,6 +168,19 @@ async function openOverlay(page: Page, path = '/') {
   await tid(page, P.link).click();
   await expect(tid(page, P.dialog)).toBeVisible();
   await page.waitForFunction(() => !!customElements.get('predictive-search'));
+  if (HAS.css) await searchCss(page);
+}
+
+// ADR 0014 mục 8 (CTO 23/11): CSS nội dung lớp search (khám phá, tab, listbox…) ở assets/predictive-search.css.
+// Chờ đúng hợp đồng BE (ES1-T377 #303): predictive-search.js đã chèn <link> từ data-stylesheet và file đã load.
+// Không tự chèn: JS không nạp thì test fail ở đây, không qua vì khối còn [hidden]. Snippet chưa có data-stylesheet thì bỏ qua.
+async function searchCss(page: Page) {
+  await page.waitForFunction(() => {
+    const href = document.querySelector<HTMLElement>('[data-testid="predictive-search"]')?.dataset.stylesheet;
+    if (!href) return true;
+    const url = new URL(href, location.href).href;
+    return [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].some((l) => l.href === url && !!l.sheet);
+  });
 }
 
 async function typeAndWait(page: Page, text: string) {
@@ -447,12 +460,14 @@ test.describe('ES1-T131 predictive (có JS)', () => {
   });
 
   test.describe('AC4 popular searches (store dev đã cấu hình)', () => {
+    // need('css') chỉ ở TC-13, TC-14 (chip trong lớp, CSS tầng 5); TC-15 là trang /search, chip ở base.css
     test.beforeEach(() => {
-      need('popularSetting', 'discover', 'css');
+      need('popularSetting', 'discover');
       test.skip(!POPULAR.length, NO_POPULAR);
     });
 
     test('TC-13 TC-16 AC4 overlay ô trống: chip đúng thứ tự, tối đa 5, link /search?q=, cao 44 (40 từ 80rem)', async ({ page }) => {
+      need('css');
       await openOverlay(page);
       const chips = tid(page, P.popular).getByRole('link');
       const expected = POPULAR.slice(0, 5);
@@ -468,6 +483,7 @@ test.describe('ES1-T131 predictive (có JS)', () => {
     });
 
     test('TC-14 AC4 bấm chip trong overlay: chữ vào ô, gợi ý chạy tại chỗ', async ({ page }) => {
+      need('css');
       const requests = await mockSuggest(page);
       await openOverlay(page);
       const before = page.url();
@@ -488,7 +504,8 @@ test.describe('ES1-T131 predictive (có JS)', () => {
 
   test.describe('AC11 khám phá', () => {
     test('TC-17 AC11 ô trống: khối khám phá, không tab, không nút chân, không khối rỗng', async ({ page }) => {
-      need('discover');
+      // CSS hiện khối khám phá khi ô trống ở file tầng 5 (ADR 0014 mục 8): cần BE nạp file, openOverlay chờ file load
+      need('discover', 'css');
       const watch = watchStore(page);
       await openOverlay(page);
       const discover = tid(page, P.discover);
@@ -501,7 +518,11 @@ test.describe('ES1-T131 predictive (có JS)', () => {
             .map((el) => el.outerHTML.slice(0, 120)),
         );
         expect(empty, 'khối con hiện mà không có link').toEqual([]);
-      } else note('AC11', 'khối khám phá không hiện: 3 nguồn rỗng, chưa có recent');
+      } else {
+        // CSS đã load: khối ẩn chỉ đúng khi không nguồn nào có link (khối có link mà ẩn = CSS tầng 5 chưa áp, fail)
+        await expect(discover.locator('a[href]'), 'khối khám phá có link mà không hiện').toHaveCount(0);
+        note('AC11', 'khối khám phá không hiện: 3 nguồn rỗng, chưa có recent');
+      }
       await expect(tid(page, P.tabs)).toBeHidden();
       await expect(tid(page, P.all)).toBeHidden();
       await watch.finish();

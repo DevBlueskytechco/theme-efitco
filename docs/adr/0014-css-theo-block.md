@@ -43,7 +43,7 @@ A.
    | 2 | `base.css` | `<head>`, mọi trang | token, reset, keyframe `motion-*`, token `--icon-*`. Khung: header, announcement, menu drawer, mega, localization, footer. Lớp: dialog, sheet, drawer, toast, thanh đáy. Component dùng chung: button, round/close button, form, form-status, alert, empty-state, skeleton, spinner, rte, image, container background, product-card, price, rating-stars, product-media, variant picker, product-form, countdown, vỏ + skeleton của overlay tầng 5 (quick view, predictive search, mini cart…), cart drawer + cart-lines + cart-summary, breadcrumb, page-title, page-banner, pagination, carousel-nav, carousel-progress, "Hàng ngang" chung, article-card. Block màn đầu template mặc định: slideshow, collection-list + collection-card, rich-text. Block có class dùng ở block khác: featured-collection (collection-products, cart-page, 404), blog-posts (article-card + Hàng ngang). |
    | 3 | `product.css`, `collection.css`, `cart.css`, `aux.css` | `<head>`, `case template.name` (ADR 0013, không đổi) | block chỉ có ở 1 nhóm template |
    | 4 | `assets/<block>.css` | trong block, `stylesheet_tag` | block cấp section đặt được ở template bất kỳ, không ở màn đầu template mặc định |
-| 5 | `assets/<overlay>.css` | nạp lười bằng JS khi người dùng mở lớp (mục 8, CTO 23/11) | nội dung overlay chỉ cần khi mở: quick view, predictive search, mini cart… |
+   | 5 | `assets/<overlay>.css` | nạp lười bằng JS khi người dùng mở lớp (mục 8, CTO 23/11) | nội dung overlay chỉ cần khi mở: quick view, predictive search, mini cart… |
 
 2. File tầng 4 đợt này (11 file; selector → file ở `drafts/techlead/ES1-T564/selector-map.md`):
 
@@ -94,6 +94,7 @@ A.
 8. Overlay nạp lười, tầng 5 (CTO 23/11, PR #301 ES1-T373, PR #303 ES1-T377):
    - Vì sao: CSS nội dung overlay (chỉ cần khi người dùng mở) nằm ở `base.css` thì mọi trang tải mà phần lớn lượt xem không mở. Trang chủ vượt 57 344 (PR #303: 57 553).
    - Gồm: lớp mở theo thao tác của người dùng, không ở màn đầu: quick view (`quick-view.css`), predictive search (`predictive-search.css`), mini cart, popup sau này. Tên file theo custom element.
+   - Tham chiếu: quick view (PR #301 ES1-T373) cũng thuộc tầng 5 này. Chỗ #301 ghi "mục 5" là tầng 5 ở bảng mục 1; hợp đồng nạp, trần, spec đều theo mục 8 này (mục 5 là trần `base.css` / tầng 4).
    - Giữ ở `base.css` (phần cho lần vẽ đầu khi mở): nút / ô mở lớp trên header hoặc card, vỏ dialog / drawer / sheet, thanh tiêu đề + nút đóng, form ô tìm, guard `[hidden]`, skeleton, dòng `role="status"` ẩn. Lớp mở ra phải dùng được (đóng, gõ, submit GET) khi file tầng 5 chưa tải.
    - Chuyển sang `assets/<overlay>.css`: phần nội dung (kết quả, tab, lưới sản phẩm, thông báo, chân lớp, partial nạp về). Rule nào hiện một khối nội dung đang `[hidden]` (vd khám phá khi ô trống) cũng ở file tầng 5, để chưa tải thì khối đó còn ẩn.
    - Hợp đồng nạp (FE in markup, BE viết JS):

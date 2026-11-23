@@ -1,5 +1,5 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không có trình duyệt, preview, node). Kết quả thật lấy từ CI.
-// Ticket ES1-T130 TE-8-BE1: assets/search-loader.js (≤ 256 B) + assets/predictive-search.js (≤ 6 656 B), docs/srs.md TE-8 AC1, NFR-4.
+// Ticket ES1-T130 TE-8-BE1: assets/search-loader.js (≤ 256 B) + assets/predictive-search.js (≤ 6 912 B; 6 656 → 6 912 CTO 23/11 (#303, ADR 0014 mục 8): loader CSS tầng 5), docs/srs.md TE-8 AC1, NFR-4.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T130.spec.ts -g "AC1"
 // Phần lớn test mock /search/suggest.json bằng page.route để kiểm hành vi tất định (debounce, huỷ, phím, lỗi).
 // Test dữ liệu thật dùng TE8_QUERY_ALL (ES1-T125, env hoặc tests/e2e/store-data.json); thiếu thì skip có lý do.
@@ -108,9 +108,10 @@ const activeId = (page: Page) => tid(page, T.input).getAttribute('aria-activedes
 test.describe('ES1-T130 tĩnh', () => {
   test.beforeEach(() => test.skip(!isDesktop(), 'static, chạy 1 lần'));
 
-  test('AC1 trần byte 256 và 6656, loader không comment', () => {
+  test('AC1 trần byte 256 và 6912, loader không comment', () => {
     expect(statSync(LOADER).size).toBeLessThanOrEqual(256);
-    expect(statSync(MODULE_FILE).size).toBeLessThanOrEqual(6656);
+    // CTO 23/11 (#303, ADR 0014 mục 8): 6 656 → 6 912 cho loader CSS nạp lười data-stylesheet
+    expect(statSync(MODULE_FILE).size).toBeLessThanOrEqual(6912);
     const loader = readFileSync(LOADER, 'utf8');
     expect(loader).not.toMatch(/\/\/|\/\*/);
     expect(loader).toContain('[data-search-src]');

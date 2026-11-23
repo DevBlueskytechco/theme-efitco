@@ -49,9 +49,10 @@
 
   Hooks for assets/predictive-search.js (ES1-T130, TE-8-R2-BE1, TE-8-R2-BE3):
   - <predictive-search> data-stylesheet: URL of assets/predictive-search.css
-    (ES1-T377, CTO 23/11). On the first open, hover or focus of
-    header-search-link BE appends one <link rel="stylesheet"> to <head> (no
-    preload, none if a link with that href is already there), keeps the
+    (ES1-T377, CTO 23/11). On the first open (predictive-search.js connects,
+    search-loader.js has no room for hover / focus) BE appends one
+    <link rel="stylesheet"> to <head> (no preload, none if a link with that
+    href is already there), keeps the
     skeleton (data-predictive-skeleton) shown until its load event (on error
     show results anyway), then shows results / discover. Same contract as
     data-stylesheet on <quick-view> (ES1-T373).
