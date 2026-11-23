@@ -18,7 +18,7 @@ Mốc: 360, 768, 1280, 1920 bằng `setViewportSize` ở project desktop (cao 90
 | TC-03 | AC2 | Drawer mở, 360 và 768 | Đóng lần lượt bằng nút đóng, Esc, chạm scrim (vùng ngoài drawer) | Mỗi lần drawer hết modal, focus về nút menu, `aria-expanded="false"`, `html` không còn `data-layer-open` | E2E/a11y | P1 |
 | TC-04 | AC2 | Không JS, 360 và 768 | Bấm nút menu, bấm mục có cấp 2 | Drawer hiện bằng CSS; `header-drawer-submenu` mở tại chỗ (accordion `<details>`), không có Back hiển thị | E2E nojs | P1 |
 | TC-05 | AC2 | Project mobile (cảm ứng), 360 | Chạm (tap) nút menu, chạm mục có cấp 2, chạm Back | Như TC-01, TC-02 với sự kiện chạm thật | E2E | P2 |
-| TC-06 | AC3 | Shop bật customer accounts, 4 mốc, `/` | Render header | `header-account` là `<shopify-account>`, hiện; `header-cart-link` href `/cart`, tên "Cart, {n} item(s)"; `header-search-link` href `/search`, tên "Search". Dưới 80rem chân drawer có `header-drawer-account` trỏ `/account` hoặc `/account/login` | E2E | P1 |
+| TC-06 | AC3 | Shop bật customer accounts, 4 mốc, `/` | Render header | `header-account` là `<shopify-account>`, hiện; `header-cart-link` href `/cart`, tên "Cart, {n} item(s)"; `header-search-link` href `/search`, tên "Search". Dưới 80rem chân drawer có `header-drawer-account` trỏ `/account`, `/account/login` hoặc `/customer_authentication/redirect` (`routes.account_login_url` khi bật customer accounts mới) | E2E | P1 |
 | TC-07 | AC3 | Repo theme | Đọc `templates/` | Không có thư mục `templates/customers/`, không file `templates/customers*` | Tĩnh | P1 |
 | TC-08 | AC3 | Store dev bật customer accounts mới | GET `/account/login` không theo chuyển hướng | 3xx, `Location` trỏ dịch vụ tài khoản của Shopify (shopify.com/…/account, `customer_authentication` hoặc `*.account.myshopify.com`), không phải trang theme | E2E | P2 |
 | TC-09 | AC4 | Text announcement rỗng (mặc định store dev, `EXPECT_ANNOUNCEMENT` không đặt hoặc `off`) | Mở `/` ở 4 mốc | Không có `announcement-bar`, không có `announcement-bar-placeholder` trên storefront | E2E | P1 |
@@ -83,3 +83,11 @@ Mốc: 360, 768, 1280, 1920 bằng `setViewportSize` ở project desktop (cao 90
 5. TC-08: định dạng `Location` của customer accounts mới (shopify.com/<id>/account hay `customer_authentication`) đọc theo tài liệu Shopify, chưa đo trên store dev.
 6. TC-18: giả định Liquid `form.posted_successfully?` đúng khi URL có `customer_posted=true`; nếu không render thì test skip có lý do, phần gửi thật ở TE-1 TC-32.
 7. Ngoài AC ticket: locale `blocks.header.sign_in` "Sign In", `blocks.footer.try_again` "Try Again" lệch content.md (sentence case, CTO 21/11) — thuộc việc đổi chuỗi theo ES1-T567, không tạo bug ở đây.
+
+## CI store-tests run 45228503580 (PR #332) — phân loại lỗi
+Không có bug theme; 3 lỗi đều do spec, đã sửa spec (không nới assert):
+- TC-03 AC2 360 + 768 (scrim): đo `boundingBox` drawer ngay sau `showModal` khi drawer còn trượt vào (`translate`, base.css `.drawer`), mép phải đo được nhỏ hơn thật → cú chạm `mép + 12` rơi vào drawer khi chuyển động xong (768 flaky, 360 đỏ). Sửa: chờ `getAnimations().finished` rồi chạm `width − 6` (drawer 90% ở 360, `--drawer-m` từ 48rem, luôn để lại scrim bên phải). modal-dialog.js đóng khi chạm ngoài hộp dialog — đúng navigation.md.
+- TC-06 AC3 360 + 768: link tài khoản chân drawer là `routes.account_login_url`; store dev bật customer accounts mới nên Shopify render `/customer_authentication/redirect`, spec chỉ nhận `/account(/login)`. Sửa regex nhận thêm đường này (đúng hành vi nền tảng, cùng giả định TC-08).
+- TC-27 AC10 360 + 768: `first().or(first())` khớp cả nút nước và nút ngôn ngữ → strict mode violation. Sửa: `.or(...).filter({ visible: true }).first()`.
+- Bug: không có.
+

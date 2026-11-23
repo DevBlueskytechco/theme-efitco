@@ -388,8 +388,10 @@ test.describe('ES1-T325 storefront', () => {
       await closed('Esc');
       await toggle.click();
       await expect.poll(() => isModal(drawer)).toBe(true);
+      // Drawer trượt vào (translate, base.css .drawer): đo hộp khi hết chuyển động, nếu không mép phải còn lệch và cú chạm rơi vào drawer.
+      await drawer.evaluate((d) => Promise.all(d.getAnimations({ subtree: true }).map((a) => a.finished.catch(() => undefined))));
       const box = (await drawer.boundingBox())!;
-      const x = Math.min(width - 6, box.x + box.width + 12);
+      const x = width - 6;
       expect(x, 'không có vùng scrim ngoài drawer').toBeGreaterThan(box.x + box.width);
       await page.mouse.click(x, heightOf(width) / 2);
       await closed('scrim');
@@ -418,7 +420,8 @@ test.describe('ES1-T325 storefront', () => {
         const { drawer } = await openDrawer(page);
         const link = drawer.getByTestId(T.drawerAccount);
         await expect(link).toBeVisible();
-        expect(new URL((await link.getAttribute('href'))!, page.url()).pathname).toMatch(/\/account(\/login)?$/);
+        // routes.account_login_url: customer accounts mới (store dev) render /customer_authentication/redirect, cũ là /account/login.
+        expect(new URL((await link.getAttribute('href'))!, page.url()).pathname).toMatch(/\/account(\/login)?$|\/customer_authentication\/redirect$/);
       }
     });
   }
@@ -694,7 +697,8 @@ test.describe('ES1-T325 storefront', () => {
       await expect(level.getByTestId(T.back)).toBeFocused();
       expect(await modalCount(page), 'chỉ 1 lớp modal (drawer)').toBe(1);
       await expect(footerPanel(page), 'không mở panel footer').toBeHidden();
-      await expect(level.getByTestId('header-drawer-country-option').first().or(level.getByTestId(T.drawerLanguageOpt).first())).toBeVisible();
+      // Nước và ngôn ngữ cùng có trong cấp 2 → .or() khớp 2 phần tử; lấy phần tử thấy được đầu tiên.
+      await expect(level.getByTestId('header-drawer-country-option').or(level.getByTestId(T.drawerLanguageOpt)).filter({ visible: true }).first()).toBeVisible();
       await level.getByTestId(T.back).click();
       await expect(level).toBeHidden();
       await expect(summary).toBeFocused();
