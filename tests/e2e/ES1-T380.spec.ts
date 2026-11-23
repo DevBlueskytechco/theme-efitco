@@ -50,10 +50,11 @@ const EVENTS_STUB =
     ['SearchUpdateEvent:shopify:search:update', 'CollectionUpdateEvent:shopify:collection:update']
       .map((s) => {
         const [cls, ...type] = s.split(':');
-        return `export class ${cls} extends Event{constructor(d){super(${JSON.stringify(type.join(':'))},{bubbles:true});this.detail=d}}`;
+        return `export class ${cls} extends Event{constructor(d){super(${JSON.stringify(type.join(':'))},{bubbles:true});Object.assign(this,d)}}`;
       })
       .join(';'),
   );
+// Như thư viện thật (cdn.shopify.com/storefront/standard-events.js: ShopifyStandardEvent Object.assign(this, data)): dữ liệu nằm trên event, không ở detail.
 
 // partials giả: fetch ghi tên + URL; __mode 'fail' thì reject; apply làm như server: ghi nhãn mới (server luôn render nhãn)
 // và checked mặc định theo URL đã fetch (sync() đặt lại ô theo defaultChecked sau apply, như ES1-T111 APPLY).
@@ -103,7 +104,7 @@ async function setupFixture(page: Page, url: string, html: string) {
     w.__resolved = [];
     for (const type of ['shopify:search:update', 'shopify:collection:update'])
       window.addEventListener(type, (e) => {
-        const detail = (e as unknown as { detail: Detail }).detail;
+        const detail = e as unknown as Detail;
         w.__ev.push({ type, detail });
         detail?.promise?.then((v) => w.__resolved.push(v));
       });
@@ -200,7 +201,7 @@ async function openSearch(page: Page) {
   await page.addInitScript(() => {
     const w = window as unknown as { __t380: string[] };
     w.__t380 = [];
-    window.addEventListener('shopify:search:update', (e) => w.__t380.push(JSON.stringify((e as unknown as { detail?: { search?: unknown } }).detail?.search ?? null)), true);
+    window.addEventListener('shopify:search:update', (e) => w.__t380.push(JSON.stringify((e as unknown as { search?: unknown }).search ?? null)), true);
   });
   await gotoStore(page, searchUrl({ type: 'product' }));
   await expectNotChallenged(page);
@@ -211,8 +212,11 @@ async function openSearch(page: Page) {
 async function tick(page: Page) {
   await tid(page, 'collection-filter-open').click();
   await expect(drawer(page)).toBeVisible();
-  const input = freeInput(page);
-  test.skip((await input.count()) === 0, 'dữ liệu: không còn giá trị filter tick được');
+  // Ghim đúng ô sẽ tick: freeInput có :not(:checked) nên sau khi tick sẽ trỏ sang ô chưa tick kế tiếp
+  const all = drawer(page).locator('[data-testid="collection-filter-input"]');
+  const i = await all.evaluateAll((els) => els.findIndex((el) => !(el as HTMLInputElement).checked && !(el as HTMLInputElement).disabled));
+  test.skip(i < 0, 'dữ liệu: không còn giá trị filter tick được');
+  const input = all.nth(i);
   return { input, label: input.locator('xpath=ancestor::label[1]') };
 }
 
