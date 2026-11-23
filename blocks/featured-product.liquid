@@ -434,9 +434,9 @@
                 {%- assign discount_percent = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
                 <span class="featured-product__discount" data-testid="featured-product-discount">
                   {%- if discount_percent > 0 -%}
-                    {{- 'products.card.sale_percent' | t: percent: discount_percent -}}
+                    <bdi>{{ 'products.card.sale_percent' | t: percent: discount_percent }}</bdi>
                   {%- else -%}
-                    {{- 'products.card.sale' | t -}}
+                    <bdi>{{ 'products.card.sale' | t }}</bdi>
                   {%- endif -%}
                 </span>
               {%- endif -%}
