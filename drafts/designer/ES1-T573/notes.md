@@ -16,7 +16,7 @@ Nguồn: notes ES1-T567 §6.20, §8.3, §9.6; ES1-T293, T278, T279. Nhánh làm 
 | AC6 `:root` = `kit_root_count` = DESIGN.md = handoff §3.6; tokens.json load đạt | Một phần | `:root` kit = 170 (177 dòng `--*:` − 5 dòng trong media query − 2 dòng chú thích). foundation.html `h-token-architecture` và foundation.md §32.2 = 170. tokens.json, DESIGN.md, handoff: bản vá mục 5 (bị chặn ghi) |
 | AC7 `.filter-toggle__count` 20 × 20; grep class 24 cũ = 0 | Đạt (theo CSS) | kit: `min-width` + `height` = `--count-badge-size` 20, `line-height` 20; nội dung "1" 13px + đệm 4 × 2 < 20 nên ra 20 × 20. Không thêm class biến thể 24 |
 
-Kiểm trước PR: foundation 360 / 1280 render 0 lỗi console (133549 / 62112 px). 13 trang đổi alias + search + password + gift card chụp 360: 0 lỗi console; product, cart, search, marketing-popups cao đúng bằng ảnh cũ (18687, 11345, 12503, 14452).
+Kiểm trước PR: foundation 360 / 1280 render 0 lỗi console (lượt 2: 133590 / 62152 px). 13 trang đổi alias + search + password + gift card chụp 360: 0 lỗi console; product, cart, search, marketing-popups cao đúng bằng ảnh cũ (18687, 11345, 12503, 14452).
 
 ## 2. Đã làm
 
@@ -131,7 +131,7 @@ Nếu DESIGN.md có câu "150" ở chỗ khác (mục Sources / version): đổi
 
 ## 7. Ticket
 
-Hỏi áp bản vá mục 5 (scope-guard chặn Designer ghi 4 file): tạo ở lượt này, xem link trong comment ticket ES1-T573.
+ES1-T598 (Tech Lead): áp bản vá mục 5 (scope-guard chặn Designer ghi 4 file; thử lại 23/11 lượt 2, vẫn bị chặn).
 
 ## 8. Quyết định CTO cần chốt
 
