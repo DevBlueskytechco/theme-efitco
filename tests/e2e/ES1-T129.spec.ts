@@ -60,8 +60,28 @@ async function asDrawer(page: Page) {
   });
 }
 
-// Giống BE1: clone template vào nhóm, mở listbox. count option mỗi thẻ template.
+// CSS nội dung lớp search nạp lười (ADR 0014 mục 8, CTO 23/11): làm đúng hợp đồng BE ES1-T378 — 1 <link> vào <head> từ
+// data-stylesheet của <predictive-search>, không lặp nếu JS đã chèn, chờ load. Phần vỏ, thanh ô tìm, skeleton ở base.css không cần.
+async function loadSearchCss(page: Page) {
+  await page.evaluate(async () => {
+    const href = document.querySelector<HTMLElement>('[data-testid="predictive-search"]')!.dataset.stylesheet!;
+    const url = new URL(href, location.href).href;
+    let link = [...document.head.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].find((l) => l.href === url);
+    if (link?.sheet) return;
+    if (!link) {
+      link = Object.assign(document.createElement('link'), { rel: 'stylesheet', href: url });
+      document.head.append(link);
+    }
+    await new Promise((done, fail) => {
+      link!.addEventListener('load', done, { once: true });
+      link!.addEventListener('error', () => fail(new Error(`không tải được ${url}`)), { once: true });
+    });
+  });
+}
+
+// Giống BE1: nạp CSS nội dung, clone template vào nhóm, mở listbox. count option mỗi thẻ template.
 async function fillListbox(page: Page, count = 1) {
+  await loadSearchCss(page);
   await page.evaluate((n) => {
     const root = document.querySelector('[data-testid="predictive-search"]')!;
     const clone = (kind: string, group: string, label: string) => {
@@ -129,6 +149,10 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     await expect(root).toHaveAttribute('data-label-count', /%n/);
     await expect(root).toHaveAttribute('data-label-empty', /%s/);
     await expect(root).toHaveAttribute('data-label-all', /%s/);
+    // ADR 0014 mục 8: CSS nội dung nạp lười, chưa mở thì chưa có link nào tới file
+    await expect(root).toHaveAttribute('data-stylesheet', /predictive-search(\.[\w-]+)?\.css/);
+    const href = new URL((await root.getAttribute('data-stylesheet'))!, page.url()).pathname;
+    expect(await page.evaluate((p) => [...document.querySelectorAll('link')].filter((l) => new URL(l.href).pathname === p).length, href)).toBe(0);
 
     const groups = await tid(page, T.group).evaluateAll((els) =>
       els.map((e) => [e.getAttribute('data-predictive-group'), (e as HTMLElement).hidden, e.getAttribute('role')])

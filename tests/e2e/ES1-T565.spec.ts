@@ -4,10 +4,12 @@
 // - Không `preload` trên dòng link; không stylesheet_tag trong snippets/.
 // - base.css ≤ 49 152 B (ES1-T566 hạ 40 960); base + file tầng 4 do block trong templates/index.liquid nạp ≤ 57 344 B (CTO 21/11 ES1-T569), ≤ 10 file.
 // - Không prelude trùng giữa base.css, file tầng 3, file tầng 4; base.css không còn selector của 5 block đã tách; .quiz-page__breadcrumb ở collection.css.
+// - Tầng 5 overlay nạp lười (ADR 0014 mục 8, CTO 23/11): quick-view.css (khi có), predictive-search.css gzip ≤ 8 192, có data-stylesheet,
+//   không stylesheet_tag nào nạp, không prelude trùng với base.css / tầng 3 / tầng 4.
 // ES1-T566 dùng lại spec này: thêm 6 file vào BLOCK_FILES/PARENTS, hạ BASE_MAX.
 // Chạy: npx playwright test tests/e2e/ES1-T565.spec.ts --project=desktop
 import { test, expect } from './support/test';
-import { readFileSync, readdirSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 
 const read = (path: string) => readFileSync(path, 'utf8');
@@ -32,6 +34,11 @@ const BLOCK_FILES = Object.keys(PARENTS);
 const CHILDREN = ['quiz-step', 'shop-the-look-row'];
 // Class block đã tách: không được còn trong prelude nào của base.css
 const MOVED = /\.(quiz|bundle-builder|shop-the-look|featured-product|image-with-text)(?![\w-])|\.(quiz|bundle-builder|shop-the-look|featured-product|image-with-text)[-_]/;
+
+// ADR 0014 mục 8 (CTO 23/11): file overlay tầng 5, BE nạp lười từ data-stylesheet. quick-view.css kiểm khi đã có (PR #301 ES1-T373).
+const OVERLAY_REQUIRED = ['predictive-search'];
+const OVERLAY_FILES = ['quick-view', ...OVERLAY_REQUIRED].filter((f) => OVERLAY_REQUIRED.includes(f) || existsSync(`assets/${f}.css`));
+const OVERLAY_MAX = 8192;
 
 const LINK = /\{\{-?\s*'([a-z0-9-]+)\.css'\s*\|\s*asset_url\s*\|\s*stylesheet_tag([^}]*)\}\}/g;
 
@@ -131,7 +138,7 @@ test.describe('ES1-T565 CSS theo block (tĩnh, ADR 0014)', () => {
     const base = preludes(read('assets/base.css'));
     const seen = new Map<string, string>();
     const dupes: string[] = [];
-    for (const f of [...PAGE_FILES, ...loaders.keys()]) {
+    for (const f of [...PAGE_FILES, ...loaders.keys(), ...OVERLAY_FILES]) {
       for (const p of preludes(read(`assets/${f}.css`))) {
         if (base.has(p)) dupes.push(`base.css ↔ ${f}.css: ${p}`);
         const other = seen.get(p);
@@ -140,6 +147,29 @@ test.describe('ES1-T565 CSS theo block (tĩnh, ADR 0014)', () => {
       }
     }
     expect(dupes).toEqual([]);
+  });
+
+  test('tầng 5 overlay: gzip ≤ 8 192, có data-stylesheet, không stylesheet_tag nào nạp (ADR 0014 mục 8)', () => {
+    const sizes = Object.fromEntries(OVERLAY_FILES.map((f) => [`${f}.css`, gz(`assets/${f}.css`)]));
+    console.log(`[ES1-T565] gzip tầng 5 ${JSON.stringify(sizes)}`);
+    for (const [f, size] of Object.entries(sizes)) expect(size, f).toBeLessThanOrEqual(OVERLAY_MAX);
+    const liquid = ['layout', 'blocks', 'snippets', 'templates'].flatMap((dir) =>
+      readdirSync(dir)
+        .filter((f) => f.endsWith('.liquid'))
+        .map((f) => ({ file: `${dir}/${f}`, src: read(`${dir}/${f}`) })),
+    );
+    for (const f of OVERLAY_FILES) {
+      const tag = new RegExp(`'${f}\\.css'\\s*\\|\\s*asset_url\\s*\\|\\s*stylesheet_tag`);
+      expect(liquid.filter((l) => tag.test(l.src)).map((l) => l.file), `${f}.css không nạp bằng stylesheet_tag`).toEqual([]);
+      const attr = new RegExp(`data-stylesheet="\\{\\{\\s*'${f}\\.css'\\s*\\|\\s*asset_url\\s*\\}\\}"`);
+      expect(liquid.filter((l) => attr.test(l.src)).map((l) => l.file), `${f}.css có data-stylesheet`).toHaveLength(1);
+    }
+    expect(read('snippets/predictive-search.liquid')).toMatch(/<predictive-search[^>]*data-stylesheet="\{\{ 'predictive-search\.css' \| asset_url \}\}"/);
+    // Nội dung kết quả không quay lại base.css (vỏ, thanh ô tìm, skeleton, status được giữ)
+    const content = /\.predictive-search__(tabs?|hint|notice|listbox|group|option|link|media|image|discover|footer|query|prices?)(?![\w-])/;
+    // Ngoại lệ: 2 rule hiện / ẩn nút "View all" theo listbox (đích là .predictive-search__all, giữ ở base để Enter / bấm vẫn dùng được)
+    const viewAll = /\.predictive-search__all(\[hidden\])?\)?$/;
+    expect([...preludes(read('assets/base.css'))].filter((p) => content.test(p) && !viewAll.test(p))).toEqual([]);
   });
 
   test('base.css không còn selector 5 block đã tách; breadcrumb quiz ở collection.css; quiz-fade theo quiz.css', () => {

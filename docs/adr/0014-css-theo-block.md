@@ -35,14 +35,15 @@ Ngày: 2026-11-21 | Trạng thái: Đề xuất (hướng CTO chốt 21/11, ES1-
 
 ## Quyết định
 A.
-1. 4 tầng CSS, xếp theo câu hỏi "markup sinh class này render ở đâu":
+1. 5 tầng CSS, xếp theo câu hỏi "markup sinh class này render ở đâu" (tầng 5 thêm CTO 23/11, mục 8):
 
    | Tầng | File | Nạp | Gồm |
    |---|---|---|---|
    | 1 | `critical.css` | `<head>`, `preload: true` (giữ ADR 0003) | màn đầu: layout, header tĩnh, hero |
-   | 2 | `base.css` | `<head>`, mọi trang | token, reset, keyframe `motion-*`, token `--icon-*`. Khung: header, announcement, menu drawer, mega, localization, footer. Lớp: dialog, sheet, drawer, toast, thanh đáy. Component dùng chung: button, round/close button, form, form-status, alert, empty-state, skeleton, spinner, rte, image, container background, product-card, price, rating-stars, product-media, variant picker, product-form, countdown, quick view, cart drawer + cart-lines + cart-summary, predictive search, breadcrumb, page-title, page-banner, pagination, carousel-nav, carousel-progress, "Hàng ngang" chung, article-card. Block màn đầu template mặc định: slideshow, collection-list + collection-card, rich-text. Block có class dùng ở block khác: featured-collection (collection-products, cart-page, 404), blog-posts (article-card + Hàng ngang). |
+   | 2 | `base.css` | `<head>`, mọi trang | token, reset, keyframe `motion-*`, token `--icon-*`. Khung: header, announcement, menu drawer, mega, localization, footer. Lớp: dialog, sheet, drawer, toast, thanh đáy. Component dùng chung: button, round/close button, form, form-status, alert, empty-state, skeleton, spinner, rte, image, container background, product-card, price, rating-stars, product-media, variant picker, product-form, countdown, vỏ + skeleton của overlay tầng 5 (quick view, predictive search, mini cart…), cart drawer + cart-lines + cart-summary, breadcrumb, page-title, page-banner, pagination, carousel-nav, carousel-progress, "Hàng ngang" chung, article-card. Block màn đầu template mặc định: slideshow, collection-list + collection-card, rich-text. Block có class dùng ở block khác: featured-collection (collection-products, cart-page, 404), blog-posts (article-card + Hàng ngang). |
    | 3 | `product.css`, `collection.css`, `cart.css`, `aux.css` | `<head>`, `case template.name` (ADR 0013, không đổi) | block chỉ có ở 1 nhóm template |
    | 4 | `assets/<block>.css` | trong block, `stylesheet_tag` | block cấp section đặt được ở template bất kỳ, không ở màn đầu template mặc định |
+| 5 | `assets/<overlay>.css` | nạp lười bằng JS khi người dùng mở lớp (mục 8, CTO 23/11) | nội dung overlay chỉ cần khi mở: quick view, predictive search, mini cart… |
 
 2. File tầng 4 đợt này (11 file; selector → file ở `drafts/techlead/ES1-T564/selector-map.md`):
 
@@ -89,6 +90,20 @@ A.
    - File tầng 4 không preload. Thẻ link nằm trong HTML stream ngay trước block, preload scanner thấy sớm. Preload lại đẩy CSS block dưới màn đầu tranh băng thông với ảnh LCP.
    - Merchant/Sidekick kéo block tầng 4 lên đầu trang: chấp nhận 1 request ≤ 8 KB chặn phần sau nó. LCP vẫn là ảnh hero nếu hero còn ở đầu.
 7. PR FE đang mở vượt 49 152 B (#287, #292, ES1-T529): không nâng trần. Rebase sau ES1-T565. Phần CSS block tầng 4 mà PR thêm thì ghi vào file block.
+
+8. Overlay nạp lười, tầng 5 (CTO 23/11, PR #301 ES1-T373, PR #303 ES1-T377):
+   - Vì sao: CSS nội dung overlay (chỉ cần khi người dùng mở) nằm ở `base.css` thì mọi trang tải mà phần lớn lượt xem không mở. Trang chủ vượt 57 344 (PR #303: 57 553).
+   - Gồm: lớp mở theo thao tác của người dùng, không ở màn đầu: quick view (`quick-view.css`), predictive search (`predictive-search.css`), mini cart, popup sau này. Tên file theo custom element.
+   - Giữ ở `base.css` (phần cho lần vẽ đầu khi mở): nút / ô mở lớp trên header hoặc card, vỏ dialog / drawer / sheet, thanh tiêu đề + nút đóng, form ô tìm, guard `[hidden]`, skeleton, dòng `role="status"` ẩn. Lớp mở ra phải dùng được (đóng, gõ, submit GET) khi file tầng 5 chưa tải.
+   - Chuyển sang `assets/<overlay>.css`: phần nội dung (kết quả, tab, lưới sản phẩm, thông báo, chân lớp, partial nạp về). Rule nào hiện một khối nội dung đang `[hidden]` (vd khám phá khi ô trống) cũng ở file tầng 5, để chưa tải thì khối đó còn ẩn.
+   - Hợp đồng nạp (FE in markup, BE viết JS):
+     - FE: `data-stylesheet="{{ '<overlay>.css' | asset_url }}"` trên custom element của lớp (`<quick-view>`, `<predictive-search>`…). Không `stylesheet_tag`, không `<link>` trong `layout/`, snippet hay block; không `preload`.
+     - BE: lần mở đầu (hoặc hover / focus đầu nút mở, cùng lúc import JS của lớp) thêm đúng 1 `<link rel="stylesheet" href="<data-stylesheet>">` vào `<head>`. Không thêm nếu đã có link cùng `href`. Chờ `load` (lỗi thì vẫn hiện) rồi mới hiện nội dung; trong lúc chờ giữ skeleton / trạng thái loading.
+     - Chưa có JS hoặc JS chưa nạp file: lớp không vỡ, nội dung còn `[hidden]` hoặc chỉ skeleton.
+   - Thứ tự cascade: file tầng 5 nạp sau `base.css` (giống tầng 4, mục 4). Khai báo dùng chung với block tầng 4 (vd eyebrow featured-product ↔ quick view) thì lặp trong file tầng 5, không phụ thuộc file block.
+   - Trần: mỗi file tầng 5 ≤ 8 192 B gzip. Chạm trần thì tách phần ít dùng (vd tab, recent) ra file riêng, không nâng trần. File tầng 5 không tính vào ngân sách trang chủ 57 344 (mục 5) vì không tải khi chưa mở.
+   - Spec: `tests/e2e/ES1-T565.spec.ts` kiểm trần 8 192 và không prelude trùng với `base.css`, tầng 3, tầng 4 cho mọi file tầng 5 đang có (`quick-view.css` khi tồn tại, `predictive-search.css`); kiểm có `data-stylesheet` trỏ đúng file và không `stylesheet_tag` nào nạp file tầng 5. Spec store mở lớp mà JS chưa nạp file thì tự chèn link theo đúng hợp đồng trên (như BE) trước khi đo phần nội dung, hoặc skip có lý do.
+   - Tech Lead review: rule nội dung overlay thêm vào `base.css`, hoặc file tầng 5 nạp bằng `stylesheet_tag` / `preload`: REQUEST_CHANGES.
 
 ## Hệ quả
 - Tốt:

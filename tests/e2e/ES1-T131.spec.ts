@@ -30,6 +30,8 @@ const HAS = {
   states: SNIPPET.includes('predictive-search-error') && SNIPPET.includes('predictive-search-empty') && /predictive-search-(error|empty)|predictive-?(error|empty)/i.test(PS_JS),
   recent: /localStorage/.test(PS_JS),
   popularSetting: /"id"\s*:\s*"popular_searches"/.test(SETTINGS),
+  // ADR 0014 mục 8 (CTO 23/11): CSS nội dung lớp search ở assets/predictive-search.css, BE nạp lười từ data-stylesheet
+  css: !SNIPPET.includes('data-stylesheet') || /dataset\.stylesheet|data-stylesheet/.test(PS_JS),
 };
 const WAIT = {
   searchPage: 'ES1-T128 (blocks/search-results) chưa merge',
@@ -39,6 +41,7 @@ const WAIT = {
   states: 'ES1-T377 + ES1-T378 (hộp 0 kết quả, lỗi, loading) chưa merge',
   recent: 'TE-8-R2-BE3 ES1-T379 (Should, recent searches) chưa merge hoặc đã bị cắt',
   popularSetting: 'ES1-T377 (theme setting popular_searches) chưa merge',
+  css: 'ES1-T378 (predictive-search.js nạp lười assets/predictive-search.css theo data-stylesheet) chưa merge',
 } as const;
 
 function need(...keys: Array<keyof typeof HAS>) {
@@ -325,7 +328,7 @@ test.describe('ES1-T131 predictive (có JS)', () => {
   });
 
   test.describe('AC10 tab', () => {
-    test.beforeEach(() => need('tabs'));
+    test.beforeEach(() => need('tabs', 'css'));
 
     test('TC-05 AC10 tablist: All + tab mỗi nhóm có kết quả kèm số, đủ 8 thì 8+, nhóm 0 không có tab', async ({ page }) => {
       const watch = watchStore(page);
@@ -445,7 +448,7 @@ test.describe('ES1-T131 predictive (có JS)', () => {
 
   test.describe('AC4 popular searches (store dev đã cấu hình)', () => {
     test.beforeEach(() => {
-      need('popularSetting', 'discover');
+      need('popularSetting', 'discover', 'css');
       test.skip(!POPULAR.length, NO_POPULAR);
     });
 

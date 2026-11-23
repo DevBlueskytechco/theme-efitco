@@ -34,13 +34,27 @@
   aria-required-children. Tabs, discover, notices and the footer link sit
   outside the listbox (§8, §10).
 
-  States without JavaScript logic (CSS only, assets/base.css):
+  CSS in two files (ADR 0014 tier 5, CTO 23/11): assets/base.css holds what the
+  first paint of the open layer needs (dialog shell, bar with the form, [hidden]
+  guard, scrolling body, skeleton, hidden status line). Everything else (tabs,
+  hint, notices, listbox, discover, footer) is in assets/predictive-search.css,
+  loaded lazily by BE (see data-stylesheet below). Until it loads every content
+  block stays [hidden], so the layer shows the bar and an empty or skeleton body.
+
+  States without JavaScript logic (CSS only, assets/predictive-search.css):
   - Field empty (:placeholder-shown): discover shows even while [hidden],
     footer and tablist never show.
   - Listbox not [hidden]: the footer link shows even while [hidden].
   Everything else is a [hidden] toggle owned by BE.
 
   Hooks for assets/predictive-search.js (ES1-T130, TE-8-R2-BE1, TE-8-R2-BE3):
+  - <predictive-search> data-stylesheet: URL of assets/predictive-search.css
+    (ES1-T377, CTO 23/11). On the first open, hover or focus of
+    header-search-link BE appends one <link rel="stylesheet"> to <head> (no
+    preload, none if a link with that href is already there), keeps the
+    skeleton (data-predictive-skeleton) shown until its load event (on error
+    show results anyway), then shows results / discover. Same contract as
+    data-stylesheet on <quick-view> (ES1-T373).
   - <predictive-search>: data-url, data-money-format, data-label-count (%n is
     the number), data-label-empty, data-label-all, data-label-products (%s is
     the search terms), data-label-shop-all + data-shop-all-url (footer link at
@@ -154,6 +168,7 @@
       data-label-loading="{{ 'blocks.predictive_search.loading' | t | escape }}"
       data-label-sale-price="{{ 'products.price.sale_price' | t | escape }}"
       data-label-regular-price="{{ regular_price_label | escape }}"
+      data-stylesheet="{{ 'predictive-search.css' | asset_url }}"
     >
       <div class="predictive-search__bar">
         <h2
