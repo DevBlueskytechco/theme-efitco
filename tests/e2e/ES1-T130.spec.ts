@@ -3,6 +3,9 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T130.spec.ts -g "AC1"
 // Phần lớn test mock /search/suggest.json bằng page.route để kiểm hành vi tất định (debounce, huỷ, phím, lỗi).
 // Test dữ liệu thật dùng TE8_QUERY_ALL (ES1-T125, env hoặc tests/e2e/store-data.json); thiếu thì skip có lý do.
+// ES1-T377 (TE-8-R2-FE1, docs/ui-spec/predictive-search.md §2.5, §11; ES1-T563): thêm nhóm queries đầu listbox, thứ tự
+// queries, products, collections, articles, pages; "View all" ra khỏi listbox (nút ở chân, không role=option) nên listbox
+// chỉ còn option kết quả và rỗng khi 0 kết quả (chờ list mở bằng status thay vì listbox hiện).
 import { readFileSync, statSync } from 'node:fs';
 import { test, expect, type Page, type Request } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -237,10 +240,11 @@ test.describe('ES1-T130 predictive search', () => {
       els.map((g) => [g.getAttribute('data-predictive-group'), (g as HTMLElement).hidden, g.querySelectorAll('[role="option"]').length])
     );
     expect(groups).toEqual([
+      ['queries', true, 0],
       ['products', false, 2],
       ['collections', false, 1],
-      ['pages', false, 1],
       ['articles', false, 1],
+      ['pages', false, 1],
     ]);
 
     const first = tid(page, T.option).first();
@@ -279,7 +283,9 @@ test.describe('ES1-T130 predictive search', () => {
   test('AC1 0 kết quả: nhóm ẩn, chỉ còn dòng all, status đọc câu rỗng', async ({ page }) => {
     await mockSuggest(page, () => ({ products: [], collections: [], pages: [], articles: [] }));
     await openSearch(page);
-    await typeAndWaitList(page, 'zzqx');
+    // 0 kết quả: listbox không còn option nào (View all ở chân) nên không có hộp để đo visible; chờ aria-expanded
+    await tid(page, T.input).fill('zzqx');
+    await expect(tid(page, T.input)).toHaveAttribute('aria-expanded', 'true');
     await expect(tid(page, T.option)).toHaveCount(0);
     for (const g of await tid(page, T.group).all()) await expect(g).toBeHidden();
     await expect(tid(page, T.all)).toBeVisible();
@@ -294,7 +300,7 @@ test.describe('ES1-T130 predictive search', () => {
     const input = tid(page, T.input);
     const options = page.locator(`[data-testid="${T.listbox}"] [role="option"]`);
     const count = await options.count();
-    expect(count).toBe(FIXTURE_OPTIONS + 1);
+    expect(count).toBe(FIXTURE_OPTIONS);
 
     await input.press('ArrowDown');
     const firstId = await options.first().getAttribute('id');

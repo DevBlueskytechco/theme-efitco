@@ -133,6 +133,15 @@ const FULL = build({ queries: 4, products: 8, collections: 2, pages: 0, articles
 const NONE = build({});
 
 type Reply = Results | { status: number } | 'abort';
+// Như Predictive Search API: chỉ trả nhóm có trong resources[type] (query → queries, product → products…).
+// predictive-search.js của ES1-T130 không xin `query`, API thật không trả queries; mock trả cả queries thì option rỗng tên
+// (axe link-name, CI PR #303). TE-8-R2-BE1 (ES1-T378) xin `query` thì mock trả queries như cũ.
+const byType = (r: Results, types: string | null): Results => {
+  if (!types) return r;
+  const plural: Record<string, string> = { query: 'queries', product: 'products', collection: 'collections', page: 'pages', article: 'articles' };
+  const keep = new Set(types.split(',').map((t) => plural[t.trim()]));
+  return Object.fromEntries(Object.entries(r).filter(([k]) => keep.has(k))) as Results;
+};
 async function mockSuggest(page: Page, reply: (q: string, n: number) => Reply = () => FULL, delay: (q: string, n: number) => number = () => 0) {
   const requests: Request[] = [];
   page.on('request', (r) => SUGGEST.test(r.url()) && requests.push(r));
@@ -145,7 +154,8 @@ async function mockSuggest(page: Page, reply: (q: string, n: number) => Reply = 
     const r = reply(q, i);
     if (r === 'abort') return route.abort('failed').catch(() => {});
     if ('status' in r) return route.fulfill({ status: (r as { status: number }).status, body: 'error' }).catch(() => {});
-    await route.fulfill({ json: { resources: { results: r } } }).catch(() => {});
+    const types = new URL(route.request().url()).searchParams.get('resources[type]');
+    await route.fulfill({ json: { resources: { results: byType(r as Results, types) } } }).catch(() => {});
   });
   return requests;
 }

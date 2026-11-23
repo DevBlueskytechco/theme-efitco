@@ -5,6 +5,10 @@
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T129.spec.ts -g "AC1-markup|AC3"
 // JS chưa có (modal-dialog.js, predictive-search.js của BE) nên test tự gọi showModal. Spec không click link khi có JS: sau BE spec vẫn đúng.
 // Đo hình học với reducedMotion 'reduce': transition mở (opacity + translate) không làm lệch boundingBox (bài học ES1-T313 TC-05).
+// ES1-T377 (TE-8-R2-FE1, docs/ui-spec/predictive-search.md §2.5, §8, §11; ES1-T563): hợp đồng markup đổi — 5 nhóm
+// (queries, products, collections, articles, pages), 3 template (query, product, link); "View all" ra khỏi listbox thành
+// .button ở chân (không role=option); phần cuộn là thân tabpanel predictive-search-body, listbox không tự cuộn;
+// sản phẩm từ 80rem ở popup tab All là card 1:1. Assert cũ đổi theo hợp đồng mới, không bỏ kiểm.
 import { test, expect, type Browser, type Page } from './support/test';
 import { newStoreContext } from './support/store-noise';
 import AxeBuilder from '@axe-core/playwright';
@@ -24,6 +28,7 @@ const T = {
   option: 'predictive-search-option',
   all: 'predictive-search-all',
   status: 'predictive-search-status',
+  body: 'predictive-search-body',
 };
 
 const tid = (page: Page, id: string) => page.getByTestId(id);
@@ -129,19 +134,31 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
       els.map((e) => [e.getAttribute('data-predictive-group'), (e as HTMLElement).hidden, e.getAttribute('role')])
     );
     expect(groups).toEqual([
+      ['queries', true, 'group'],
       ['products', true, 'group'],
       ['collections', true, 'group'],
-      ['pages', true, 'group'],
       ['articles', true, 'group'],
+      ['pages', true, 'group'],
     ]);
-    await expect(root.locator('[data-predictive-group] [data-predictive-options]')).toHaveCount(4);
+    await expect(root.locator('[data-predictive-group] [data-predictive-options]')).toHaveCount(5);
     await expect(tid(page, T.listbox)).toHaveJSProperty('hidden', true);
-    await expect(root.locator('template[data-predictive-template]')).toHaveCount(2);
+    const templates = await root.locator('template[data-predictive-template]').evaluateAll((els) => els.map((e) => e.getAttribute('data-predictive-template')));
+    expect(templates).toEqual(['query', 'product', 'link']);
     await expect(tid(page, T.status)).toBeEmpty();
     const inList = await tid(page, T.status).evaluate((e) => !!e.closest('[role="listbox"]'));
     expect(inList).toBe(false);
-    const last = await tid(page, T.listbox).evaluate((e) => e.lastElementChild?.getAttribute('data-testid'));
-    expect(last).toBe(T.all);
+    // §11: "View all" ở chân cùng status, ngoài listbox, là .button không role option, [hidden] tới khi có kết quả
+    const all = await tid(page, T.all).evaluate((a) => ({
+      inList: !!a.closest('[role="listbox"]'),
+      withStatus: a.parentElement === document.querySelector('[data-testid="predictive-search-status"]')?.parentElement,
+      button: a.classList.contains('button'),
+      role: a.getAttribute('role'),
+      hidden: (a as HTMLElement).hidden,
+    }));
+    expect(all).toEqual({ inList: false, withStatus: true, button: true, role: null, hidden: true });
+    // Thân là tabpanel bọc listbox
+    await expect(tid(page, T.body)).toHaveAttribute('role', 'tabpanel');
+    expect(await tid(page, T.listbox).evaluate((e) => e.parentElement?.getAttribute('data-testid'))).toBe(T.body);
     await expect(tid(page, T.clear)).toHaveAttribute('type', 'reset');
   });
 
@@ -218,14 +235,15 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     expect(bar.bg).toContain('noise-dark');
 
     await fillListbox(page, 12);
-    const list = tid(page, T.listbox);
+    // §11: thân tabpanel là phần duy nhất cuộn, thanh tìm đứng yên
+    const body = tid(page, T.body);
     const form = tid(page, T.form);
     const before = (await form.boundingBox())!;
-    const scroll = await list.evaluate((e) => {
+    const scroll = await body.evaluate((e) => {
       e.scrollTop = 200;
       return { top: e.scrollTop, overX: e.scrollWidth - e.clientWidth };
     });
-    expect(scroll.top, 'listbox phải tự cuộn').toBeGreaterThan(0);
+    expect(scroll.top, 'thân search phải tự cuộn').toBeGreaterThan(0);
     expect(scroll.overX).toBeLessThanOrEqual(0);
     expect((await form.boundingBox())!.y).toBeCloseTo(before.y, 0);
     const dialogOverX = await tid(page, T.dialog).evaluate((e) => e.scrollWidth - e.clientWidth);
@@ -257,8 +275,8 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     expect(box.x).toBeCloseTo(0, 0);
     expect(box.width).toBeCloseTo(1280, 0);
     expect(box.height).toBeLessThanOrEqual(640 + PX);
-    const scroll = await tid(page, T.listbox).evaluate((e) => e.scrollHeight - e.clientHeight);
-    expect(scroll, 'listbox phải tự cuộn').toBeGreaterThan(0);
+    const scroll = await tid(page, T.body).evaluate((e) => e.scrollHeight - e.clientHeight);
+    expect(scroll, 'thân search phải tự cuộn').toBeGreaterThan(0);
     const backdrop = await tid(page, T.dialog).evaluate((d) => getComputedStyle(d, '::backdrop').backgroundColor);
     expect(backdrop).not.toBe('rgba(0, 0, 0, 0)');
     // Lưới 12: logo trước ô, ô trước nút đóng, cùng hàng
@@ -302,16 +320,26 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
     const image = options.first().locator('img');
     await expect(image).toHaveAttribute('alt', '');
     const size = await image.evaluate((e) => [e.getBoundingClientRect().width, e.getBoundingClientRect().height]);
-    expect(size[0]).toBeCloseTo(64, 0);
-    expect(size[1]).toBeCloseTo(64, 0);
+    // §11: hàng ảnh 64; từ 80rem ở popup tab All sản phẩm là card 1:1 (4 cột)
+    const card = (page.viewportSize()?.width ?? 0) >= 1280 && (await tid(page, T.dialog).getAttribute('data-style')) === 'popup';
+    if (card) {
+      expect(size[0]).toBeGreaterThan(64);
+      expect(size[1]).toBeCloseTo(size[0], 0);
+    } else {
+      expect(size[0]).toBeCloseTo(64, 0);
+      expect(size[1]).toBeCloseTo(64, 0);
+    }
 
+    // aria-selected trên option dạng hàng (link): có nền và outline. "View all" không còn là option (§11).
     const style = (el: Element) => {
       const s = getComputedStyle(el);
       return { bg: s.backgroundColor, outline: s.outlineStyle };
     };
-    const off = await tid(page, T.all).evaluate(style);
-    await tid(page, T.all).evaluate((e) => e.setAttribute('aria-selected', 'true'));
-    const on = await tid(page, T.all).evaluate(style);
+    const row = options.nth(1);
+    await page.mouse.move(0, 0);
+    const off = await row.evaluate(style);
+    await row.evaluate((e) => e.setAttribute('aria-selected', 'true'));
+    const on = await row.evaluate(style);
     expect(on.bg).not.toBe(off.bg);
     expect(on.outline).toBe('solid');
   });
