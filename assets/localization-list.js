@@ -99,6 +99,7 @@ export default (p, on) => {
     const name = b.firstElementChild.textContent.trim();
     last = b;
     idle();
+    clearTimeout(t); // status lọc đang chờ (300 ms sau khi mở) không được xoá "Switching to …"
     if (err) err.hidden = navigator.onLine;
     if (!navigator.onLine && err) {
       e.preventDefault();

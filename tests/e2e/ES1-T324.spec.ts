@@ -132,7 +132,9 @@ async function mount(page: Page, opts: MountOptions = {}) {
     if (pathname === '/localization' && req.method() === 'POST') {
       posts.push(req.postData() ?? '');
       if (opts.holdPost) await new Promise<void>((r) => (release = r));
-      return route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>switched</title><p data-testid="switched">ok</p>' });
+      // Trang đích như mọi trang theme: meta viewport + base.css (cùng opt-in @view-transition), không thì Chromium báo pageerror
+      // "ViewTransition opt-in disabled" / "Viewport size changed"
+      return route.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><meta name="viewport" content="width=device-width,initial-scale=1"><title>switched</title><link rel="stylesheet" href="/assets/base.css"><p data-testid="switched">ok</p>' });
     }
     if (!pathname.startsWith('/assets/')) return route.fulfill({ body: FIXTURE, contentType: 'text/html; charset=utf-8' });
     const name = pathname.slice('/assets/'.length);
@@ -174,6 +176,9 @@ async function openFooter(page: Page) {
 }
 
 async function axeSerious(page: Page, include: string) {
+  // Popover mở bằng motion-fade (base.css): quét giữa lúc mờ dần thì axe đo sai tương phản → chờ hết animation
+  await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => {}))));
+  await expectNotChallenged(page);
   const r = await new AxeBuilder({ page }).include(include).analyze();
   return r.violations.filter((v) => ['serious', 'critical'].includes(v.impact ?? '')).map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`);
 }
@@ -390,15 +395,29 @@ test.describe('ES1-T324 fixture', () => {
 
     await toggleOf(page).click();
     await expect.poll(() => detailsOpen(page)).toBe(true);
+    // POST bị giữ = điều hướng đang chờ: Playwright treo mọi locator / evaluate trên khung tới khi điều hướng xong,
+    // nên trạng thái đang đổi (L9) được trang tự báo ra qua MutationObserver + exposeFunction, kèm thời điểm so với lúc gửi.
+    const snaps: Array<{ t: number; form: string | null; fr: string | null; ca: string | null; status: string }> = [];
+    await page.exposeFunction('__l9', (s: (typeof snaps)[number]) => snaps.push(s));
+    await page.evaluate(() => {
+      const f = document.querySelector('footer form')!;
+      const a = (sel: string, n: string) => f.querySelector(sel)!.getAttribute(n);
+      let t0 = 0;
+      f.addEventListener('submit', () => (t0 = performance.now()), { capture: true });
+      new MutationObserver(() => (window as unknown as { __l9: (s: unknown) => void }).__l9({
+        t: performance.now() - t0, form: f.getAttribute('aria-busy'), fr: a('[value="FR"]', 'aria-busy'), ca: a('[value="CA"]', 'aria-disabled'),
+        status: f.querySelector('[data-testid="footer-country-status"]')!.textContent!,
+      })).observe(f, { subtree: true, attributes: true, childList: true, characterData: true });
+    });
     const fr = opts.and(page.locator('[value="FR"]'));
     await fr.click({ noWaitAfter: true });
     await expect.poll(() => posts.length).toBe(1);
     expect(posts[0]).toContain('country_code=FR');
     expect(posts[0]).toContain('form_type=localization');
-    await expect(fr).toHaveAttribute('aria-busy', 'true');
-    await expect(opts.and(page.locator('[value="CA"]'))).toHaveAttribute('aria-disabled', 'true');
-    await expect(footer(page).locator('form')).toHaveAttribute('aria-busy', 'true');
-    await expect(footer(page).getByTestId('footer-country-status')).toHaveText('Switching to France');
+    await expect.poll(() => snaps.at(-1)?.fr).toBe('true');
+    const busy = snaps.at(-1)!;
+    expect(busy.t, 'spinner hàng chọn chỉ sau 300 ms').toBeGreaterThanOrEqual(290);
+    expect(busy).toMatchObject({ form: 'true', ca: 'true', status: 'Switching to France' });
     release();
     await expect(page.getByTestId('switched')).toBeVisible();
     expect(errors).toEqual([]);
