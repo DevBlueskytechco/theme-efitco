@@ -75,13 +75,24 @@
     /* Sàn vùng bấm (WCAG 2.5.8, TE-3 AC6): hằng số, không theo space_base */
     --touch-target-min: 24px;
 
-    /* Corner radius */
+    /* Corner radius. Thang 4 / 8 / 12 / 16 / 20 + pill (foundation §1.2, ES1-T537): hằng số, không theo setting.
+       Bo lồng: con nhỏ hơn cha một bậc (thumb 8 trong card 12, card 12 trong panel 16, panel 16 trong dialog 20). */
+    --radius-xs: 4px;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    /* Pill shape (badges): constant, not a merchant setting */
+    --radius-pill: 999px;
+    /* Vai trò theo setting */
     --radius-input: {{ settings.input_corner_radius }}px;
     --radius-button: {{ settings.button_corner_radius }}px;
     --radius-card: {{ settings.card_corner_radius }}px;
     --radius-hero: {{ settings.hero_corner_radius }}px;
-    /* Pill shape (badges): constant, not a merchant setting */
-    --radius-pill: 999px;
+    /* Vai trò cố định: swatch, thumb · panel, banner, card bài viết · dialog, bottom sheet */
+    --radius-swatch: var(--radius-sm);
+    --radius-panel: var(--radius-lg);
+    --radius-dialog: var(--radius-xl);
 
     /* Colors */
     --color-background: {{ settings.background_color }};
