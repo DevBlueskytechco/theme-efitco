@@ -83,13 +83,13 @@ Phải làm một trong hai:
 
 Setting liên quan (bundle builder; header "Discount tiers"): "Tier 1 items needed" / "Tier 1 discount", "Tier 2 items needed" / "Tier 2 discount", "Tier 3 items needed" / "Tier 3 discount", "Collection". Mặc định hiện tại 2 món 10%, 3 món 15%, bậc 3 là 0%. Shop the look dùng cùng nhãn: mặc định 4 món 10%, bậc 2 và 3 là 0%.
 
-Ví dụ cấu hình đã dùng trên store dev (tham khảo, không phải đường bấm):
+Ví dụ cấu hình (tham khảo, không phải đường bấm):
 
 | Tên | Điều kiện | Giảm | Phạm vi |
 | --- | --- | --- | --- |
-| figma-bundle-tier-2 | Từ 2 món | 10% | collection của bundle |
-| figma-bundle-tier-3 | Từ 3 món | 15% | collection của bundle |
-| figma-setup | Từ 4 món | 10% | collection của shop the look |
+| bundle-tier-2 | Từ 2 món | 10% | collection của bundle |
+| bundle-tier-3 | Từ 3 món | 15% | collection của bundle |
+| setup | Từ 4 món | 10% | collection của shop the look |
 
 Trên store dev, 3 món cho ra 15% (bậc cao nhất thắng, không cộng 10% với 15%) và discount không áp lên sản phẩm ngoài collection. Cách cấu hình để đạt kết quả này ở store của bạn: KHÔNG CHẮC, hỏi ở ES1-T429.
 

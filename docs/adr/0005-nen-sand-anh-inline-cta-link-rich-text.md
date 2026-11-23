@@ -2,6 +2,7 @@ KHÔNG CHẮC: (1) 2 setting mới của rich-text (ảnh inline + phần headin
 
 # 0005. Nền sand #EBE6E0, ảnh inline trong heading, CTA dạng link + icon cho rich-text
 Ngày: 2026-11-02 | Trạng thái: Đề xuất (trả lời ES1-T41, nguồn drafts/designer/ES1-T34/ui-spec-rich-text.md nhánh feature/ai-ES1-T34)
+Cập nhật 21/11/2026 (CTO, ES1-T567): nguồn thiết kế là mockup `drafts/designer/**` + `drafts/designer/_kit/kit.css`; tên file thiết kế và mã node trong ADR này là bối cảnh lúc ra quyết định, không còn là căn cứ; quyết định giữ nguyên.
 
 ## Bối cảnh
 - Frame 1:453 (rich-text 1:454 + collection list 1:464) nền #EBE6E0. Snapshot docs/figma/snapshot-1-359.json có 12 node fill #EBE6E0 (1:453, 1:625 Inspiration 1920 × 960, 1:534, 1:536, 1:575, 1:799, 6 card Product 1:845–1:880) → màu lặp, không phải lẻ. docs/tokens.json và settings chưa có (17 màu, ADR 0001).
