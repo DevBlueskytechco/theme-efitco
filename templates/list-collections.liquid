@@ -1,4 +1,4 @@
-{% # TE-6 AC5, AC15 (SRS 0.5), docs/ui-spec/list-collections.md. Breadcrumb Home / Collections, h1 + "{n} collections", cards in the .collection-card language of blocks/collection-card.liquid (one title link stretched over the card), shared pagination 24 per page. Test hooks: list-collections, list-collections-grid, list-collections-card, list-collections-card-image, list-collections-card-title, list-collections-card-link, list-collections-card-meta, list-collections-empty(-heading, -button), plus the hooks of snippets/breadcrumb, page-title and pagination. %}
+{% # TE-6 AC5, AC15 (SRS 0.5), docs/ui-spec/list-collections.md. Breadcrumb Home / Collections, h1 + "{n} collections", cards in the .collection-card language of blocks/collection-card.liquid (one title link stretched over the card), shared pagination 24 per page. Test hooks: list-collections, list-collections-grid, list-collections-card, list-collections-card-image, list-collections-card-title, list-collections-card-link, list-collections-card-meta, list-collections-empty(-heading, -button), list-collections-page-empty(-heading, -button) for ?page= past the last page (AC7, "Go to page 1"), plus the hooks of snippets/breadcrumb, page-title and pagination. %}
 {% block 'container', id: 'list-collections' %}
   <div class="list-collections" data-testid="list-collections">
     {% render 'breadcrumb' %}
@@ -19,6 +19,19 @@
           assign empty_text = 'collections.empty' | t
           assign empty_button = 'collections.empty_cta' | t
           render 'empty-state', heading: empty_heading, text: empty_text, button_label: empty_button, button_url: routes.all_products_collection_url, testid: 'list-collections-empty'
+        -%}
+      {%- elsif collections.size == 0 -%}
+        {%- liquid
+          # ?page= past the last page (TE-6 AC7, pagination.md §3): the store has collections, this page has none
+          assign first_page_url = routes.collections_url
+          assign first_part = paginate.parts | first
+          if first_part.is_link
+            assign first_page_url = first_part.url
+          endif
+          assign empty_heading = 'collections.page_empty_heading' | t
+          assign empty_text = 'collections.page_empty_hint' | t
+          assign empty_button = 'collections.page_first' | t
+          render 'empty-state', heading: empty_heading, text: empty_text, button_label: empty_button, button_url: first_page_url, testid: 'list-collections-page-empty'
         -%}
       {%- else -%}
         <ul class="list-collections__grid" role="list" data-testid="list-collections-grid">
