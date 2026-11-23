@@ -60,7 +60,7 @@ Nguồn chuẩn: mockup `drafts/designer/ES1-T262/mini-cart-quickview.html` + `d
 
 Drawer phải (foundation §15), `<dialog>` + `showModal()` như code.
 
-1. Header 72 (`.overlay__header`): h2 "Cart" (heading 22–28) · pill số lượng "3 items" (13/600, nền alt) · link "View cart" (14, gạch chân, cao 44) · nút đóng tròn 48 (`.close-button`).
+1. Header 72 (`.overlay__header`): h2 "Your cart" (heading 22–28) · pill số lượng "3 items" (13/600, nền alt) — ở 360 pill xuống dòng dưới tiêu đề vì "Your cart" (CTO 23/11) dài hơn, header cao khoảng 96 thay vì 72 · link "View cart" (14, gạch chân, cao 44) · nút đóng tròn 48 (`.close-button`).
 2. Body cuộn riêng (`overscroll-behavior: contain`), padding 16 (24 từ 48rem):
    1. Thông báo "Added to cart" (chỉ sau khi thêm giỏ; `role="status"`): viền trái 4px `--color-badge-new`, icon check, tên + biến thể.
    2. Thanh freeship (`cart-free-shipping`): icon xe 20 · câu `cart.free_shipping_remaining` (số tiền đậm) · thanh 6px bo pill, nền alt, phần đầy accent. Đạt ngưỡng: câu `cart.free_shipping_reached`, thanh + icon `--color-badge-new`.
@@ -249,7 +249,7 @@ Tương phản (tính tay WCAG, số từ foundation §2; L muted-light 0.147, a
 
 - Vùng chạm: nút đóng 48; thùng rác, −, +, ô số, View cart, Quick view, swatch, pill, thumbnail 64–72, Add / Choose 44; Checkout, Add to cart 48. Hai nút cạnh nhau cách ≥ 8 trong cụm, cụm cách 12–16.
 - Tên: mọi nút icon có tên riêng kèm tên sản phẩm: "Remove {title}" (`cart.remove_label` có sẵn), "Decrease quantity for {title}", "Increase quantity for {title}", ô số `cart.quantity_label`; "Add" / "Choose" có phần ẩn "{title} to cart" / "options for {title}"; "Quick view" + tên; thumbnail "Show image 2 of 3"; chevron "Previous image" / "Next image"; "View details" + "of {title}"; ô số có `<label>` "Quantity" thật. Không có 2 link/nút cùng tên khác đích.
-- Bàn phím: drawer, dialog dùng `showModal()` (bẫy focus, Escape đóng, nền inert); mở thì focus vào tiêu đề (drawer: h2 "Cart"; quickview: tiêu đề, `tabindex="-1"`), Tab tiếp theo trong drawer: "View cart" → nút đóng (CTO 17/11, ES1-T476; ADR 0007 #5; SRS TE-5 AC15); đóng thì trả focus về nút mở. Thumbnail, option là radio/nút đi bằng Tab, ←/→ trong nhóm radio.
+- Bàn phím: drawer, dialog dùng `showModal()` (bẫy focus, Escape đóng, nền inert); mở thì focus vào tiêu đề (drawer: h2 "Your cart"; quickview: tiêu đề, `tabindex="-1"`), Tab tiếp theo trong drawer: "View cart" → nút đóng (CTO 17/11, ES1-T476; ADR 0007 #5; SRS TE-5 AC15); đóng thì trả focus về nút mở. Thumbnail, option là radio/nút đi bằng Tab, ←/→ trong nhóm radio.
 - Live region: `cart-items-status` (status) và `cart-items-error` (alert) có sẵn; quickview thêm 1 status + 1 alert.
 - Heading: drawer h2 → "Pairs well with" h3; quickview h2. Không nhảy bậc.
 - Màu không đứng một mình: hết hàng có chữ "Sold out", lỗi có icon + câu, đạt freeship có câu.
