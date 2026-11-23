@@ -116,6 +116,7 @@ const stubMedia = (page: Page) =>
   });
 
 const plays = (page: Page) => page.evaluate(() => (window as unknown as { __media: { plays: number } }).__media.plays);
+const height = (el: Locator) => el.evaluate((node) => node.getBoundingClientRect().height);
 const isPaused = (scope: Locator) => scope.locator('video').evaluate((el) => (el as HTMLVideoElement).paused);
 
 // Yêu cầu tệp giả treo: không có error, không có tải.
@@ -187,7 +188,8 @@ async function expectPrice(scope: Locator, variant: Variant) {
 
 // ES1-T344 (ADR 0010 bảng trang chủ): picker + product-form của featured nạp lười theo tương tác vùng mua
 // (pointerenter/focusin/touchstart), không theo viewport như ES1-T139. Rê vào nút mua: pointerenter tới cả
-// product-form và .featured-product__details (chứa picker). Picker ẩn tới khi defined (base.css) nên phải tương tác trước.
+// product-form và .featured-product__details (chứa picker). Markup picker hiện từ khi featured-product defined
+// (featured-product.css), module picker chỉ nạp khi tương tác: test đổi lựa chọn phải tương tác trước.
 async function wakeBuy(scope: Locator) {
   await scope.getByTestId('featured-product-add').hover();
 }
@@ -453,7 +455,7 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
   });
 
   test('AC2 lựa chọn đổi trước khi module nạp (picker bị giữ): id đúng, POST đúng variant', async ({ page }) => {
-    // CSS ẩn picker khi chưa defined nên khách không bấm được; tình huống thật là trình duyệt khôi phục form. Đổi checked bằng script.
+    // Khách bấm radio trước khi module nạp (picker đã hiện, ES1-T344) hoặc trình duyệt khôi phục form. Đổi checked bằng script.
     let release = () => {};
     const held = new Promise<void>((resolve) => {
       release = resolve;
@@ -603,6 +605,43 @@ test.describe('ES1-T158 AC3 lazy', () => {
 
     await band(page, 'te13-video').getByTestId('video-carousel').scrollIntoViewIfNeeded();
     await expect.poll(() => loaded.some((url) => MODULES.video.test(url))).toBe(true);
+  });
+
+  // ES1-T344 (ADR 0010): có JS, trước tương tác, markup picker đã hiện (không chờ rê chuột), giữ chỗ từ đầu (CLS 0),
+  // đúng 1 bộ chọn (không select biến thể), module picker, form chưa nạp.
+  test('AC3 trước tương tác: picker nhìn thấy, giữ chỗ từ đầu, 1 bộ chọn, module picker chưa nạp', async ({ page }) => {
+    const loaded: string[] = [];
+    page.on('request', (request) => {
+      if (Object.values(MODULES).some((m) => m.test(request.url()))) loaded.push(request.url());
+    });
+    let release = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route(MODULES.featured, async (route) => {
+      await held;
+      await route.continue();
+    });
+    await page.goto(TE13);
+    const scope = band(page, 'te13-a');
+    const picker = scope.getByTestId('product-variant-picker');
+    test.skip((await picker.count()) === 0, 'Sản phẩm không có nhiều variant');
+    await expect(picker).toHaveCount(1);
+    await scope.getByTestId('featured-product').scrollIntoViewIfNeeded();
+    await expect.poll(() => loaded.some((url) => MODULES.featured.test(url))).toBe(true);
+    // featured-product chưa defined: picker chưa hiện nhưng đã chiếm chỗ.
+    const before = await height(picker);
+    expect(before).toBeGreaterThan(0);
+    await expect(picker).toBeHidden();
+    release();
+    await expect(scope.getByTestId('featured-product')).toHaveAttribute('data-enhanced', '');
+    await expect(picker).toBeVisible();
+    await expect(picker.getByTestId('product-option').first()).toBeVisible();
+    expect(await height(picker)).toBe(before);
+    expect(await picker.locator('input[type="radio"]:checked').count()).toBeGreaterThan(0);
+    await expect(scope.locator('select[name="id"], noscript')).toHaveCount(0);
+    expect(await page.evaluate(() => Boolean(customElements.get('product-variant-picker')))).toBe(false);
+    expect(loaded.some((url) => MODULES.picker.test(url) || MODULES.form.test(url))).toBe(false);
   });
 
   test('AC3 trong khung có thẻ video, ngoài khung thì chưa; không có video tự chạy', async ({ page }) => {

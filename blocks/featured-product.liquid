@@ -50,8 +50,9 @@
   data-lazy-module (URL read by assets/lazy-module.js) on featured-product,
   on .featured-product__summary for sale-countdown.js (near viewport) and,
   outside the theme editor, on product-form and on .featured-product__details
-  for the picker, which has display none until defined and so never
-  intersects. Both carry data-lazy-on="interaction" (ADR 0010): they load on
+  for the picker. With scripting the picker markup keeps its space from the
+  first paint and shows once featured-product is defined, before the picker
+  module loads (assets/featured-product.css). Both carry data-lazy-on="interaction" (ADR 0010): they load on
   the first pointerenter, focusin or touchstart inside the element; without
   JS the form still buys the current variant;
   data-sale-countdown-slot around the countdown; sale-countdown, data-sale-countdown,
