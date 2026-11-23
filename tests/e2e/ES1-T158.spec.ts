@@ -146,9 +146,11 @@ async function openCountdown(page: Page, left: number) {
   const box = root.getByTestId(COUNTDOWN);
   test.skip((await box.count()) === 0, 'Sản phẩm band A không có giá gạch ở variant đầu (te13-featured, ES1-T153)');
   await expect(root).toHaveAttribute('data-enhanced', '');
+  // ES1-T344 (ADR 0009): đếm ở assets/sale-countdown.js, nạp lười khi .featured-product__summary gần khung nhìn.
+  // Timer chỉ chạy khi khung trong viewport; Pixel 7 có gallery ở trên. Observer chạy theo frame thật.
+  await box.scrollIntoViewIfNeeded();
+  await expect.poll(() => page.evaluate(() => !!customElements.get('sale-countdown'))).toBe(true);
   if (left > 0) {
-    // Timer chỉ chạy khi khung trong viewport; Pixel 7 có gallery ở trên. Observer chạy theo frame thật.
-    await box.scrollIntoViewIfNeeded();
     await expect(box).toBeInViewport();
     await page.waitForTimeout(300);
   }
@@ -270,22 +272,25 @@ test.describe('ES1-T158 AC1 countdown', () => {
     expect(keys.filter((key) => /countdown|featured|deadline|timer/i.test(key))).toEqual([]);
   });
 
-  test('AC1 tua qua giờ kết thúc: hidden, không hiện lại kể cả khi đồng hồ chạy tiếp', async ({ page }) => {
+  // ES1-T344: ADR 0009 / TE-4 AC17 K3 thay hành vi ẩn khung cũ: giữ khung, chữ "This sale has ended", không đếm lại.
+  test('AC1 tua qua giờ kết thúc: K3 ended, không đếm lại kể cả khi đồng hồ chạy tiếp', async ({ page }) => {
     const { box } = await openCountdown(page, 120);
     await expect(box).toBeVisible();
     await page.clock.fastForward(121000);
-    await expect(box).toBeHidden();
-    await expect(box).toHaveAttribute('hidden', '');
+    await expect(box).toHaveAttribute('data-state', 'ended');
+    await expect(box).toBeVisible();
+    await expect(box.locator('[data-countdown-unit]')).toHaveCount(0);
     await page.clock.fastForward(60000);
     await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
-    await expect(box).toHaveAttribute('hidden', '');
+    await expect(box).toHaveAttribute('data-state', 'ended');
+    await expect(box.locator('[data-countdown-unit]')).toHaveCount(0);
   });
 
-  test('AC1 đồng hồ đã quá hạn khi tải (trang cache): không bao giờ hiện, vẫn data-enhanced', async ({ page }) => {
+  test('AC1 đồng hồ đã quá hạn khi tải (trang cache): chuyển ngay K3, vẫn data-enhanced', async ({ page }) => {
     const { root, box } = await openCountdown(page, -5);
     await expect(root).toHaveAttribute('data-enhanced', '');
-    await expect(box).toHaveAttribute('hidden', '');
-    await expect(box).toBeHidden();
+    await expect(box).toHaveAttribute('data-state', 'ended');
+    await expect(box.locator('[data-countdown-unit]')).toHaveCount(0);
   });
 
   test('AC1 tab ẩn thì dừng, quay lại tính lại ngay', async ({ page }) => {

@@ -47,9 +47,13 @@
   selling plan has no form, only View Detail, because this block has no plan picker.
 
   JS hooks: featured-product (custom element, data-enhanced, data-design-mode);
-  data-lazy-module (URL read by assets/lazy-module.js) on featured-product and,
-  outside the theme editor, on product-form and on .featured-product__summary for
-  the picker, which has display none until defined and so never intersects;
+  data-lazy-module (URL read by assets/lazy-module.js) on featured-product,
+  on .featured-product__summary for sale-countdown.js (near viewport) and,
+  outside the theme editor, on product-form and on .featured-product__details
+  for the picker, which has display none until defined and so never
+  intersects. Both carry data-lazy-on="interaction" (ADR 0010): they load on
+  the first pointerenter, focusin or touchstart inside the element; without
+  JS the form still buys the current variant;
   data-sale-countdown-slot around the countdown; sale-countdown, data-sale-countdown,
   data-end (epoch seconds), data-state, data-size, data-label-ended and
   data-countdown-unit (days, hours, minutes, seconds) with data-countdown-value
@@ -70,7 +74,7 @@
   values form no variant; the button then says Unavailable, disabled). With 2+
   featured products on a page the partial names repeat, so
   assets/featured-product.js swap() replaces the fieldsets, the price, the
-  JSON and the button of its own band from
+  JSON, the button and the countdown slot of its own band from
   ?view=featured-product&option_values= (ES1-T169 D4).
 
   Test hooks: featured-product, featured-product-eyebrow, featured-product-title,
@@ -325,7 +329,15 @@
         {%- endif -%}
       </product-media-gallery>
 
-      <div class="featured-product__details">
+      <div
+        class="featured-product__details"
+        {% if has_variant_choice %}
+          {% unless request.design_mode or featured.requires_selling_plan %}
+            data-lazy-module="{{ 'product-variant-picker.js' | asset_url }}"
+          {% endunless %}
+          data-lazy-on="interaction"
+        {% endif %}
+      >
         <div class="featured-product__header">
           {%- if block.settings.eyebrow != blank -%}
             <p class="featured-product__eyebrow" data-testid="featured-product-eyebrow">
@@ -347,14 +359,7 @@
           -%}
         </div>
 
-        <div
-          class="featured-product__summary"
-          {% if has_variant_choice %}
-            {% unless request.design_mode or featured.requires_selling_plan %}
-              data-lazy-module="{{ 'product-variant-picker.js' | asset_url }}"
-            {% endunless %}
-          {% endif %}
-        >
+        <div class="featured-product__summary" data-lazy-module="{{ 'sale-countdown.js' | asset_url }}">
           {% partial 'product-price' %}
             <div class="featured-product__price" data-variant-price data-testid="featured-product-price">
               {%- if variant_exists -%}
@@ -415,6 +420,7 @@
             {% unless request.design_mode %}
               data-lazy-module="{{ 'product-form.js' | asset_url }}"
             {% endunless %}
+            data-lazy-on="interaction"
             data-product-id="{{ featured.id }}"
             data-product-url="{{ featured.url }}"
             data-cart-add-url="{{ routes.cart_add_url }}"
