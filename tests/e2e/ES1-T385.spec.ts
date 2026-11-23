@@ -13,7 +13,9 @@
 //   TE385_POST_COMMENT=1 (đăng bình luận thật), TE385_STORE_STATE=configured (AC15), FRESH_THEME_ID (theme mới cài, AC15)
 // Bài có ảnh, bài không ảnh, trang tag tìm lúc chạy từ trang blog, không cứng handle bài.
 // Phần JS do BE còn mở: ES1-T473 (focus hộp lỗi/thành công bình luận, chevron bài liên quan) → fixme gắn mã.
-// Bug đã biết: test.fail gắn mã (ES1-T506 (ES1-T385-B01), ES1-T517 (B02, TC-14 360), ES1-T518 (B03), ES1-T520 (B04, TC-33 1280/1920)); khi bug sửa test đỏ lại → gỡ test.fail.
+// Bug đã biết: test.fail gắn mã (ES1-T517 (B02, TC-14 360), ES1-T520 (B04, TC-33 1280/1920)); khi bug sửa test đỏ lại → gỡ test.fail.
+// ES1-T506 (B01) đã sửa ở #276: khung card là article-card-frame (nền tối 3/4, bo 16), article-card-link chỉ bọc chữ tiêu đề,
+// ::after của link phủ khung và vẽ vòng focus → đo kích thước/nền/vị trí ở frame, outline focus ở ::after của link (ES1-T531).
 // Câu hỏi AC: ES1-T519 [Q] (AC14 bài không ảnh → LCP h1) — CI 20/11 đo LCP là <p>; TC-46b test.fail tới khi CTO chốt.
 import { test, expect, type Browser, type Locator, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -331,10 +333,10 @@ test.describe('ES1-T385 blog', () => {
       await openBlog(page, w);
       const grid = page.getByTestId('blog-articles-grid');
       expect(await grid.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length), `${w}: số cột`).toBe(cols);
-      const link = grid.getByTestId('article-card-link').first();
-      const r = await rect(link);
+      const frame = grid.getByTestId('article-card-frame').first();
+      const r = await rect(frame);
       expect(r.height, `${w}: cao ≥ rộng × 4/3`).toBeGreaterThanOrEqual((r.width * 4) / 3 - 2);
-      expect(await css(link, 'border-top-left-radius')).toBe('16px');
+      expect(await css(frame, 'border-top-left-radius')).toBe('16px');
       if (cw) {
         expect(near(r.width, cw), `${w}: rộng ${r.width}, cần ${cw}`).toBe(true);
         expect.soft(near(r.height, ch), `${w}: cao ${r.height}, cần ${ch} (tên dài được cao thêm)`).toBe(true);
@@ -345,7 +347,6 @@ test.describe('ES1-T385 blog', () => {
 
   test('TC-05 AC2, AC7: mỗi card 1 link, tên link = tiêu đề bài', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
-    test.fail(true, 'ES1-T506 (ES1-T385-B01): link card bọc tag, trích đoạn, meta nên tên truy cập dài hơn tiêu đề');
     await openBlog(page, 1280);
     const cards = page.getByTestId('blog-articles-grid').getByTestId('article-card');
     expect(await cards.count()).toBeGreaterThan(0);
@@ -361,7 +362,7 @@ test.describe('ES1-T385 blog', () => {
     for (const w of WIDTHS) {
       await openBlog(page, w);
       for (const card of await page.getByTestId('blog-articles-grid').getByTestId('article-card').all()) {
-        const link = await rect(card.getByTestId('article-card-link'));
+        const frame = await rect(card.getByTestId('article-card-frame'));
         const title = card.getByTestId('article-card-title');
         const t = await title.evaluate((el) => {
           const s = getComputedStyle(el);
@@ -371,7 +372,7 @@ test.describe('ES1-T385 blog', () => {
         expect(t.clamp === 'none' || t.clamp === '', `${w}: không line-clamp`).toBe(true);
         expect(t.overflow, `${w}: không ellipsis`).not.toBe('ellipsis');
         expect(t.fits && !t.text.includes('…'), `${w}: tiêu đề "${t.text.trim()}" hiện đủ`).toBe(true);
-        expect(t.top >= link.y - 1 && t.bottom <= link.y + link.height + 1, `${w}: tiêu đề nằm trong card (không bị clip)`).toBe(true);
+        expect(t.top >= frame.y - 1 && t.bottom <= frame.y + frame.height + 1, `${w}: tiêu đề nằm trong card (không bị clip)`).toBe(true);
         const excerpt = card.getByTestId('article-card-excerpt');
         if (await excerpt.count()) {
           const e = (await excerpt.textContent()) ?? '';
@@ -396,14 +397,14 @@ test.describe('ES1-T385 blog', () => {
     for (const w of [360, 1280]) {
       await openBlog(page, w);
       const card = page.getByTestId('blog-articles-grid').getByTestId('article-card').first();
-      const link = card.getByTestId('article-card-link');
-      const sizeBefore = await rect(link);
+      const frame = card.getByTestId('article-card-frame');
+      const sizeBefore = await rect(frame);
       await card.getByTestId('article-card-image').evaluate((el) => el.remove());
-      const sizeAfter = await rect(link);
+      const sizeAfter = await rect(frame);
       expect(near(sizeAfter.width, sizeBefore.width, 1) && near(sizeAfter.height, sizeBefore.height, 1), `${w}: giữ kích thước card`).toBe(true);
       const dark = await resolveColor(page, 'var(--color-background-dark)');
       const fg = await resolveColor(page, 'var(--color-background-dark-foreground)');
-      expect(await css(link, 'background-color'), `${w}: nền tối`).toBe(dark);
+      expect(await css(frame, 'background-color'), `${w}: nền tối`).toBe(dark);
       expect(await css(card.getByTestId('article-card-title'), 'color'), `${w}: chữ trắng`).toBe(fg);
       expect(contrast(parseColor(fg).rgb, parseColor(dark).rgb), `${w}: tương phản`).toBeGreaterThanOrEqual(17);
     }
@@ -702,12 +703,13 @@ test.describe('ES1-T385 blog', () => {
         await el.decode();
       }, WHITE);
       await page.mouse.move(0, 0);
-      const link = await rect(card.getByTestId('article-card-link'));
+      // Mẫu nền ở lề trong khung (x + 6, trong padding 16/20), không ở link: link chỉ bọc chữ tiêu đề nên x + 6 rơi vào nét chữ
+      const frame = await rect(card.getByTestId('article-card-frame'));
       for (const id of ['article-card-title', 'article-card-excerpt', 'article-card-meta']) {
         const el = card.getByTestId(id);
         if ((await el.count()) === 0) continue;
         const r = await rect(el);
-        const bg = await brightestPixel(page, { x: Math.round(link.x + 6), y: Math.round(r.y), width: 3, height: Math.max(1, Math.round(r.height)) });
+        const bg = await brightestPixel(page, { x: Math.round(frame.x + 6), y: Math.round(r.y), width: 3, height: Math.max(1, Math.round(r.height)) });
         const fg = blend(parseColor(await css(el, 'color')), bg);
         const ratio = contrast(fg, bg);
         expect(ratio, `${w} ${id}: ${ratio.toFixed(2)}:1 trên nền rgb(${bg.join(',')})`).toBeGreaterThanOrEqual(4.5);
@@ -1131,7 +1133,6 @@ test.describe('ES1-T385 bài viết', () => {
 
   test('TC-45b AC14: meta description bài ≤ 160 ký tự', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
-    test.fail(true, 'ES1-T518 (ES1-T385-B03): meta-tags dùng page_description (~320 ký tự), chưa cắt excerpt_or_content về 160');
     const d = await discover(page);
     const paths = [d.withCover, d.noCover].filter((p): p is string => !!p);
     test.fixme(paths.length === 0, 'không có bài');
@@ -1231,7 +1232,7 @@ test.describe('ES1-T385 biên', () => {
       await openBlog(page, w);
       const dark = await resolveColor(page, 'var(--color-background-dark)');
       for (const card of (await page.getByTestId('blog-articles-grid').getByTestId('article-card').all()).slice(0, 4)) {
-        expect(await css(card.getByTestId('article-card-link'), 'background-color')).toBe(dark);
+        expect(await css(card.getByTestId('article-card-frame'), 'background-color'), `${w}: nền tối khung card`).toBe(dark);
         await expect(card.getByTestId('article-card-title')).toBeVisible();
       }
       const media = page.getByTestId('blog-articles-featured').locator(':scope > div').first();
@@ -1257,7 +1258,14 @@ test.describe('ES1-T385 biên', () => {
     expect(seen[topics + 1]).toBe('article-card-link');
     const accent = await resolveColor(page, 'var(--color-accent)');
     const focused = page.locator(':focus');
-    expect(await css(focused, 'outline-color'), 'outline card màu accent').toBe(accent);
+    // ES1-T506: link chỉ bọc tiêu đề, vòng focus vẽ ở ::after phủ cả khung card
+    expect(await css(focused, 'outline-style', '::after'), 'outline card (::after)').toBe('solid');
+    expect(await css(focused, 'outline-color', '::after'), 'outline card màu accent').toBe(accent);
+    const ring = await focused.evaluate((el) => {
+      const a = getComputedStyle(el, '::after');
+      return { position: a.position, inset: [a.top, a.right, a.bottom, a.left] };
+    });
+    expect(ring, 'vòng focus phủ cả khung card').toEqual({ position: 'absolute', inset: ['0px', '0px', '0px', '0px'] });
     await page.keyboard.press('Shift+Tab');
     await expect(page.getByTestId('blog-articles-featured-link')).toBeFocused();
     expect(await css(page.getByTestId('blog-articles-featured'), 'outline-style'), 'khối nổi bật có outline').not.toBe('none');

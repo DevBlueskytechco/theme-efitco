@@ -4,7 +4,7 @@
   description, spec table, Add to cart and View Detail. Reads the product from
   block.settings.product, never the global product. templates/product.featured-product
   passes the global product as the product parameter, so ?view=featured-product
-  returns the 2 partials below with the same markup for the requested variant.
+  returns the 3 partials below with the same markup for the requested variant.
 
   Gallery (ADR 0012, Theme Store rich media): every media type of the product
   (image, video, YouTube/Vimeo, 3D model), 8 at most, scroll-snap, lazy, each
@@ -49,7 +49,18 @@
   data-product-id, data-product-url, data-cart-add-url, data-cart-url,
   data-cart-type, data-label-add, data-label-added, data-label-sold-out,
   data-label-unavailable; data-fetch-url and data-regions on product-variant-picker.
-  Partials: product-price, product-buy-buttons.
+  Partials (ADR 0008 item 3, one featured product per real page):
+  product-options (the picker fieldsets, rendered by
+  snippets/product-variant-picker because regions lists it: the server
+  refreshes the legend and every value state after a change), product-price
+  (data-variant-price; no price and no discount when the selected option
+  values form no variant), product-buy-buttons (add button and
+  snippets/selected-variant-data: one variant, null when the selected option
+  values form no variant; the button then says Unavailable, disabled). With 2+
+  featured products on a page the partial names repeat, so
+  assets/featured-product.js swap() replaces the fieldsets, the price, the
+  JSON and the button of its own band from
+  ?view=featured-product&option_values= (ES1-T169 D4).
 
   Test hooks: featured-product, featured-product-eyebrow, featured-product-title,
   featured-product-media, featured-product-media-item, featured-product-thumbnail,
@@ -64,15 +75,23 @@
   product-media-video, product-media-external-video,
   product-media-external-video-template, product-media-model
   (snippets/product-media-item). Also product-variant-picker,
-  product-option, product-option-value, product-variant-select and price*.
+  product-option, product-option-value and price*. No select listing
+  variants (TE-4 AC13, NFR-7): without JS the form buys the current variant.
 
   Empty state: no product selected → a hint in the theme editor, nothing on the
   storefront.
+
+  Styles: assets/featured-product.css (this block and the seal), loaded by the
+  stylesheet_tag line before the root, outside every partial, without preload
+  (ADR 0014), only when the block prints markup (product set, or the theme
+  editor) and never in the ?view=featured-product data view. Gallery, picker,
+  form and countdown styles stay in assets/base.css.
 
   Self-contained: callers must leave the body empty.
 
   @param {string} [id] - Static block id, needed when a template has more than one featured product
   @param {boolean} [hide_options] - True hides the variant picker, as on the home page (Figma 1:759). Default: false
+  @param {boolean} [stylesheet] - False skips the stylesheet_tag line. Only templates/product.featured-product passes it: that layout none data view returns partials to a page that already has the link. Default: true
 
   @example
   {% block 'container', id: 'home-featured-product', tag: 'div' %}
@@ -80,8 +99,21 @@
   {% endblock %}
 {% enddoc %}
 
-{%- assign featured = block.settings.product -%}
+{%- liquid
+  assign featured = block.settings.product
+  # ADR 0014: link only when the block prints markup, else the container sees a non-empty body and renders an empty band. The data view (stylesheet: false, layout none) never prints it.
+  assign load_stylesheet = false
+  if featured != blank or request.design_mode
+    assign load_stylesheet = true
+  endif
+  if stylesheet == false
+    assign load_stylesheet = false
+  endif
+-%}
 
+{%- if load_stylesheet -%}
+  {{ 'featured-product.css' | asset_url | stylesheet_tag }}
+{%- endif -%}
 {%- if featured == blank -%}
   {%- if request.design_mode -%}
     <div
@@ -109,6 +141,22 @@
     endif
     if hide_options
       assign has_variant_choice = false
+    endif
+
+    # Tổ hợp đang chọn không tạo thành biến thể: cùng quy tắc blocks/product-form (ADR 0008, ES1-T253)
+    assign variant_exists = true
+    if has_variant_choice
+      for option in featured.options_with_values limit: 1
+        for value in option.values
+          if value.selected and value.variant == blank
+            assign variant_exists = false
+          endif
+        endfor
+      endfor
+    endif
+    assign can_buy = false
+    if variant_exists and current_variant.available
+      assign can_buy = true
     endif
     assign fetch_url = featured.url | append: '?view=featured-product'
 
@@ -378,9 +426,11 @@
           {% endif %}
         >
           {% partial 'product-price' %}
-            <div class="featured-product__price" data-testid="featured-product-price">
-              {% render 'price', product: featured, variant: current_variant %}
-              {%- if current_variant.compare_at_price > current_variant.price -%}
+            <div class="featured-product__price" data-variant-price data-testid="featured-product-price">
+              {%- if variant_exists -%}
+                {% render 'price', product: featured, variant: current_variant %}
+              {%- endif -%}
+              {%- if variant_exists and current_variant.compare_at_price > current_variant.price -%}
                 {%- assign discount_percent = current_variant.compare_at_price | minus: current_variant.price | times: 100.0 | divided_by: current_variant.compare_at_price | round -%}
                 <span class="featured-product__discount" data-testid="featured-product-discount">
                   {%- if discount_percent > 0 -%}
@@ -447,39 +497,37 @@
             {%- if has_variant_choice -%}
               {%- render 'product-variant-picker',
                 product: featured,
-                current_variant: current_variant,
                 form_id: form_id,
                 fetch_url: fetch_url,
-                regions: 'product-price product-buy-buttons'
+                regions: 'product-options product-price product-buy-buttons'
               -%}
             {%- endif -%}
 
             {%- form 'product', featured, id: form_id, class: 'featured-product__actions' -%}
               <input type="hidden" name="id" value="{{ current_variant.id }}">
 
-              {%- if has_variant_choice -%}
-                {%- render 'product-variant-select', product: featured, current_variant: current_variant, form_id: form_id -%}
-              {%- endif -%}
-
               {% partial 'product-buy-buttons' %}
                 <div class="featured-product__add-wrapper">
+                  {%- render 'selected-variant-data', variant: current_variant, exists: variant_exists -%}
                   <button
                     class="button featured-product__add"
                     type="submit"
                     name="add"
-                    {% unless current_variant.available %}
+                    {% unless can_buy %}
                       disabled
                     {% endunless %}
                     data-testid="featured-product-add"
                   >
-                    {%- if current_variant.available -%}
+                    {%- if can_buy -%}
                       {% render 'header-icon', name: 'bag' %}
                     {%- endif -%}
                     <span class="product-form__add-label">
-                      {%- if current_variant.available -%}
+                      {%- if can_buy -%}
                         {{- label_add -}}
-                      {%- else -%}
+                      {%- elsif variant_exists -%}
                         {{- label_sold_out -}}
+                      {%- else -%}
+                        {{- label_unavailable -}}
                       {%- endif -%}
                     </span>
                   </button>
@@ -515,12 +563,14 @@
       "type": "text",
       "id": "eyebrow",
       "label": "t:labels.eyebrow",
+      "info": "t:info.sample_default",
       "default": "FEATURED PRODUCT · FREE WEIGHTS"
     },
     {
       "type": "text",
       "id": "countdown_label",
       "label": "t:labels.countdown_label",
+      "info": "t:info.sample_default",
       "default": "Sale ends in"
     },
     {

@@ -28,7 +28,7 @@ Mockup: `drafts/designer/ES1-T258/gift_card.html` + `gift_card-360|768|1280|1920
 
 1. Thanh trên 80: nền `--color-background-dark` + noise; logo trắng 100 × 30 thẳng mép trái container (`settings.logo` hoặc shop.name), link về `shop.url`, `aria-label="Efitco home"`, ô bấm 44. Không menu (trang ngoài layout).
 2. Intro căn giữa: eyebrow "Gift card" · h1 "Your Efitco Gift Card" (`shop.name`) · "Use this gift card at checkout." (locale `gift_card.use_at_checkout`).
-3. Thẻ (chỉ CSS, không ảnh): tỉ lệ 1.586 (thẻ ngân hàng), nền `--color-background-dark` + noise, bo 16, vòng trang trí trắng 6% góc trên · logo trắng + nhãn pill "Gift card" · "Balance" 14 muted-on-dark · số dư `gift_card.balance | money` heading 800 40–64 · nếu balance < initial_value: "of $50.00 initial value".
+3. Thẻ (chỉ CSS, không ảnh): tỉ lệ 1.586 (thẻ ngân hàng), nền `--color-background-dark` + noise, bo 16, vòng trang trí trắng 6% góc trên · logo trắng + nhãn `.badge--outline` "Gift card" (ES1-T527 V63: pill 28, 13/600, viền + chữ trắng, Title case) · "Balance" 14 muted-on-dark · số dư `gift_card.balance | money` heading 800 `--font-size-h1` 40 → 48 · nếu balance < initial_value: "of $50.00 initial value".
 4. Panel trắng bo 16:
    - "Gift card code" · mã `gift_card.code | format_code` 18/600 giãn chữ 0.08em trong ô viền đứt muted-light nền alt, `user-select: all` · nút secondary "Copy Code" (JS, BE).
    - QR 144 × 144 (≥ 120 theo SRS) viền border, nền trắng; tên "QR code, scan to redeem gift card"; chú thích "Pay in store" + "Show this QR code at the counter, or enter the code at online checkout."
@@ -59,7 +59,7 @@ Không setting mới (template `layout none`, không block). Dùng `settings.log
 | Trạng thái | Hiện thế nào | Nguồn |
 | --- | --- | --- |
 | Đã dùng một phần (S1) | số dư + dòng "of $50.00 initial value" | Dawn/Shopify gift card mặc định |
-| Hết hạn (S2) | `gift_card.expired`: thẻ xám (`filter: grayscale`), số dư gạch, nhãn pill "Expired"; `.alert` "This gift card has expired" + ngày hết hạn + cách xử lý; ẩn QR, Wallet, Copy; nút secondary "Contact Us"; vẫn hiện mã | 05 §4, 01 (không chỉ màu) |
+| Hết hạn (S2) | `gift_card.expired`: thẻ xám (`filter: grayscale`), số dư gạch, nhãn `.badge--outline` "Expired"; `.alert` "This gift card has expired" + ngày hết hạn + cách xử lý; ẩn QR, Wallet, Copy; nút secondary "Contact Us"; vẫn hiện mã | 05 §4, 01 (không chỉ màu) |
 | Bị tắt | `gift_card.enabled == false`: như S2, tiêu đề "This gift card is no longer active" (code hiện gộp chung chuỗi expired, cần tách) | ĐỀ XUẤT 05 §4.1 lỗi cụ thể |
 | Đã chép (S3) | nhãn nút "Copied" + icon check 2s, `role="status"` "Gift card code copied" | 05 §6 phản hồi |
 | Không JS | ẩn nút Copy, Print; QR không vẽ → giữ khung 144 với chữ "Enter the code at checkout" (không khung trống) | AGENTS progressive enhancement |

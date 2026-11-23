@@ -132,7 +132,9 @@ test.describe('ES1-T366 tĩnh', () => {
     expect(BLOCK).not.toContain('scroll-lock');
     const partial = BLOCK.slice(BLOCK.indexOf("{% partial 'collection-filters' %}"), BLOCK.indexOf('{% endpartial %}'));
     for (const id of ['collection-filter-status', 'collection-filter-clear', 'collection-filter-apply']) expect(partial).toContain(`data-testid="${id}"`);
-    expect(partial).toContain("'blocks.collection_filters.show_results' | t: count: collection.products_count");
+    // ES1-T128: block dùng chung collection + search, số đếm qua source_count; trang collection vẫn là collection.products_count
+    expect(partial).toContain("'blocks.collection_filters.show_results' | t: count: source_count");
+    expect(BLOCK).toMatch(/elsif collection != blank[\s\S]*?assign source_count = collection\.products_count/);
     expect(BLOCK).toContain("append: '?sort_by='");
     expect(GROUP).toContain('assign visible_limit = 6');
     expect(GROUP).toContain('class="filter-group__more"');
