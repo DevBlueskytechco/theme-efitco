@@ -2,6 +2,7 @@ KHÔNG CHẮC: số gzip "hiện tại" lấy từ ES1-T472 (develop ~51,9 KB sa
 
 # 0013. Tách CSS theo template: base.css (khung + trang chủ) và 4 file nạp theo template.name
 Ngày: 2026-11-17 | Trạng thái: Chấp nhận (CTO 17/11, ES1-T472 phương án a); sửa một phần bởi ADR 0014 (21/11, ES1-T564) | Đảo ES1-T310 #1 (1 file base.css), sửa task-split ES1-T307 D7, bổ sung ADR 0003
+Cập nhật 21/11/2026 (CTO, ES1-T567): nguồn thiết kế là mockup `drafts/designer/**` + `drafts/designer/_kit/kit.css`; tên file thiết kế và mã node trong ADR này là bối cảnh lúc ra quyết định, không còn là căn cứ; quyết định giữ nguyên.
 
 Sửa đổi 21/11 (ADR 0014, CTO chốt hướng ở ES1-T564): `base.css` chạm lại trần (develop 48 641 B, #292 50 104 B) vì mục 1 để "toàn bộ block trang chủ" ở `base.css`.
 - Mục 1: bỏ "toàn bộ block trang chủ" khỏi `base.css`. Block cấp section không ở màn đầu có file `assets/<block>.css`, nạp bằng `stylesheet_tag` trong block (tầng 4, ADR 0014 mục 1–3). 4 file nhóm trang giữ nguyên.

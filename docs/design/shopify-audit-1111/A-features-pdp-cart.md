@@ -1,3 +1,6 @@
+> CẬP NHẬT 21/11/2026 (CTO, ES1-T567) — TÀI LIỆU LỊCH SỬ (bản rà 11/11).
+> Nguồn chuẩn thiết kế hiện nay là mockup HTML `drafts/designer/**` cùng `drafts/designer/_kit/kit.css`. Chỗ bên dưới nhắc file thiết kế cũ hoặc mã node là ghi chép lúc rà, không còn là căn cứ; kết luận tuân thủ Shopify giữ nguyên.
+
 # Audit A — Shopify Theme Store: mục 4 (Features) + mục 7 (Layout, Product, Cart, Gift card, Password)
 
 Theme Efitco, repo `theme-efitco` (thư mục làm việc, nhánh develop, đọc 11/11/2026, không fetch). Chỉ đọc, không sửa.

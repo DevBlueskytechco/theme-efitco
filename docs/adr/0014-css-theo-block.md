@@ -2,6 +2,7 @@ KHÔNG CHẮC: (1) số gzip sau tách là ước lượng từ byte thô (sed |
 
 # 0014. CSS theo block: assets/<block>.css nạp bằng stylesheet_tag trong block, base.css chỉ khung + component dùng chung
 Ngày: 2026-11-21 | Trạng thái: Đề xuất (hướng CTO chốt 21/11, ES1-T564) | Sửa ADR 0013 mục 1 (nội dung base.css), mục 2 (quy tắc xếp rule), mục 4 (trần base.css). Giữ nguyên 4 file nhóm trang của ADR 0013. Sửa 21/11 theo CTO ES1-T575: block nhỏ/luôn có ở trang chủ giữ `base.css`, bỏ mục tiêu hạ `base.css` 40 960 (mục 1, 2, 5, Hệ quả, Đo).
+Cập nhật 21/11/2026 (ES1-T567): nguồn thiết kế là mockup drafts/designer/** (theo Design System Polaris-first), không còn so với bản vẽ cũ; quyết định ADR giữ nguyên.
 
 ## Bối cảnh
 - ADR 0013 (17/11) tách CSS theo template nhưng để "toàn bộ block trang chủ" ở `base.css`. Trang chủ là nơi R2 thêm nhiều nhất, nên `base.css` lại chạm trần 49 152 B gzip:
@@ -12,7 +13,7 @@ Ngày: 2026-11-21 | Trạng thái: Đề xuất (hướng CTO chốt 21/11, ES1-
 - Ràng buộc:
   - AGENTS.md: CSS chỉ ở `assets/`. Không `{% stylesheet %}`, không build step, không `<style>` trong block.
   - `critical.css` ≤ 10 240 B thô (ADR 0003). CI chặn merge khi perf < 96 desktop, < 90 mobile, a11y < 98. NFR-1 nghiệm thu desktop ≥ 98.
-  - Trang chủ giống 100 % Figma là mục tiêu số 1. LCP trang chủ là ảnh slide đầu (AGENTS.md mục Images).
+  - Trang chủ giống mockup drafts/designer/** là mục tiêu số 1. LCP trang chủ là ảnh slide đầu (AGENTS.md mục Images).
   - Canvas: Sidekick sửa từng file, nên phải đoán được rule của block nằm ở file nào.
 - Hành vi trình duyệt cần dựa vào:
   - `<link rel="stylesheet">` trong `<body>` hợp lệ (body-ok).

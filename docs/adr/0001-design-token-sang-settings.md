@@ -1,5 +1,6 @@
 # 0001. Design token từ Figma → settings_schema + css-variables
 Ngày: 2026-10-22 | Trạng thái: Đề xuất (G3 chấp nhận)
+Cập nhật 21/11/2026 (CTO, ES1-T567): nguồn thiết kế là mockup `drafts/designer/**` + `drafts/designer/_kit/kit.css`; tên file thiết kế và mã node trong ADR này là bối cảnh lúc ra quyết định, không còn là căn cứ; quyết định giữ nguyên. Riêng hướng "token từ bản vẽ → settings": từ 21/11 thứ tự là kit.css → `docs/tokens.json` → `settings_schema.json` + `css-variables.liquid` phản chiếu kit (cơ chế "mỗi token = 1 setting + 1 biến CSS" giữ); việc viết lại tiêu đề và mục Bối cảnh của ADR chờ CTO / Tech Lead (Còn mở, notes ES1-T567).
 
 ## Bối cảnh
 Figma Efitco T10 có token màu/chữ/khoảng cách. Theme Store R15/R16 yêu cầu font_picker, ≥ 4 màu có foreground. Sidekick cần đổi màu/chữ qua settings, không sửa CSS.

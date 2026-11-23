@@ -3,7 +3,7 @@
 | Bước | Nội dung | Sprint 1 | Sprint 2 | Sprint 3 | Sprint 4 | Tuần 11 |
 | --- | --- | --- | --- | --- | --- | --- |
 | C1 | Mở được trong Canvas; mọi template hiện trong khung nhìn toàn trang; không template lỗi |  |  |  |  |  |
-| C2 | 16 block trang chủ đúng thứ tự docs/figma-inventory.md; sửa text trực tiếp được; đổi setting phản ánh ngay |  |  |  |  |  |
+| C2 | 16 block trang chủ đúng thứ tự mockup `drafts/designer/ES1-T293/index.html` (`docs/ui-spec/index.md`); sửa text trực tiếp được; đổi setting phản ánh ngay |  |  |  |  |  |
 | C3 | Sidekick: 3 yêu cầu mẫu (đổi bố cục hero; thêm block testimonial; đổi màu nút) — tuần 11: 10 yêu cầu |  |  |  |  |  |
 | C4 | Sau Sidekick sửa: theme check 0 lỗi; cấu trúc Skeleton không đổi |  |  |  |  |  |
 | C5 | Kết quả ghi lại; lỗi → bug P2 truy về block/story |  |  |  |  |  |

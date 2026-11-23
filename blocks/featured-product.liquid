@@ -6,6 +6,13 @@
   passes the global product as the product parameter, so ?view=featured-product
   returns the 3 partials below with the same markup for the requested variant.
 
+  Layout (index-mobile-b.md §2, index-1280.md khối 10, TE-13 AC6): below 48rem
+  one column, image 1:1 with the product contained, spec rows label above value,
+  buttons stacked full width; from 48rem image 4:3, spec rows 2 columns, buttons
+  in one row; from 64rem 2 columns 1fr | 80 | 1fr (580 | 80 | 580 at 1280),
+  image 668 / 653. View Detail carries a visually hidden " of {product}"
+  (TE-13 AC6) so the link name is unique on the page.
+
   Gallery (ADR 0012, Theme Store rich media): every media type of the product
   (image, video, YouTube/Vimeo, 3D model), 8 at most, scroll-snap, lazy, each
   item through snippets/product-media-item.liquid with zoom off (video poster
@@ -134,6 +141,8 @@
     assign label_added = 'blocks.product_form.added_to_cart' | t
     assign label_sold_out = 'blocks.product_form.sold_out' | t
     assign label_unavailable = 'blocks.product_form.unavailable' | t
+    assign featured_title = featured.title
+    assign view_detail_suffix = 'blocks.featured_product.view_detail_suffix' | t: product: featured_title
 
     assign has_variant_choice = true
     if featured.has_only_default_variant or featured.variants.size == 1
@@ -475,6 +484,7 @@
           <div class="featured-product__actions">
             <a class="button button--secondary featured-product__view-detail" href="{{ featured.url }}" data-testid="featured-product-view-detail">
               {{- 'blocks.featured_product.view_detail' | t -}}
+              <span class="visually-hidden"> {{ view_detail_suffix }}</span>
               {% render 'slideshow-icon', name: 'arrow' %}
             </a>
           </div>
@@ -536,6 +546,7 @@
 
               <a class="button button--secondary featured-product__view-detail" href="{{ featured.url }}" data-testid="featured-product-view-detail">
                 {{- 'blocks.featured_product.view_detail' | t -}}
+                <span class="visually-hidden"> {{ view_detail_suffix }}</span>
                 {% render 'slideshow-icon', name: 'arrow' %}
               </a>
             {%- endform -%}
