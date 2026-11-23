@@ -40,7 +40,7 @@ class PredictiveSearch extends HTMLElement {
     on(form, 'reset', () => (this.hide(), this.input.focus()));
     on(dialog, 'close', () => this.hide());
     on(this.closest('modal-dialog'), 'modal:open', () => this.update());
-    // ADR 0014 §8: CSS on first open, skeleton until load/error
+    // ADR 0014 §8
     const href = this.dataset.stylesheet,
       sk = $('[data-predictive-skeleton]');
     const l =
@@ -49,7 +49,7 @@ class PredictiveSearch extends HTMLElement {
         document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href })));
     if (l && !l.sheet) {
       if (sk) sk.hidden = false;
-      this.css = new Promise((r) => (l.onload = l.onerror = r)).then(() => sk && (sk.hidden = true));
+      this.css = (l.p ||= new Promise((r) => (l.onload = l.onerror = r))).then(() => sk && (sk.hidden = true));
     }
     if (dialog?.open) this.update();
   }
