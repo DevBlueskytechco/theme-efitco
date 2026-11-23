@@ -621,20 +621,37 @@ test.describe('ES1-T412 store — featured product rich media, focal point', () 
     test.info().annotations.push(...tag('§4 Rich media in featured product', 'A#22', 'TS-BE1 (ES1-T410)'));
     const errors = watchConsole(page);
     await page.route(EMBED, (r) => r.fulfill({ status: 200, contentType: 'text/html', body: '<!doctype html><title>stub</title>' }));
-    await gotoStore(page, FEATURED);
+    // ?view=featured-product là data view `layout none` (ADR 0008 mục 3, templates/product.featured-product.liquid): không
+    // base.css/featured-product.css → poster SVG phủ cả khung, item co lại khi iframe thay poster, IntersectionObserver thấy
+    // item rời khung và stop() trả poster (CI PR #296: embed đã được gọi rồi iframe mất). Đó là trang không dành cho người xem,
+    // không phải lỗi theme. Bấm Play chạy trên trang thật /?view=te13 (CSS + lazy-module như trang chủ). Sản phẩm featured ở
+    // te13 không có external_video thì chép đúng <li> external_video mà Liquid render cho MEDIA (lấy từ data view) vào item đầu
+    // gallery (item đã được product-media-gallery quan sát), giống ES1-T410 nhưng markup lấy từ store, không viết tay.
+    await gotoStore(page, '/?view=te13');
     const featured = page.getByTestId('featured-product').first();
-    const item = featured.locator('li[data-media-type="external_video"]').first();
-    test.fixme((await item.count()) === 0, `${MEDIA} không có external_video`);
     const gallery = featured.locator('product-media-gallery').first();
+    test.fixme((await gallery.count()) === 0, 'te13 chưa có featured product');
     await gallery.scrollIntoViewIfNeeded();
     await expect.poll(() => page.evaluate(() => Boolean(customElements.get('product-media-gallery')))).toBe(true);
+    let item = gallery.locator('li[data-media-type="external_video"]').first();
+    if ((await item.count()) === 0) {
+      const copied = await gallery.locator('li[data-media-id][data-media-type]').first().evaluate(async (li, url) => {
+        const html = await (await fetch(url)).text();
+        const real = new DOMParser().parseFromString(html, 'text/html').querySelector('li[data-media-type="external_video"]');
+        if (!real) return false;
+        const el = li as HTMLElement;
+        el.dataset.mediaId = real.getAttribute('data-media-id') ?? '';
+        el.dataset.mediaType = 'external_video';
+        el.innerHTML = real.innerHTML;
+        return true;
+      }, FEATURED);
+      test.fixme(!copied, `${MEDIA} không có external_video`);
+      item = gallery.locator('li[data-media-type="external_video"]').first();
+    }
+    await expect(item.getByTestId('product-media-external-video-template')).toHaveCount(1);
     await item.scrollIntoViewIfNeeded();
     const before = page.url();
     const poster = item.getByTestId('product-media-external-video');
-    // Ảnh đang hiện có thể là media khác trong carousel: bấm thumbnail của item trước nếu có.
-    const id = await item.getAttribute('data-media-id');
-    const thumb = featured.locator(`a[href^="#"][data-media-id="${id}"]`).first();
-    if ((await thumb.count()) && !(await poster.isVisible())) await thumb.click();
     await poster.click();
     await expect(item.locator('iframe')).toHaveCount(1);
     await expect(item.locator('iframe')).toHaveAttribute('src', EMBED);
