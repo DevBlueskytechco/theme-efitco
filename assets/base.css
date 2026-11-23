@@ -879,13 +879,23 @@ modal-dialog {
   display: inline-flex;
   align-items: center;
   min-block-size: calc(var(--space-1) * 7);
+  max-inline-size: calc(100% - 2 * var(--space-2));
   padding-inline: var(--space-3);
   border-radius: var(--radius-pill);
   font-size: var(--font-size-xs);
   font-weight: 600;
   line-height: 1.5;
   letter-spacing: -0.02em;
+  white-space: nowrap;
   pointer-events: none;
+}
+
+/* Badge dài hơn bề ngang ảnh (foundation.md §37): chọn thêm, tối đa 2 dòng, bo 12 thay pill. Giá trị theo kit.css */
+.badge--wrap {
+  max-inline-size: 100%;
+  padding-block: var(--space-1);
+  border-radius: var(--radius-card);
+  white-space: normal;
 }
 
 .product-card__badge[hidden] {
@@ -945,6 +955,7 @@ modal-dialog {
   .product-card__badge {
     inset-block-start: var(--space-4);
     inset-inline-start: var(--space-4);
+    max-inline-size: calc(100% - 2 * var(--space-4));
   }
 
   .product-card__rating {
@@ -2775,6 +2786,22 @@ localization-picker[data-tabs] .localization__tabs {
   letter-spacing: -0.01em;
   text-decoration: none;
   cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Nhãn dịch dài hơn khung (foundation.md §37): chọn thêm, chữ xuống dòng trong nút, nút cao lên.
+   Không cắt "…", không thu chữ, không khoá bề rộng. Giá trị theo kit.css */
+.button--wrap {
+  max-inline-size: 100%;
+  padding-block: var(--space-2);
+  white-space: normal;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.button--wrap:has(> svg) {
+  text-align: start;
+  text-wrap: wrap;
 }
 
 .button--secondary {
@@ -3193,7 +3220,6 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
 
   .slideshow__buttons .button {
     gap: calc(var(--space-1) * 2.5);
-    min-inline-size: var(--figma-hero-cta-width);
   }
 
   slideshow-carousel[data-enhanced] .slideshow__controls {
@@ -6509,6 +6535,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-header__icon svg { display: block; }
 
   .button { font-family: var(--font-primary--family); font-size: 16px; line-height: 26px; font-weight: 600; letter-spacing: -0.16px; padding: 13px 32px; border-width: 0; border-radius: var(--figma-radius-8); gap: 8px; min-height: 52px; }
+  /* .button ngay trên ghi đè padding-block của .button--wrap: đặt lại theo kit */
+  .button--wrap { padding-block: var(--space-2); }
 
   /* Dải tối: hero + danh mục cùng nền var(--figma-1a1a1a) tới y=1515 */
   body:has(.slideshow) { background: var(--figma-ffffff); }
