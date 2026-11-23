@@ -291,6 +291,16 @@ test.describe('ES1-T45 RTL (ES1-T37 D6, TE-14 AC4)', () => {
     await disclosure.locator('summary').click();
     const panel = page.locator('.site-footer__panel');
     await expect(panel).toBeVisible();
+    // ES1-T324: < 48rem có JS, localization-picker nâng panel thành bottom sheet modal (docs/ui-spec/localization.md §4.3, §5):
+    // sheet ở top layer, không có offsetParent → kiểm sheet phủ hết bề ngang khung nhìn ở cả LTR và RTL thay cho bám inline-start.
+    const sheet = disclosure.locator('dialog').first();
+    if (await sheet.count() && await expect.poll(() => sheet.evaluate((d) => d.matches(':modal'))).toBe(true).then(() => true, () => false)) {
+      const span = () => sheet.evaluate((d) => { const b = d.getBoundingClientRect(); return { left: Math.round(b.left), right: Math.round(innerWidth - b.right) }; });
+      expect(await span()).toEqual({ left: 0, right: 0 });
+      await setDir(page, 'rtl');
+      expect(await span()).toEqual({ left: 0, right: 0 });
+      return;
+    }
     const edges = () =>
       panel.evaluate(el => {
         const p = el.getBoundingClientRect();
