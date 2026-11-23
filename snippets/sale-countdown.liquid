@@ -1,0 +1,195 @@
+{% doc %}
+  Shared "Sale ends in" countdown (ADR 0009, docs/ui-spec/countdown.md) for the
+  featured product, the product page and the big offer card. The only place that
+  decides whether a countdown shows (TE-4 AC17, TE-13 AC1, AC-H23).
+
+  End date: product.metafields.custom.sale_ends_at (date_time) first. Only when
+  the product has no such metafield, fallback_end (YYYY-MM-DD HH:MM in store
+  time, with the store offset added). A product with the metafield counts to that
+  date everywhere, even when fallback_end is set.
+
+  Renders nothing (no element, no reserved space) unless all of these hold: a
+  valid end date, the end date is after now, the variant has a compare-at price
+  above its price, the variant is available (R8: no fake countdown). In the theme
+  editor only: a notice when fallback_end is malformed, and a notice when the
+  metafield overrides a filled fallback_end.
+
+  Markup: <sale-countdown> host (container for the size query) around one frame
+  with role timer named by a visually hidden sentence with the end date in a
+  time element. The visible label and the cells are aria-hidden, no aria-live.
+  Numbers are printed by Liquid so the frame has its real size at first paint
+  (CLS 0, ES1-T276); JavaScript only updates them. 4 cells (days, hours,
+  minutes, seconds); the days cell has hidden below 24 hours. The day cell can
+  hold 3 digits. With scripting none the host is hidden (numbers that do not
+  move would be a fake countdown).
+
+  Size: regular follows the host width (Compact below 23rem, Regular from
+  23rem); compact is Compact at every width (big offer card, CD1).
+
+  JS hooks (assets/sale-countdown.js, BE, TE-13-R2-BE1): sale-countdown custom
+  element; on the frame data-sale-countdown, data-end (epoch seconds),
+  data-state (running, or ending below 1 hour; the script sets ended),
+  data-size, data-label-ended (text for K3: the script replaces label and cells
+  with <span class="sale-countdown__ended">, keeps the frame, and points the
+  hidden sentence to the same text); data-countdown-unit (days, hours, minutes,
+  seconds) on each cell, data-countdown-value on its number.
+
+  Test hooks: {testid} on the frame, {testid}-days, {testid}-hours,
+  {testid}-minutes, {testid}-seconds on the cells, {testid}-label,
+  {testid}-ends-on, {testid}-notice (editor only).
+
+  @param {product} product - Product whose sale ends
+  @param {variant} [variant] - Variant to check for compare-at price and stock. Default: product.selected_or_first_available_variant
+  @param {string} [fallback_end] - End date used only when the product has no custom.sale_ends_at metafield, YYYY-MM-DD HH:MM in store time
+  @param {string} [size] - regular (size follows the container) or compact (always Compact). Default: regular
+  @param {string} [label] - Visible label. Default: blocks.sale_countdown.label
+  @param {string} [testid] - data-testid of the frame, prefix of the cell test ids. Default: sale-countdown
+  @param {string} [id] - Id of the hidden sentence, unique on the page. Default: SaleCountdown-{testid}-{product.id}
+
+  @example
+  {% render 'sale-countdown',
+    product: featured,
+    variant: current_variant,
+    fallback_end: block.settings.countdown_end,
+    size: 'regular',
+    label: block.settings.countdown_label,
+    testid: 'featured-product-countdown',
+    id: countdown_id
+  %}
+{% enddoc %}
+
+{%- liquid
+  assign sc_variant = variant | default: product.selected_or_first_available_variant
+  assign sc_testid = testid | default: 'sale-countdown'
+  assign sc_size = 'regular'
+  if size == 'compact'
+    assign sc_size = 'compact'
+  endif
+  assign sc_label = label | strip
+  if sc_label == blank
+    assign sc_label = 'blocks.sale_countdown.label' | t
+  endif
+  assign sc_id = id
+  if sc_id == blank
+    assign sc_id = 'SaleCountdown-' | append: sc_testid | append: '-' | append: product.id
+  endif
+
+  assign sc_now = 'now' | date: '%s' | plus: 0
+  assign sc_end = 0
+  assign sc_stamp = ''
+  assign sc_invalid = false
+  assign sc_from_metafield = false
+  assign sc_fallback = fallback_end | strip
+
+  assign sc_metafield = product.metafields.custom.sale_ends_at.value
+  if sc_metafield != blank
+    assign sc_from_metafield = true
+    assign sc_end_text = sc_metafield | date: '%s'
+    assign sc_end_check = sc_end_text | plus: 0 | append: ''
+    if sc_end_check == sc_end_text
+      assign sc_end = sc_end_text | plus: 0
+      assign sc_stamp = sc_metafield
+    endif
+  elsif sc_fallback != blank
+    # 16 characters in the shape 0000-00-00 00:00, then a clean read as epoch seconds in store time
+    assign sc_invalid = true
+    assign sc_separators = sc_fallback | slice: 4 | append: ''
+    assign sc_separators = sc_fallback | slice: 7 | prepend: sc_separators
+    assign sc_separators = sc_fallback | slice: 10 | prepend: sc_separators
+    assign sc_separators = sc_fallback | slice: 13 | prepend: sc_separators
+    assign sc_digits = sc_fallback | remove: '-' | remove: ' ' | remove: ':'
+    assign sc_digits_check = sc_digits | plus: 0 | append: ''
+    if sc_fallback.size == 16 and sc_separators == '-- :' and sc_digits_check == sc_digits
+      assign sc_offset = 'now' | date: '%z'
+      assign sc_fallback_stamp = sc_fallback | append: ' ' | append: sc_offset
+      assign sc_end_text = sc_fallback_stamp | date: '%s'
+      assign sc_end_check = sc_end_text | plus: 0 | append: ''
+      if sc_end_check == sc_end_text
+        assign sc_end = sc_end_text | plus: 0
+        assign sc_stamp = sc_fallback_stamp
+        assign sc_invalid = false
+      endif
+    endif
+  endif
+
+  assign sc_show = false
+  if sc_end > sc_now and sc_variant != blank and sc_variant.available and sc_variant.compare_at_price > sc_variant.price
+    assign sc_show = true
+    assign sc_remaining = sc_end | minus: sc_now
+    assign sc_days = sc_remaining | divided_by: 86400
+    assign sc_days_text = sc_days | append: ''
+    if sc_days < 10
+      assign sc_days_text = sc_days | prepend: '0'
+    endif
+    assign sc_hours_text = sc_remaining | modulo: 86400 | divided_by: 3600 | prepend: '0' | slice: -2, 2
+    assign sc_minutes_text = sc_remaining | modulo: 3600 | divided_by: 60 | prepend: '0' | slice: -2, 2
+    assign sc_seconds_text = sc_remaining | modulo: 60 | prepend: '0' | slice: -2, 2
+    assign sc_state = 'running'
+    if sc_remaining < 3600
+      assign sc_state = 'ending'
+    endif
+    assign sc_datetime = sc_stamp | date: '%Y-%m-%dT%H:%M:%S%z'
+    assign sc_zone = sc_stamp | date: '%Z'
+    assign sc_date = sc_stamp | date: format: 'date_at_time' | append: ' ' | append: sc_zone | strip
+  endif
+-%}
+
+{%- if request.design_mode -%}
+  {%- if sc_invalid -%}
+    <p class="sale-countdown-notice" data-testid="{{ sc_testid }}-notice">
+      {{- 'blocks.sale_countdown.invalid_date' | t -}}
+    </p>
+  {%- elsif sc_from_metafield and sc_fallback != blank -%}
+    <p class="sale-countdown-notice" data-testid="{{ sc_testid }}-notice">
+      {{- 'blocks.sale_countdown.metafield_overrides' | t -}}
+    </p>
+  {%- endif -%}
+{%- endif -%}
+
+{%- if sc_show -%}
+  <sale-countdown class="sale-countdown-host">
+    <div
+      class="sale-countdown"
+      role="timer"
+      aria-labelledby="{{ sc_id }}"
+      data-sale-countdown
+      data-size="{{ sc_size }}"
+      data-state="{{ sc_state }}"
+      data-end="{{ sc_end }}"
+      data-label-ended="{{ 'blocks.sale_countdown.ended' | t | escape }}"
+      data-testid="{{ sc_testid }}"
+    >
+      <span class="sale-countdown__label" aria-hidden="true" data-testid="{{ sc_testid }}-label">
+        {{- sc_label | escape -}}
+      </span>
+      <span class="sale-countdown__units" aria-hidden="true">
+        <span
+          class="sale-countdown__unit"
+          data-countdown-unit="days"
+          data-testid="{{ sc_testid }}-days"
+          {% if sc_days == 0 %}
+            hidden
+          {% endif %}
+        >
+          <span data-countdown-value>{{ sc_days_text }}</span>
+          <span class="visually-hidden">{{ 'blocks.sale_countdown.days' | t }}</span>
+        </span>
+        <span class="sale-countdown__unit" data-countdown-unit="hours" data-testid="{{ sc_testid }}-hours">
+          <span data-countdown-value>{{ sc_hours_text }}</span>
+          <span class="visually-hidden">{{ 'blocks.sale_countdown.hours' | t }}</span>
+        </span>
+        <span class="sale-countdown__unit" data-countdown-unit="minutes" data-testid="{{ sc_testid }}-minutes">
+          <span data-countdown-value>{{ sc_minutes_text }}</span>
+          <span class="visually-hidden">{{ 'blocks.sale_countdown.minutes' | t }}</span>
+        </span>
+        <span class="sale-countdown__unit" data-countdown-unit="seconds" data-testid="{{ sc_testid }}-seconds">
+          <span data-countdown-value>{{ sc_seconds_text }}</span>
+          <span class="visually-hidden">{{ 'blocks.sale_countdown.seconds' | t }}</span>
+        </span>
+      </span>
+      <span class="visually-hidden" id="{{ sc_id }}" data-testid="{{ sc_testid }}-ends-on">
+        <time datetime="{{ sc_datetime }}">{{ 'blocks.sale_countdown.ends_on' | t: date: sc_date }}</time>
+      </span>
+    </div>
+  </sale-countdown>
+{%- endif -%}
