@@ -1,5 +1,5 @@
 // ES1-T478 (ADR 0013, CTO 17/11 ES1-T472 a): tách CSS theo template. Spec tĩnh, không cần store.
-// - Trần gzip (Node zlib.gzipSync mức mặc định): base.css ≤ 49 152 B; product.css, collection.css, cart.css, aux.css ≤ 16 384 B mỗi file;
+// - Trần gzip (Node zlib.gzipSync mức mặc định): base.css ≤ 49 152 B (ADR 0014 mục 5, CTO 21/11 ES1-T575); product.css, collection.css, cart.css, aux.css ≤ 16 384 B mỗi file;
 //   critical.css ≤ 10 240 B thô.
 // - layout/theme.liquid: đúng 1 `case template.name` ngay sau base.css, mỗi file template đúng 1 lần, không preload.
 // - layout/password.liquid, templates/gift_card.liquid: aux.css ngay sau base.css.
@@ -10,6 +10,11 @@ import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 
 const PAGE_FILES = ['product', 'collection', 'cart', 'aux'] as const;
+// File tầng 4 (ADR 0014 mục 2): 5 file ES1-T565 + 2 file ES1-T566 (CTO 21/11 ES1-T575: block nhỏ/luôn có ở trang chủ giữ base.css)
+const BLOCK_FILES = [
+  'quiz', 'shop-the-look', 'bundle-builder', 'featured-product', 'image-with-text',
+  'multicolumn', 'hello-world',
+] as const;
 const read = (path: string) => readFileSync(path, 'utf8');
 const gz = (path: string) => gzipSync(readFileSync(path)).length;
 
@@ -67,11 +72,12 @@ test.describe('ES1-T478 tách CSS theo template (tĩnh)', () => {
     }
   });
 
-  test('không prelude nào trùng giữa base.css và file template, hay giữa 2 file template', () => {
+  // ES1-T565 (ADR 0014 mục Đo): thêm file CSS theo block (tầng 4) vào kiểm prelude trùng
+  test('không prelude nào trùng giữa base.css, file template và file block, hay giữa 2 file đó', () => {
     const base = preludes(read('assets/base.css'));
     const seen = new Map<string, string>();
     const dupes: string[] = [];
-    for (const f of PAGE_FILES) {
+    for (const f of [...PAGE_FILES, ...BLOCK_FILES]) {
       for (const p of preludes(read(`assets/${f}.css`))) {
         if (base.has(p)) dupes.push(`base.css ↔ ${f}.css: ${p}`);
         const other = seen.get(p);

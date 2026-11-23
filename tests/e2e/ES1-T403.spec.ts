@@ -40,8 +40,12 @@ test.describe('ES1-T403 tĩnh', () => {
 
   test('D5 line-clamp / ellipsis chỉ còn ở tên shop (critical) và badge article-card__tag', () => {
     const hits: string[] = [];
-    // ES1-T478: quét cả file CSS theo template (ADR 0013)
-    for (const file of ['assets/critical.css', 'assets/base.css', 'assets/product.css', 'assets/collection.css', 'assets/cart.css', 'assets/aux.css']) {
+    // ES1-T478: quét cả file CSS theo template (ADR 0013); ES1-T565: thêm 5 file block, ES1-T566: thêm multicolumn, hello-world (ADR 0014; CTO 21/11 ES1-T575)
+    const blockFiles = [
+      'quiz', 'shop-the-look', 'bundle-builder', 'featured-product', 'image-with-text',
+      'multicolumn', 'hello-world',
+    ].map((b) => `assets/${b}.css`);
+    for (const file of ['assets/critical.css', 'assets/base.css', 'assets/product.css', 'assets/collection.css', 'assets/cart.css', 'assets/aux.css', ...blockFiles]) {
       const css = noComments(read(file));
       for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
         if (/line-clamp|text-overflow:\s*ellipsis/.test(rule[2])) hits.push(`${file}: ${rule[1].trim()}`);
@@ -54,7 +58,9 @@ test.describe('ES1-T403 tĩnh', () => {
   });
 
   test('C8 viền radio quiz không dùng #999 (2.85:1)', () => {
-    const css = noComments(read('assets/base.css'));
+    // ES1-T565 (ADR 0014): CSS quiz ở assets/quiz.css
+    expect(noComments(read('assets/base.css'))).not.toContain('.quiz-option__mark');
+    const css = noComments(read('assets/quiz.css'));
     const marks = [...css.matchAll(/\.quiz-option__mark\s*\{([^}]*)\}/g)].map((m) => m[1]);
     expect(marks.length).toBeGreaterThan(0);
     for (const body of marks) expect(body).not.toContain('--figma-999999');
