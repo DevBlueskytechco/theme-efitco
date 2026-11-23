@@ -26,8 +26,8 @@ Mới:
   outputs this class render?":
   1. `assets/critical.css`: above-the-fold styles (layout, header, hero,
      buttons), at most 10 240 B, `preload: true` in the layouts.
-  2. `assets/base.css`, every page, at most 40 960 B gzip (49 152 until
-     ES1-T566 merges): tokens, keyframes `motion-*`, the frame (header,
+  2. `assets/base.css`, every page, at most 49 152 B gzip (CTO 21/11
+     ES1-T575): tokens, keyframes `motion-*`, the frame (header,
      announcement, menu drawer, mega menu, localization, footer), layers
      (dialog, sheet, drawer, toast), shared components (button, form,
      form-status, empty state, skeleton, product card, price, rating stars,
@@ -35,7 +35,10 @@ Mới:
      drawer, predictive search, breadcrumb, page title, pagination, carousel
      nav and progress, article card), and blocks on the first screen of a
      default template (slideshow, collection list, rich text) or whose classes
-     other blocks reuse (featured collection, blog posts).
+     other blocks reuse (featured collection, blog posts), and small blocks
+     always on the home page (testimonials, video carousel, FAQ, shop by
+     level). Home page budget: `base.css` + block files that
+     `templates/index.liquid` loads at most 57 344 B gzip.
   3. Page group files, loaded by `template.name` in `layout/theme.liquid`,
      each at most 16 384 B gzip: `assets/product.css` (`product`),
      `assets/collection.css` (`collection`, `search`, `list-collections`),
@@ -46,17 +49,20 @@ Mới:
   4. Block files `assets/<block>.css`, at most 8 192 B gzip each, for a
      section-level block that can sit on any template and is not on the first
      screen (quiz, shop the look, bundle builder, featured product, image with
-     text, testimonials, video carousel, FAQ, shop by level, multicolumn). The
+     text, multicolumn, hello world). The
      parent block outputs one line
      `{{ '<block>.css' | asset_url | stylesheet_tag }}` right before its root
      element, outside every `{% partial %}` and before the placeholder
      branch. Child blocks do not link. Another parent that renders the child
-     links it too (`contact-aside` links `faq.css`). Never from a snippet or a
+     links it too (`liquid-tips` links `hello-world.css`). Print the line
+     only when the block prints markup or in the theme editor
+     (`if <render condition> or request.design_mode`). Never from a snippet or a
      layout.
   Why: every rule in `base.css` ships on every page; a block file only loads
   where the block is, on any template a merchant or Sidekick puts it.
 - New section-level blocks get a block file by default. Use `base.css` only
-  for first-screen blocks or shared components, and say why in the PR. Shared
+  for first-screen blocks, shared components, or small blocks always on the
+  home page, and say why in the PR. Shared
   markup (product card, cart drawer, quick view, product media, variant picker,
   product form, countdown) stays in `base.css`. When unsure, use `base.css`.
   Why: quick view and drawers render on other templates through partials, so

@@ -1,5 +1,7 @@
 # PRD — theme-efitco · bản 0.2 · PO · 11/11/2026 (bản 0.1: 22/10/2026)
 
+Cập nhật CTO 21/11/2026 (ES1-T567): baseline thiết kế là mockup HTML `drafts/designer/**` + `drafts/designer/_kit/kit.css`; chỗ ghi "giống / theo / khớp" bản vẽ đọc là "khớp mockup"; mã node và tên file thiết kế cũ là ghi chép lịch sử, không còn là căn cứ; nhãn nút sentence case (Polaris).
+
 Nguồn 0.2: REQ-0002 (BGĐ duyệt thiết kế 11/11), đề xuất PO ES1-T305 (bảng ưu tiên), quyết định CTO ES1-T308, T309, T310, T311, T301; kế hoạch DEV `drafts/techlead/ES1-T307/task-split.md`; SRS 0.4 (`docs/srs.md`).
 
 ## Vấn đề
@@ -29,7 +31,7 @@ R1 = lên Canvas store thật tuần 11 (28/12/2026), đạt chuẩn Theme Store
 - TE-14 sẵn sàng cho Sidekick, Canvas, agent (AGENTS.md, DESIGN.md, logical properties) — 0.2 thêm
 - TE-15 collection list và shop by level — 0.2 thêm
 - TE-16 blog posts (trang chủ) — 0.2 thêm
-- TE-17 trang chủ giống Figma, dữ liệu store dev, cổng đo — 0.2 thêm
+- TE-17 trang chủ khớp mockup, dữ liệu store dev, cổng đo — 0.2 thêm
 - TE-18 popup marketing: newsletter, before you leave, big offer — 0.2 thêm
 - TE-19 upsell giỏ hàng (cart.md §3.8, sổ 10/11 G2) — 0.2 thêm, chờ AC SRS 0.5
 - TE-20 blog và bài viết, gồm mở rộng (blog.md B1–B3, article.md A1–A3, thông báo bình luận) — 0.2 thêm, chờ AC SRS 0.5
@@ -42,7 +44,7 @@ Mục tiêu charter: M1 = Canvas (charter mục tiêu 1), M2 = chất lượng N
 
 | Thứ tự | Story | M/C/R | Point FE/BE/QA | Nhóm | Lý do 1 dòng | Mục tiêu |
 | --- | --- | --- | --- | --- | --- | --- |
-| 1 | TE-17 trang chủ giống Figma | 5/4/5 | 13/0/13 | Must | mục tiêu số 1 CTO 06/11; cổng đo cuối | M1, M2 |
+| 1 | TE-17 trang chủ khớp mockup | 5/4/5 | 13/0/13 | Must | mục tiêu số 1 CTO 06/11; cổng đo cuối | M1, M2 |
 | 2 | TE-13 featured/video | 4/3/5 | 4/3/0 | Must | trang chủ; countdown chung theo metafield | M2 |
 | 3 | TE-7 nội dung | 3/4/3 | 5/3/0 | Must | trang chủ, rẻ | M1 |
 | 4 | TE-2 slideshow | 4/4/4 | 5/3/0 | Must | trang chủ, LCP | M2 |
@@ -78,22 +80,22 @@ Won't R1:
 - Wishlist.
 - Multi-market UI tuỳ chỉnh (localization chỉ theo TE-1 AC5, AC9, AC10).
 - Nộp Theme Store; ảnh logo bên thứ ba và tên theme listing để sau R1 (ES1-T308 #2).
-- Nội dung Figma trong mặc định theme (ES1-T308 #1): theme mới cài để trống, nội dung Figma chỉ cấu hình trên store dev.
+- Nội dung demo trong mặc định theme (ES1-T308 #1): theme mới cài để trống, nội dung demo chỉ cấu hình trên store dev.
 
 ## Chỉ số thành công
 - NFR-1 (chỉ tiêu nghiệm thu, đo trên demo store dev): Accessibility 100 và Best Practices 100 ở mọi trang đo; SEO 100 ở trang chủ, collection, sản phẩm, blog, bài viết, page; Performance desktop ≥ 98, mobile ≥ 90. Best Practices ghi tách phần theme và phần nền tảng Shopify.
 - Ngưỡng CI chặn merge (ES1-T301, CTO 11/11): performance desktop ≥ 0.96, mobile ≥ 0.9; accessibility 1.0; Best Practices warn 0.78 (lên error sau ticket BE thứ tự nạp module); SEO warn 1.
 - Checklist Canvas 10/10 khi lên Canvas 28/12; 10 yêu cầu Sidekick mẫu theme check 0 lỗi; thời gian Sidekick mỗi yêu cầu mẫu ≤ 3 phút.
 - Bug P1/P2 = 0 khi lên Canvas.
-- Trang chủ giống Figma theo TE-17 trên store dev đã cấu hình (sổ chênh lệch 0 mục mở).
+- Trang chủ khớp mockup theo TE-17 trên store dev đã cấu hình (sổ chênh lệch 0 mục mở).
 - Tài liệu merchant đủ mọi block trong theme (số block theo charter 0.2 ES1-T399).
 
 ## Ràng buộc
 - Skeleton block-first (AGENTS.md); không sections, không JSON template, không section groups (CTO 11/11); code tự viết, không dựa Dawn/Horizon.
 - ADR 0006 ngân sách JS; ADR 0007–0010 Chấp nhận, áp mọi task REQ-0002.
-- Theme mới cài để trống: setting chữ, claim, mã giảm mặc định rỗng, bậc giảm 0, không handle `figma-*` (ES1-T308 #1, T309 #2, #3).
+- Theme mới cài để trống: setting chữ, claim, mã giảm mặc định rỗng, bậc giảm 0, không handle demo của store dev (tiền tố cũ, bảng tên ở `drafts/designer/ES1-T567/notes.md` mục 5) (ES1-T308 #1, T309 #2, #3).
 - Mọi nội dung `docs/ui-spec` trên develop 11/11, kể cả dòng ĐỀ XUẤT, là phạm vi Dev (ES1-T309 #1).
-- Canvas early access; không phụ thuộc app; token Figma trong giới hạn Shopify (font_picker, ≥ 4 màu).
+- Canvas early access; không phụ thuộc app; token thiết kế (kit.css) trong giới hạn Shopify (font_picker, ≥ 4 màu).
 - Check chặn merge: theme-check, preview, e2e, lighthouse.
 
 ## Câu hỏi mở

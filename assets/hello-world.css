@@ -1,0 +1,103 @@
+/** Hello world block + liquid-tips (Skeleton). Nạp trong blocks/hello-world.liquid, blocks/liquid-tips.liquid (ADR 0014) */
+.welcome {
+  display: grid;
+  grid-template-columns: var(--content-grid);
+  background-color: var(--color-background-alt);
+  color: var(--color-background-alt-foreground);
+  padding: var(--space-7) 0;
+}
+
+.welcome-content {
+  grid-column: 2;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+  padding: 0 var(--space-5);
+}
+
+.welcome-description {
+  max-width: 80ch;
+  margin-block-start: var(--space-5);
+}
+
+.icon {
+  width: 300px;
+}
+
+.highlights {
+  display: grid;
+  gap: var(--space-6);
+  grid-template-columns: 1fr;
+  margin-block-start: var(--space-7);
+}
+
+@media (min-width: 80rem) {
+  .highlights {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.highlight {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: var(--space-5);
+  border-radius: var(--radius-card);
+  background-color: var(--color-background-cream);
+  color: var(--color-muted);
+}
+
+.highlight > * + * {
+  margin-block-start: var(--space-4);
+}
+
+.highlight h3 {
+  font-size: var(--font-size-base);
+  color: var(--color-background-cream-foreground);
+}
+
+.highlight-description {
+  flex: 1 1;
+}
+
+/**
+ * Flashes a liquid-tip after the "show another tip" button swaps in fresh
+ * content through partial rendering. The brief highlight pulse draws the
+ * eye to the new tip so the change is noticeable without a page reload.
+ */
+@keyframes highlight-flash {
+  from {
+    background-color: var(--color-border);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+.highlight-description--flash {
+  animation: highlight-flash 0.6s ease-out;
+  border-radius: var(--radius-input);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlight-description--flash {
+    animation: none;
+  }
+}
+
+.highlight a,
+.welcome-content a {
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 44px;
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-button);
+  color: var(--color-foreground);
+  padding: var(--space-2) var(--space-4);
+  text-decoration: none;
+  cursor: pointer;
+}

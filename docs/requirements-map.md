@@ -25,7 +25,7 @@ Nguồn: `docs/checklist-theme-store.md`, `docs/srs.md` 0.5 (dòng "Mã R" của
 | R17 Responsive images | srcset, lazy | Bắt buộc | mọi FE: TE-2, TE-3, TE-4 (AC23), TE-5 (AC19), TE-6 (AC15), TE-7 (AC7), TE-8 (AC8, AC14), TE-11 (AC10), TE-13 (AC8), TE-15, TE-16, TE-19 (AC6), TE-20 (AC6, AC9), TE-21 (AC8, AC12), TE-22 (AC6) |
 | R18 Naming | 1–2 từ, không trùng Shopify | Tham khảo (không Canvas/Sidekick trong tên; tên theme để sau R1, ES1-T308 #2) | — |
 | R19 Version/release notes | version + notes | Bắt buộc. Writer làm: release notes mỗi sprint và bản R1 Canvas 28/12. Không có AC trong SRS, chưa có task writer R2 (ES1-T440 #1) | writer |
-| R20 Demo store | client transfer store | Tham khảo; thay bằng dữ liệu demo trên hoa-qua-nhap-khau (efitco-ai-dev) (ES1-T298). Nội dung Figma chỉ cấu hình trên store dev (fixture TE-17-R2-QA0) | TE-9 (AC4, AC7), TE-17 |
+| R20 Demo store | client transfer store | Tham khảo; thay bằng dữ liệu demo trên hoa-qua-nhap-khau (efitco-ai-dev) (ES1-T298). Nội dung demo (theo mockup, CTO 21/11 ES1-T567) chỉ cấu hình trên store dev (fixture TE-17-R2-QA0) | TE-9 (AC4, AC7), TE-17 |
 | R21–R22 Docs/support | tài liệu, contact form, SLA | Tham khảo; thay bằng docs/merchant + hướng dẫn Canvas | TE-10 (AC5), writer |
 | Canvas C1–C5 | mở được; block hiện đúng; sửa trực tiếp; Sidekick 3/10 yêu cầu; theme check sau sửa | Bắt buộc | TE-10 (AC4), TE-14, TE-17 (AC-H6), cuối mỗi sprint |
 
