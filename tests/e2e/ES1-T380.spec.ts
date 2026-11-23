@@ -55,12 +55,17 @@ const EVENTS_STUB =
       .join(';'),
   );
 
-// partials giả: fetch ghi tên + URL; __mode 'fail' thì reject; apply ghi nhãn mới (server luôn render nhãn)
+// partials giả: fetch ghi tên + URL; __mode 'fail' thì reject; apply làm như server: ghi nhãn mới (server luôn render nhãn)
+// và checked mặc định theo URL đã fetch (sync() đặt lại ô theo defaultChecked sau apply, như ES1-T111 APPLY).
 const body = JS.replace(
   /^import .*$/m,
   `const partials = {
     fetch: (...a) => { const o = a.pop(); (window.__calls ||= []).push({ names: a, url: o.url }); return window.__mode == "fail" ? Promise.reject(new TypeError("Failed to fetch")) : Promise.resolve({}); },
-    apply: async () => { document.querySelector("[data-results-label]").setAttribute("data-results-label", window.__next); },
+    apply: async () => {
+      const q = new URL(window.__calls.at(-1).url).searchParams;
+      document.querySelector("[data-results-label]").setAttribute("data-results-label", window.__next);
+      for (const i of document.querySelectorAll("#collection-filter-form input[type=checkbox]")) i.toggleAttribute("checked", q.getAll(i.name).includes(i.value));
+    },
   };`,
 ).replace(/https:\/\/cdn\.shopify\.com[^"]*/, EVENTS_STUB);
 
@@ -91,7 +96,7 @@ type Detail = { search?: { query: string; sortKey?: string }; collection?: unkno
 async function setupFixture(page: Page, url: string, html: string) {
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
-  await page.route(url.split('?')[0] + '*', (r) => r.fulfill({ contentType: 'text/html', body: html }));
+  await page.route(url.split('?')[0] + '*', (r) => r.fulfill({ contentType: 'text/html; charset=utf-8', body: html }));
   await page.addInitScript(() => {
     const w = window as unknown as { __ev: { type: string; detail: Detail }[]; __resolved: unknown[] };
     w.__ev = [];
