@@ -21,7 +21,7 @@ featured-product {
 
 .featured-product__view {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-6);
 }
 
 .featured-product__gallery,
@@ -36,11 +36,11 @@ featured-product {
   align-content: start;
 }
 
-/* Figma 1:761: 113 x 112, 24 from the image corner; 72 x 71, 12 below 48rem */
+/* Figma 1:761: 113 x 112, 24 from the image corner; 72 / 16 below 48rem, 88 / 24 below 64rem */
 .featured-product__seal {
   position: absolute;
-  inset-block-start: var(--space-3);
-  inset-inline-start: var(--space-3);
+  inset-block-start: var(--space-4);
+  inset-inline-start: var(--space-4);
   inline-size: 4.5rem;
   block-size: auto;
   color: var(--color-muted-on-dark);
@@ -53,11 +53,17 @@ featured-product {
   .featured-product__seal {
     inset-block-start: var(--space-5);
     inset-inline-start: var(--space-5);
+    inline-size: 5.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .featured-product__seal {
     inline-size: 7.0625rem;
   }
 }
 
-/* Figma 1:760: 668 / 653 */
+/* Figma 1:760: 668 / 653 từ 64rem */
 .featured-product__media-list {
   display: flex;
   margin: 0;
@@ -78,7 +84,7 @@ featured-product {
 .featured-product__media-item {
   flex: 0 0 100%;
   min-inline-size: 0;
-  aspect-ratio: 668 / 653;
+  aspect-ratio: 1;
   scroll-margin-block-start: var(--space-8);
   scroll-snap-align: start;
 }
@@ -89,8 +95,25 @@ featured-product {
 
 .featured-product__media-item .image > img {
   block-size: 100%;
+  padding: 8%;
   object-fit: contain;
   mix-blend-mode: normal;
+}
+
+@media (min-width: 48rem) {
+  .featured-product__media-item {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (min-width: 64rem) {
+  .featured-product__media-item {
+    aspect-ratio: 668 / 653;
+  }
+
+  .featured-product__media-item .image > img {
+    padding: 0;
+  }
 }
 
 /* Rich media (ADR 0012): snippets/product-media-item fills the 668 / 653 frame like an image */
@@ -294,7 +317,12 @@ featured-product[data-design-mode] .featured-product__countdown {
   line-height: 1.625;
 }
 
-/* Figma 1:798: dòng lẻ nền sand, dòng chẵn trắng, viền 1px */
+/* Figma 1:798: dòng lẻ nền sand, viền 1px; dưới 48rem nhãn trên giá trị */
+.featured-product__specs,
+.featured-product__specs tbody {
+  display: block;
+}
+
 .featured-product__specs {
   inline-size: 100%;
   overflow: hidden;
@@ -304,6 +332,12 @@ featured-product[data-design-mode] .featured-product__countdown {
   border-collapse: separate;
 }
 
+.featured-product__spec {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+}
+
 .featured-product__spec:nth-child(odd) {
   background-color: var(--color-background-sand);
   color: var(--color-background-sand-foreground);
@@ -311,8 +345,7 @@ featured-product[data-design-mode] .featured-product__countdown {
 
 .featured-product__spec-label,
 .featured-product__spec-value {
-  padding-block: var(--space-2);
-  padding-inline: var(--space-3);
+  padding: 0;
   vertical-align: baseline;
 }
 
@@ -329,7 +362,23 @@ featured-product[data-design-mode] .featured-product__countdown {
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.625;
-  text-align: end;
+}
+
+@media (min-width: 48rem) {
+  .featured-product__specs,
+  .featured-product__specs tbody,
+  .featured-product__spec {
+    display: revert;
+  }
+
+  .featured-product__spec-label,
+  .featured-product__spec-value {
+    padding: var(--space-3) var(--space-5);
+  }
+
+  .featured-product__spec-value {
+    text-align: end;
+  }
 }
 
 .featured-product__buy {
@@ -337,20 +386,15 @@ featured-product[data-design-mode] .featured-product__countdown {
   gap: var(--space-4);
 }
 
+/* Nút xếp dọc, 1 hàng từ 48rem */
 .featured-product__actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--space-3);
 }
 
 /* Không JS: select trong noscript chiếm trọn hàng trên 2 nút */
 .featured-product__actions noscript {
   flex-basis: 100%;
-}
-
-.featured-product__add-wrapper,
-.featured-product__view-detail {
-  flex: 1 1 auto;
 }
 
 .featured-product__add {
@@ -389,14 +433,14 @@ featured-product[data-design-mode] .featured-product__countdown {
     padding-block: var(--space-2);
   }
 
+  .featured-product__actions {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
   .featured-product__add-wrapper,
   .featured-product__view-detail {
     flex: none;
-  }
-
-  .featured-product__spec-label,
-  .featured-product__spec-value {
-    padding-inline: var(--space-5);
   }
 }
 
