@@ -384,7 +384,7 @@ Bỏ qua, kèm lý do:
 Cần CTO chốt (lệch có từ trước lượt này, không tự chọn):
 
 - ĐÃ CHỐT (CTO 23/11): tiêu đề drawer mini cart là "Your cart" ở mọi mockup và spec (`foundation.html`, `marketing-popups.html`, `mini-cart-quickview.html`, `shopify-features.html`; `foundation.md`, `content.md`, `mini-cart-quickview.md`).
-- Menu footer "Information": 4 chỗ có "Our Efitco" (`foundation.html`, `ES1-T279`, `ES1-T293`; `foundation.md` §4, `index-mobile-b.md`), 11 trang còn lại không có mà có "Shipping policy", "Refund policy". Chốt một danh sách rồi đồng bộ.
+- ĐÃ CHỐT (CTO 23/11): menu footer "Information" ở mọi trang là Our story · Our Efitco · FAQs · Contact us · Shipping policy · Refund policy; đã thêm "Our Efitco" vào 11 trang còn thiếu.
 
 ## Phụ lục. Chuỗi đã đổi sang sentence case (CTO 21/11 lượt 2)
 
