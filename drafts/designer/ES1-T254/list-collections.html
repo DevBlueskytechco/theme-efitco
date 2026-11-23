@@ -15,8 +15,8 @@
   .lc-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2xl) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
   @media (min-width: 48rem) { .lc-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (min-width: 80rem) { .lc-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: var(--space-3xl); } }
-  /* 2 cột ở 360: tên h3 28 quá to cho card rộng ~160 → bậc h4 20/24 dưới 48rem (Figma M/H5) */
-  @media (max-width: 47.99rem) { .lc-grid .collection-card { gap: var(--space-sm); } .lc-grid .collection-card__title { font-size: var(--font-size-h4); } .lc-grid .collection-card__count { margin-block-start: calc(var(--space-xs) * -1); } }
+  /* 2 cột ở 360: tên h3 28 quá to cho card rộng ~160 → bậc h4 20/24 dưới 48rem (--font-size-h4 + --line-height-h4) */
+  @media (max-width: 47.99rem) { .lc-grid .collection-card { gap: var(--space-sm); } .lc-grid .collection-card__title { font-size: var(--font-size-h4); line-height: var(--line-height-h4); } .lc-grid .collection-card__count { margin-block-start: calc(var(--space-xs) * -1); } }
   /* Vòng focus card: cách chữ/mép --space-xs như .product-card (review vòng 2; kit .collection-card để 4px, đề xuất kit nâng lên --space-xs — notes.md) */
   .lc-grid .collection-card:focus-visible, .lc-grid .collection-card.is-focus { outline-offset: var(--space-xs); }
   .section-end { padding-block-end: var(--section-gap); }
@@ -50,7 +50,7 @@
 
 <a class="visually-hidden" href="#main">Skip to content</a>
 
-<!-- Header mọi trang: thanh tối riêng + noise, cao 80, không đè ảnh (sổ 10/11, Figma 1:362) -->
+<!-- Header mọi trang: thanh tối riêng + noise, cao 80, không đè ảnh (sổ 10/11) -->
 <header class="site-header demo-static">
   <div class="site-header__inner">
     <button class="site-header__icon site-header__menu-toggle" type="button" aria-label="Open menu" aria-expanded="false"><svg aria-hidden="true"><use href="#i-menu"/></svg></button>
@@ -60,7 +60,7 @@
         <li><a class="site-header__link" href="#">Shop <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#" aria-current="page">Collection <svg width="9" height="5" aria-hidden="true"><use href="#i-chevron"/></svg></a></li>
         <li><a class="site-header__link" href="#">Sale</a></li>
-        <li><a class="site-header__link" href="#">Our Story</a></li>
+        <li><a class="site-header__link" href="#">Our story</a></li>
         <li><a class="site-header__link" href="#">Blog</a></li>
         <li><a class="site-header__link" href="#">Contact</a></li>
         <li><a class="site-header__link" href="#">Help</a></li>
@@ -102,17 +102,17 @@
   </ul>
 </main>
 
-<!-- Footer (foundation §4 vòng 3, Figma 1:1104) -->
+<!-- Footer (foundation §4 vòng 3) -->
 <footer class="site-footer">
   <div class="container site-footer__band">
     <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg" alt="" width="196" height="246"></div>
     <div class="site-footer__newsletter">
-      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <h2><span>Get 15% off</span> your first order</h2>
       <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
     <form class="site-footer__form" onsubmit="return false">
       <label class="visually-hidden" for="nl-email">Email</label>
-      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% off</button></div>
       <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
@@ -130,15 +130,15 @@
         <a class="shop-follow" href="#">Follow on <b>shop</b></a>
       </div>
       <div class="site-footer__menus">
-        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches &amp; Racks</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
       </div>
     </div>
     <ul class="site-footer__trust">
-      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
-      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
-      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
-      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 year warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 day money back</li>
     </ul>
   </div>
   <div class="container site-footer__bottom">
@@ -155,7 +155,7 @@
 <div class="container section-end">
   <section class="demo-block" aria-labelledby="l1">
     <h2 id="l1">L1. Phân trang (khi &gt; 24 collection)</h2>
-    <p class="demo-note">Snippet pagination chung (docs/ui-spec/pagination.md). Trang 1: Previous giữ chỗ, mờ 0.35 + aria-disabled (sổ 10/11). Store dev có 14 collection nên trang thật không hiện phân trang.</p>
+    <p class="demo-note">Snippet pagination chung (docs/ui-spec/pagination.md). Trang 1: Previous giữ chỗ, cặp màu disabled (viền border, icon muted-light, không opacity) + aria-disabled. Store dev có 14 collection nên trang thật không hiện phân trang.</p>
     <nav class="pagination" aria-label="Pagination sample" style="margin: 0">
       <ul class="pagination__list" role="list">
         <li class="pagination__item--prev"><span class="round-button pagination__step" role="link" aria-disabled="true" aria-label="Previous page"><svg aria-hidden="true"><use href="#i-prev"/></svg></span></li>
@@ -171,9 +171,9 @@
     <div class="state-box">
       <div class="empty-state">
         <span class="empty-state__icon" aria-hidden="true"><svg><use href="#i-empty"/></svg></span>
-        <h3>No Collections Yet</h3>
+        <h3>No collections yet</h3>
         <p>No collections to show yet. Browse every product in the store instead.</p>
-        <div class="empty-state__actions"><a class="button" href="#">Shop All Products</a></div>
+        <div class="empty-state__actions"><a class="button" href="#">Shop all products</a></div>
       </div>
     </div>
   </section>

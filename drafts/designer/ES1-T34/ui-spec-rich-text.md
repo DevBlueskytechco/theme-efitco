@@ -1,3 +1,6 @@
+> TÀI LIỆU LỊCH SỬ (ĐÃ THAY 21/11/2026, ES1-T567): ghi chép của thời điểm lập, không còn là căn cứ thiết kế.
+> Nguồn chuẩn hiện nay là mockup HTML `drafts/designer/**` cùng `drafts/designer/_kit/kit.css`; nội dung bên dưới giữ nguyên.
+
 KHÔNG CHẮC: (1) Component icon 1:126 không có trong snapshot docs/figma/ → chỉ biết kích thước 20 × 16, chưa xác nhận hình mũi tên. (2) Chưa có docs/figma/img/1-454.png → thứ tự ảnh inline và chữ ở dòng 2 heading suy từ toạ độ, chưa nhìn ảnh. (3) Figma chỉ có desktop 1920; mọi số 360/768/1280 dưới đây là ĐỀ XUẤT. Hỏi CTO/Tech Lead ở ticket ES1-T41 (xem cuối file).
 
 # UI spec rich-text — Figma 1:454 (trả lời ES1-T34 cho ES1-T29)

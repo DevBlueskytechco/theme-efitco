@@ -4,23 +4,25 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Efitco home page, tablet and mobile (bundle to footer) — ES1-T279</title>
-<meta name="description" content="Efitco home page lower blocks at 768 and 360: bundle builder, featured product, video demo, testimonials, why choose, blog, FAQ and footer, developed from Figma 1:359.">
+<meta name="description" content="Efitco home page lower blocks at 768 and 360: bundle builder, featured product, video demo, testimonials, why choose, blog, FAQ and footer; the source of truth for these blocks below 1280.">
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
   /*
-    ES1-T279. Gốc: Figma 1:359 (desktop 1920). Mockup chỉ vẽ < 80rem (768 và 360);
-    desktop 1280/1920 là Figma, không vẽ lại. Spec: docs/ui-spec/index-mobile-b.md.
-    ES1-T527 (DS check 20/11): component dùng chung lấy từ kit (.section, .option-card--tile, .dpanel, .meter,
+    ES1-T279. File này là NGUỒN CHUẨN cho các khối nửa dưới trang chủ ở 360 và 768 (CTO 21/11, ES1-T567).
+    Mockup chỉ vẽ < 80rem; desktop 1280/1920: drafts/designer/ES1-T293/index.html. Spec: docs/ui-spec/index-mobile-b.md.
+    Tỉ lệ ảnh. Chuẩn: Carbon aspect ratio 1:1, 4:3, 16:9; M3 carousel 9:16.
+    Kích thước khối (width / height) viết px hoặc rem, bội 4, không dùng token khoảng cách (Polaris: space token không dùng cho width / height).
+    ES1-T527 (rà soát kit 20/11): component dùng chung lấy từ kit (.section, .option-card--tile, .dpanel, .meter,
     .buy-bar, .teaser, .product-row, .rating, .section-link, .button--secondary, .display, .on-dark);
     file này chỉ còn bố cục trang. Mọi màu là var(--*) của kit.
   */
   body { overflow-x: hidden; }
-  .icon-16 { width: 16px; height: 14px; flex: none; }
-  /* Hàng ngang tràn tới mép phải màn hình, mép trái thẳng container (Figma 1:817, 1:885, 1:1022) */
+  .icon-16 { width: 16px; height: 14px; flex: none; } /* Thiết kế: quang học glyph mũi tên 16 × 14 */
+  /* Hàng ngang tràn tới mép phải màn hình, mép trái thẳng container (video, đánh giá, blog) */
   .bleed-row { margin-inline-end: calc(var(--page-margin) * -1); padding-inline-end: var(--page-margin); scroll-padding-inline-start: 0; }
   .bleed-row::after { content: ''; flex: 0 0 1px; }
 
-  /* ===== 1. Bundle builder (Figma 1:636): kit .option-card--tile + .dpanel ===== */
+  /* ===== 1. Bundle builder: kit .option-card--tile + .dpanel ===== */
   .bundle__header { display: grid; gap: var(--space-sm); margin-block-end: var(--heading-gap); }
   .bundle__header .section-link { justify-self: start; }
   .bundle__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--grid-gap); margin: 0; padding: 0; list-style: none; }
@@ -30,7 +32,7 @@
   .bpanel .dpanel__lines { margin-block-start: var(--space-md); }
   .bpanel__summary { display: grid; gap: var(--space-sm); }
   .bpanel__note { display: flex; align-items: center; gap: var(--space-xs); }
-  .bpanel__note svg { flex: none; width: 16px; height: 16px; }
+  .bpanel__note svg { flex: none; width: var(--icon-size-sm); height: var(--icon-size-sm); }
 
   /* ===== 1b. Thanh dính bundle < 48rem (ES1-T286, CTO chốt 10/11 H4): kit .buy-bar (V34) =====
      Trang thật: position fixed đáy màn (kit); trang chỉ thêm ẩn/hiện + ô lỗi xuống dòng. Mockup vẽ trong khung .phone. */
@@ -38,13 +40,13 @@
   .bundle-bar.is-visible { translate: 0 0; visibility: visible; transition: translate var(--motion-base) var(--ease-out), visibility 0s; }
   .bundle-bar[hidden] { display: none; }
   .bundle-bar .form-message { flex-basis: 100%; }
-  /* "{n} Items" trên, "{total}" dưới: giá dài ($1,234.56) vẫn vừa cạnh nút ở 320 */
+  /* "{n} items" trên, "{total}" dưới: giá dài ($1,234.56) vẫn vừa cạnh nút ở 320 */
   .bundle-bar .buy-bar__info { white-space: nowrap; }
   .bundle-bar .button { padding-inline: var(--space-md); } /* vừa 320 cạnh tổng tiền (như bản 10/11) */
-  .bundle-bar .buy-bar__info strong { font-size: var(--font-size-lg); font-variant-numeric: tabular-nums; }
+  .bundle-bar .buy-bar__info strong { font-size: var(--font-size-lg); line-height: var(--line-height-title); font-variant-numeric: tabular-nums; }
   @media (min-width: 48rem) { .bundle-bar { display: none; } }
   @media (prefers-reduced-motion: reduce) { .bundle-bar, .bundle-bar.is-visible { transition: none; } }
-  /* Teaser Big Offer (kit .teaser) nhấc lên trên thanh đáy theo chiều cao thật của thanh (marketing-popups §4) */
+  /* Teaser Big offer (kit .teaser) nhấc lên trên thanh đáy theo chiều cao thật của thanh (marketing-popups §4) */
   /* Trang thật: :root:has(.bundle-bar.is-visible) { --bottom-bar-height: <chiều cao thanh> } (JS đo).
      Mockup có nhiều khung .phone trên 1 trang nên chỉ đặt theo từng khung (review vòng 2: khung 2 không bị nhấc) */
 
@@ -80,38 +82,38 @@
     .phone .bpanel { grid-template-columns: minmax(0, 1fr); }
   }
 
-  /* ===== 2. Featured product (Figma 1:759) ===== */
+  /* ===== 2. Featured product ===== */
   .fp { display: grid; gap: var(--space-2xl); }
   .fp__media { position: relative; aspect-ratio: 1; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-panel); background: var(--color-background-cream); }
   .fp__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; padding: 8%; }
   .fp__seal { position: absolute; inset-block-start: var(--space-md); inset-inline-start: var(--space-md); width: 72px; height: 72px; color: var(--color-muted-light); }
+  .fp__seal text { text-transform: uppercase; }
   .fp__details { display: grid; gap: var(--space-md); align-content: start; }
-  .fp__title { font-size: var(--font-size-h1); }
-  /* Countdown = kit .sale-countdown (13b, vòng 2): Compact < 23rem khung chứa, Regular ≥ 23rem */
+    /* Countdown = kit .sale-countdown (13b, vòng 2): Compact < 23rem khung chứa, Regular ≥ 23rem */
   .fp__details .sale-countdown-host { min-width: 0; }
   .fp__price { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs) var(--space-sm); }
-  .fp__price .price__sale { font-size: var(--font-size-lg); font-weight: 500; }
+  .fp__price .price__sale { font-size: var(--font-size-lg); line-height: var(--line-height-title); font-weight: 500; }
   .fp__price s { color: var(--color-muted); }
   .fp__rating { flex-wrap: wrap; }
-  .fp__rating .sep { width: 1px; height: 14px; background: var(--color-muted-light); }
+  .fp__rating .sep { width: 1px; height: var(--icon-size-sm); background: var(--color-muted-light); }
   .fp__desc { color: var(--color-muted); }
   .specs { margin: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
   .specs > div { display: grid; gap: var(--space-2xs); padding: var(--space-sm) var(--space-md); }
   .specs > div:nth-child(odd) { background: var(--color-background-sand); }
-  .specs dt { color: var(--color-muted); font-size: var(--font-size-sm); }
+  .specs dt { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .specs dd { margin: 0; font-weight: 500; }
   .fp__actions { display: grid; gap: var(--space-sm); padding-block-start: var(--space-xs); }
 
-  /* ===== 3. Video demo (Figma 1:817) ===== */
+  /* ===== 3. Video demo ===== */
   .vrow > li { flex: 0 0 252px; }
   .vcard { display: grid; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); }
   .vcard__media { position: relative; aspect-ratio: 9 / 16; background: var(--color-background-dark); }
   .vcard__media img { width: 100%; height: 100%; object-fit: cover; }
   .vcard__play { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
-  .vcard__play span { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: color-mix(in srgb, var(--color-background) 92%, transparent); color: var(--color-foreground); transition: scale var(--motion-fast) var(--ease-out), background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out); }
-  .vcard__play svg { width: 16px; height: 18px; margin-inline-start: 3px; }
+  .vcard__play span { display: grid; place-items: center; width: var(--round-button-size); height: var(--round-button-size); border-radius: 50%; background: color-mix(in srgb, var(--color-background) 92%, transparent); color: var(--color-foreground); transition: scale var(--motion-fast) var(--ease-out), background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out); }
+  .vcard__play svg { width: 16px; height: 18px; margin-inline-start: var(--space-050); } /* Thiết kế: quang học glyph play 16 × 18 */
   .vcard__play:hover span { scale: 1.06; background: var(--color-accent); color: var(--color-accent-foreground); }
-  .vcard__play:focus-visible { outline-offset: -4px; }
+  .vcard__play:focus-visible { outline-offset: calc(var(--space-2xs) * -1); }
   /* V30: dòng sản phẩm = kit .product-row (thumb 56 cream bo 8) */
   .vcard__product { position: relative; min-height: 76px; padding: var(--space-sm); }
   .vcard__product .product-row__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -119,21 +121,21 @@
   .vcard__product a::after, .tcard__product a::after { content: ''; position: absolute; inset: 0; }
   .vcard__product a:hover, .tcard__product a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
 
-  /* ===== 4. Testimonials (Figma 1:885) ===== */
+  /* ===== 4. Testimonials ===== */
   .trow > li { flex: 0 0 272px; }
   .tcard { display: flex; flex-direction: column; height: 100%; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background); }
-  .tcard > img { width: 100%; aspect-ratio: 456 / 270; object-fit: cover; }
+  .tcard > img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
   .tcard__body { display: flex; flex: 1; flex-direction: column; gap: var(--space-sm); padding: var(--space-xl); }
   .tcard__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs) var(--space-sm); }
   .tcard__name { font-weight: 500; }
-  .tcard__verified { display: inline-flex; align-items: center; gap: var(--space-2xs); color: var(--color-muted-light); font-size: var(--font-size-sm); }
-  .tcard__verified svg { width: 16px; height: 16px; color: var(--color-badge-new); }
+  .tcard__verified { display: inline-flex; align-items: center; gap: var(--space-2xs); color: var(--color-muted-light); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .tcard__verified svg { width: var(--icon-size-sm); height: var(--icon-size-sm); color: var(--color-badge-new); }
   .tcard__meta .rating__stars { flex-basis: 100%; }
-  .tcard__title { font-family: var(--font-primary--family); } /* kit .text-title (Common/Title 18/28 700) */
+  .tcard__title { font-family: var(--font-primary--family); } /* kit .text-title (18/28, Inter 700) */
   .tcard__quote { flex: 1; color: var(--color-muted); }
   .tcard__product { position: relative; margin-block-start: var(--space-xs); padding-block-start: var(--space-xl); border-block-start: 1px solid var(--color-border); }
 
-  /* ===== 5. Why choose (Figma 1:992): .on-dark của kit (eyebrow xám, focus trắng) ===== */
+  /* ===== 5. Why choose: .on-dark của kit (eyebrow xám, focus trắng) ===== */
   .why { background: var(--color-background-dark) var(--dark-texture); }
   .why__media { position: relative; aspect-ratio: 1; overflow: hidden; }
   .why__media img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
@@ -144,20 +146,20 @@
   .why__accent { display: none; position: absolute; overflow: hidden; border-radius: var(--radius-card); }
   .why__accent img { width: 100%; height: 100%; object-fit: cover; }
 
-  /* ===== 6. Blog (Figma 1:1022) ===== */
+  /* ===== 6. Blog ===== */
   .blog-row > li { flex: 0 0 252px; }
 
-  /* ===== 7. FAQ (Figma 1:1057): accordion kit (V37) ===== */
+  /* ===== 7. FAQ: accordion kit (V37) ===== */
   .faq { display: grid; gap: var(--space-2xl); }
   .faq__aside { position: relative; }
-  .faq__image { width: 100%; aspect-ratio: 509 / 542; object-fit: cover; border-radius: var(--radius-panel); }
-  .faq__stats { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); margin: calc(var(--space-7) * -1) var(--space-sm) 0; padding: 0; list-style: none; }
+  .faq__image { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--radius-panel); }
+  .faq__stats { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); margin: calc(var(--space-4xl) * -1) var(--space-sm) 0; padding: 0; list-style: none; }
   .faq__stat { display: grid; gap: var(--space-2xs); padding: var(--space-md); border-radius: var(--radius-sm); color: var(--color-background-dark-foreground); }
   .faq__stat:first-child { background: var(--color-accent); }
   .faq__stat:last-child { background: var(--color-background-dark); }
-  .faq__stat-label { font-family: var(--font-heading--family); font-size: var(--font-size-eyebrow); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
+  .faq__stat-label { font-family: var(--font-heading--family); font-size: var(--font-size-eyebrow); line-height: var(--line-height-eyebrow); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
   .faq__stat-value { font-family: var(--font-heading--family); font-size: var(--font-size-h1); font-weight: var(--font-heading--weight-display); line-height: 1; letter-spacing: var(--letter-spacing-heading); }
-  .faq__stat-text { font-size: var(--font-size-sm); font-weight: 500; }
+  .faq__stat-text { font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: 500; }
 
   /* ===== Footer: kit.css (foundation §4) ===== */
 
@@ -166,11 +168,11 @@
   .state-card { display: grid; gap: var(--space-sm); padding: var(--space-md); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background); }
   .state-row { display: grid; gap: var(--space-md); }
   .vcard--error .vcard__media { display: grid; place-items: center; padding: var(--space-xl); text-align: center; color: var(--color-background-dark-foreground); }
-  .vcard--error .vcard__media p { display: grid; justify-items: center; gap: var(--space-xs); font-size: var(--font-size-sm); }
-  .vcard--error svg { width: 24px; height: 24px; color: var(--color-background-dark-foreground); }
+  .vcard--error .vcard__media p { display: grid; justify-items: center; gap: var(--space-xs); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .vcard--error svg { width: var(--icon-size-lg); height: var(--icon-size-lg); color: var(--color-background-dark-foreground); }
   .state-grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-md); margin: 0; padding: 0; list-style: none; }
   .state-card .button { white-space: normal; text-align: center; }
-  .state-card .fp__actions .button { white-space: nowrap; } /* V23: View Detail 1 dòng cạnh Sold out */
+  .state-card .fp__actions .button { white-space: nowrap; } /* V23: View details 1 dòng cạnh Sold out */
   /* V25: nhãn tiết kiệm 1 dòng (icon + chữ), cột tiền không xuống dòng */
   .dpanel__row--saving > :first-child { white-space: nowrap; }
   /* V30: ô cream bọc thumb = kit .product-row__media (ES1-T527 vòng 3 đưa vào kit) */
@@ -191,10 +193,10 @@
     .specs dd { text-align: end; }
     .fp__actions { grid-template-columns: auto auto; justify-content: start; }
     .vrow > li { flex-basis: 264px; }
-    .trow > li, .blog-row > li { flex-basis: 307px; }
+    .trow > li, .blog-row > li { flex-basis: 19.25rem; } /* 308 */
     .why__media { aspect-ratio: 4 / 3; }
     .why__media img { object-position: 50% 25%; }
-    .why__content { padding-block: var(--space-md) var(--space-4xl); padding-inline-end: calc(var(--space-1) * 50); }
+    .why__content { padding-block: var(--space-md) var(--space-4xl); padding-inline-end: 12.5rem; } /* 200 = ảnh phụ 168 + 32 */
     .why__accent { display: block; }
     .why__accent--1 { inset-block-start: calc(var(--space-3xl) * -1); inset-inline-end: 0; width: 168px; height: 168px; }
     .why__accent--2 { inset-block-end: var(--space-4xl); inset-inline-end: var(--space-2xl); width: 100px; height: 100px; }
@@ -240,13 +242,13 @@
 <main id="main">
   <h1 class="visually-hidden">Efitco home page, lower blocks</h1>
 
-  <!-- ===== 1. Bundle builder (Figma 1:636), nền cream ===== -->
+  <!-- ===== 1. Bundle builder, nền cream ===== -->
   <section class="section section--cream" aria-labelledby="bundle-h" data-testid="container-home-bundle-builder">
     <div class="container">
       <div class="bundle__header">
         <p class="eyebrow">Build your bundle</p>
-        <h2 id="bundle-h">Pick Your Kit, Save As You Go</h2>
-        <a class="section-link" href="#">View Preset Bundles<svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        <h2 id="bundle-h">Pick your kit, save as you go</h2>
+        <a class="section-link" href="#">View preset bundles<svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
       <form id="bundle-form" onsubmit="return false">
         <fieldset style="margin:0;padding:0;border:0">
@@ -262,7 +264,7 @@
         </fieldset>
         <div class="dpanel bpanel" role="group" aria-labelledby="bpanel-h">
           <div>
-            <div class="bpanel__head"><h3 class="dpanel__title" id="bpanel-h">Your Bundle</h3><span class="badge badge--tag">5 Items</span></div>
+            <div class="bpanel__head"><h3 class="dpanel__title" id="bpanel-h">Your bundle</h3><span class="badge badge--outline">5 items</span></div>
             <ul class="dpanel__lines">
               <li class="dpanel__row"><span>Kettlebell 16 kg</span><span>$259.00</span></li>
               <li class="dpanel__row"><span>Battle rope</span><span>$89.00</span></li>
@@ -277,34 +279,34 @@
             <div class="meter meter--done" aria-hidden="true"><span class="meter__fill" style="--value:100%"></span></div>
             <p class="dpanel__muted bpanel__note"><svg aria-hidden="true"><use href="#i-check"/></svg>You reached 15% off</p>
             <p class="dpanel__row dpanel__row--total"><span>Total</span><span>$436.90</span></p>
-            <button class="button button--full" type="submit">Add Bundle To Cart <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            <button class="button button--full" type="submit">Add bundle to cart <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></button>
             <p class="visually-hidden" role="status">5 selected, total $436.90</p>
           </div>
         </div>
       </form>
       <!-- Thanh dính < 48rem (ES1-T286): in sẵn hidden, BE bỏ hidden + .is-visible theo IntersectionObserver; vẽ ở mục States -->
       <div class="buy-bar bundle-bar" data-testid="bundle-sticky-bar" hidden>
-            <p class="buy-bar__info"><span>5 Items</span><span class="visually-hidden">Total</span><strong>$436.90</strong></p>
-          <button class="button" type="submit" form="bundle-form">Add Bundle To Cart</button>
+            <p class="buy-bar__info"><span>5 items</span><span class="visually-hidden">Total</span><strong>$436.90</strong></p>
+          <button class="button" type="submit" form="bundle-form">Add bundle to cart</button>
       </div>
     </div>
   </section>
 
-  <!-- ===== 2. Featured product (Figma 1:759), nền trắng ===== -->
+  <!-- ===== 2. Featured product, nền trắng ===== -->
   <section class="section" aria-labelledby="fp-h" data-testid="container-home-featured-product">
     <div class="container fp">
       <div class="fp__media">
         <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P15.jpg?width=1080" alt="Ativafit Lava 66 lb Adjustable dumbbells on their base" width="1080" height="1080">
-        <svg class="fp__seal" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="seal-path" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0"/></defs><text font-family="Inter, sans-serif" font-size="13" font-weight="500" letter-spacing="3.2" fill="currentColor"><textPath href="#seal-path">EFITCO · FEATURE PRODUCT ·</textPath></text><circle cx="60" cy="64" r="12" fill="none" stroke="currentColor" stroke-width="5"/><path d="M52 52c0-6 16-6 16 0" fill="none" stroke="currentColor" stroke-width="4"/></svg>
+        <svg class="fp__seal" viewBox="0 0 120 120" aria-hidden="true"><defs><path id="seal-path" d="M60 60m-46 0a46 46 0 1 1 92 0a46 46 0 1 1-92 0"/></defs><text font-family="Inter, sans-serif" font-size="13" font-weight="500" letter-spacing="3.2" fill="currentColor"><textPath href="#seal-path">Efitco · Feature product ·</textPath></text><circle cx="60" cy="64" r="12" fill="none" stroke="currentColor" stroke-width="5"/><path d="M52 52c0-6 16-6 16 0" fill="none" stroke="currentColor" stroke-width="4"/></svg>
       </div>
       <div class="fp__details">
-        <p class="eyebrow">Featured Product · Free Weights</p>
-        <h2 class="fp__title" id="fp-h">Ativafit Lava 66 lb Adjustable</h2>
+        <p class="eyebrow">Featured product · Free Weights</p>
+        <h2 class="h1" id="fp-h">Ativafit Lava 66 lb Adjustable</h2>
         <div class="sale-countdown-host"><div class="sale-countdown" role="timer" aria-label="Sale ends in 22 hours 36 minutes 28 seconds" data-testid="sale-countdown"><span class="sale-countdown__label" aria-hidden="true">Sale ends in</span><span class="sale-countdown__units" aria-hidden="true"><span class="sale-countdown__unit">22</span><span class="sale-countdown__unit">36</span><span class="sale-countdown__unit">28</span></span></div></div>
         <div class="fp__price">
           <span class="price__sale"><span class="visually-hidden">Sale price</span>$379.99</span>
           <s><span class="visually-hidden">Regular price</span>$499.99</s>
-          <span class="badge badge--sale">-24%</span>
+          <span class="badge badge--sale">−24%</span>
         </div>
         <p class="rating fp__rating"><span class="rating__stars" aria-hidden="true"><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg></span><span><span class="visually-hidden">Rated 4.9 out of 5 stars</span><span aria-hidden="true">(4.9)</span></span><span class="sep" aria-hidden="true"></span><span class="rating__count">341 reviews</span></p>
         <p class="fp__desc">11 to 66 lb in seconds. One pair replaces a whole rack of fixed dumbbells - and takes up less floor space than a shoebox. No plates to swap, no waiting between sets, just one dial and go. Fifteen pairs of dumbbells living quietly in the corner - and your room stays a room.</p>
@@ -315,89 +317,89 @@
           <div><dt>Assembly</dt><dd>None — ready out of the box</dd></div>
         </dl>
         <div class="fp__actions">
-          <button class="button" type="button"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add To Cart</button>
-          <a class="button button--secondary" href="#">View Detail<span class="visually-hidden"> of Ativafit Lava 66 lb Adjustable</span> <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+          <button class="button" type="button"><svg aria-hidden="true"><use href="#i-bag"/></svg>Add to cart</button>
+          <a class="button button--secondary" href="#">View details<span class="visually-hidden"> of Ativafit Lava 66 lb Adjustable</span> <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ===== 3. Video demo (Figma 1:817), nền trắng ===== -->
+  <!-- ===== 3. Video demo, nền trắng ===== -->
   <section class="section" aria-labelledby="video-h" data-testid="container-home-video-carousel">
     <div class="container">
       <div class="section-header section-header--split">
         <p class="eyebrow">Video demo</p>
-        <h2 id="video-h">See Real Equipment In Action, Before You Buy</h2>
+        <h2 id="video-h">See real equipment in action, before you buy</h2>
         <div class="carousel-nav"><button class="round-button" type="button" aria-label="Previous videos" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button><button class="round-button" type="button" aria-label="Next videos"><svg aria-hidden="true"><use href="#i-next"/></svg></button></div>
       </div>
       <ul class="card-row bleed-row vrow" aria-label="Product videos. Scroll sideways to see more." tabindex="0">
         <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-1.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Ativafit Lava 66 lb"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Ativafit Lava 66 lb</a></p><p class="price"><span class="price__sale">$379.99</span><s class="price__compare">$499.99</s></p></div></div></li>
         <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-2.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Compact Power Rack"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Compact Power Rack</a></p><p class="price"><span>$549.00</span></p></div></div></li>
-        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-3.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Hex Dumbbell Set"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P17.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Hex Dumbbell Set</a></p><p class="price"><span class="price__sale">$289.00</span><s class="price__compare">$339.00</s></p></div></div></li>
+        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-3.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Adjustable dumbbell pair"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P17.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Adjustable dumbbell pair</a></p><p class="price"><span>$259.00</span></p></div></div></li>
         <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-4.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Home Starter Kit"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Home Starter Kit</a></p><p class="price"><span class="price__sale">$399.00</span><s class="price__compare">$512.00</s></p></div></div></li>
-        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-5.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Cast Iron Kettlebell"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P20.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Cast Iron Kettlebell</a></p><p class="price"><span>$52.00</span></p></div></div></li>
+        <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-5.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Iron Core Kettlebell 16 kg"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P20.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Iron Core Kettlebell 16 kg</a></p><p class="price"><span>$119.00</span></p></div></div></li>
         <li class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-6.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Resistance Band Set"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P06.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Resistance Band Set</a></p><p class="price"><span>$45.00</span></p></div></div></li>
       </ul>
       <div class="carousel-progress p-video" aria-hidden="true"><span class="carousel-progress__thumb"></span></div>
     </div>
   </section>
 
-  <!-- ===== 4. Testimonials (Figma 1:885), nền cream ===== -->
+  <!-- ===== 4. Testimonials, nền cream ===== -->
   <section class="section section--cream" aria-labelledby="t-h" data-testid="container-home-testimonials">
     <div class="container">
       <div class="section-header section-header--split">
         <p class="eyebrow">Testimonial</p>
-        <h2 id="t-h">What Our Customers Say?</h2>
+        <h2 id="t-h">What our customers say?</h2>
         <div class="carousel-nav"><button class="round-button" type="button" aria-label="Previous reviews" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button><button class="round-button" type="button" aria-label="Next reviews"><svg aria-hidden="true"><use href="#i-next"/></svg></button></div>
       </div>
       <ul class="card-row bleed-row trow" aria-label="Customer reviews" tabindex="0">
-        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-1.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">E. Johnson</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="rating__stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Versatile Gear For All Exercises</h3><p class="tcard__quote">High quality equipment that doesn't break the bank. I am very impressed with the overall durability.</p><div class="product-row tcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Ativafit Lava 66 lb</a></p><p class="price"><span class="price__sale">$379.99</span><s class="price__compare">$499.99</s></p></div></div></div></article></li>
-        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-2.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">S. Williams</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="rating__stars" role="img" aria-label="4 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg class="is-empty" aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Folds Away In Seconds</h3><p class="tcard__quote">The rack folds flat against the wall. My garage is a garage again between sessions.</p><div class="product-row tcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Compact Power Rack R3</a></p><p class="price"><span>$549.00</span></p></div></div></div></article></li>
-        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-3.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">M. Anderson</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="rating__stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Smooth Every Single Rep</h3><p class="tcard__quote">The dial switches weight fast, no jamming at all. Saves an entire corner of my room.</p><div class="product-row tcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">FlexFold Adjustable Bench</a></p><p class="price"><span class="price__sale">$189.00</span><s class="price__compare">$229.00</s></p></div></div></div></article></li>
-        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-4.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">J. Miller</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="rating__stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Worth Every Penny</h3><p class="tcard__quote">Spins so smoothly, no tangling even at high speed. Best rope I have owned.</p><div class="product-row tcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Revllen Pro Speed Rope</a></p><p class="price"><span class="price__sale">$34.99</span><s class="price__compare">$44.99</s></p></div></div></div></article></li>
+        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-1.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">E. Johnson</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="rating__stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Versatile gear for all exercises</h3><p class="tcard__quote">High quality equipment that doesn't break the bank. I am very impressed with the overall durability.</p><div class="product-row tcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Ativafit Lava 66 lb</a></p><p class="price"><span class="price__sale">$379.99</span><s class="price__compare">$499.99</s></p></div></div></div></article></li>
+        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-2.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">S. Williams</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="rating__stars" role="img" aria-label="4 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg class="is-empty" aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Folds away in seconds</h3><p class="tcard__quote">The rack folds flat against the wall. My garage is a garage again between sessions.</p><div class="product-row tcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Compact Power Rack R3</a></p><p class="price"><span>$549.00</span></p></div></div></div></article></li>
+        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-3.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">M. Anderson</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="rating__stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Smooth every single rep</h3><p class="tcard__quote">The dial switches weight fast, no jamming at all. Saves an entire corner of my room.</p><div class="product-row tcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">FlexFold Adjustable Bench</a></p><p class="price"><span class="price__sale">$189.00</span><s class="price__compare">$229.00</s></p></div></div></div></article></li>
+        <li><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-4.jpg?width=720" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">J. Miller</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="rating__stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Worth every penny</h3><p class="tcard__quote">Spins so smoothly, no tangling even at high speed. Best rope I have owned.</p><div class="product-row tcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P04.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Revllen Pro Speed Rope</a></p><p class="price"><span class="price__sale">$34.99</span><s class="price__compare">$44.99</s></p></div></div></div></article></li>
       </ul>
       <div class="carousel-progress p-review" aria-hidden="true"><span class="carousel-progress__thumb"></span></div>
     </div>
   </section>
 
-  <!-- ===== 5. Why choose (Figma 1:992), nền tối + noise ===== -->
+  <!-- ===== 5. Why choose, nền tối + noise ===== -->
   <section class="why on-dark" aria-labelledby="why-h" data-testid="container-home-why-choose">
     <div class="why__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-why-b.jpg?width=1200" alt="Athlete holding a weighted bar in front of his face" width="1200" height="1140"></div>
     <div class="container why__content">
       <div class="why__accent why__accent--1"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-why-1.jpg?width=400" alt="" width="400" height="400"></div>
       <p class="eyebrow">We are about</p>
-      <h2 class="display why__heading" id="why-h">Why Choose<br> Efitco?</h2>
+      <h2 class="display why__heading" id="why-h">Why choose<br> Efitco?</h2>
       <p class="why__body">Affordable, high-quality fitness gear that supports beginners to elite athletes. We design for the home first — equipment that folds, stacks or disappears when you're done, so your living room stays a living room between sessions.</p>
-      <a class="button" href="#">View About Us <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      <a class="button" href="#">View about us <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       <div class="why__accent why__accent--2"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-why-2.jpg?width=240" alt="" width="240" height="240"></div>
     </div>
   </section>
 
-  <!-- ===== 6. Blog (Figma 1:1022), nền trắng ===== -->
+  <!-- ===== 6. Blog, nền trắng ===== -->
   <section class="section" aria-labelledby="blog-h" data-testid="container-home-blog-posts">
     <div class="container">
       <div class="section-header section-header--split">
         <p class="eyebrow">From the Efitco blog</p>
-        <h2 id="blog-h">Training Tips &amp; Inspiration</h2>
+        <h2 id="blog-h">Training tips &amp; inspiration</h2>
         <div class="carousel-nav"><button class="round-button" type="button" aria-label="Previous articles" aria-disabled="true"><svg aria-hidden="true"><use href="#i-prev"/></svg></button><button class="round-button" type="button" aria-label="Next articles"><svg aria-hidden="true"><use href="#i-next"/></svg></button></div>
       </div>
       <ul class="card-row bleed-row blog-row" aria-label="Blog articles. Scroll sideways to see more." tabindex="0">
-        <li><a class="article-card" href="/blogs/figma-blog/figma-stretch-after-training"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Exercises</span><span class="article-card__content"><h3 class="article-card__title">How to stretch properly after training</h3><span class="article-card__meta">2 min read</span></span></a></li>
-        <li><a class="article-card" href="/blogs/figma-blog/figma-home-gym-15m2"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Featured</span><span class="article-card__content"><h3 class="article-card__title">Set up a perfect home gym in just 15m²</h3><span class="article-card__meta">5 min read</span></span></a></li>
-        <li><a class="article-card" href="/blogs/figma-blog/figma-eat-before-after-session"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Diet plans</span><span class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><span class="article-card__meta">7 min read</span></span></a></li>
-        <li><a class="article-card" href="/blogs/figma-blog/figma-rubber-vs-urethane"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Diet plans</span><span class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><span class="article-card__meta">5 min read</span></span></a></li>
+        <li><a class="article-card" href="/blogs/training/stretch-after-training"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-1.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Exercises</span><span class="article-card__content"><h3 class="article-card__title">How to stretch properly after training</h3><span class="article-card__meta">2 min read</span></span></a></li>
+        <li><a class="article-card" href="/blogs/training/home-gym-15m2"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-2.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Featured</span><span class="article-card__content"><h3 class="article-card__title">Set up a perfect home gym in just 15m²</h3><span class="article-card__meta">5 min read</span></span></a></li>
+        <li><a class="article-card" href="/blogs/training/eat-before-after-session"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-4.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Diet plans</span><span class="article-card__content"><h3 class="article-card__title">What to eat before and after a heavy session</h3><span class="article-card__meta">7 min read</span></span></a></li>
+        <li><a class="article-card" href="/blogs/training/rubber-vs-urethane"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/articles/efx-blog-5.jpg?width=640" alt="" width="640" height="853"><span class="badge badge--tag">Diet plans</span><span class="article-card__content"><h3 class="article-card__title">Rubber vs urethane: which plates last longer</h3><span class="article-card__meta">5 min read</span></span></a></li>
       </ul>
       <div class="carousel-progress p-blog" aria-hidden="true"><span class="carousel-progress__thumb"></span></div>
     </div>
   </section>
 
-  <!-- ===== 7. FAQ (Figma 1:1057), nền cream ===== -->
+  <!-- ===== 7. FAQ, nền cream ===== -->
   <section class="section section--cream" aria-labelledby="faq-h" data-testid="container-home-faq">
     <div class="container faq">
       <div>
         <div class="section-header">
-          <p class="eyebrow">Questions and Answers</p>
-          <h2 id="faq-h">We're Proud To Be The Best At Training</h2>
+          <p class="eyebrow">Questions and answers</p>
+          <h2 id="faq-h">We're proud to be the best at training</h2>
         </div>
         <div class="accordion">
           <details open><summary>How long does shipping take?</summary><div><p>Orders ship within one business day. Standard delivery is 2-4 business days across the continental US, and shipping is free on orders over $99.</p></div></details>
@@ -418,17 +420,17 @@
   </section>
 </main>
 
-<!-- ===== 8. Footer (Figma 1:1104, foundation §4) ===== -->
+<!-- ===== 8. Footer (foundation §4) ===== -->
 <footer class="site-footer" data-testid="footer">
   <div class="container site-footer__band">
     <div class="site-footer__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-news.jpg?width=200" alt="" width="196" height="246"></div>
     <div class="site-footer__newsletter">
-      <h2><span>Get 15% Off</span> Your First Order</h2>
+      <h2><span>Get 15% off</span> your first order</h2>
       <p>Get expert training tips, early access to gear, and exclusive offers - plus up to 15% off for subscribers.</p>
     </div>
     <form class="site-footer__form" onsubmit="return false" novalidate>
       <label class="visually-hidden" for="nl-email">Email</label>
-      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% Off</button></div>
+      <div class="site-footer__field"><input class="site-footer__input" id="nl-email" type="email" name="contact[email]" autocomplete="email" placeholder="Email"><button class="button" type="submit"><svg aria-hidden="true"><use href="#i-send"/></svg>Get 15% off</button></div>
       <p class="site-footer__note">No spam. Unsubscribe anytime.</p>
     </form>
   </div>
@@ -446,19 +448,19 @@
         <a class="shop-follow" href="#">Follow on <b>shop</b></a>
       </div>
       <div class="site-footer__menus only-mobile">
-        <div class="site-footer__menu"><details><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-        <div class="site-footer__menu"><details><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        <div class="site-footer__menu"><details><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches &amp; Racks</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
       </div>
       <div class="site-footer__menus only-tablet">
-        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches</a></li><li><a href="#">Accessories</a></li></ul></details></div>
-        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our Story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact Us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Shop <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Weight</a></li><li><a href="#">Portable Fitness</a></li><li><a href="#">Benches &amp; Racks</a></li><li><a href="#">Accessories</a></li></ul></details></div>
+        <div class="site-footer__menu"><details open><summary>Information <svg aria-hidden="true"><use href="#i-chevron"/></svg></summary><ul><li><a href="#">Our story</a></li><li><a href="#">Our Efitco</a></li><li><a href="#">FAQs</a></li><li><a href="#">Contact us</a></li><li><a href="#">Shipping policy</a></li><li><a href="#">Refund policy</a></li></ul></details></div>
       </div>
     </div>
     <ul class="site-footer__trust">
-      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 Year Warranty</li>
-      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast Shipping</li>
-      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium Quality</li>
-      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 Day Money Back</li>
+      <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 year warranty</li>
+      <li><svg aria-hidden="true"><use href="#i-truck"/></svg>Fast shipping</li>
+      <li><svg aria-hidden="true"><use href="#i-award"/></svg>Premium quality</li>
+      <li><svg aria-hidden="true"><use href="#i-refresh"/></svg>90 day money back</li>
     </ul>
   </div>
   <div class="container site-footer__bottom">
@@ -471,20 +473,20 @@
   </div>
 </footer>
 
-<!-- ===== Trạng thái (ĐỀ XUẤT, Figma không có) ===== -->
+<!-- ===== Trạng thái (ĐỀ XUẤT) ===== -->
 <section class="container demo-block" aria-labelledby="states-h">
   <h2 id="states-h">States</h2>
-  <p class="demo-note">Bundle sticky bar on mobile (grid on screen, panel on screen, empty, adding, error) with the Big Offer button above it; bundle with 2 items, sold-out card, empty bundle, add error; featured product sold out; video that cannot play; loading row.</p>
+  <p class="demo-note">Bundle sticky bar on mobile (grid on screen, panel on screen, empty, adding, error) with the Big offer button above it; bundle with 2 items, sold-out card, empty bundle, add error; featured product sold out; video that cannot play; loading row.</p>
   <div class="states">
     <div class="phone-row" data-testid="bundle-sticky-bar-states">
       <div class="phone-wrap">
-        <p class="demo-label">Mobile 360 × 640: grid on screen, panel not yet · bar shown, Big Offer lifted 16 above bar</p>
+        <p class="demo-label">Mobile 360 × 640: grid on screen, panel not yet · bar shown, Big offer lifted 16 above bar</p>
         <div class="phone" inert aria-hidden="true">
           <div class="phone__page">
             <div class="bundle__header">
               <p class="eyebrow">Build your bundle</p>
-              <p class="h2">Pick Your Kit, Save As You Go</p>
-              <span class="section-link">View Preset Bundles<svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></span>
+              <p class="h2">Pick your kit, save as you go</p>
+              <span class="section-link">View preset bundles<svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></span>
             </div>
             <ul class="bundle__grid">
               <li><label class="option-card option-card--tile"><input class="visually-hidden" type="checkbox" checked><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P09.jpg?width=480" alt="" width="480" height="480"><span class="option-card__body"><span class="option-card__title">Kettlebell 16 kg</span><span class="price">$259.00</span></span><span class="option-card__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></label></li>
@@ -493,15 +495,15 @@
               <li><label class="option-card option-card--tile"><input class="visually-hidden" type="checkbox"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P12.jpg?width=480" alt="" width="480" height="480"><span class="option-card__body"><span class="option-card__title">Weighted vest</span><span class="price">$34.00</span></span><span class="option-card__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></label></li>
             </ul>
           </div>
-          <div class="teaser"><span class="teaser__open"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
+          <div class="teaser"><span class="teaser__open"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">−24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
           <div class="buy-bar bundle-bar is-visible">
-            <p class="buy-bar__info"><span>5 Items</span><strong>$436.90</strong></p>
-              <span class="button">Add Bundle To Cart</span>
+            <p class="buy-bar__info"><span>5 items</span><strong>$436.90</strong></p>
+              <span class="button">Add bundle to cart</span>
           </div>
         </div>
       </div>
       <div class="phone-wrap">
-        <p class="demo-label">Mobile 360 × 640: panel on screen · bar hidden, Big Offer back to 16 from bottom</p>
+        <p class="demo-label">Mobile 360 × 640: panel on screen · bar hidden, Big offer back to 16 from bottom</p>
         <div class="phone" inert aria-hidden="true">
           <div class="phone__page">
             <ul class="bundle__grid">
@@ -510,7 +512,7 @@
             </ul>
             <div class="dpanel bpanel">
               <div>
-                <div class="bpanel__head"><span class="dpanel__title">Your Bundle</span><span class="badge badge--tag">5 Items</span></div>
+                <div class="bpanel__head"><span class="dpanel__title">Your bundle</span><span class="badge badge--outline">5 items</span></div>
                 <ul class="dpanel__lines">
                   <li class="dpanel__row"><span>Kettlebell 16 kg</span><span>$259.00</span></li>
                   <li class="dpanel__row"><span>Battle rope</span><span>$89.00</span></li>
@@ -521,28 +523,28 @@
               </div>
             </div>
           </div>
-          <div class="teaser"><span class="teaser__open"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><use href="#i-tag"/></svg>Big Offer <span class="badge badge--sale">-24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
+          <div class="teaser"><span class="teaser__open"><svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><use href="#i-tag"/></svg>Big offer <span class="badge badge--sale">−24%</span></span><span class="teaser__close"><svg aria-hidden="true"><use href="#i-close"/></svg></span></div>
           <div class="buy-bar bundle-bar">
-            <p class="buy-bar__info"><span>5 Items</span><strong>$436.90</strong></p>
-              <span class="button">Add Bundle To Cart</span>
+            <p class="buy-bar__info"><span>5 items</span><strong>$436.90</strong></p>
+              <span class="button">Add bundle to cart</span>
           </div>
         </div>
       </div>
       <div class="phone-wrap phone-wrap--wide">
-        <p class="demo-label">Sticky bar states: 0 items · adding · add error (bar grows, Big Offer follows its height)</p>
+        <p class="demo-label">Sticky bar states: 0 items · adding · add error (bar grows, Big offer follows its height)</p>
         <div class="bar-demo">
           <div class="buy-bar bundle-bar">
-            <p class="buy-bar__info"><span>0 Items</span><span class="visually-hidden">Total</span><strong>$0.00</strong></p>
-              <button class="button" type="button" disabled>Add Bundle To Cart</button>
+            <p class="buy-bar__info"><span>0 items</span><span class="visually-hidden">Total</span><strong>$0.00</strong></p>
+              <button class="button" type="button" disabled>Add bundle to cart</button>
           </div>
           <div class="buy-bar bundle-bar">
-            <p class="buy-bar__info"><span>5 Items</span><span class="visually-hidden">Total</span><strong>$436.90</strong></p>
-              <button class="button" type="button" aria-busy="true">Add Bundle To Cart</button>
+            <p class="buy-bar__info"><span>5 items</span><span class="visually-hidden">Total</span><strong>$436.90</strong></p>
+              <button class="button" type="button" aria-busy="true">Add bundle to cart</button>
           </div>
           <div class="buy-bar bundle-bar">
             <div class="form-message form-message--error form-message--inline" role="alert"><svg aria-hidden="true" width="20" height="20"><use href="#i-alert"/></svg><p>We couldn't add your bundle to the cart. Check your cart and try again.</p></div>
-            <p class="buy-bar__info"><span>5 Items</span><span class="visually-hidden">Total</span><strong>$436.90</strong></p>
-              <button class="button" type="button">Add Bundle To Cart</button>
+            <p class="buy-bar__info"><span>5 items</span><span class="visually-hidden">Total</span><strong>$436.90</strong></p>
+              <button class="button" type="button">Add bundle to cart</button>
           </div>
         </div>
       </div>
@@ -557,7 +559,7 @@
             <div class="meter" aria-hidden="true"><span class="meter__fill" style="--value:66%"></span></div>
             <p class="dpanel__muted bpanel__note"><svg aria-hidden="true"><use href="#i-lock"/></svg>Add 1 more item to unlock 15% off</p>
             <p class="dpanel__row dpanel__row--total"><span>Total</span><span>$313.20</span></p>
-            <button class="button button--full" type="button" aria-busy="true">Add Bundle To Cart</button>
+            <button class="button button--full" type="button" aria-busy="true">Add bundle to cart</button>
           </div>
         </div>
       </div>
@@ -565,7 +567,7 @@
         <p class="demo-label">Bundle: empty, sold out, error</p>
         <ul class="state-grid-2">
           <li><label class="option-card option-card--tile is-disabled"><input class="visually-hidden" type="checkbox" disabled aria-label="Weighted vest is sold out"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P12.jpg?width=480" alt="Weighted vest" width="480" height="480"><span class="option-card__body"><span class="badge badge--sold-out">Sold out</span><span class="option-card__title">Weighted vest</span><span class="price">$34.00</span></span></label></li>
-          <li style="grid-column:1/-1"><div class="dpanel" style="height:100%;align-content:center"><p class="dpanel__muted bpanel__note">Select products to build your bundle.</p><button class="button button--full" type="button" disabled>Add Bundle To Cart</button></div></li>
+          <li style="grid-column:1/-1"><div class="dpanel" style="height:100%;align-content:center"><p class="dpanel__muted bpanel__note">Select products to build your bundle.</p><button class="button button--full" type="button" disabled>Add bundle to cart</button></div></li>
         </ul>
         <div class="alert" role="alert"><svg aria-hidden="true"><use href="#i-alert"/></svg><div class="alert__body"><strong>Bundle not added</strong><p>We couldn't add your bundle to the cart. Check your cart and try again.</p></div></div>
       </div>
@@ -574,12 +576,12 @@
       <div class="state-card">
         <p class="demo-label">Featured product: sold out, countdown ended (hidden)</p>
         <div class="fp__price"><span>$379.99</span><span class="badge badge--sold-out">Sold out</span></div>
-        <div class="fp__actions"><button class="button" type="button" disabled>Sold out</button><a class="button button--secondary" href="#">View Detail<span class="visually-hidden"> of Ativafit Lava 66 lb Adjustable</span> <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
+        <div class="fp__actions"><button class="button" type="button" disabled>Sold out</button><a class="button button--secondary" href="#">View details<span class="visually-hidden"> of Ativafit Lava 66 lb Adjustable</span> <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a></div>
       </div>
       <div class="state-card">
         <p class="demo-label">Video error · loading</p>
         <ul class="state-grid-2">
-          <li class="vcard vcard--error"><div class="vcard__media"><p><svg aria-hidden="true"><use href="#i-alert"/></svg>Video unavailable. <a class="text-link" href="#">View Cast Iron Kettlebell</a></p></div></li>
+          <li class="vcard vcard--error"><div class="vcard__media"><p><svg aria-hidden="true"><use href="#i-alert"/></svg>Video unavailable. <a class="text-link" href="#">View Iron Core Kettlebell 16 kg</a></p></div></li>
           <li aria-busy="true"><span class="skeleton" style="aspect-ratio:9/16"></span><span class="visually-hidden" role="status">Loading videos</span></li>
         </ul>
       </div>

@@ -2,7 +2,7 @@
 
 ## Phạm vi và loại
 - Unit-ish: theme check (Liquid/schema/locale), JSON schema validate cho settings.
-- UI: ảnh 3 breakpoint mỗi PR FE; visual diff so Figma (ngưỡng 2%).
+- UI: ảnh 3 breakpoint mỗi PR FE; visual diff so ảnh mockup `drafts/designer/<ticket>/<trang>-360|768|1280|1920.png` (ngưỡng 2%; CTO 21/11 ES1-T567: mockup là nguồn chuẩn, Cần QA đổi baseline của bộ so ảnh).
 - E2E: Playwright trên preview hoa-qua-nhap-khau (efitco-ai-dev), chromium desktop + Pixel 7; luồng mua (home → collection → filter → product → variant → add → drawer → checkout), search, cart page fallback không JS.
 - A11y: axe trong Playwright 0 serious/critical; lhci accessibility = 100 (ES1-T301, ES1-T416); manual keyboard + screen reader mỗi story tương tác.
 - Hiệu năng: lhci home/product/collection desktop + mobile, dữ liệu benchmark; ngưỡng 96/90.

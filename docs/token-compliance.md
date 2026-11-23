@@ -1,3 +1,7 @@
+> ĐÃ THAY 21/11/2026 (CTO, ES1-T567) — TÀI LIỆU LỊCH SỬ, KHÔNG CÒN HIỆU LỰC.
+> Nguồn chuẩn thiết kế hiện nay là mockup HTML `drafts/designer/**` cùng `drafts/designer/_kit/kit.css`; token máy đọc ở `docs/tokens.json`; bản vẽ được dựng lại từ mockup theo `docs/design/figma-handoff.md`.
+> Nội dung bên dưới giữ nguyên để tra lịch sử (đối chiếu token với file thiết kế cũ, 22–30/10/2026; các quyết định màu AA trong đó vẫn giữ, xem `docs/design/decisions.md` và `docs/tokens.json` `_contrast`). Không dùng làm căn cứ thiết kế, không so ảnh hay so token theo file này.
+
 # Token — chỗ phải đổi để hợp chuẩn Theme Store (chuẩn nội bộ)
 
 Nguồn: docs/figma-inventory.md, docs/tokens.json (22/10/2026).
