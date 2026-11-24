@@ -4,14 +4,14 @@
 // file này kiểm theo AC ở mức story, case trùng ý đã có ở spec dev thì chỉ giữ phần nghiệm thu (giá trị, trạng thái quan sát được), không lặp hợp đồng hook.
 // Test case: drafts/qa/ES1-T159/test-cases.md (TC-xx trong tên test). Template kiểm thử: /?view=te13, /?view=te13-states, /?view=te13-featured.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T159.spec.ts (project desktop + mobile Pixel 7).
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { test, expect, type Locator, type Page, type Request } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { CART_GLOB, themeAdd } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
 import { pageJson, readCartJson, readCartNoScript, requireJson } from './support/product-data';
 import { chooseOptions } from './support/variant-picker';
-import { gotoStore, skipIfStoreBlocked } from './support/store-guard';
+import { clickAndLoad, gotoStore, skipIfStoreBlocked } from './support/store-guard';
 import { env } from './support/store-data';
 import { fixtureApplied } from './support/home-fixture';
 
@@ -113,6 +113,8 @@ async function readProduct(scope: Locator): Promise<Product> {
 }
 const currentId = async (scope: Locator) => Number(await scope.locator('form input[type="hidden"][name="id"]').inputValue());
 const wakeBuy = (scope: Locator) => scope.getByTestId('featured-product-add').hover();
+// Form chứa nút mua. filter({ has: scope.getByTestId(...) }) sai: locator con tính lại từ container-… bên trong form nên không khớp (CI 45265403257).
+const buyForm = (scope: Locator) => scope.locator('form:has([data-testid="featured-product-add"])');
 
 /** Giá, giá gạch, % giảm của scope khớp biến thể (TE-13 AC2). */
 async function expectPrice(scope: Locator, v: Variant) {
@@ -133,7 +135,8 @@ const fakeShopifyCard = (page: Page, n: number) =>
   beforeModules(page, (v) => {
     const { n, src } = v as { n: number; src: string };
     const el = document.querySelector(`[data-video-card-id="te13-video-${n}"] video-card`) as HTMLElement | null;
-    if (!el) return;
+    // Thẻ đã là video Shopify thật thì giữ nguyên (TC-32 gọi trước lần tải duy nhất, không mở trang 2 lần).
+    if (!el || el.dataset.videoKind === 'shopify') return;
     el.dataset.videoKind = 'shopify';
     el.querySelector('template')!.innerHTML = `<video class="video-card__media" playsinline preload="metadata" aria-label="Demo"><source src="${src}" type="video/mp4"></video>`;
     if (!el.querySelector('[data-video-toggle]')) {
@@ -226,14 +229,23 @@ test.describe('ES1-T159 AC1 countdown', () => {
     expect(navigations).toBe(0);
   });
 
+  // Đồng hồ thật, không page.clock: CI 45265403257 lần tải thứ 2 dưới đồng hồ giả bị Cloudflare trả màn thử thách (4/4 lần),
+  // page.reload() không qua guard nên báo "không thấy countdown". Tải lại bằng gotoStore cùng URL: bị chặn thì báo Cloudflare.
   test('TC-08 AC1 TE-4 AC17 reload không reset; xoá storage không đổi kết quả', async ({ page }) => {
-    const { frame, end } = await openCountdown(page, 3 * 86400 + 3600);
-    await page.clock.runFor(5000);
-    const left = () => page.evaluate((e) => Math.floor(e - Date.now() / 1000), end);
-    near(secondsOf(await cellValues(frame)), await left(), 2);
-    await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });
-    await page.reload();
+    const end = Math.floor(Date.now() / 1000) + 3 * 86400 + 3600;
+    await setEnd(page, end);
+    await gotoStore(page, STATES);
+    const frame = featured(page, 'te13-a').getByTestId(CD);
+    test.skip((await frame.count()) === 0, 'Band A không có giá gạch ở biến thể đầu (ES1-T153)');
     await frame.scrollIntoViewIfNeeded();
+    await expect.poll(() => page.evaluate(() => !!customElements.get('sale-countdown'))).toBe(true);
+    const left = () => page.evaluate((e) => Math.floor(e - Date.now() / 1000), end);
+    await expect.poll(async () => Math.abs(secondsOf(await cellValues(frame)) - (await left()))).toBeLessThanOrEqual(2);
+    await page.waitForTimeout(2000);
+    await page.evaluate(() => { localStorage.clear(); sessionStorage.clear(); });
+    await gotoStore(page, STATES);
+    await frame.scrollIntoViewIfNeeded();
+    await expect.poll(() => page.evaluate(() => !!customElements.get('sale-countdown'))).toBe(true);
     await expect.poll(async () => Math.abs(secondsOf(await cellValues(frame)) - (await left()))).toBeLessThanOrEqual(2);
     const keys = await page.evaluate(() => [...Object.keys(localStorage), ...Object.keys(sessionStorage)]);
     expect(keys.filter((k) => /countdown|deadline|timer|sale/i.test(k))).toEqual([]);
@@ -341,12 +353,12 @@ test.describe('ES1-T159 AC2 featured product', () => {
   test('TC-17 AC2 AC6 không sale: không giá gạch, không badge % (band nào có biến thể đầu không sale)', async ({ page }) => {
     await gotoStore(page, STATES);
     let checked = 0;
-    for (const id of ['te13-b', 'te13-d']) {
-      const scope = featured(page, id);
+    for (const bandId of ['te13-b', 'te13-d']) {
+      const scope = featured(page, bandId);
       if ((await scope.count()) === 0) continue;
       const p = await readProduct(scope);
-      const id = await currentId(scope);
-      const selected = p.variants.find((x) => x.id === id);
+      const variantId = await currentId(scope);
+      const selected = p.variants.find((x) => x.id === variantId);
       if (!selected || (selected.compare_at_price && selected.compare_at_price > selected.price)) continue;
       await expect.poll(async () => cents(await scope.getByTestId('price-regular').first().textContent())).toBe(selected.price);
       await expect(scope.getByTestId('featured-product-discount')).toHaveCount(0);
@@ -469,19 +481,25 @@ test.describe('ES1-T159 AC2 featured product', () => {
     });
   });
 
-  test('TC-25 AC2 lỗi mạng khi thêm giỏ (route.abort): nút không kẹt, có thông báo lỗi, không pageerror', async ({ page }) => {
+  // Hợp đồng product-form (ES1-T67 AC8, assets/product-form.js, ES1-T85): lỗi mạng/5xx khi POST /cart/add.js → submit form thường,
+  // không giữ khách ở nút kèm thông báo. POST /cart/add thường bị route.fulfill giả: store dev Cloudflare chặn POST thật (CI 45265403257).
+  test('TC-25 AC2 lỗi mạng khi thêm giỏ (route.abort /cart/add.js): rơi về POST form thường đúng biến thể, không pageerror', async ({ page }) => {
     const errors = watchConsole(page);
     await page.route(CART_GLOB.add, (r) => r.abort());
+    await page.route(/\/cart\/add(\?|$)/, (r) => r.fulfill({ contentType: 'text/html', body: '<!doctype html><title>cart add (giả)</title>' }));
     await gotoStore(page, TE13);
     const scope = featured(page, 'te13-a');
     const add = scope.getByTestId('featured-product-add');
     test.skip(await add.isDisabled(), 'Biến thể đầu hết hàng');
+    const id = await currentId(scope);
     await wakeBuy(scope);
     await expect.poll(() => page.evaluate(() => !!customElements.get('product-form'))).toBe(true);
+    const ajax = page.waitForRequest((r) => /\/cart\/add\.js(\?|$)/.test(r.url()) && r.method() === 'POST');
+    const native = page.waitForRequest((r) => /\/cart\/add(\?|$)/.test(r.url()) && r.method() === 'POST' && r.isNavigationRequest());
     await add.click();
-    await expect(add).toBeEnabled();
-    await expect(add).not.toHaveAttribute('aria-busy', 'true');
-    await expect(scope.getByTestId('featured-product-error')).not.toBeEmpty();
+    await ajax;
+    const post = await native;
+    expect(post.postData() ?? '', 'form thường gửi id biến thể đang chọn').toContain(String(id));
     expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([]);
   });
 
@@ -570,8 +588,8 @@ test.describe('ES1-T159 AC3 AC4 video carousel', () => {
 
   test('TC-32 AC4 tệp video lỗi: poster + link sản phẩm, thẻ giữ kích thước, chữ "Video unavailable. View {title}", thẻ khác không ảnh hưởng', async ({ page }) => {
     const errors = watchConsole(page);
-    const real = await (async () => { await gotoStore(page, TE13); return (await card(page, 1).getAttribute('data-video-kind')) === 'shopify'; })();
-    if (!real) await fakeShopifyCard(page, 1);
+    // 1 lần tải: CI 45265403257 lần mở /?view=te13 thứ 2 trong test bị Cloudflare chặn (4/4 lần).
+    await fakeShopifyCard(page, 1);
     await page.route((u) => VIDEO_FILE.test(u.toString()), (r) => r.abort());
     await page.route(EMBED, (r) => r.fulfill({ contentType: 'text/html', body: '<!doctype html><title>embed</title>' }));
     await gotoStore(page, TE13);
@@ -607,11 +625,26 @@ test.describe('ES1-T159 AC3 AC4 video carousel', () => {
 test.describe('ES1-T159 AC5 ngân sách JS', () => {
   for (const path of [HOME, TE13]) {
     test(`TC-33 AC5 ${path}: JS theme tải sẵn ≤ 40 960 B, sau cuộn hết trang ≤ 65 536 B`, async ({ page }) => {
-      const sum = () => page.evaluate(() => (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
-        .filter((e) => /\/assets\/[^?]+\.js(\?|$)/.test(e.name))
-        .reduce((a, e) => ({ bytes: a.bytes + (e.transferSize || e.encodedBodySize), files: [...a.files, e.name.split('/').pop()!.split('?')[0]] }), { bytes: 0, files: [] as string[] }));
+      // ADR 0006: chỉ JS của theme (/t/<id>/assets/*.js), không tính script Shopify (load_feature, origin_trials,
+      // shop_events_listener, partial_rendering, webmcp… cũng có /assets/ trong URL; CI 45265403257 đếm nhầm vào, 52 718 B).
+      // Mỗi file lấy số lớn nhất của decodedBodySize, transferSize và `wc -c` tệp trong repo (ADR 0010 mục Đo), mỗi file 1 lần.
+      const sum = async () => {
+        const entries = await page.evaluate(() => (performance.getEntriesByType('resource') as PerformanceResourceTiming[])
+          .map((e) => [e.name, Math.max(e.decodedBodySize || 0, e.transferSize || 0, e.encodedBodySize || 0)] as [string, number]));
+        const files = new Map<string, number>();
+        for (const [url, bytes] of entries) {
+          const m = url.match(/\/t\/\d+\/assets\/([^/?#]+\.js)(?:[?#]|$)/);
+          if (!m) continue;
+          const local = existsSync(`assets/${m[1]}`) ? statSync(`assets/${m[1]}`).size : 0;
+          files.set(m[1], Math.max(files.get(m[1]) ?? 0, bytes, local));
+        }
+        return { bytes: [...files.values()].reduce((a, b) => a + b, 0), files: [...files].map(([f, b]) => `${f} ${b}`) };
+      };
       await gotoStore(page, path, { waitUntil: 'load' });
+      // Tính cả import() lười đã kích lúc tải (phần tử trong 200px khung nhìn đầu), cùng cách ES1-T316.
+      await page.waitForLoadState('networkidle');
       const pre = await sum();
+      expect(pre.files.length, 'đọc được JS theme /t/<id>/assets/ trong Resource Timing').toBeGreaterThan(0);
       for (let y = 0; y < 40; y++) {
         await page.mouse.wheel(0, 800);
         await page.waitForTimeout(120);
@@ -726,7 +759,18 @@ test.describe('ES1-T159 AC6 AC8 đo theo mốc', () => {
     near(play.x + play.w / 2, frame.x + frame.w / 2);
     near(play.y + play.h / 2, frame.y + frame.h / 2);
     const link = c.getByTestId('video-card-product-title');
-    expect((await box(link)).h).toBeGreaterThanOrEqual(44);
+    // Vùng bấm của link là ::after inset 0 phủ cả hàng sản phẩm (base.css .video-card__product-title::after), không phải hộp chữ:
+    // đo khối chứa của ::after và hit-test 3 điểm (2 góc, giữa) đều trúng link. Hộp chữ 26px (CI 45265403257) không phải vùng bấm.
+    await link.scrollIntoViewIfNeeded();
+    const hit = await link.evaluate((el) => {
+      const row = (el as HTMLElement).offsetParent as HTMLElement | null;
+      if (!row || getComputedStyle(el, '::after').position !== 'absolute') return { h: 0, hits: [false] };
+      const r = row.getBoundingClientRect();
+      const pts = [[r.left + 3, r.top + 3], [r.left + r.width / 2, r.top + r.height / 2], [r.right - 3, r.bottom - 3]];
+      return { h: r.height, hits: pts.map(([x, y]) => document.elementFromPoint(x, y)?.closest('a') === el) };
+    });
+    expect(hit.h, 'chiều cao vùng bấm link sản phẩm').toBeGreaterThanOrEqual(44);
+    expect(hit.hits, 'mọi điểm trong hàng sản phẩm trúng link').toEqual(hit.hits.map(() => true));
     const cut = await link.evaluate((el) => ({ over: getComputedStyle(el).textOverflow, clipped: el.scrollWidth > el.clientWidth + 1 || el.scrollHeight > el.clientHeight + 1 }));
     expect(cut.over).not.toBe('ellipsis');
     expect(cut.clipped).toBe(false);
@@ -872,12 +916,14 @@ test.describe('ES1-T159 nojs', () => {
       const scope = featured(page, 'te13-a');
       const add = scope.getByTestId('featured-product-add');
       test.skip(await add.isDisabled(), 'Biến thể hiện tại hết hàng');
-      const form = scope.locator('form').filter({ has: add });
+      const form = buyForm(scope);
       await expect(form).toHaveAttribute('method', /post/i);
       expect(await form.getAttribute('action')).toMatch(/\/cart\/add/);
       await expect(scope.locator('select[name="id"]')).toHaveCount(0);
       const id = await currentId(scope);
-      await Promise.all([page.waitForURL(/\/cart(\?|$)/), add.click()]);
+      // clickAndLoad: POST bị Cloudflare thử thách thì báo "bị Cloudflare chặn" (skipIfStoreBlocked nhận), không treo waitForURL.
+      await clickAndLoad(page, () => add.click());
+      await expect(page).toHaveURL(/\/cart(\?|$)/);
       const cart = await readCartNoScript<{ items: { variant_id: number }[] }>(page);
       expect(cart.items.map((i) => i.variant_id)).toContain(id);
     });
@@ -912,8 +958,12 @@ test.describe('ES1-T159 module lỗi', () => {
       const scope = featured(page, 'te13-a');
       await scope.scrollIntoViewIfNeeded();
       await wakeBuy(scope);
-      const form = scope.locator('form').filter({ has: scope.getByTestId('featured-product-add') });
-      await expect(form).toHaveAttribute('method', /post/i);
+      await expect(buyForm(scope)).toHaveAttribute('method', /post/i);
+      if (mod === 'sale-countdown') {
+        const frame = scope.getByTestId(CD);
+        // KHÔNG CHẮC (ES1-T608): ui-spec countdown §5 K0 in số Liquid ngay; module lỗi thì số đứng yên. Ghi trạng thái, chưa assert.
+        test.info().annotations.push({ type: 'sale-countdown lỗi', description: `khung ${await frame.count() ? (await frame.isVisible() ? 'hiện (số đứng yên)' : 'ẩn') : 'không có'}` });
+      }
       await gotoStore(page, TE13);
       await carousel(page).scrollIntoViewIfNeeded();
       await page.waitForTimeout(500);
@@ -922,12 +972,6 @@ test.describe('ES1-T159 module lỗi', () => {
         // Không module: bấm poster đi theo link (không chặn mặc định).
         const [req] = await Promise.all([page.waitForRequest((r) => /youtube\.com\/watch/.test(r.url())).catch(() => null), card(page, 2).getByTestId('video-card-poster').click()]);
         expect(req, 'poster đi theo href khi video-carousel.js lỗi').not.toBeNull();
-      }
-      if (mod === 'sale-countdown') {
-        await gotoStore(page, STATES);
-        const frame = featured(page, 'te13-a').getByTestId(CD);
-        // KHÔNG CHẮC (ES1-T608): ui-spec countdown §5 K0 in số Liquid ngay; module lỗi thì số đứng yên. Ghi trạng thái, chưa assert.
-        test.info().annotations.push({ type: 'sale-countdown lỗi', description: `khung ${await frame.count() ? (await frame.isVisible() ? 'hiện (số đứng yên)' : 'ẩn') : 'không có'}` });
       }
       expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([]);
     });
@@ -942,7 +986,8 @@ test.describe('ES1-T159 module lỗi', () => {
       test.skip(await add.isDisabled(), 'Biến thể đầu hết hàng');
       const id = await currentId(scope);
       await scope.scrollIntoViewIfNeeded();
-      await Promise.all([page.waitForURL(/\/cart(\?|$)/), add.click()]);
+      await clickAndLoad(page, () => add.click());
+      await expect(page).toHaveURL(/\/cart(\?|$)/);
       const cart = await readCartJson<{ items: { variant_id: number }[] }>(page);
       expect(cart.items.map((i) => i.variant_id)).toContain(id);
     });

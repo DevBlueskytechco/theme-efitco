@@ -15,7 +15,7 @@ Không viết trùng spec dev: ES1-T156 (markup featured), ES1-T157 (markup vide
 | TC-05 | AC1, AC6 | band C, hết hàng toàn bộ, ngày còn hạn | render | 0 countdown; nút disabled "Sold out" | E2E | P1 |
 | TC-06 | AC1 | trang cache: đồng hồ khách (page.clock) đã qua `data-end` 30 s khi JS chạy | module chạy | `data-state=ended`, chữ "This sale has ended", không ô số, không số âm | E2E | P1 |
 | TC-07 | AC1 | đang đếm, còn 4 s | page.clock.runFor 6 s rồi 10 s | K3, khung giữ chiều cao (± 2), không đếm lại; giá và nút giữ nguyên; 0 điều hướng (không tự tải lại) | E2E | P1 |
-| TC-08 | AC1 | còn 3 ngày 1 giờ | chạy 5 s; xoá localStorage + sessionStorage; reload | số = `data-end` − now (± 2 s) trước và sau reload; 0 khoá countdown/deadline/timer/sale trong storage | E2E | P1 |
+| TC-08 | AC1 | còn 3 ngày 1 giờ (`data-end` đặt trước module, đồng hồ thật) | chờ 2 s; xoá localStorage + sessionStorage; tải lại cùng URL bằng `gotoStore` | số = `data-end` − now (± 2 s) trước và sau tải lại; 0 khoá countdown/deadline/timer/sale trong storage | E2E | P1 |
 | TC-09 | AC-H23 | còn 5 giờ 2 phút | render, chạy 1 s, 4 s | ô ngày ẩn; 3 ô 2 chữ số; tổng giảm đúng 1 rồi 4 | E2E | P1 |
 | TC-10 | AC1 (TE-4 AC32) | còn 3 700 s | chạy 200 s | `running` → `ending`; nền ô = `--color-accent`; kích thước ô không đổi; ô vẫn là 2 chữ số | E2E | P2 |
 | TC-11 | AC1 | còn 2 ngày | render | `aria-labelledby` trỏ câu ẩn có ngày; `.sale-countdown__units` aria-hidden; 0 `aria-live` | a11y | P2 |
@@ -32,20 +32,20 @@ Không viết trùng spec dev: ES1-T156 (markup featured), ES1-T157 (markup vide
 | TC-22 | AC2, AC-H22 | /?view=te13 band A có bộ chọn, ≥ 2 biến thể còn hàng | chọn biến thể khác (ưu tiên có ảnh riêng) | hidden `id` đổi; giá/giá gạch/% khớp JSON; nút bật; thumbnail ảnh biến thể `aria-current=true`, ảnh vào khung; URL không đổi, 0 điều hướng | E2E | P1 |
 | TC-23 | AC2, AC-H22 | band A biến thể còn hàng, `cart_type` theo setting store | bấm Add to cart (thật, helper 429) | `/cart.js` có variant id; drawer: `cart-drawer-dialog` hiện, `header-cart-count` = 1; page: URL /cart | E2E | P1 |
 | TC-24 | AC2 | đổi `data-cart-type` sang chế độ còn lại trước khi module chạy | bấm Add to cart | page → /cart; drawer → drawer mở | E2E | P2 |
-| TC-25 | AC2 | `route.abort` /cart/add.js | bấm Add to cart | nút bật lại, không `aria-busy`, vùng lỗi có chữ, 0 pageerror | E2E | P1 |
+| TC-25 | AC2 | `route.abort` /cart/add.js; POST /cart/add thường được `route.fulfill` giả (store dev Cloudflare chặn POST thật) | bấm Add to cart | theme gửi POST /cart/add.js rồi rơi về submit form thường (ES1-T67 AC8, `assets/product-form.js`): request điều hướng POST /cart/add có id biến thể đang chọn; 0 pageerror | E2E | P1 |
 | TC-26 | AC-H22 | `/` đã áp fixture (ES1-T331), `hide_options` | bấm Add to cart | 0 bộ chọn (ghi ES1-T608); `/cart.js` có variant; drawer mở, số giỏ = 1 | E2E | P1 |
 | TC-27 | AC3 | bộ 8 thẻ; bộ trộn 1 có nguồn + 1 không; bộ không nguồn | render | 8 thẻ; 1 thẻ; band rỗng không có carousel; thẻ có poster có `img` | E2E | P1 |
 | TC-28 | AC3 | carousel đẩy xuống 400vh | tải; cuộn tới | 0 request tệp video/embed khi tải; 0 `video`/`iframe`; sau cuộn: 0 request YouTube/Vimeo; thẻ Shopify có `video` | E2E/perf | P1 |
 | TC-29 | AC3 | carousel trong khung | chờ 800 ms | 0 `video[autoplay]`; mọi video `paused` | E2E | P1 |
 | TC-30 | AC3 | thẻ YouTube, embed fulfill giả | bấm poster | request embed chỉ sau bấm; iframe `youtube-nocookie.com/embed/` tại chỗ; URL trang giữ; thẻ khác vẫn poster | E2E | P1 |
 | TC-31 | AC3 | template kiểm thử có 3 stat; bộ trộn stat 2 không value | render | 3 ô ("360+"); bộ trộn 1 ô (comment Tech Lead 06/11: chỉ kiểm trên template kiểm thử) | UI | P3 |
-| TC-32 | AC4 | (gồm trạng thái lỗi của AC8) thẻ 1 Shopify (thật hoặc giả), `route.abort` tệp video | vào khung | `data-video-error`; poster hiện, href = product url; chữ ẩn "Video unavailable. View {title}"; 0 `video`; khung giữ kích thước (± 1); link sản phẩm giữ; thẻ 2 bấm vẫn ra iframe; axe 0 serious; 0 pageerror | E2E/a11y | P1 |
-| TC-33 | AC5 | `/` và `/?view=te13` | tải; cuộn hết trang | JS `/assets/*.js` tải sẵn ≤ 40 960 B, sau cuộn ≤ 65 536 B (ADR 0006, 0010); số + danh sách file ghi annotation `js-bytes` | perf | P1 |
+| TC-32 | AC4 | (gồm trạng thái lỗi của AC8) thẻ 1 Shopify (thật hoặc giả: init script bỏ qua khi thẻ đã là Shopify, chỉ mở trang 1 lần), `route.abort` tệp video | vào khung | `data-video-error`; poster hiện, href = product url; chữ ẩn "Video unavailable. View {title}"; 0 `video`; khung giữ kích thước (± 1); link sản phẩm giữ; thẻ 2 bấm vẫn ra iframe; axe 0 serious; 0 pageerror | E2E/a11y | P1 |
+| TC-33 | AC5 | `/` và `/?view=te13` | tải; cuộn hết trang | JS của theme (`/t/<id>/assets/*.js`, mỗi file 1 lần, số lớn nhất của decodedBodySize / transferSize / `wc -c` tệp repo; không tính script Shopify theo ADR 0006) tải sẵn (sau networkidle) ≤ 40 960 B, sau cuộn ≤ 65 536 B (ADR 0006, 0010); số + danh sách file ghi annotation `js-bytes`; 0 file theme đọc được thì fail | perf | P1 |
 | TC-34 | AC6 | viewport 360, band A STATES | render | media 320 × 320; View detail dưới Add, 2 nút cùng rộng = 320; ô countdown 40, số 16px (± 2 px) | UI | P2 |
 | TC-35 | AC6 | viewport 768 | render | media 728 × 546; 2 nút cùng hàng; ô 44, số 18px; th/td spec cùng hàng | UI | P2 |
 | TC-36 | AC6 | viewport 1280 | render | gallery 580, khoảng 80, chi tiết 580; ảnh 580 × 566 | UI | P2 |
 | TC-37 | AC8 | viewport 360 / 768 / 1280, bộ 8 thẻ | render, cuộn tới | 360: thẻ 252 × 448, lộ 72 px thẻ 2, không nút; 768/1280: thẻ 264, nút 52 "Previous videos"/"Next videos"; thanh tiến trình hiện; 1280: 4 thẻ trọn + ≥ 25% thẻ 5 | UI | P2 |
-| TC-38 | AC8 | viewport 1280, thẻ 6 có sản phẩm | render | play 52 × 52 giữa khung (± 2); link tên sản phẩm cao ≥ 44, không ellipsis, không bị cắt | UI/a11y | P2 |
+| TC-38 | AC8 | viewport 1280, thẻ 6 có sản phẩm | render | play 52 × 52 giữa khung (± 2); vùng bấm link tên sản phẩm (::after phủ hàng sản phẩm) cao ≥ 44, hit-test 2 góc + giữa hàng trúng link; chữ không ellipsis, không bị cắt | UI/a11y | P2 |
 | TC-39 | AC8 | thẻ 1 Shopify, play/pause stub | bấm poster | nút toggle hiện, tên "Pause video: {title}"; axe 0 serious khi video chạy | E2E/a11y | P2 |
 | TC-40 | AC-H21 | `/` 1920, đã áp fixture | render | 6 thẻ 264 × 554; 0 stat, 0 link, 0 subheading; 0 video/iframe; poster hiện | UI | P1 |
 | TC-41 | AC-H23 | `/` đã áp fixture, metafield < 24 h | render | ô ngày ẩn. Skip có lý do khi dữ liệu không < 24 h (case đếm/F5 đã có ở TC-08, TC-09 bằng page.clock) | E2E | P2 |
@@ -54,16 +54,16 @@ Không viết trùng spec dev: ES1-T156 (markup featured), ES1-T157 (markup vide
 | TC-44 | AC3 (R12) | 1280, list có tabindex | focus list, ArrowRight × 5 | `scrollLeft` tăng | a11y | P2 |
 | TC-45 | AC1 | JS tắt | render STATES | `sale-countdown` ẩn, cao 0; 0 khung countdown nhìn thấy | nojs | P1 |
 | TC-46 | AC2 | JS tắt, ≥ 2 media | bấm thumbnail 2 | URL có hash `#FeaturedMedia-…`, phần tử đích có | nojs | P2 |
-| TC-47 | AC2 | JS tắt | bấm Add to cart | form method POST, action /cart/add; 0 `select[name=id]`; tới /cart; giỏ có variant hiện tại | nojs | P1 |
+| TC-47 | AC2 | JS tắt | bấm Add to cart (`clickAndLoad`: Cloudflare thử thách thì skip có lý do, ES1-T300) | form chứa nút mua method POST, action /cart/add; 0 `select[name=id]`; tới /cart; giỏ có variant hiện tại | nojs | P1 |
 | TC-48 | AC3, AC4 | JS tắt | render, bấm link sản phẩm thẻ 6 | poster YouTube → youtube.com/watch, Vimeo → vimeo.com/{id}, Shopify → product url; 0 video/iframe; link sản phẩm điều hướng | nojs | P1 |
-| TC-49 | AC2, AC3 | JS bật, chặn lần lượt featured-product / video-carousel / product-form / product-variant-picker / sale-countdown .js | tải, tương tác | form mua method POST; poster vẫn href; chặn video-carousel thì bấm poster đi theo link; chặn sale-countdown: ghi trạng thái khung (ES1-T608); 0 pageerror | E2E | P2 |
-| TC-50 | AC2 | chặn product-form.js | bấm Add to cart | form POST tới /cart, giỏ có variant | E2E | P1 |
+| TC-49 | AC2, AC3 | JS bật, chặn lần lượt featured-product / video-carousel / product-form / product-variant-picker / sale-countdown .js | tải STATES rồi TE13 (2 lần mở trang) | form chứa nút mua method POST; poster vẫn href; chặn video-carousel thì bấm poster đi theo link; chặn sale-countdown: ghi trạng thái khung band A ngay ở STATES (ES1-T608); 0 pageerror | E2E | P2 |
+| TC-50 | AC2 | chặn product-form.js | bấm Add to cart (`clickAndLoad`) | form POST tới /cart, giỏ có variant; Cloudflare thử thách POST thì skip có lý do (ES1-T300) | E2E | P1 |
 | TC-51 | AC2, AC3 | /?view=te13, embed bị chặn | tải; cuộn tới carousel | axe 0 serious/critical cả 2 lúc; 0 console error (bỏ qua script nền tảng Shopify) | a11y | P1 |
 
 ## Case biên (ngoài AC)
 - Rỗng: bộ video không thẻ nào có nguồn → không render (TC-27); band không ngày (TC-03); không metafield (TC-19).
 - Tối đa: 8 thẻ video (TC-27), 8 media gallery (TC-14), ngày còn 3 ngày (TC-08) — ô ngày 3 chữ số chưa có dữ liệu (≥ 100 ngày), không kiểm.
-- Mất mạng: /cart/add.js abort (TC-25), tệp video abort (TC-32), module JS abort (TC-49, TC-50).
+- Mất mạng: /cart/add.js abort → submit form thường (TC-25), tệp video abort (TC-32), module JS abort (TC-49, TC-50).
 - 360px: TC-34, TC-37 (project desktop đặt viewport 360); Pixel 7 (412) chạy toàn bộ case chức năng.
 - Bàn phím: TC-42–TC-44. Screen reader: tên timer, aria-hidden ô (TC-11), " of {product}" (TC-20), "Pause video: {title}" (TC-39), "Video unavailable…" (TC-32).
 - Editor (`design_mode`) vs storefront: thông báo AC7 chỉ editor — kiểm tay (dưới); storefront không in (TC-04).
@@ -87,6 +87,19 @@ Offset dùng để tính `data-end` từ setting `countdown_end` (YYYY-MM-DD HH:
 - `media-dủ-loại` (TE13_VIDEO_READY = true): thẻ video 1. Không có video Shopify thì spec thay thẻ 1 bằng video giả (tệp `fake.mp4` route).
 - YouTube `aqz-KE-bpKQ`, Vimeo `1084537` (thẻ 2–8); request embed được fulfill giả/abort, không gọi ra ngoài.
 - Fixture trang chủ ES1-T331 (`tests/fixtures/home-figma.json`): TC-26, TC-40, TC-41 skip khi chưa áp.
+
+## Phân loại lỗi CI 45265403257 (sửa spec 24/11)
+| TC | Nguyên nhân | Loại | Sửa |
+| --- | --- | --- | --- |
+| TC-08 | lần tải thứ 2 (page.reload dưới page.clock) nhận màn thử thách Cloudflare 4/4 lần (error-context: "Your connection needs to be verified"), reload không qua guard nên báo thiếu countdown | môi trường + spec | đồng hồ thật, tải lại bằng `gotoStore` (bị chặn thì báo Cloudflare); assert giữ nguyên |
+| TC-17 | `const id` trùng tên biến vòng lặp → ReferenceError | lỗi code spec | đổi tên `bandId`, `variantId` |
+| TC-25 | spec viết theo hành vi sai: product-form lỗi mạng rơi về submit form thường (ES1-T67 AC8), POST /cart/add thật bị Cloudflare thử thách → mất nút | spec sai hợp đồng | assert POST form thường đúng biến thể, fulfill giả POST /cart/add |
+| TC-32 | lần mở `/?view=te13` thứ 2 trong test bị Cloudflare chặn (cf-mitigated) cả 4 lần | môi trường | mở trang 1 lần; init script tự bỏ qua thẻ Shopify thật |
+| TC-33 | regex `/assets/…js` đếm cả script Shopify (load_feature, origin_trials, shop_events_listener, partial_rendering, webmcp): 52 718 / 55 311 B; JS theme tĩnh ước ≈ 28,7 KB (`/`) | spec đo sai định nghĩa ADR 0006 | chỉ `/t/<id>/assets/`, max(decoded, transfer, `wc -c`), networkidle như ES1-T316; trần giữ 40 960 / 65 536 |
+| TC-38 | đo hộp chữ link (26 px); vùng bấm là `::after` inset 0 phủ hàng sản phẩm 84 px | spec đo sai đối tượng | đo khối chứa `::after` + hit-test |
+| TC-47, TC-49 | `filter({ has: scope.getByTestId(…) })`: locator con bắt đầu từ `container-…` nên không khớp bên trong form | lỗi code spec | `form:has([data-testid=featured-product-add])` |
+| TC-50 | POST /cart/add thật bị Cloudflare thử thách, `waitForURL` treo 30 s thay vì báo chặn | môi trường + spec | `clickAndLoad` → skipIfStoreBlocked nhận lỗi Cloudflare |
+Không có bug theme thật, không vượt ngân sách JS thật trong lượt này: không tạo ticket bug.
 
 ## KHÔNG CHẮC
 - Xem dòng đầu file. Câu hỏi mở: ES1-T608 (AC-H22 trên `/`, countdown khi module lỗi), ES1-T600 (countdown 1 band khi đổi biến thể, TC-13 fixme).
