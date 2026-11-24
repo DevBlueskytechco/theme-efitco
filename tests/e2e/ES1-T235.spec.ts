@@ -68,7 +68,16 @@ test.describe('ES1-T235 trải nghiệm', () => {
     const open = () => disclosure.evaluate((el: HTMLDetailsElement) => el.open);
     await toggle.click();
     expect(await open()).toBe(true);
-    await page.mouse.click(5, 300);
+    // ES1-T324: < 48rem có JS là bottom sheet modal (docs/ui-spec/localization.md §4.3, §5: đóng khi chạm scrim), sheet cao tới 88dvh
+    // nên (5, 300) nằm trong sheet → bấm vào scrim phía trên sheet. ≥ 48rem: popover, bấm ngoài như cũ.
+    let y = 300;
+    if (page.viewportSize()!.width < 768) {
+      const panel = page.getByTestId('footer-localization-panel');
+      await expect.poll(() => panel.evaluate((d) => d.matches(':modal'))).toBe(true);
+      await panel.evaluate((d) => Promise.all(d.getAnimations().map((a) => a.finished)));
+      y = (await panel.boundingBox())!.y / 2;
+    }
+    await page.mouse.click(5, y);
     await expect.poll(open).toBe(false);
     await toggle.click();
     await page.keyboard.press('Escape');

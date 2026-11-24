@@ -25,6 +25,10 @@
   Localization (TE-1 AC5, AC10; localization.md; contract TE-1-R2-FE5 /
   TE-1-R2-BE2): only when Shopify Markets sells more than one country or
   language, no setting. Hooks for assets/localization-picker.js:
+  - Loading (TE-1-R2-BE2, ADR 0010): assets/lazy-module.js imports it on the first
+    interaction with the host (data-lazy-module, data-lazy-on="interaction"); it
+    imports assets/localization-list.js from data-list-src (keyboard, search,
+    switching, error).
   - <localization-picker> wraps the localization form. data-country-count,
     data-label-status ("[count] countries found"), data-label-status-one,
     data-label-no-results ("[query]"), data-label-error ("[name]"),
@@ -362,6 +366,9 @@
           <dialog> with showModal() as a bottom sheet (.dialog), with tabs when both lists.
         {% endcomment %}
         <localization-picker
+          data-lazy-module="{{ 'localization-picker.js' | asset_url }}"
+          data-lazy-on="interaction"
+          data-list-src="{{ 'localization-list.js' | asset_url }}"
           data-country-count="{{ localization.available_countries.size }}"
           data-label-status="{{ label_status | escape }}"
           data-label-status-one="{{ label_status_one | escape }}"
@@ -416,6 +423,7 @@
             </details>
           {%- endform -%}
         </localization-picker>
+        <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
       {%- endif -%}
 
       {%- if show_payment_icons -%}

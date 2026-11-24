@@ -106,7 +106,7 @@
 .image-with-text__media::before {
   content: "";
   display: block;
-  aspect-ratio: 920 / 876;
+  aspect-ratio: 1;
 }
 
 .image.image-with-text__media > img {
@@ -117,12 +117,12 @@
   object-fit: cover;
 }
 
-/* Figma 1:998: gradient từ 61.3% xuống đáy */
+/* Gradient 55% → nền tối (61.3% từ 64rem) */
 .image.image-with-text__media::after {
   content: "";
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(to bottom, transparent 61.3%, var(--color-background-dark));
+  background-image: linear-gradient(to bottom, transparent 55%, var(--color-background-dark));
 }
 
 .image-with-text__media--empty {
@@ -148,12 +148,44 @@
 }
 
 .image-with-text--split .image-with-text__content {
-  padding-block: var(--space-7);
+  padding-block: var(--space-2) var(--space-7);
   padding-inline: var(--page-margin);
 }
 
 .image-with-text--split .image-with-text__accents {
   display: none;
+}
+
+/* 768: chữ chừa 200 cho ảnh nhỏ 168 (đè đáy ảnh 40) và 100 */
+@media (min-width: 48rem) {
+  .image-with-text--split .image-with-text__media::before {
+    aspect-ratio: 4 / 3;
+  }
+
+  .image-with-text--split .image-with-text__content {
+    padding-block-start: var(--space-4);
+    padding-inline-end: calc(var(--page-margin) + var(--space-1) * 50);
+  }
+
+  .image-with-text--split .image-with-text__accents {
+    display: contents;
+  }
+
+  .image-with-text--split .image.image-with-text__accent {
+    position: absolute;
+  }
+
+  .image-with-text--split .image.image-with-text__accent--1 {
+    inset-block-start: calc(var(--space-1) * -10);
+    inset-inline-end: var(--page-margin);
+    inline-size: calc(var(--space-1) * 42);
+  }
+
+  .image-with-text--split .image.image-with-text__accent--2 {
+    inset-block-end: var(--space-7);
+    inset-inline-end: calc(var(--page-margin) + var(--space-6));
+    inline-size: calc(var(--space-1) * 25);
+  }
 }
 
 /* Layout banner, Figma 1:625 */
@@ -281,7 +313,20 @@
     grid-column: 1 / -1;
   }
 
+  .image-with-text--split .image-with-text__media::before {
+    aspect-ratio: 920 / 876;
+  }
+
+  .image.image-with-text__media::after {
+    background-image: linear-gradient(to bottom, transparent 61.3%, var(--color-background-dark));
+  }
+
+  .image-with-text--split .image-with-text__accents {
+    display: none;
+  }
+
   .image-with-text--split .image-with-text__content {
+    padding-block: var(--space-7);
     padding-inline: var(--image-with-text-inset);
   }
 
@@ -300,10 +345,31 @@
     display: contents;
   }
 
-  /* Hộp chữ dừng đúng mép ảnh accent 201: Figma 660, chừa 21 để chữ dài không đè ảnh */
+  /* Cột ảnh = lề + (nội dung − 80) / 2, chữ cách ảnh 80 */
+  .image-with-text--split {
+    --image-with-text-side: max(var(--page-margin), (100% - var(--page-width)) / 2 + var(--page-margin));
+
+    --image-with-text-media: minmax(0, calc(var(--image-with-text-side) + (100% - 2 * var(--image-with-text-side) - var(--space-1) * 20) / 2));
+
+    grid-template-columns: var(--image-with-text-media) minmax(0, 1fr);
+  }
+
+  .image-with-text--image-right {
+    grid-template-columns: minmax(0, 1fr) var(--image-with-text-media);
+  }
+
+  .image-with-text--split .image-with-text__heading {
+    font-size: min(var(--font-size-display), 6.25vw);
+  }
+
+  /* Hộp chữ dừng trước ảnh nhỏ 1 */
   .image-with-text--split .image-with-text__content {
-    max-inline-size: calc(var(--image-with-text-inset) + min(639px, 33.28vw));
-    padding-inline-end: 0;
+    max-inline-size: calc(100% - var(--image-with-text-inset) - min(201px, 10.47vw));
+    padding-inline: calc(var(--space-1) * 20) 0;
+  }
+
+  .image-with-text--image-right .image-with-text__content {
+    padding-inline: var(--image-with-text-inset) 0;
   }
 
   .image.image-with-text__accent {
@@ -403,7 +469,7 @@
 /* ==== Chuyển động v2 ==== */
 @media (prefers-reduced-motion: no-preference) {
   /* 6. Make fitness: chữ đậm dần theo cuộn (motion.js đặt --w cho từng chữ) */
-  html[data-motion] .image-with-text__heading[data-scrub] .motion-word { color: color-mix(in srgb, var(--figma-1a1a1a) calc(var(--w, 0) * 100%), var(--figma-b2b2b2)); transition: color 120ms linear; }
+  html[data-motion] .image-with-text__heading[data-scrub] .motion-word { color: color-mix(in srgb, var(--figma-1a1a1a) calc(var(--w, 0) * 100%), var(--figma-b2b2b2)); transition: color var(--motion-fast) linear; }
   html[data-motion] .image-with-text__heading[data-scrub] strong { color: inherit; }
 }
 

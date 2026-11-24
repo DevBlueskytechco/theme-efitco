@@ -165,7 +165,8 @@ test.describe('ES1-T119 TE-7 FAQ', () => {
     expect(stat1.y + stat1.height, 'ô chạm nửa dưới ảnh').toBeGreaterThan(image.y + image.height / 2);
   });
 
-  test('AC2 360: câu hỏi, rồi ảnh, rồi ô stat không đè; trang không tràn ngang', async ({ page }) => {
+  // ES1-T342: docs/ui-spec/index-mobile-b.md §7 (360) đổi ô stat thành 2 ô 142 đè đáy ảnh 48, lùi 12 mỗi bên; 2 ô không đè nhau
+  test('AC2 360: câu hỏi, rồi ảnh, rồi 2 ô stat đè đáy ảnh 48, không đè nhau; trang không tràn ngang', async ({ page }) => {
     await page.setViewportSize({ width: 360, height: 740 });
     await page.goto(TE7);
     const figma = band(page, 'te7-faq');
@@ -175,8 +176,11 @@ test.describe('ES1-T119 TE-7 FAQ', () => {
     const stat2 = (await tid(figma, 'faq-stat-2').boundingBox())!;
 
     expect(image.y).toBeGreaterThanOrEqual(list.y + list.height);
-    expect(stat1.y).toBeGreaterThanOrEqual(image.y + image.height);
-    expect(stat2.y).toBeGreaterThanOrEqual(image.y + image.height);
+    expect(Math.abs(image.y + image.height - stat1.y - 48)).toBeLessThanOrEqual(2);
+    expect(Math.abs(stat2.y - stat1.y)).toBeLessThanOrEqual(1);
+    expect(stat2.x).toBeGreaterThanOrEqual(stat1.x + stat1.width);
+    expect(stat1.x).toBeGreaterThanOrEqual(image.x);
+    expect(stat2.x + stat2.width).toBeLessThanOrEqual(image.x + image.width);
 
     const pageOverflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(pageOverflow).toBeLessThanOrEqual(0);
