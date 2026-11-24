@@ -7,6 +7,18 @@ featured-product {
   display: block;
 }
 
+/* ADR 0010: picker giữ chỗ (CLS 0), hiện khi featured-product defined, trước module picker */
+@media (scripting: enabled) {
+  featured-product product-variant-picker:not(:defined) {
+    display: grid;
+    visibility: hidden;
+  }
+
+  featured-product:defined product-variant-picker:not(:defined) {
+    visibility: visible;
+  }
+}
+
 .featured-product {
   padding-block: var(--space-7);
 }
@@ -21,7 +33,7 @@ featured-product {
 
 .featured-product__view {
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-6);
 }
 
 .featured-product__gallery,
@@ -36,11 +48,11 @@ featured-product {
   align-content: start;
 }
 
-/* Figma 1:761: 113 x 112, 24 from the image corner; 72 x 71, 12 below 48rem */
+/* Figma 1:761: 113 x 112, 24 from the image corner; 72 / 16 below 48rem, 88 / 24 below 64rem */
 .featured-product__seal {
   position: absolute;
-  inset-block-start: var(--space-3);
-  inset-inline-start: var(--space-3);
+  inset-block-start: var(--space-4);
+  inset-inline-start: var(--space-4);
   inline-size: 4.5rem;
   block-size: auto;
   color: var(--color-muted-on-dark);
@@ -53,11 +65,17 @@ featured-product {
   .featured-product__seal {
     inset-block-start: var(--space-5);
     inset-inline-start: var(--space-5);
+    inline-size: 5.5rem;
+  }
+}
+
+@media (min-width: 64rem) {
+  .featured-product__seal {
     inline-size: 7.0625rem;
   }
 }
 
-/* Figma 1:760: 668 / 653 */
+/* Figma 1:760: 668 / 653 từ 64rem */
 .featured-product__media-list {
   display: flex;
   margin: 0;
@@ -78,7 +96,7 @@ featured-product {
 .featured-product__media-item {
   flex: 0 0 100%;
   min-inline-size: 0;
-  aspect-ratio: 668 / 653;
+  aspect-ratio: 1;
   scroll-margin-block-start: var(--space-8);
   scroll-snap-align: start;
 }
@@ -89,8 +107,25 @@ featured-product {
 
 .featured-product__media-item .image > img {
   block-size: 100%;
+  padding: 8%;
   object-fit: contain;
   mix-blend-mode: normal;
+}
+
+@media (min-width: 48rem) {
+  .featured-product__media-item {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+@media (min-width: 64rem) {
+  .featured-product__media-item {
+    aspect-ratio: 668 / 653;
+  }
+
+  .featured-product__media-item .image > img {
+    padding: 0;
+  }
 }
 
 /* Rich media (ADR 0012): snippets/product-media-item fills the 668 / 653 frame like an image */
@@ -178,72 +213,6 @@ featured-product {
   text-wrap: balance;
 }
 
-.featured-product__notice {
-  margin: 0;
-  padding: var(--space-3) var(--space-4);
-  outline: 1px dashed var(--color-sale);
-  outline-offset: -1px;
-  font-size: var(--font-size-sm);
-}
-
-/* R8: giữ chỗ nhưng không hiện số chưa kiểm. Chỉ hiện khi JS đã tính (data-enhanced) hoặc trong editor; không JS thì không chiếm chỗ */
-.featured-product__countdown {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: var(--space-2);
-  inline-size: fit-content;
-  max-inline-size: 100%;
-  padding: var(--space-3) var(--space-5);
-  border-radius: var(--radius-card);
-  background-color: var(--color-background-dark);
-  color: var(--color-background-dark-foreground);
-  visibility: hidden;
-}
-
-featured-product[data-enhanced] .featured-product__countdown,
-featured-product[data-design-mode] .featured-product__countdown {
-  visibility: visible;
-}
-
-.featured-product__countdown[hidden],
-.featured-product__countdown-unit[hidden] {
-  display: none;
-}
-
-@media (scripting: none) {
-  .featured-product__countdown {
-    display: none;
-  }
-}
-
-.featured-product__countdown-label {
-  font-size: var(--font-size-base);
-  font-weight: 500;
-  line-height: 1.625;
-}
-
-.featured-product__countdown-units {
-  display: flex;
-  gap: var(--space-3);
-}
-
-/* Figma 1:776: 44 × 44, viền, chữ 18 / 28 700 */
-.featured-product__countdown-unit {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-inline-size: 44px;
-  block-size: 44px;
-  padding-inline: var(--space-1);
-  border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 15%, var(--color-background-dark));
-  border-radius: var(--radius-button);
-  font-size: var(--font-size-lg);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: calc(28 / 18);
-}
-
 .featured-product__summary {
   display: grid;
   gap: var(--space-2);
@@ -294,7 +263,12 @@ featured-product[data-design-mode] .featured-product__countdown {
   line-height: 1.625;
 }
 
-/* Figma 1:798: dòng lẻ nền sand, dòng chẵn trắng, viền 1px */
+/* Figma 1:798: dòng lẻ nền sand, viền 1px; dưới 48rem nhãn trên giá trị */
+.featured-product__specs,
+.featured-product__specs tbody {
+  display: block;
+}
+
 .featured-product__specs {
   inline-size: 100%;
   overflow: hidden;
@@ -304,6 +278,12 @@ featured-product[data-design-mode] .featured-product__countdown {
   border-collapse: separate;
 }
 
+.featured-product__spec {
+  display: grid;
+  gap: var(--space-1);
+  padding: var(--space-3) var(--space-4);
+}
+
 .featured-product__spec:nth-child(odd) {
   background-color: var(--color-background-sand);
   color: var(--color-background-sand-foreground);
@@ -311,8 +291,7 @@ featured-product[data-design-mode] .featured-product__countdown {
 
 .featured-product__spec-label,
 .featured-product__spec-value {
-  padding-block: var(--space-2);
-  padding-inline: var(--space-3);
+  padding: 0;
   vertical-align: baseline;
 }
 
@@ -329,7 +308,23 @@ featured-product[data-design-mode] .featured-product__countdown {
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: 1.625;
-  text-align: end;
+}
+
+@media (min-width: 48rem) {
+  .featured-product__specs,
+  .featured-product__specs tbody,
+  .featured-product__spec {
+    display: revert;
+  }
+
+  .featured-product__spec-label,
+  .featured-product__spec-value {
+    padding: var(--space-3) var(--space-5);
+  }
+
+  .featured-product__spec-value {
+    text-align: end;
+  }
 }
 
 .featured-product__buy {
@@ -337,20 +332,15 @@ featured-product[data-design-mode] .featured-product__countdown {
   gap: var(--space-4);
 }
 
+/* Nút xếp dọc, 1 hàng từ 48rem */
 .featured-product__actions {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   gap: var(--space-3);
 }
 
 /* Không JS: select trong noscript chiếm trọn hàng trên 2 nút */
 .featured-product__actions noscript {
   flex-basis: 100%;
-}
-
-.featured-product__add-wrapper,
-.featured-product__view-detail {
-  flex: 1 1 auto;
 }
 
 .featured-product__add {
@@ -381,21 +371,14 @@ featured-product[data-design-mode] .featured-product__countdown {
 }
 
 @media (min-width: 48rem) {
-  .featured-product__countdown {
-    flex-direction: row;
-    align-items: center;
-    gap: var(--space-4);
-    padding-block: var(--space-2);
+  .featured-product__actions {
+    display: flex;
+    flex-wrap: wrap;
   }
 
   .featured-product__add-wrapper,
   .featured-product__view-detail {
     flex: none;
-  }
-
-  .featured-product__spec-label,
-  .featured-product__spec-value {
-    padding-inline: var(--space-5);
   }
 }
 
@@ -421,10 +404,6 @@ featured-product[data-design-mode] .featured-product__countdown {
   .featured-product__eyebrow { color: var(--color-accent); }
   .featured-product__details { display: flex; flex-direction: column; gap: 24px; }
   .featured-product__header { display: grid; gap: 12px; }
-  .featured-product__countdown { align-self: flex-start; width: 310px; height: 60px; padding: 0 24px; border-radius: var(--figma-radius-8); background: var(--figma-1a1a1a); color: var(--figma-ffffff); display: flex; align-items: center; justify-content: space-between; }
-  .featured-product__countdown-units { display: flex; gap: 12px; }
-  .featured-product__countdown-unit { display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: 1px solid var(--figma-333333); border-radius: var(--figma-radius-8); font-size: 18px; line-height: 28px; font-weight: 700; letter-spacing: -0.18px; }
-  .featured-product__countdown-label { font-size: 16px; line-height: 26px; font-weight: 500; letter-spacing: -0.16px; white-space: nowrap; }
   .featured-product__summary { display: grid; gap: 8px; }
   .featured-product__description { width: calc(100% + 6px); max-width: none; margin: 0; color: var(--figma-4d4d4d); font-size: 16px; line-height: 26px; font-weight: 500; letter-spacing: -0.16px; }
   .featured-product__specs { margin: -1px 0 0; border-radius: var(--figma-radius-8); border-color: var(--figma-ebe6e0); }
@@ -436,7 +415,6 @@ featured-product[data-design-mode] .featured-product__countdown {
   /* Tinh chỉnh ±px theo so pixel với frame Figma */
   .featured-product__eyebrow { position: relative; inset-block-start: 1px; }
   .featured-product__title { letter-spacing: -1px; }
-  .featured-product__countdown-unit > span:first-child { position: relative; inset-block-start: 1px; }
   .featured-product__discount { letter-spacing: -0.26px; margin-inline-start: 1px; position: relative; inset-block-start: -1px; min-height: 28px; display: inline-flex; align-items: center; padding-block: 0; }
   .featured-product__rating-count { border-color: var(--figma-e5e5e5); }
   .featured-product__spec-label, .featured-product__spec-value { padding-block: 0; vertical-align: middle; }
