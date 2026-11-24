@@ -15,7 +15,7 @@ Skeleton Theme `a7a655e79b21e68316c228dc7e437b0b32550888`, block-first: `templat
 Không có Section Rendering API (không sections). Dùng `{% partial 'name' %}` + `@shopify/partial-rendering` cho: cart-drawer, cart-count, collection-products, collection-filters, search-suggestions, product-media, product-price. Fallback: form submit thường. Ràng buộc: partial chỉ render khi `shop.features.agentic_editor_enabled?` — store dev phải bật; nếu không, JS phát hiện lỗi 'Unknown tag' không xảy ra vì SFR; chỉ thử trên store đã bật.
 
 ## Token và màu
-`tokens.json` (Designer) → settings color/font/range → `css-variables.liquid` sinh `--color-*`, `--font-*`, `--space-*`, `--radius-*`. CSS chỉ dùng biến. ADR 0001.
+Thứ tự nguồn (ADR 0015, thay một phần ADR 0001): kit `drafts/designer/_kit/kit.css` `:root` → mockup `drafts/designer/**` → `docs/tokens.json`, `DESIGN.md`, `docs/ui-spec/foundation.md` → `config/settings_schema.json` (default) + `snippets/css-variables.liquid`; nơi dưới lệch kit là sai, lệch tạm ghi ở `docs/tokens.json` `_source_of_truth.known_mismatches`. Trong code giữ cơ chế ADR 0001 mục B: settings color/font/range → `css-variables.liquid` sinh `--color-*`, `--font-*`, `--space-*`, `--radius-*`. CSS chỉ dùng biến.
 
 ## JS
 Web Components không framework, progressive enhancement, mỗi tính năng 1 file, nạp `type="module"` trong block cần. ADR 0002.
