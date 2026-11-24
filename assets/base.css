@@ -1126,7 +1126,7 @@ modal-dialog {
   text-wrap: balance;
 }
 
-/* 360: 2 cột 152, gap 16 ngang / 24 dọc (index-mobile-a §5) */
+/* 360: 2 cột, gap 24 / 16 */
 .featured-collection__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1140,8 +1140,7 @@ modal-dialog {
   min-inline-size: 0;
 }
 
-/* Tab: chỉ có khi từ 2 tab. Heading trên, tab dưới; từ 64rem heading trái, tab phải.
-   collection-tabs giữ khoảng cách của .featured-collection, có box để lazy-module quan sát nên không dùng display: contents */
+/* Tab (từ 2 tab). collection-tabs cần box cho lazy-module: không display: contents */
 collection-tabs {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1155,7 +1154,7 @@ collection-tabs {
   align-items: stretch;
 }
 
-/* Dưới 48rem cuộn ngang tới mép. padding-block chừa chỗ cho vùng bấm 44, khung cuộn không cắt */
+/* Dưới 48rem cuộn ngang; padding-block chừa vùng bấm 44 */
 .featured-collection__tabs {
   display: flex;
   gap: var(--space-2);
@@ -1174,8 +1173,7 @@ collection-tabs {
   display: none;
 }
 
-/* Figma: 40 cao, padding ngang 28, bo 8, Inter 600 16/26, letter-spacing -0.16. Dưới 80rem cao 44 (index-mobile-a §5,
-   AC-H35); từ 80rem 40 như Figma, vùng bấm 44 bằng ::before */
+/* Cao 44 (AC-H35); từ 80rem 40 như Figma, vùng bấm 44 bằng ::before */
 .featured-collection__tab {
   position: relative;
   display: inline-flex;
@@ -1266,7 +1264,7 @@ collection-tabs {
     gap: var(--space-4);
   }
 
-  /* Số card chia hết cho 4 (TE-3 AC17; mặc định 4, D7): 4 cột 170 ở 768, gap 16, không để card lẻ; còn lại 3 cột */
+  /* Số card chia hết cho 4: 4 cột (TE-3 AC17) */
   .featured-collection__grid:has(> :last-child:nth-child(4n)) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
@@ -3257,8 +3255,7 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   }
 }
 
-/** Rich text (Figma 1:454; index-mobile-a §4, index-1280 khối 4): 1 cột dưới 64rem (48rem: đoạn | link 1 hàng),
-   2 cột heading | body + CTA từ 64rem */
+/** Rich text (Figma 1:454): 1 cột, từ 64rem heading | body */
 .rich-text {
   container-type: inline-size;
   display: grid;
@@ -3269,7 +3266,6 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   padding-block: var(--space-7);
 }
 
-/* Display: 48 ở 360 (3 dòng, balance), 70 ở 768 (2 dòng như Figma) */
 .rich-text__heading {
   font-size: var(--font-size-display);
   font-weight: var(--font-heading--weight-display);
@@ -3280,7 +3276,7 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   text-wrap: balance;
 }
 
-/* Ảnh inline 1:455: 165 × 94 ở chữ 100px, co theo em. Khoảng cách 2 bên là dấu cách thật trong heading */
+/* Ảnh inline 1:455: co theo em */
 .rich-text__heading .rich-text__inline-image {
   display: inline-block;
   inline-size: auto;
@@ -3303,7 +3299,6 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   line-height: calc(26 / 16);
 }
 
-/* 360: đoạn → link 12 */
 .rich-text__content > * + * {
   margin-block-start: var(--space-3);
 }
@@ -3312,7 +3307,7 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   margin-block-start: var(--space-3);
 }
 
-/* 768: đoạn 1fr trái, link phải căn đáy, cách 32 */
+/* 48rem: đoạn | link */
 @media (min-width: 48rem) {
   .rich-text__content {
     display: grid;
@@ -3327,7 +3322,7 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
 }
 
 @media (min-width: 64rem) {
-  /* Figma 1920: cột 732 / 526, khoảng 158 trên 1416 = 11.16% */
+  /* Figma 1920: 732 / 526, gap 158 / 1416 */
   .rich-text {
     grid-template-columns: minmax(0, 732fr) minmax(0, 526fr);
     align-items: start;
@@ -3348,8 +3343,7 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
     max-inline-size: none;
   }
 
-  /* Dòng dài nhất (NEED + ảnh + TO TRAIN.) ≈ 6.94em, hộp Figma 7.32em = cột trái.
-     Cỡ chữ = cột trái / 7.32 = (100cqi - gap) / 12.58 → đúng 100 ở 1416, không tràn cột ở 1024 (~69px) */
+  /* Cỡ chữ = cột trái / 7.32em (hộp Figma): 100 ở 1416, không tràn ở 1024 */
   .rich-text__heading {
     font-size: min(var(--font-size-display), (100cqi - max(var(--space-7), 11.16cqi)) / 12.58);
   }
@@ -3359,7 +3353,7 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   }
 }
 
-/* index-1280 khối 4: cột phải 528 (x 732 ở 1280, x 1140 ở 1920), display min(display, 6.25vw) = 80 ở 1280 (R2) */
+/* index-1280 khối 4: cột phải 528, chữ 80 ở 1280 */
 @media (min-width: 80rem) {
   .rich-text {
     grid-template-columns: minmax(0, 1fr) min(calc(var(--space-1) * 132), 45%);
@@ -5399,7 +5393,7 @@ cart-drawer {
   font-size: var(--font-size-sm);
 }
 
-/* 320 x 240 ở 360. Nền tối giữ chữ trắng đọc được khi chưa có ảnh; tên dài thì thẻ cao thêm, không cắt chữ */
+/* Nền tối giữ chữ trắng đọc được khi chưa có ảnh */
 .level-card__link {
   position: relative;
   display: flex;
@@ -5433,8 +5427,7 @@ cart-drawer {
   object-fit: cover;
 }
 
-/* Dưới 80rem (index-mobile-a §4): gradient phủ cả card từ 35% xuống đáy, tối 85%, để nhãn ở card thấp 232, 240
-   (khối chữ ~47% card) vẫn nằm trên phần tối. Từ 80rem lớp này theo Figma 1:469 (khối "Trang chủ theo Figma") */
+/* Gradient cả card để nhãn ở card thấp vẫn trên nền tối; từ 80rem theo Figma 1:469 */
 .level-card__link::after {
   position: absolute;
   inset: 0;
@@ -5443,7 +5436,6 @@ cart-drawer {
   pointer-events: none;
 }
 
-/* 360: padding 24 / 24 / 16 */
 .level-card__content {
   position: relative;
   z-index: var(--layer-content);
@@ -5451,7 +5443,7 @@ cart-drawer {
   padding-inline: var(--space-5);
 }
 
-/* Figma 1:472: 14 / 16; copy có 2 dấu cách nên giữ nguyên khoảng trắng */
+/* Copy có 2 dấu cách: giữ khoảng trắng */
 .level-card__label {
   margin: 0;
   font-family: var(--font-heading--family);
@@ -5463,7 +5455,7 @@ cart-drawer {
   white-space: pre-wrap;
 }
 
-/* Tên h3: 22 ở 360, 24 ở 768 (index-mobile-a §4); 36 / 44 từ 80rem (Figma 1:473, letter-spacing -0.72) */
+/* h3 dưới 80rem, h2 từ 80rem (Figma 1:473) */
 .level-card__title {
   margin: 0;
   margin-block-start: var(--space-1);
@@ -5479,7 +5471,7 @@ cart-drawer {
   text-underline-offset: 0.1em;
 }
 
-/* Dưới 80rem luôn hiện (màn chạm không có hover): hàng cao 44, kẻ trắng 24%, chữ 14 / 22 */
+/* Dưới 80rem luôn hiện, cao 44 */
 .level-card__products {
   display: flex;
   align-items: center;
@@ -5499,7 +5491,6 @@ cart-drawer {
   height: var(--space-5);
 }
 
-/* 768: 3 cột 232 x 232, padding 16 */
 @media (min-width: 48rem) {
   .shop-by-level__list {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -5532,16 +5523,14 @@ cart-drawer {
     gap: var(--space-5);
   }
 
-  /* Figma 1:469: chữ cách mép 40, hàng số sản phẩm cách đáy 20 */
+  /* Figma 1:469 */
   .level-card__content {
     padding-block-end: calc(var(--space-1) * 5);
     padding-inline: calc(var(--space-1) * 10);
   }
 }
 
-/* index-1280 khối 4, §2.3: tên 36; hàng số sản phẩm theo Figma 1:474, 1:475 (kẻ trắng 20%, cách 12, chữ 14 / 22).
-   Thiết bị rê chuột được: hàng ẩn (cao 0, opacity 0), hiện khi rê hoặc focus bàn phím vào card; số vẫn trong tên link.
-   Chỉ opacity chuyển động (khối "Chuyển động", 250 ms), giảm chuyển động thì hiện/ẩn tức thì. Card tỉ lệ cố định: 0 CLS */
+/* index-1280 §2.3, Figma 1:474: có hover thì hàng số ẩn, hiện khi rê/focus (số vẫn trong tên link) */
 @media (min-width: 80rem) {
   .level-card__title {
     font-size: var(--font-size-h2);
@@ -6765,12 +6754,10 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
   /* Intro + cấp độ */
   .shop-by-level__list { gap: 24px; }
-  .level-card__link { border-radius: var(--figma-radius-16); aspect-ratio: 1; position: relative; }
-  .level-card__link::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 63.16%, var(--figma-000000) 100%); pointer-events: none; }
-  /* Padding 32 ở 1280, 40 ở 1920 (index-1280 khối 4, R3). Figma card 1 là trạng thái hover: hàng số sản phẩm
-     chỉ hiện khi rê/focus (khối Shop by level), lúc hiện thì đáy 18 như card 1 */
-  .level-card__link { --level-card-pad: clamp(var(--space-6), var(--space-4) + 1.25vw, calc(var(--space-1) * 10)); }
-  .level-card__content { z-index: var(--layer-content); padding: 0 var(--level-card-pad) var(--level-card-pad); background-image: none; }
+  /* Pad 32 ở 1280, 40 ở 1920 (R3); hàng số hiện khi rê/focus, đáy 18 */
+  .level-card__link { --level-card-pad: clamp(var(--space-6), var(--space-4) + 1.25vw, calc(var(--space-1) * 10)); border-radius: var(--figma-radius-16); }
+  .level-card__link::after { background: linear-gradient(to bottom, transparent 63.16%, var(--figma-000000) 100%); }
+  .level-card__content { padding: 0 var(--level-card-pad) var(--level-card-pad); }
   .level-card__products .slideshow-icon { width: 16px; height: 14px; margin-inline-end: 5px; }
   .level-card__products { position: relative; inset-block-start: -3px; }
   .level-card__content:has(> .level-card__products) { padding-block-end: 18px; }
