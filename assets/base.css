@@ -750,6 +750,7 @@ modal-dialog {
   .dialog:not([open])::backdrop,
   .drawer:not([open], :popover-open)::backdrop {
     opacity: 0;
+    transition-duration: var(--motion-fast);
   }
 
   .dialog:not([open]) {
@@ -2810,7 +2811,7 @@ localization-picker[data-tabs] .localization__tabs {
 .button--link .slideshow-icon {
   inline-size: calc(var(--space-1) * 5);
   block-size: var(--space-4);
-  transition: translate 0.2s ease-out;
+  transition: translate var(--motion-base) var(--ease-out);
 }
 
 .button--link:hover .button__label {
@@ -6818,7 +6819,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   /* Video */
   .block-container:has(> .video-carousel) { background: var(--figma-ffffff); }
   .video-carousel__eyebrow { color: var(--color-accent); }
-  .video-card__play { opacity: 0; transition: opacity 0.2s; }
+  .video-card__play { opacity: 0; transition: opacity var(--motion-fast) var(--ease-out); }
   .video-card:hover .video-card__play, .video-card__poster:focus-visible .video-card__play { opacity: 1; }
 
   /* Testimonial */
@@ -6930,7 +6931,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   html[data-motion] .button--link:hover:not(:disabled), html[data-motion] .button--link:active:not(:disabled) { translate: none; scale: none; box-shadow: none; }
   .slideshow-icon--arrow { transition: translate var(--motion-base) var(--ease-out); }
   html[data-motion] a:hover > .slideshow-icon--arrow, html[data-motion] button:hover > .slideshow-icon--arrow { translate: 3px 0; }
-  .button[aria-busy='true']::after { animation: motion-spin 700ms linear infinite; }
+  .button[aria-busy='true']::after { animation: motion-spin var(--motion-hero) linear infinite; }
 
   /* Menu */
   .site-header__link, .site-header__icon { transition: color var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out); }
@@ -6949,7 +6950,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   html[data-motion] .site-header__mega-link:dir(rtl):hover { translate: calc(-1 * var(--space-1)) 0; }
   .site-header__submenu .site-header__link { transition: color var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
   html[data-motion] .site-header__submenu .site-header__link:hover { color: var(--color-accent); translate: 4px 0; text-decoration: none; }
-  [data-testid='header-cart-link'][data-bump] { animation: motion-bump 500ms var(--ease-out); }
+  [data-testid='header-cart-link'][data-bump] { animation: motion-bump var(--motion-slow) var(--ease-out); }
   .site-header__cart-count { animation: motion-pop var(--motion-base) var(--ease-out); }
 
   /* Card, ảnh */
@@ -7145,7 +7146,7 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
 /* ==== Chuyển động v2: mở trang, hiện dần theo cuộn, cuộn gắn tiến trình. Chỉ transform, opacity, clip-path. ==== */
 @media (prefers-reduced-motion: no-preference) {
   /* Hiện dần theo cuộn: motion.js gắn data-reveal + data-reveal-kind, --reveal-i là thứ tự trong nhóm */
-  html[data-motion] [data-reveal] { transition-property: opacity, translate, scale, clip-path; transition-duration: var(--motion-reveal); transition-timing-function: var(--ease-expo); transition-delay: calc(var(--reveal-i, 0) * 80ms); }
+  html[data-motion] [data-reveal] { transition-property: opacity, translate, scale, clip-path; transition-duration: var(--motion-reveal); transition-timing-function: var(--ease-expo); transition-delay: calc(var(--reveal-i, 0) * var(--motion-stagger)); }
   html[data-motion] [data-reveal='wait'] { opacity: 0; translate: 0 32px; }
   html[data-motion] [data-reveal='wait'][data-reveal-kind='card'] { translate: 0 56px; scale: 0.97; }
   html[data-motion] [data-reveal='wait'][data-reveal-kind='media'] { opacity: 1; translate: none; clip-path: inset(14% 10% 14% 10% round var(--figma-radius-24)); }
