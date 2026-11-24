@@ -7,6 +7,14 @@
   and the storefront renders nothing. Text alignment and background come from
   the parent container. Self-contained: callers must leave the body empty.
 
+  Text settings keep a neutral sample default with info 'sample default'
+  (Dawn style; ADR 0011 mục 3 ngoại lệ, CTO 23/11, ES1-T336/ES1-T430): no
+  claim, no figures.
+
+  Layout (index-mobile-a.md §4, index-1280.md khối 4): display heading at every
+  width (48 at 360, 70 on two lines at 768, min(display, 6.25vw) from 80rem);
+  from 48rem text and link share one row; from 64rem heading | text and link.
+
   Test hooks: data-testid="rich-text", "rich-text-heading",
   "rich-text-inline-image" (image wrapper), "rich-text-body", "rich-text-button".
 
@@ -48,8 +56,8 @@
             inline: true,
             decorative: true,
             width: 330,
-            widths: '165, 330',
-            sizes: '(min-width: 64rem) 165px, 80px',
+            widths: '80, 165, 240, 330',
+            sizes: '(min-width: 48rem) 165px, 80px',
             loading: 'lazy',
             testid: 'rich-text-inline-image'
           %}

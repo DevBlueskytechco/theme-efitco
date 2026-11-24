@@ -407,7 +407,9 @@ test.describe('ES1-T53 TE-3 featured collection + product card', () => {
     const img = block.getByTestId(T.image).first();
     test.skip((await img.count()) === 0, 'Card đầu không có ảnh');
     await expect(img).toHaveAttribute('loading', 'lazy');
-    await expect(img).toHaveAttribute('sizes', new RegExp(`calc\\(1416px / ${DESKTOP_COLUMNS}\\)`));
+    // ES1-T336: từ 80rem cột = min(100vw - 40px, 1416px) / số cột (nội dung 1240 ở 1280, 1416 ở 1920; index-1280.md);
+    // calc(1416px / N) cũ tải dư ở 1280.
+    await expect(img).toHaveAttribute('sizes', new RegExp(`calc\\(min\\(100vw - 40px, 1416px\\) / ${DESKTOP_COLUMNS}\\)`));
     await expect(img).toHaveAttribute('width', /^\d+$/);
     await expect(img).toHaveAttribute('height', /^\d+$/);
   });
