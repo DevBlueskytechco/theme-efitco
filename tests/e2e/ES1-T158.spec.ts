@@ -116,6 +116,7 @@ const stubMedia = (page: Page) =>
   });
 
 const plays = (page: Page) => page.evaluate(() => (window as unknown as { __media: { plays: number } }).__media.plays);
+const height = (el: Locator) => el.evaluate((node) => node.getBoundingClientRect().height);
 const isPaused = (scope: Locator) => scope.locator('video').evaluate((el) => (el as HTMLVideoElement).paused);
 
 // Yêu cầu tệp giả treo: không có error, không có tải.
@@ -146,9 +147,11 @@ async function openCountdown(page: Page, left: number) {
   const box = root.getByTestId(COUNTDOWN);
   test.skip((await box.count()) === 0, 'Sản phẩm band A không có giá gạch ở variant đầu (te13-featured, ES1-T153)');
   await expect(root).toHaveAttribute('data-enhanced', '');
+  // ES1-T344 (ADR 0009): đếm ở assets/sale-countdown.js, nạp lười khi .featured-product__summary gần khung nhìn.
+  // Timer chỉ chạy khi khung trong viewport; Pixel 7 có gallery ở trên. Observer chạy theo frame thật.
+  await box.scrollIntoViewIfNeeded();
+  await expect.poll(() => page.evaluate(() => !!customElements.get('sale-countdown'))).toBe(true);
   if (left > 0) {
-    // Timer chỉ chạy khi khung trong viewport; Pixel 7 có gallery ở trên. Observer chạy theo frame thật.
-    await box.scrollIntoViewIfNeeded();
     await expect(box).toBeInViewport();
     await page.waitForTimeout(300);
   }
@@ -183,12 +186,21 @@ async function expectPrice(scope: Locator, variant: Variant) {
   await expect(scope.getByTestId('featured-product-discount')).toHaveCount(variant.compare_at_price && variant.compare_at_price > variant.price ? 1 : 0);
 }
 
+// ES1-T344 (ADR 0010 bảng trang chủ): picker + product-form của featured nạp lười theo tương tác vùng mua
+// (pointerenter/focusin/touchstart), không theo viewport như ES1-T139. Rê vào nút mua: pointerenter tới cả
+// product-form và .featured-product__details (chứa picker). Markup picker hiện từ khi featured-product defined
+// (featured-product.css), module picker chỉ nạp khi tương tác: test đổi lựa chọn phải tương tác trước.
+async function wakeBuy(scope: Locator) {
+  await scope.getByTestId('featured-product-add').hover();
+}
+
 async function openPicker(page: Page, url: string, bandId: string) {
   const scope = band(page, bandId);
   await page.goto(url);
   await scope.getByTestId('featured-product').scrollIntoViewIfNeeded();
   const picker = scope.getByTestId('product-variant-picker');
   test.skip((await picker.count()) === 0, 'Sản phẩm không có nhiều variant');
+  await wakeBuy(scope);
   await expect(picker).toBeVisible();
   return scope;
 }
@@ -270,22 +282,25 @@ test.describe('ES1-T158 AC1 countdown', () => {
     expect(keys.filter((key) => /countdown|featured|deadline|timer/i.test(key))).toEqual([]);
   });
 
-  test('AC1 tua qua giờ kết thúc: hidden, không hiện lại kể cả khi đồng hồ chạy tiếp', async ({ page }) => {
+  // ES1-T344: ADR 0009 / TE-4 AC17 K3 thay hành vi ẩn khung cũ: giữ khung, chữ "This sale has ended", không đếm lại.
+  test('AC1 tua qua giờ kết thúc: K3 ended, không đếm lại kể cả khi đồng hồ chạy tiếp', async ({ page }) => {
     const { box } = await openCountdown(page, 120);
     await expect(box).toBeVisible();
     await page.clock.fastForward(121000);
-    await expect(box).toBeHidden();
-    await expect(box).toHaveAttribute('hidden', '');
+    await expect(box).toHaveAttribute('data-state', 'ended');
+    await expect(box).toBeVisible();
+    await expect(box.locator('[data-countdown-unit]')).toHaveCount(0);
     await page.clock.fastForward(60000);
     await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')));
-    await expect(box).toHaveAttribute('hidden', '');
+    await expect(box).toHaveAttribute('data-state', 'ended');
+    await expect(box.locator('[data-countdown-unit]')).toHaveCount(0);
   });
 
-  test('AC1 đồng hồ đã quá hạn khi tải (trang cache): không bao giờ hiện, vẫn data-enhanced', async ({ page }) => {
+  test('AC1 đồng hồ đã quá hạn khi tải (trang cache): chuyển ngay K3, vẫn data-enhanced', async ({ page }) => {
     const { root, box } = await openCountdown(page, -5);
     await expect(root).toHaveAttribute('data-enhanced', '');
-    await expect(box).toHaveAttribute('hidden', '');
-    await expect(box).toBeHidden();
+    await expect(box).toHaveAttribute('data-state', 'ended');
+    await expect(box.locator('[data-countdown-unit]')).toHaveCount(0);
   });
 
   test('AC1 tab ẩn thì dừng, quay lại tính lại ngay', async ({ page }) => {
@@ -402,6 +417,7 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
     await gotoStore(page, TE13);
     const scope = band(page, 'te13-a');
     const ready = async () => {
+      await wakeBuy(scope); // ES1-T344: picker nạp khi tương tác (ADR 0010).
       await expect(scope.getByTestId('product-variant-picker')).toBeVisible();
     };
     await ready();
@@ -431,7 +447,7 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
     const root = scope.locator('product-form');
     const add = scope.getByTestId('featured-product-add');
     test.skip(await add.isDisabled(), 'Variant đầu hết hàng');
-    await add.scrollIntoViewIfNeeded(); // Module nạp khi gần viewport.
+    await wakeBuy(scope); // ES1-T344 (ADR 0010): product-form nạp khi tương tác vùng mua, không theo viewport.
     await expect.poll(() => root.evaluate(() => Boolean(customElements.get('product-form')))).toBe(true);
     await add.click();
     await expect(scope.getByTestId('featured-product-error')).toHaveText(message);
@@ -439,7 +455,7 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
   });
 
   test('AC2 lựa chọn đổi trước khi module nạp (picker bị giữ): id đúng, POST đúng variant', async ({ page }) => {
-    // CSS ẩn picker khi chưa defined nên khách không bấm được; tình huống thật là trình duyệt khôi phục form. Đổi checked bằng script.
+    // Khách bấm radio trước khi module nạp (picker đã hiện, ES1-T344) hoặc trình duyệt khôi phục form. Đổi checked bằng script.
     let release = () => {};
     const held = new Promise<void>((resolve) => {
       release = resolve;
@@ -458,9 +474,12 @@ test.describe('ES1-T158 AC2 1 block: partial', () => {
     test.skip((await scope.getByTestId('product-variant-picker').count()) === 0, 'Sản phẩm không có nhiều variant');
     const { next } = await otherVariant(scope);
     test.skip(!next, 'Cần 2 variant còn hàng');
-    await scope.getByTestId('featured-product-add').scrollIntoViewIfNeeded(); // Module nạp khi gần viewport.
+    await scope.getByTestId('featured-product-add').scrollIntoViewIfNeeded();
 
     await setCheckedByName(scope.getByTestId('product-variant-picker'), next!.options);
+    // ES1-T344 (ADR 0010): picker, form nạp khi tương tác vùng mua; picker bị giữ ở route trên.
+    await wakeBuy(scope);
+    await expect.poll(() => page.evaluate(() => Boolean(customElements.get('product-variant-picker')))).toBe(false);
     release();
     await expect(scope.locator('input[type="hidden"][name="id"]')).toHaveValue(String(next!.id));
 
@@ -578,11 +597,51 @@ test.describe('ES1-T158 AC3 lazy', () => {
     await band(page, 'te13-a').getByTestId('featured-product').scrollIntoViewIfNeeded();
     await expect(band(page, 'te13-a').getByTestId('featured-product')).toHaveAttribute('data-enhanced', '');
     expect(loaded.some((url) => MODULES.featured.test(url))).toBe(true);
+    // ES1-T344 (ADR 0010): tới gần chỉ nạp featured-product.js (+ sale-countdown.js); form, picker chờ tương tác vùng mua.
+    expect(loaded.some((url) => MODULES.form.test(url) || MODULES.picker.test(url))).toBe(false);
+    await wakeBuy(band(page, 'te13-a'));
     await expect.poll(() => loaded.some((url) => MODULES.form.test(url))).toBe(true);
     expect(loaded.some((url) => MODULES.video.test(url))).toBe(false);
 
     await band(page, 'te13-video').getByTestId('video-carousel').scrollIntoViewIfNeeded();
     await expect.poll(() => loaded.some((url) => MODULES.video.test(url))).toBe(true);
+  });
+
+  // ES1-T344 (ADR 0010): có JS, trước tương tác, markup picker đã hiện (không chờ rê chuột), giữ chỗ từ đầu (CLS 0),
+  // đúng 1 bộ chọn (không select biến thể), module picker, form chưa nạp.
+  test('AC3 trước tương tác: picker nhìn thấy, giữ chỗ từ đầu, 1 bộ chọn, module picker chưa nạp', async ({ page }) => {
+    const loaded: string[] = [];
+    page.on('request', (request) => {
+      if (Object.values(MODULES).some((m) => m.test(request.url()))) loaded.push(request.url());
+    });
+    let release = () => {};
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    await page.route(MODULES.featured, async (route) => {
+      await held;
+      await route.continue();
+    });
+    await page.goto(TE13);
+    const scope = band(page, 'te13-a');
+    const picker = scope.getByTestId('product-variant-picker');
+    test.skip((await picker.count()) === 0, 'Sản phẩm không có nhiều variant');
+    await expect(picker).toHaveCount(1);
+    await scope.getByTestId('featured-product').scrollIntoViewIfNeeded();
+    await expect.poll(() => loaded.some((url) => MODULES.featured.test(url))).toBe(true);
+    // featured-product chưa defined: picker chưa hiện nhưng đã chiếm chỗ.
+    const before = await height(picker);
+    expect(before).toBeGreaterThan(0);
+    await expect(picker).toBeHidden();
+    release();
+    await expect(scope.getByTestId('featured-product')).toHaveAttribute('data-enhanced', '');
+    await expect(picker).toBeVisible();
+    await expect(picker.getByTestId('product-option').first()).toBeVisible();
+    expect(await height(picker)).toBe(before);
+    expect(await picker.locator('input[type="radio"]:checked').count()).toBeGreaterThan(0);
+    await expect(scope.locator('select[name="id"], noscript')).toHaveCount(0);
+    expect(await page.evaluate(() => Boolean(customElements.get('product-variant-picker')))).toBe(false);
+    expect(loaded.some((url) => MODULES.picker.test(url) || MODULES.form.test(url))).toBe(false);
   });
 
   test('AC3 trong khung có thẻ video, ngoài khung thì chưa; không có video tự chạy', async ({ page }) => {
