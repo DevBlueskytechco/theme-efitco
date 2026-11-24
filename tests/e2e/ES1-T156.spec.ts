@@ -75,15 +75,18 @@ test.describe('ES1-T156 TE-13 featured product', () => {
     }
   });
 
-  test('AC1-markup chưa có data-enhanced: khung giữ chỗ nhưng không nhìn thấy', async ({ page }) => {
-    await page.route(/\/featured-product\.js/, (route) => route.abort());
+  // ES1-T343: đổi theo quyết định CTO 11/11 ES1-T276 (docs/design/decisions.md) và SRS 0.4 TE-4 AC17 (TE-13 AC1 theo component chung):
+  // số Liquid in sẵn hiện ngay trước JS, khung đủ cỡ (CLS 0). Bản cũ (R1, R8) ẩn bằng visibility tới khi có data-enhanced.
+  test('AC1-markup chưa có data-enhanced: khung hiện ngay với số Liquid in sẵn, đủ kích thước', async ({ page }) => {
+    await page.route(/\/(featured-product|sale-countdown)\.js/, (route) => route.abort());
     await page.goto(TE13);
     const a = band(page, 'a');
     test.skip(!(await onSale(a)), 'Band A không sale');
     await expect(tid(a, 'featured-product')).not.toHaveAttribute('data-enhanced', /.*/);
-    await expect(tid(a, COUNTDOWN)).toBeHidden();
+    await expect(tid(a, COUNTDOWN)).toBeVisible();
     const box = await tid(a, COUNTDOWN).boundingBox();
     expect(box?.height ?? 0).toBeGreaterThan(0);
+    await expect(tid(a, `${COUNTDOWN}-hours`).locator('[data-countdown-value]')).toHaveText(/^\d{2,}$/);
   });
 
   test('AC2 giá gạch và % giảm đúng, không sale thì không có badge', async ({ page }) => {

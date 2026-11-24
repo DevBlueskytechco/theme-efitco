@@ -4285,6 +4285,117 @@ product-variant-picker:not(:defined) {
   font-size: var(--font-size-sm);
 }
 
+/** Sale countdown (ADR 0009, countdown.md §1–§5; snippets/sale-countdown): featured product, PDP, big offer.
+   Compact khi khung chứa < 23rem, Regular từ 23rem (data-size regular); data-size compact luôn Compact (CD1).
+   Số in sẵn bằng Liquid, hiện ngay (ES1-T276); không JS thì ẩn. Không chuyển động. */
+sale-countdown {
+  display: block;
+  container-type: inline-size;
+}
+
+@media (scripting: none) {
+  sale-countdown {
+    display: none;
+  }
+}
+
+.sale-countdown-slot {
+  display: contents;
+}
+
+.sale-countdown {
+  --sale-countdown-cell: 40px;
+  --sale-countdown-gap: var(--space-1);
+  --sale-countdown-pad: var(--space-4);
+  --sale-countdown-size: var(--font-size-base);
+  --sale-countdown-leading: var(--line-height-body);
+  --sale-countdown-ended-min: 16.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  box-sizing: border-box;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  min-block-size: 60px;
+  margin: 0;
+  padding: var(--space-2) var(--sale-countdown-pad);
+  border-radius: var(--figma-radius-8);
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+}
+
+@container (min-width: 23rem) {
+  .sale-countdown[data-size='regular'] {
+    --sale-countdown-cell: 44px;
+    --sale-countdown-gap: var(--space-3);
+    --sale-countdown-pad: var(--space-5);
+    --sale-countdown-size: var(--font-size-lg);
+    --sale-countdown-leading: calc(28 / 18);
+    --sale-countdown-ended-min: 19.5rem;
+  }
+}
+
+.sale-countdown[hidden],
+.sale-countdown__unit[hidden] {
+  display: none;
+}
+
+.sale-countdown__label,
+.sale-countdown__ended {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+.sale-countdown__units {
+  display: flex;
+  gap: var(--sale-countdown-gap);
+}
+
+.sale-countdown__unit {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-inline-size: var(--sale-countdown-cell);
+  block-size: var(--sale-countdown-cell);
+  padding-inline: var(--space-1);
+  border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, var(--color-background-dark));
+  border-radius: var(--figma-radius-8);
+  font-size: var(--sale-countdown-size);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: var(--sale-countdown-leading);
+}
+
+/* K2 < 1 giờ: ô accent, không nhấp nháy, không đổi cỡ */
+.sale-countdown[data-state='ending'] .sale-countdown__unit {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+/* K3 hết giờ khi đang xem: giữ khung, bề rộng tối thiểu bằng lúc chạy 3 ô */
+.sale-countdown[data-state='ended'] {
+  min-inline-size: min(var(--sale-countdown-ended-min), 100%);
+}
+
+.sale-countdown__ended {
+  color: color-mix(in srgb, var(--color-background-dark-foreground) 60%, var(--color-background-dark));
+}
+
+/* Chỉ trong theme editor: ngày sai định dạng, metafield thay setting */
+.sale-countdown-notice {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  outline: 1px dashed var(--color-sale);
+  outline-offset: -1px;
+  font-size: var(--font-size-sm);
+}
+
 /** Rich text chung. h4–h6 cỡ, weight ở critical.css */
 .rte {
   overflow-wrap: break-word;
@@ -6021,10 +6132,10 @@ cart-drawer {
   }
 }
 
-/** FAQ: dưới 64rem câu hỏi, ảnh, ô stat xếp dọc; từ 64rem 2 cột, ô stat đè mép dưới ảnh */
+/** FAQ: câu hỏi, ảnh, ô stat đè mép dưới ảnh; từ 64rem 2 cột */
 .faq {
   display: grid;
-  gap: calc(var(--space-1) * 10);
+  gap: var(--space-6);
   min-inline-size: 0;
   padding-block: var(--space-7);
 }
@@ -6091,7 +6202,7 @@ cart-drawer {
   grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
   column-gap: var(--space-3);
-  min-block-size: 44px;
+  min-block-size: calc(var(--space-1) * 14);
   padding-block: var(--space-2);
   color: var(--color-muted);
   list-style: none;
@@ -6191,6 +6302,28 @@ cart-drawer {
   text-align: start;
 }
 
+/* 360: 2 ô đè đáy ảnh 48 */
+.faq__media--overlay {
+  position: relative;
+  gap: 0;
+}
+
+.faq__media--overlay .faq__stats {
+  position: relative;
+  flex-wrap: nowrap;
+  margin-block-start: calc(var(--space-7) * -1);
+  margin-inline: var(--space-3);
+}
+
+.faq__media--overlay .faq__stat {
+  flex: 1 1 0;
+  padding: var(--space-4);
+}
+
+.faq__media--overlay .faq__stat-value {
+  font-size: calc(var(--space-1) * 10);
+}
+
 .faq__stat--accent {
   background-color: var(--color-accent);
   color: var(--color-accent-foreground);
@@ -6227,39 +6360,54 @@ cart-drawer {
   line-height: calc(22 / 14);
 }
 
+/* 48rem (index-mobile-b §7): ảnh 76% (553) sát mép cuối, hàng ô 80% (582) cách đáy 7.5% */
+@media (min-width: 48rem) {
+  .faq {
+    gap: calc(var(--space-1) * 10);
+  }
+
+  .faq__image {
+    inline-size: 76%;
+    margin-inline-start: auto;
+  }
+
+  .faq__media--overlay .faq__stats {
+    position: absolute;
+    inset-block-end: 7.5%;
+    inset-inline-start: 0;
+    inline-size: 80%;
+    margin: 0;
+  }
+
+  .faq__media--overlay .faq__stat {
+    flex: 0 1 calc(50% - var(--space-3) / 2);
+    padding: var(--space-5);
+  }
+
+  .faq__media--overlay .faq__stat-value {
+    font-size: calc(var(--space-1) * 12);
+  }
+}
+
+/* Figma: 668 + 80 + 668; ảnh 509 / 668, hàng ô 532 / 668 cách đáy 40 */
 @media (min-width: 64rem) {
   .faq {
     padding-block: var(--space-8);
   }
 
-  /* Figma: 668 + 80 + 668 */
   .faq--with-media {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
     column-gap: calc(var(--space-1) * 20);
   }
 
-  /* Ảnh 509 / 668 của cột, sát mép cuối */
   .faq__image {
     inline-size: calc(509 / 668 * 100%);
-    margin-inline-start: auto;
-  }
-
-  /* Hàng ô 532 / 668 của cột, cách đáy ảnh 40 */
-  .faq__media--overlay {
-    position: relative;
   }
 
   .faq__media--overlay .faq__stats {
-    position: absolute;
     inset-block-end: calc(var(--space-1) * 10);
-    inset-inline-start: 0;
-    flex-wrap: nowrap;
     inline-size: calc(532 / 668 * 100%);
-  }
-
-  .faq__media--overlay .faq__stat {
-    flex: 0 1 calc(50% - var(--space-3) / 2);
   }
 }
 
