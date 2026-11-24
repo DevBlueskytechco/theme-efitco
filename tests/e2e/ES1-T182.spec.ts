@@ -143,10 +143,12 @@ test.describe('ES1-T182 TE-17-FE1c', () => {
       const media = el.parentElement!.querySelector('[data-testid="featured-product-media"]')!.getBoundingClientRect();
       return { width: rect.width, top: rect.top - media.top, left: rect.left - media.left };
     });
-    const wide = (page.viewportSize()?.width ?? 0) >= 768;
-    expect(Math.round(seal.width)).toBe(wide ? 113 : 72);
-    expect(Math.round(seal.top)).toBe(wide ? 24 : 12);
-    expect(Math.round(seal.left)).toBe(wide ? 24 : 12);
+    // ES1-T342: docs/ui-spec/index-mobile-b.md §2 "Dấu tròn" 360: 72 cách góc 16, 768: 88 cách góc 24; từ 64rem Figma 113 / 24
+    const vw = page.viewportSize()?.width ?? 0;
+    const [size, inset] = vw >= 1024 ? [113, 24] : vw >= 768 ? [88, 24] : [72, 16];
+    expect(Math.round(seal.width)).toBe(size);
+    expect(Math.round(seal.top)).toBe(inset);
+    expect(Math.round(seal.left)).toBe(inset);
   });
 
   test('AC-H6 quiz-step: setting thắng default theo từng trường, trường trống lấy default, show_item tắt thì ẩn', async ({ page }) => {
