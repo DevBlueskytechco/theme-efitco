@@ -754,6 +754,7 @@ modal-dialog {
   .dialog:not([open])::backdrop,
   .drawer:not([open], :popover-open)::backdrop {
     opacity: 0;
+    transition-duration: var(--motion-fast);
   }
 
   .dialog:not([open]) {
@@ -1130,10 +1131,11 @@ modal-dialog {
   text-wrap: balance;
 }
 
+/* 360: 2 cột, gap 24 / 16 */
 .featured-collection__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
+  gap: var(--space-5) var(--space-4);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -1143,8 +1145,7 @@ modal-dialog {
   min-inline-size: 0;
 }
 
-/* Tab: chỉ có khi từ 2 tab. Heading trên, tab dưới; từ 64rem heading trái, tab phải.
-   collection-tabs giữ khoảng cách của .featured-collection, có box để lazy-module quan sát nên không dùng display: contents */
+/* Tab (từ 2 tab). collection-tabs cần box cho lazy-module: không display: contents */
 collection-tabs {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1158,7 +1159,7 @@ collection-tabs {
   align-items: stretch;
 }
 
-/* Dưới 48rem cuộn ngang tới mép. padding-block chừa chỗ cho vùng bấm 44, khung cuộn không cắt */
+/* Dưới 48rem cuộn ngang; padding-block chừa vùng bấm 44 */
 .featured-collection__tabs {
   display: flex;
   gap: var(--space-2);
@@ -1177,14 +1178,14 @@ collection-tabs {
   display: none;
 }
 
-/* Figma: 40 cao, padding ngang 28, bo 8, Inter 600 16/26, letter-spacing -0.16. Vùng bấm 44 bằng ::before */
+/* Cao 44 (AC-H35); từ 80rem 40 như Figma, vùng bấm 44 bằng ::before */
 .featured-collection__tab {
   position: relative;
   display: inline-flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  min-block-size: calc(var(--space-1) * 10);
+  min-block-size: calc(var(--space-1) * 11);
   padding-inline: calc(var(--space-1) * 7);
   border-radius: calc(var(--radius-button) * 2);
   background-color: var(--color-background-alt);
@@ -1265,10 +1266,11 @@ collection-tabs {
 @media (min-width: 48rem) {
   .featured-collection__grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
   }
 
-  /* Đúng 4 card (mặc định D7): 4 cột, không để 1 card lẻ */
-  .featured-collection__grid:has(> :nth-child(4):last-child) {
+  /* Số card chia hết cho 4: 4 cột (TE-3 AC17) */
+  .featured-collection__grid:has(> :last-child:nth-child(4n)) {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
@@ -1293,7 +1295,7 @@ collection-tabs {
 
 @media (min-width: 80rem) {
   .featured-collection__grid,
-  .featured-collection__grid:has(> :nth-child(4):last-child) {
+  .featured-collection__grid:has(> :last-child:nth-child(4n)) {
     grid-template-columns: repeat(var(--columns, 4), minmax(0, 1fr));
     gap: var(--space-5);
   }
@@ -2813,7 +2815,7 @@ localization-picker[data-tabs] .localization__tabs {
 .button--link .slideshow-icon {
   inline-size: calc(var(--space-1) * 5);
   block-size: var(--space-4);
-  transition: translate 0.2s ease-out;
+  transition: translate var(--motion-base) var(--ease-out);
 }
 
 .button--link:hover .button__label {
@@ -3258,7 +3260,7 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   }
 }
 
-/** Rich text: 1 cột dưới 64rem, 2 cột heading | body + CTA từ 64rem */
+/** Rich text (Figma 1:454): 1 cột, từ 64rem heading | body */
 .rich-text {
   container-type: inline-size;
   display: grid;
@@ -3269,17 +3271,17 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
   padding-block: var(--space-7);
 }
 
-/* 48 = type_scale; Figma chỉ có 1920, mobile theo ui-spec ES1-T34 */
 .rich-text__heading {
-  font-size: 3rem;
+  font-size: var(--font-size-display);
   font-weight: var(--font-heading--weight-display);
   letter-spacing: -0.04em;
   line-height: 1;
+  overflow-wrap: break-word;
   text-transform: uppercase;
   text-wrap: balance;
 }
 
-/* Ảnh inline 1:455: 165 × 94 ở chữ 100px, co theo em. Khoảng cách 2 bên là dấu cách thật trong heading */
+/* Ảnh inline 1:455: co theo em */
 .rich-text__heading .rich-text__inline-image {
   display: inline-block;
   inline-size: auto;
@@ -3296,21 +3298,36 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
 }
 
 .rich-text__body {
+  max-inline-size: 34rem;
   font-weight: 500;
   letter-spacing: -0.01em;
   line-height: calc(26 / 16);
 }
 
 .rich-text__content > * + * {
-  margin-block-start: var(--space-5);
+  margin-block-start: var(--space-3);
 }
 
 .rich-text__body > * + * {
   margin-block-start: var(--space-3);
 }
 
+/* 48rem: đoạn | link */
+@media (min-width: 48rem) {
+  .rich-text__content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+    column-gap: var(--space-6);
+  }
+
+  .rich-text__content > * + * {
+    margin-block-start: 0;
+  }
+}
+
 @media (min-width: 64rem) {
-  /* Figma 1920: cột 732 / 526, khoảng 158 trên 1416 = 11.16% */
+  /* Figma 1920: 732 / 526, gap 158 / 1416 */
   .rich-text {
     grid-template-columns: minmax(0, 732fr) minmax(0, 526fr);
     align-items: start;
@@ -3318,19 +3335,37 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
     padding-block: var(--space-8);
   }
 
+  .rich-text__content {
+    display: block;
+  }
+
   .rich-text__heading:only-child,
   .rich-text__content:only-child {
     grid-column: 1 / -1;
   }
 
-  /* Dòng dài nhất (NEED + ảnh + TO TRAIN.) ≈ 6.94em, hộp Figma 7.32em = cột trái.
-     Cỡ chữ = cột trái / 7.32 = (100cqi - gap) / 12.58 → đúng 100 ở 1416, không tràn cột ở 1024 (~69px) */
+  .rich-text__body {
+    max-inline-size: none;
+  }
+
+  /* Cỡ chữ = cột trái / 7.32em (hộp Figma): 100 ở 1416, không tràn ở 1024 */
   .rich-text__heading {
     font-size: min(var(--font-size-display), (100cqi - max(var(--space-7), 11.16cqi)) / 12.58);
   }
 
   .rich-text__content > * + * {
     margin-block-start: calc(var(--space-1) * 10);
+  }
+}
+
+/* index-1280 khối 4: cột phải 528, chữ 80 ở 1280 */
+@media (min-width: 80rem) {
+  .rich-text {
+    grid-template-columns: minmax(0, 1fr) min(calc(var(--space-1) * 132), 45%);
+  }
+
+  .rich-text__heading {
+    font-size: min(var(--font-size-display), 6.25vw);
   }
 }
 
@@ -4246,6 +4281,117 @@ product-variant-picker:not(:defined) {
   border-inline-start: 2px solid var(--color-sale);
   background-color: var(--color-background-alt);
   color: var(--color-background-alt-foreground);
+  font-size: var(--font-size-sm);
+}
+
+/** Sale countdown (ADR 0009, countdown.md §1–§5; snippets/sale-countdown): featured product, PDP, big offer.
+   Compact khi khung chứa < 23rem, Regular từ 23rem (data-size regular); data-size compact luôn Compact (CD1).
+   Số in sẵn bằng Liquid, hiện ngay (ES1-T276); không JS thì ẩn. Không chuyển động. */
+sale-countdown {
+  display: block;
+  container-type: inline-size;
+}
+
+@media (scripting: none) {
+  sale-countdown {
+    display: none;
+  }
+}
+
+.sale-countdown-slot {
+  display: contents;
+}
+
+.sale-countdown {
+  --sale-countdown-cell: 40px;
+  --sale-countdown-gap: var(--space-1);
+  --sale-countdown-pad: var(--space-4);
+  --sale-countdown-size: var(--font-size-base);
+  --sale-countdown-leading: var(--line-height-body);
+  --sale-countdown-ended-min: 16.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-4);
+  box-sizing: border-box;
+  inline-size: fit-content;
+  max-inline-size: 100%;
+  min-block-size: 60px;
+  margin: 0;
+  padding: var(--space-2) var(--sale-countdown-pad);
+  border-radius: var(--figma-radius-8);
+  background-color: var(--color-background-dark);
+  color: var(--color-background-dark-foreground);
+}
+
+@container (min-width: 23rem) {
+  .sale-countdown[data-size='regular'] {
+    --sale-countdown-cell: 44px;
+    --sale-countdown-gap: var(--space-3);
+    --sale-countdown-pad: var(--space-5);
+    --sale-countdown-size: var(--font-size-lg);
+    --sale-countdown-leading: calc(28 / 18);
+    --sale-countdown-ended-min: 19.5rem;
+  }
+}
+
+.sale-countdown[hidden],
+.sale-countdown__unit[hidden] {
+  display: none;
+}
+
+.sale-countdown__label,
+.sale-countdown__ended {
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: var(--line-height-body);
+  overflow-wrap: anywhere;
+}
+
+.sale-countdown__units {
+  display: flex;
+  gap: var(--sale-countdown-gap);
+}
+
+.sale-countdown__unit {
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  min-inline-size: var(--sale-countdown-cell);
+  block-size: var(--sale-countdown-cell);
+  padding-inline: var(--space-1);
+  border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, var(--color-background-dark));
+  border-radius: var(--figma-radius-8);
+  font-size: var(--sale-countdown-size);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: var(--sale-countdown-leading);
+}
+
+/* K2 < 1 giờ: ô accent, không nhấp nháy, không đổi cỡ */
+.sale-countdown[data-state='ending'] .sale-countdown__unit {
+  border-color: var(--color-accent);
+  background-color: var(--color-accent);
+  color: var(--color-accent-foreground);
+}
+
+/* K3 hết giờ khi đang xem: giữ khung, bề rộng tối thiểu bằng lúc chạy 3 ô */
+.sale-countdown[data-state='ended'] {
+  min-inline-size: min(var(--sale-countdown-ended-min), 100%);
+}
+
+.sale-countdown__ended {
+  color: color-mix(in srgb, var(--color-background-dark-foreground) 60%, var(--color-background-dark));
+}
+
+/* Chỉ trong theme editor: ngày sai định dạng, metafield thay setting */
+.sale-countdown-notice {
+  margin: 0;
+  padding: var(--space-3) var(--space-4);
+  outline: 1px dashed var(--color-sale);
+  outline-offset: -1px;
   font-size: var(--font-size-sm);
 }
 
@@ -5252,7 +5398,7 @@ cart-drawer {
   font-size: var(--font-size-sm);
 }
 
-/* 320 x 240 ở 360. Nền tối giữ chữ trắng đọc được khi chưa có ảnh; tên dài thì thẻ cao thêm, không cắt chữ */
+/* Nền tối giữ chữ trắng đọc được khi chưa có ảnh */
 .level-card__link {
   position: relative;
   display: flex;
@@ -5286,16 +5432,23 @@ cart-drawer {
   object-fit: cover;
 }
 
-/* Gradient 1:469 cao 168 ở card 456 (36.8%). Đặt trên khối chữ để luôn phủ hết chữ ở card thấp 232, 240.
-   Figma #000 80%, dùng token nền tối: 0 màu literal */
-.level-card__content {
-  position: relative;
-  padding-block: calc(var(--space-1) * 7.5) var(--space-4);
-  padding-inline: var(--space-4);
-  background-image: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--color-background-dark) 80%, transparent));
+/* Gradient cả card để nhãn ở card thấp vẫn trên nền tối; từ 80rem theo Figma 1:469 */
+.level-card__link::after {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(to bottom, transparent 35%, color-mix(in srgb, var(--color-background-dark) 85%, transparent));
+  content: '';
+  pointer-events: none;
 }
 
-/* Figma 1:472: 14 / 16; copy có 2 dấu cách nên giữ nguyên khoảng trắng */
+.level-card__content {
+  position: relative;
+  z-index: var(--layer-content);
+  padding-block: var(--space-5) var(--space-4);
+  padding-inline: var(--space-5);
+}
+
+/* Copy có 2 dấu cách: giữ khoảng trắng */
 .level-card__label {
   margin: 0;
   font-family: var(--font-heading--family);
@@ -5307,31 +5460,31 @@ cart-drawer {
   white-space: pre-wrap;
 }
 
-/* Figma 1:473: 36 / 44, letter-spacing -0.72 */
+/* h3 dưới 80rem, h2 từ 80rem (Figma 1:473) */
 .level-card__title {
   margin: 0;
   margin-block-start: var(--space-1);
-  font-size: var(--font-size-h2);
+  font-size: var(--font-size-h3);
   font-weight: var(--font-heading--weight);
   letter-spacing: -0.02em;
   line-height: calc(44 / 36);
+  overflow-wrap: break-word;
 }
 
-.level-card__link:hover .level-card__title {
+.level-card__link:is(:hover, :focus-visible) .level-card__title {
   text-decoration: underline;
   text-underline-offset: 0.1em;
 }
 
-/* Figma 1:474, 1:475: kẻ trắng 20%, hàng cao 29, chữ 14 / 22 */
+/* Dưới 80rem luôn hiện, cao 44 */
 .level-card__products {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--space-1);
-  min-block-size: calc(var(--space-3) + 30px);
-  margin-block-start: var(--space-3);
-  border-block-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 20%, transparent);
-  padding-block-start: var(--space-3);
+  min-block-size: calc(var(--space-1) * 11);
+  margin-block-start: var(--space-2);
+  border-block-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent);
   font-size: var(--font-size-sm);
   font-weight: 500;
   line-height: calc(22 / 14);
@@ -5350,6 +5503,10 @@ cart-drawer {
 
   .level-card__link {
     aspect-ratio: 1;
+  }
+
+  .level-card__content {
+    padding: var(--space-4);
   }
 }
 
@@ -5371,10 +5528,40 @@ cart-drawer {
     gap: var(--space-5);
   }
 
-  /* Figma 1:469: chữ cách mép 40, hàng số sản phẩm cách đáy 20 */
+  /* Figma 1:469 */
   .level-card__content {
     padding-block-end: calc(var(--space-1) * 5);
     padding-inline: calc(var(--space-1) * 10);
+  }
+}
+
+/* index-1280 §2.3, Figma 1:474: có hover thì hàng số ẩn, hiện khi rê/focus (số vẫn trong tên link) */
+@media (min-width: 80rem) {
+  .level-card__title {
+    font-size: var(--font-size-h2);
+  }
+
+  .level-card__products {
+    min-block-size: calc(var(--space-1) * 10.5);
+    margin-block-start: var(--space-3);
+    border-block-start-color: color-mix(in srgb, var(--color-background-dark-foreground) 20%, transparent);
+    padding-block-start: var(--space-3);
+  }
+}
+
+@media (min-width: 80rem) and (hover: hover) {
+  .level-card__link:not(:hover, :focus-visible) .level-card__content {
+    padding-block-end: var(--level-card-pad);
+  }
+
+  .level-card__link:not(:hover, :focus-visible) .level-card__products {
+    max-block-size: 0;
+    min-block-size: 0;
+    margin-block-start: 0;
+    border-block-start-width: 0;
+    padding-block-start: 0;
+    overflow: hidden;
+    opacity: 0;
   }
 }
 
@@ -5767,7 +5954,7 @@ cart-drawer {
   font-size: var(--font-size-sm);
 }
 
-/* Predictive search: snippets/predictive-search.liquid */
+/* Predictive search: vỏ + thanh ô tìm + skeleton (ADR 0014 mục 8); nội dung ở predictive-search.css */
 .predictive-search-dialog {
   --search-gutter: var(--space-5);
   --search-line: var(--color-muted-light);
@@ -5857,57 +6044,65 @@ cart-drawer {
   color: inherit;
 }
 
-.predictive-search__status,
-.predictive-search__listbox {
-  padding-inline: var(--search-gutter);
+.predictive-search__spinner {
+  align-self: center;
+  inline-size: calc(var(--space-1) * 5);
+  block-size: calc(var(--space-1) * 5);
+  margin-inline: var(--space-3);
 }
 
-.predictive-search__status,
-.predictive-search__group-title,
-.predictive-search__price {
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
+.predictive-search__form:has(.predictive-search__spinner:not([hidden])) .predictive-search__clear {
+  display: none;
 }
 
-.predictive-search__group-title {
-  margin-block: var(--space-5) var(--space-2);
+.predictive-search [hidden] {
+  display: none;
 }
 
-.predictive-search__option {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-block-size: 44px;
-  padding: var(--space-1) var(--space-2);
-  font-size: var(--font-size-sm);
-  text-decoration: none;
+.predictive-search:has(.predictive-search__input:placeholder-shown) :is(.predictive-search__tabs, .predictive-search__all) {
+  display: none;
 }
 
-.predictive-search__option:hover,
-.predictive-search__option[aria-selected='true'] {
-  background-color: var(--color-background-alt);
+.predictive-search:has(.predictive-search__listbox:not([hidden])):not(:has(.predictive-search__input:placeholder-shown)) .predictive-search__all[hidden] {
+  display: inline-flex;
 }
 
-.predictive-search__option[aria-selected='true'] {
-  outline: 2px solid;
-  outline-offset: -2px;
-}
-
-.predictive-search__image {
-  flex: none;
-  inline-size: 64px;
-  block-size: 64px;
-  border-radius: var(--radius-input);
-  object-fit: cover;
-}
-
-.predictive-search__option-text {
+.predictive-search__body {
   display: grid;
-  overflow-wrap: anywhere;
+  align-content: start;
+  gap: var(--space-6);
+  padding: var(--space-5) var(--search-gutter);
 }
 
-.predictive-search__all {
-  border-block-start: 1px solid var(--color-border);
+.predictive-search__skeleton {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.predictive-search__skeleton-lines,
+.predictive-search__skeleton-items {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.predictive-search__skeleton-item {
+  grid-template-columns: calc(var(--space-1) * 16) minmax(0, 1fr);
+  align-items: center;
+  column-gap: var(--space-3);
+}
+
+.predictive-search__skeleton-item > .skeleton--media {
+  grid-row: span 2;
+  margin: 0;
+}
+
+.predictive-search__status {
+  position: absolute;
+  inline-size: 1px;
+  block-size: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 @media (min-width: 48rem) {
@@ -5917,9 +6112,20 @@ cart-drawer {
     border-end-start-radius: var(--radius-card);
     border-end-end-radius: var(--radius-card);
   }
+
+  [data-style='popup'] .predictive-search__skeleton {
+    grid-template-columns: minmax(0, 3fr) minmax(0, var(--search-main, 5fr));
+    grid-auto-flow: row dense;
+    align-content: start;
+    column-gap: var(--space-5);
+  }
 }
 
 @media (min-width: 80rem) {
+  .predictive-search-dialog[data-style='popup'] {
+    --search-main: 9fr;
+  }
+
   [data-style='popup'] .predictive-search__bar {
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: var(--space-5);
@@ -5932,17 +6138,38 @@ cart-drawer {
 
   [data-style='popup'] .predictive-search__form {
     grid-column: 4 / 12;
+    min-block-size: calc(var(--space-1) * 13);
+    font-size: var(--font-size-lg);
   }
 
   .predictive-search__close-form {
     justify-self: end;
   }
+
+  [data-style='popup'] .predictive-search__body {
+    padding-block: var(--space-6);
+  }
+
+  [data-style='popup'] .predictive-search__skeleton-items {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-5);
+  }
+
+  [data-style='popup'] .predictive-search__skeleton-item {
+    grid-template-columns: none;
+  }
+
+  [data-style='popup'] .predictive-search__skeleton-item > .skeleton--media {
+    grid-row: auto;
+    margin-block-end: var(--space-1);
+  }
 }
 
-/** FAQ: dưới 64rem câu hỏi, ảnh, ô stat xếp dọc; từ 64rem 2 cột, ô stat đè mép dưới ảnh */
+/** FAQ: câu hỏi, ảnh, ô stat đè mép dưới ảnh; từ 64rem 2 cột */
 .faq {
   display: grid;
-  gap: calc(var(--space-1) * 10);
+  gap: var(--space-6);
   min-inline-size: 0;
   padding-block: var(--space-7);
 }
@@ -6009,7 +6236,7 @@ cart-drawer {
   grid-template-columns: 24px minmax(0, 1fr);
   align-items: center;
   column-gap: var(--space-3);
-  min-block-size: 44px;
+  min-block-size: calc(var(--space-1) * 14);
   padding-block: var(--space-2);
   color: var(--color-muted);
   list-style: none;
@@ -6109,6 +6336,28 @@ cart-drawer {
   text-align: start;
 }
 
+/* 360: 2 ô đè đáy ảnh 48 */
+.faq__media--overlay {
+  position: relative;
+  gap: 0;
+}
+
+.faq__media--overlay .faq__stats {
+  position: relative;
+  flex-wrap: nowrap;
+  margin-block-start: calc(var(--space-7) * -1);
+  margin-inline: var(--space-3);
+}
+
+.faq__media--overlay .faq__stat {
+  flex: 1 1 0;
+  padding: var(--space-4);
+}
+
+.faq__media--overlay .faq__stat-value {
+  font-size: calc(var(--space-1) * 10);
+}
+
 .faq__stat--accent {
   background-color: var(--color-accent);
   color: var(--color-accent-foreground);
@@ -6145,39 +6394,54 @@ cart-drawer {
   line-height: calc(22 / 14);
 }
 
+/* 48rem (index-mobile-b §7): ảnh 76% (553) sát mép cuối, hàng ô 80% (582) cách đáy 7.5% */
+@media (min-width: 48rem) {
+  .faq {
+    gap: calc(var(--space-1) * 10);
+  }
+
+  .faq__image {
+    inline-size: 76%;
+    margin-inline-start: auto;
+  }
+
+  .faq__media--overlay .faq__stats {
+    position: absolute;
+    inset-block-end: 7.5%;
+    inset-inline-start: 0;
+    inline-size: 80%;
+    margin: 0;
+  }
+
+  .faq__media--overlay .faq__stat {
+    flex: 0 1 calc(50% - var(--space-3) / 2);
+    padding: var(--space-5);
+  }
+
+  .faq__media--overlay .faq__stat-value {
+    font-size: calc(var(--space-1) * 12);
+  }
+}
+
+/* Figma: 668 + 80 + 668; ảnh 509 / 668, hàng ô 532 / 668 cách đáy 40 */
 @media (min-width: 64rem) {
   .faq {
     padding-block: var(--space-8);
   }
 
-  /* Figma: 668 + 80 + 668 */
   .faq--with-media {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     align-items: start;
     column-gap: calc(var(--space-1) * 20);
   }
 
-  /* Ảnh 509 / 668 của cột, sát mép cuối */
   .faq__image {
     inline-size: calc(509 / 668 * 100%);
-    margin-inline-start: auto;
-  }
-
-  /* Hàng ô 532 / 668 của cột, cách đáy ảnh 40 */
-  .faq__media--overlay {
-    position: relative;
   }
 
   .faq__media--overlay .faq__stats {
-    position: absolute;
     inset-block-end: calc(var(--space-1) * 10);
-    inset-inline-start: 0;
-    flex-wrap: nowrap;
     inline-size: calc(532 / 668 * 100%);
-  }
-
-  .faq__media--overlay .faq__stat {
-    flex: 0 1 calc(50% - var(--space-3) / 2);
   }
 }
 
@@ -6535,18 +6799,18 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
   /* Intro + cấp độ */
   .shop-by-level__list { gap: 24px; }
-  .level-card__link { border-radius: var(--figma-radius-16); aspect-ratio: 1; position: relative; }
-  .level-card__link::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to bottom, transparent 63.16%, var(--figma-000000) 100%); pointer-events: none; }
-  .level-card__content { z-index: var(--layer-content); padding: 0 40px 40px; background-image: none; }
+  /* Pad 32 ở 1280, 40 ở 1920 (R3); hàng số hiện khi rê/focus, đáy 18 */
+  .level-card__link { --level-card-pad: clamp(var(--space-6), var(--space-4) + 1.25vw, calc(var(--space-1) * 10)); border-radius: var(--figma-radius-16); }
+  .level-card__link::after { background: linear-gradient(to bottom, transparent 63.16%, var(--figma-000000) 100%); }
+  .level-card__content { padding: 0 var(--level-card-pad) var(--level-card-pad); }
   .level-card__products .slideshow-icon { width: 16px; height: 14px; margin-inline-end: 5px; }
-  .level-card__products { display: none; position: relative; inset-block-start: -3px; }
-  .level-card:first-child .level-card__content { padding-block-end: 18px; }
-  .level-card:first-child .level-card__products, .level-card:hover .level-card__products { display: flex; }
+  .level-card__products { position: relative; inset-block-start: -3px; }
+  .level-card__content:has(> .level-card__products) { padding-block-end: 18px; }
 
   /* Hàng sản phẩm */
   .featured-collection__eyebrow { color: var(--color-accent); }
   .featured-collection__tabs { gap: 8px; }
-  .featured-collection__tab { height: 40px; padding: 7px 28px; border-radius: var(--figma-radius-8); background: var(--figma-f4f4f5); color: var(--figma-1a1a1a); font-size: 16px; line-height: 26px; font-weight: 600; letter-spacing: -0.16px; justify-content: center; }
+  .featured-collection__tab { height: 40px; min-block-size: 0; padding: 7px 28px; border-radius: var(--figma-radius-8); background: var(--figma-f4f4f5); color: var(--figma-1a1a1a); font-size: 16px; line-height: 26px; font-weight: 600; letter-spacing: -0.16px; justify-content: center; }
   .featured-collection__tab:nth-child(1) { min-width: 76px; }
   .featured-collection__tab:nth-child(2) { min-width: 110px; }
   .featured-collection__tab:nth-child(3) { min-width: 180px; }
@@ -6559,7 +6823,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   /* Video */
   .block-container:has(> .video-carousel) { background: var(--figma-ffffff); }
   .video-carousel__eyebrow { color: var(--color-accent); }
-  .video-card__play { opacity: 0; transition: opacity 0.2s; }
+  .video-card__play { opacity: 0; transition: opacity var(--motion-fast) var(--ease-out); }
   .video-card:hover .video-card__play, .video-card__poster:focus-visible .video-card__play { opacity: 1; }
 
   /* Testimonial */
@@ -6617,8 +6881,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .shop-by-level__eyebrow, .featured-collection__eyebrow, .video-carousel__eyebrow, .testimonials__eyebrow, .blog-posts__eyebrow, .faq__eyebrow, .faq__stat-label { position: relative; inset-block-start: 1px; }
   .rich-text__heading { position: relative; inset-block-start: 2px; }
   .rich-text__content .button { gap: 14px; }
-  .level-card:first-child .level-card__label { position: relative; inset-block-start: -1px; }
-  .level-card:not(:first-child) .level-card__title { position: relative; inset-block-start: 1px; }
+  .level-card__link:is(:hover, :focus-visible) .level-card__label { position: relative; inset-block-start: -1px; }
+  .level-card__link:not(:hover, :focus-visible) .level-card__title { position: relative; inset-block-start: 1px; }
   .product-card__badge, .article-card__tag { padding-block: 4px 2px; }
   .product-card__rating-star { position: relative; inset-inline-start: -1px; inset-block-start: -1px; }
   .product-card__rating > span[aria-hidden] { position: relative; inset-inline-start: -1px; inset-block-start: 1px; }
@@ -6671,7 +6935,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   html[data-motion] .button--link:hover:not(:disabled), html[data-motion] .button--link:active:not(:disabled) { translate: none; scale: none; box-shadow: none; }
   .slideshow-icon--arrow { transition: translate var(--motion-base) var(--ease-out); }
   html[data-motion] a:hover > .slideshow-icon--arrow, html[data-motion] button:hover > .slideshow-icon--arrow { translate: 3px 0; }
-  .button[aria-busy='true']::after { animation: motion-spin 700ms linear infinite; }
+  .button[aria-busy='true']::after { animation: motion-spin var(--motion-hero) linear infinite; }
 
   /* Menu */
   .site-header__link, .site-header__icon { transition: color var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out); }
@@ -6690,7 +6954,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   html[data-motion] .site-header__mega-link:dir(rtl):hover { translate: calc(-1 * var(--space-1)) 0; }
   .site-header__submenu .site-header__link { transition: color var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
   html[data-motion] .site-header__submenu .site-header__link:hover { color: var(--color-accent); translate: 4px 0; text-decoration: none; }
-  [data-testid='header-cart-link'][data-bump] { animation: motion-bump 500ms var(--ease-out); }
+  [data-testid='header-cart-link'][data-bump] { animation: motion-bump var(--motion-slow) var(--ease-out); }
   .site-header__cart-count { animation: motion-pop var(--motion-base) var(--ease-out); }
 
   /* Card, ảnh */
@@ -6888,7 +7152,7 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
 /* ==== Chuyển động v2: mở trang, hiện dần theo cuộn, cuộn gắn tiến trình. Chỉ transform, opacity, clip-path. ==== */
 @media (prefers-reduced-motion: no-preference) {
   /* Hiện dần theo cuộn: motion.js gắn data-reveal + data-reveal-kind, --reveal-i là thứ tự trong nhóm */
-  html[data-motion] [data-reveal] { transition-property: opacity, translate, scale, clip-path; transition-duration: var(--motion-reveal); transition-timing-function: var(--ease-expo); transition-delay: calc(var(--reveal-i, 0) * 80ms); }
+  html[data-motion] [data-reveal] { transition-property: opacity, translate, scale, clip-path; transition-duration: var(--motion-reveal); transition-timing-function: var(--ease-expo); transition-delay: calc(var(--reveal-i, 0) * var(--motion-stagger)); }
   html[data-motion] [data-reveal='wait'] { opacity: 0; translate: 0 32px; }
   html[data-motion] [data-reveal='wait'][data-reveal-kind='card'] { translate: 0 56px; scale: 0.97; }
   html[data-motion] [data-reveal='wait'][data-reveal-kind='media'] { opacity: 1; translate: none; clip-path: inset(14% 10% 14% 10% round var(--figma-radius-24)); }
