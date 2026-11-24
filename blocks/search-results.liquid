@@ -27,7 +27,9 @@
     side from 64rem.
 
   Empty (S2, shown to shoppers, ES1-T127 #5): no results and no filter:
-  snippets/empty-state "Nothing Matches “q” Yet" + Shop All Products. A page
+  snippets/empty-state "Nothing Matches “q” Yet" + Shop All Products, then
+  snippets/popular-searches (theme setting settings.popular_searches, FD2,
+  TE-8 AC4; this block has no setting of its own; empty setting: nothing). A page
   number past the last page: empty-state with "Go to page 1". search.terms is
   escaped before it goes into a key ending in _html (ES1-T124 #5).
 
@@ -37,7 +39,8 @@
   Test hooks (search.md §10): search-products, search-product-grid,
   search-active-filters, search-filter-note, search-filtered-empty(-heading,
   -button), search-articles, search-pages, search-pagination, search-empty
-  (-heading, -button), search-error (-heading, -button); shared with TE-6:
+  (-heading, -button), search-popular (-chip), search-error (-heading,
+  -button); shared with TE-6:
   collection-filter-open,
   collection-filter-count, collection-sort, collection-sort-apply and the hooks
   of snippets/pagination.liquid (pagination-summary only here) and
@@ -130,6 +133,8 @@
                 assign empty_text = 'search.no_results_text' | t
                 assign empty_button = 'search.shop_all' | t
                 render 'empty-state', heading: empty_heading, text: empty_text, button_label: empty_button, button_url: routes.all_products_collection_url, icon: 'search', testid: 'search-empty'
+                # Popular searches (FD2, TE-8 AC4, AC8 S2): theme setting, empty renders nothing
+                render 'popular-searches', heading_tag: 'h2', testid: 'search-popular', class: 'search-results__suggest'
               else
                 # Page number past the last page: the first page keeps q, type, sort and filters
                 assign first_url = paginate.parts.first.url | default: empty_clear_url
