@@ -112,7 +112,8 @@ async function openFake(page: Page, options?: { layer?: boolean; modal?: boolean
     const url = new URL(route.request().url());
     if (url.pathname.startsWith('/assets/')) {
       const file = url.pathname.slice('/assets/'.length);
-      if (!['search-handoff.js', 'modal-dialog.js', 'predictive-search.js'].includes(file)) return route.fulfill({ status: 404, body: '' });
+      // ES1-T378: predictive-search.js import() predictive-search-results.js cùng thư mục để vẽ nhóm
+      if (!['search-handoff.js', 'modal-dialog.js', 'predictive-search.js', 'predictive-search-results.js'].includes(file)) return route.fulfill({ status: 404, body: '' });
       if (file === 'predictive-search.js') hits.predictive++;
       return route.fulfill({ body: read(`assets/${file}`), contentType: 'text/javascript' });
     }
