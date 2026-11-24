@@ -1,4 +1,4 @@
-// <collection-filters> TE-6, also /search (ES1-T123 D4).
+// <collection-filters> TE-6 + /search (ES1-T380).
 import { partials } from "@shopify/partial-rendering";
 
 const T = (id) => `[data-testid="${id}"]`;
@@ -7,7 +7,7 @@ const LINK = [PAGES + " a[href]", ..."filter-clear empty-button chip chips-clear
 const RESULTS = "[data-results-label]";
 const GROUP = "details[data-filter-param]";
 const OPEN = T("collection-filter-open");
-// /search S6b: alert, old grid kept; none (collection): reload.
+// S6b alert (/search); none: reload.
 const ERROR = "template[data-results-error]";
 const events = import("https://cdn.shopify.com/storefront/standard-events.js").catch(() => null);
 
@@ -32,6 +32,10 @@ class CollectionFilters extends HTMLElement {
 		for (const t of ["select", "deselect"]) document[m]("shopify:block:" + t, this);
 	}
 
+	$(s) {
+		return this.querySelector(s);
+	}
+
 	get form() {
 		return document.getElementById("collection-filter-form");
 	}
@@ -40,7 +44,7 @@ class CollectionFilters extends HTMLElement {
 		return document.getElementById("collection-filter-drawer");
 	}
 
-	// <modal-dialog> (ADR 0007); showModal throws on a popover.
+	// ADR 0007; showModal throws on a popover.
 	show(o) {
 		const g = this.dlg;
 		const m = g?.parentElement;
@@ -67,30 +71,26 @@ class CollectionFilters extends HTMLElement {
 			if (t.contains?.(this.dlg)) type.endsWith("deselect") ? this.hide() : this.show(o);
 		} else if (type == "pageshow") {
 			if (e.persisted && location.href != this.shown) this.go(location.href);
-			else if (!this.hasAttribute("aria-busy")) this.sync();
+			else if (!this.ariaBusy) this.sync();
 		} else if (type == "input") {
-			// Price: debounce 400 ms.
 			if (!num) return;
 			clearTimeout(this.tm);
 			this.ctrl?.abort();
 			this.bad();
 			this.tm = setTimeout(() => this.price(), 400);
 		} else if (type == "keydown") {
-			// Enter: apply now (submit closes).
 			if (num && e.key == "Enter" && !e.isComposing) e.preventDefault(), this.price(1);
 		} else if (type == "focusout") {
 			if (num) this.bad(1);
 		} else if (type == "change") {
-			// Swatches: no form.
 			if (own && !num && !this.bad(1)) this.go(this.url(), 0, 1);
 		} else if (type == "submit") {
 			if (t != f) return;
 			e.preventDefault();
 			clearTimeout(this.tm);
 			if (this.bad(1)) return;
-			// "Show N products": close once applied.
 			const u = this.url();
-			const p = this.hasAttribute("aria-busy") ? (u == this.want ? this.p : this.go(u, 0, 1)) : u == this.shown || this.go(u, 0, 1);
+			const p = this.ariaBusy ? (u == this.want ? this.p : this.go(u, 0, 1)) : u == this.shown || this.go(u, 0, 1);
 			Promise.resolve(p).then((ok) => ok && this.hide());
 		} else {
 			if (t.closest?.("[data-retry]") && this.err?.contains(t)) return this.go(...this.args);
@@ -108,12 +108,11 @@ class CollectionFilters extends HTMLElement {
 		clearTimeout(this.tm);
 		if (this.bad(show)) return;
 		const u = this.url();
-		if (u != (this.hasAttribute("aria-busy") ? this.want : this.shown)) this.go(u, 0, 1);
+		if (u != (this.ariaBusy ? this.want : this.shown)) this.go(u, 0, 1);
 	}
 
-	// min > max: no request.
 	bad(show) {
-		const [lo, hi, err] = ["min", "max", "error"].map((s) => this.querySelector(T("collection-filter-price-" + s)));
+		const [lo, hi, err] = ["min", "max", "error"].map((s) => this.$(T("collection-filter-price-" + s)));
 		if (!lo || !hi) return;
 		const no = lo.value && hi.value && +lo.value > +hi.value;
 		if (err && (show || !no)) {
@@ -121,7 +120,7 @@ class CollectionFilters extends HTMLElement {
 			for (const i of [lo, hi]) {
 				const d = (i.getAttribute("aria-describedby") || "").replace(err.id, "").trim();
 				i.setAttribute("aria-describedby", no ? `${d} ${err.id}` : d);
-				no ? i.setAttribute("aria-invalid", "true") : i.removeAttribute("aria-invalid");
+				i.ariaInvalid = no ? "true" : null;
 			}
 		}
 		return no;
@@ -144,44 +143,49 @@ class CollectionFilters extends HTMLElement {
 	async run(url, page, emit) {
 		this.ctrl?.abort();
 		const c = (this.ctrl = new AbortController());
+		const s = c.signal;
 		const done = emit && this.emit(url);
-		this.querySelector(RESULTS)?.setAttribute("data-results-label", "");
-		this.setAttribute("aria-busy", "true");
+		// Empty after apply = not applied.
+		const r0 = this.$(RESULTS)?.dataset;
+		if (r0) (this.lbl = r0.resultsLabel || this.lbl), (r0.resultsLabel = "");
+		this.ariaBusy = "true";
+		if (this.err?.contains(document.activeElement)) this.$(OPEN)?.focus();
 		this.err?.remove();
+		const rp = this.dataset.resultsPartial;
 		try {
-			const update = await partials.fetch(this.dataset.resultsPartial || "collection-products", "collection-filters", "collection-filter-count", { url, signal: c.signal });
-			if (c.signal.aborted) return;
+			const update = await partials.fetch(...(rp ? [rp, "collection-filters"] : ["collection-products", "collection-filters", "collection-filter-count"]), { url, signal: s });
+			if (s.aborted) return;
 			const open = new Map([...this.querySelectorAll(GROUP)].map((d) => [d.dataset.filterParam, d.open]));
 			const a = document.activeElement;
 			await partials.apply(update);
-			if (c.signal.aborted) return;
-			const r = this.querySelector(RESULTS);
+			if (s.aborted) return;
+			const r = this.$(RESULTS);
 			const label = r?.dataset.resultsLabel;
 			if (!label) throw 0;
 			history.replaceState(history.state, "", url);
 			this.shown = location.href;
 			this.sync();
-			// Focus lost: twin, else ×.
-			if (a && !a.isConnected) (document.getElementById(a.id) || this.querySelector(T("collection-filter-close")))?.focus();
+			if (a && !a.isConnected) (document.getElementById(a.id) || this.$(T("collection-filter-close")))?.focus();
 			for (const d of this.querySelectorAll(GROUP)) d.open = open.get(d.dataset.filterParam) ?? d.open;
-			this.querySelector(T("collection-status"))?.replaceChildren(label);
+			document.querySelector(T("collection-status") + "," + T("search-status"))?.replaceChildren(label);
 			if (page) {
 				const f = r.querySelector("[data-results-focus]") || r;
 				f.tabIndex = -1;
 				f.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
 				f.focus({ preventScroll: true });
 			}
-			if (done) done({ productsCount: +(r.dataset.resultsCount ?? label.replace(/\D/g, "")) });
+			if (done) done({ productsCount: +(r.dataset.resultsCount ?? (label.match(/^\d[\d,.]*/)?.[0].replace(/\D/g, "") || 0)) });
 			return 1;
 		} catch {
-			if (c.signal.aborted) return;
-			const t = this.querySelector(ERROR);
+			if (s.aborted) return;
+			const r = this.$(RESULTS)?.dataset;
+			if (r && !r.resultsLabel) r.resultsLabel = this.lbl || "";
+			const t = this.$(ERROR);
 			if (!t) return location.assign(url);
-			// Alert reachable; ticks stay.
 			this.hide();
 			t.after((this.err = t.content.firstElementChild.cloneNode(true)));
 		} finally {
-			if (this.ctrl == c) this.removeAttribute("aria-busy");
+			if (this.ctrl == c) this.ariaBusy = null;
 		}
 	}
 
@@ -197,23 +201,23 @@ class CollectionFilters extends HTMLElement {
 		}
 	}
 
-	// shopify:collection:update, collections only.
 	emit(url) {
 		const f = this.form;
 		const d = f?.dataset;
-		if (!d?.collectionHandle) return;
+		const h = d?.collectionHandle;
+		const query = f?.elements.q?.value;
+		if (!h && query == null) return;
 		let done;
 		const result = new Promise((r) => (done = r));
 		const s = new URL(url).searchParams.get("sort_by")?.split("-")[0];
-		const sortKey = s == "best" ? "BEST_SELLING" : s?.toUpperCase();
-		const collection = { id: d.collectionId ? `gid://shopify/Collection/${d.collectionId}` : null, handle: d.collectionHandle, productsCount: +d.productsCount || 0 };
+		const sort = s && { sortKey: s == "best" ? "BEST_SELLING" : s.toUpperCase() };
 		events.then((m) => {
-			const E = m?.CollectionUpdateEvent;
-			if (!E) return;
 			try {
+				const E = m[h ? "CollectionUpdateEvent" : "SearchUpdateEvent"];
 				const p = E.createPromise?.();
-				if (p?.resolve) result.then(p.resolve);
-				f.dispatchEvent(new E({ collection, promise: p?.promise || result, ...(sortKey && { sortKey }) }));
+				p?.resolve && result.then(p.resolve);
+				const promise = p?.promise || result;
+				f.dispatchEvent(new E(h ? { collection: { id: d.collectionId ? `gid://shopify/Collection/${d.collectionId}` : null, handle: h, productsCount: +d.productsCount || 0 }, promise, ...sort } : { search: { query, ...sort }, promise }));
 			} catch {}
 		});
 		return done;

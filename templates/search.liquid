@@ -1,4 +1,4 @@
-{% # TE-8 composition (docs/ui-spec/search.md §2, §3.1–§3.3, §10; drafts/techlead/ES1-T307/task-split.md §3 row ES1-T128). Page head: breadcrumb, h1, GET form (works without JavaScript; hidden type and options[prefix] are the ES1-T124 #4 defaults), status line role="status" (BE rewrites it from data-results-label after a refresh) and the result type links. <collection-filters> stays here because it wraps 2 blocks; the modifier collection-layout--drawer keeps the filter dialog a drawer at every width (search.md §3.6, CTO 10/11 #2); assets/collection-filters.js (BE) reads data-results-partial for the name of the results partial. Test hooks: search-head, search-title, search-form, search-input, search-submit, search-status, search-type-nav. %}
+{% # TE-8 composition (docs/ui-spec/search.md §2, §3.1–§3.3, §10; drafts/techlead/ES1-T307/task-split.md §3 row ES1-T128). Page head: breadcrumb, h1, GET form (works without JavaScript; hidden type and options[prefix] are the ES1-T124 #4 defaults), status line role="status" (BE rewrites it from data-results-label after a refresh) and the result type links. <collection-filters> stays here because it wraps 2 blocks; the modifier collection-layout--drawer keeps the filter dialog a drawer at every width (search.md §3.6, CTO 10/11 #2); assets/collection-filters.js (BE) reads data-results-partial for the name of the results partial. Test hooks: search-head, search-title, search-form, search-input, search-submit, search-status, search-type-nav, search-popular (S1, snippets/popular-searches). %}
 {%- liquid
   assign search_types = 'product,article,page'
   assign search_prefix = 'last'
@@ -120,6 +120,11 @@
       </nav>
     {%- endif -%}
   </div>
+
+  {%- unless search.performed -%}
+    {% # S1 no search yet: Popular searches from the theme setting (FD2, TE-8 AC4, AC8); empty setting renders nothing %}
+    {% render 'popular-searches', heading_tag: 'h2', testid: 'search-popular', class: 'search-popular' %}
+  {%- endunless -%}
 {% endblock %}
 
 {% if search.performed %}
