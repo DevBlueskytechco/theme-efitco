@@ -1,0 +1,67 @@
+{% doc %}
+  Renders the "Popular searches" chips (FD2, foundation §24.1, SRS TE-8 AC4).
+  One theme setting feeds every place: settings.popular_searches in Theme
+  settings > Search. Terms are split on commas, trimmed, empty terms skipped,
+  and only the first 5 show. Empty setting: nothing is rendered (no heading,
+  no empty frame), so a fresh install shows no block.
+
+  Each chip is a real link to the search page with ?q=term, so it works
+  without JavaScript. In the search layer, assets/predictive-search.js (BE)
+  reads data-predictive-query on a chip click, puts the term in the field and
+  runs suggestions in place instead of leaving the page.
+
+  Used by snippets/predictive-search.liquid (empty field, 0 results),
+  templates/search.liquid (no search yet, S1) and blocks/search-results.liquid
+  (0 results, S2).
+
+  Test hooks: {testid} on the root, {testid}-chip on each link.
+
+  @param {string} [heading_tag] - 'h2' or 'h3' (default), to keep the heading order of the caller
+  @param {string} [testid] - data-testid prefix. Default: 'popular-searches'
+  @param {string} [class] - Extra class on the root element
+
+  @example
+  {% render 'popular-searches', heading_tag: 'h2', testid: 'search-popular' %}
+{% enddoc %}
+
+{%- liquid
+  assign popular_tag = 'h3'
+  if heading_tag == 'h2'
+    assign popular_tag = 'h2'
+  endif
+  assign popular_testid = testid | default: 'popular-searches'
+  assign popular_terms = settings.popular_searches | split: ','
+  assign popular_count = 0
+-%}
+
+{%- capture popular_chips -%}
+  {%- for raw_term in popular_terms -%}
+    {%- assign popular_term = raw_term | strip -%}
+    {%- if popular_term == blank -%}
+      {%- continue -%}
+    {%- endif -%}
+    {%- if popular_count >= 5 -%}
+      {%- break -%}
+    {%- endif -%}
+    {%- assign popular_count = popular_count | plus: 1 -%}
+    <li>
+      <a
+        class="search-chip"
+        href="{{ routes.search_url }}?q={{ popular_term | url_encode }}"
+        data-predictive-query="{{ popular_term | escape }}"
+        data-testid="{{ popular_testid }}-chip"
+      >
+        {{- popular_term | escape -}}
+      </a>
+    </li>
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if popular_count > 0 -%}
+  <div class="popular-searches{% if class != blank %} {{ class }}{% endif %}" data-testid="{{ popular_testid }}">
+    <{{ popular_tag }} class="popular-searches__title">{{ 'search.popular_searches' | t }}</{{ popular_tag }}>
+    <ul class="search-chips" role="list">
+      {{- popular_chips -}}
+    </ul>
+  </div>
+{%- endif -%}
