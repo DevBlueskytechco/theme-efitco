@@ -807,13 +807,14 @@ test.describe('ES1-T112 AC5 list-collections', () => {
   });
 
   test('TC-50 AC7 list-collections: ?page= vượt → không trang trắng, empty state + "Go to page 1"', async ({ page, guard }) => {
-    // Bug theme, không nới: CI #286 đỏ đúng chỗ này; ES1-T525 #2 mặc định AC7 áp cho list-collections. Gỡ khi ES1-T562 merge.
-    test.fail(true, 'ES1-T562: templates/list-collections.liquid thiếu nhánh ?page= vượt (BUG-ES1-T112-01)');
+    // ES1-T525 #2: AC7 áp cho list-collections; nhánh ?page= vượt thêm ở ES1-T562 (testid list-collections-page-empty).
     const res = await page.goto(`${LIST}?page=9999`);
     expect(res?.status()).toBe(200);
     await expectNotChallenged(page);
     await expect(page.getByTestId('page-title-heading')).toHaveText('Collections');
-    // AC7 + pagination.md §3: mọi danh sách nhiều trang; template chưa có nhánh này (ES1-T562, drafts/qa/ES1-T112/bugs/)
+    // AC7 + pagination.md §3: mọi danh sách nhiều trang
+    await expect(page.getByTestId('list-collections-page-empty')).toBeVisible();
+    await expect(page.getByTestId('list-collections-grid')).toHaveCount(0);
     const firstPage = page.getByRole('link', { name: 'Go to page 1' });
     await expect(firstPage).toBeVisible();
     await expect(firstPage).toHaveAttribute('href', /\/collections\/?(\?page=1)?$/);

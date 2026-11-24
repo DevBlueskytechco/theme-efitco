@@ -30,6 +30,8 @@ async function open(page: Page, url: string, bandId: string) {
   await scope.getByTestId('featured-product').scrollIntoViewIfNeeded();
   const picker = scope.getByTestId('product-variant-picker');
   test.skip((await picker.count()) === 0, 'Sản phẩm không có nhiều variant');
+  // ES1-T344 (ADR 0010): picker + product-form của featured nạp khi tương tác vùng mua (không theo viewport); picker ẩn tới khi defined.
+  await scope.getByTestId('featured-product-add').hover();
   await expect(picker).toBeVisible();
   return scope;
 }
