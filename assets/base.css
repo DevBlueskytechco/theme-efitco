@@ -5874,12 +5874,7 @@ cart-drawer {
   font-size: var(--font-size-sm);
 }
 
-/* Predictive search: snippets/predictive-search.liquid. Ở đây chỉ phần cần cho lần vẽ đầu khi mở lớp (CTO 23/11, ADR 0014
-   tầng 5): vỏ dialog popup / drawer, thanh ô tìm (logo, form, nút xoá, spinner, nút đóng), guard [hidden], thân cuộn +
-   skeleton, dòng status ẩn. Nội dung kết quả (tab, gợi ý, 0 kết quả, khám phá, bố cục chân): assets/predictive-search.css,
-   BE (ES1-T378) nạp lười từ data-stylesheet của <predictive-search> khi mở lần đầu, giữ skeleton tới khi file tải xong.
-   Chưa nạp file đó thì mọi khối nội dung còn [hidden] (guard dưới), popup không vỡ. Chip popular searches dùng chung
-   với trang search, 404: giữ ở đây. */
+/* Predictive search: vỏ + thanh ô tìm + skeleton (ADR 0014 mục 8); nội dung ở predictive-search.css */
 .predictive-search-dialog {
   --search-gutter: var(--space-5);
   --search-line: var(--color-muted-light);
@@ -5984,7 +5979,6 @@ cart-drawer {
   display: none;
 }
 
-/* Nút "View all" ở chân hiện theo listbox ngay cả khi predictive-search.css chưa tải: Enter / bấm vẫn sang trang kết quả */
 .predictive-search:has(.predictive-search__input:placeholder-shown) :is(.predictive-search__tabs, .predictive-search__all) {
   display: none;
 }
@@ -6031,59 +6025,6 @@ cart-drawer {
   white-space: nowrap;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .search-chip {
-    transition: background-color var(--motion-fast) var(--ease-out), border-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out);
-  }
-}
-
-.popular-searches {
-  display: grid;
-  gap: var(--space-3);
-}
-
-.popular-searches__title {
-  margin: 0;
-  font-family: var(--font-primary--family);
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  line-height: var(--line-height-body);
-}
-
-.search-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.search-chip {
-  display: inline-flex;
-  align-items: center;
-  max-inline-size: 100%;
-  min-block-size: calc(var(--space-1) * 11);
-  padding-inline: var(--space-4);
-  border: 1px solid var(--color-border);
-  border-radius: var(--figma-radius-4);
-  background-color: var(--color-background-alt);
-  color: var(--color-background-alt-foreground);
-  font-size: var(--font-size-sm);
-  font-weight: 500;
-  text-decoration: none;
-  overflow-wrap: anywhere;
-}
-
-.search-chip:hover {
-  border-color: var(--color-foreground);
-}
-
-.search-chip:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
-}
-
 @media (min-width: 48rem) {
   .predictive-search-dialog[data-style='popup'] {
     block-size: auto;
@@ -6102,7 +6043,6 @@ cart-drawer {
 
 @media (min-width: 80rem) {
   .predictive-search-dialog[data-style='popup'] {
-    --search-col: calc((100% - 2 * var(--search-gutter) - 11 * var(--space-5)) / 12);
     --search-main: 9fr;
   }
 
@@ -6143,10 +6083,6 @@ cart-drawer {
   [data-style='popup'] .predictive-search__skeleton-item > .skeleton--media {
     grid-row: auto;
     margin-block-end: var(--space-1);
-  }
-
-  .search-chip {
-    min-block-size: calc(var(--space-1) * 10);
   }
 }
 
