@@ -11,7 +11,7 @@ import { CART_GLOB, themeAdd } from './support/cart-api';
 import { watchShopPay403 } from './support/console-guard';
 import { pageJson, readCartJson, readCartNoScript, requireJson } from './support/product-data';
 import { chooseOptions } from './support/variant-picker';
-import { clickAndLoad, gotoStore, skipIfStoreBlocked, waitStoreCooldown } from './support/store-guard';
+import { clickAndLoad, expectNotChallenged, gotoStore, skipIfStoreBlocked, waitStoreCooldown } from './support/store-guard';
 import { env } from './support/store-data';
 import { fixtureApplied } from './support/home-fixture';
 
@@ -84,6 +84,7 @@ const setEnd = (page: Page, end: number) =>
   beforeModules(page, (v) => { for (const el of document.querySelectorAll('[data-sale-countdown]')) (el as HTMLElement).dataset.end = String(v); }, end);
 
 async function axeSerious(page: Page) {
+  await expectNotChallenged(page);
   const r = await new AxeBuilder({ page }).analyze();
   return r.violations.filter((v) => v.impact === 'serious' || v.impact === 'critical').map((v) => `${v.id}: ${v.nodes.map((n) => n.target.join(' ')).join(', ')}`);
 }
@@ -484,9 +485,9 @@ test.describe('ES1-T159 AC2 featured product', () => {
     });
   });
 
-  // Hợp đồng product-form (ES1-T67 AC8, assets/product-form.js, ES1-T85): lỗi mạng/5xx khi POST /cart/add.js → submit form thường,
+  // Hợp đồng product-form (ES1-T67 AC8, assets/product-form.js, ES1-T85): lỗi mạng/5xx khi POST Cart API add → submit form thường,
   // không giữ khách ở nút kèm thông báo. POST /cart/add thường bị route.fulfill giả: store dev Cloudflare chặn POST thật (CI 45265403257).
-  test('TC-25 AC2 lỗi mạng khi thêm giỏ (route.abort /cart/add.js): rơi về POST form thường đúng biến thể, không pageerror', async ({ page }) => {
+  test('TC-25 AC2 lỗi mạng khi thêm giỏ (route.abort Cart API add): rơi về POST form thường đúng biến thể, không pageerror', async ({ page }) => {
     const errors = watchConsole(page);
     await page.route(CART_GLOB.add, (r) => r.abort());
     await page.route(/\/cart\/add(\?|$)/, (r) => r.fulfill({ contentType: 'text/html', body: '<!doctype html><title>cart add (giả)</title>' }));
