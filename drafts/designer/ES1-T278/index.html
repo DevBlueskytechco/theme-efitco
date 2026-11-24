@@ -15,13 +15,15 @@
   Kích thước khối (width / height) viết px, bội 4, không dùng token khoảng cách (Polaris: space token không dùng cho width / height).
   ES1-T527 (rà soát kit 20/11): component dùng chung lấy từ kit (.collection-card, .option-card, .product-row, .dpanel,
   .meter, .section-link, .badge, .alert, .skeleton, .spinner, .empty-state, .dialog); file này chỉ còn bố cục trang.
+  ES1-T573 (kit 2.1.0): .level-card, .stl__* + .hotspot, .quiz-opt lên kit (màn DS h-level-card, h-stl, h-quiz-opt);
+  aspect-ratio chỉ đọc var(--ratio-*).
 */
 .icon-16 { width: 16px; height: 14px; flex: none; } /* Thiết kế: quang học glyph mũi tên 16 × 14 */
 
 /* ===== 1. Header: kit .site-header, không đổi ===== */
 
 /* ===== 2. Hero: 360 = 3/4, 768 = 4/3 (CTO 10/11) ===== */
-.hero { position: relative; display: grid; aspect-ratio: 3 / 4; overflow: hidden; background: var(--color-background-dark); color: var(--color-background-dark-foreground); }
+.hero { position: relative; display: grid; aspect-ratio: var(--ratio-3-4); overflow: hidden; background: var(--color-background-dark); color: var(--color-background-dark-foreground); }
 /* ES1-T292: ảnh hero hiện ngay (LCP, không reveal); focal point efx-slide-2.jpg = 25% 0% để vùng chữ nằm trên nền trơn (≥ 4.5:1) ở cả 360 và 768 */
 .hero__img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 25% 0%; }
 /* Sổ 10/11: lớp tối 30% (overlay_opacity 30) chỉ dưới 1280 */
@@ -42,22 +44,12 @@
 .cat-row { margin-inline-end: calc(var(--page-margin) * -1); padding-inline-end: var(--page-margin); }
 .cat-row > li { flex-basis: min(70vw, 21rem); }
 
-/* ===== 4. Intro + Shop by level: card 4/3 ở 360, 1/1 ở 768 ===== */
+/* ===== 4. Intro + Shop by level: kit .level-card (4/3 ở 360, 1/1 ở 768; h-level-card) ===== */
 .intro__img { display: inline-block; width: 1.65em; height: 0.94em; margin-inline: 0.04em; vertical-align: -0.1em; border-radius: var(--radius-sm); object-fit: cover; }
 .intro__aside { display: grid; justify-items: start; gap: var(--space-sm); margin-block-start: var(--space-xl); }
 .intro__body { max-width: 34rem; }
 .level { margin-block-start: var(--section-gap); }
 .level-grid { display: grid; gap: var(--grid-gap); margin: 0; padding: 0; list-style: none; }
-.level-card { position: relative; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 4 / 3; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); color: var(--color-background-dark-foreground); text-decoration: none; }
-.level-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; transition: scale var(--motion-slow) var(--ease-out); }
-/* Gradient tối 0 → 85%; dưới 80rem bắt đầu từ 35% để nhãn + tiêu đề + số SP luôn trên nền tối (AA) */
-.level-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 35%, color-mix(in srgb, var(--color-background-dark) 85%, transparent)); }
-.level-card:hover img { scale: 1.04; }
-.level-card__body { position: relative; z-index: 2; display: grid; gap: var(--space-2xs); padding: var(--space-xl) var(--space-xl) var(--space-md); }
-.level-card__label { font-family: var(--font-heading--family); font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
-.level-card__title { color: inherit; font-family: var(--font-heading--family); font-size: var(--font-size-h3); line-height: var(--line-height-h3); font-weight: var(--font-heading--weight); } /* V27 */
-/* V31: dưới 64rem luôn hiện "N products →" (không có hover trên cảm ứng) */
-.level-card__foot { display: flex; align-items: center; justify-content: space-between; min-height: var(--touch-target); margin-block-start: var(--space-xs); border-block-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); font-size: var(--font-size-sm); line-height: var(--line-height-sm); font-weight: 500; }
 
 /* ===== 5. Bestsellers ===== */
 .best .tabs { margin-block-end: var(--space-xl); margin-inline-end: calc(var(--page-margin) * -1); padding-inline-end: var(--page-margin); }
@@ -77,33 +69,9 @@
 .quiz__body { display: grid; gap: var(--space-md); margin-block-start: var(--space-xl); }
 .quiz__map { display: none; }
 .quiz__options { display: grid; gap: var(--space-xs); min-width: 0; margin: 0; padding: 0; border: 0; }
-/* V26: hàng câu trả lời = kit .option-card; trang chỉ thêm cột ảnh 44 */
-.quiz-opt { grid-template-columns: 44px minmax(0, 1fr); align-items: center; column-gap: var(--space-sm); min-height: 72px; }
-.quiz-opt__thumb { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; background: var(--color-background-sand); }
-.quiz-opt__text { display: grid; }
+/* V26: hàng câu trả lời = kit .option-card.quiz-opt (h-quiz-opt, 2.1.0) */
 
-/* ===== 7. Shop the look: ảnh 1/1 ===== */
-.stl__head { display: grid; gap: var(--space-sm); margin-block-end: var(--heading-gap); }
-.stl__head .section-header { margin: 0; }
-.stl__head .section-link { justify-self: start; }
-.stl__media { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); }
-.stl__media img { width: 100%; height: 100%; object-fit: cover; }
-.hotspot { position: absolute; width: var(--touch-target); height: var(--touch-target); margin: calc(var(--touch-target) / -2) 0 0 calc(var(--touch-target) / -2); padding: 0; border: 0; background: none; cursor: pointer; }
-.hotspot::before { content: ''; position: absolute; inset: var(--space-sm); border-radius: 50%; background: var(--color-background); box-shadow: 0 0 0 var(--space-2xs) color-mix(in srgb, var(--color-background) 40%, transparent); }
-.hotspot[aria-pressed='true']::before { inset: var(--space-xs); box-shadow: 0 0 0 var(--space-050) var(--color-foreground), 0 0 0 var(--space-150) color-mix(in srgb, var(--color-background) 60%, transparent); }
-.stl__body { display: grid; gap: var(--space-xl); margin-block-start: var(--space-xl); }
-.stl__fits { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md) var(--space-xl); border-radius: var(--radius-sm); background: var(--color-background-sand); }
-.stl__fits-icon { display: grid; flex: none; place-items: center; width: 52px; height: 52px; border-radius: 50%; background: var(--color-background); }
-.stl__fits-icon svg { width: 28px; height: 28px; }
-.stl__fits b { display: block; font-size: var(--font-size-lg); line-height: var(--line-height-title); }
-.stl__fits span { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
-.stl__rows { display: grid; gap: var(--space-sm); margin: var(--space-sm) 0 0; padding: 0; list-style: none; }
-/* V26/V30: dòng = kit .option-card (đang xem = is-checked) chứa kit .product-row; cả dòng là link */
-.stl-row .product-row__title a { text-decoration: none; }
-.stl-row .product-row__title a::after { content: ''; position: absolute; inset: 0; }
-.stl-row .product-row__title a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
-/* Review vòng 2: viền accent = đang xem (hotspot), không vòng check (tổng tiền tính cả 4 món) */
-.stl-row { padding-inline-end: var(--space-md); }
+/* ===== 7. Shop the look: kit .stl (h-stl, 2.1.0), ảnh 1/1 ===== */
 /* V25: nhãn tiết kiệm 1 dòng (icon + chữ), cột tiền không xuống dòng */
 .dpanel__row--saving > :first-child { white-space: nowrap; }
 /* V30: ô cream bọc thumb = kit .product-row__media (ES1-T527 vòng 3 đưa vào kit) */
@@ -134,7 +102,7 @@
 
 @media (min-width: 48rem) {
   /* Hero 768: tràn mép như 360 (dải rộng --band-inset = 0 ở 768), chữ giữa dọc, mép 20; 2 nút 52 góc dưới phải, không dot */
-  .hero { aspect-ratio: 4 / 3; }
+  .hero { aspect-ratio: var(--ratio-4-3); }
   .hero__content { justify-content: center; gap: var(--space-md); padding-block: var(--space-4xl); }
   .hero__content > * { max-width: 28rem; }
   .hero__dots { display: none; }
@@ -144,8 +112,6 @@
 
   .intro__aside { grid-template-columns: minmax(0, 1fr) auto; align-items: end; column-gap: var(--space-2xl); }
   .level-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .level-card { aspect-ratio: 1; }
-  .level-card__body { padding: var(--space-md); }
 
   .best .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   .best .tabs { margin-inline-end: 0; padding-inline-end: 0; }
@@ -155,13 +121,6 @@
   .quiz__card { padding: var(--space-xl); }
   .quiz__body { grid-template-columns: 152px minmax(0, 1fr); align-items: stretch; }
   .quiz__map { display: block; width: 152px; height: 100%; min-height: 256px; border-radius: var(--radius-card); background: var(--color-background-sand); object-fit: contain; }
-  .quiz-opt { min-height: 80px; }
-
-  .stl__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
-  .stl__head > div { grid-column: 1; }
-  .stl__head .section-link { grid-column: 2; grid-row: 1; }
-  .stl__body { grid-template-columns: minmax(0, 1fr) 280px; align-items: start; gap: var(--space-md); }
-  .stl__summary { position: sticky; inset-block-start: calc(var(--header-height) + var(--space-md)); }
 
   .mf { padding-block: var(--space-5xl); }
   .mf__img--1 { width: 160px; height: 160px; }
@@ -371,6 +330,7 @@
         </div>
         <a class="section-link" href="#">Browse all setups<svg viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></a>
       </div>
+      <div class="stl">
       <div class="stl__media">
         <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-look.jpg?width=1080" alt="Corner home gym with adjustable bench, dumbbells and storage cart" width="1872" height="1632">
         <button class="hotspot" type="button" style="left:85.04%;top:15.3%" aria-pressed="true" aria-label="Show Ativafit Lava 66 lb in the list"></button>
@@ -379,7 +339,7 @@
         <button class="hotspot" type="button" style="left:46.4%;top:58.2%" aria-pressed="false" aria-label="Show Training Mat 12 mm in the list"></button>
       </div>
       <div class="stl__body">
-        <div>
+        <div class="stl__list">
           <div class="stl__fits">
             <span class="stl__fits-icon" aria-hidden="true"><svg><use href="#i-ruler"/></svg></span>
             <p><b>Fits: 2.4×2.0 m</b><span>Folds flat when you're done.</span></p>
@@ -397,6 +357,7 @@
           <p class="dpanel__row dpanel__row--total"><span>Total</span><span>$1,069.18</span></p>
           <button class="button button--full" type="button">Add setup to cart <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></button>
         </div>
+      </div>
       </div>
     </div>
   </section>

@@ -15,7 +15,7 @@
   .board-intro { padding-block: var(--space-2xl) var(--space-xs); }
   .board-intro p { margin-block-start: var(--space-sm); color: var(--color-muted); }
   .demo-block > h2 { font-size: var(--font-size-h2); }
-  .tag-mock { display: inline-block; margin-inline-start: var(--space-2); padding: 0 var(--space-2); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-pill); color: var(--color-muted); font-family: var(--font-primary--family); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: 0; vertical-align: middle; }
+  .tag-mock { display: inline-block; margin-inline-start: var(--space-xs); padding: 0 var(--space-xs); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-pill); color: var(--color-muted); font-family: var(--font-primary--family); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: 0; vertical-align: middle; }
 
   /* ---------- Khung PDP: ≥ 64rem 2 cột (gallery | buy box), dưới 64rem chỉ buy box ---------- */
   .pdp-f { display: grid; gap: var(--space-xl); }
@@ -32,14 +32,14 @@
   .buy { display: grid; gap: var(--space-xl); align-content: start; }
   .buy__head { display: grid; gap: var(--space-sm); }
   .buy__title { margin: 0; } /* = .h1 của kit: Sofia 700, --font-size-h1, lh 1.2 (V36) */
-  .buy__meta { display: grid; gap: var(--space-1); }
+  .buy__meta { display: grid; gap: var(--space-2xs); }
   /* Giá PDP = .price.price--xl của kit (28/36 Inter 600); ES1-T527 vòng 2 bỏ bản giá riêng */
   .buy__note { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .buy__note a { color: inherit; text-decoration: underline; text-underline-offset: 0.2em; }
   .buy__form { display: grid; align-content: start; gap: var(--space-xl); padding-block-start: var(--space-xl); border-block-start: 1px solid var(--color-border); }
 
   /* Shop Pay Installments: Shopify vẽ (shopify-payment-terms); theme chỉ chỉnh chỗ, cỡ, màu chữ. Chừa 1 dòng 14/20 (CLS) */
-  .installments { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-1); min-height: 20px; color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .installments { display: flex; flex-wrap: wrap; align-items: center; gap: 0 var(--space-2xs); min-height: 20px; color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .installments b { color: var(--color-foreground); font-weight: 600; }
   .installments u { color: var(--color-foreground); text-underline-offset: 0.2em; }
 
@@ -58,49 +58,49 @@
   @media (min-width: 48rem) { .assure--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
   /* ---------- §4 Purchase options (selling plan) ---------- */
-  .plans { display: grid; gap: var(--space-2); min-width: 0; margin: 0; padding: 0; border: 0; }
-  .plans legend { margin-block-end: var(--space-3); padding: 0; font-size: var(--font-size-sm); font-weight: 600; line-height: var(--line-height-sm); }
-  .plans__hint { margin-block-end: var(--space-1); color: var(--color-muted); font-size: var(--font-size-sm); }
-  .plan { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: var(--space-2) var(--space-3); min-height: 64px; padding: var(--space-4); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); cursor: pointer; transition: border-color var(--motion-fast) var(--ease-out); }
+  .plans { display: grid; gap: var(--space-xs); min-width: 0; margin: 0; padding: 0; border: 0; }
+  .plans legend { margin-block-end: var(--space-sm); padding: 0; font-size: var(--font-size-sm); font-weight: 600; line-height: var(--line-height-sm); }
+  .plans__hint { margin-block-end: var(--space-2xs); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .plan { display: grid; grid-template-columns: 20px minmax(0, 1fr) auto; align-items: center; gap: var(--space-xs) var(--space-sm); min-height: 64px; padding: var(--space-md); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); cursor: pointer; transition: border-color var(--motion-fast) var(--ease-out); }
   .plan:hover { border-color: var(--color-foreground); }
-  .plan:has(> input:checked) { padding: calc(var(--space-4) - 1px); border: 2px solid var(--color-foreground); }
+  .plan:has(> input:checked) { padding: calc(var(--space-md) - 1px); border: 2px solid var(--color-foreground); }
   .plan:has(> input:focus-visible) { outline: 2px solid var(--color-accent); outline-offset: 2px; }
   .plan > input { width: 20px; height: 20px; margin: 0; accent-color: var(--color-accent); }
-  .plan__name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); font-size: var(--font-size-base); font-weight: 600; line-height: var(--line-height-body); }
+  .plan__name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs); font-size: var(--font-size-base); font-weight: 600; line-height: var(--line-height-body); }
   .plan__price { display: grid; justify-items: end; font-size: var(--font-size-base); font-weight: 600; line-height: var(--line-height-body); text-align: end; font-variant-numeric: tabular-nums; }
   .plan__price--sale { color: var(--color-sale); }
   .plan__price s { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
   .plan__price small { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
-  .plan__body { grid-column: 2 / -1; display: grid; gap: var(--space-3); padding-block-start: var(--space-1); }
+  .plan__body { grid-column: 2 / -1; display: grid; gap: var(--space-sm); padding-block-start: var(--space-2xs); }
   .plan__body p { color: var(--color-muted); font-size: var(--font-size-sm); }
   @media (max-width: 47.99rem) { .plan__body { grid-column: 1 / -1; } } /* 360: select rộng 288 thay 256 */
   .policy-link { justify-self: start; display: inline-flex; align-items: center; min-height: var(--touch-target); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
-  .plans--compact .plan { min-height: 56px; padding: var(--space-3); }
-  .plans--compact .plan:has(> input:checked) { padding: calc(var(--space-3) - 1px); }
+  .plans--compact .plan { min-height: 56px; padding: var(--space-sm); }
+  .plans--compact .plan:has(> input:checked) { padding: calc(var(--space-sm) - 1px); }
   .sk-inline { display: inline-block; width: 64px; height: 20px; border-radius: var(--radius-xs); background: linear-gradient(90deg, var(--color-background-alt) 0 25%, var(--color-background) 50%, var(--color-background-alt) 75%) 0 0 / 300% 100%; animation: kit-shimmer 1.4s linear infinite; }
 
   /* ---------- §5 Volume pricing (.table-wrap + .data-table, hàng hiện tại .data-table__row--current; V46) + quy tắc số lượng ---------- */
   .vol-table { font-variant-numeric: tabular-nums; }
-  .show-all { display: inline-flex; align-items: center; min-height: var(--touch-target); margin-block-start: var(--space-1); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; list-style: none; }
+  .show-all { display: inline-flex; align-items: center; min-height: var(--touch-target); margin-block-start: var(--space-2xs); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; list-style: none; }
   .show-all::-webkit-details-marker { display: none; }
-  .rule { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: var(--space-2); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .rule { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: var(--space-xs); color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .rule svg { flex: none; width: var(--icon-size-sm); height: var(--icon-size-sm); margin-block-start: var(--space-050); }
   .rule--error { color: var(--color-sale); font-weight: 500; }
   .rule a { color: var(--color-foreground); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; }
-  .vol-details summary { display: flex; align-items: center; gap: var(--space-2); min-height: var(--touch-target); font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; list-style: none; }
+  .vol-details summary { display: flex; align-items: center; gap: var(--space-xs); min-height: var(--touch-target); font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; list-style: none; }
   .vol-details summary::-webkit-details-marker { display: none; }
   .vol-details summary svg { width: 12px; height: 7px; transition: rotate var(--motion-base) var(--ease-out); }
   .vol-details[open] summary svg { rotate: 180deg; }
 
   /* ---------- §6 Gift card ---------- */
-  .gift { display: grid; gap: var(--space-4); }
+  .gift { display: grid; gap: var(--space-md); }
   .gift .choice { font-weight: 500; }
-  .gift__fields { display: grid; gap: var(--space-5); min-width: 0; margin: 0; padding: 0 0 0 var(--space-4); border: 0; border-inline-start: 2px solid var(--color-border); }
+  .gift__fields { display: grid; gap: var(--space-xl); min-width: 0; margin: 0; padding: 0 0 0 var(--space-md); border: 0; border-inline-start: 2px solid var(--color-border); }
   .gift__fields .field__label span { color: var(--color-muted); font-weight: 400; }
-  @media (min-width: 48rem) { .gift__half { max-width: calc(50% - var(--space-2)); } }
+  @media (min-width: 48rem) { .gift__half { max-width: calc(50% - var(--space-xs)); } }
 
   /* ---------- §7 Pickup ---------- */
-  .pickup { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--space-1) var(--space-3); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .pickup { display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: var(--space-2xs) var(--space-sm); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .pk-icon { display: grid; place-items: center; width: var(--icon-size-md); height: var(--icon-size-md); border-radius: 50%; background: var(--color-badge-new); color: var(--color-badge-new-foreground); }
   .pk-icon svg { width: 12px; height: 12px; }
   .pk-icon--no { border: 1.5px solid var(--color-muted-light); background: var(--color-background); color: var(--color-muted-light); }
@@ -110,14 +110,14 @@
   .pickup__open { justify-self: start; display: inline-flex; align-items: center; min-height: var(--touch-target); padding: 0; border: 0; background: none; color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
   .pickup__open:hover { color: var(--color-accent); }
   .stores { margin: 0; padding: 0; list-style: none; }
-  .stores li { display: grid; gap: var(--space-1); padding-block: var(--space-4); border-block-end: 1px solid var(--color-border); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .stores li { display: grid; gap: var(--space-2xs); padding-block: var(--space-md); border-block-end: 1px solid var(--color-border); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .stores h3 { font-family: var(--font-primary--family); font-size: var(--font-size-base); font-weight: 600; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-body); }
-  .stores__status { display: flex; align-items: center; gap: var(--space-2); font-weight: 500; }
+  .stores__status { display: flex; align-items: center; gap: var(--space-xs); font-weight: 500; }
   .stores__status .pk-icon { width: 16px; height: 16px; margin: 0; }
   .stores__status .pk-icon svg { width: 10px; height: 10px; }
   .stores address { color: var(--color-muted); font-style: normal; }
   .stores a { justify-self: start; display: inline-flex; align-items: center; min-height: var(--touch-target); font-weight: 500; text-underline-offset: 0.2em; }
-  .pk-product { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-3); padding-block-end: var(--space-2); border-block-end: 1px solid var(--color-border); }
+  .pk-product { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-sm); padding-block-end: var(--space-xs); border-block-end: 1px solid var(--color-border); }
   .pk-product img { width: 64px; height: 64px; border-radius: var(--radius-sm); background: var(--color-background-cream); object-fit: contain; mix-blend-mode: darken; }
   .pk-product p { font-weight: 600; }
   .pk-product span { display: block; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
@@ -125,7 +125,7 @@
   .only-md { display: none !important; }
   @media (min-width: 48rem) { .only-sm { display: none !important; } .only-md { display: flex !important; } }
   .stage-pickup { min-height: 640px; }
-  .stage-pickup > .dialog { padding-block-start: var(--space-6); }
+  .stage-pickup > .dialog { padding-block-start: var(--space-2xl); }
 
   /* ---------- Lưới trạng thái ---------- */
   .states { display: grid; gap: var(--space-xl); margin-block-start: var(--space-2xl); }
@@ -134,15 +134,15 @@
   .state { display: grid; align-content: start; gap: var(--space-md); padding: var(--space-xl); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
   .state > .demo-label { margin: 0; }
   .states > *, .state > * { min-width: 0; }
-  .hidden-list { margin: 0; padding-inline-start: var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
-  .hidden-list li + li { margin-block-start: var(--space-1); }
+  .hidden-list { margin: 0; padding-inline-start: var(--space-xl); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .hidden-list li + li { margin-block-start: var(--space-2xs); }
 
   /* ---------- §9 Card ---------- */
   .card-variant { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .product-card .price__unit { margin-block-start: calc(var(--space-2xs) * -1); }
   .product-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   @media (min-width: 64rem) { .product-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  .card-note { margin-block-start: var(--space-2); color: var(--color-muted); font-size: var(--font-size-xs); }
+  .card-note { margin-block-start: var(--space-xs); color: var(--color-muted); font-size: var(--font-size-xs); }
 
   /* ---------- QV ---------- */
   .stage-qv { min-height: 760px; }
@@ -164,28 +164,28 @@
   .cart-f { display: grid; gap: var(--space-2xl); }
   @media (min-width: 64rem) { .cart-f { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); column-gap: var(--space-3xl); align-items: start; } }
   .cl-list { margin: 0; padding: 0; list-style: none; border-block-start: 1px solid var(--color-border); }
-  .cl { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--space-3); padding-block: var(--space-4); border-block-end: 1px solid var(--color-border); }
+  .cl { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--space-sm); padding-block: var(--space-md); border-block-end: 1px solid var(--color-border); }
   .cl__img { width: 72px; height: 72px; border-radius: var(--radius-card); background: var(--color-background-cream); object-fit: contain; mix-blend-mode: darken; }
-  .cl__info { display: grid; gap: var(--space-1); min-width: 0; font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+  .cl__info { display: grid; gap: var(--space-2xs); min-width: 0; font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .cl__title { font-size: var(--font-size-base); font-weight: 500; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-body); }
   .cl__title a { text-decoration: none; }
   .cl__meta { color: var(--color-muted); }
   .cl__meta b { color: var(--color-foreground); font-weight: 500; }
-  .cl__line { display: flex; align-items: flex-start; gap: var(--space-2); color: var(--color-muted); }
+  .cl__line { display: flex; align-items: flex-start; gap: var(--space-xs); color: var(--color-muted); }
   .cl__line svg { flex: none; width: var(--icon-size-sm); height: var(--icon-size-sm); margin-block-start: var(--space-050); }
   .cl__line--tag svg { color: var(--color-badge-new); }
   .cl__msg { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 1; color: var(--color-muted); }
-  .cl__price { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); font-size: var(--font-size-base); font-weight: 500; }
+  .cl__price { display: flex; flex-wrap: wrap; gap: 0 var(--space-xs); font-size: var(--font-size-base); font-weight: 500; }
   .cl__price .sale { color: var(--color-sale); }
   .cl__price s { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
-  .cl__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-block-start: var(--space-2); }
+  .cl__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-xs); margin-block-start: var(--space-xs); }
   .cl__total { font-size: var(--font-size-base); font-weight: 600; }
-  .cl .rule { margin-block-start: var(--space-1); }
+  .cl .rule { margin-block-start: var(--space-2xs); }
   @media (min-width: 48rem) {
-    .cl { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-4); }
+    .cl { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-md); }
     .cl__img { width: 96px; height: 96px; }
   }
-  .cart-aside { display: grid; gap: var(--space-4); align-content: start; }
+  .cart-aside { display: grid; gap: var(--space-md); align-content: start; }
   .cart-aside .installments { justify-content: center; text-align: center; }
   @media (min-width: 80rem) { .cart-aside .dpanel { padding: var(--space-3xl); } }
   .stage-mc { min-height: 720px; }
@@ -304,7 +304,7 @@
               </span>
             </label>
           </fieldset>
-          <a class="policy-link" href="#" style="margin-block-start: calc(var(--space-4) * -1)">Read the subscription policy</a>
+          <a class="policy-link" href="#" style="margin-block-start: calc(var(--space-md) * -1)">Read the subscription policy</a>
           <div class="buy__purchase">
             <label class="field__label qty-label" for="f2-qty">Quantity</label>
             <div class="quantity"><button class="quantity__button" type="button" disabled aria-label="Decrease quantity for Resistance Band Set"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" id="f2-qty" type="number" value="1" min="1"><button class="quantity__button" type="button" aria-label="Increase quantity for Resistance Band Set"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
@@ -441,7 +441,7 @@
           <p class="pickup__status">Pickup currently unavailable at <b>Efitco Saigon Centre</b></p>
           <button class="pickup__open" type="button" aria-haspopup="dialog" style="grid-column:2">Check availability at other stores</button>
         </div>
-        <p class="demo-label" style="margin-block-start: var(--space-3)">P1 · 1 địa điểm</p>
+        <p class="demo-label" style="margin-block-start: var(--space-sm)">P1 · 1 địa điểm</p>
         <div class="pickup">
           <span class="pk-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
           <p class="pickup__status">Pickup available at <b>Efitco Saigon Centre</b></p>
@@ -452,7 +452,7 @@
       </div>
     </div>
 
-    <p class="demo-label" style="margin-block-start: var(--space-6)">Dialog danh sách cửa hàng</p>
+    <p class="demo-label" style="margin-block-start: var(--space-2xl)">Dialog danh sách cửa hàng</p>
     <div class="demo-stage stage-pickup">
       <div class="scrim"></div>
       <section class="drawer drawer--end drawer--wide only-md" aria-labelledby="pk-title-md" style="flex-direction: column">
@@ -468,7 +468,7 @@
       </section>
       <section class="dialog only-sm" aria-labelledby="pk-title-sm" style="display:block">
         <button class="close-button dialog__close" type="button" aria-label="Close pickup availability"><svg><use href="#i-close"/></svg></button>
-        <h2 class="overlay__title" id="pk-title-sm" style="padding-inline-end: 56px; margin-block-end: var(--space-4)">Pickup availability</h2>
+        <h2 class="overlay__title" id="pk-title-sm" style="padding-inline-end: 56px; margin-block-end: var(--space-md)">Pickup availability</h2>
         <div class="pk-product"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-prod-P02.jpg" alt="" width="64" height="64"><p>Iron Core Kettlebell 16 kg<span>Black</span></p></div>
         <ul class="stores">
           <li><h3>Efitco Saigon Centre</h3><p class="stores__status"><span class="pk-icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>Pickup available, usually ready in 24 hours</p><address>65 Le Loi, Ben Nghe Ward<br>District 1, Ho Chi Minh City<br>Vietnam</address><a href="#">Call Efitco Saigon Centre</a></li>
@@ -584,7 +584,7 @@
             <li><svg aria-hidden="true"><use href="#i-shield"/></svg>1 year warranty</li>
             <li><svg aria-hidden="true"><use href="#i-return"/></svg><a href="#">90 day money back</a></li>
           </ul>
-          <div class="state" style="padding: var(--space-4)">
+          <div class="state" style="padding: var(--space-md)">
             <p class="demo-label">Ẩn so với sản phẩm cần ship</p>
             <ul class="hidden-list"><li>"Shipping calculated at checkout." (giữ câu thuế)</li><li>Khối pickup (P0)</li><li>Mục "Fast shipping" trong hàng cam kết (còn 2 cột)</li></ul>
           </div>
@@ -656,7 +656,7 @@
               <label class="plan"><input type="radio" name="qv-plan" checked><span class="plan__name">One-time purchase</span><span class="plan__price">$45.00</span></label>
               <label class="plan"><input type="radio" name="qv-plan"><span class="plan__name">Subscribe and save <span class="badge badge--sale">Save 10%</span></span><span class="plan__price"><small>from</small> $40.50</span></label>
             </fieldset>
-            <a class="policy-link" href="#" style="margin-block-start: calc(var(--space-2) * -1)">Read the subscription policy</a>
+            <a class="policy-link" href="#" style="margin-block-start: calc(var(--space-xs) * -1)">Read the subscription policy</a>
             <div class="buy__purchase">
               <label class="field__label qty-label" for="qv-qty">Quantity</label>
               <div class="quantity"><button class="quantity__button" type="button" disabled aria-label="Decrease quantity for Resistance Band Set"><svg aria-hidden="true"><use href="#i-minus"/></svg></button><input class="quantity__input" id="qv-qty" type="number" value="1" min="1"><button class="quantity__button" type="button" aria-label="Increase quantity for Resistance Band Set"><svg aria-hidden="true"><use href="#i-plus"/></svg></button></div>
@@ -756,7 +756,7 @@
       </div>
     </div>
 
-    <p class="demo-label" style="margin-block-start: var(--space-6)">Mini cart · dòng B2B lỗi số lượng</p>
+    <p class="demo-label" style="margin-block-start: var(--space-2xl)">Mini cart · dòng B2B lỗi số lượng</p>
     <div class="demo-stage stage-mc">
       <div class="scrim"></div>
       <section class="drawer drawer--end drawer--wide" aria-labelledby="mc-title">
