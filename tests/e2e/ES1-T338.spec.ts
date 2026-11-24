@@ -98,7 +98,9 @@ test.describe('ES1-T338 tĩnh', () => {
     test.skip(ti.project.name !== 'desktop', 'static, chạy 1 lần ở desktop');
     expect(scripts('blocks/featured-collection.liquid')).toEqual([LAZY]);
     expect(scripts('blocks/collection-products.liquid')).toEqual([]);
-    expect(scripts('blocks/quiz.liquid').sort()).toEqual([LAZY, QUIZ_DIALOG].sort());
+    // ES1-T344 (ADR 0010): quiz-dialog.js nạp lười qua data-lazy-module trên form, không còn thẻ script riêng.
+    expect(scripts('blocks/quiz.liquid')).toEqual([LAZY]);
+    expect(read('blocks/quiz.liquid')).not.toContain(QUIZ_DIALOG);
   });
 
   test('featured-collection không còn biến chỉ dùng cho thẻ script đã gỡ', ({}, ti) => {
