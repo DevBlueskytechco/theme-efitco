@@ -24,7 +24,7 @@ Bug đã biết chạy `test.fail(true, '<ticket bug>')`: bug sửa xong test b�
 | TC-04 | AC1 | 1280, band 4 mục và 6 mục | Đo card | 3 card đầu nằm trọn trong 1280; card 4 lộ ≥ 25% bề rộng card và không trọn | E2E | P1 |
 | TC-05 | AC1 | Band 1 mục (hàng vừa khung), 4 mốc, có JS | Chờ `data-enhanced` | Gốc `testimonials` có `data-static`; nút prev/next không hiện, không vào thứ tự Tab; `carousel-progress` không hiện | E2E | P1 |
 | TC-06 | AC1 | Band 4 mục, 6 mục | Đọc từng mục | Mỗi mục có quote hoặc tên; sao `role="img"` 5 svg `aria-hidden`; số sao đầy 0 (`te7-six-1`), 4 (`te7-figma-2`), 5 (`te7-figma-1`); ảnh tuỳ chọn: `te7-six-2` không `testimonial-image`, `te7-figma-1` có | E2E | P2 |
-| TC-07 | AC1 | Pixel 7 (cảm ứng), có JS | Vuốt ngang trên hàng (CDP `Input.synthesizeScrollGesture` touch) | `scrollLeft` > 0; nút không hiện; thanh tiến trình hiện | E2E | P1 |
+| TC-07 | AC1 | Pixel 7 (cảm ứng), có JS | Vuốt ngang 220 px trên hàng (CDP `Input.dispatchTouchEvent`: touchStart, 10 touchMove, touchEnd; điểm chạm phải nằm trong hàng) | `scrollLeft` > 0; nút không hiện; thanh tiến trình hiện | E2E | P1 |
 | TC-08 | AC2 | `/?view=te7`, FAQ 1, 3, 5, 10 câu | Render | Đúng 1 / 3 / 5 / 10 `faq-item`; mỗi mục là `<details>`, câu hỏi là `<summary>` chứa `<h3>`; câu không có trả lời không có `faq-answer` | E2E | P1 |
 | TC-09 | AC2 | 360, 1280, có JS | Tab tới câu 3 (Tab thật từ phần tử trước), Enter, Enter, Space, Space | Câu hỏi nhận focus, `:focus-visible`, outline ≠ none, dày > 0; Enter mở, Enter đóng, Space mở, Space đóng | E2E/a11y | P1 |
 | TC-10 | AC2 | Có JS | Đọc cây accessibility Chromium (CDP) trước và sau khi mở câu 2 | Câu 1 `expanded=true`, câu 2 `false`; sau khi mở câu 2: câu 1 `false`, câu 2 `true`; tên nút là chữ câu hỏi | a11y | P1 |

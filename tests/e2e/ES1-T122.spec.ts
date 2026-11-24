@@ -1030,8 +1030,20 @@ test.describe('ES1-T122 Pixel 7', () => {
     await expect(tid(scope, 'carousel-progress')).toBeVisible();
     const list = tid(scope, 'testimonials-list');
     const b = await viewBox(list);
+    const start = { x: Math.round(b.x + b.width * 0.7), y: Math.round(b.y + Math.min(b.height / 2, 200)) };
+    // Điểm chạm phải nằm trong hàng (không bị header, lớp phủ che): vuốt trượt chỗ khác thì báo rõ, không thành scrollLeft 0 khó hiểu.
+    expect(await list.evaluate((el, p) => el.contains(document.elementFromPoint(p.x, p.y)), start), 'điểm chạm nằm trong hàng review').toBe(true);
+    // Vuốt bằng chuỗi touchStart → 10 touchMove (22 px/bước, 220 px) → touchEnd qua Input.dispatchTouchEvent (đường Playwright touchscreen dùng).
+    // Không dùng Input.synthesizeScrollGesture: CI Linux (run 45265394543) gửi xong gesture mà khung hình không đổi, scrollLeft 0;
+    // cùng DOM + CSS + JS lấy từ trace run đó chạy lại Pixel 7 thì cả 2 cách đều cuộn 332 → lỗi ở cách bơm gesture, không ở theme.
     const cdp = await page.context().newCDPSession(page);
-    await cdp.send('Input.synthesizeScrollGesture', { x: Math.round(b.x + b.width * 0.7), y: Math.round(b.y + Math.min(b.height / 2, 200)), xDistance: -220, yDistance: 0, gestureSourceType: 'touch', speed: 1200 });
+    const at = (x: number) => [{ x, y: start.y, id: 1 }];
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: at(start.x) });
+    for (let i = 1; i <= 10; i++) {
+      await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: at(start.x - i * 22) });
+      await page.waitForTimeout(16);
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await cdp.detach();
     await expect.poll(() => list.evaluate((el) => Math.abs(el.scrollLeft)), { message: 'vuốt cuộn hàng' }).toBeGreaterThan(0);
   });
