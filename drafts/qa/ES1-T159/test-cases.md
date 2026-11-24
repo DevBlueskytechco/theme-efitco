@@ -56,7 +56,7 @@ Không viết trùng spec dev: ES1-T156 (markup featured), ES1-T157 (markup vide
 | TC-46 | AC2 | JS tắt, ≥ 2 media | bấm thumbnail 2 | URL có hash `#FeaturedMedia-…`, phần tử đích có | nojs | P2 |
 | TC-47 | AC2 | JS tắt | bấm Add to cart (`clickAndLoad`: Cloudflare thử thách thì skip có lý do, ES1-T300) | form chứa nút mua method POST, action /cart/add; 0 `select[name=id]`; tới /cart; giỏ có variant hiện tại | nojs | P1 |
 | TC-48 | AC3, AC4 | JS tắt | render, bấm link sản phẩm thẻ 6 | poster YouTube → youtube.com/watch, Vimeo → vimeo.com/{id}, Shopify → product url; 0 video/iframe; link sản phẩm điều hướng | nojs | P1 |
-| TC-49 | AC2, AC3 | JS bật, chặn lần lượt featured-product / video-carousel / product-form / product-variant-picker / sale-countdown .js | tải STATES rồi TE13 (2 lần mở trang) | form chứa nút mua method POST; poster vẫn href; chặn video-carousel thì bấm poster đi theo link; chặn sale-countdown: ghi trạng thái khung band A ngay ở STATES (ES1-T608); 0 pageerror | E2E | P2 |
+| TC-49 | AC2, AC3 | JS bật, chặn cùng lúc featured-product / video-carousel / product-form / product-variant-picker / sale-countdown .js (5 module không import nhau, fallback độc lập) | 2 test, mỗi test mở 1 trang: STATES, TE13 | STATES: form chứa nút mua method POST, featured-product + sale-countdown đã bị gọi và chặn, ghi trạng thái khung countdown band A (ES1-T608); TE13: form POST, video-carousel đã bị chặn, poster vẫn href, bấm poster đi theo link; 0 pageerror cả 2 | E2E | P2 |
 | TC-50 | AC2 | chặn product-form.js | bấm Add to cart (`clickAndLoad`) | form POST tới /cart, giỏ có variant; Cloudflare thử thách POST thì skip có lý do (ES1-T300) | E2E | P1 |
 | TC-51 | AC2, AC3 | /?view=te13, embed bị chặn | tải; cuộn tới carousel | axe 0 serious/critical cả 2 lúc; 0 console error (bỏ qua script nền tảng Shopify) | a11y | P1 |
 
@@ -100,6 +100,14 @@ Offset dùng để tính `data-end` từ setting `countdown_end` (YYYY-MM-DD HH:
 | TC-47, TC-49 | `filter({ has: scope.getByTestId(…) })`: locator con bắt đầu từ `container-…` nên không khớp bên trong form | lỗi code spec | `form:has([data-testid=featured-product-add])` |
 | TC-50 | POST /cart/add thật bị Cloudflare thử thách, `waitForURL` treo 30 s thay vì báo chặn | môi trường + spec | `clickAndLoad` → skipIfStoreBlocked nhận lỗi Cloudflare |
 Không có bug theme thật, không vượt ngân sách JS thật trong lượt này: không tạo ticket bug.
+
+## Phân loại lỗi CI 45330318088 (sửa spec 24/11, lượt 2)
+| TC | Nguyên nhân | Loại | Sửa |
+| --- | --- | --- | --- |
+| TC-49 | 5 test × 2 lần mở trang (10 lần mỗi project) dồn dập → `/?view=te13` cf-mitigated 429 (desktop 4/5, mobile 5/5) | môi trường + spec | chặn 5 module cùng lúc, 2 test × 1 lần mở trang; thêm kiểm module đã thật sự bị gọi và chặn |
+| TC-32 | không phải Cloudflare: chữ lỗi in `card_title` = alt video ("Media đủ loại"), spec lấy tên sản phẩm ("Sale giá nhỏ") | lỗi code spec | title lấy từ `data-label-error` (Liquid), đối chiếu tên nút play cùng thẻ; chữ ẩn sau lỗi = locale `error_product` với title đó |
+| TC-08 | lượt 2 đạt; bản chất cần 2 lần tải | môi trường | giữ 2 lần `gotoStore`; trước lần 2 gọi `waitStoreCooldown` (chỉ chờ khi shard đã bị 429/thử thách) |
+Số lần mở trang mỗi project (đường chính, không tính retry, nhánh thẻ giả TC-39, tải lại trong themeAdd): 65 → 57 (TC-49 10 → 2; TC-08 2, TC-32 1 giữ nguyên).
 
 ## KHÔNG CHẮC
 - Xem dòng đầu file. Câu hỏi mở: ES1-T608 (AC-H22 trên `/`, countdown khi module lỗi), ES1-T600 (countdown 1 band khi đổi biến thể, TC-13 fixme).
