@@ -12,7 +12,12 @@
   Text from the t filter may already be escaped, so it goes through escape_once.
   The title comes from the setting, then from the collection: it has no sample text,
   because a sample title would label the merchant's collection with the wrong name.
-  The product count has no sample value either: it is always products_count.
+  The product count has no sample value either: it is always products_count, with
+  the locale's singular and plural (AC-H10). An empty collection keeps the card and
+  drops the count row (index-mobile-a.md §4).
+  The "N Products →" row always shows below 80rem (touch screens have no hover).
+  From 80rem on a pointer that can hover, it shows on hover or keyboard focus of the
+  card, and its text stays in the link name while hidden (index-1280.md §2.3).
   The image comes from the setting, then from the collection, and is decorative
   because the title already names the link. Without any image the card keeps its
   dark frame, so the white text stays readable.
@@ -68,12 +73,14 @@
           <p class="level-card__label" data-testid="level-card-label">{{ card_label | escape_once }}</p>
         {%- endif -%}
         <h3 class="level-card__title" data-testid="level-card-title">{{ card_title | escape }}</h3>
-        <div class="level-card__products">
-          <span data-testid="level-card-count">
-            {{- 'blocks.level_card.products_count' | t: count: card_collection.products_count -}}
-          </span>
-          {%- render 'slideshow-icon', name: 'arrow' -%}
-        </div>
+        {%- if card_collection.products_count > 0 -%}
+          <div class="level-card__products">
+            <span data-testid="level-card-count">
+              {{- 'blocks.level_card.products_count' | t: count: card_collection.products_count -}}
+            </span>
+            {%- render 'slideshow-icon', name: 'arrow' -%}
+          </div>
+        {%- endif -%}
       </div>
     </a>
   </li>

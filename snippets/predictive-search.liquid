@@ -1,16 +1,19 @@
 {% doc %}
   Renders the search layer of the header (docs/ui-spec/predictive-search.md
-  §1–§3, §11). The caller places it right after the header-search-link anchor:
-  the anchor's nextElementSibling is <modal-dialog data-layer="search">, whose
-  first child is the <dialog>. assets/modal-dialog.js (ADR 0007) opens it with
-  showModal(), closes it on Esc or a backdrop click and returns focus to the
-  anchor. Without JavaScript the dialog stays closed and the anchor goes to the
-  search page. Inside the dialog the form is a plain GET to the search page,
-  so search works if assets/predictive-search.js fails to load.
+  §1–§8, §11; SRS TE-8 AC1, AC4, AC9–AC14). The caller places it right after
+  the header-search-link anchor: the anchor's nextElementSibling is
+  <modal-dialog data-layer="search">, whose first child is the <dialog>.
+  assets/modal-dialog.js (ADR 0007) opens it with showModal(), closes it on Esc
+  or a backdrop click and returns focus to the anchor. Without JavaScript the
+  dialog stays closed and the anchor goes to the search page. Inside the
+  dialog the form is a plain GET to the search page, so search works if
+  assets/predictive-search.js fails to load.
 
   The dialog is a .drawer (position, backdrop, shared open/close motion in
   assets/base.css); popup sets --drawer-from to a vertical offset so it slides
-  down. CSS never sets display on the listbox or groups, so [hidden] works.
+  down. CSS never sets display on the groups; every element below that has a
+  display of its own is listed in the [hidden] guard of assets/base.css, so
+  [hidden] always hides.
 
   Two styles, one markup (data-style on the dialog):
   - popup: top band. The first row is the dark 80px bar of the header: logo
@@ -18,41 +21,129 @@
   - drawer: .drawer from the inline end, 90% / 420 / 480. Visible "Search" h2
     and close button, then the field on a light background.
 
+  Rows, top to bottom: bar (form) · tablist · body (tabpanel, the only part
+  that scrolls) · footer (status + "View all"). Inside the body, in DOM order:
+  min-chars hint, skeleton, 0 results notice, error alert, listbox, discover.
+
   The clear button is a reset button: it empties the field without
   JavaScript and CSS hides it while the placeholder shows (field empty).
 
   Option elements are the <a role="option"> themselves, never wrapped in a list
   item: an option that contains a link fails axe nested-interactive. Group
   titles are plain <div>: a heading inside a listbox fails axe
-  aria-required-children.
+  aria-required-children. Tabs, discover, notices and the footer link sit
+  outside the listbox (§8, §10).
 
-  Hooks for assets/predictive-search.js (ES1-T130):
+  CSS in two files (ADR 0014 tier 5, CTO 23/11): assets/base.css holds what the
+  first paint of the open layer needs (dialog shell, bar with the form, [hidden]
+  guard, scrolling body, skeleton, hidden status line). Everything else (tabs,
+  hint, notices, listbox, discover, footer) is in assets/predictive-search.css,
+  loaded lazily by BE (see data-stylesheet below). Until it loads every content
+  block stays [hidden], so the layer shows the bar and an empty or skeleton body.
+
+  States without JavaScript logic (CSS only, assets/predictive-search.css):
+  - Field empty (:placeholder-shown): discover shows even while [hidden],
+    footer and tablist never show.
+  - Listbox not [hidden]: the footer link shows even while [hidden].
+  Everything else is a [hidden] toggle owned by BE.
+
+  Hooks for assets/predictive-search.js (ES1-T130, TE-8-R2-BE1, TE-8-R2-BE3):
+  - <predictive-search> data-stylesheet: URL of assets/predictive-search.css
+    (ES1-T377, CTO 23/11). On the first open (predictive-search.js connects,
+    search-loader.js has no room for hover / focus) BE appends one
+    <link rel="stylesheet"> to <head> (no preload, none if a link with that
+    href is already there), keeps the
+    skeleton (data-predictive-skeleton) shown until its load event (on error
+    show results anyway), then shows results / discover. Same contract as
+    data-stylesheet on <quick-view> (ES1-T373).
   - <predictive-search>: data-url, data-money-format, data-label-count (%n is
-    the number), data-label-empty and data-label-all (%s is the search terms).
-  - data-predictive-group: products, collections, pages, articles; hidden until
-    filled. data-predictive-options: where cloned options go.
-  - data-predictive-template: product, link. Inside the clones:
-    data-predictive-image, data-predictive-title, data-predictive-price.
+    the number), data-label-empty, data-label-all, data-label-products (%s is
+    the search terms), data-label-shop-all + data-shop-all-url (footer link at
+    0 results), data-label-loading, data-label-sale-price,
+    data-label-regular-price.
+  - Tablist data-testid="predictive-search-tabs" ([hidden] until results):
+    buttons with data-predictive-tab = all, products, collections, articles,
+    pages (queries has no tab: suggestions show in All only). Every tab but
+    All is [hidden] until its group has results. aria-selected + roving
+    tabindex on the buttons; the count goes in [data-predictive-count] ("8+"
+    at the limit). The body is the tabpanel (id PredictiveSearchPanel): BE
+    sets its aria-labelledby to the selected tab, and data-tab="<key>" on
+    <predictive-search> (no attribute = all). CSS reads data-tab: products
+    shows the product group as a card grid 2 / 4 / 5 columns; all shows
+    4 cards from 80rem in the popup, rows below.
+  - Link template: the icon slot holds a grid icon (collections) and a page
+    icon (pages, articles without image); CSS shows the one for the group.
+    data-predictive-image there is the 64 × 48 article image; remove it when
+    there is no image (CSS hides it in the collections group).
+  - data-predictive-group: queries, products, collections, articles, pages;
+    hidden until filled. data-predictive-options: where cloned options go.
+  - data-predictive-template: query, product, link. Inside the clones:
+    data-predictive-image, data-predictive-title, data-predictive-price,
+    data-predictive-meta (collection count, article date; remove when empty).
+    query: put the typed part in <mark> inside data-predictive-title (shown
+    400, the rest 600). product: data-predictive-price-label (swap to
+    data-label-sale-price on sale), data-predictive-compare-group +
+    data-predictive-compare (compare-at price), data-predictive-badge
+    (-N%, .product-card__badge data-badge="sale"), data-predictive-sold-out;
+    on the option set data-on-sale and data-unavailable (image 0.6).
+  - data-predictive-hint (#PredictiveSearchHint): show at 1 character and set
+    aria-describedby="PredictiveSearchHint" on the input; remove both at 0 or 2+.
+  - data-predictive-spinner in the form: show while a request is pending (CSS
+    then hides the clear button). data-predictive-skeleton: first load only.
+  - data-predictive-empty (predictive-search-empty): 0 results; fill every
+    [data-predictive-terms] with the terms (textContent).
+  - data-predictive-error: wraps the predictive-search-error alert; the
+    button has data-retry (predictive-search-error-button).
+  - data-predictive-discover: recent, popular searches, popular collections,
+    trending. Show it at 1 character and with 0 results; hide it otherwise.
+    data-predictive-no-products: line above Trending when products are 0.
+    Chips carry data-predictive-query: fill the field and run suggestions.
+  - data-predictive-recent (predictive-search-recent, Should TE-8-R2-BE3):
+    [hidden] until there are saved terms. data-predictive-recent-list gets
+    clones of template[data-predictive-recent-item] (set href ?q= and
+    data-predictive-query); data-predictive-recent-clear empties it.
+  - Footer link predictive-search-all ([hidden]): set the text of
+    data-predictive-all-label (keep the arrow), href and visibility.
   - Clear button: native reset; JS moves focus back to the input on the form
     reset event.
   - Test ids: predictive-search, predictive-search-dialog,
     predictive-search-close, predictive-search-form, predictive-search-input,
-    predictive-search-submit, predictive-search-clear,
-    predictive-search-listbox, predictive-search-group,
-    predictive-search-option, predictive-search-all, predictive-search-status.
+    predictive-search-submit, predictive-search-clear, predictive-search-tabs,
+    predictive-search-tab, predictive-search-body, predictive-search-hint,
+    predictive-search-skeleton, predictive-search-listbox,
+    predictive-search-group, predictive-search-option,
+    predictive-search-empty, predictive-search-error,
+    predictive-search-discover, predictive-search-recent,
+    predictive-search-popular, predictive-search-popular-collections,
+    predictive-search-trending, predictive-search-all,
+    predictive-search-status.
 
   @param {string} [style] - popup (default) or drawer, from the header Search style setting
   @param {image} [logo] - Logo shown in the popup bar from 80rem; the shop name when empty
   @param {number} [logo_width] - Logo width in px, same as the header
+  @param {collection[]} [popular_collections] - Header setting Popular collections, up to 4; empty hides the list
+  @param {collection} [trending_collection] - Header setting Trending products, first 4 products; empty hides the grid
 
   @example
-  {% render 'predictive-search', style: block.settings.search_style, logo: logo, logo_width: block.settings.logo_width %}
+  {% render 'predictive-search', style: block.settings.search_style, logo: logo, logo_width: block.settings.logo_width, popular_collections: block.settings.popular_collections, trending_collection: block.settings.trending_products %}
 {% enddoc %}
 
 {%- liquid
   assign search_style = style | default: 'popup'
   if search_style != 'drawer'
     assign search_style = 'popup'
+  endif
+
+  assign terms_slot = '<span data-predictive-terms></span>'
+  assign regular_price_label = 'products.price.regular_price' | t
+  assign sold_out_label = 'products.card.sold_out' | t
+  assign error_heading = 'blocks.predictive_search.error_title' | t
+  assign error_text = 'blocks.predictive_search.error_body_html' | t: terms: terms_slot
+
+  # Product image: row 64px; card in tab All from 80rem (popup) and in tab Products
+  assign result_sizes = 'auto, 64px'
+  if search_style == 'popup'
+    assign result_sizes = 'auto, (min-width: 80rem) 250px, 64px'
   endif
 -%}
 
@@ -72,6 +163,13 @@
       data-label-count="{{ 'blocks.predictive_search.count' | t: number: '%n' | escape }}"
       data-label-empty="{{ 'blocks.predictive_search.empty' | t: terms: '%s' | escape }}"
       data-label-all="{{ 'blocks.predictive_search.all' | t: terms: '%s' | escape }}"
+      data-label-products="{{ 'blocks.predictive_search.view_products' | t: terms: '%s' | escape }}"
+      data-label-shop-all="{{ 'search.shop_all' | t | escape }}"
+      data-shop-all-url="{{ routes.all_products_collection_url }}"
+      data-label-loading="{{ 'blocks.predictive_search.loading' | t | escape }}"
+      data-label-sale-price="{{ 'products.price.sale_price' | t | escape }}"
+      data-label-regular-price="{{ regular_price_label | escape }}"
+      data-stylesheet="{{ 'predictive-search.css' | asset_url }}"
     >
       <div class="predictive-search__bar">
         <h2
@@ -149,6 +247,7 @@
             <span class="visually-hidden">{{ 'blocks.predictive_search.clear' | t }}</span>
             {% render 'header-icon', name: 'close' %}
           </button>
+          <span class="spinner predictive-search__spinner" hidden aria-hidden="true" data-predictive-spinner></span>
         </form>
 
         <form class="predictive-search__close-form" method="dialog">
@@ -164,77 +263,306 @@
         </form>
       </div>
 
-      <div class="predictive-search__status" role="status" data-testid="predictive-search-status"></div>
+      {%- liquid
+        assign tab_keys = 'all,products,collections,articles,pages' | split: ','
+      -%}
+      <div
+        class="predictive-search__tabs featured-collection__tabs"
+        role="tablist"
+        aria-label="{{ 'blocks.predictive_search.tabs_label' | t | escape }}"
+        hidden
+        data-testid="predictive-search-tabs"
+      >
+        {% for tab_key in tab_keys %}
+          <button
+            class="featured-collection__tab predictive-search__tab"
+            type="button"
+            role="tab"
+            id="PredictiveSearchTab-{{ tab_key }}"
+            aria-controls="PredictiveSearchPanel"
+            {% if forloop.first %}
+              aria-selected="true"
+              tabindex="0"
+            {% else %}
+              aria-selected="false"
+              tabindex="-1"
+              hidden
+            {% endif %}
+            data-predictive-tab="{{ tab_key }}"
+            data-testid="predictive-search-tab"
+          >
+            {%- case tab_key -%}
+              {%- when 'all' -%}
+                {{- 'blocks.predictive_search.tab_all' | t -}}
+              {%- when 'products' -%}
+                {{- 'blocks.predictive_search.group_products' | t -}}
+              {%- when 'collections' -%}
+                {{- 'blocks.predictive_search.group_collections' | t -}}
+              {%- when 'articles' -%}
+                {{- 'blocks.predictive_search.group_articles' | t -}}
+              {%- else -%}
+                {{- 'blocks.predictive_search.group_pages' | t -}}
+            {%- endcase -%}
+            {%- unless forloop.first -%}
+              <span class="predictive-search__tab-count" data-predictive-count></span>
+            {%- endunless -%}
+          </button>
+        {% endfor %}
+      </div>
 
       <div
-        class="drawer__body predictive-search__listbox"
-        id="PredictiveSearchListbox"
-        role="listbox"
-        aria-label="{{ 'blocks.predictive_search.listbox_label' | t | escape }}"
-        hidden
-        data-testid="predictive-search-listbox"
+        class="drawer__body predictive-search__body"
+        id="PredictiveSearchPanel"
+        role="tabpanel"
+        aria-labelledby="PredictiveSearchTab-all"
+        data-testid="predictive-search-body"
       >
-        {%- liquid
-          assign groups = 'products,collections,pages,articles' | split: ','
-        -%}
-        {% for group in groups %}
-          <div
-            class="predictive-search__group"
-            role="group"
-            aria-labelledby="PredictiveSearchGroup-{{ group }}"
-            hidden
-            data-predictive-group="{{ group }}"
-            data-testid="predictive-search-group"
-          >
-            <div class="predictive-search__group-title" id="PredictiveSearchGroup-{{ group }}">
-              {%- case group -%}
-                {%- when 'products' -%}
-                  {{- 'blocks.predictive_search.group_products' | t -}}
-                {%- when 'collections' -%}
-                  {{- 'blocks.predictive_search.group_collections' | t -}}
-                {%- when 'pages' -%}
-                  {{- 'blocks.predictive_search.group_pages' | t -}}
-                {%- else -%}
-                  {{- 'blocks.predictive_search.group_articles' | t -}}
-              {%- endcase -%}
-            </div>
-            <div data-predictive-options></div>
-          </div>
-        {% endfor %}
+        <p
+          class="predictive-search__hint"
+          id="PredictiveSearchHint"
+          hidden
+          data-predictive-hint
+          data-testid="predictive-search-hint"
+        >
+          <span class="predictive-search__hint-icon">{% render 'status-icon', name: 'info' %}</span>
+          {{ 'blocks.predictive_search.min_chars' | t }}
+        </p>
 
+        <div
+          class="predictive-search__skeleton"
+          hidden
+          aria-hidden="true"
+          data-predictive-skeleton
+          data-testid="predictive-search-skeleton"
+        >
+          <div class="predictive-search__skeleton-lines">
+            <span class="skeleton skeleton--line"></span>
+            <span class="skeleton skeleton--line skeleton--short"></span>
+            <span class="skeleton skeleton--line"></span>
+          </div>
+          <div class="predictive-search__skeleton-items">
+            {%- for i in (1..4) -%}
+              <div class="skeleton-card predictive-search__skeleton-item">
+                <span class="skeleton skeleton--media"></span>
+                <span class="skeleton skeleton--line"></span>
+                <span class="skeleton skeleton--line skeleton--short"></span>
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+
+        <div
+          class="predictive-search__notice"
+          hidden
+          data-predictive-empty
+          data-testid="predictive-search-empty"
+        >
+          <span class="predictive-search__notice-icon">{% render 'status-icon', name: 'search' %}</span>
+          <div class="predictive-search__notice-body">
+            <h3 class="predictive-search__notice-title" data-testid="predictive-search-empty-heading">
+              {{- 'blocks.predictive_search.no_results_title_html' | t: terms: terms_slot -}}
+            </h3>
+            <p class="predictive-search__notice-text">{{ 'blocks.predictive_search.no_results_hint' | t }}</p>
+          </div>
+        </div>
+
+        <div class="predictive-search__error" hidden data-predictive-error>
+          {% render 'empty-state',
+            kind: 'error',
+            heading: error_heading,
+            text: error_text,
+            heading_tag: 'h3',
+            testid: 'predictive-search-error'
+          %}
+        </div>
+
+        <div
+          class="predictive-search__listbox"
+          id="PredictiveSearchListbox"
+          role="listbox"
+          aria-label="{{ 'blocks.predictive_search.listbox_label' | t | escape }}"
+          hidden
+          data-testid="predictive-search-listbox"
+        >
+          {%- liquid
+            assign groups = 'queries,products,collections,articles,pages' | split: ','
+          -%}
+          {% for group in groups %}
+            <div
+              class="predictive-search__group predictive-search__group--{{ group }}"
+              role="group"
+              aria-labelledby="PredictiveSearchGroup-{{ group }}"
+              hidden
+              data-predictive-group="{{ group }}"
+              data-testid="predictive-search-group"
+            >
+              <div class="predictive-search__group-title" id="PredictiveSearchGroup-{{ group }}">
+                {%- case group -%}
+                  {%- when 'queries' -%}
+                    {{- 'blocks.predictive_search.group_queries' | t -}}
+                  {%- when 'products' -%}
+                    {{- 'blocks.predictive_search.group_products' | t -}}
+                  {%- when 'collections' -%}
+                    {{- 'blocks.predictive_search.group_collections' | t -}}
+                  {%- when 'articles' -%}
+                    {{- 'blocks.predictive_search.group_articles' | t -}}
+                  {%- else -%}
+                    {{- 'blocks.predictive_search.group_pages' | t -}}
+                {%- endcase -%}
+              </div>
+              <div class="predictive-search__options" data-predictive-options></div>
+            </div>
+          {% endfor %}
+        </div>
+
+        <div
+          class="predictive-search__discover"
+          hidden
+          data-predictive-discover
+          data-testid="predictive-search-discover"
+        >
+          <p class="predictive-search__no-products" hidden data-predictive-no-products>
+            {{- 'blocks.predictive_search.no_products_html' | t: terms: terms_slot -}}
+          </p>
+
+          <div class="predictive-search__discover-side">
+            <div
+              class="predictive-search__discover-group"
+              hidden
+              data-predictive-recent
+              data-testid="predictive-search-recent"
+            >
+              <div class="predictive-search__discover-head">
+                <h3 class="popular-searches__title">{{ 'blocks.predictive_search.recent' | t }}</h3>
+                <button
+                  class="predictive-search__text-button"
+                  type="button"
+                  aria-label="{{ 'blocks.predictive_search.clear_recent_label' | t | escape }}"
+                  data-predictive-recent-clear
+                >
+                  {{- 'blocks.predictive_search.clear_recent' | t -}}
+                </button>
+              </div>
+              <ul class="search-chips" role="list" data-predictive-recent-list></ul>
+              <template data-predictive-recent-item>
+                <li><a class="search-chip" href="{{ routes.search_url }}" data-predictive-query></a></li>
+              </template>
+            </div>
+
+            {% render 'popular-searches',
+              heading_tag: 'h3',
+              testid: 'predictive-search-popular',
+              class: 'predictive-search__discover-group'
+            %}
+
+            {%- if popular_collections != blank -%}
+              <div
+                class="predictive-search__discover-group"
+                data-testid="predictive-search-popular-collections"
+              >
+                <h3 class="popular-searches__title">{{ 'blocks.predictive_search.popular_collections' | t }}</h3>
+                <ul class="predictive-search__links" role="list">
+                  {%- for popular_collection in popular_collections limit: 4 -%}
+                    <li>
+                      <a class="predictive-search__link" href="{{ popular_collection.url }}">
+                        <span class="predictive-search__icon">{% render 'status-icon', name: 'grid' %}</span>
+                        <span class="predictive-search__link-title">{{ popular_collection.title | escape }}</span>
+                        <span class="predictive-search__meta">
+                          {{- 'collections.products_count' | t: count: popular_collection.products_count -}}
+                        </span>
+                      </a>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+              </div>
+            {%- endif -%}
+          </div>
+
+          {%- if trending_collection != blank and trending_collection.products_count > 0 -%}
+            <div
+              class="predictive-search__discover-group predictive-search__trending"
+              data-testid="predictive-search-trending"
+            >
+              <h3 class="popular-searches__title">{{ 'blocks.predictive_search.trending' | t }}</h3>
+              <ul class="predictive-search__trending-grid" role="list">
+                {%- for trending_product in trending_collection.products limit: 4 -%}
+                  <li>
+                    {% render 'product-card',
+                      product: trending_product,
+                      sizes: '(min-width: 80rem) 250px, 50vw',
+                      heading_level: 'h4',
+                      card_context: 'search',
+                      show_swatches: false
+                    %}
+                  </li>
+                {%- endfor -%}
+              </ul>
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+
+      <div class="predictive-search__footer">
+        <div class="predictive-search__status" role="status" data-testid="predictive-search-status"></div>
         <a
-          class="predictive-search__option predictive-search__all"
+          class="button predictive-search__all"
           href="{{ routes.search_url }}"
-          role="option"
-          tabindex="-1"
-          aria-selected="false"
+          hidden
           data-testid="predictive-search-all"
         >
-          {{- 'blocks.predictive_search.view_all' | t -}}
+          <span data-predictive-all-label>{{ 'blocks.predictive_search.view_all' | t }}</span>
+          {% render 'slideshow-icon', name: 'arrow' %}
         </a>
       </div>
 
-      <template data-predictive-template="product">
+      <template data-predictive-template="query">
         <a
-          class="predictive-search__option"
+          class="predictive-search__option predictive-search__option--query"
           href="{{ routes.search_url }}"
           role="option"
           tabindex="-1"
           aria-selected="false"
           data-testid="predictive-search-option"
         >
-          <img
-            class="predictive-search__image"
-            alt=""
-            width="64"
-            height="64"
-            sizes="64px"
-            loading="lazy"
-            data-predictive-image
-          >
+          <span class="predictive-search__icon">{% render 'status-icon', name: 'search' %}</span>
           <span class="predictive-search__option-text">
-            <span data-predictive-title></span>
-            <span class="predictive-search__price" data-predictive-price></span>
+            <span class="predictive-search__query" data-predictive-title></span>
+          </span>
+        </a>
+      </template>
+
+      <template data-predictive-template="product">
+        <a
+          class="predictive-search__option predictive-search__option--product"
+          href="{{ routes.search_url }}"
+          role="option"
+          tabindex="-1"
+          aria-selected="false"
+          data-testid="predictive-search-option"
+        >
+          <span class="predictive-search__media">
+            <img
+              class="predictive-search__image"
+              alt=""
+              width="64"
+              height="64"
+              sizes="{{ result_sizes }}"
+              loading="lazy"
+              data-predictive-image
+            >
+            <span class="product-card__badge predictive-search__badge" data-badge="sale" hidden data-predictive-badge></span>
+          </span>
+          <span class="predictive-search__option-text">
+            <span class="predictive-search__product-title" data-predictive-title></span>
+            <span class="predictive-search__prices">
+              <span class="visually-hidden" data-predictive-price-label>{{ regular_price_label }}</span>
+              <span class="predictive-search__price" data-predictive-price></span>
+              <span class="predictive-search__compare-group" hidden data-predictive-compare-group>
+                <span class="visually-hidden">{{ regular_price_label }}</span>
+                <s class="predictive-search__compare" data-predictive-compare></s>
+              </span>
+              <span class="predictive-search__sold-out" hidden data-predictive-sold-out>{{ sold_out_label }}</span>
+            </span>
           </span>
         </a>
       </template>
@@ -248,8 +576,22 @@
           aria-selected="false"
           data-testid="predictive-search-option"
         >
+          <span class="predictive-search__icon">
+            {%- render 'status-icon', name: 'grid' -%}
+            {%- render 'status-icon', name: 'article' -%}
+          </span>
+          <img
+            class="predictive-search__thumb"
+            alt=""
+            width="64"
+            height="48"
+            sizes="64px"
+            loading="lazy"
+            data-predictive-image
+          >
           <span class="predictive-search__option-text">
             <span data-predictive-title></span>
+            <span class="predictive-search__meta" data-predictive-meta></span>
           </span>
         </a>
       </template>

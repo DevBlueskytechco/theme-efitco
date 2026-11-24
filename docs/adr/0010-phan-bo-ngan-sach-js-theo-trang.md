@@ -43,7 +43,7 @@ C. Trần mỗi file giữ 8 192 B. Bảng trần dưới đây ghi vào DoD c�
 | Collection, search | collection-filters | 8 192 | collection-filters / search |
 | Cart | cart-items | 7 168 | cart-page |
 | | cart-checkout-bar (thanh checkout dưới 64rem, `<cart-checkout-bar>`; tách khỏi cart-items, CTO 18/11 ES1-T490 B) | 1 024 | cart-page |
-| Lười theo tương tác, mọi trang | quick-view 6 144; predictive-search 6 656; localization-picker 4 096; popup-queue 1 536 tải sẵn + popup-forms 4 096 lười | — | khi bấm / khi điều kiện popup đủ |
+| Lười theo tương tác, mọi trang | quick-view 6 144; predictive-search 6 912 (6 656 → 6 912 CTO 23/11 (#303, ADR 0014 mục 8): loader CSS tầng 5); localization-picker 4 096; popup-queue 1 536 tải sẵn + popup-forms 4 096 lười | — | khi bấm / khi điều kiện popup đủ |
 
 - `assets/lazy-module.js` nhận thêm `data-lazy-on="interaction"` (nạp khi `pointerenter`, `focusin`, `touchstart` đầu tiên trong element) bên cạnh mặc định viewport; trần 768 B.
 - JS nạp theo tương tác không tính vào trần sau cuộn (ADR 0006 đo cuộn hết trang và mở search, không bấm), nhưng mỗi file vẫn ≤ 8 192 B.

@@ -73,7 +73,9 @@
   JavaScript hooks: custom element quiz-finder (root, id = static block id for
   the "Retake the quiz" link), data-enhanced, data-design-mode, data-lazy-module
   (URL of assets/quiz-finder.js, read by assets/lazy-module.js; neither renders
-  in the theme editor or with results_view), data-results-url,
+  in the theme editor or with results_view; with results_popup the form also
+  carries data-lazy-module for assets/quiz-dialog.js with
+  data-lazy-on="interaction", ADR 0010), data-results-url,
   data-results-view, data-label-results (%n stands for the count),
   data-label-loading, data-label-added, data-label-adding, data-quiz-submit
   (id {id}-submit), data-quiz-back, data-quiz-status, data-quiz-results-panel
@@ -292,6 +294,10 @@
         method="get"
         {% if heading != blank %}
           aria-labelledby="{{ heading_id }}"
+        {% endif %}
+        {% if results_popup %}
+          data-lazy-module="{{ 'quiz-dialog.js' | asset_url }}"
+          data-lazy-on="interaction"
         {% endif %}
         data-testid="quiz-form"
       >
@@ -605,7 +611,6 @@
     {%- if results_popup -%}
       </dialog>
       </modal-dialog>
-      <script src="{{ 'quiz-dialog.js' | asset_url }}" type="module"></script>
     {%- endif -%}
 
     {%- unless results_only or request.design_mode -%}

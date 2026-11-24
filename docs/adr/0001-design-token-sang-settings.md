@@ -1,5 +1,5 @@
 # 0001. Design token từ Figma → settings_schema + css-variables
-Ngày: 2026-10-22 | Trạng thái: Đề xuất (G3 chấp nhận)
+Ngày: 2026-10-22 | Trạng thái: Đề xuất (G3 chấp nhận); Thay một phần bởi ADR 0015 (23/11/2026, ES1-T570): thứ tự nguồn token và câu "tokens.json là nguồn" theo `docs/adr/0015-thu-tu-nguon-token.md`; mục B (1 setting + 1 biến CSS) và hai mục Bổ sung giữ hiệu lực. Nội dung dưới giữ làm lịch sử.
 Cập nhật 21/11/2026 (CTO, ES1-T567): nguồn thiết kế là mockup `drafts/designer/**` + `drafts/designer/_kit/kit.css`; tên file thiết kế và mã node trong ADR này là bối cảnh lúc ra quyết định, không còn là căn cứ; quyết định giữ nguyên. Riêng hướng "token từ bản vẽ → settings": từ 21/11 thứ tự là kit.css → `docs/tokens.json` → `settings_schema.json` + `css-variables.liquid` phản chiếu kit (cơ chế "mỗi token = 1 setting + 1 biến CSS" giữ); việc viết lại tiêu đề và mục Bối cảnh của ADR chờ CTO / Tech Lead (Còn mở, notes ES1-T567).
 
 ## Bối cảnh
