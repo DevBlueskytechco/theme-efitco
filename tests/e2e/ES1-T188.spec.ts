@@ -149,7 +149,9 @@ test.describe('ES1-T188 trang /?view=figma', () => {
     for (const p of hiddenOnly) expect(requested.has(p), `ảnh tab ẩn đã tải: ${p}`).toBe(false);
   });
 
-  test('tab cao 40 như Figma, vùng bấm từ 44', async ({ page }) => {
+  // ES1-T336: dưới 80rem tab cao 44 (index-mobile-a.md §5 bảng Tab, vùng chạm 360 "tab 44", AC-H35);
+  // từ 80rem giữ 40 (index-1280.md R3). Spec cũ đòi 40 ở mọi khổ, trái ui-spec mobile.
+  test('tab cao 44 dưới 80rem, 40 từ 80rem, vùng bấm từ 44', async ({ page }) => {
     await openFigma(page);
     const tab = blockOn(page).getByTestId(T.tab).first();
     await tab.scrollIntoViewIfNeeded();
@@ -157,7 +159,7 @@ test.describe('ES1-T188 trang /?view=figma', () => {
       height: el.getBoundingClientRect().height,
       hit: parseFloat(getComputedStyle(el, '::before').height),
     }));
-    expect(m.height).toBe(40);
+    expect(m.height).toBe((page.viewportSize()?.width ?? 0) >= 1280 ? 40 : 44);
     expect(m.hit).toBeGreaterThanOrEqual(44);
   });
 
