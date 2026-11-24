@@ -28,7 +28,11 @@
     JavaScript. The next element sibling must stay the
     <modal-dialog data-layer="search"> of snippets/predictive-search.liquid;
     JS opens it from this link. The search_style setting picks popup (dark
-    top band) or drawer (inline end).
+    top band) or drawer (inline end). popular_collections (up to 4) and
+    trending_products (first 4 products) feed the discover area of the layer
+    (predictive-search.md §5, TE-8 AC11); empty hides that part. Popular
+    searches is the theme setting settings.popular_searches (FD2), not a
+    header setting.
   - data-search-src on header-search-link: URL of assets/predictive-search.js.
     assets/search-loader.js (always loaded, max 256 B, no comments inside)
     listens for clicks on window, so it survives editor re-renders. Plain
@@ -584,7 +588,9 @@
       {% render 'predictive-search',
         style: block.settings.search_style,
         logo: logo,
-        logo_width: block.settings.logo_width
+        logo_width: block.settings.logo_width,
+        popular_collections: block.settings.popular_collections,
+        trending_collection: block.settings.trending_products
       %}
 
       {% if shop.customer_accounts_enabled %}
@@ -691,6 +697,19 @@
         }
       ],
       "default": "popup"
+    },
+    {
+      "type": "collection_list",
+      "id": "popular_collections",
+      "label": "t:labels.popular_collections",
+      "info": "t:info.popular_collections",
+      "limit": 4
+    },
+    {
+      "type": "collection",
+      "id": "trending_products",
+      "label": "t:labels.trending_products",
+      "info": "t:info.trending_products"
     }
   ]
 }
