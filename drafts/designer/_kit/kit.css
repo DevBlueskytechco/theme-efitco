@@ -91,7 +91,9 @@
   --space-5xl: 64px;                    /* Chuẩn: Polaris React space 64px */
   --space-6xl: 80px;                    /* Chuẩn: Polaris React space 80px. Tầng desktop */
   --space-7xl: 128px;                   /* padding section từ 64rem. Chuẩn: Polaris React space 128px. THAY 21/11 lượt 2 (ES1-T567): trước là 120, ngoài thang */
-  /* Alias cho code theme (setting space_base × 1,2,3,4,6,8,12,32; code đang × 30 = 120: Cần FE) và trang mockup cũ: KHÔNG dùng cho thành phần mới. */
+  /* DEPRECATED 2.1.0 (ES1-T573), xoá ở bản major kế tiếp (3.0.0): alias --space-1…8. Mockup đọc 0 lần (grep var(--space-[1-8]) = 0);
+     chỉ giữ để khớp code theme (setting space_base × 1,2,3,4,6,8,12,32; code đang × 30 = 120: Cần FE). Thay: 1→2xs, 2→xs, 3→sm, 4→md,
+     5→xl, 6→2xl, 7→4xl, 8→7xl. KHÔNG dùng ở bất kỳ chỗ mới nào. */
   --space-1: var(--space-2xs);
   --space-2: var(--space-xs);
   --space-3: var(--space-sm);
@@ -122,7 +124,7 @@
   --radius-input: var(--radius-xs);
   --radius-button: var(--radius-xs);
   --radius-card: var(--radius-md);   /* setting card_corner_radius 12 */
-  --radius-hero: var(--radius-md);
+  --radius-hero: var(--radius-md);   /* DEPRECATED 2.1.0 (ES1-T573), xoá ở 3.0.0: mockup đọc 0 lần; chỗ cũ (marketing-popups) đọc --radius-md. Hero trang chủ đọc --radius-panel */
   --radius-swatch: var(--radius-sm); /* swatch card 32 × 16, thumb dòng hàng */
   --radius-panel: var(--radius-lg);  /* banner trang con, card bài viết, card collection, panel footer, panel tối, hộp freeship */
   --radius-dialog: var(--radius-xl); /* dialog, bottom sheet (CTO 20/11 V04: 20 là bậc lớn nhất của thang) */
@@ -193,6 +195,35 @@
   --count-badge-size: 20px;             /* số đếm giỏ trên icon header */
   --progress-height: 4px;               /* thanh tiến trình carousel (CTO 09/11 "mảnh"); trên lưới 4px */
   --meter-height: 8px;                  /* thanh freeship / mục tiêu; trên lưới 4px */
+  /* Thang kích thước (2.1.0, ES1-T573): ô ảnh, thumb, nút / đĩa icon, hàng cao cố định. Tầng primitive cho width / height, tách khỏi
+     --space-* (Polaris: space token không dùng cho width / height). Bội 4; tên theo bậc cùng quy ước --space-050 / --space-150
+     (bậc 100 = 4px, không đặt tên theo giá trị, foundation.md §32.1): 1000 = 40, 1100 = 44 … 2400 = 96.
+     Thiết kế: gom các kích thước đang viết số trong mockup (ES1-T567 notes 8.3). Token vai trò ở trên (touch-target 44, control 48,
+     round-button 52) giữ tên riêng, cùng giá trị với bậc tương ứng. */
+  --size-1000: 40px;                      /* ô ảnh nhỏ, tab desktop */
+  --size-1100: 44px;                      /* thumb tròn câu trả lời quiz, vùng chạm */
+  --size-1200: 48px;                      /* thumb thanh dính đáy */
+  --size-1300: 52px;                      /* đĩa icon "Fits" shop the look */
+  --size-1400: 56px;                      /* thumb dòng sản phẩm, ảnh hàng danh mục */
+  --size-1600: 64px;                      /* thumb gợi ý tìm kiếm, trần chân level card khi mở */
+  --size-1800: 72px;                      /* hàng câu trả lời quiz < 48rem, seal featured product 360 */
+  --size-2000: 80px;                      /* hàng câu trả lời quiz từ 48rem, thumb dòng giỏ */
+  --size-2400: 96px;                      /* ảnh chồng footer, placeholder media tối đa */
+  /* Tỉ lệ khung ảnh có tên (2.1.0, ES1-T573). Chuẩn: Carbon aspect ratio 1:1, 2:1, 3:2, 4:3, 16:9; M3 carousel 9:16; Spectrum 3:4.
+     aspect-ratio trong mockup CHỈ đọc var(--ratio-*) (trừ auto). Custom property cục bộ --ratio của .media nhận các token này */
+  --ratio-1-1: 1 / 1;
+  --ratio-2-1: 2 / 1;
+  --ratio-3-2: 3 / 2;
+  --ratio-4-3: 4 / 3;
+  --ratio-3-4: 3 / 4;
+  --ratio-16-9: 16 / 9;
+  --ratio-9-16: 9 / 16;
+  /* Display co theo cột từ 80rem: 80 ở 1280, 100 từ 1600 (dòng = cỡ, cả hai bội 4). Thiết kế: chữ display hero / intro trang chủ
+     không tràn 6 cột ở 1280. Chỉ trang chủ đọc; .display mặc định giữ --font-size-display */
+  --display-fluid: min(var(--font-size-display), 6.25vw);
+  --logo-width: 100px;                  /* logo header 100 × 30 mọi mốc. Thiết kế: logo thương hiệu, tỉ lệ 10:3 (setting logo_width của theme) */
+  --logo-height: 30px;
+  --quantity-compact-width: 130px;      /* bề ngang .quantity--compact: nút 44 + ô 40 + nút 44 + viền 2; cột "Quantity" trang giỏ đọc số này */
   --overlay-scrim: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
   /* Elevation (V15): 3 bậc + bóng thanh đáy, không thêm bóng tự chế. Polaris: cấp nổi card → popover → toast → modal */
   --shadow-none: none;
@@ -309,7 +340,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .site-header :focus-visible { outline-color: var(--color-background-dark-foreground); }
 .site-header__inner { display: flex; align-items: center; gap: var(--space-xs); width: var(--content-width); min-height: var(--header-height); margin-inline: auto; }
 .site-header__logo { display: inline-flex; align-items: center; min-height: var(--touch-target); color: inherit; }
-.site-header__logo svg { width: 100px; height: 30px; } /* 100 × 30 mọi mốc. Thiết kế: logo thương hiệu, tỉ lệ 10:3 */
+.site-header__logo svg { width: var(--logo-width); height: var(--logo-height); } /* 100 × 30 mọi mốc. Thiết kế: logo thương hiệu, tỉ lệ 10:3 */
 .site-header__nav { display: none; margin-inline: auto; }
 .site-header__menu { display: flex; gap: var(--space-3xl); margin: 0; padding: 0; list-style: none; } /* 40. Chuẩn: Polaris large-400 */
 /* Chữ menu = trắng 60% trộn nền tối = #A3A3A3 trên #1A1A1A. AA: 6.9:1. Hover / mở / trang hiện tại: trắng 100% */
@@ -354,7 +385,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 .mega__col a:hover { color: var(--color-accent); }
 .mega__all { font-weight: 600; text-decoration: underline !important; text-underline-offset: 0.25em; }
 .mega__promo { position: relative; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); }
-.mega__promo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+.mega__promo img { width: 100%; aspect-ratio: var(--ratio-4-3); object-fit: cover; }
 .mega__promo-label { padding: var(--space-md); font-weight: 600; }
 
 /* ============ 5. Breadcrumb + page title (ĐỀ XUẤT) ============ */
@@ -488,7 +519,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* Ảnh 1/1 (Polaris Image mặc định 1/1) bo 12 nền cream, ảnh contain; ảnh → chữ 8; tên 16/24 500; giá 16/24 500; badge cách mép 8 / 16 từ 64rem */
 .product-card { position: relative; display: flex; flex-direction: column; gap: var(--space-xs); min-width: 0; transition: translate var(--motion-slow) var(--ease-expo); }
 .product-card:hover, .product-card.is-hover { translate: 0 -4px; }
-.product-card__media { position: relative; display: block; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); }
+.product-card__media { position: relative; display: block; aspect-ratio: var(--ratio-1-1); overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); }
 .product-card__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; transition: scale var(--motion-slow) var(--ease-out); }
 .product-card:hover .product-card__media img, .product-card.is-hover .product-card__media img { scale: 1.04; }
 .product-card__badges { position: absolute; inset-block-start: var(--space-xs); inset-inline: var(--space-xs); display: flex; justify-content: space-between; gap: var(--space-2xs); pointer-events: none; }
@@ -518,7 +549,7 @@ button, input, select, textarea { font: inherit; color: inherit; }
 /* ============ 9. Card bài viết ============ */
 /* Ảnh phủ kín 3/4 (Spectrum: preview cao tối đa 3:4) bo 16, gradient tối nửa dưới; tag trung tính góc trên cuối, cách mép 12;
    nội dung đệm 16 / 24 từ 48rem; tên 18/28 700; meta 14/20 500 trắng */
-.article-card { position: relative; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: 3 / 4; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); color: var(--color-background-dark-foreground); text-decoration: none; transition: translate var(--motion-slow) var(--ease-expo), box-shadow var(--motion-slow) var(--ease-expo); }
+.article-card { position: relative; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: var(--ratio-3-4); overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); color: var(--color-background-dark-foreground); text-decoration: none; transition: translate var(--motion-slow) var(--ease-expo), box-shadow var(--motion-slow) var(--ease-expo); }
 .article-card:hover, .article-card.is-hover { translate: 0 -6px; box-shadow: var(--shadow-raised); }
 .article-card > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 /* Gradient, badge, nội dung cùng --layer-content: thứ tự DOM quyết định (::before dưới, badge + nội dung trên), không cần số lớp thứ hai */
@@ -673,7 +704,7 @@ select.field__input[aria-expanded='true'], select.field__input.is-open { border-
 /* ============ 12. Trạng thái dùng chung ============ */
 .skeleton { display: block; border-radius: var(--radius-card); background: linear-gradient(90deg, var(--color-background-alt) 0 25%, var(--color-background) 50%, var(--color-background-alt) 75%) 0 0 / 300% 100%; animation: kit-shimmer var(--motion-hero) linear infinite; }
 .skeleton--line { height: var(--font-size-sm); border-radius: var(--radius-xs); }
-.skeleton--media { aspect-ratio: 1; }
+.skeleton--media { aspect-ratio: var(--ratio-1-1); }
 .skeleton-card { display: grid; gap: var(--space-xs); }
 .empty-state { display: grid; justify-items: center; gap: var(--space-md); max-width: 32rem; margin-inline: auto; padding-block: var(--space-4xl); text-align: center; }
 .empty-state__icon { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 50%; background: var(--color-background-alt); color: var(--color-foreground); }
@@ -861,7 +892,7 @@ select.field__input[aria-expanded='true'], select.field__input.is-open { border-
 .option-card__title { font-weight: 600; }
 .option-card__meta { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
 .option-card--tile { padding: var(--space-xs); padding-inline-end: var(--space-xs); }
-.option-card--tile img { width: 100%; aspect-ratio: 1; object-fit: contain; border-radius: var(--radius-sm); background: var(--color-background-cream); mix-blend-mode: darken; }
+.option-card--tile img { width: 100%; aspect-ratio: var(--ratio-1-1); object-fit: contain; border-radius: var(--radius-sm); background: var(--color-background-cream); mix-blend-mode: darken; }
 .option-card--tile .option-card__check { inset-block-start: var(--space-sm); inset-inline-end: var(--space-sm); }
 .option-card--tile .option-card__body { display: grid; gap: var(--space-2xs); padding: var(--space-xs); }
 
@@ -960,7 +991,7 @@ select.field__input[aria-expanded='true'], select.field__input.is-open { border-
 
 /* --- Collection card: ảnh 3/2 bo 16 (Chuẩn: Carbon aspect ratio 3:2; THAY 21/11 ES1-T567, trước 336/220), ảnh → tên 16, tên Sofia 700 h3 28/36; --dark (dải tối carousel), --menu (mega, 4/3 bo 12, tên 16/600) --- */
 .collection-card { position: relative; display: grid; gap: var(--space-md); color: inherit; text-decoration: none; }
-.collection-card__media { display: block; aspect-ratio: 3 / 2; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); }
+.collection-card__media { display: block; aspect-ratio: var(--ratio-3-2); overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); }
 .collection-card__media img { width: 100%; height: 100%; object-fit: cover; transition: scale var(--motion-slow) var(--ease-out); }
 .collection-card__media .product-card__placeholder { color: var(--color-muted-light); }
 .collection-card__title { margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: var(--letter-spacing-heading); line-height: var(--line-height-h3); }
@@ -973,7 +1004,7 @@ select.field__input[aria-expanded='true'], select.field__input.is-open { border-
 .collection-card--dark .collection-card__media, .section--dark .collection-card__media { background: color-mix(in srgb, var(--color-background-dark-foreground) 6%, var(--color-background-dark)); }
 .collection-card--dark:focus-visible, .collection-card--dark.is-focus, .section--dark .collection-card:focus-visible { outline-color: var(--color-background-dark-foreground); }
 .collection-card--menu { gap: var(--space-xs); }
-.collection-card--menu .collection-card__media { aspect-ratio: 4 / 3; border-radius: var(--radius-card); }
+.collection-card--menu .collection-card__media { aspect-ratio: var(--ratio-4-3); border-radius: var(--radius-card); }
 .collection-card--menu .collection-card__title { font-family: var(--font-primary--family); font-size: var(--font-size-base); font-weight: 600; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-body); }
 .collection-card--menu .collection-card__count { margin: 0; }
 
@@ -1217,7 +1248,7 @@ a.pagination__page:hover, .pagination__page.is-hover { border-color: var(--color
    <span class="media" style="--ratio: 3 / 2"><img …></span>. Tỉ lệ chỉ lấy trong bộ có tên: 1/1, 2/1, 3/2, 4/3, 16/9 (Chuẩn: Carbon aspect ratio),
    9/16 (M3 carousel), 3/4 (Spectrum; cả hero 360). Mặc định 1/1 (Polaris Image), cover (ảnh đời sống: collection, blog, banner).
    --contain: ảnh sản phẩm nền trắng trên cream (mix darken). Thiếu ảnh / ảnh lỗi: giữ khung + nền, .media__placeholder (icon), không icon ảnh vỡ */
-.media { position: relative; display: block; aspect-ratio: var(--ratio, 1); overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); color: var(--color-muted-light); }
+.media { position: relative; display: block; aspect-ratio: var(--ratio, var(--ratio-1-1)); overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); color: var(--color-muted-light); }
 .media > img { width: 100%; height: 100%; object-fit: cover; }
 .media--contain > img { object-fit: contain; mix-blend-mode: darken; }
 .media--panel { border-radius: var(--radius-panel); }
@@ -1248,6 +1279,172 @@ a.pagination__page:hover, .pagination__page.is-hover { border-color: var(--color
 :dir(rtl) select.field__input { background-position: 17px 50%, 22px 50%; }
 /* Stepper giữ thứ tự − số + ở RTL (foundation.md §34, hàng "Giữ thứ tự chữ số") */
 :dir(rtl) .quantity { direction: ltr; }
+
+/* ============ 13c. Bổ sung 2.1.0 (ES1-T573, ĐỀ XUẤT tới khi CTO duyệt) ============
+   (a) 4 mảnh nhỏ trước đây mỗi trang tự viết; (b) 7 component riêng trang chủ, trước định nghĩa 2 lần (ES1-T293 cho ≥ 80rem,
+   ES1-T278 / T279 cho 360 / 768). Gộp mobile-first: gốc = 360, @48rem = 768, @80rem = 1280 / 1920. Bố cục section (.hero, .mf, .quiz,
+   .fp, .why, .bpanel, .intro, lưới hàng) giữ ở trang. Trang KHÔNG định nghĩa lại các selector dưới đây. Màn DS: h-level-card … h-quiz-opt. */
+
+/* --- (a) Nút icon tròn 44 (xoá dòng, ghi chú; mini cart, giỏ): chỉ icon, bắt buộc aria-label. Chuẩn: Polaris touch target 44 --- */
+.icon-button { display: inline-flex; flex: none; align-items: center; justify-content: center; width: var(--touch-target); height: var(--touch-target); padding: 0; border: 0; border-radius: 50%; background: none; color: var(--color-muted); cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
+.icon-button svg { width: var(--icon-size-md); height: var(--icon-size-md); }
+.icon-button:hover, .icon-button.is-hover { background: var(--color-background-alt); color: var(--color-foreground); }
+.icon-button:disabled, .icon-button[aria-disabled='true'] { background: none; color: var(--color-muted-light); cursor: not-allowed; }
+/* --- (a) Nút chữ gạch chân 44 (hành động phụ trong dialog: "No thanks", "Remove"): 14/20 500 muted, hover foreground. AA: muted 8.45:1 --- */
+.link-button { display: inline-flex; align-items: center; min-height: var(--touch-target); padding: 0; border: 0; background: none; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 500; line-height: var(--line-height-sm); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; cursor: pointer; }
+.link-button:hover, .link-button.is-hover { color: var(--color-foreground); }
+/* --- (a) Tay nắm bottom sheet 40 × 4, cách đỉnh 8, giữa ngang; gắn class lên khung sheet (đã position). Trang trí, không bấm được:
+   đóng sheet bằng nút × và Esc (foundation §16). --mobile: chỉ vẽ dưới 48rem (khung thành dialog từ 48rem) --- */
+.sheet-handle::before { content: ''; position: absolute; inset-block-start: var(--space-xs); inset-inline-start: calc(50% - var(--size-1000) / 2); width: var(--size-1000); height: var(--progress-height); border-radius: var(--radius-pill); background: var(--color-border); }
+@media (min-width: 48rem) { .sheet-handle--mobile::before { content: none; } }
+/* --- (a) Số bộ lọc đang áp trên nút Filter: 20 × 20 = --count-badge-size như số đếm giỏ (trước 24, đọc --space-xl), nền accent.
+   AA: trắng trên accent 4.97:1; nút hover đảo nền foreground thì số đảo trắng / foreground --- */
+.filter-toggle__count { display: inline-grid; place-items: center; min-width: var(--count-badge-size); height: var(--count-badge-size); padding-inline: var(--space-2xs); border-radius: var(--radius-pill); background: var(--color-accent); color: var(--color-accent-foreground); font-size: var(--font-size-xs); font-weight: 700; line-height: var(--count-badge-size); font-variant-numeric: tabular-nums; }
+.filter-toggle:hover .filter-toggle__count, .filter-toggle.is-hover .filter-toggle__count { background: var(--color-background); color: var(--color-foreground); }
+
+/* --- (b1) Level card (h-level-card): ảnh nền + gradient tối, nhãn HOA 14, tiêu đề Sofia, chân "N products →".
+   4/3 dưới 48rem, 1/1 từ 48rem. Dưới 80rem chân luôn hiện (cảm ứng, V31); từ 80rem chân ẩn, hiện khi hover / focus (không chiếm chỗ).
+   AA: chữ trắng trên gradient tối 85% (dưới 80rem bắt đầu 35%) / 100% (từ 80rem bắt đầu 50%) --- */
+.level-card { position: relative; display: flex; flex-direction: column; justify-content: flex-end; aspect-ratio: var(--ratio-4-3); overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-dark); color: var(--color-background-dark-foreground); text-decoration: none; }
+.level-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; transition: scale var(--motion-slow) var(--ease-out); }
+.level-card::before { content: ''; position: absolute; inset: 0; z-index: 1; background: linear-gradient(to bottom, transparent 35%, color-mix(in srgb, var(--color-background-dark) 85%, transparent)); }
+.level-card:hover img, .level-card.is-hover img { scale: 1.04; }
+.level-card:focus-visible, .level-card.is-focus { outline-color: var(--color-accent); }
+.level-card__body { position: relative; z-index: 2; display: grid; gap: var(--space-2xs); padding: var(--space-xl) var(--space-xl) var(--space-md); }
+.level-card__label { font-family: var(--font-heading--family); font-size: var(--font-size-sm); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-caps); line-height: var(--line-height-sm); text-transform: uppercase; }
+/* V27: tiêu đề luôn heading Sofia 700 (kể cả thẻ span ở khung trạng thái) */
+.level-card__title { color: inherit; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); letter-spacing: var(--letter-spacing-heading); line-height: var(--line-height-h3); }
+.level-card__foot { display: flex; align-items: center; justify-content: space-between; min-height: var(--touch-target); margin-block-start: var(--space-xs); border-block-start: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); font-size: var(--font-size-sm); font-weight: 500; line-height: var(--line-height-sm); }
+@media (min-width: 48rem) {
+  .level-card { aspect-ratio: var(--ratio-1-1); }
+  .level-card__body { padding: var(--space-md); }
+}
+@media (min-width: 80rem) {
+  .level-card::before { background: linear-gradient(to bottom, transparent 50%, var(--color-background-dark)); }
+  .level-card__body { padding: clamp(var(--space-2xl), 2.0833vw, var(--space-3xl)); } /* 32 ở 1280 → 40 ở 1920 */
+  .level-card__title { font-size: var(--font-size-h2); line-height: var(--line-height-h2); }
+  .level-card__foot { min-height: 0; max-height: 0; margin-block-start: 0; overflow: hidden; border-block-start-color: transparent; opacity: 0; transition: max-height var(--motion-base) var(--ease-out), opacity var(--motion-base) var(--ease-out), margin var(--motion-base) var(--ease-out); }
+  .level-card:hover .level-card__foot, .level-card:focus-visible .level-card__foot, .level-card.is-hover .level-card__foot { max-height: var(--size-1600); margin-block-start: var(--space-md); padding-block-start: var(--space-md); border-color: color-mix(in srgb, var(--color-background-dark-foreground) 24%, transparent); opacity: 1; }
+}
+
+/* --- (b2) Shop the look (h-stl): .stl > .stl__media (ảnh 1/1 + .hotspot) + .stl__body (.stl__list: .stl__fits + .stl__rows; .dpanel.stl__summary).
+   360: một cột. 768: list | summary 280 dính. ≥ 80rem: ảnh 8 cột | cột phải 4 cột, summary đáy cột. Dòng = .option-card.stl-row
+   (đang xem = is-checked, viền accent, không vòng check vì tổng tính cả 4 món); cả dòng là link (V26, V30) --- */
+.stl__head { display: grid; gap: var(--space-sm); margin-block-end: var(--heading-gap); }
+.stl__head .section-header { margin: 0; }
+.stl__head .section-link { justify-self: start; }
+.stl__media { position: relative; aspect-ratio: var(--ratio-1-1); overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); }
+.stl__media img { width: 100%; height: 100%; object-fit: cover; }
+.stl__body { display: grid; gap: var(--space-xl); margin-block-start: var(--space-xl); }
+.stl__fits { display: flex; align-items: center; gap: var(--space-md); padding: var(--space-md) var(--space-xl); border-radius: var(--radius-sm); background: var(--color-background-sand); }
+.stl__fits-icon { display: grid; flex: none; place-items: center; width: var(--size-1300); height: var(--size-1300); border-radius: 50%; background: var(--color-background); }
+.stl__fits-icon svg { width: 28px; height: 28px; } /* Thiết kế: quang học glyph thước 28 */
+.stl__fits b { display: block; font-size: var(--font-size-lg); line-height: var(--line-height-title); }
+.stl__fits span { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+.stl__rows { display: grid; gap: var(--space-sm); margin: var(--space-sm) 0 0; padding: 0; list-style: none; }
+.stl-row { padding-inline-end: var(--space-md); }
+.stl-row .product-row__title a { text-decoration: none; }
+.stl-row .product-row__title a::after { content: ''; position: absolute; inset: 0; }
+.stl-row .product-row__title a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+/* Điểm nóng: vùng chạm 44, chấm trắng 20 + quầng trắng 40%; đang chọn (aria-pressed) chấm 28 viền foreground 2 + quầng 60% */
+.hotspot { position: absolute; width: var(--touch-target); height: var(--touch-target); margin: calc(var(--touch-target) / -2) 0 0 calc(var(--touch-target) / -2); padding: 0; border: 0; background: none; cursor: pointer; }
+.hotspot::before { content: ''; position: absolute; inset: var(--space-sm); border-radius: 50%; background: var(--color-background); box-shadow: 0 0 0 var(--space-2xs) color-mix(in srgb, var(--color-background) 40%, transparent); }
+.hotspot[aria-pressed='true']::before { inset: var(--space-xs); box-shadow: 0 0 0 var(--space-050) var(--color-foreground), 0 0 0 var(--space-150) color-mix(in srgb, var(--color-background) 60%, transparent); }
+@media (min-width: 48rem) {
+  .stl__head { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+  .stl__head > div { grid-column: 1; }
+  .stl__head .section-link { grid-column: 2; grid-row: 1; }
+  .stl__body { grid-template-columns: minmax(0, 1fr) 280px; align-items: start; gap: var(--space-md); }
+  .stl__summary { position: sticky; inset-block-start: calc(var(--header-height) + var(--space-md)); }
+}
+@media (min-width: 80rem) {
+  .stl { display: grid; grid-template-columns: repeat(var(--grid-columns), minmax(0, 1fr)); column-gap: var(--grid-gap); }
+  .stl__media { grid-column: span 8; }
+  .stl__body { grid-column: span 4; display: flex; flex-direction: column; gap: clamp(var(--space-md), 1.25vw, var(--space-xl)); margin-block-start: 0; }
+  .stl__list { display: contents; }
+  .stl__fits { min-height: clamp(84px, 5.2vw, 100px); padding-block: 0; } /* 84 ở 1280 → 100 ở 1920. Thiết kế: cao theo cột ảnh */
+  .stl__rows { gap: var(--space-xs); margin: 0; }
+  .stl__summary { position: static; margin-block-start: auto; }
+}
+
+/* --- (b3) Video card (h-vcard): khung 9/16 (Chuẩn: M3 carousel 9:16) nền tối + nút play tròn 52, dòng sản phẩm .product-row.
+   --error: video không tải được (giữ khung, chữ + icon thay ảnh) --- */
+.vcard { display: grid; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); }
+.vcard__media { position: relative; aspect-ratio: var(--ratio-9-16); background: var(--color-background-dark); }
+.vcard__media img { width: 100%; height: 100%; object-fit: cover; }
+.vcard__play { position: absolute; inset: 0; display: grid; place-items: center; width: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+.vcard__play span { display: grid; place-items: center; width: var(--round-button-size); height: var(--round-button-size); border-radius: 50%; background: color-mix(in srgb, var(--color-background) 92%, transparent); color: var(--color-foreground); transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out); }
+.vcard__play svg { width: 16px; height: 18px; margin-inline-start: var(--space-050); } /* Thiết kế: quang học glyph play 16 × 18 */
+.vcard__play:hover span, .vcard__play.is-hover span { scale: 1.06; background: var(--color-accent); color: var(--color-accent-foreground); }
+.vcard__play:focus-visible, .vcard__play.is-focus { outline-offset: calc(var(--space-2xs) * -1); } /* vòng focus trong khung (overflow hidden) */
+.vcard__product { position: relative; min-height: 76px; padding: var(--space-sm); }
+.vcard__product .product-row__title { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vcard__product a, .tcard__product a { text-decoration: none; }
+.vcard__product a::after, .tcard__product a::after { content: ''; position: absolute; inset: 0; }
+.vcard__product a:hover, .tcard__product a:hover { text-decoration: underline; text-underline-offset: 0.2em; }
+.vcard--error .vcard__media { display: grid; place-items: center; padding: var(--space-xl); color: var(--color-background-dark-foreground); text-align: center; }
+.vcard--error .vcard__media p { display: grid; justify-items: center; gap: var(--space-xs); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+.vcard--error svg { width: var(--icon-size-lg); height: var(--icon-size-lg); color: var(--color-background-dark-foreground); }
+@media (min-width: 80rem) { .vcard__product { min-height: 84px; padding: var(--space-sm) var(--space-md); } } /* 76 → 84: đệm ngang 16 */
+
+/* --- (b4) Testimonial card (h-tcard): ảnh 16/9, tên + Verified + sao, tiêu đề .text-title, trích dẫn muted, dòng sản phẩm dưới vạch.
+   Dưới 80rem sao xuống hàng riêng; từ 80rem một hàng, sao dạt phải, tên 14/600 --- */
+.tcard { display: flex; flex-direction: column; height: 100%; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background); }
+.tcard > img { width: 100%; aspect-ratio: var(--ratio-16-9); object-fit: cover; }
+.tcard__body { display: flex; flex: 1; flex-direction: column; gap: var(--space-sm); padding: var(--space-xl); }
+.tcard__meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-xs) var(--space-sm); }
+.tcard__name { font-weight: 500; }
+.tcard__verified { display: inline-flex; align-items: center; gap: var(--space-2xs); color: var(--color-muted-light); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+.tcard__verified svg { width: var(--icon-size-sm); height: var(--icon-size-sm); color: var(--color-badge-new); }
+.tcard__meta .rating__stars { flex-basis: 100%; }
+.tcard__title { font-family: var(--font-primary--family); } /* kèm .text-title (18/28, Inter 700) */
+.tcard__quote { flex: 1; color: var(--color-muted); }
+.tcard__product { position: relative; margin-block-start: var(--space-xs); padding-block-start: var(--space-xl); border-block-start: 1px solid var(--color-border); }
+@media (min-width: 80rem) {
+  .tcard__meta { flex-wrap: nowrap; gap: var(--space-sm); }
+  .tcard__name { font-size: var(--font-size-sm); font-weight: 600; line-height: var(--line-height-sm); }
+  .tcard__meta .rating__stars { flex-basis: auto; margin-inline-start: auto; }
+}
+
+/* --- (b5) Bảng thông số (h-specs): <dl class="specs"><div><dt/><dd/></div>…; hàng lẻ nền sand, viền border, bo 8.
+   360: dt trên dd; từ 48rem dt trái, dd phải; từ 80rem hàng cao tối thiểu 44 --- */
+.specs { width: 100%; margin: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-sm); }
+.specs > div { display: grid; gap: var(--space-2xs); padding: var(--space-sm) var(--space-md); }
+.specs > div:nth-child(odd) { background: var(--color-background-sand); }
+.specs dt { color: var(--color-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
+.specs dd { margin: 0; font-weight: 500; }
+@media (min-width: 48rem) {
+  .specs > div { grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-md); padding-inline: var(--space-xl); }
+  .specs dd { text-align: end; }
+}
+@media (min-width: 80rem) {
+  .specs { margin-block-start: var(--space-xs); }
+  .specs > div { display: flex; justify-content: space-between; min-height: var(--size-1100); padding: var(--space-xs) var(--space-xl); }
+}
+
+/* --- (b6) Số liệu FAQ (h-faq-stats): 2 ô (accent, tối) nhãn eyebrow + số Sofia 800 cỡ h1 + câu ngắn. AA: trắng trên accent 4.97:1, trên dark 17.4:1.
+   360: chồng lên đáy ảnh 48, lề 12; từ 48rem nổi góc dưới trái khung ảnh (80% bề ngang) --- */
+.faq__stats { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-sm); margin: calc(var(--space-4xl) * -1) var(--space-sm) 0; padding: 0; list-style: none; }
+.faq__stat { display: grid; gap: var(--space-2xs); padding: var(--space-md); border-radius: var(--radius-sm); color: var(--color-background-dark-foreground); }
+.faq__stat:first-child { background: var(--color-accent); }
+.faq__stat:last-child { background: var(--color-background-dark); }
+.faq__stat-label { font-family: var(--font-heading--family); font-size: var(--font-size-eyebrow); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-caps); line-height: var(--line-height-eyebrow); text-transform: uppercase; }
+.faq__stat-value { font-family: var(--font-heading--family); font-size: var(--font-size-h1); font-weight: var(--font-heading--weight-display); letter-spacing: var(--letter-spacing-heading); line-height: 1; } /* Thiết kế: số một dòng, dòng = cỡ */
+.faq__stat-text { font-size: var(--font-size-sm); font-weight: 500; line-height: var(--line-height-sm); }
+@media (min-width: 48rem) {
+  .faq__stats { position: absolute; inset-block-end: 7.5%; inset-inline-start: 0; width: 80%; margin: 0; }
+  .faq__stat { padding: var(--space-xl); }
+}
+@media (min-width: 80rem) { .faq__stats { inset-block-end: var(--space-3xl); width: 79.6%; } }
+
+/* --- (b7) Câu trả lời quiz (h-quiz-opt): .option-card.quiz-opt (V26: viền accent 2 + check accent 24) + thumb tròn 44 bên trái.
+   Giữ tên riêng, không gộp vào .option-card--tile. Cao tối thiểu 72 dưới 48rem, 80 từ 48rem --- */
+.quiz-opt { grid-template-columns: var(--size-1100) minmax(0, 1fr); align-items: center; column-gap: var(--space-sm); min-height: var(--size-1800); }
+.quiz-opt__thumb { width: var(--size-1100); height: var(--size-1100); border-radius: 50%; background: var(--color-background-sand); object-fit: cover; }
+.quiz-opt__text { display: grid; }
+@media (min-width: 48rem) { .quiz-opt { min-height: var(--size-2000); } }
+
+@media (prefers-reduced-motion: reduce) { .level-card:hover img, .level-card.is-hover img { scale: none; } }
 
 /* ============ 14. Motion ============ */
 @keyframes kit-spin { to { rotate: 360deg; } }
