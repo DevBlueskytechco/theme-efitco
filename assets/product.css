@@ -298,3 +298,286 @@ product-recommendations {
 .product-sticky-bar__add[aria-disabled='true'] {
   cursor: progress;
 }
+
+
+/** Chuyển từ base.css (ES1-T565 trần trang chủ 57 344 B): rule chỉ render ở template này, không ở trang chủ / quick view */
+
+@media (min-width: 64rem) {
+  /* Cộng chiều cao header vì header sticky mặc định bật */
+    .product__details {
+      position: sticky;
+      inset-block-start: calc(var(--header-height) + var(--space-6));
+    }
+}
+
+.product-media__list,
+.product-media__thumbnails {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-media__list {
+  display: flex;
+  gap: var(--space-2);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.product-media__list::-webkit-scrollbar {
+  display: none;
+}
+
+@media (scripting: none) {
+  .product-media__list {
+      scrollbar-width: thin;
+    }
+
+  .product-media__list::-webkit-scrollbar {
+      display: block;
+    }
+}
+
+.product-media__item {
+  position: relative;
+  display: grid;
+  flex: 0 0 100%;
+  align-content: center;
+  overflow: hidden;
+  scroll-snap-align: start;
+  /* Bấm thumbnail (anchor) không để media nằm dưới header sticky */
+  scroll-margin-block-start: calc(var(--sticky-top) + var(--space-4));
+  border-radius: var(--radius-card);
+  background-color: var(--color-background-cream);
+}
+
+.product-media__placeholder {
+  aspect-ratio: 1;
+  color: var(--color-muted-light);
+}
+
+.product-media__placeholder-svg {
+  inline-size: 100%;
+  block-size: 100%;
+  fill: currentcolor;
+}
+
+.product-media__thumbnails {
+  display: flex;
+  gap: var(--space-2);
+  margin-block-start: var(--space-3);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.product-media__thumbnail-item {
+  flex: none;
+}
+
+.product-media__thumbnail-image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  mix-blend-mode: darken;
+}
+
+/* Dialog zoom: assets/product-media.js mở bằng showModal() và gắn ảnh */
+.product-media__dialog {
+  inline-size: 100%;
+  max-inline-size: 100%;
+  block-size: 100%;
+  max-block-size: 100%;
+  padding: 0;
+  border: 0;
+}
+
+.product-media__dialog::backdrop {
+  background-color: color-mix(in srgb, var(--color-background-dark) 60%, transparent);
+}
+
+.product-media__dialog-image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: contain;
+}
+
+.product-media__dialog-form {
+  position: absolute;
+  inset-block-start: var(--space-4);
+  inset-inline-end: var(--space-4);
+  z-index: var(--layer-content);
+}
+
+.product-media__dialog-close {
+  position: relative;
+  display: grid;
+  place-items: center;
+  inline-size: 44px;
+  block-size: 44px;
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  cursor: pointer;
+}
+
+.product-media__dialog-close:hover {
+  border-color: var(--color-foreground);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+}
+
+.product-media__close-icon::before,
+.product-media__close-icon::after {
+  position: absolute;
+  inset-block-start: calc(50% - 1px);
+  inset-inline-start: calc(50% - var(--space-2));
+  inline-size: var(--space-4);
+  block-size: 2px;
+  background-color: currentcolor;
+  content: '';
+  rotate: 45deg;
+}
+
+.product-media__close-icon::after {
+  rotate: -45deg;
+}
+
+@media (min-width: 64rem) {
+  .product-media__list {
+      flex-direction: column;
+      gap: var(--space-3);
+      overflow: visible;
+      scroll-snap-type: none;
+    }
+
+  .product-media__item {
+      flex: none;
+    }
+}
+
+.product-form--placeholder {
+  padding: var(--space-4);
+  outline: 1px dashed var(--color-border);
+  outline-offset: -1px;
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+.product-form__textarea {
+  resize: vertical;
+}
+
+.product-gift-card__toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-block-size: 44px;
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+}
+
+.product-gift-card__fields {
+  display: none;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* Buy buttons */
+.product-form__buy-buttons {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.product-form__payment-button:empty,
+.product-form__installments:empty {
+  display: none;
+}
+
+/* Dynamic checkout: chỉ nút unbranded + link "More payment options"
+   lấy token foreground/background (tương phản như chữ thân, AA); nút ví có thương hiệu (Shop Pay,
+   PayPal…) giữ màu của Shopify. 2 class để thắng CSS Shopify kể cả :hover:not([disabled]). */
+.product-form__payment-button .shopify-payment-button__button--unbranded {
+  min-block-size: 52px;
+  padding: var(--space-3) var(--space-6);
+  border: 1px solid var(--color-foreground);
+  border-radius: var(--radius-button);
+  background-color: var(--color-foreground);
+  color: var(--color-background);
+  font-family: inherit;
+  font-size: var(--font-size-base);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.product-form__payment-button .shopify-payment-button__button--unbranded:hover:not([disabled]) {
+  border-color: var(--color-foreground);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.product-form__payment-button .shopify-payment-button__button--unbranded:focus-visible {
+  outline: 2px solid var(--color-foreground);
+  outline-offset: 2px;
+}
+
+.product-form__payment-button .shopify-payment-button__button--unbranded[disabled] {
+  border-color: var(--color-border);
+  background-color: var(--color-background-alt);
+  color: var(--color-muted);
+  opacity: 1;
+}
+
+.product-form__payment-button .shopify-payment-button__more-options {
+  color: var(--color-foreground);
+  font-size: var(--font-size-sm);
+  text-decoration: underline;
+}
+
+.product-pickup__status {
+  font-weight: 600;
+}
+
+.product-pickup__time,
+.product-pickup__address {
+  color: var(--color-muted);
+}
+
+.product-pickup__address p {
+  margin: 0;
+}
+
+.product-pickup__details {
+  margin-block-start: var(--space-2);
+}
+
+.product-pickup__summary {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: max(var(--space-5), var(--touch-target-min));
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  cursor: pointer;
+}
+
+.product-pickup__list {
+  display: grid;
+  gap: var(--space-4);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.product-pickup__name {
+  font-weight: 600;
+}
+
+/* Model 3D nạp xong không được nở khỏi cột gallery (TC-108) */
+.product-media__item { grid-template-columns: minmax(0, 1fr); }
