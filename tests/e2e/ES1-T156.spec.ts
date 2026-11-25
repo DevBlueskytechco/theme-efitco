@@ -102,7 +102,7 @@ test.describe('ES1-T156 TE-13 featured product', () => {
       const price = money(await tid(scope, 'price-regular').textContent());
       expect(compare).toBeGreaterThan(price);
       const percent = Math.round(((compare - price) * 100) / compare);
-      await expect(discount, `band ${id}`).toHaveText(percent > 0 ? `-${percent}%` : 'Sale');
+      await expect(discount, `band ${id}`).toHaveText(percent > 0 ? `−${percent}%` : 'Sale');
     }
   });
 
