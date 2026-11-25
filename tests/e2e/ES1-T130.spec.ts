@@ -30,6 +30,7 @@ const T = {
 
 const LOADER = 'assets/search-loader.js';
 const MODULE_FILE = 'assets/predictive-search.js';
+const RESULTS_FILE = 'assets/predictive-search-results.js';
 const HEADER = 'blocks/header.liquid';
 const SNIPPET = 'snippets/predictive-search.liquid';
 const SUGGEST = /\/search\/suggest\.json/;
@@ -133,7 +134,8 @@ test.describe('ES1-T130 tĩnh', () => {
   });
 
   test('AC1 contract JS ↔ snippet: tên element, hook, không innerHTML, không partial, không console', () => {
-    const js = readFileSync(MODULE_FILE, 'utf8');
+    // ES1-T378: phần vẽ nhóm, tab, nút chân ở assets/predictive-search-results.js (import() từ predictive-search.js)
+    const js = readFileSync(MODULE_FILE, 'utf8') + readFileSync(RESULTS_FILE, 'utf8');
     const snippet = readFileSync(SNIPPET, 'utf8');
     expect(js).toContain("customElements.get('predictive-search')");
     expect(snippet).toContain('<predictive-search');
@@ -207,7 +209,8 @@ test.describe('ES1-T130 predictive search', () => {
     expect(requests).toHaveLength(1);
     const url = new URL(requests[0].url());
     expect(url.searchParams.get('q')).toBe('ben');
-    expect(url.searchParams.get('resources[type]')).toBe('product,collection,page,article');
+    // ES1-T378 (ui-spec predictive-search §4): thêm query cho nhóm Suggestions
+    expect(url.searchParams.get('resources[type]')).toBe('query,product,collection,article,page');
     await expect(tid(page, T.listbox)).toBeVisible();
     await expect(tid(page, T.input)).toHaveAttribute('aria-expanded', 'true');
   });

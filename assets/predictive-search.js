@@ -1,55 +1,64 @@
 /**
- * <predictive-search> (ES1-T130, TE-8 AC1, NFR-4), imported by search-loader.js after
- * the dialog opens: reads the value already typed on connect.
- * API (ES1-T124 #1): GET {data-url}.json, resources.results; price is a decimal string.
+ * <predictive-search> (ES1-T130, ES1-T378; TE-8 AC1, NFR-4; ui-spec predictive-search §4, §6),
+ * imported by search-loader.js after the dialog opens. Hooks: {% doc %} of the snippet.
+ * API (ES1-T124 #1): GET {data-url}.json, resources.results. No event (#3), no partial (#2).
  * https://shopify.dev/docs/api/ajax/reference/predictive-search
- * No shopify:search:update event (submit, filter, sort only, #3); no partial (#2).
+ * Groups, tabs, footer link: predictive-search-results.js, imported on connect.
  */
 
 const PARAMS = {
-  'resources[type]': 'product,collection,page,article',
+  'resources[type]': 'query,product,collection,article,page',
   'resources[limit]': 8,
   'resources[limit_scope]': 'each',
   'resources[options][unavailable_products]': 'last',
 };
 
-// Same as product-recommendations.js
-const money = (cents, format) =>
-  format.replace(/<[^>]*>/g, '').replace(/\{\{\s*(\w+)\s*\}\}/, (_, key) => {
-    const sep = /comma/.test(key) ? '.' : ',';
-    const [int, dec] = (cents / 100).toFixed(/no_dec/.test(key) ? 0 : 2).split('.');
-    return int.replace(/\B(?=(\d{3})+$)/g, sep) + (dec ? (sep == ',' ? '.' : ',') + dec : '');
-  });
+// this[key] = the element with that attribute
+const HOOKS = {
+  input: 'role=combobox',
+  list: 'role=listbox',
+  status: 'role=status',
+  tabs: 'role=tablist',
+  all: 'data-testid=predictive-search-all',
+  hint: 'data-predictive-hint',
+  sk: 'data-predictive-skeleton',
+  spin: 'data-predictive-spinner',
+  empty: 'data-predictive-empty',
+  error: 'data-predictive-error',
+  discover: 'data-predictive-discover',
+};
+
+const show = (el, on) => el && (el.hidden = !on);
 
 class PredictiveSearch extends HTMLElement {
   connectedCallback() {
-    const $ = (s) => this.querySelector(s);
-    this.input = $('[role="combobox"]');
-    this.list = $('[role="listbox"]');
-    this.status = $('[role="status"]');
-    this.all = $('[data-testid="predictive-search-all"]');
+    for (const k in HOOKS) this[k] = this.querySelector(`[${HOOKS[k]}]`);
     const form = (this.form = this.input?.form);
     const dialog = this.closest('dialog');
-    if (!form || !this.list) return;
+    if (!form || !this.list || !this.all) return;
     const signal = (this.on = new AbortController()).signal;
     const on = (el, type, fn) => el?.addEventListener(type, fn, { signal });
 
     on(this.input, 'input', () => this.update());
     on(this.input, 'keydown', (e) => this.key(e));
+    on(this.tabs, 'keydown', (e) => this.m?.arrow(this, e));
+    on(this, 'click', (e) => this.click(e));
     // Clear (type="reset"): back to the field, no suggestions
     on(form, 'reset', () => (this.hide(), this.input.focus()));
     on(dialog, 'close', () => this.hide());
     on(this.closest('modal-dialog'), 'modal:open', () => this.update());
-    // ADR 0014 §8
-    const href = this.dataset.stylesheet,
-      sk = $('[data-predictive-skeleton]');
+
+    // asset_url (ES1-T485); none/error: GET form ok
+    this.ui = (this.dataset.resultsSrc ? import(this.dataset.resultsSrc) : Promise.reject()).then((m) => (this.m = m), () => {});
+    // ADR 0014 §8: one <link>, skeleton until load or error
+    const href = this.dataset.stylesheet;
     const l =
       href &&
       (document.querySelector(`link[href="${href}"]`) ||
         document.head.appendChild(Object.assign(document.createElement('link'), { rel: 'stylesheet', href })));
     if (l && !l.sheet) {
-      if (sk) sk.hidden = false;
-      this.css = (l.p ||= new Promise((r) => (l.onload = l.onerror = r))).then(() => sk && (sk.hidden = true));
+      show(this.sk, 1);
+      this.css = new Promise((r) => (l.onload = l.onerror = r)).then(() => show(this.sk, (this.css = null) || this.ac));
     }
     if (dialog?.open) this.update();
   }
@@ -59,13 +68,17 @@ class PredictiveSearch extends HTMLElement {
     this.hide();
   }
 
-  // < 2 characters: cancel and hide; else wait 300ms. The old request stops now.
-  update() {
+  // < 2 characters: hide (1: hint + discover); else wait 300ms (click: now)
+  update(now) {
     this.stop();
     this.select();
     const q = this.input.value.trim();
-    if (q.length < 2) return this.hide();
-    this.timer = setTimeout(() => this.load(q), 300);
+    const one = q.length == 1;
+    if (q.length < 2) this.hide();
+    show(this.hint, one);
+    show(this.discover, one || !this.discover?.hidden);
+    one && this.hint ? this.input.setAttribute('aria-describedby', this.hint.id) : this.input.removeAttribute('aria-describedby');
+    if (q.length > 1) this.timer = setTimeout(() => this.load(q), now ? 0 : 300);
   }
 
   stop() {
@@ -73,79 +86,63 @@ class PredictiveSearch extends HTMLElement {
     this.ac?.abort();
     this.ac = null;
     this.list.removeAttribute('aria-busy');
+    show(this.spin, 0);
   }
 
   async load(q) {
     const ac = (this.ac = new AbortController());
+    // > 5 s is an error (§6): ac stays current, unlike an abort from stop()
+    setTimeout(() => ac.abort(), 5000);
     this.list.setAttribute('aria-busy', 'true');
+    show(this.spin, 1);
+    // First load: skeleton, status, footer link; later ones keep the old results
+    if (this.list.hidden) {
+      [this.error, this.empty, this.discover].forEach((el) => show(el, 0));
+      show(this.sk, 1);
+      this.status.textContent = this.dataset.labelLoading || '';
+      this.q = q;
+      this.m?.foot(this, 1);
+    }
+    let results;
     try {
-      const res = await fetch(`${this.dataset.url}.json?${new URLSearchParams({ q, ...PARAMS })}`, {
-        signal: ac.signal,
-      });
-      // 429 and other errors: no retry, the form still submits
+      const res = await fetch(`${this.dataset.url}.json?${new URLSearchParams({ q, ...PARAMS })}`, { signal: ac.signal });
+      // 429 and other errors: no retry; Try again and submit still work
       if (!res.ok) throw res;
-      const { results } = (await res.json()).resources;
-      await this.css;
-      if (ac == this.ac) this.render(q, results);
-    } catch {
-      // AbortError: whoever aborted owns the state
-      if (!ac.signal.aborted) this.hide();
-    } finally {
-      if (ac == this.ac) this.list.removeAttribute('aria-busy');
-    }
+      results = (await res.json()).resources.results;
+    } catch {}
+    await this.css;
+    await this.ui;
+    // Aborted by typing, reset or close: that caller owns the state
+    if (ac != this.ac) return;
+    this.stop();
+    this.q = q;
+    for (const el of this.querySelectorAll('[data-predictive-terms]')) el.textContent = q;
+    results && this.m ? this.m.render(this, results) : this.fail();
   }
 
-  render(q, results) {
-    const d = this.dataset;
-    const terms = (label) => (label || '').replace('%s', () => q);
-    let n = 0;
-    for (const group of this.querySelectorAll('[data-predictive-group]')) {
-      const key = group.dataset.predictiveGroup;
-      const items = results[key] || [];
-      const tpl = this.querySelector(`[data-predictive-template="${key == 'products' ? 'product' : 'link'}"]`);
-      group.querySelector('[data-predictive-options]').replaceChildren(
-        ...items.map((item) => this.option(tpl.content.cloneNode(true), item, ++n))
-      );
-      group.hidden = !items.length;
-    }
-
-    const url = new URL(this.form.action);
-    url.search = new URLSearchParams(new FormData(this.form));
-    this.all.href = url;
-    this.all.id ||= `${this.list.id}-all`;
-    this.all.textContent = terms(d.labelAll) || this.all.textContent;
-
-    this.list.hidden = false;
-    this.input.setAttribute('aria-expanded', 'true');
-    this.select();
-    this.status.textContent = n ? (d.labelCount || '').replace('%n', n) : terms(d.labelEmpty);
+  // Alert with Try again; the footer link still opens the results page
+  fail() {
+    this.hide();
+    show(this.error, 1);
+    this.m?.foot(this, 1);
   }
 
-  // Template clone, textContent only
-  option(node, item, i) {
-    const $ = (s) => node.querySelector(`[data-predictive-${s}]`);
-    const a = node.firstElementChild;
-    a.href = item.url;
-    a.id = `${this.list.id}-${i}`;
-    $('title').textContent = item.title;
-    const price = $('price');
-    if (price) price.textContent = money(Math.round(item.price * 100), this.dataset.moneyFormat || '');
-    const img = $('image');
-    const src = item.image || item.featured_image?.url;
-    if (img && src) {
-      const u = new URL(src, location.href);
-      // src ends at width 64
-      img.srcset = [128, 64].map((w) => (u.searchParams.set('width', w), `${u} ${w}w`)).join();
-      img.src = u;
-    } else img?.remove();
-    return node;
+  // Tab; suggestion or chip: fill the field, suggest now; Try again
+  click(e) {
+    const t = e.target.closest('[data-predictive-tab],[data-predictive-query],[data-retry]');
+    if (!t) return;
+    e.preventDefault();
+    if (t.dataset.predictiveTab) return this.m?.tab(this, t);
+    if (t.dataset.predictiveQuery) this.input.value = t.dataset.predictiveQuery;
+    this.input.focus();
+    this.update(1);
   }
 
-  // Focus stays on the input; the active option is aria-activedescendant
+  // Focus stays on the input; active option: aria-activedescendant, hidden ones skipped
   key(e) {
     if (e.isComposing) return;
     const open = !this.list.hidden;
-    const options = [...this.list.querySelectorAll('[role="option"]')];
+    const options = [...this.list.querySelectorAll('[role="option"]')].filter((o) => o.offsetParent);
     const i = options.indexOf(this.active);
     const step = { ArrowDown: 1, ArrowUp: -1 }[e.key];
     if (step && open && options.length) {
@@ -175,7 +172,8 @@ class PredictiveSearch extends HTMLElement {
     if (!this.on) return;
     this.stop();
     this.select();
-    this.list.hidden = true;
+    for (const el of [this.list, this.tabs, this.all, this.empty, this.error, this.discover]) show(el, 0);
+    show(this.sk, this.css);
     this.input.setAttribute('aria-expanded', 'false');
     this.status.textContent = '';
   }
