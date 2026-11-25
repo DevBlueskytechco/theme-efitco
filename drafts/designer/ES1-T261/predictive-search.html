@@ -8,9 +8,9 @@
 <link rel="stylesheet" href="../_kit/kit.css">
 <style>
   /* ===== Mockup helper (không chuyển sang theme) ===== */
-  .sheet-intro { padding-block: var(--space-5) var(--space-6); }
-  .sheet-intro p { margin-block-start: var(--space-3); color: var(--color-muted); }
-  .demo-block { padding-block: var(--space-7) 0; }
+  .sheet-intro { padding-block: var(--space-xl) var(--space-2xl); }
+  .sheet-intro p { margin-block-start: var(--space-sm); color: var(--color-muted); }
+  .demo-block { padding-block: var(--space-4xl) 0; }
   .stage { --stage-h: 760px; position: relative; height: var(--stage-h); overflow: hidden; border-block: 1px dashed var(--color-muted-light); background: var(--color-background); }
   @media (min-width: 48rem) { .stage { --stage-h: 1024px; } }
   @media (min-width: 80rem) { .stage { --stage-h: 800px; } }
@@ -20,13 +20,13 @@
   @media (min-width: 100rem) { .stage--tall { --stage-h: 1240px; } }
   .stage > .scrim { position: absolute; }
   .ghost .site-header { position: relative; }
-  .ghost-page { display: grid; gap: var(--space-5); padding-block: var(--space-6); }
+  .ghost-page { display: grid; gap: var(--space-xl); padding-block: var(--space-2xl); }
   .ghost-line { display: block; width: 40%; height: 40px; border-radius: var(--radius-xs); background: var(--color-background-alt); }
   .ghost-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--grid-gap); }
   .ghost-grid span { aspect-ratio: 1; border-radius: var(--radius-card); background: var(--color-background-cream); }
   @media (min-width: 48rem) { .ghost-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   @media (min-width: 80rem) { .ghost-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  .edge-box { max-width: 480px; padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
+  .edge-box { max-width: 480px; padding: var(--space-xl); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
 
   /* ===== Search overlay (ĐỀ XUẤT, docs/ui-spec/predictive-search.md) ===== */
   .ps { position: absolute; z-index: var(--layer-overlay); display: flex; flex-direction: column; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); }
@@ -38,18 +38,18 @@
   @media (min-width: 80rem) { .ps--drawer { width: 480px; } }
 
   .ps__inner { width: var(--content-width); margin-inline: auto; }
-  .ps--drawer .ps__inner { width: auto; margin: 0; padding-inline: var(--space-5); }
+  .ps--drawer .ps__inner { width: auto; margin: 0; padding-inline: var(--space-xl); }
 
-  .ps__head .ps__inner { display: flex; align-items: center; gap: var(--space-3); min-height: calc(var(--space-1) * 18); padding-inline-end: var(--space-3); border-block-end: 1px solid var(--color-border); }
+  .ps__head .ps__inner { display: flex; align-items: center; gap: var(--space-sm); min-height: calc(var(--space-2xs) * 18); padding-inline-end: var(--space-sm); border-block-end: 1px solid var(--color-border); }
   .ps__title { flex: 1; margin: 0; font-family: var(--font-heading--family); font-size: var(--font-size-h3); font-weight: var(--font-heading--weight); line-height: var(--line-height-h3); }
 
   .ps__top { flex: none; }
-  .ps__top .ps__inner { display: flex; align-items: center; gap: var(--space-3); padding-block: var(--space-3); }
-  .ps--drawer .ps__top .ps__inner { padding-block: var(--space-4) var(--space-3); }
+  .ps__top .ps__inner { display: flex; align-items: center; gap: var(--space-sm); padding-block: var(--space-sm); }
+  .ps--drawer .ps__top .ps__inner { padding-block: var(--space-md) var(--space-sm); }
   .ps__logo { display: none; }
   /* Vòng 3: hàng ô tìm của popup = thanh tối header (sổ 10/11), cao 80 mọi mốc, nằm đúng chỗ header */
   .ps--popup .ps__top { background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); }
-  .ps--popup .ps__top .ps__inner { min-height: var(--header-height); padding-block: var(--space-4); }
+  .ps--popup .ps__top .ps__inner { min-height: var(--header-height); padding-block: var(--space-md); }
   .ps--popup .ps__top :focus-visible { outline-color: var(--color-background-dark-foreground); }
   @media (min-width: 80rem) {
     .ps--popup .ps__top .ps__inner { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); }
@@ -65,25 +65,25 @@
   .ps__top .search-field { flex: 1; }
   @media (min-width: 80rem) { .ps--popup .search-field .field__input { font-size: var(--font-size-lg); } }
 
-  .ps__tabs .ps__inner { padding-block: 0 var(--space-3); }
-  .ps--popup .ps__tabs .ps__inner { padding-block: var(--space-4); }
+  .ps__tabs .ps__inner { padding-block: 0 var(--space-sm); }
+  .ps--popup .ps__tabs .ps__inner { padding-block: var(--space-md); }
   @media (min-width: 80rem) {
-    .ps--popup .ps__tabs .ps__inner { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); padding-block: var(--space-5); }
+    .ps--popup .ps__tabs .ps__inner { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--grid-gap); padding-block: var(--space-xl); }
     .ps--popup .ps__tabs .tabs { grid-column: 4 / -1; }
   }
   /* Vòng 3: tab = kit .tab (cao 44, 40 từ 80rem; padding ngang 24; 16/500; cách 8), không còn biến thể nhỏ */
-  .tab__count { margin-inline-start: var(--space-2); font-weight: 400; }
-  .ps--drawer .tab { padding-inline: var(--space-5); }
+  .tab__count { margin-inline-start: var(--space-xs); font-weight: 400; }
+  .ps--drawer .tab { padding-inline: var(--space-xl); }
 
   .ps__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; border-block-start: 1px solid var(--color-border); }
-  .ps__body > .ps__inner { padding-block: var(--space-5); }
-  @media (min-width: 80rem) { .ps--popup .ps__body > .ps__inner { padding-block: var(--space-6); } }
+  .ps__body > .ps__inner { padding-block: var(--space-xl); }
+  @media (min-width: 80rem) { .ps--popup .ps__body > .ps__inner { padding-block: var(--space-2xl); } }
 
-  .ps-layout { display: grid; gap: var(--space-6); align-content: start; }
+  .ps-layout { display: grid; gap: var(--space-2xl); align-content: start; }
   @media (min-width: 48rem) {
     .ps--popup .ps-layout { grid-template-columns: repeat(8, minmax(0, 1fr)); grid-template-rows: repeat(4, auto) 1fr; column-gap: var(--grid-gap); row-gap: 0; }
     .ps--popup .ps-layout > * { grid-column: 1 / span 3; }
-    .ps--popup .ps-layout > :not(.ps-main):not(:last-child) { margin-block-end: var(--space-6); }
+    .ps--popup .ps-layout > :not(.ps-main):not(:last-child) { margin-block-end: var(--space-2xl); }
     .ps--popup .ps-layout > .ps-main { grid-column: 4 / -1; grid-row: 1 / -1; }
     .ps--popup .ps-layout--full > .ps-main { grid-column: 1 / -1; }
   }
@@ -91,12 +91,12 @@
     .ps--popup .ps-layout { grid-template-columns: repeat(12, minmax(0, 1fr)); }
   }
 
-  .ps-group__title { margin: 0 0 var(--space-2); }
-  .ps-group__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-block-end: var(--space-2); }
+  .ps-group__title { margin: 0 0 var(--space-xs); }
+  .ps-group__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); margin-block-end: var(--space-xs); }
   .ps-group__head .ps-group__title { margin: 0; }
   .ps-list { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; }
 
-  .ps-option { display: flex; align-items: center; gap: var(--space-3); min-height: var(--touch-target); margin-inline: calc(var(--space-3) * -1); padding: var(--space-1) var(--space-3); border-radius: var(--radius-input); color: inherit; text-decoration: none; transition: background-color var(--motion-fast) var(--ease-out); }
+  .ps-option { display: flex; align-items: center; gap: var(--space-sm); min-height: var(--touch-target); margin-inline: calc(var(--space-sm) * -1); padding: var(--space-2xs) var(--space-sm); border-radius: var(--radius-input); color: inherit; text-decoration: none; transition: background-color var(--motion-fast) var(--ease-out); }
   .ps-option:hover, .ps-option.is-hover { background: var(--color-background-alt); }
   .ps-option[aria-selected='true'] { background: var(--color-background-alt); outline: 2px solid var(--color-accent); outline-offset: -2px; }
   .ps-option > svg { flex: none; width: var(--icon-size-sm); height: var(--icon-size-sm); color: var(--color-muted); }
@@ -104,42 +104,42 @@
   .ps-option__text mark { background: none; color: inherit; font-weight: 400; }
   .ps-option__meta { flex: none; margin-inline-start: auto; color: var(--color-muted); font-size: var(--font-size-sm); }
   .ps-option--plain .ps-option__text { font-weight: 500; }
-  .ps-option--article { align-items: flex-start; padding-block: var(--space-2); }
+  .ps-option--article { align-items: flex-start; padding-block: var(--space-xs); }
   .ps-option--article img { flex: none; width: 64px; height: 48px; border-radius: var(--radius-xs); object-fit: cover; }
   .ps-option--article .ps-option__text { display: grid; gap: var(--space-050); font-weight: 500; line-height: var(--line-height-body); }
   .ps-option--article small { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
 
   /* Sản phẩm: mặc định dạng hàng (ảnh 64), từ 80rem trong popup thành card */
-  .ps-products { display: grid; gap: var(--space-1); margin: 0; padding: 0; list-style: none; }
-  .ps-card { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-3); min-height: 80px; margin-inline: calc(var(--space-3) * -1); padding: var(--space-2) var(--space-3); border-radius: var(--radius-input); color: inherit; text-decoration: none; transition: background-color var(--motion-fast) var(--ease-out); }
+  .ps-products { display: grid; gap: var(--space-2xs); margin: 0; padding: 0; list-style: none; }
+  .ps-card { position: relative; display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-sm); min-height: 80px; margin-inline: calc(var(--space-sm) * -1); padding: var(--space-xs) var(--space-sm); border-radius: var(--radius-input); color: inherit; text-decoration: none; transition: background-color var(--motion-fast) var(--ease-out); }
   .ps-card:hover, .ps-card.is-hover { background: var(--color-background-alt); }
   .ps-card[aria-selected='true'] { background: var(--color-background-alt); outline: 2px solid var(--color-accent); outline-offset: -2px; }
   .ps-card__media { position: relative; display: grid; place-items: center; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-swatch); background: var(--color-background-cream); }
   /* Badge -N% góc trái trên như kit .product-card (chỉ ở dạng card, không ở hàng ảnh 64) */
-  .ps-card__badge { position: absolute; z-index: 1; inset-block-start: var(--space-2); inset-inline-start: var(--space-2); display: none; }
+  .ps-card__badge { position: absolute; z-index: 1; inset-block-start: var(--space-xs); inset-inline-start: var(--space-xs); display: none; }
   .ps-products--grid .ps-card__badge { display: inline-flex; }
-  @media (min-width: 64rem) { .ps-products--grid .ps-card__badge { inset-block-start: var(--space-4); inset-inline-start: var(--space-4); } }
+  @media (min-width: 64rem) { .ps-products--grid .ps-card__badge { inset-block-start: var(--space-md); inset-inline-start: var(--space-md); } }
   .ps-card__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; transition: scale var(--motion-slow) var(--ease-out); }
   .ps-card__media svg { width: 45%; height: auto; color: var(--color-muted-light); }
   .ps-card__info { display: grid; gap: var(--space-050); min-width: 0; }
   .ps-card__title { font-weight: 500; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-body); } /* 16/24 như kit .product-card__title */
   .ps-card .price { font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
 
-  .ps-products--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5) var(--grid-gap); }
-  .ps-products--grid .ps-card { grid-template-columns: 1fr; align-items: start; gap: var(--space-2); min-height: 0; margin: 0; padding: 0; border-radius: var(--radius-card); background: none; }
+  .ps-products--grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-xl) var(--grid-gap); }
+  .ps-products--grid .ps-card { grid-template-columns: 1fr; align-items: start; gap: var(--space-xs); min-height: 0; margin: 0; padding: 0; border-radius: var(--radius-card); background: none; }
   .ps-products--grid .ps-card__media { border-radius: var(--radius-card); }
   .ps-products--grid .ps-card .price { font-size: var(--font-size-base); }
   .ps-products--grid .ps-card:hover .ps-card__media img, .ps-products--grid .ps-card.is-hover .ps-card__media img { scale: 1.04; }
   .ps-products--grid .ps-card:hover .ps-card__title, .ps-products--grid .ps-card.is-hover .ps-card__title { text-decoration: underline; text-underline-offset: 0.2em; }
-  .ps-products--grid .ps-card[aria-selected='true'] { background: none; outline-offset: var(--space-1); }
+  .ps-products--grid .ps-card[aria-selected='true'] { background: none; outline-offset: var(--space-2xs); }
   @media (min-width: 48rem) {
     .ps-products--tab { grid-template-columns: repeat(4, minmax(0, 1fr)); }
   }
   @media (min-width: 80rem) {
-    .ps--popup .ps-products--all { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); }
-    .ps--popup .ps-products--all .ps-card { grid-template-columns: 1fr; align-items: start; gap: var(--space-2); min-height: 0; margin: 0; padding: 0; background: none; }
-    .ps--popup .ps-products--all .ps-card__badge { display: inline-flex; inset-block-start: var(--space-4); inset-inline-start: var(--space-4); }
-    .ps--popup .ps-products--all .ps-card__info { gap: var(--space-1); }
+    .ps--popup .ps-products--all { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-xl); }
+    .ps--popup .ps-products--all .ps-card { grid-template-columns: 1fr; align-items: start; gap: var(--space-xs); min-height: 0; margin: 0; padding: 0; background: none; }
+    .ps--popup .ps-products--all .ps-card__badge { display: inline-flex; inset-block-start: var(--space-md); inset-inline-start: var(--space-md); }
+    .ps--popup .ps-products--all .ps-card__info { gap: var(--space-2xs); }
     .ps--popup .ps-products--all .ps-card__media { border-radius: var(--radius-card); }
     .ps--popup .ps-products--all .ps-card .price { font-size: var(--font-size-base); }
     .ps--popup .ps-products--all .ps-card:hover .ps-card__media img, .ps--popup .ps-products--all .ps-card.is-hover .ps-card__media img { scale: 1.04; }
@@ -150,38 +150,38 @@
   .ps--drawer .ps-products--tab { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
   .ps__footer { flex: none; border-block-start: 1px solid var(--color-border); background: var(--color-background); }
-  .ps__footer .ps__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); padding-block: var(--space-3); }
+  .ps__footer .ps__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding-block: var(--space-sm); }
   .ps__status { color: var(--color-muted); font-size: var(--font-size-sm); }
-  .ps__footer .button { flex: none; min-width: 0; padding-inline: var(--space-5); white-space: normal; text-align: center; }
+  .ps__footer .button { flex: none; min-width: 0; padding-inline: var(--space-xl); white-space: normal; text-align: center; }
   @media (max-width: 47.99rem) {
     .ps__status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
     .ps__footer .button { flex: 1; }
   }
   .ps--drawer .ps__status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   .ps--drawer .ps__footer .button { flex: 1; }
-  .ps--drawer .ps__footer .ps__inner { padding-block: var(--space-4) var(--space-5); }
+  .ps--drawer .ps__footer .ps__inner { padding-block: var(--space-md) var(--space-xl); }
 
   /* Khám phá (mở khi chưa gõ đủ 2 ký tự, hoặc 0 kết quả) */
-  .ps-hint { display: flex; align-items: center; gap: var(--space-2); margin-block-end: var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .ps-hint { display: flex; align-items: center; gap: var(--space-xs); margin-block-end: var(--space-xl); color: var(--color-muted); font-size: var(--font-size-sm); }
   .ps-hint svg { flex: none; width: var(--icon-size-sm); height: var(--icon-size-sm); }
-  .ps-section + .ps-section { margin-block-start: var(--space-6); }
-  .ps-section h4 { margin: 0 0 var(--space-3); }
-  .ps-section__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); margin-block-end: var(--space-2); }
+  .ps-section + .ps-section { margin-block-start: var(--space-2xl); }
+  .ps-section h4 { margin: 0 0 var(--space-sm); }
+  .ps-section__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); margin-block-end: var(--space-xs); }
   .ps-section__head h4 { margin: 0; }
   .ps-text-button { display: inline-flex; align-items: center; min-height: var(--touch-target); padding: 0; border: 0; background: none; color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 500; text-decoration: underline; text-underline-offset: 0.2em; cursor: pointer; }
   .ps-text-button:hover { color: var(--color-accent); }
   .ps-links { margin: 0; padding: 0; list-style: none; }
-  .ps-links a { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: var(--touch-target); color: inherit; font-weight: 500; text-decoration: none; }
+  .ps-links a { display: flex; align-items: center; justify-content: space-between; gap: var(--space-sm); min-height: var(--touch-target); color: inherit; font-weight: 500; text-decoration: none; }
   .ps-links a:hover { color: var(--color-accent); text-decoration: underline; text-underline-offset: 0.2em; }
   .ps-links small { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
 
 
-  .ps-skeleton-rows { display: grid; gap: var(--space-4); }
-  .ps-skeleton-row { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-3); }
+  .ps-skeleton-rows { display: grid; gap: var(--space-md); }
+  .ps-skeleton-row { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: var(--space-sm); }
   .ps-skeleton-row .skeleton--media { border-radius: var(--radius-swatch); }
-  .ps-skeleton-row > div { display: grid; gap: var(--space-2); }
+  .ps-skeleton-row > div { display: grid; gap: var(--space-xs); }
   .ps-skeleton-row .skeleton--line:last-child { width: 30%; }
-  .ps-skeleton-lines { display: grid; gap: var(--space-4); }
+  .ps-skeleton-lines { display: grid; gap: var(--space-md); }
   .ps-skeleton-lines .skeleton--line:nth-child(1) { width: 40%; }
   .ps-skeleton-lines .skeleton--line:nth-child(2) { width: 80%; }
   .ps-skeleton-lines .skeleton--line:nth-child(3) { width: 65%; }
@@ -189,7 +189,7 @@
   .ps-skeleton-cards { display: none; }
   @media (min-width: 80rem) {
     .ps--popup .ps-skeleton-rows { display: none; }
-    .ps--popup .ps-skeleton-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-5); }
+    .ps--popup .ps-skeleton-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-xl); }
     .ps-skeleton-cards .skeleton-card .skeleton--line:last-child { width: 40%; }
   }
   .ps-alert { max-width: 40rem; }
@@ -199,12 +199,12 @@
     .ps--popup { animation: ps-drop var(--motion-base) var(--ease-out) both; }
     .ps--drawer { animation: ps-slide 250ms var(--ease-out) both; }
   }
-  @keyframes ps-drop { from { opacity: 0; translate: 0 calc(var(--space-5) * -1); } }
+  @keyframes ps-drop { from { opacity: 0; translate: 0 calc(var(--space-xl) * -1); } }
   @keyframes ps-slide { from { translate: 100% 0; } }
 
   /* ===== ES1-T527: kit .group-label (V76), .chip/.chip-list (V41), .empty-state--compact (V54), .button--small;
      hàng active-descendant = outline accent inset như .listbox__option (V68); Sold out dòng có ảnh = badge + ảnh 0.6 (V67) ===== */
-  .ps-empty + .ps-section { margin-block-start: var(--space-6); }
+  .ps-empty + .ps-section { margin-block-start: var(--space-2xl); }
   .ps-card__media img.is-sold-out { opacity: 0.6; }
   .ps-card__info .badge { justify-self: start; }
 </style>
@@ -687,7 +687,7 @@
   </section>
 
   <!-- ===================== 8. Ca biên trong danh sách ===================== -->
-  <section class="demo-block" aria-labelledby="s8" style="padding-block-end: var(--space-7)">
+  <section class="demo-block" aria-labelledby="s8" style="padding-block-end: var(--space-4xl)">
     <div class="container">
       <h2 id="s8">8. Edge cases in the product list</h2>
       <p class="demo-note" lang="vi">Ca biên từ demo-data edge_cases: không ảnh (placeholder trên cream), hết hàng (dòng có ảnh: badge Sold out + ảnh 0.6, xếp cuối; quy tắc V67 trong sổ quyết định), giá sale nhỏ, tên dài cắt 2 dòng.</p>

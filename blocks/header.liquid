@@ -28,7 +28,11 @@
     JavaScript. The next element sibling must stay the
     <modal-dialog data-layer="search"> of snippets/predictive-search.liquid;
     JS opens it from this link. The search_style setting picks popup (dark
-    top band) or drawer (inline end).
+    top band) or drawer (inline end). popular_collections (up to 4) and
+    trending_products (first 4 products) feed the discover area of the layer
+    (predictive-search.md §5, TE-8 AC11); empty hides that part. Popular
+    searches is the theme setting settings.popular_searches (FD2), not a
+    header setting.
   - data-search-src on header-search-link: URL of assets/predictive-search.js.
     assets/search-loader.js (always loaded, max 256 B, no comments inside)
     listens for clicks on window, so it survives editor re-renders. Plain
@@ -60,7 +64,8 @@
     {% form 'localization' %}; mỗi mục là nút submit nên đổi được khi không JS. Form bọc trong
     <localization-picker> (hợp đồng TE-1-R2-FE5 / TE-1-R2-BE2, như footer): danh sách, tab, ô tìm
     (> 10 nước), status, lỗi từ snippets/localization-lists.liquid, testid tiền tố header-drawer-.
-    Tab chỉ hiện khi BE gắn data-tabs lên host (cấp 2 đang phủ drawer).
+    Tab chỉ hiện khi BE gắn data-tabs lên host (cấp 2 đang phủ drawer). Nạp lười như footer
+    (TE-1-R2-BE2): data-lazy-module + data-lazy-on="interaction" (lazy-module.js), data-list-src.
   - header-drawer-account: link gốc trong chân drawer (icon + "Sign In", đã đăng nhập "Account"),
     tên truy cập = chữ thấy được (TE-1 AC14, WCAG 2.5.3). Không dùng <shopify-account> ở đây: nút
     trong shadow có aria-label="Account" cố định, lệch chữ "Sign In" (axe label-content-name-mismatch).
@@ -301,6 +306,9 @@
                     assign label_updating = 'blocks.footer.updating' | t: name: '[name]'
                   -%}
                   <localization-picker
+                    data-lazy-module="{{ 'localization-picker.js' | asset_url }}"
+                    data-lazy-on="interaction"
+                    data-list-src="{{ 'localization-list.js' | asset_url }}"
                     data-country-count="{{ localization.available_countries.size }}"
                     data-label-status="{{ label_status | escape }}"
                     data-label-status-one="{{ label_status_one | escape }}"
@@ -350,6 +358,7 @@
                     </details>
                   {%- endform -%}
                   </localization-picker>
+                  <script src="{{ 'lazy-module.js' | asset_url }}" type="module"></script>
                 {%- endif -%}
               </div>
             {%- endif -%}
@@ -579,7 +588,9 @@
       {% render 'predictive-search',
         style: block.settings.search_style,
         logo: logo,
-        logo_width: block.settings.logo_width
+        logo_width: block.settings.logo_width,
+        popular_collections: block.settings.popular_collections,
+        trending_collection: block.settings.trending_products
       %}
 
       {% if shop.customer_accounts_enabled %}
@@ -686,6 +697,19 @@
         }
       ],
       "default": "popup"
+    },
+    {
+      "type": "collection_list",
+      "id": "popular_collections",
+      "label": "t:labels.popular_collections",
+      "info": "t:info.popular_collections",
+      "limit": 4
+    },
+    {
+      "type": "collection",
+      "id": "trending_products",
+      "label": "t:labels.trending_products",
+      "info": "t:info.trending_products"
     }
   ]
 }
