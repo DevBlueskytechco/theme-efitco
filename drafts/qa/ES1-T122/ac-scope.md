@@ -1,0 +1,10 @@
+# ES1-T122 — AC trong phạm vi (trích docs/srs.md#TE-7 bản 0.5)
+Dùng cho `ac_coverage.py`. Ticket ghi AC1–AC5; comment CTO 11/11 yêu cầu viết theo SRS 0.5 nên thêm AC6, AC7 (AC mới 0.5 chưa có TC cấp story). AC-H24, AC-H25 đã phủ ở ES1-T179.spec.ts, không nằm trong phạm vi file này.
+
+- AC1 Given testimonials có 1–6 mục When render Then hàng ngang ở mọi mốc, không thanh cuộn trình duyệt; từ 768 có nút back/next tròn 52px ở đầu khối (trắng viền #E5E5E5, rê chuột cam) và thanh tiến trình mảnh; 360 ẩn nút, vuốt, vẫn có tiến trình. 1280 lộ ≥ 25% card kế. Hàng vừa khung: lưới tĩnh, không nút, không tiến trình. Mỗi mục có quote, tên, sao (0–5), ảnh tuỳ chọn.
+- AC2 Given FAQ có 1–10 mục When render Then disclosure dùng được bằng bàn phím (Enter/Space mở), trình đọc màn hình đọc được trạng thái mở/đóng (details/summary, không JS), một hoặc nhiều mở theo setting.
+- AC3 Given image with text When render Then ảnh trái/phải theo setting, ở 360 ảnh trên; heading, richtext, nút.
+- AC4 Given multicolumn 2–4 cột When render Then icon/ảnh, heading, text, link mỗi cột; 360 xếp 1 cột.
+- AC5 Given theme mới cài When render 4 block Then không copy, số liệu, review, tên khách mẫu của mockup làm mặc định, không Lorem; setting chữ rỗng thì phần tử không render. Custom Liquid (setting type liquid) vẫn có trong theme, không gọi trong `templates/index.liquid`.
+- AC6 Given testimonials 4 mục có ảnh When đo Then card 272/307/360/456 (ảnh 161/182/213/270 cao); dưới 80rem sao hàng riêng, từ 80rem cùng hàng; card cao bằng nhau; không ảnh bắt đầu từ thân; không sản phẩm không gạch, không hàng sản phẩm; sao `role="img"` "{n} out of 5 stars"; nút đầu/cuối cặp màu disabled, không opacity, `aria-disabled="true"`; `<ul aria-label="Customer reviews" tabindex="0">`.
+- AC7 Given dưới 80rem When render Then why: ảnh lớn trên chữ, 2 ảnh nhỏ không hiện/không tải ở 360, hiện ở 768, eyebrow `--color-muted-on-dark`. FAQ: accordion trước nhóm ảnh, icon +/− cùng màu chữ câu hỏi, hàng ≥ 56, ô số chỉ render khi bật và có chữ. Make fitness: 360 hiện 2 ảnh, ảnh 3 không hiện/không tải; 768 hiện 3; ảnh không đè chữ; thiếu ảnh bỏ ô; `button_label` rỗng không có nút.
