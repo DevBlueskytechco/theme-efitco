@@ -56,6 +56,9 @@
     skeleton (data-predictive-skeleton) shown until its load event (on error
     show results anyway), then shows results / discover. Same contract as
     data-stylesheet on <quick-view> (ES1-T373).
+  - <predictive-search> data-results-src: URL of
+    assets/predictive-search-results.js (ES1-T378, ES1-T485: asset_url keeps
+    ?v=). BE import()s it on connect; missing or failed: error box on results.
   - <predictive-search>: data-url, data-money-format, data-label-count (%n is
     the number), data-label-empty, data-label-all, data-label-products (%s is
     the search terms), data-label-shop-all + data-shop-all-url (footer link at
@@ -170,6 +173,7 @@
       data-label-sale-price="{{ 'products.price.sale_price' | t | escape }}"
       data-label-regular-price="{{ regular_price_label | escape }}"
       data-stylesheet="{{ 'predictive-search.css' | asset_url }}"
+      data-results-src="{{ 'predictive-search-results.js' | asset_url }}"
     >
       <div class="predictive-search__bar">
         <h2

@@ -48,8 +48,8 @@ class PredictiveSearch extends HTMLElement {
     on(dialog, 'close', () => this.hide());
     on(this.closest('modal-dialog'), 'modal:open', () => this.update());
 
-    // Same folder (assets/); on error the GET form still works
-    this.ui = import(new URL('predictive-search-results.js', import.meta.url)).then((m) => (this.m = m), () => {});
+    // asset_url (ES1-T485); none/error: GET form ok
+    this.ui = (this.dataset.resultsSrc ? import(this.dataset.resultsSrc) : Promise.reject()).then((m) => (this.m = m), () => {});
     // ADR 0014 §8: one <link>, skeleton until load or error
     const href = this.dataset.stylesheet;
     const l =

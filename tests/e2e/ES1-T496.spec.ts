@@ -79,7 +79,7 @@ const SUGGEST = {
 
 function fakeHtml({ layer = true, modal = true } = {}) {
   const dialog = `<modal-dialog data-layer="search"><dialog class="drawer" aria-labelledby="PredictiveSearchTitle" data-testid="predictive-search-dialog">
-<predictive-search data-testid="predictive-search" data-url="/search/suggest" data-money-format="\${{amount}}" data-label-count="%n results" data-label-empty="No results for %s" data-label-all="View all results for %s">
+<predictive-search data-testid="predictive-search" data-url="/search/suggest" data-results-src="/assets/predictive-search-results.js?v=1" data-money-format="\${{amount}}" data-label-count="%n results" data-label-empty="No results for %s" data-label-all="View all results for %s">
 <h2 id="PredictiveSearchTitle">Search</h2>
 <form action="/search" method="get" role="search" data-testid="predictive-search-form">
 <label for="PredictiveSearchInput">Search</label>
@@ -112,7 +112,7 @@ async function openFake(page: Page, options?: { layer?: boolean; modal?: boolean
     const url = new URL(route.request().url());
     if (url.pathname.startsWith('/assets/')) {
       const file = url.pathname.slice('/assets/'.length);
-      // ES1-T378: predictive-search.js import() predictive-search-results.js cùng thư mục để vẽ nhóm
+      // ES1-T378: predictive-search.js import() predictive-search-results.js theo data-results-src (ES1-T485) để vẽ nhóm
       if (!['search-handoff.js', 'modal-dialog.js', 'predictive-search.js', 'predictive-search-results.js'].includes(file)) return route.fulfill({ status: 404, body: '' });
       if (file === 'predictive-search.js') hits.predictive++;
       return route.fulfill({ body: read(`assets/${file}`), contentType: 'text/javascript' });

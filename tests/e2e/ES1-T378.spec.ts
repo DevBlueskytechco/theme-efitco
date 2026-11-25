@@ -111,7 +111,7 @@ test.describe('ES1-T378 tĩnh', () => {
     // $('price-label') trong option(): tên ghép từ tiền tố
     for (const s of js.matchAll(/\$\('([a-z-]+)'\)/g)) hooks.add(`data-predictive-${s[1]}`);
     for (const hook of hooks) expect(snippet, hook).toContain(hook);
-    for (const label of ['labelLoading', 'labelProducts', 'labelShopAll', 'shopAllUrl', 'labelSalePrice', 'stylesheet']) {
+    for (const label of ['labelLoading', 'labelProducts', 'labelShopAll', 'shopAllUrl', 'labelSalePrice', 'stylesheet', 'resultsSrc']) {
       expect(js, label).toContain(`.${label}`);
       expect(snippet, label).toContain(`data-${label.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`);
     }
@@ -119,12 +119,14 @@ test.describe('ES1-T378 tĩnh', () => {
     expect(js).not.toMatch(/innerHTML|insertAdjacentHTML|outerHTML|partials|section_id|console\.|dispatchEvent|localStorage/);
   });
 
-  test('AC1 lõi import results cùng thư mục, không import tĩnh, không thẻ script cho results', () => {
+  test('AC1 lõi import results theo data-results-src (asset_url, ES1-T485), không import tĩnh, không thẻ script cho results', () => {
     const core = readFileSync(CORE, 'utf8');
-    expect(core).toContain("import(new URL('predictive-search-results.js', import.meta.url))");
+    expect(core).toContain('import(this.dataset.resultsSrc)');
+    expect(core).not.toContain('import.meta.url');
+    expect(readFileSync(SNIPPET, 'utf8')).toContain(`data-results-src="{{ 'predictive-search-results.js' | asset_url }}"`);
     expect(core).not.toMatch(/^import\s/m);
     expect(readFileSync(RESULTS, 'utf8')).not.toMatch(/^import\s/m);
-    for (const f of ['blocks/header.liquid', SNIPPET, 'layout/theme.liquid']) expect(readFileSync(f, 'utf8'), f).not.toContain('predictive-search-results');
+    for (const f of ['blocks/header.liquid', SNIPPET, 'layout/theme.liquid']) expect(readFileSync(f, 'utf8'), f).not.toMatch(/<script[^>]+predictive-search-results|modulepreload[^>]*predictive-search-results/);
     expect(core).toContain("'resources[type]': 'query,product,collection,article,page'");
   });
 });

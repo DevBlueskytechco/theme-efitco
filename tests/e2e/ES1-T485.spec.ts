@@ -65,7 +65,7 @@ test.describe('ES1-T485 tĩnh', () => {
   });
 
   test('Liquid: hook URL nạp lười đều qua asset_url', () => {
-    const hooks = /data-(drawer-src|motion-src|lazy-module|items-src|search-src)="([^"]*)"/g;
+    const hooks = /data-(drawer-src|motion-src|lazy-module|items-src|search-src|results-src)="([^"]*)"/g;
     let seen = 0;
     for (const path of liquidFiles()) {
       for (const [, name, value] of read(path).matchAll(hooks)) {
