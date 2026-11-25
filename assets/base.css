@@ -4486,17 +4486,47 @@ sale-countdown {
   font-size: var(--font-size-sm);
 }
 
+/**
+ * Bảng trong rich text (ES1-T547, kit V46): giữ display table, rộng hết cột, ô hẹp thì chữ xuống dòng.
+ * Bảng > 4 cột: merchant bọc <div class="table-wrap"> trong rich text để cuộn ngang trong khung.
+ */
 .rte table {
-  display: block;
-  max-inline-size: 100%;
-  overflow-x: auto;
+  inline-size: 100%;
   border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
 }
 
 .rte :is(th, td) {
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border);
+  padding: var(--space-3) var(--space-4);
+  border-block-end: 1px solid var(--color-border);
   text-align: start;
+  vertical-align: top;
+  overflow-wrap: break-word;
+}
+
+/* Chuỗi dài không khoảng trắng (URL, mã) không đẩy bảng rộng quá cột: như .data-table--fluid td của kit */
+.rte td {
+  overflow-wrap: anywhere;
+}
+
+.rte th {
+  background: var(--color-background-alt);
+  font-weight: 600;
+}
+
+.table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+}
+
+.rte .table-wrap table {
+  min-inline-size: 32rem;
+}
+
+.rte .table-wrap tr:last-child > * {
+  border-block-end: 0;
 }
 
 .rte hr {

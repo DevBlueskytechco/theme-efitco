@@ -365,14 +365,14 @@ test.describe('ES1-T386 page', () => {
       expect(await noHScroll(page), 'trang không cuộn ngang').toBe(true);
       const table = rte.locator('table').first();
       if (await table.count()) {
-        const scroller = await table.evaluate((el) => {
-          for (let n: Element | null = el; n && !n.matches('[data-testid="page-content"]'); n = n.parentElement) {
-            const o = getComputedStyle(n).overflowX;
-            if (o === 'auto' || o === 'scroll') return { ok: true, wider: n.scrollWidth > n.clientWidth };
-          }
-          return { ok: false, wider: false };
+        // ES1-T547: bảng trong .table-wrap cuộn trong khung; bảng trần (≤ 4 cột) không cuộn, vừa cột .rte
+        const fit = await table.evaluate((el) => {
+          const wrap = el.closest('.table-wrap');
+          if (wrap) return { wrapped: true, ok: ['auto', 'scroll'].includes(getComputedStyle(wrap).overflowX) };
+          const rteEl = el.closest('.rte')!;
+          return { wrapped: false, ok: el.getBoundingClientRect().width <= rteEl.clientWidth + 1 };
         });
-        expect(scroller.ok, 'bảng có khung cuộn ngang riêng').toBe(true);
+        expect(fit.ok, fit.wrapped ? '.table-wrap là khung cuộn ngang' : 'bảng trần vừa cột .rte').toBe(true);
       } else test.info().annotations.push({ type: 'thiếu dữ liệu', description: 'page không có bảng: phần bảng của AC2 chưa kiểm' });
       for (const img of await rte.locator('img').all()) await expect(img).toHaveAttribute('loading', 'lazy');
       const link = rte.locator('p a').first();
