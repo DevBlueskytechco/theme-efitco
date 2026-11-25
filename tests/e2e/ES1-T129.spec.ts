@@ -253,7 +253,7 @@ test.describe('ES1-T129 TE-8 dialog search', () => {
 
     const bar = await tid(page, T.form).evaluate((f) => {
       const b = f.parentElement!;
-      return { h: b.getBoundingClientRect().height, bg: getComputedStyle(b).backgroundImage };
+      return { h: b.getBoundingClientRect().height, bg: getComputedStyle(b).borderImageSource }; // ES1-T533: noise = border-image fill
     });
     expect(bar.h).toBeGreaterThanOrEqual(80);
     expect(bar.bg).toContain('noise-dark');
