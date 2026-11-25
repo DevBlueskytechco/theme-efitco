@@ -16,15 +16,15 @@
   .cart-page { padding-block: 0 var(--section-gap); }
   .cart-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-xs) var(--space-md); padding-block: var(--space-xl); }
   @media (min-width: 64rem) { .cart-head { padding-block: var(--space-2xl) var(--space-3xl); } }
-  .cart-head__title { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-3); }
+  .cart-head__title { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-sm); }
   .cart-head__count { color: var(--color-muted); font-size: var(--font-size-base); }
-  .back-link { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--touch-target); font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+  .back-link { display: inline-flex; align-items: center; gap: var(--space-xs); min-height: var(--touch-target); font-weight: 500; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
   .back-link svg { width: 16px; height: 14px; scale: -1 1; }
   .back-link:hover, .back-link.is-hover { color: var(--color-accent); }
 
   /* ---- Bố cục 2 cột (ES1-T93 #2: < 64rem 1 cột, từ 64rem 8/12 + 4/12 sticky) ---- */
   .cart-layout { display: grid; gap: var(--space-2xl); }
-  @media (min-width: 64rem) { .cart-layout { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); column-gap: var(--space-7); align-items: start; } }
+  @media (min-width: 64rem) { .cart-layout { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); column-gap: var(--space-4xl); align-items: start; } }
 
 
   /* ---- Freeship (AC3): .meter-box + .meter của kit (V48: track 8 bo pill, fill accent, đạt = badge-new, hộp cream bo 16) ---- */
@@ -38,28 +38,28 @@
   .line {
     position: relative;
     display: grid;
-    grid-template-columns: calc(var(--space-1) * 22) minmax(0, 1fr) auto;
+    grid-template-columns: calc(var(--space-2xs) * 22) minmax(0, 1fr) auto;
     grid-template-areas: "media info remove" "media qty total";
-    gap: var(--space-3);
-    padding-block: var(--space-5);
+    gap: var(--space-sm);
+    padding-block: var(--space-xl);
     border-block-end: 1px solid var(--color-border);
   }
   .line__media { grid-area: media; align-self: start; display: block; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-card); background: var(--color-background-cream); }
   .line__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
   .line__media .product-card__placeholder svg { width: 50%; }
-  .line__info { grid-area: info; display: grid; align-content: start; gap: var(--space-1); min-width: 0; }
+  .line__info { grid-area: info; display: grid; align-content: start; gap: var(--space-2xs); min-width: 0; }
   .line__title { font-weight: 500; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-body); text-decoration: none; overflow-wrap: anywhere; }
   .line__title:hover, .line__title.is-hover { text-decoration: underline; text-underline-offset: 0.2em; }
   .line__meta { display: grid; gap: 0; margin: 0; color: var(--color-muted); font-size: var(--font-size-sm); }
   .line__meta dt, .line__meta dd { display: inline; margin: 0; }
   .line__meta dd { color: var(--color-foreground); }
   .line .price { font-size: var(--font-size-sm); }
-  .line__discount { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--color-badge-new); font-size: var(--font-size-sm); font-weight: 500; }
+  .line__discount { display: inline-flex; align-items: center; gap: var(--space-2xs); color: var(--color-badge-new); font-size: var(--font-size-sm); font-weight: 500; }
   .line__discount svg { width: 14px; height: 14px; flex: none; }
   .line__qty { grid-area: qty; align-self: end; }
   .line__total { grid-area: total; align-self: end; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; min-height: var(--touch-target); margin: 0; font-weight: 600; line-height: var(--line-height-body); text-align: end; }
   .line__total s { color: var(--color-muted); font-size: var(--font-size-sm); font-weight: 400; }
-  .line__remove { grid-area: remove; justify-self: end; align-self: start; display: inline-flex; align-items: center; justify-content: center; width: var(--touch-target); height: var(--touch-target); margin-block-start: calc(var(--space-3) * -1); margin-inline-end: calc(var(--space-3) * -1); border-radius: 50%; color: var(--color-muted); transition: color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out); }
+  .line__remove { grid-area: remove; justify-self: end; align-self: start; display: inline-flex; align-items: center; justify-content: center; width: var(--touch-target); height: var(--touch-target); margin-block-start: calc(var(--space-sm) * -1); margin-inline-end: calc(var(--space-sm) * -1); border-radius: 50%; color: var(--color-muted); transition: color var(--motion-fast) var(--ease-out), background-color var(--motion-fast) var(--ease-out); }
   .line__remove svg { width: var(--icon-size-md); height: var(--icon-size-md); }
   .line__remove:hover, .line__remove.is-hover { background: var(--color-background-alt); color: var(--color-sale); }
   .line__remove:focus-visible, .line__remove.is-focus { outline: 2px solid var(--color-accent); outline-offset: 0; }
@@ -69,52 +69,52 @@
   .line:has(> .line__error) { grid-template-areas: "media info remove" "media qty total" "error error error"; }
 
   @media (min-width: 48rem) {
-    .lines-head { display: grid; grid-template-columns: calc(var(--space-1) * 30) minmax(0, 1fr) auto calc(var(--space-1) * 24) var(--touch-target); gap: var(--space-4); padding-block-end: var(--space-3); color: var(--color-muted); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
+    .lines-head { display: grid; grid-template-columns: calc(var(--space-2xs) * 30) minmax(0, 1fr) auto calc(var(--space-2xs) * 24) var(--touch-target); gap: var(--space-md); padding-block-end: var(--space-sm); color: var(--color-muted); font-size: var(--font-size-xs); font-weight: 600; letter-spacing: var(--letter-spacing-caps); text-transform: uppercase; }
     .lines-head span:first-child { grid-column: 1 / 3; }
-    .lines-head .qh { width: 130px; } /* = .quantity--compact: 44 + 40 + 44 + viền 2 */
+    .lines-head .qh { width: var(--quantity-compact-width); } /* = .quantity--compact: 44 + 40 + 44 + viền 2 */
     .lines-head .th { text-align: end; }
-    .line { grid-template-columns: calc(var(--space-1) * 30) minmax(0, 1fr) auto calc(var(--space-1) * 24) var(--touch-target); grid-template-areas: "media info qty total remove"; gap: var(--space-4); align-items: start; }
+    .line { grid-template-columns: calc(var(--space-2xs) * 30) minmax(0, 1fr) auto calc(var(--space-2xs) * 24) var(--touch-target); grid-template-areas: "media info qty total remove"; gap: var(--space-md); align-items: start; }
     .line__qty, .line__total { align-self: start; }
     .line:has(> .line__error) { grid-template-areas: "media info qty total remove" ". error error error error"; }
     .line__remove { margin: 0; }
     .line .price { font-size: var(--font-size-base); }
   }
-  @media (min-width: 80rem) { .line, .lines-head { column-gap: var(--space-5); } }
+  @media (min-width: 80rem) { .line, .lines-head { column-gap: var(--space-xl); } }
 
 
   /* Ghi chú đơn (AC5): textarea 144 mặc định của kit (V50) */
-  .cart-note { margin-block-start: var(--space-6); }
+  .cart-note { margin-block-start: var(--space-2xl); }
 
   /* ---- Tóm tắt: panel tối, cùng ngôn ngữ panel "Your bundle" trang chủ (.dpanel của kit) ---- */
-  .summary-col { display: grid; align-content: start; gap: var(--space-4); }
-  @media (min-width: 64rem) { .summary-col { position: sticky; inset-block-start: calc(var(--header-height) + var(--space-4)); } }
+  .summary-col { display: grid; align-content: start; gap: var(--space-md); }
+  @media (min-width: 64rem) { .summary-col { position: sticky; inset-block-start: calc(var(--header-height) + var(--space-md)); } }
   .summary { display: grid; gap: var(--space-xl); padding: var(--space-xl); border-radius: var(--radius-panel); background: var(--color-background-panel); color: var(--color-background-dark-foreground); }
   .summary :focus-visible, .summary .is-focus { outline-color: var(--color-background-dark-foreground); }
   @media (min-width: 48rem) { .summary { padding: var(--space-2xl); } }
   @media (min-width: 80rem) { .summary { padding: var(--space-3xl); } }
-  .summary__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); padding-block-end: var(--space-5); border-block-end: 1px solid var(--color-muted); }
+  .summary__head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-xl); padding-block-end: var(--space-xl); border-block-end: 1px solid var(--color-muted); }
   .summary__title { font-family: var(--font-primary--family); font-size: var(--font-size-lg); font-weight: 700; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-title); }
-  .summary__rows { display: grid; gap: var(--space-5); margin: 0; font-weight: 500; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-body); }
-  .summary__rows > div { display: flex; justify-content: space-between; gap: var(--space-4); }
+  .summary__rows { display: grid; gap: var(--space-xl); margin: 0; font-weight: 500; letter-spacing: var(--letter-spacing-body); line-height: var(--line-height-body); }
+  .summary__rows > div { display: flex; justify-content: space-between; gap: var(--space-md); }
   .summary__rows dt, .summary__rows dd { margin: 0; }
   .summary__rows .is-muted { color: var(--panel-muted); font-size: var(--font-size-sm); text-align: end; }
   .summary__rows .is-saving { color: var(--panel-saving); }
   .summary__rows .is-saving dd { white-space: nowrap; }
-  .summary__rows .is-saving dt { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .summary__rows .is-saving dt { display: inline-flex; align-items: center; gap: var(--space-xs); }
   .summary__rows .is-saving svg { width: var(--icon-size-sm); height: var(--icon-size-sm); }
-  .summary__total { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); margin: 0; padding-block-start: var(--space-5); border-block-start: 1px solid var(--color-muted); font-weight: 500; line-height: var(--line-height-body); }
+  .summary__total { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-md); margin: 0; padding-block-start: var(--space-xl); border-block-start: 1px solid var(--color-muted); font-weight: 500; line-height: var(--line-height-body); }
   .summary__total span:last-child { font-size: var(--font-size-lg); font-weight: 700; letter-spacing: var(--letter-spacing-body); }
   .summary__note { color: var(--panel-muted); font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
   .summary .button svg { width: 16px; height: 14px; }
-  .summary__secure { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); color: var(--panel-muted); font-size: var(--font-size-sm); }
-  .summary__secure > span { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .summary__secure { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-xs) var(--space-sm); color: var(--panel-muted); font-size: var(--font-size-sm); }
+  .summary__secure > span { display: inline-flex; align-items: center; gap: var(--space-xs); }
   .summary__secure svg { width: var(--icon-size-sm); height: var(--icon-size-sm); }
-  .summary__status { display: flex; align-items: center; gap: var(--space-2); color: var(--panel-muted); font-size: var(--font-size-sm); }
+  .summary__status { display: flex; align-items: center; gap: var(--space-xs); color: var(--panel-muted); font-size: var(--font-size-sm); }
   .summary__status .spinner { border-color: var(--color-muted); border-block-start-color: var(--color-background-dark-foreground); }
   /* Nút thanh toán nhanh ở cart = 48 (§27: 52 PDP / 48 cart / 44 drawer, V40); theme: --shopify-accelerated-checkout-button-block-size */
-  .accelerated .brand-btn { min-height: var(--space-7); }
-  .accelerated { display: grid; gap: var(--space-2); min-height: calc(var(--control-height) + var(--space-6)); }
-  .accelerated__or { display: flex; align-items: center; gap: var(--space-3); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .accelerated .brand-btn { min-height: var(--space-4xl); }
+  .accelerated { display: grid; gap: var(--space-xs); min-height: calc(var(--control-height) + var(--space-2xl)); }
+  .accelerated__or { display: flex; align-items: center; gap: var(--space-sm); color: var(--color-muted); font-size: var(--font-size-sm); }
   .accelerated__or::before, .accelerated__or::after { content: ''; flex: 1; height: 1px; background: var(--color-border); }
 
 
@@ -137,13 +137,13 @@
   .states { padding-block-end: var(--section-gap); background: var(--color-background); }
   .states .demo-block > h2 { font-size: var(--font-size-h3); line-height: var(--line-height-h3); }
   .state-pair { display: grid; gap: var(--space-2xl); }
-  @media (min-width: 64rem) { .state-pair { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); column-gap: var(--space-7); align-items: start; } }
+  @media (min-width: 64rem) { .state-pair { grid-template-columns: minmax(0, 8fr) minmax(0, 4fr); column-gap: var(--space-4xl); align-items: start; } }
   .state-frame { border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); padding: var(--space-md); }
-  @media (min-width: 48rem) { .state-frame { padding: var(--space-5); } }
+  @media (min-width: 48rem) { .state-frame { padding: var(--space-xl); } }
   .state-frame--mobile { max-width: 360px; padding: 0; overflow: hidden; }
-  .control-grid { display: grid; gap: var(--space-5); }
+  .control-grid { display: grid; gap: var(--space-xl); }
   @media (min-width: 48rem) { .control-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  .control-grid > div { display: grid; gap: var(--space-3); align-content: start; }
+  .control-grid > div { display: grid; gap: var(--space-sm); align-content: start; }
   .panel-demo { display: grid; gap: var(--space-sm); padding: var(--space-xl); border-radius: var(--radius-panel); background: var(--color-background-panel); }
 </style></head>
 <body>
@@ -399,7 +399,7 @@
           <p>Find gear for your next session, from free weights to recovery tools.</p>
           <div class="empty-state__actions"><a class="button" href="#" data-testid="cart-empty-cta">Continue shopping<svg aria-hidden="true" style="width:16px;height:14px"><use href="#i-arrow"/></svg></a><a class="text-link" href="#" style="align-self: center">Browse collections</a></div>
         </div>
-        <div class="section-header" style="margin-block: var(--space-6) var(--space-5)"><p class="eyebrow">Popular right now</p><h3>Bestsellers</h3></div>
+        <div class="section-header" style="margin-block: var(--space-2xl) var(--space-xl)"><p class="eyebrow">Popular right now</p><h3>Bestsellers</h3></div>
         <ul class="product-grid" aria-label="Bestsellers">
           <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P22.png" alt="FlexFold Adjustable Bench" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">−17%</span></div></div><div class="product-card__info"><h4 class="product-card__title"><a href="#">FlexFold Adjustable Bench</a></h4><div class="price"><span class="price__sale">$189.00</span><s class="price__compare">$229.00</s></div></div></li>
           <li class="product-card"><div class="product-card__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P19_a6b9558c-55ae-4c40-89c0-e49534cc3a6e.png" alt="Home Starter Kit" width="600" height="600"><div class="product-card__badges"><span class="badge badge--sale">−22%</span></div></div><div class="product-card__info"><h4 class="product-card__title"><a href="#">Home Starter Kit</a></h4><div class="price"><span class="price__sale">$399.00</span><s class="price__compare">$512.00</s></div></div></li>
