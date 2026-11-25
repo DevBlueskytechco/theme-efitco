@@ -477,7 +477,7 @@
 }
 
 .filter-option:has(:disabled) {
-  color: var(--color-muted);
+  color: var(--color-muted-light);
   cursor: not-allowed;
 }
 
@@ -543,8 +543,22 @@
   outline-offset: 4px;
 }
 
+/* Disabled: không làm mờ; gạch chéo foreground viền trắng qua ô màu (kit .facet-swatch, foundation §30.6) */
 .filter-option__input:disabled + .filter-option__swatch {
-  opacity: 0.4;
+  position: relative;
+}
+
+.filter-option__input:disabled + .filter-option__swatch::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  inline-size: 2px;
+  block-size: 100%;
+  translate: -50% -50%;
+  rotate: -45deg;
+  background: var(--color-foreground);
+  box-shadow: 0 0 0 1px var(--color-background);
 }
 
 /** List collections (TE-6 AC15), card: .collection-card */
