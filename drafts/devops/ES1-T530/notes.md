@@ -66,3 +66,17 @@ node scripts/check-tokens.mjs              # dán output; mong đợi FAIL 1 t�
 node scripts/check-mockup-kit.mjs          # mong đợi FAIL 0
 ```
 Ngoài phạm vi: grep figma / --figma-* / z-index / bóng (ES1-T558), `_version` + CHANGELOG (ES1-T559), sửa code token (ES1-T536…T540, T576, T581).
+
+## Sửa sau CI đỏ (run 45432811501, 25/11)
+- `norm()` xoá khoảng trắng sau `)` nên `0 calc(4px * -1) 24px …` thành `0 -4px24px` → FAIL giả `elevation.bar` và WARN giả `--shadow-overlay` (assets/base.css:131). Nay chỉ bỏ khoảng trắng sau `(`, trước `)`, quanh `,`. Test ca 13 (bóng có calc) đỏ trên code cũ, xanh sau sửa.
+- `type_primary_font`: áp đúng chữ ES1-T585 (khoá `known_mismatches`, DESIGN.md; không tăng `_version`) — ADR 0015 bảng Việc ghi "trước ES1-T530 merge". FAIL → WARN lệch tạm.
+- Mockup `drafts/designer/ES1-T260/navigation.html:135` `.product-row__thumb.is-sold-out` (trạng thái mới cho component kit, ca 12 chủ ý bắt) → selector ngữ cảnh `.edge-rows .product-row__thumb.is-sold-out`.
+- Còn 1 FAIL thật: luật 1 `kit_root_count` 150 ≠ 170 — kit lên 170 ở ES1-T573 (#329) nhưng bản vá 2.1.0 cho docs/tokens.json chưa áp, chờ CTO trả lời [Q] ES1-T598. Không áp ở đây (đổi `_version`, CHANGELOG, DESIGN.md, handoff ngoài phạm vi DevOps).
+
+Output thật trên nhánh sau merge develop 25/11:
+```
+FAIL tokens.json _source_of_truth.kit_root_count 150 ≠ 170 (docs/tokens.json:32) · luật 1: nơi 3 chưa chép theo kit
+kit 170 · tokens.json lệch 1 · màu 20/22, lệch tạm 2 · font 1/2, lệch tạm 1 · nhóm khác WARN 112 · FAIL 1
+mockup 23 trang · 23 <style> · 1831 rule · FAIL 0 (bỏ qua ES1-T251, ES1-T252, ES1-T174)
+OK check-tokens (13 ca)
+```

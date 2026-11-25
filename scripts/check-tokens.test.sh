@@ -219,4 +219,13 @@ hasnt "mockup biến thể" ".hero .badge--sale"
 has "mockup biến thể" "FAIL 3"
 ok
 
+# 13. Bóng có calc() rồi tới token kế (box-shadow shorthand): giữ khoảng trắng sau ")" → khớp tokens.json
+D="$(fix bong)"
+perl -pi -e 's/^  --layer-header: 10;/  --layer-header: 10;\n  --shadow-bar: 0 calc(var(--space-xs) * -1) var(--space-xs) color-mix(in srgb, var(--color-accent) 10%, transparent);/' "$D/drafts/designer/_kit/kit.css"
+perl -pi -e 's/"kit_root_count": 11/"kit_root_count": 12/; s/^  "layer": \{ "header": 10 \},/  "layer": { "header": 10 },\n  "elevation": { "bar": "0 -8 8 accent 10%" },/' "$D/docs/tokens.json"
+run "bóng calc" 0 "$CT" --root "$D"
+has "bóng calc" "tokens.json lệch 0"
+hasnt "bóng calc" "elevation.bar"
+ok
+
 echo "OK check-tokens ($pass ca)"

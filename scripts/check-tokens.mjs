@@ -158,7 +158,8 @@ function expandHex(h) {
 }
 function norm(v) {
   let s = String(v).trim().toLowerCase().replace(/\s+/g, ' ');
-  s = s.replace(/\s*([(),])\s*/g, '$1');
+  // Giữ khoảng trắng sau ')' — shorthand như box-shadow '0 calc(..) 24px' cần nó.
+  s = s.replace(/\(\s+/g, '(').replace(/\s+\)/g, ')').replace(/\s*,\s*/g, ',');
   s = s.replace(/#([0-9a-f]{3,8})\b/g, (_, h) => '#' + expandHex(h));
   s = s.replace(/(?<![#\w.])-?\d*\.?\d+/g, (n) => fmtNum(n));
   return s;
