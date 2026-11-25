@@ -30,6 +30,8 @@ const HAS = {
   states: SNIPPET.includes('predictive-search-error') && SNIPPET.includes('predictive-search-empty') && /predictive-search-(error|empty)|predictive-?(error|empty)/i.test(PS_JS),
   recent: /localStorage/.test(PS_JS),
   popularSetting: /"id"\s*:\s*"popular_searches"/.test(SETTINGS),
+  // ADR 0014 mục 8 (CTO 23/11): CSS nội dung lớp search ở assets/predictive-search.css, BE nạp lười từ data-stylesheet
+  css: !SNIPPET.includes('data-stylesheet') || /dataset\.stylesheet|data-stylesheet/.test(PS_JS),
 };
 const WAIT = {
   searchPage: 'ES1-T128 (blocks/search-results) chưa merge',
@@ -39,6 +41,7 @@ const WAIT = {
   states: 'ES1-T377 + ES1-T378 (hộp 0 kết quả, lỗi, loading) chưa merge',
   recent: 'TE-8-R2-BE3 ES1-T379 (Should, recent searches) chưa merge hoặc đã bị cắt',
   popularSetting: 'ES1-T377 (theme setting popular_searches) chưa merge',
+  css: 'ES1-T378 (predictive-search.js nạp lười assets/predictive-search.css theo data-stylesheet) chưa merge',
 } as const;
 
 function need(...keys: Array<keyof typeof HAS>) {
@@ -133,6 +136,15 @@ const FULL = build({ queries: 4, products: 8, collections: 2, pages: 0, articles
 const NONE = build({});
 
 type Reply = Results | { status: number } | 'abort';
+// Như Predictive Search API: chỉ trả nhóm có trong resources[type] (query → queries, product → products…).
+// predictive-search.js của ES1-T130 không xin `query`, API thật không trả queries; mock trả cả queries thì option rỗng tên
+// (axe link-name, CI PR #303). TE-8-R2-BE1 (ES1-T378) xin `query` thì mock trả queries như cũ.
+const byType = (r: Results, types: string | null): Results => {
+  if (!types) return r;
+  const plural: Record<string, string> = { query: 'queries', product: 'products', collection: 'collections', page: 'pages', article: 'articles' };
+  const keep = new Set(types.split(',').map((t) => plural[t.trim()]));
+  return Object.fromEntries(Object.entries(r).filter(([k]) => keep.has(k))) as Results;
+};
 async function mockSuggest(page: Page, reply: (q: string, n: number) => Reply = () => FULL, delay: (q: string, n: number) => number = () => 0) {
   const requests: Request[] = [];
   page.on('request', (r) => SUGGEST.test(r.url()) && requests.push(r));
@@ -145,7 +157,8 @@ async function mockSuggest(page: Page, reply: (q: string, n: number) => Reply = 
     const r = reply(q, i);
     if (r === 'abort') return route.abort('failed').catch(() => {});
     if ('status' in r) return route.fulfill({ status: (r as { status: number }).status, body: 'error' }).catch(() => {});
-    await route.fulfill({ json: { resources: { results: r } } }).catch(() => {});
+    const types = new URL(route.request().url()).searchParams.get('resources[type]');
+    await route.fulfill({ json: { resources: { results: byType(r as Results, types) } } }).catch(() => {});
   });
   return requests;
 }
@@ -155,6 +168,19 @@ async function openOverlay(page: Page, path = '/') {
   await tid(page, P.link).click();
   await expect(tid(page, P.dialog)).toBeVisible();
   await page.waitForFunction(() => !!customElements.get('predictive-search'));
+  if (HAS.css) await searchCss(page);
+}
+
+// ADR 0014 mục 8 (CTO 23/11): CSS nội dung lớp search (khám phá, tab, listbox…) ở assets/predictive-search.css.
+// Chờ đúng hợp đồng BE (ES1-T377 #303): predictive-search.js đã chèn <link> từ data-stylesheet và file đã load.
+// Không tự chèn: JS không nạp thì test fail ở đây, không qua vì khối còn [hidden]. Snippet chưa có data-stylesheet thì bỏ qua.
+async function searchCss(page: Page) {
+  await page.waitForFunction(() => {
+    const href = document.querySelector<HTMLElement>('[data-testid="predictive-search"]')?.dataset.stylesheet;
+    if (!href) return true;
+    const url = new URL(href, location.href).href;
+    return [...document.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')].some((l) => l.href === url && !!l.sheet);
+  });
 }
 
 async function typeAndWait(page: Page, text: string) {
@@ -315,7 +341,7 @@ test.describe('ES1-T131 predictive (có JS)', () => {
   });
 
   test.describe('AC10 tab', () => {
-    test.beforeEach(() => need('tabs'));
+    test.beforeEach(() => need('tabs', 'css'));
 
     test('TC-05 AC10 tablist: All + tab mỗi nhóm có kết quả kèm số, đủ 8 thì 8+, nhóm 0 không có tab', async ({ page }) => {
       const watch = watchStore(page);
@@ -434,12 +460,14 @@ test.describe('ES1-T131 predictive (có JS)', () => {
   });
 
   test.describe('AC4 popular searches (store dev đã cấu hình)', () => {
+    // need('css') chỉ ở TC-13, TC-14 (chip trong lớp, CSS tầng 5); TC-15 là trang /search, chip ở base.css
     test.beforeEach(() => {
       need('popularSetting', 'discover');
       test.skip(!POPULAR.length, NO_POPULAR);
     });
 
     test('TC-13 TC-16 AC4 overlay ô trống: chip đúng thứ tự, tối đa 5, link /search?q=, cao 44 (40 từ 80rem)', async ({ page }) => {
+      need('css');
       await openOverlay(page);
       const chips = tid(page, P.popular).getByRole('link');
       const expected = POPULAR.slice(0, 5);
@@ -455,6 +483,7 @@ test.describe('ES1-T131 predictive (có JS)', () => {
     });
 
     test('TC-14 AC4 bấm chip trong overlay: chữ vào ô, gợi ý chạy tại chỗ', async ({ page }) => {
+      need('css');
       const requests = await mockSuggest(page);
       await openOverlay(page);
       const before = page.url();
@@ -475,7 +504,8 @@ test.describe('ES1-T131 predictive (có JS)', () => {
 
   test.describe('AC11 khám phá', () => {
     test('TC-17 AC11 ô trống: khối khám phá, không tab, không nút chân, không khối rỗng', async ({ page }) => {
-      need('discover');
+      // CSS hiện khối khám phá khi ô trống ở file tầng 5 (ADR 0014 mục 8): cần BE nạp file, openOverlay chờ file load
+      need('discover', 'css');
       const watch = watchStore(page);
       await openOverlay(page);
       const discover = tid(page, P.discover);
@@ -488,7 +518,11 @@ test.describe('ES1-T131 predictive (có JS)', () => {
             .map((el) => el.outerHTML.slice(0, 120)),
         );
         expect(empty, 'khối con hiện mà không có link').toEqual([]);
-      } else note('AC11', 'khối khám phá không hiện: 3 nguồn rỗng, chưa có recent');
+      } else {
+        // CSS đã load: khối ẩn chỉ đúng khi không nguồn nào có link (khối có link mà ẩn = CSS tầng 5 chưa áp, fail)
+        await expect(discover.locator('a[href]'), 'khối khám phá có link mà không hiện').toHaveCount(0);
+        note('AC11', 'khối khám phá không hiện: 3 nguồn rỗng, chưa có recent');
+      }
       await expect(tid(page, P.tabs)).toBeHidden();
       await expect(tid(page, P.all)).toBeHidden();
       await watch.finish();

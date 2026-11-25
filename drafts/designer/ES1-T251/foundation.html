@@ -204,10 +204,25 @@
   :is(.touch-table, .stack-table) th .icon { margin-inline-end: var(--space-2xs); vertical-align: middle; }
   :is(.touch-table, .stack-table) td.is-num { white-space: nowrap; }
   .name-nowrap th[scope='row'] code { white-space: nowrap; }
+  /* ES1-T573: khung mẫu component trang chủ (35–41). Lưới mẫu 1 / 2 / 3 cột, thẻ giữ bề ngang như trên trang */
+  .hp-grid { display: grid; gap: var(--space-xl); margin: 0 0 var(--space-xl); padding: 0; list-style: none; }
+  @media (min-width: 48rem) { .hp-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 80rem) { .hp-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .hp-grid > li { display: grid; gap: var(--space-xs); align-content: start; min-width: 0; }
+  .hp-card-264 { max-inline-size: 264px; }
+  .hp-card-456 { max-inline-size: 456px; }
+  .hp-faq { position: relative; max-inline-size: 640px; aspect-ratio: var(--ratio-4-3); }
+  .hp-faq img { position: absolute; inset-block: 0; inset-inline-end: 0; width: 76%; height: 100%; object-fit: cover; border-radius: var(--radius-panel); }
+  .icon-16 { width: 16px; height: 14px; flex: none; } /* Thiết kế: quang học glyph mũi tên 16 × 14 */
+  .hp-tcard-stage { padding: var(--space-md); border-radius: var(--radius-card); background: var(--color-background-cream); }
+  fieldset.hp-grid { min-inline-size: 0; }
 </style>
 </head>
 <body>
 <svg aria-hidden="true" focusable="false" style="position:absolute;width:0;height:0;overflow:hidden">
+  <symbol id="i-play" viewBox="0 0 16 18"><path fill="currentColor" d="M15 7.3a2 2 0 0 1 0 3.4L3 17.6A2 2 0 0 1 0 15.9V2.1A2 2 0 0 1 3 .4l12 6.9Z"/></symbol>
+  <symbol id="i-verified" viewBox="0 0 16 16"><g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="3"/><path d="m5.2 8.2 2 2 3.8-4"/></g></symbol>
+  <symbol id="i-ruler" viewBox="0 0 28 28"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M4 19 19 4l5 5L9 24z"/><path d="m8 15 2 2M11 12l2 2M14 9l2 2M17 6l2 2"/><path d="M4 9 9 4l15 15-5 5z" opacity=".55"/></g></symbol>
   <symbol id="i-search" viewBox="0 0 20 20"><path fill="currentColor" fill-rule="evenodd" d="M8.8 1.8a7.1 7.1 0 1 0 0 14.3 7.1 7.1 0 0 0 0-14.3ZM0 9a8.8 8.8 0 1 1 17.6 0A8.8 8.8 0 0 1 0 9Z"/><path fill="currentColor" d="M14.4 14.6c.3-.3.9-.3 1.2 0l4.1 3.9c.4.3.4.9 0 1.2-.3.4-.9.4-1.2 0l-4.1-3.8c-.4-.4-.4-1 0-1.3Z"/></symbol>
   <symbol id="i-user" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="8" r="4.2"/><path d="M4 21c.8-4 4-6.2 8-6.2s7.2 2.2 8 6.2"/></g></symbol>
   <symbol id="i-bag" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18.6 21.6H6a3 3 0 0 1-3-3.3l1-8.7a1.5 1.5 0 0 1 1.5-1.3h13.6a1.5 1.5 0 0 1 1.5 1.3l1 8.7a3 3 0 0 1-3 3.3Z"/><path d="M6.4 8.3a5.9 5.9 0 0 1 11.8 0M8.6 12.7H16"/></g></symbol>
@@ -460,7 +475,7 @@
         <li><i style="border-radius: var(--radius-xl)"></i><code>--radius-xl</code> 20 · dialog, sheet</li>
         <li><i style="border-radius: var(--radius-pill)"></i><code>--radius-pill</code> 999 (nửa chiều cao) · badge, variant pill</li>
       </ul>
-      <p class="demo-label">Một hệ tên (V06) · tên chính <code>--space-050…7xl</code> · <code>--space-1…8</code> và <code>calc(var(--space-1) * N)</code> chỉ còn là tên cũ trong code theme</p>
+      <p class="demo-label">Một hệ tên (V06) · tên chính <code>--space-050…7xl</code> · <code>--space-1…8</code> và <code>calc(var(--space-2xs) * N)</code> chỉ còn là tên cũ trong code theme</p>
       <div class="table-wrap">
         <table class="data-table stack-table name-nowrap">
           <caption class="visually-hidden">Spacing names: old to new</caption>
@@ -472,15 +487,15 @@
             <tr><th scope="row"><code>--space-xs</code></th><td class="is-num" data-label="px">8</td><td data-label="Old name"><code>--space-2</code></td><td data-label="Note">Chuẩn: Polaris small-200</td></tr>
             <tr><th scope="row"><code>--space-sm</code></th><td class="is-num" data-label="px">12</td><td data-label="Old name"><code>--space-3</code></td><td data-label="Note">Chuẩn: Polaris small-100</td></tr>
             <tr><th scope="row"><code>--space-md</code></th><td class="is-num" data-label="px">16</td><td data-label="Old name"><code>--space-4</code></td><td data-label="Note">Chuẩn: Polaris base</td></tr>
-            <tr><th scope="row"><code>--space-lg</code></th><td class="is-num" data-label="px">20</td><td data-label="Old name"><code>calc(var(--space-1) * 5)</code></td><td data-label="Note">Chuẩn: Polaris large-100 · Cần FE thêm bậc vào css-variables.liquid</td></tr>
+            <tr><th scope="row"><code>--space-lg</code></th><td class="is-num" data-label="px">20</td><td data-label="Old name"><code>calc(var(--space-2xs) * 5)</code></td><td data-label="Note">Chuẩn: Polaris large-100 · Cần FE thêm bậc vào css-variables.liquid</td></tr>
             <tr><th scope="row"><code>--space-xl</code></th><td class="is-num" data-label="px">24</td><td data-label="Old name"><code>--space-5</code></td><td data-label="Note">Chuẩn: Polaris large-200</td></tr>
             <tr><th scope="row"><code>--space-2xl</code></th><td class="is-num" data-label="px">32</td><td data-label="Old name"><code>--space-6</code></td><td data-label="Note">Chuẩn: Polaris large-300</td></tr>
-            <tr><th scope="row"><code>--space-3xl</code></th><td class="is-num" data-label="px">40</td><td data-label="Old name"><code>calc(var(--space-1) * 10)</code></td><td data-label="Note">Chuẩn: Polaris large-400 · Cần FE thêm bậc</td></tr>
+            <tr><th scope="row"><code>--space-3xl</code></th><td class="is-num" data-label="px">40</td><td data-label="Old name"><code>calc(var(--space-2xs) * 10)</code></td><td data-label="Note">Chuẩn: Polaris large-400 · Cần FE thêm bậc</td></tr>
             <tr><th scope="row"><code>--space-4xl</code></th><td class="is-num" data-label="px">48</td><td data-label="Old name"><code>--space-7</code></td><td data-label="Note">Chuẩn: Polaris large-500 (ES1-T567). <code>--space-7</code> là alias của bậc này</td></tr>
-            <tr><th scope="row"><code>--space-5xl</code></th><td class="is-num" data-label="px">64</td><td data-label="Old name"><code>calc(var(--space-1) * 16)</code></td><td data-label="Note">Chuẩn: Polaris React space 64px · Cần FE thêm bậc</td></tr>
-            <tr><th scope="row"><code>--space-6xl</code></th><td class="is-num" data-label="px">80</td><td data-label="Old name"><code>calc(var(--space-1) * 20)</code></td><td data-label="Note">Chuẩn: Polaris React space 80px · Cần FE thêm bậc · tầng desktop</td></tr>
+            <tr><th scope="row"><code>--space-5xl</code></th><td class="is-num" data-label="px">64</td><td data-label="Old name"><code>calc(var(--space-2xs) * 16)</code></td><td data-label="Note">Chuẩn: Polaris React space 64px · Cần FE thêm bậc</td></tr>
+            <tr><th scope="row"><code>--space-6xl</code></th><td class="is-num" data-label="px">80</td><td data-label="Old name"><code>calc(var(--space-2xs) * 20)</code></td><td data-label="Note">Chuẩn: Polaris React space 80px · Cần FE thêm bậc · tầng desktop</td></tr>
             <tr><th scope="row"><code>--space-7xl</code></th><td class="is-num" data-label="px">128</td><td data-label="Old name"><code>--space-8</code></td><td data-label="Note">Padding section từ 1024. Chuẩn: Polaris React space 128px</td></tr>
-            <tr><th scope="row">Không phải khoảng cách</th><td class="is-num" data-label="px">44 · 48 · 52 · 40</td><td data-label="Old name"><code>calc(var(--space-1) * 11 | 12 | 13 | 10)</code></td><td data-label="Note">Là kích thước (Polaris: space token không dùng cho width / height): <code>--touch-target</code>, <code>--control-height-compact</code> (44) · <code>--control-height</code> (48 mọi mốc) · <code>--row-height</code>, <code>--round-button-size</code> (52) · <code>--tab-height-desktop</code> (40) · <code>--count-badge-size</code> (20) · <code>--progress-height</code> (4) · <code>--meter-height</code> (8)</td></tr>
+            <tr><th scope="row">Không phải khoảng cách</th><td class="is-num" data-label="px">44 · 48 · 52 · 40</td><td data-label="Old name"><code>calc(var(--space-2xs) * 11 | 12 | 13 | 10)</code></td><td data-label="Note">Là kích thước (Polaris: space token không dùng cho width / height): <code>--touch-target</code>, <code>--control-height-compact</code> (44) · <code>--control-height</code> (48 mọi mốc) · <code>--row-height</code>, <code>--round-button-size</code> (52) · <code>--tab-height-desktop</code> (40) · <code>--count-badge-size</code> (20) · <code>--progress-height</code> (4) · <code>--meter-height</code> (8)</td></tr>
           </tbody>
         </table>
       </div>
@@ -500,9 +515,9 @@
           <tbody>
             <tr><th scope="row">Biến bo cũ, giá trị 2</th><td class="is-num" data-label="px">2</td><td data-label="Use"><code>--radius-pill</code></td><td data-label="Note">Thanh cao 4 (tiến trình bundle, tay nắm sheet): bo nửa chiều cao</td></tr>
             <tr><th scope="row">Biến bo cũ, giá trị 4</th><td class="is-num" data-label="px">4</td><td data-label="Use"><code>--radius-xs</code></td><td data-label="Note">Đang dùng 2 lần ở aux.css: không xoá trước khi thay. Hoặc role <code>--radius-input</code>, <code>--radius-button</code></td></tr>
-            <tr><th scope="row">Biến bo cũ, giá trị 8 · <code>calc(var(--radius-card) - var(--space-1))</code></th><td class="is-num" data-label="px">8</td><td data-label="Use"><code>--radius-sm</code></td><td data-label="Note">Swatch, thumb, ô countdown</td></tr>
+            <tr><th scope="row">Biến bo cũ, giá trị 8 · <code>calc(var(--radius-card) - var(--space-2xs))</code></th><td class="is-num" data-label="px">8</td><td data-label="Use"><code>--radius-sm</code></td><td data-label="Note">Swatch, thumb, ô countdown</td></tr>
             <tr><th scope="row">Biến bo cũ, giá trị 12</th><td class="is-num" data-label="px">12</td><td data-label="Use"><code>--radius-card</code></td><td data-label="Note">Role, không dùng <code>--radius-md</code> trực tiếp cho card</td></tr>
-            <tr><th scope="row">Biến bo cũ, giá trị 16 · <code>calc(var(--radius-card) + var(--space-1))</code></th><td class="is-num" data-label="px">16</td><td data-label="Use"><code>--radius-panel</code></td><td data-label="Note">Panel, banner, card bài viết, card collection</td></tr>
+            <tr><th scope="row">Biến bo cũ, giá trị 16 · <code>calc(var(--radius-card) + var(--space-2xs))</code></th><td class="is-num" data-label="px">16</td><td data-label="Use"><code>--radius-panel</code></td><td data-label="Note">Panel, banner, card bài viết, card collection</td></tr>
             <tr><th scope="row">Biến bo cũ, giá trị 18</th><td class="is-num" data-label="px">18</td><td data-label="Use"><code>--radius-pill</code></td><td data-label="Note">Nhãn đếm cao 28: 18 đã lớn hơn nửa chiều cao, hình không đổi</td></tr>
             <tr><th scope="row">Biến bo cũ, giá trị 24 · <code>calc(var(--radius-card) * 2)</code></th><td class="is-num" data-label="px">24</td><td data-label="Use"><code>--radius-dialog</code> (20)</td><td data-label="Note">V04: 24 quy về 20, bậc lớn nhất của thang; panel lớn trong trang dùng <code>--radius-xl</code></td></tr>
             <tr><th scope="row">Biến bo cũ, giá trị 999</th><td class="is-num" data-label="px">999</td><td data-label="Use"><code>--radius-pill</code></td><td data-label="Note">Đã có sẵn</td></tr>
@@ -511,7 +526,7 @@
       </div>
       <div class="dos">
         <div class="do"><b>Nên</b>Chọn bậc gần nhất của thang, viết bằng tên <code>--space-050…7xl</code>; phần tử lồng trong bo nhỏ hơn khung chứa; bo theo vai trò (<code>--radius-card</code>, <code>--radius-panel</code>, <code>--radius-dialog</code>).</div>
-        <div class="dont"><b>Không nên</b><code>calc(var(--radius-card) + var(--space-2xs))</code>, bo 24 cho panel trong trang, dùng token space làm bo góc, khoảng 56 hay 60 (ngoài thang), <code>calc(var(--space-1) * N)</code> hay <code>--space-1…8</code> trong thành phần mới, con bo lớn hơn cha.</div>
+        <div class="dont"><b>Không nên</b><code>calc(var(--radius-card) + var(--space-2xs))</code>, bo 24 cho panel trong trang, dùng token space làm bo góc, khoảng 56 hay 60 (ngoài thang), <code>calc(var(--space-2xs) * N)</code> hay <code>--space-1…8</code> trong thành phần mới, con bo lớn hơn cha.</div>
         <p class="tokens">Setting: <code>space_base</code>, <code>input_corner_radius</code>, <code>button_corner_radius</code>, <code>card_corner_radius</code>, <code>hero_corner_radius</code></p>
       </div>
     </section>
@@ -712,27 +727,29 @@
         <li><code>space_base</code> 4<i>→</i><code>--space-md</code> 16<i>→</i><code>--grid-gap</code> (768)<i>→</i><code>.product-grid</code></li>
         <li><code>foreground_color</code><i>→</i><code>--color-foreground</code><i>→</i><code>--shadow-raised</code> (12%)<i>→</i><code>.dropdown</code>, <code>.toast</code></li>
       </ul>
-      <p class="demo-label">Nhóm token · số đếm trong <code>:root</code> của kit (150) · nơi khai báo trong code theme hôm nay</p>
+      <p class="demo-label">Nhóm token · số đếm trong <code>:root</code> của kit (170, bản 2.1.0: +20) · nơi khai báo trong code theme hôm nay</p>
       <div class="table-wrap">
         <table class="data-table stack-table">
           <caption class="visually-hidden">Token groups, counts and where they live</caption>
           <thead><tr><th scope="col">Group</th><th scope="col" class="is-num">Kit</th><th scope="col">Tier</th><th scope="col">Theme code today</th></tr></thead>
           <tbody>
             <tr><th scope="row">Color</th><td class="is-num" data-label="Kit">32</td><td data-label="Tier">22 primitive có setting · 6 alias trạng thái + 4 dẫn xuất (accent-on-sand, panel-muted, panel-saving, overlay-scrim) semantic</td><td data-label="Theme code today">23 <code>--color-*</code> ở css-variables.liquid · 3 dẫn xuất panel-muted, panel-saving, overlay-scrim đang ở base.css · 6 alias trạng thái chưa có</td></tr>
-            <tr><th scope="row">Typography</th><td class="is-num" data-label="Kit">34</td><td data-label="Tier">Primitive (họ chữ, cỡ, letter-spacing) · semantic (12 line-height theo bậc)</td><td data-label="Theme code today">Có 15 / 34 · thiếu eyebrow, h4, body-weight, 5 letter-spacing, line-height từng bậc (h1…h4, eyebrow, title, reading, sm, label, price-lg, display); body đang 1.625, cần 1.5</td></tr>
-            <tr><th scope="row">Space</th><td class="is-num" data-label="Kit">14 + 8</td><td data-label="Tier">14 bậc primitive · 8 tên cũ là alias</td><td data-label="Theme code today">Chỉ có <code>--space-1…8</code>; thiếu bậc 2, 6, 20, 40, 64, 80; <code>--space-7</code> (48) cần thêm tên <code>--space-4xl</code></td></tr>
-            <tr><th scope="row">Radius</th><td class="is-num" data-label="Kit">6 + 7</td><td data-label="Tier">6 bậc primitive · 7 role semantic</td><td data-label="Theme code today">4 role + pill · thiếu xs…xl, panel, swatch · <code>--radius-dialog</code> đang ở base.css = card × 2 = 24 (kit 20)</td></tr>
+            <tr><th scope="row">Typography</th><td class="is-num" data-label="Kit">35</td><td data-label="Tier">Primitive (họ chữ, cỡ, letter-spacing) · semantic (12 line-height theo bậc) · <code>--display-fluid</code> (2.1.0: display co theo cột từ 1280, trang chủ)</td><td data-label="Theme code today">Có 15 / 34 · thiếu eyebrow, h4, body-weight, 5 letter-spacing, line-height từng bậc (h1…h4, eyebrow, title, reading, sm, label, price-lg, display); body đang 1.625, cần 1.5</td></tr>
+            <tr><th scope="row">Space</th><td class="is-num" data-label="Kit">14 + 8</td><td data-label="Tier">14 bậc primitive · 8 tên cũ là alias, <b>Deprecated 2.1.0</b> (mockup đọc 0 lần, xoá ở 3.0.0)</td><td data-label="Theme code today">Chỉ có <code>--space-1…8</code>; thiếu bậc 2, 6, 20, 40, 64, 80; <code>--space-7</code> (48) cần thêm tên <code>--space-4xl</code></td></tr>
+            <tr><th scope="row">Radius</th><td class="is-num" data-label="Kit">6 + 7</td><td data-label="Tier">6 bậc primitive · 7 role semantic (<code>--radius-hero</code> Deprecated 2.1.0, đọc <code>--radius-md</code>)</td><td data-label="Theme code today">4 role + pill · thiếu xs…xl, panel, swatch · <code>--radius-dialog</code> đang ở base.css = card × 2 = 24 (kit 20)</td></tr>
             <tr><th scope="row">Motion</th><td class="is-num" data-label="Kit">8 + 3</td><td data-label="Tier">8 duration primitive · 3 easing semantic</td><td data-label="Theme code today">css-variables.liquid (đủ)</td></tr>
             <tr><th scope="row">Shadow</th><td class="is-num" data-label="Kit">4</td><td data-label="Tier">Semantic</td><td data-label="Theme code today">base.css (2 trong 4); thiếu none, bar</td></tr>
             <tr><th scope="row">Layer</th><td class="is-num" data-label="Kit">8</td><td data-label="Tier">Semantic</td><td data-label="Theme code today">base.css (đủ 8), cần gom về css-variables.liquid</td></tr>
             <tr><th scope="row">Icon</th><td class="is-num" data-label="Kit">4</td><td data-label="Tier">Primitive</td><td data-label="Theme code today">Chỉ <code>--icon-stroke-width</code>, khai báo cục bộ 2 chỗ · thiếu 3 cỡ</td></tr>
             <tr><th scope="row">Size and layout</th><td class="is-num" data-label="Kit">15</td><td data-label="Tier">Semantic (page width, lề, header, grid, control, touch target, texture)</td><td data-label="Theme code today">Có 4 / 15: page-width, page-margin, header-height, touch-target-min · thiếu touch-target, section-gap, heading-gap, grid-gap, grid-columns, control-height(-compact), content-width, band-side, band-inset, dark-texture</td></tr>
-            <tr><th scope="row">Component</th><td class="is-num" data-label="Kit">7</td><td data-label="Tier">Component (<code>--tab-padding-inline</code> 24, <code>--tab-height-desktop</code> 40, <code>--row-height</code> 52, <code>--round-button-size</code> 52, <code>--count-badge-size</code> 20, <code>--progress-height</code> 4, <code>--meter-height</code> 8)</td><td data-label="Theme code today">Viết số trong base.css (tab đang 28)</td></tr>
-            <tr><th scope="row">Breakpoint</th><td class="is-num" data-label="Kit">3</td><td data-label="Tier">48rem, 64rem, 80rem: hằng số trong media query (CSS không cho dùng biến), không tính vào 150</td><td data-label="Theme code today">AGENTS.md</td></tr>
+            <tr><th scope="row">Component</th><td class="is-num" data-label="Kit">10</td><td data-label="Tier">Component (<code>--tab-padding-inline</code> 24, <code>--tab-height-desktop</code> 40, <code>--row-height</code> 52, <code>--round-button-size</code> 52, <code>--count-badge-size</code> 20, <code>--progress-height</code> 4, <code>--meter-height</code> 8; 2.1.0: <code>--logo-width</code> 100, <code>--logo-height</code> 30, <code>--quantity-compact-width</code> 130)</td><td data-label="Theme code today">Viết số trong base.css (tab đang 28); <code>--logo-width</code> đặt inline theo setting <code>logo_width</code></td></tr>
+            <tr><th scope="row">Size scale</th><td class="is-num" data-label="Kit">9</td><td data-label="Tier">Primitive 2.1.0: <code>--size-1000 / 1100 / 1200 / 1300 / 1400 / 1600 / 1800 / 2000 / 2400</code> = 40 / 44 / 48 / 52 / 56 / 64 / 72 / 80 / 96 cho width / height (bậc 100 = 4px như <code>--space-050</code>; không dùng <code>--space-*</code> cho kích thước)</td><td data-label="Theme code today">Chưa có (viết số)</td></tr>
+            <tr><th scope="row">Aspect ratio</th><td class="is-num" data-label="Kit">7</td><td data-label="Tier">Primitive 2.1.0: <code>--ratio-1-1, 2-1, 3-2, 4-3, 3-4, 16-9, 9-16</code>; <code>aspect-ratio</code> chỉ đọc token này (trừ auto)</td><td data-label="Theme code today">Chưa có (viết số trong block)</td></tr>
+            <tr><th scope="row">Breakpoint</th><td class="is-num" data-label="Kit">3</td><td data-label="Tier">48rem, 64rem, 80rem: hằng số trong media query (CSS không cho dùng biến), không tính vào 170</td><td data-label="Theme code today">AGENTS.md</td></tr>
           </tbody>
         </table>
       </div>
-      <p class="demo-note" style="margin-block: var(--space-sm) 0">Đối chiếu với <code>origin/develop</code>: trong 150 token của kit, 66 có ở css-variables.liquid, 15 khai báo ở base.css (cần gom), 69 chưa có trong code (17 token thêm ở ES1-T567). Giá trị kit đã đổi mà code chưa theo (Cần FE): <code>--space-4xl</code> 48, line-height thân 1.5 và từng bậc heading, <code>--band-inset</code> 64, <code>--tab-padding-inline</code> 24.</p>
+      <p class="demo-note" style="margin-block: var(--space-sm) 0">Đối chiếu với <code>origin/develop</code>: trong 150 token của kit bản 2.0.0, 66 có ở css-variables.liquid, 15 khai báo ở base.css (cần gom), 69 chưa có trong code (17 token thêm ở ES1-T567). Bản 2.1.0 (ES1-T573) thêm 20 token chưa có trong code (9 size, 7 ratio, display-fluid, logo-width / height, quantity-compact-width): 89 / 170 chưa có. Giá trị kit đã đổi mà code chưa theo (Cần FE): <code>--space-4xl</code> 48, line-height thân 1.5 và từng bậc heading, <code>--band-inset</code> 64, <code>--tab-padding-inline</code> 24.</p>
       <p class="demo-label" style="margin-block-start: var(--space-xl)">Nguồn chuẩn · kit và mockup là gốc (ES1-T567) · sổ quyết định ghi lý do</p>
       <p class="demo-note">Giá trị trong <code>:root</code> của kit là giá trị chuẩn; các nơi còn lại chép theo, lệch thì ghi "Cần FE". Đang lệch, chờ FE sửa setting: <code>badge_new_color</code> #467A48 → #4B824D (V01) · <code>background_alt_color</code> #F4F4F4 → #F4F4F5 (V18).</p>
       <ol class="chain-list">
@@ -1218,7 +1235,7 @@
           <thead><tr><th scope="col">Place</th><th scope="col">Ratio</th><th scope="col">Fit</th><th scope="col">Radius</th><th scope="col">Source</th></tr></thead>
           <tbody>
             <tr><th scope="row">Product card, quick view, PDP gallery, featured product</th><td data-label="Ratio">1 / 1</td><td data-label="Fit">Contain, nền cream</td><td data-label="Radius"><code>--radius-card</code> 12</td><td data-label="Source">Chuẩn: Polaris Image mặc định 1/1</td></tr>
-            <tr><th scope="row">Hero / slideshow, hero mini, ảnh bìa bài viết</th><td data-label="Ratio">2 / 1 từ 1280 · 4 / 3 ở 768 · 3 / 4 dưới 768</td><td data-label="Fit">Cover + focal point</td><td data-label="Radius"><code>--radius-panel</code> 16 (hero trang chủ, hero mini, bìa bài viết) · <code>--radius-hero</code> 12 chỉ còn cho khung popup</td><td data-label="Source">Chuẩn: Carbon 2:1, 4:3 · Spectrum 3:4 ở 360</td></tr>
+            <tr><th scope="row">Hero / slideshow, hero mini, ảnh bìa bài viết</th><td data-label="Ratio">2 / 1 từ 1280 · 4 / 3 ở 768 · 3 / 4 dưới 768</td><td data-label="Fit">Cover + focal point</td><td data-label="Radius"><code>--radius-panel</code> 16 (hero trang chủ, hero mini, bìa bài viết) · khung popup <code>--radius-md</code> 12 (<code>--radius-hero</code> Deprecated 2.1.0)</td><td data-label="Source">Chuẩn: Carbon 2:1, 4:3 · Spectrum 3:4 ở 360</td></tr>
             <tr><th scope="row">Collection card</th><td data-label="Ratio">3 / 2</td><td data-label="Fit">Cover</td><td data-label="Radius"><code>--radius-panel</code> 16</td><td data-label="Source">Chuẩn: Carbon 3:2</td></tr>
             <tr><th scope="row">Collection card trong mega menu, ảnh promo mega, cột ảnh FAQ</th><td data-label="Ratio">4 / 3</td><td data-label="Fit">Cover</td><td data-label="Radius"><code>--radius-card</code> 12</td><td data-label="Source">Chuẩn: Carbon 4:3</td></tr>
             <tr><th scope="row">Training level card, shop the look, why choose us</th><td data-label="Ratio">1 / 1</td><td data-label="Fit">Cover</td><td data-label="Radius"><code>--radius-panel</code> 16</td><td data-label="Source">Chuẩn: Carbon 1:1</td></tr>
@@ -2164,6 +2181,104 @@
         <div class="do"><b>Nên</b>Nhãn nút và link dạng nút sentence case, mở bằng động từ ("Add to cart", "Shop bestsellers"); link nói rõ đích ("Read the full guide", "See shipping dates"); <code>aria-label</code> chứa đúng chữ đang hiển thị; số và tiền theo định dạng của Shopify; dấu "…" (U+2026), dấu trừ "−" (U+2212), khoảng giá "$50–$200" (en dash).</div>
         <div class="dont"><b>Không nên</b>"Read more", "Learn more", "Click here" đứng một mình; chữ HOA gõ tay; nhãn nút Title Case ("Add To Cart", "Try Again"), có mạo từ hay dấu câu; "Please", "Sorry", "Oops" thừa; từ kỹ thuật ("invalid", "error 422"); cắt "…" cho nút, tab, badge, giá.</div>
       </div>
+    </section>
+
+    <!-- 35–41. Component riêng trang chủ (ES1-T573, kit 2.1.0, ĐỀ XUẤT tới khi CTO duyệt). Nguồn trang: ES1-T293 (≥ 1280), ES1-T278 / T279 (360, 768) -->
+    <section class="demo-block" aria-labelledby="h-level-card" data-status="proposed">
+      <h2 id="h-level-card">35. Level card</h2>
+      <p class="demo-note">Thẻ "Shop by level" trang chủ. Ảnh phủ + gradient tối, nhãn Sofia 800 14/20 HOA, tiêu đề Sofia 700 (28/36 dưới 1280, h2 32/40 → 36/44 từ 1280), chân "N products →" 14/20 500 cao 44 dưới vạch trắng 24%. Bo 16 (<code>--radius-panel</code>). Khung <code>--ratio-4-3</code> ở 360, <code>--ratio-1-1</code> từ 768. Đệm 24 / 24 / 16 (360), 16 (768), 32 → 40 (1280 → 1920). Dưới 1280 chân luôn hiện (cảm ứng); từ 1280 chân ẩn, hiện khi hover hoặc focus bàn phím, không chiếm chỗ (V31). AA: chữ trắng trên gradient tối 85% / 100%. Cả thẻ là một link, ảnh <code>alt=""</code> (tên nằm ở tiêu đề).</p>
+      <ul class="hp-grid hp-grid--3" aria-label="Level card states">
+        <li><a class="level-card" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-1.jpg?width=720" alt="" width="912" height="912"><span class="level-card__body"><span class="level-card__label">Level fitness</span><span class="level-card__title">Beginner</span><span class="level-card__foot">24 products <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></span></span></a><small class="state-tag">Default (từ 1280 chân ẩn)</small></li>
+        <li><a class="level-card is-hover" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-2.jpg?width=720" alt="" width="912" height="912"><span class="level-card__body"><span class="level-card__label">Level fitness</span><span class="level-card__title">Intermediate</span><span class="level-card__foot">12 products <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></span></span></a><small class="state-tag">Hover: ảnh phóng 1.04 (500 ms), chân hiện</small></li>
+        <li><a class="level-card is-hover is-focus" href="#"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-lvl-3.jpg?width=720" alt="" width="912" height="912"><span class="level-card__body"><span class="level-card__label">Level fitness</span><span class="level-card__title">Advanced</span><span class="level-card__foot">10 products <svg class="icon-16" viewBox="0 0 16 14" aria-hidden="true"><use href="#i-arrow"/></svg></span></span></a><small class="state-tag">Focus: vòng accent 2, cách 2; chân hiện như hover</small></li>
+      </ul>
+      <div class="dos">
+        <div class="do"><b>Nên</b>3 thẻ cùng trạng thái mặc định; số sản phẩm lấy từ collection. Thiếu ảnh: giữ khung nền tối (<code>--color-background-dark</code>), chữ vẫn đọc được.</div>
+        <div class="dont"><b>Không nên</b>Đặt nút riêng trong thẻ (thẻ đã là link); ẩn chân dưới 1280.</div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="h-stl" data-status="proposed">
+      <h2 id="h-stl">36. Shop the look</h2>
+      <p class="demo-note">Cấu trúc <code>.stl</code> &gt; <code>.stl__media</code> (ảnh <code>--ratio-1-1</code>, bo 16, nền cream, điểm nóng) + <code>.stl__body</code> (<code>.stl__list</code>: ô "Fits" sand bo 8 có đĩa icon 52 (<code>--size-1300</code>) và các dòng <code>.option-card.stl-row</code>; <code>.dpanel.stl__summary</code>). 360: một cột, cách 24. 768: danh sách | tóm tắt 280 dính dưới header. Từ 1280: ảnh 8 cột | cột phải 4 cột, khoảng 16 → 24, tóm tắt đáy cột, dòng cách 8. Điểm nóng <code>.hotspot</code>: vùng chạm 44, chấm trắng 20 + quầng 4; đang chọn (<code>aria-pressed="true"</code>) chấm 28 viền foreground 2. Dòng đang xem: viền accent (V26), không vòng check vì tổng tính cả bộ.</p>
+      <div class="two-col">
+        <div class="stl__media" style="max-inline-size: 456px">
+          <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-look.jpg?width=960" alt="Corner home gym with adjustable bench, dumbbells and storage cart" width="1872" height="1632">
+          <button class="hotspot" type="button" style="left:85.04%;top:15.3%" aria-pressed="true" aria-label="Show Ativafit Lava 66 lb in the list"></button>
+          <button class="hotspot" type="button" style="left:26.5%;top:67.6%" aria-pressed="false" aria-label="Show FlexFold Bench in the list"></button>
+          <button class="hotspot is-focus" type="button" style="left:78.2%;top:64%" aria-pressed="false" aria-label="Show Compact Power Rack R3 in the list"></button>
+        </div>
+        <div class="stl__list" style="display: grid; gap: var(--space-md); align-content: start">
+          <div class="stl__fits"><span class="stl__fits-icon" aria-hidden="true"><svg><use href="#i-ruler"/></svg></span><p><b>Fits: 2.4×2.0 m</b><span>Folds flat when you're done.</span></p></div>
+          <ul class="stl__rows" style="margin: 0">
+            <li class="option-card stl-row is-checked" aria-current="true"><div class="product-row"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=160" alt="" width="128" height="128"></span><div><p class="product-row__title"><a href="#">Ativafit Lava 66 lb</a></p><p class="price">$379.99</p></div></div></li>
+            <li class="option-card stl-row is-hover"><div class="product-row"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P07.jpg?width=160" alt="" width="128" height="128"></span><div><p class="product-row__title"><a href="#">FlexFold Bench</a></p><p class="price">$189.99</p></div></div></li>
+            <li class="option-card stl-row is-disabled"><div class="product-row"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=160" alt="" width="128" height="128"></span><div><p class="product-row__title"><a href="#">Compact Power Rack R3</a></p><p class="price"><span class="badge badge--sold-out">Sold out</span> <span class="text-muted">$549.00</span></p></div></div></li>
+          </ul>
+          <small class="state-tag">Dòng: đang xem (is-checked) · hover · hết hàng (is-disabled, tổng bỏ món này). Điểm nóng: đang chọn · mặc định · focus</small>
+        </div>
+      </div>
+      <div class="dos">
+        <div class="do"><b>Nên</b>Bấm điểm nóng thì dòng tương ứng thành "đang xem" và cuộn vào tầm nhìn; <code>aria-label</code> điểm nóng nêu tên sản phẩm.</div>
+        <div class="dont"><b>Không nên</b>Điểm nóng nhỏ hơn 44; tóm tắt dính ở 360 (che dòng).</div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="h-vcard" data-status="proposed">
+      <h2 id="h-vcard">37. Video card</h2>
+      <p class="demo-note">Card video demo: khung <code>--ratio-9-16</code> nền tối, nút play tròn 52 (<code>--round-button-size</code>) trắng 92%, hover cam accent + phóng 1.06; dòng sản phẩm <code>.product-row</code> (thumb 56) cao 76 (đệm 12) dưới 1280, 84 (đệm 12 / 16) từ 1280; tên một dòng, cắt "…". Viền border, bo 12. Card 252 (360) · 264 (từ 768). Nút play: <code>aria-label</code> "Play video: {tên}"; vòng focus thụt vào trong khung 4. <code>--error</code>: giữ khung, icon + chữ trắng thay ảnh.</p>
+      <ul class="hp-grid hp-grid--3" aria-label="Video card states">
+        <li class="hp-card-264"><div class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-1.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play" type="button" aria-label="Play video: Ativafit Lava 66 lb"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Ativafit Lava 66 lb</a></p><p class="price"><span class="price__sale">$379.99</span><s class="price__compare">$499.99</s></p></div></div></div><small class="state-tag">Default</small></li>
+        <li class="hp-card-264"><div class="vcard"><div class="vcard__media"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-pos-2.jpg?width=600" alt="" width="600" height="1067"><button class="vcard__play is-hover is-focus" type="button" aria-label="Play video: Compact Power Rack"><span><svg aria-hidden="true"><use href="#i-play"/></svg></span></button></div><div class="product-row vcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P08.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Compact Power Rack</a></p><p class="price"><span>$549.00</span></p></div></div></div><small class="state-tag">Hover + focus nút play</small></li>
+        <li class="hp-card-264"><div class="vcard vcard--error"><div class="vcard__media"><p><svg aria-hidden="true"><use href="#i-alert"/></svg>Video unavailable. <a class="text-link" href="#">View Iron Core Kettlebell 16 kg</a></p></div></div><small class="state-tag">--error: video lỗi, link tới sản phẩm (như ES1-T279)</small></li>
+      </ul>
+    </section>
+
+    <section class="demo-block" aria-labelledby="h-tcard" data-status="proposed">
+      <h2 id="h-tcard">38. Testimonial card</h2>
+      <p class="demo-note">Ảnh <code>--ratio-16-9</code>, thân đệm 24 cách 12: hàng meta (tên, "Verified" muted-light 14/20 + icon xanh 16, sao), tiêu đề <code>.text-title</code> 18/28 Inter 700, trích dẫn muted 16/24 giãn hết, dòng sản phẩm dưới vạch border (đệm 24). Nền trắng bo 16 trên section cream. Dưới 1280 sao xuống hàng riêng, tên 16/500; từ 1280 một hàng, sao dạt phải, tên 14/600. Card 272 (360) · 308 (768) · tối đa 456 (1280). Sao có <code>role="img"</code> + <code>aria-label</code> "N out of 5 stars". Badge Verified mặc định tắt (E9).</p>
+      <ul class="hp-grid hp-tcard-stage" aria-label="Testimonial card">
+        <li class="hp-card-456"><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-1.jpg?width=920" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">E. Johnson</span><span class="tcard__verified"><svg aria-hidden="true"><use href="#i-verified"/></svg>Verified</span><span class="rating__stars" role="img" aria-label="5 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Versatile gear for all exercises</h3><p class="tcard__quote">High quality equipment that doesn't break the bank. I am very impressed with the overall durability.</p><div class="product-row tcard__product"><span class="product-row__media"><img class="product-row__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/P05.jpg?width=120" alt="" width="56" height="56"></span><div><p class="product-row__title"><a href="#">Ativafit Lava 66 lb</a></p><p class="price"><span class="price__sale">$379.99</span><s class="price__compare">$499.99</s></p></div></div></div></article><small class="state-tag">Default (card trắng trên nền cream như section)</small></li>
+        <li class="hp-card-456"><article class="tcard"><img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-rev-2.jpg?width=920" alt="" width="720" height="426"><div class="tcard__body"><div class="tcard__meta"><span class="tcard__name">S. Williams</span><span class="rating__stars" role="img" aria-label="4 out of 5 stars"><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg aria-hidden="true"><use href="#i-star"/></svg><svg class="is-empty" aria-hidden="true"><use href="#i-star"/></svg></span></div><h3 class="tcard__title text-title">Folds away in seconds</h3><p class="tcard__quote">The rack folds flat against the wall. My garage is a garage again between sessions.</p></div></article><small class="state-tag">Partial: tắt Verified, đánh giá không gắn sản phẩm (ẩn dòng sản phẩm)</small></li>
+      </ul>
+    </section>
+
+    <section class="demo-block" aria-labelledby="h-specs" data-status="proposed">
+      <h2 id="h-specs">39. Specs table</h2>
+      <p class="demo-note"><code>&lt;dl class="specs"&gt;</code>, mỗi hàng một <code>&lt;div&gt;</code> chứa <code>dt</code> (muted 14/20) + <code>dd</code> (16/24 500). Hàng lẻ nền sand, viền border, bo 8. 360: dt trên dd, đệm 12 / 16, cách 4. Từ 768: dt trái, dd phải (căn cuối), đệm ngang 24, cách 16. Từ 1280: hàng cao tối thiểu 44 (<code>--size-1100</code>), đệm 8 / 24. Giá trị dài xuống dòng trong cột dd, không cắt.</p>
+      <dl class="specs" aria-label="Specifications" style="max-inline-size: 560px">
+        <div><dt>Weight range</dt><dd>11 – 66 lb per hand</dd></div>
+        <div><dt>Footprint</dt><dd>0.18 m² — fits under a desk</dd></div>
+        <div><dt>Materials</dt><dd>Cast iron core, reinforced rubber</dd></div>
+        <div><dt>Assembly</dt><dd>None — ready out of the box</dd></div>
+      </dl>
+      <div class="dos">
+        <div class="do"><b>Nên</b>2–6 hàng lấy từ metafield sản phẩm; không có metafield nào thì không in bảng.</div>
+        <div class="dont"><b>Không nên</b>Dùng bảng thông số làm bảng giá; tô màu khác sand cho hàng lẻ.</div>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="h-faq-stats" data-status="proposed">
+      <h2 id="h-faq-stats">40. FAQ stats</h2>
+      <p class="demo-note">2 ô số liệu cạnh ảnh FAQ: ô 1 nền accent, ô 2 nền tối, chữ trắng; nhãn eyebrow Sofia 800 HOA, số Sofia 800 cỡ h1 (dòng = cỡ), câu 14/20 500. Bo 8, cách 12. 360: chồng lên đáy ảnh 48, lề 12, đệm 16. Từ 768: nổi góc dưới trái khung ảnh, rộng 80%, đệm 24; từ 1280 cách đáy 40. AA: trắng / accent 4.97:1, trắng / dark 17.4:1. Là <code>&lt;ul&gt;</code> (thông tin, không bấm được).</p>
+      <div class="hp-faq">
+        <img src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-faq.jpg?width=1080" alt="" width="1080" height="1150">
+        <ul class="faq__stats">
+          <li class="faq__stat"><span class="faq__stat-label">Products</span><span class="faq__stat-value">360+</span><span class="faq__stat-text">Home gym gear in stock.</span></li>
+          <li class="faq__stat"><span class="faq__stat-label">Warranty</span><span class="faq__stat-value">12</span><span class="faq__stat-text">Months on every item.</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="demo-block" aria-labelledby="h-quiz-opt" data-status="proposed">
+      <h2 id="h-quiz-opt">41. Quiz answer option</h2>
+      <p class="demo-note"><code>.option-card.quiz-opt</code>: hàng câu trả lời quiz, cùng trạng thái của Selectable option (20) nhưng là component riêng (không gộp <code>--tile</code>): cột thumb tròn 44 (<code>--size-1100</code>) nền sand, chữ (tiêu đề 600 + meta muted 14/20), check tròn 24 góc trên phải. Cao tối thiểu 72 (<code>--size-1800</code>) dưới 768, 80 (<code>--size-2000</code>) từ 768. Chọn: viền accent 2 (inset, 0 CLS) + check accent. <code>&lt;input type="radio"&gt;</code> ẩn trong <code>&lt;label&gt;</code>, nhóm trong <code>&lt;fieldset&gt;</code> có legend.</p>
+      <fieldset class="hp-grid hp-grid--3" style="border: 0">
+        <legend class="visually-hidden">Where do you want to focus?</legend>
+        <div class="state"><label class="option-card quiz-opt"><input class="visually-hidden" type="radio" name="ds-quiz" checked><img class="quiz-opt__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-thumb-1.jpg?width=96" alt="" width="88" height="88"><span class="quiz-opt__text"><span class="option-card__title">Upper body</span><span class="option-card__meta">Shoulders, arms, chest</span></span><span class="option-card__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></label><small>Selected</small></div>
+        <div class="state"><label class="option-card quiz-opt is-hover"><input class="visually-hidden" type="radio" name="ds-quiz"><img class="quiz-opt__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-thumb-2.jpg?width=96" alt="" width="88" height="88"><span class="quiz-opt__text"><span class="option-card__title">Core</span><span class="option-card__meta">Abs, stability, balance</span></span><span class="option-card__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></label><small>Hover</small></div>
+        <div class="state"><label class="option-card quiz-opt is-focus"><input class="visually-hidden" type="radio" name="ds-quiz"><img class="quiz-opt__thumb" src="https://cdn.shopify.com/s/files/1/0625/5335/8433/files/efx-thumb-3.jpg?width=96" alt="" width="88" height="88"><span class="quiz-opt__text"><span class="option-card__title">Lower body</span><span class="option-card__meta">Legs, glutes, calves</span></span><span class="option-card__check" aria-hidden="true"><svg><use href="#i-tick"/></svg></span></label><small>Focus</small></div>
+      </fieldset>
     </section>
   </div>
 </main>

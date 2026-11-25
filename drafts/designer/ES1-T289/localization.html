@@ -9,7 +9,7 @@
 <style>
   /* ES1-T289 · Localization. Chỉ CSS riêng; phần chung ở ../_kit/kit.css */
   .site-header.demo-static { position: relative; }
-  .page-stub { padding-block: var(--space-7); }
+  .page-stub { padding-block: var(--space-4xl); }
 
   /* ---------- Trigger (kit .site-footer__locale: cờ 24 + USD / EN + chevron) ---------- */
   .loc-trigger { list-style: none; }
@@ -21,17 +21,17 @@
   .site-footer__end { position: relative; }
 
   /* ---------- Popover ≥ 48rem (spec §4.2) ---------- */
-  .loc__panel { position: absolute; inset-block-end: calc(100% + var(--space-2)); inset-inline-start: 50%; z-index: var(--layer-floating); display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-5); width: calc(var(--space-1) * 150); padding: var(--space-5); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); font-size: var(--font-size-base); font-weight: var(--font-body-weight); text-align: start; translate: -50% 0; }
-  .loc__panel--one { grid-template-columns: minmax(0, 1fr); width: calc(var(--space-1) * 80); }
+  .loc__panel { position: absolute; inset-block-end: calc(100% + var(--space-xs)); inset-inline-start: 50%; z-index: var(--layer-floating); display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--space-xl); width: calc(var(--space-2xs) * 150); padding: var(--space-xl); border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-raised); font-size: var(--font-size-base); font-weight: var(--font-body-weight); text-align: start; translate: -50% 0; }
+  .loc__panel--one { grid-template-columns: minmax(0, 1fr); width: calc(var(--space-2xs) * 80); }
   @media (min-width: 64rem) { .loc__panel { inset-inline: auto 0; translate: none; } }
   @media (max-width: 47.99rem) { .site-footer .loc__panel { display: none; } }
   .loc__panel--static { position: static; translate: none; box-shadow: var(--shadow-raised); }
   @media (max-width: 47.99rem) { .loc__panel--static { grid-template-columns: minmax(0, 1fr); width: 100%; } }
 
-  .loc__group { display: grid; align-content: start; gap: var(--space-3); min-width: 0; }
+  .loc__group { display: grid; align-content: start; gap: var(--space-sm); min-width: 0; }
 
 
-  .loc__list { position: relative; display: grid; gap: 0; max-height: calc(var(--space-1) * 80); margin: 0; padding: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; }
+  .loc__list { position: relative; display: grid; gap: 0; max-height: calc(var(--space-2xs) * 80); margin: 0; padding: 0; overflow-y: auto; overscroll-behavior: contain; list-style: none; }
   .loc__name { flex: 1; min-width: 0; }
   .loc__name b { font-weight: 600; }
   .loc__meta { flex: none; color: var(--color-muted); font-size: var(--font-size-sm); font-weight: var(--font-body-weight); }
@@ -41,12 +41,12 @@
   /* ---------- Bottom sheet < 48rem (spec §4.3) ---------- */
   .site-footer { position: relative; }
   .loc-scrim { position: absolute; inset: 0; z-index: var(--layer-scrim); background: var(--overlay-scrim); }
-  .loc-sheet { position: absolute; inset-inline: 0; inset-block-end: 0; z-index: var(--layer-overlay); display: flex; flex-direction: column; gap: var(--space-4); height: 704px; padding: var(--space-6) var(--space-4) var(--space-5); border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); text-align: start; }
-  .loc-sheet::before { content: ''; position: absolute; inset-block-start: var(--space-2); inset-inline-start: calc(50% - var(--space-lg)); width: var(--space-3xl); height: var(--progress-height); border-radius: var(--radius-pill); background: var(--color-border); }
-  .loc-sheet .dialog__title { margin: 0; padding-inline-end: calc(var(--space-1) * 14); }
-  .loc-sheet .dialog__close { position: absolute; inset-block-start: var(--space-3); inset-inline-end: var(--space-3); }
+  .loc-sheet { position: absolute; inset-inline: 0; inset-block-end: 0; z-index: var(--layer-overlay); display: flex; flex-direction: column; gap: var(--space-md); height: 704px; padding: var(--space-2xl) var(--space-md) var(--space-xl); border-radius: var(--radius-dialog) var(--radius-dialog) 0 0; background: var(--color-background); color: var(--color-foreground); box-shadow: var(--shadow-overlay); text-align: start; }
+  /* Tay nắm 40 × 4: kit .sheet-handle (2.1.0, ES1-T573) */
+  .loc-sheet .dialog__title { margin: 0; padding-inline-end: calc(var(--space-2xs) * 14); }
+  .loc-sheet .dialog__close { position: absolute; inset-block-start: var(--space-sm); inset-inline-end: var(--space-sm); }
   .loc-sheet .loc__list { flex: 1; max-height: none; }
-  .loc-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2); }
+  .loc-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-xs); }
   /* 2 tab chia đều, không tràn mép ở drawer 360 (review vòng 2): nhãn dài xuống dòng trong tab cao ≥ 44 */
   .loc-tabs .tab { justify-content: center; min-width: 0; padding: var(--space-2xs) var(--space-xs); white-space: normal; overflow-wrap: anywhere; text-align: center; line-height: 1.25; } /* 16/20: nhãn 2 dòng vừa tab 44; Thiết kế */ /* + <wbr> sau '/': "Country/region" có chỗ ngắt, giữ lề trong 8 (ES1-T527 vòng 3) */
   @media (min-width: 48rem) { .site-footer .loc-scrim, .site-footer .loc-sheet { display: none; } }
@@ -58,20 +58,20 @@
   .drawer-stage .scrim, .drawer-stage .drawer { position: absolute; }
   .drawer-stage .drawer { width: 90%; }
   /* Hàng localization gộp = kit .drawer-loc (V65, LC1): hàng cuối danh sách cấp 1, không khung; bỏ bản riêng (review vòng 2) */
-  .level2__top { display: flex; align-items: center; justify-content: space-between; min-height: 72px; padding: var(--space-3) var(--space-3) var(--space-3) var(--space-5); border-block-end: 1px solid var(--color-border); }
-  .level2__body { display: flex; flex: 1; flex-direction: column; gap: var(--space-4); min-height: 0; padding: var(--space-4) var(--space-5) var(--space-5); }
+  .level2__top { display: flex; align-items: center; justify-content: space-between; min-height: 72px; padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-xl); border-block-end: 1px solid var(--color-border); }
+  .level2__body { display: flex; flex: 1; flex-direction: column; gap: var(--space-md); min-height: 0; padding: var(--space-md) var(--space-xl) var(--space-xl); }
   .level2__body .loc__list { flex: 1; max-height: none; }
 
   /* ---------- States layout ---------- */
-  .demo-states { padding-block: var(--space-7); }
-  .state-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); align-items: start; }
+  .demo-states { padding-block: var(--space-4xl); }
+  .state-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2xl); align-items: start; }
   @media (min-width: 48rem) { .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .stage-light { padding: var(--space-5); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background-alt); }
-  .stage-dark { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); padding: var(--space-4) var(--space-5); border-radius: var(--radius-card); background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); }
+  .stage-light { padding: var(--space-xl); border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background-alt); }
+  .stage-dark { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-md); padding: var(--space-md) var(--space-xl); border-radius: var(--radius-card); background: var(--color-background-dark) var(--dark-texture); color: var(--color-background-dark-foreground); }
   .stage-dark .demo-label { width: 100%; margin: 0; color: var(--color-muted-on-dark); }
   .stage-dark :focus-visible { outline-color: var(--color-background-dark-foreground); }
-  .stage-stack { display: grid; gap: var(--space-3); }
-  .phone-stage { position: relative; overflow: hidden; width: 360px; max-width: 100%; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--overlay-scrim); padding-block-start: var(--space-7); }
+  .stage-stack { display: grid; gap: var(--space-sm); }
+  .phone-stage { position: relative; overflow: hidden; width: 360px; max-width: 100%; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--overlay-scrim); padding-block-start: var(--space-4xl); }
 
   /* ---------- ES1-T527: kit .group-label (V76), .search-field + .field__input--compact 44 trong popover (V21),
      .listbox__option (V68: hover nền alt, focus outline accent inset, hiện tại 600 + ✓), .empty-state--compact (V54),
@@ -81,7 +81,7 @@
   .loc__option[aria-disabled='true'] .loc__meta { color: var(--color-muted-light); }
   .loc__option .spinner { flex: none; }
   .loc-sheet .loc__option, .level2__body .loc__option { min-height: var(--control-height); }
-  .loc__empty { min-height: calc(var(--space-1) * 50); align-content: center; }
+  .loc__empty { min-height: calc(var(--space-2xs) * 50); align-content: center; }
   .loc__text-button { min-height: var(--touch-target); padding: 0; border: 0; background: none; cursor: pointer; }
   .loc__retry { justify-self: start; }
   .level2__title { font-size: var(--font-size-h2); line-height: var(--line-height-h2); font-weight: var(--font-heading--weight-display); }
@@ -233,7 +233,7 @@
 
   <!-- < 48rem: bottom sheet thay popover (spec §4.3). Tab Country/region đang chọn -->
   <div class="loc-scrim" aria-hidden="true"></div>
-  <div class="loc-sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+  <div class="loc-sheet sheet-handle" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <h2 class="dialog__title" id="sheet-title">Country and language</h2>
     <button class="close-button dialog__close" type="button" aria-label="Close country and language"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
     <div class="loc-tabs" role="tablist" aria-label="Country and language">
@@ -243,7 +243,7 @@
     <div class="loc__group" role="tabpanel" id="panel-country" aria-labelledby="tab-country" style="flex:1;min-height:0;display:flex;flex-direction:column">
       <label class="visually-hidden" for="sheet-search">Search countries</label>
       <div class="search-field"><svg aria-hidden="true"><use href="#i-search"/></svg><input class="field__input" id="sheet-search" type="search" placeholder="Search countries" autocomplete="off" aria-controls="sheet-countries"></div>
-      <ul class="loc__list" id="sheet-countries" aria-label="Countries" data-scroll-current style="flex:1;margin-block-start:var(--space-2)">
+      <ul class="loc__list" id="sheet-countries" aria-label="Countries" data-scroll-current style="flex:1;margin-block-start:var(--space-xs)">
         <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Australia</span><span class="loc__meta">AUD $</span></button></li>
         <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Austria</span><span class="loc__meta">EUR €</span></button></li>
         <li><button class="listbox__option loc__option" type="button"><span class="loc__name">Belgium</span><span class="loc__meta">EUR €</span></button></li>
@@ -449,8 +449,8 @@
         </div>
       </div>
       <div class="phone-stage">
-        <p class="demo-label" style="padding-inline:var(--space-4);color:var(--color-background)">Sheet 360 · tab Language</p>
-        <div class="loc-sheet loc-sheet--static loc-sheet--short" role="dialog" aria-modal="true" aria-labelledby="sheet2-title">
+        <p class="demo-label" style="padding-inline:var(--space-md);color:var(--color-background)">Sheet 360 · tab Language</p>
+        <div class="loc-sheet loc-sheet--static loc-sheet--short sheet-handle" role="dialog" aria-modal="true" aria-labelledby="sheet2-title">
           <h2 class="dialog__title" id="sheet2-title">Country and language</h2>
           <button class="close-button dialog__close" type="button" aria-label="Close country and language, sample"><svg aria-hidden="true"><use href="#i-close"/></svg></button>
           <div class="loc-tabs" role="tablist" aria-label="Country and language, sample">

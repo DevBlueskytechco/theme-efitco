@@ -1,8 +1,11 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không có trình duyệt, preview, node). Kết quả thật lấy từ CI.
-// Ticket ES1-T130 TE-8-BE1: assets/search-loader.js (≤ 256 B) + assets/predictive-search.js (≤ 6 656 B), docs/srs.md TE-8 AC1, NFR-4.
+// Ticket ES1-T130 TE-8-BE1: assets/search-loader.js (≤ 256 B) + assets/predictive-search.js (≤ 6 912 B; 6 656 → 6 912 CTO 23/11 (#303, ADR 0014 mục 8): loader CSS tầng 5), docs/srs.md TE-8 AC1, NFR-4.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T130.spec.ts -g "AC1"
 // Phần lớn test mock /search/suggest.json bằng page.route để kiểm hành vi tất định (debounce, huỷ, phím, lỗi).
 // Test dữ liệu thật dùng TE8_QUERY_ALL (ES1-T125, env hoặc tests/e2e/store-data.json); thiếu thì skip có lý do.
+// ES1-T377 (TE-8-R2-FE1, docs/ui-spec/predictive-search.md §2.5, §11; ES1-T563): thêm nhóm queries đầu listbox, thứ tự
+// queries, products, collections, articles, pages; "View all" ra khỏi listbox (nút ở chân, không role=option) nên listbox
+// chỉ còn option kết quả và rỗng khi 0 kết quả (chờ list mở bằng status thay vì listbox hiện).
 import { readFileSync, statSync } from 'node:fs';
 import { test, expect, type Page, type Request } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
@@ -105,9 +108,10 @@ const activeId = (page: Page) => tid(page, T.input).getAttribute('aria-activedes
 test.describe('ES1-T130 tĩnh', () => {
   test.beforeEach(() => test.skip(!isDesktop(), 'static, chạy 1 lần'));
 
-  test('AC1 trần byte 256 và 6656, loader không comment', () => {
+  test('AC1 trần byte 256 và 6912, loader không comment', () => {
     expect(statSync(LOADER).size).toBeLessThanOrEqual(256);
-    expect(statSync(MODULE_FILE).size).toBeLessThanOrEqual(6656);
+    // CTO 23/11 (#303, ADR 0014 mục 8): 6 656 → 6 912 cho loader CSS nạp lười data-stylesheet
+    expect(statSync(MODULE_FILE).size).toBeLessThanOrEqual(6912);
     const loader = readFileSync(LOADER, 'utf8');
     expect(loader).not.toMatch(/\/\/|\/\*/);
     expect(loader).toContain('[data-search-src]');
@@ -237,10 +241,11 @@ test.describe('ES1-T130 predictive search', () => {
       els.map((g) => [g.getAttribute('data-predictive-group'), (g as HTMLElement).hidden, g.querySelectorAll('[role="option"]').length])
     );
     expect(groups).toEqual([
+      ['queries', true, 0],
       ['products', false, 2],
       ['collections', false, 1],
-      ['pages', false, 1],
       ['articles', false, 1],
+      ['pages', false, 1],
     ]);
 
     const first = tid(page, T.option).first();
@@ -279,7 +284,9 @@ test.describe('ES1-T130 predictive search', () => {
   test('AC1 0 kết quả: nhóm ẩn, chỉ còn dòng all, status đọc câu rỗng', async ({ page }) => {
     await mockSuggest(page, () => ({ products: [], collections: [], pages: [], articles: [] }));
     await openSearch(page);
-    await typeAndWaitList(page, 'zzqx');
+    // 0 kết quả: listbox không còn option nào (View all ở chân) nên không có hộp để đo visible; chờ aria-expanded
+    await tid(page, T.input).fill('zzqx');
+    await expect(tid(page, T.input)).toHaveAttribute('aria-expanded', 'true');
     await expect(tid(page, T.option)).toHaveCount(0);
     for (const g of await tid(page, T.group).all()) await expect(g).toBeHidden();
     await expect(tid(page, T.all)).toBeVisible();
@@ -294,7 +301,7 @@ test.describe('ES1-T130 predictive search', () => {
     const input = tid(page, T.input);
     const options = page.locator(`[data-testid="${T.listbox}"] [role="option"]`);
     const count = await options.count();
-    expect(count).toBe(FIXTURE_OPTIONS + 1);
+    expect(count).toBe(FIXTURE_OPTIONS);
 
     await input.press('ArrowDown');
     const firstId = await options.first().getAttribute('id');
