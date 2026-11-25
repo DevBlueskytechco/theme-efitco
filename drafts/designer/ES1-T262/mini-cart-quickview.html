@@ -20,123 +20,120 @@
   @media (min-width: 120rem) { :root { --stage-h: 1000px; } }
 
   /* Header: dùng nguyên kit vòng 3 (thanh tối + noise, sổ 10/11), không override */
-  .intro { padding-block: var(--space-5) var(--space-6); }
-  .intro p { margin-block-start: var(--space-3); color: var(--color-muted); }
+  .intro { padding-block: var(--space-xl) var(--space-2xl); }
+  .intro p { margin-block-start: var(--space-sm); color: var(--color-muted); }
 
   /* Sân khấu mô phỏng thiết bị: tràn hết bề ngang, cao = màn hình của mốc */
   .stage { height: var(--stage-h); min-height: 0; border-inline: 0; border-radius: 0; background: var(--color-background); }
   .stage__page { position: absolute; inset: 0; overflow: hidden; }
   .stage__page .site-header { position: relative; }
-  .stage__page .page-title { padding-block: var(--space-5); }
-  .stage .dialog { max-height: calc(var(--stage-h) - var(--space-7)); }
+  .stage__page .page-title { padding-block: var(--space-xl); }
+  .stage .dialog { max-height: calc(var(--stage-h) - var(--space-4xl)); }
   @media (max-width: 47.99rem) { .stage .dialog { max-height: calc(var(--stage-h) * 0.88); } }
 
-  /* ---------- Icon button chung (xoá, ghi chú) ---------- */
-  .icon-button { display: inline-flex; flex: none; align-items: center; justify-content: center; width: var(--touch-target); height: var(--touch-target); padding: 0; border: 0; border-radius: 50%; background: none; color: var(--color-muted); cursor: pointer; transition: background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
-  .icon-button svg { width: var(--icon-size-md); height: var(--icon-size-md); }
-  .icon-button:hover, .icon-button.is-hover { background: var(--color-background-alt); color: var(--color-foreground); }
+  /* ---------- Icon button chung (xoá, ghi chú): kit .icon-button (2.1.0, ES1-T573) ---------- */
 
 
   /* ---------- Mini cart (cart drawer) ---------- */
-  .cd__count { display: inline-flex; align-items: center; min-height: 24px; margin-inline-start: var(--space-2); padding-inline: var(--space-2); border-radius: var(--radius-pill); background: var(--color-background-alt); color: var(--color-foreground); font-family: var(--font-primary--family); font-size: var(--font-size-xs); font-weight: 600; vertical-align: middle; letter-spacing: 0; }
-  .cd__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-4) var(--space-4) var(--space-5); }
-  @media (min-width: 48rem) { .cd__body { padding-inline: var(--space-5); } }
+  .cd__count { display: inline-flex; align-items: center; min-height: 24px; margin-inline-start: var(--space-xs); padding-inline: var(--space-xs); border-radius: var(--radius-pill); background: var(--color-background-alt); color: var(--color-foreground); font-family: var(--font-primary--family); font-size: var(--font-size-xs); font-weight: 600; vertical-align: middle; letter-spacing: 0; }
+  .cd__body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-md) var(--space-md) var(--space-xl); }
+  @media (min-width: 48rem) { .cd__body { padding-inline: var(--space-xl); } }
 
   .cd-lines { margin: 0; padding: 0; list-style: none; }
-  .cd__view-head { display: inline-flex; align-items: center; min-height: var(--touch-target); padding-inline: var(--space-2); font-size: var(--font-size-sm); white-space: nowrap; }
-  .cd-line { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--space-3); padding-block: var(--space-4); border-block-end: 1px solid var(--color-border); }
-  @media (min-width: 48rem) { .cd-line { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-4); } }
+  .cd__view-head { display: inline-flex; align-items: center; min-height: var(--touch-target); padding-inline: var(--space-xs); font-size: var(--font-size-sm); white-space: nowrap; }
+  .cd-line { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: var(--space-sm); padding-block: var(--space-md); border-block-end: 1px solid var(--color-border); }
+  @media (min-width: 48rem) { .cd-line { grid-template-columns: 96px minmax(0, 1fr); gap: var(--space-md); } }
   .cd-line__media { display: block; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-swatch); background: var(--color-background-cream); }
   .cd-line__media img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
-  .cd-line__main { display: grid; align-content: start; gap: var(--space-1); min-width: 0; }
-  .cd-line__top { display: flex; align-items: flex-start; gap: var(--space-2); }
-  .cd-line__title { flex: 1; min-width: 0; padding-block-start: var(--space-1); font-weight: 500; line-height: var(--line-height-body); text-decoration: none; }
+  .cd-line__main { display: grid; align-content: start; gap: var(--space-2xs); min-width: 0; }
+  .cd-line__top { display: flex; align-items: flex-start; gap: var(--space-xs); }
+  .cd-line__title { flex: 1; min-width: 0; padding-block-start: var(--space-2xs); font-weight: 500; line-height: var(--line-height-body); text-decoration: none; }
   .cd-line__title:hover, .cd-line__title.is-hover { text-decoration: underline; text-underline-offset: 0.2em; }
-  .cd-line__top .icon-button { margin-block-start: calc(var(--space-2) * -1); margin-inline-end: calc(var(--space-3) * -1); }
+  .cd-line__top .icon-button { margin-block-start: calc(var(--space-xs) * -1); margin-inline-end: calc(var(--space-sm) * -1); }
   .cd-line__meta { margin: 0; color: var(--color-muted); font-size: var(--font-size-sm); }
   .cd-line__meta dd { display: inline; margin: 0; color: var(--color-foreground); }
   .cd-line__meta dt { display: inline; }
   .cd-line .price { font-size: var(--font-size-sm); line-height: var(--line-height-sm); }
-  .cd-line__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-2); margin-block-start: var(--space-2); }
+  .cd-line__row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-xs); margin-block-start: var(--space-xs); }
   .cd-line__total { font-weight: 600; }
-  .cd-line__msg { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: var(--space-2); font-size: var(--font-size-sm); font-weight: 500; }
+  .cd-line__msg { grid-column: 1 / -1; display: flex; align-items: flex-start; gap: var(--space-xs); font-size: var(--font-size-sm); font-weight: 500; }
   .cd-line__msg svg { flex: none; width: var(--icon-size-sm); height: var(--icon-size-sm); margin-block-start: var(--space-050); }
   .cd-line.is-sold-out .cd-line__media img { opacity: 0.6; }
 
 
-  .upsell__list { display: grid; gap: var(--space-3); margin: 0; padding: 0; list-style: none; }
+  .upsell__list { display: grid; gap: var(--space-sm); margin: 0; padding: 0; list-style: none; }
 
   .accel { display: grid; place-items: center; min-height: var(--touch-target); border: 1px dashed color-mix(in srgb, var(--color-background-dark-foreground) 40%, var(--color-background-panel)); border-radius: var(--radius-button); color: var(--panel-muted); font-size: var(--font-size-xs); text-align: center; }
   .cd__foot .busy-dot { border-color: color-mix(in srgb, var(--color-background-dark-foreground) 30%, var(--color-background-panel)); border-block-start-color: var(--color-background-dark-foreground); }
   .sum-note--busy { display: inline-flex; align-items: center; gap: var(--space-xs); }
-  .cd__view { display: flex; align-items: center; justify-content: center; min-height: var(--touch-target); margin-block: calc(var(--space-2) * -1); }
+  .cd__view { display: flex; align-items: center; justify-content: center; min-height: var(--touch-target); margin-block: calc(var(--space-xs) * -1); }
   .busy-dot { display: inline-block; width: var(--icon-size-sm); height: var(--icon-size-sm); border: 2px solid var(--color-border); border-block-start-color: var(--color-foreground); border-radius: 50%; vertical-align: middle; animation: kit-spin var(--motion-hero) linear infinite; }
 
   /* ---------- Quick view ---------- */
   /* Rộng 720 dưới 80rem, từ 80rem = kit .dialog--m-wide 960 (V69) */
   @media (max-width: 79.99rem) { .qv { --dialog-width: 720px; } }
-  .qv__grid { display: grid; grid-template-areas: 'title' 'media' 'info'; gap: var(--space-4); }
-  @media (min-width: 48rem) { .qv__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; grid-template-areas: 'media title' 'media info'; column-gap: var(--space-5); row-gap: var(--space-3); } }
-  @media (min-width: 80rem) { .qv__grid { column-gap: var(--space-7); } }
+  .qv__grid { display: grid; grid-template-areas: 'title' 'media' 'info'; gap: var(--space-md); }
+  @media (min-width: 48rem) { .qv__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; grid-template-areas: 'media title' 'media info'; column-gap: var(--space-xl); row-gap: var(--space-sm); } }
+  @media (min-width: 80rem) { .qv__grid { column-gap: var(--space-4xl); } }
   /* Eyebrow 16/800 → tiêu đề cách 12; tiêu đề Sofia 700 (không 800), ls −0.02em */
-  .qv__head { grid-area: title; display: grid; gap: var(--space-3); padding-inline-end: calc(var(--space-1) * 14); }
+  .qv__head { grid-area: title; display: grid; gap: var(--space-sm); padding-inline-end: calc(var(--space-2xs) * 14); }
   .qv__title { font-size: var(--font-size-h2); font-weight: var(--font-heading--weight); letter-spacing: var(--letter-spacing-heading); line-height: var(--line-height-h2); }
   .qv__media { grid-area: media; min-width: 0; }
   /* Khung ảnh cream bo 16 (--radius-panel) */
   .qv__main { position: relative; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); }
   .qv__main img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
   /* Chevron tròn 52 (sổ 09/11 mọi carousel; kit .round-button), góc phải dưới ảnh, ≥ 48rem */
-  .qv__nav { position: absolute; inset-block-end: var(--space-4); inset-inline-end: var(--space-4); display: flex; gap: var(--space-2); }
-  .qv__thumbs { display: none; gap: var(--space-2); margin: var(--space-3) 0 0; padding: 0; list-style: none; }
+  .qv__nav { position: absolute; inset-block-end: var(--space-md); inset-inline-end: var(--space-md); display: flex; gap: var(--space-xs); }
+  .qv__thumbs { display: none; gap: var(--space-xs); margin: var(--space-sm) 0 0; padding: 0; list-style: none; }
   .qv__thumb { display: block; width: 64px; height: 64px; padding: 0; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-swatch); background: var(--color-background-cream); cursor: pointer; }
   .qv__thumb img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
   .qv__thumb[aria-current='true'] { border: 2px solid var(--color-foreground); }
   .qv__thumb:hover { border-color: var(--color-foreground); }
   @media (min-width: 80rem) { .qv__thumb { width: 72px; height: 72px; } }
   /* Mobile: dải ảnh vuốt + thanh tiến trình (sổ quyết định 09/11), không thumbnail */
-  .qv__strip { display: flex; gap: var(--space-3); margin: 0; padding: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; list-style: none; }
+  .qv__strip { display: flex; gap: var(--space-sm); margin: 0; padding: 0; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; list-style: none; }
   .qv__strip li { position: relative; flex: 0 0 78%; aspect-ratio: 1; overflow: hidden; border-radius: var(--radius-panel); background: var(--color-background-cream); scroll-snap-align: start; }
   .qv__strip img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: darken; }
   .qv__strip li:only-child { flex-basis: 100%; aspect-ratio: 4 / 3; } /* 1 ảnh: không cần lộ ảnh sau, thấp hơn để bộ chọn lên gần */
-  .qv__media .carousel-progress { margin-block-start: var(--space-4); }
+  .qv__media .carousel-progress { margin-block-start: var(--space-md); }
   .qv__media .qv__main { display: none; }
   @media (min-width: 48rem) {
     .qv__strip, .qv__media .carousel-progress { display: none; }
     .qv__media .qv__main { display: block; }
     .qv__thumbs { display: flex; }
   }
-  .qv__info { grid-area: info; display: flex; flex-direction: column; gap: var(--space-4); min-width: 0; }
-  @media (min-width: 80rem) { .qv__info { gap: var(--space-5); } } /* 24. Chuẩn: Polaris large-200 */
+  .qv__info { grid-area: info; display: flex; flex-direction: column; gap: var(--space-md); min-width: 0; }
+  @media (min-width: 80rem) { .qv__info { gap: var(--space-xl); } } /* 24. Chuẩn: Polaris large-200 */
   /* Hàng giá: giá sale · giá gạch · badge -N% cùng hàng, cách 8, cao 28 */
-  .qv__price { align-items: center; row-gap: var(--space-1); }
+  .qv__price { align-items: center; row-gap: var(--space-2xs); }
   .qv__price .badge { align-self: center; }
   .qv__desc { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 3; color: var(--color-muted); }
   /* Đang tải biến thể: kit .button.is-pending (VP1) giữ màu primary, aria-disabled, không spinner */
   .qv__price-skel { width: 45%; height: 28px; }
   /* Số lượng: hàng riêng (giữ chức năng vòng 2) */
-  .qv__qty { display: grid; justify-items: start; gap: var(--space-2); }
+  .qv__qty { display: grid; justify-items: start; gap: var(--space-xs); }
   /* Hàng mua: "Add to cart" (accent, icon túi 24) + "View details" (kit .button--tertiary: nền alt CÓ viền muted-light, khác disabled; V23), cách 12 */
-  .qv__buy { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: stretch; }
-  @media (min-width: 80rem) { .qv__buy { margin-block-start: var(--space-4); } } /* 24 + 16 = 40. Chuẩn: Polaris large-400 */
-  .qv__buy .button { flex: 1 1 auto; padding-inline: var(--space-4); }
-  @media (min-width: 80rem) { .qv__buy .button { flex: 0 0 auto; padding-inline: var(--space-6); } }
+  .qv__buy { display: flex; flex-wrap: wrap; gap: var(--space-sm); align-items: stretch; }
+  @media (min-width: 80rem) { .qv__buy { margin-block-start: var(--space-md); } } /* 24 + 16 = 40. Chuẩn: Polaris large-400 */
+  .qv__buy .button { flex: 1 1 auto; padding-inline: var(--space-md); }
+  @media (min-width: 80rem) { .qv__buy .button { flex: 0 0 auto; padding-inline: var(--space-2xl); } }
   .qv__buy .button > svg:first-child { width: var(--icon-size-lg); height: var(--icon-size-lg); }
   /* Mobile: hàng mua dính đáy sheet (vùng ngón cái) */
   @media (max-width: 47.99rem) {
-    .qv .qv__buy { position: sticky; z-index: 1; inset-block-end: calc(var(--space-5) * -1); flex-wrap: nowrap; margin-inline: calc(var(--space-4) * -1); padding: var(--space-3) var(--space-4) var(--space-5); border-block-start: 1px solid var(--color-border); background: var(--color-background); }
+    .qv .qv__buy { position: sticky; z-index: 1; inset-block-end: calc(var(--space-xl) * -1); flex-wrap: nowrap; margin-inline: calc(var(--space-md) * -1); padding: var(--space-sm) var(--space-md) var(--space-xl); border-block-start: 1px solid var(--color-border); background: var(--color-background); }
   }
   /* ≥ 48rem: dialog cao hơn màn (3 option, option mở hết) → BE gắn .qv--long, hàng mua dính đáy cột phải */
   @media (min-width: 48rem) {
-    .qv--long .qv__buy { position: sticky; z-index: 1; inset-block-end: calc(var(--space-6) * -1); margin-block-start: 0; padding-block: var(--space-4) var(--space-6); border-block-start: 1px solid var(--color-border); background: var(--color-background); }
+    .qv--long .qv__buy { position: sticky; z-index: 1; inset-block-end: calc(var(--space-2xl) * -1); margin-block-start: 0; padding-block: var(--space-md) var(--space-2xl); border-block-start: 1px solid var(--color-border); background: var(--color-background); }
   }
-  @media (min-width: 80rem) { .qv--long .qv__buy { inset-block-end: calc(var(--space-7) * -1); padding-block-end: var(--space-7); } }
+  @media (min-width: 80rem) { .qv--long .qv__buy { inset-block-end: calc(var(--space-4xl) * -1); padding-block-end: var(--space-4xl); } }
   /* Mockup: mô phỏng sheet/dialog đã cuộn (thay scrollTop) để thấy vùng option + hàng mua dính */
   .qv--sim .qv__grid { margin-block-start: calc(var(--qv-scroll, 0px) * -1); }
   .qv--sim .dialog__close { z-index: 2; background: var(--color-background); }
   /* Sheet < 48rem (review vòng 2: × đè pill khi cuộn): × nằm trong dải đầu sheet dính trên (sticky, nền trắng hết bề ngang),
      nội dung cuộn chạy dưới dải, không còn đè lên bộ chọn; tiêu đề không cần chừa chỗ cho × */
   @media (max-width: 47.99rem) {
-    .qv .dialog__close { position: sticky; inset-block-start: var(--space-2); z-index: 2; display: flex; margin: calc(var(--space-3) - var(--space-6)) calc(var(--space-3) - var(--space-4)) var(--space-2) auto; background: var(--color-background); box-shadow: 0 0 0 100vmax var(--color-background); clip-path: inset(-100vmax -100vmax calc(var(--space-2) * -1) -100vmax); }
+    .qv .dialog__close { position: sticky; inset-block-start: var(--space-xs); z-index: 2; display: flex; margin: calc(var(--space-sm) - var(--space-2xl)) calc(var(--space-sm) - var(--space-md)) var(--space-xs) auto; background: var(--color-background); box-shadow: 0 0 0 100vmax var(--color-background); clip-path: inset(-100vmax -100vmax calc(var(--space-xs) * -1) -100vmax); }
     .qv::before { z-index: 3; } /* thanh kéo nằm trên dải */
     .qv .qv__head { padding-inline-end: 0; }
   }
@@ -147,13 +144,13 @@
   @media (min-width: 48rem) { .qv--scroll-a { --qv-scroll: 0px; } .qv--scroll-b { --qv-scroll: 120px; } }
 
   /* ---------- Nút Quick view trên card (ĐỀ XUẤT) ---------- */
-  .qv-trigger { position: absolute; z-index: 2; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2); border: 1px solid var(--color-border); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; transition: opacity var(--motion-base) var(--ease-out), translate var(--motion-base) var(--ease-out), background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
+  .qv-trigger { position: absolute; z-index: 2; display: inline-flex; align-items: center; justify-content: center; gap: var(--space-xs); border: 1px solid var(--color-border); background: var(--color-background); color: var(--color-foreground); font-size: var(--font-size-sm); font-weight: 600; cursor: pointer; transition: opacity var(--motion-base) var(--ease-out), translate var(--motion-base) var(--ease-out), background-color var(--motion-fast) var(--ease-out), color var(--motion-fast) var(--ease-out); }
   .qv-trigger svg { width: var(--icon-size-md); height: var(--icon-size-md); }
   /* < 64rem hoặc màn chạm: nút tròn 44 luôn hiện */
-  .qv-trigger { inset-block-end: var(--space-2); inset-inline-end: var(--space-2); width: var(--touch-target); height: var(--touch-target); padding: 0; border-radius: 50%; }
+  .qv-trigger { inset-block-end: var(--space-xs); inset-inline-end: var(--space-xs); width: var(--touch-target); height: var(--touch-target); padding: 0; border-radius: 50%; }
   .qv-trigger__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (min-width: 64rem) and (hover: hover) {
-    .qv-trigger { inset-inline: var(--space-4); inset-block-end: var(--space-4); width: auto; height: var(--touch-target); border-radius: var(--radius-button); opacity: 0; translate: 0 var(--space-2); }
+    .qv-trigger { inset-inline: var(--space-md); inset-block-end: var(--space-md); width: auto; height: var(--touch-target); border-radius: var(--radius-button); opacity: 0; translate: 0 var(--space-xs); }
     .qv-trigger__label { position: static; width: auto; height: auto; overflow: visible; clip: auto; }
     .product-card:hover .qv-trigger, .product-card.is-hover .qv-trigger, .product-card:focus-within .qv-trigger, .product-card.is-focus .qv-trigger { opacity: 1; translate: 0 0; }
     .qv-trigger:hover, .qv-trigger.is-hover { border-color: var(--color-foreground); background: var(--color-foreground); color: var(--color-background); }
@@ -163,18 +160,18 @@
   .trigger-row .product-card__media > img { border-radius: var(--radius-card); }
 
   /* ---------- Bảng trạng thái ---------- */
-  .states { display: grid; gap: var(--space-6) var(--space-5); align-items: start; }
+  .states { display: grid; gap: var(--space-2xl) var(--space-xl); align-items: start; }
   @media (min-width: 48rem) { .states { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   @media (min-width: 80rem) { .states { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
   .panel { display: flex; flex-direction: column; overflow: hidden; border: 1px solid var(--color-border); border-radius: var(--radius-card); background: var(--color-background); box-shadow: var(--shadow-raised); }
   .panel .overlay__header { min-height: 64px; }
-  .panel--pad { padding: var(--space-5); gap: var(--space-4); }
+  .panel--pad { padding: var(--space-xl); gap: var(--space-md); }
   .panel .cd__body { overflow: visible; }
-  .note-list { margin: 0; padding-inline-start: var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
-  .trigger-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
+  .note-list { margin: 0; padding-inline-start: var(--space-xl); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .trigger-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2xl) var(--grid-gap); margin: 0; padding: 0; list-style: none; }
   @media (min-width: 48rem) { .trigger-row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  .trigger-row > li { display: grid; gap: var(--space-2); align-content: start; }
-  .force-touch .qv-trigger { inset: auto var(--space-2) var(--space-2) auto !important; width: var(--touch-target) !important; height: var(--touch-target); padding: 0; border-radius: 50% !important; opacity: 1 !important; translate: none !important; }
+  .trigger-row > li { display: grid; gap: var(--space-xs); align-content: start; }
+  .force-touch .qv-trigger { inset: auto var(--space-xs) var(--space-xs) auto !important; width: var(--touch-target) !important; height: var(--touch-target); padding: 0; border-radius: 50% !important; opacity: 1 !important; translate: none !important; }
   .force-touch .qv-trigger__label { position: absolute !important; width: 1px !important; height: 1px !important; overflow: hidden !important; clip: rect(0 0 0 0) !important; }
   .skeleton--btn { height: var(--control-height); border-radius: var(--radius-button); }
   .skeleton--title { height: 28px; width: 80%; border-radius: var(--radius-xs); }
@@ -193,7 +190,7 @@
   .upsell__title { margin-block-end: var(--space-sm); }
   .up-item { padding: var(--space-xs) var(--space-sm) var(--space-xs) var(--space-xs); border: 1px solid var(--color-border); border-radius: var(--radius-card); }
   .button > .button__arrow { width: 16px; height: 14px; transition: translate var(--motion-base) var(--ease-out); }
-  .qv__buy .button:hover .button__arrow, .qv__buy .button.is-hover .button__arrow { translate: var(--space-1) 0; }
+  .qv__buy .button:hover .button__arrow, .qv__buy .button.is-hover .button__arrow { translate: var(--space-2xs) 0; }
 </style>
 </head>
 <body>
@@ -311,7 +308,7 @@
   </section>
 
   <!-- ================= 2. QUICK VIEW ================= -->
-  <section aria-labelledby="h-qv" style="margin-block-start: var(--space-7)">
+  <section aria-labelledby="h-qv" style="margin-block-start: var(--space-4xl)">
     <div class="container"><p class="demo-label" id="h-qv">2 · Quick view · FlexFold Adjustable Bench (3 ảnh, 3 màu, sale −17%). ≥ 768 hộp giữa (720 / 960), chevron 52 trên ảnh; &lt; 768 bottom sheet, hàng "Add to cart" + "View details" dính đáy</p></div>
     <div class="demo-stage stage" role="group" aria-label="Quick view open">
       <div class="stage__page" aria-hidden="true">
@@ -381,7 +378,7 @@
   </section>
 
   <!-- ================= 2b. CA BIÊN 2048: 3 OPTION, WEIGHT 40 GIÁ TRỊ, THU GỌN ================= -->
-  <section aria-labelledby="h-qv-many" style="margin-block-start: var(--space-7)">
+  <section aria-labelledby="h-qv-many" style="margin-block-start: var(--space-4xl)">
     <div class="container"><p class="demo-label" id="h-qv-many">2b · Ca biên 2048 biến thể: Adjustable dumbbell pair, 3 option (Weight 40 giá trị 5–200 lb, Color, Grip; option giả lập theo ticket). Weight thu gọn 7 + "+33"; 45, 60 lb hết hàng (gạch); White không tồn tại với 20 lb + Rubber (gạch chéo + vòng đứt). ≥ 768 dialog dài hơn màn → hàng mua dính đáy cột phải; 360 sheet đã cuộn tới bộ chọn, hàng mua dính đáy</p></div>
     <div class="demo-stage stage" role="group" aria-label="Quick view, product with three options, collapsed">
       <div class="stage__page" aria-hidden="true">
@@ -444,7 +441,7 @@
   </section>
 
   <!-- ================= 2c. CA BIÊN 2048: WEIGHT MỞ HẾT, ĐÃ CUỘN ================= -->
-  <section aria-labelledby="h-qv-all" style="margin-block-start: var(--space-7)">
+  <section aria-labelledby="h-qv-all" style="margin-block-start: var(--space-4xl)">
     <div class="container"><p class="demo-label" id="h-qv-all">2c · Bấm "+33": mở hết 40 giá trị tại chỗ, focus vào "40 lb" (giá trị đầu tiên vừa hiện, variant-picker §5); 105–200 lb không tồn tại với Rubber (gạch + viền đứt). Sheet/dialog cuộn bên trong, nút đóng và hàng "Add to cart" luôn thấy; "Show fewer" ô cuối thu lại, focus về "+33"</p></div>
     <div class="demo-stage stage" role="group" aria-label="Quick view, all weight values expanded">
       <div class="stage__page" aria-hidden="true">
@@ -511,7 +508,7 @@
 
   <div class="container">
     <!-- ================= 3. NÚT QUICK VIEW TRÊN CARD ================= -->
-    <section class="demo-block" aria-labelledby="h-trigger" style="margin-block-start: var(--space-7)">
+    <section class="demo-block" aria-labelledby="h-trigger" style="margin-block-start: var(--space-4xl)">
       <h2 id="h-trigger">3. Quick view trigger on product card</h2>
       <p class="demo-note">Nút ĐỀ XUẤT. ≥ 64rem có hover: lúc nghỉ card đúng như kit .product-card; rê chuột hoặc focus bàn phím mới trượt lên nút "Quick view" (44 cao). &lt; 64rem hoặc màn chạm: nút tròn 44 icon túi + luôn hiện, tên "Quick view {tên sản phẩm}".</p>
       <ul class="trigger-row" role="list">
@@ -663,11 +660,11 @@
               <section class="upsell" style="margin-block-start: 0" aria-busy="true" aria-labelledby="up-load">
                 <h4 class="group-label upsell__title" id="up-load">Pairs well with</h4>
                 <ul class="upsell__list" role="list">
-                  <li class="product-row up-item"><span class="skeleton" style="width: 56px; height: 56px; border-radius: var(--radius-swatch)"></span><div style="display: grid; gap: var(--space-2)"><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></div><span class="skeleton" style="width: 64px; height: 44px; border-radius: var(--radius-button)"></span></li>
-                  <li class="product-row up-item"><span class="skeleton" style="width: 56px; height: 56px; border-radius: var(--radius-swatch)"></span><div style="display: grid; gap: var(--space-2)"><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></div><span class="skeleton" style="width: 64px; height: 44px; border-radius: var(--radius-button)"></span></li>
+                  <li class="product-row up-item"><span class="skeleton" style="width: 56px; height: 56px; border-radius: var(--radius-swatch)"></span><div style="display: grid; gap: var(--space-xs)"><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></div><span class="skeleton" style="width: 64px; height: 44px; border-radius: var(--radius-button)"></span></li>
+                  <li class="product-row up-item"><span class="skeleton" style="width: 56px; height: 56px; border-radius: var(--radius-swatch)"></span><div style="display: grid; gap: var(--space-xs)"><span class="skeleton skeleton--line"></span><span class="skeleton skeleton--line" style="width: 40%"></span></div><span class="skeleton" style="width: 64px; height: 44px; border-radius: var(--radius-button)"></span></li>
                 </ul>
               </section>
-              <p class="note-list" style="margin-block-start: var(--space-4)">0 kết quả hoặc lỗi: ẩn cả khối, không để khung trống.</p>
+              <p class="note-list" style="margin-block-start: var(--space-md)">0 kết quả hoặc lỗi: ẩn cả khối, không để khung trống.</p>
             </div>
           </div>
         </div>
@@ -686,7 +683,7 @@
             <span class="skeleton skeleton--title"></span>
             <span class="skeleton skeleton--media"></span>
             <span class="skeleton skeleton--line" style="width: 30%"></span>
-            <div style="display: flex; gap: var(--space-2)"><span class="skeleton" style="width: 44px; height: 44px; border-radius: 50%"></span><span class="skeleton" style="width: 44px; height: 44px; border-radius: 50%"></span><span class="skeleton" style="width: 44px; height: 44px; border-radius: 50%"></span></div>
+            <div style="display: flex; gap: var(--space-xs)"><span class="skeleton" style="width: 44px; height: 44px; border-radius: 50%"></span><span class="skeleton" style="width: 44px; height: 44px; border-radius: 50%"></span><span class="skeleton" style="width: 44px; height: 44px; border-radius: 50%"></span></div>
             <span class="skeleton skeleton--btn"></span>
             <p class="visually-hidden" role="status">Loading product…</p>
           </div>
