@@ -232,7 +232,8 @@ test.describe('ES1-T149 panel', () => {
     await inputs[0].check();
     await inputs[1].check();
     expect(await root.getAttribute('data-enhanced')).toBeNull();
-    await expect(part(root, 'total')).toBeHidden();
+    // SRS 0.5 TE-12 AC8 (ES1-T339): tổng in sẵn từ Liquid nên luôn hiện (trước đây ẩn tới khi module nạp); module nạp xong thì tính lại
+    await expect(part(root, 'total')).toBeVisible();
 
     release();
     await ready(root);
