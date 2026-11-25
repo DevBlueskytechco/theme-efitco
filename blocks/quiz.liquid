@@ -472,13 +472,13 @@
                         %}
                         <div class="quiz__card-action">
                           {%- if item.available == false -%}
-                            <button type="button" class="button button--secondary quiz__card-button" disabled data-testid="quiz-card-sold-out">
+                            <button type="button" class="button button--secondary button--wrap quiz__card-button" disabled data-testid="quiz-card-sold-out">
                               <span aria-hidden="true">{{ 'blocks.quiz.sold_out' | t }}</span>
                               <span class="visually-hidden">{{ 'blocks.quiz.card_sold_out' | t: title: card_product.title }}</span>
                             </button>
                           {%- elsif card_variant == nil and card_product.variants_count > 1 -%}
                             <a
-                              class="button button--secondary quiz__card-button"
+                              class="button button--secondary button--wrap quiz__card-button"
                               href="{{ card_product.url }}"
                               data-quiz-choose
                               data-product-url="{{ card_product.url }}"
@@ -491,7 +491,7 @@
                             <form class="quiz__card-form" method="post" action="{{ routes.cart_add_url }}" data-quiz-add-form data-testid="quiz-card-form">
                               <input type="hidden" name="id" value="{{ add_variant.id }}">
                               <input type="hidden" name="quantity" value="1">
-                              <button type="submit" class="button button--secondary quiz__card-button" data-quiz-add data-testid="quiz-card-add">
+                              <button type="submit" class="button button--secondary button--wrap quiz__card-button" data-quiz-add data-testid="quiz-card-add">
                                 {%- render 'header-icon', name: 'bag' -%}
                                 <span aria-hidden="true" data-quiz-add-label>{{ 'blocks.product_form.add_to_cart' | t }}</span>
                                 <span class="visually-hidden">{{ 'blocks.quiz.card_add' | t: title: card_product.title }}</span>
