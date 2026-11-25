@@ -166,8 +166,6 @@ modal-dialog {
 
 /* Nút đóng tròn 48, icon 20. Tên riêng qua aria-label hoặc chữ ẩn. */
 .close-button {
-  --icon-stroke-width: 1.5;
-
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -2702,8 +2700,6 @@ localization-picker[data-tabs] .localization__tabs {
 }
 
 .localization__clear svg {
-  --icon-stroke-width: 1.5;
-
   inline-size: var(--space-4);
   block-size: var(--space-4);
 }
@@ -4926,9 +4922,10 @@ cart-items[aria-busy='true'] {
 
 .cart-summary__badge {
   padding: var(--space-1) var(--space-3);
+  border: 1px solid currentColor;
   border-radius: var(--radius-pill);
-  background-color: var(--color-accent);
-  color: var(--color-accent-foreground);
+  background-color: transparent;
+  color: var(--color-background-dark-foreground);
   font-size: var(--font-size-xs);
   font-weight: 600;
   line-height: var(--line-height-body);
@@ -5668,7 +5665,7 @@ cart-drawer {
   background-image: linear-gradient(to bottom, transparent 63.72%, var(--color-background-dark));
 }
 
-/* Figma 1:1035: pill cao 28, cách mép 12, chữ 13 / 20. Nhãn dài thì cắt, không tràn khỏi card */
+/* Figma 1:1035: pill cao 28, cách mép 12, chữ 13 / 20. Tag trung tính (ES1-T567, kit .badge--tag); không cắt "…" (§37) */
 .article-card__tag {
   position: absolute;
   inset-block-start: var(--space-3);
@@ -5678,15 +5675,14 @@ cart-drawer {
   margin: 0;
   padding-block: calc(var(--space-1) * 0.75);
   padding-inline: var(--space-3);
-  overflow: hidden;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  background-color: var(--color-accent);
-  color: var(--color-accent-foreground);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
   font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: calc(20 / 13);
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -6891,12 +6887,11 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .rich-text__content .button { gap: 14px; }
   .level-card__link:is(:hover, :focus-visible) .level-card__label { position: relative; inset-block-start: -1px; }
   .level-card__link:not(:hover, :focus-visible) .level-card__title { position: relative; inset-block-start: 1px; }
-  .product-card__badge, .article-card__tag { padding-block: 4px 2px; }
+  .product-card__badge { padding-block: 4px 2px; }
   .product-card__rating-star { position: relative; inset-inline-start: -1px; inset-block-start: -1px; }
   .product-card__rating > span[aria-hidden] { position: relative; inset-inline-start: -1px; inset-block-start: 1px; }
   .price { gap: 9px; }
   .testimonial-item__title { position: relative; inset-block-start: 1px; }
-  .article-card__tag { translate: -1px 0; }
   .faq-item__question { position: relative; inset-block-start: 2px; }
   .faq-item:first-child .faq-item__summary { position: relative; inset-block-start: -1px; }
   .faq-item:first-child .faq-item__question { inset-block-start: 3px; }
