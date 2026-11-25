@@ -1,7 +1,6 @@
-// TE-4 AC5 AC6 AC8 (ES1-T67, ES1-T85, ES1-T96). Submit → cart/add.js; page type, no drawer dialog or drawer script not defined → cart URL.
-// 4xx → API description in role=alert; network/5xx without JSON → native submit.
-// shopify:cart:lines-update dispatched before the POST; its promise always resolves a CartLinesUpdateResult.
+// TE-4 AC5 AC6 AC8 (ES1-T67, T85, T96): POST cart/add.js; 4xx → alert; network/5xx → native submit.
 const ADD = 'button[name="add"]';
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 const OFFSET = "properties[__shopify_offset]";
 const HEADERS = { Accept: "application/json", "X-Requested-With": "XMLHttpRequest" };
 const events = import("https://cdn.shopify.com/storefront/standard-events.js").catch(() => null);
@@ -14,11 +13,7 @@ class ProductForm extends HTMLElement {
     this.error = this.querySelector(":scope>[role=alert]");
     this.gift = form.querySelector('input[name="properties[__shopify_send_gift_card_to_customer]"]');
     const f = (this.fields = this.gift?.closest(".product-gift-card")?.querySelector("fieldset"));
-    if (f && !f.querySelector(`[name="${OFFSET}"]`)) {
-      const input = Object.assign(document.createElement("input"), { type: "hidden", name: OFFSET });
-      input.value = String(new Date().getTimezoneOffset());
-      f.append(input);
-    }
+    if (f && !f.querySelector(`[name="${OFFSET}"]`)) f.append(Object.assign(document.createElement("input"), { type: "hidden", name: OFFSET, value: new Date().getTimezoneOffset() }));
     this.syncGift();
     this.listen("addEventListener");
   }
@@ -50,8 +45,7 @@ class ProductForm extends HTMLElement {
     if (on) this.locked = [...document.querySelectorAll(ADD)].filter((b) => b.form === this.form).map((b) => [b, b.disabled]);
     for (const [b, was] of this.locked || []) {
       b.disabled = on || was;
-      if (on) b.setAttribute("aria-busy", "true");
-      else b.removeAttribute("aria-busy");
+      b.ariaBusy = on ? "true" : null;
     }
   }
 
@@ -59,22 +53,19 @@ class ProductForm extends HTMLElement {
     if (el) el.textContent = text;
   }
 
-  // CartLinesUpdateEvent; library missing, slower than 500 ms or other shape → no event, add still works.
+  // No events library in 500 ms → no event.
   async emit(body) {
-    const E = (await Promise.race([events, new Promise((r) => setTimeout(r, 500))]))?.CartLinesUpdateEvent;
+    const E = (await Promise.race([events, wait(500)]))?.CartLinesUpdateEvent;
     try {
       const d = E.createPromise();
       d.promise.catch(() => {});
       const lines = [{ merchandiseId: `gid://shopify/ProductVariant/${body.get("id")}`, quantity: Number(body.get("quantity")) || 1 }];
       this.dispatchEvent(new E({ action: "add", context: "product", lines, promise: d.promise }));
       return { E, d };
-    } catch {
-      // Skip the event.
-    }
+    } catch {}
   }
 
-  // Resolve only: a rejected promise surfaced as pageerror in CI (PR #72).
-  // signal set → cart = current /cart.js via createCartFromAjaxResponse, null if unavailable.
+  // Resolve only (PR #72); signal → cart from /cart.js, else null.
   async settle(ev, message, signal) {
     if (!ev) return;
     let cart = null;
@@ -82,17 +73,28 @@ class ProductForm extends HTMLElement {
       try {
         const r = await fetch(`${this.dataset.cartUrl}.js`, { headers: HEADERS, signal });
         if (r.ok) cart = ev.E.createCartFromAjaxResponse(await r.json()) ?? null;
-      } catch {
-        // cart stays null.
-      }
+      } catch {}
     }
     ev.d.resolve({ cart, userErrors: message ? [{ message }] : [], warnings: [] });
+  }
+
+  // ES1-T602: radio changed before the lazy picker → wait (≤ 9 s) for its load; id unchanged → no add.
+  async ready() {
+    const p = this.querySelector("product-variant-picker:not(:defined)");
+    const id = this.form.elements.id.value;
+    if (![...(p?.querySelectorAll("input") || [])].some((r) => r.checked != r.defaultChecked)) return true;
+    this.lock(true);
+    await Promise.race([customElements.whenDefined(p.localName), wait(9e3)]);
+    while (this.ariaBusy) await wait(99);
+    this.lock(false);
+    return this.form.elements.id.value != id;
   }
 
   async submit(e) {
     e.preventDefault();
     if (this.busy) return;
     const { submitter } = e;
+    if (!(await this.ready())) return;
     const body = new FormData(this.form);
     if (!body.get("selling_plan")) body.delete("selling_plan");
     const controller = (this.controller = new AbortController());
@@ -114,7 +116,7 @@ class ProductForm extends HTMLElement {
       }
       this.dispatchEvent(new CustomEvent("theme:cart:updated", { bubbles: true, detail: { source: "product-form", item: data, opener: submitter } }));
       await this.settle(ev, "", signal);
-      if (this.dataset.labelAdded) this.say(this.status, this.dataset.labelAdded);
+      this.say(this.status, this.dataset.labelAdded);
       leaving = this.dataset.cartType === "page" || !document.querySelector("cart-drawer dialog") || !customElements.get("cart-drawer");
       if (leaving) window.location.assign(this.dataset.cartUrl);
     } catch (err) {
