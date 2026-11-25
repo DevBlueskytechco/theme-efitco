@@ -96,15 +96,39 @@
     --grid-columns: 4;
     --dark-texture: url('{{ 'noise-dark.png' | asset_url }}');
 
-    /* Space scale: 4 / 8 / 12 / 16 / 24 / 32 / 48 / 120 px at base 4 */
-    --space-1: {{ space }}px;
-    --space-2: {{ space | times: 2 }}px;
-    --space-3: {{ space | times: 3 }}px;
-    --space-4: {{ space | times: 4 }}px;
-    --space-5: {{ space | times: 6 }}px;
-    --space-6: {{ space | times: 8 }}px;
-    --space-7: {{ space | times: 12 }}px;
-    --space-8: {{ space | times: 30 }}px;
+    /* Thang khoảng cách, một hệ tên (foundation.md §1.2, kit.css): 2 / 4 / 6 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 / 64 / 80 / 128 px
+       ở space_base 4. Chỉ cho padding, gap, margin; giá trị ngoài thang quy về bậc gần nhất */
+    --space-050: {{ space | times: 0.5 }}px;
+    --space-2xs: {{ space }}px;
+    --space-150: {{ space | times: 1.5 }}px;
+    --space-xs: {{ space | times: 2 }}px;
+    --space-sm: {{ space | times: 3 }}px;
+    --space-md: {{ space | times: 4 }}px;
+    --space-lg: {{ space | times: 5 }}px;
+    --space-xl: {{ space | times: 6 }}px;
+    --space-2xl: {{ space | times: 8 }}px;
+    --space-3xl: {{ space | times: 10 }}px;
+    --space-4xl: {{ space | times: 12 }}px;
+    --space-5xl: {{ space | times: 16 }}px;
+    --space-6xl: {{ space | times: 20 }}px;
+    --space-7xl: {{ space | times: 32 }}px;
+    /* DEPRECATED (kit 2.1.0): alias tên cũ, không dùng ở chỗ mới. 1→2xs, 2→xs, 3→sm, 4→md, 5→xl, 6→2xl, 7→4xl, 8→7xl */
+    --space-1: var(--space-2xs);
+    --space-2: var(--space-xs);
+    --space-3: var(--space-sm);
+    --space-4: var(--space-md);
+    --space-5: var(--space-xl);
+    --space-6: var(--space-2xl);
+    --space-7: var(--space-4xl);
+    --space-8: var(--space-7xl);
+    /* Dẫn xuất (foundation.md §2): section 48 → 128 từ 64rem, tiêu đề → nội dung 24 → 40 từ 80rem, gutter 12 / 16 / 24 */
+    --section-gap: var(--space-4xl);
+    --heading-gap: var(--space-xl);
+    --grid-gap: var(--space-sm);
+    /* Dải rộng (hero trang chủ, panel footer): lùi tối đa 64 mỗi bên, màn hẹp tràn mép; 100% tính tại phần tử dùng */
+    --band-side: calc((100% - var(--content-width)) / 2);
+    --band-inset: max(0px, min(var(--space-5xl), calc(var(--band-side) - var(--space-5xl))));
+    --tab-padding-inline: var(--space-xl);
     /* Sàn vùng bấm (WCAG 2.5.8, TE-3 AC6): hằng số, không theo space_base */
     --touch-target-min: 24px;
     /* Kích thước component (kit): px hằng số, không theo space_base */
@@ -113,6 +137,7 @@
     --control-height-compact: 44px;
     --tab-height-desktop: 40px;
     --row-height: 52px;
+    --round-button-size: 52px;
     --count-badge-size: 20px;
     --progress-height: 4px;
     --meter-height: 8px;
@@ -202,14 +227,23 @@
   @media (min-width: 48rem) {
     :root {
       --grid-columns: 8;
+      --grid-gap: var(--space-md);
       --letter-spacing-display: -0.04em;
       --line-height-display: 1;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    :root {
+      --section-gap: var(--space-7xl);
     }
   }
 
   @media (min-width: 80rem) {
     :root {
       --grid-columns: 12;
+      --grid-gap: var(--space-xl);
+      --heading-gap: var(--space-3xl);
       --line-height-h2: 1.2222;
       --line-height-h1: 1.1667;
     }

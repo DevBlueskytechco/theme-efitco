@@ -3,7 +3,7 @@
 
 /** Image with text (TE-7, Figma 1:992 split, 1:625 banner). Từ 80rem kích thước theo khung 1920 (vw), trần là số Figma */
 .image-with-text {
-  --image-with-text-inset: min(calc(var(--space-1) * 20), 4.17vw);
+  --image-with-text-inset: min(var(--space-6xl), 4.17vw);
 
   position: relative;
   min-inline-size: 0;
@@ -71,7 +71,7 @@
 }
 
 .image-with-text__content > .image-with-text__button {
-  margin-block-start: calc(var(--space-1) * 10);
+  margin-block-start: var(--space-3xl);
 }
 
 /* Nền sáng: viền focus accent của .button:focus-visible ở base.css. Dải tối: viền trắng */
@@ -164,7 +164,7 @@
 
   .image-with-text--split .image-with-text__content {
     padding-block-start: var(--space-4);
-    padding-inline-end: calc(var(--page-margin) + var(--space-1) * 50);
+    padding-inline-end: calc(var(--page-margin) + 12.5rem);
   }
 
   .image-with-text--split .image-with-text__accents {
@@ -176,15 +176,15 @@
   }
 
   .image-with-text--split .image.image-with-text__accent--1 {
-    inset-block-start: calc(var(--space-1) * -10);
+    inset-block-start: calc(var(--space-3xl) * -1);
     inset-inline-end: var(--page-margin);
-    inline-size: calc(var(--space-1) * 42);
+    inline-size: 10.5rem;
   }
 
   .image-with-text--split .image.image-with-text__accent--2 {
     inset-block-end: var(--space-7);
     inset-inline-end: calc(var(--page-margin) + var(--space-6));
-    inline-size: calc(var(--space-1) * 25);
+    inline-size: 6.25rem;
   }
 }
 
@@ -235,7 +235,7 @@
 }
 
 .image-with-text--banner .image-with-text__content > .image-with-text__button {
-  margin-block-start: calc(var(--space-1) * 9);
+  margin-block-start: var(--space-2xl);
 }
 
 /* index-mobile-a §8: accent 3 = ảnh phải (1:635), accent 2 = dưới trái (1:634), ẩn ở 360 */
@@ -246,13 +246,13 @@
 
 .image-with-text--banner .image.image-with-text__accent {
   flex: none;
-  inline-size: calc(var(--space-1) * 28);
+  inline-size: 7rem;
 }
 
 .image-with-text--banner .image.image-with-text__accent--3 {
   order: 1;
-  inline-size: calc(var(--space-1) * 22);
-  margin-block-start: calc(var(--space-1) * 10);
+  inline-size: 5.5rem;
+  margin-block-start: var(--space-3xl);
   margin-inline-start: auto;
 }
 
@@ -264,7 +264,7 @@
 @media (min-width: 48rem) {
   .image-with-text--banner {
     gap: var(--space-5);
-    padding-block: calc(var(--space-1) * 16);
+    padding-block: var(--space-5xl);
   }
 
   .image-with-text--banner .image-with-text__body {
@@ -273,20 +273,20 @@
   }
 
   .image-with-text--banner .image.image-with-text__accent--1 {
-    inline-size: calc(var(--space-1) * 40);
+    inline-size: 10rem;
   }
 
   .image-with-text--banner .image.image-with-text__accent--3 {
-    inline-size: calc(var(--space-1) * 32);
-    margin-block-start: calc(var(--space-1) * 16);
+    inline-size: 8rem;
+    margin-block-start: var(--space-5xl);
   }
 
   .image-with-text--banner .image.image-with-text__accent--2 {
     position: absolute;
     display: block;
-    inset-block-end: calc(var(--space-1) * 16);
+    inset-block-end: var(--space-5xl);
     inset-inline-start: var(--page-margin);
-    inline-size: calc(var(--space-1) * 26);
+    inline-size: 6.5rem;
   }
 }
 
@@ -349,7 +349,7 @@
   .image-with-text--split {
     --image-with-text-side: max(var(--page-margin), (100% - var(--page-width)) / 2 + var(--page-margin));
 
-    --image-with-text-media: minmax(0, calc(var(--image-with-text-side) + (100% - 2 * var(--image-with-text-side) - var(--space-1) * 20) / 2));
+    --image-with-text-media: minmax(0, calc(var(--image-with-text-side) + (100% - 2 * var(--image-with-text-side) - var(--space-6xl)) / 2));
 
     grid-template-columns: var(--image-with-text-media) minmax(0, 1fr);
   }
@@ -365,7 +365,7 @@
   /* Hộp chữ dừng trước ảnh nhỏ 1 */
   .image-with-text--split .image-with-text__content {
     max-inline-size: calc(100% - var(--image-with-text-inset) - min(201px, 10.47vw));
-    padding-inline: calc(var(--space-1) * 20) 0;
+    padding-inline: var(--space-6xl) 0;
   }
 
   .image-with-text--image-right .image-with-text__content {
@@ -383,12 +383,12 @@
 
   .image-with-text--split .image.image-with-text__accent--1 {
     inline-size: min(201px, 10.47vw);
-    inset-block-start: min(calc(var(--space-1) * 19.5), 4.06vw);
+    inset-block-start: min(var(--space-6xl), 4.06vw);
   }
 
   .image-with-text--split .image.image-with-text__accent--2 {
     inline-size: min(120px, 6.25vw);
-    inset-block-end: min(calc(var(--space-1) * 19.5), 4.06vw);
+    inset-block-end: min(var(--space-6xl), 4.06vw);
   }
 
   /* index-1280 §2.5: cao 50vw (640 ở 1280, 960 ở 1920), display min(100, 6.25vw) = 80 ở 1280 (R2) */
@@ -411,11 +411,11 @@
   }
 
   .image-with-text--banner .image-with-text__content > .image-with-text__body {
-    margin-block-start: calc(var(--space-1) * 10);
+    margin-block-start: var(--space-3xl);
   }
 
   .image-with-text--banner .image-with-text__content > .image-with-text__button {
-    margin-block-start: calc(var(--space-1) * 20);
+    margin-block-start: var(--space-6xl);
   }
 
   /* Figma 1:633, 1:634, 1:635: tính từ band 960, 2 ảnh trái cách trên và dưới 117.5, ảnh phải cách trên 383.5 */
