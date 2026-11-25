@@ -1307,27 +1307,38 @@ collection-tabs {
   }
 }
 
-/** Breadcrumb, tiêu đề trang, banner trang con (TE-22-R2-FE1; TE-22 AC9–AC13). Tên dài xuống dòng */
+/** Breadcrumb, tiêu đề trang, banner trang con (TE-22-R2-FE1; TE-22 AC9–AC13).
+    V20: breadcrumb luôn 1 dòng, mục cuối co + "…", dưới 48rem mục giữa cắt 10ch.
+    Không overflow: hidden ở ol: cắt vòng focus của link cao 44 (dòng 20) */
 .breadcrumb {
+  min-inline-size: 0;
+  max-inline-size: 100%;
   padding-block-start: var(--space-4);
   font-size: var(--font-size-sm);
-  line-height: calc(var(--space-1) * 5);
+  line-height: var(--line-height-sm);
 }
 
 .breadcrumb__list {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
+  min-inline-size: 0;
+  max-inline-size: 100%;
   margin: 0;
   padding: 0;
   list-style: none;
+  white-space: nowrap;
 }
 
 .breadcrumb__item {
   display: flex;
+  flex: none;
   align-items: center;
   min-inline-size: 0;
-  overflow-wrap: anywhere;
+}
+
+.breadcrumb__item:last-child {
+  flex: 0 1 auto;
 }
 
 /* Dấu "/" trang trí, không đọc (alt rỗng) */
@@ -1340,10 +1351,28 @@ collection-tabs {
 .breadcrumb__link {
   display: inline-flex;
   align-items: center;
-  min-block-size: calc(var(--space-1) * 11);
+  min-block-size: var(--touch-target);
   color: var(--color-muted);
   text-decoration: none;
   text-underline-offset: 0.2em;
+}
+
+/* Dưới 48rem: mục giữa cắt 10ch; dòng cao 44 giữ vùng chạm */
+.breadcrumb__item:not(:first-child, :last-child) .breadcrumb__link {
+  display: block;
+  max-inline-size: 10ch;
+  overflow: hidden;
+  line-height: var(--touch-target);
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 48rem) {
+  .breadcrumb__item:not(:first-child, :last-child) .breadcrumb__link {
+    display: inline-flex;
+    max-inline-size: none;
+    overflow: visible;
+    line-height: inherit;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1362,8 +1391,12 @@ collection-tabs {
 }
 
 .breadcrumb__current {
+  display: block;
+  min-inline-size: 0;
+  overflow: hidden;
   color: var(--color-foreground);
   font-weight: 500;
+  text-overflow: ellipsis;
 }
 
 /* minmax(0, 1fr): từ dài trong h1 xuống dòng thay vì nới cột */
@@ -1453,6 +1486,10 @@ collection-tabs {
 @media (min-width: 64rem) {
   .breadcrumb {
     padding-block-start: var(--space-5);
+  }
+
+  .breadcrumb__current {
+    max-inline-size: 48ch;
   }
 
   .page-title {
@@ -2667,7 +2704,6 @@ localization-picker[data-tabs] .localization__tabs {
   border-radius: var(--radius-input);
   background: var(--color-background);
   color: var(--color-foreground);
-  font: inherit;
 }
 
 .localization__search-input::placeholder {
@@ -4774,7 +4810,6 @@ cart-items[aria-busy='true'] {
   border-radius: inherit;
   background: transparent;
   color: inherit;
-  font: inherit;
   text-align: center;
 }
 
@@ -4961,7 +4996,6 @@ cart-items[aria-busy='true'] {
   border-radius: var(--radius-input);
   background-color: var(--color-background);
   color: var(--color-foreground);
-  font: inherit;
   resize: vertical;
 }
 
