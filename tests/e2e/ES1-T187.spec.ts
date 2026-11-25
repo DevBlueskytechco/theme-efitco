@@ -14,7 +14,7 @@
 import { readFileSync } from 'node:fs';
 import AxeBuilder from '@axe-core/playwright';
 import { test, expect, type Locator, type Page } from './support/test';
-import { gotoStore } from './support/store-guard';
+import { expectNotChallenged, gotoStore, waitStoreCooldown } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 import { loadHomeFixture, skipUnlessFixture, fixtureApplied } from './support/home-fixture';
 
@@ -73,6 +73,7 @@ function watchConsole(page: Page) {
 }
 
 async function expectAxeClean(page: Page, selectors: string[]) {
+  await expectNotChallenged(page);
   let builder = new AxeBuilder({ page });
   for (const s of selectors) builder = builder.include(s);
   const { violations } = await builder.analyze();
@@ -104,7 +105,7 @@ async function noHorizontalOverflow(page: Page) {
 
 /** Số sản phẩm thật: mở trang collection, đọc dòng "N products" render ở server (collection.products_count). */
 async function realCount(page: Page, href: string): Promise<number | null> {
-  await gotoStore(page, href);
+  await gotoStore(page, href, { waitUntil: 'domcontentloaded' });
   const count = page.getByTestId('collection-count');
   if ((await count.count()) === 0) return null;
   const match = (await count.first().innerText()).match(/\d[\d,.]*/);
@@ -266,6 +267,11 @@ test.describe('ES1-T187 AC-H8 1920', () => {
 });
 
 test.describe('ES1-T187 AC-H10 badge số sản phẩm', () => {
+  // Badge và dòng collection-count đều render ở server, không phụ thuộc viewport: chạy 1 project để bớt nửa số lần tải trang collection (store dev chặn 429).
+  onlyProject('desktop', 'số sản phẩm render ở server, giống nhau ở mọi project: chạy 1 lần để giảm tải store (429)');
+  // Shard đã gặp 429 thì chờ hết đợt chặn trước khi mở thêm trang collection (ES1-T477 a); chưa gặp thì không chờ.
+  test.beforeEach(async () => { await waitStoreCooldown('ES1-T187 AC-H10'); });
+
   test('TC-10 AC-H10: /?view=te15 3 card, badge = products_count thật của collection theo locale', async ({ page }) => {
     await open(page, TE15, 1024);
     const cards = band(page, 'te15-level-three').getByTestId('level-card');
@@ -406,7 +412,8 @@ test.describe('ES1-T187 không JS', () => {
     const lastBefore = await box(last);
     expect(lastBefore.x + lastBefore.width, 'card cuối tràn: còn nội dung để cuộn').toBeGreaterThan(trackBox.x + trackBox.width);
     await row.track.focus();
-    await page.keyboard.press('End');
+    // Home/End trong Chromium cuộn theo chiều dọc; danh sách chỉ tràn ngang nên dùng mũi tên phải (như TC-15).
+    await page.keyboard.press('ArrowRight');
     await expect.poll(async () => (await box(last)).x).toBeLessThan(lastBefore.x - 1);
 
     const level = band(page, 'te15-level-three');
@@ -439,7 +446,8 @@ test.describe('ES1-T187 thiếu scroll-buttons.js', () => {
     await expect(row.next).toBeHidden();
     await expect(row.progress).toBeHidden();
     await row.track.focus();
-    await page.keyboard.press('End');
+    // Home/End trong Chromium cuộn theo chiều dọc; danh sách chỉ tràn ngang nên dùng mũi tên phải (như TC-15).
+    await page.keyboard.press('ArrowRight');
     await expect.poll(() => scrollLeft(row.track)).toBeGreaterThan(0);
     await expectAxeClean(page, ['[data-testid="container-te15-five"]', '[data-testid="container-te15-level-three"]']);
     // Log mạng của chính file bị chặn là do test, không phải lỗi theme.

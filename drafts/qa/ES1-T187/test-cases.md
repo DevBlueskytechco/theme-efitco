@@ -20,9 +20,9 @@ Spec: `tests/e2e/ES1-T187.spec.ts`. Gộp phần nghiệm thu của spec dev ES1
 | TC-14 | AC-H10 | `/?view=te15` 1920, desktop (pointer hover) | không rê; rê card; focus card bằng Tab | hàng số opacity 0 khi không rê/focus; 1 khi rê; 1 khi `:focus-visible`; tên truy cập link chứa chữ badge | E2E/a11y | P2 |
 | TC-15 | AC-H8 (bàn phím) | band `te15-five`, 1024 | focus back, Tab; Enter; Tab; ArrowRight, ArrowLeft; Tab | Tab tới next, vòng focus thấy được; Enter cuộn 1 card; Tab vào danh sách (`tabindex=0`), vòng focus thấy; ArrowRight cuộn tiếp, ArrowLeft lùi; Tab tới link card 1, vòng focus trên `::after` thấy được | a11y/E2E | P1 |
 | TC-16 | AC-H10 (bàn phím) | band `te15-level-three` | Tab tới link card 1; Enter | link focus, vòng focus thấy; Enter mở đúng href collection | a11y/E2E | P2 |
-| TC-17 | AC-H8, AC-H9 (nojs) | JS tắt, `/?view=te15`, 1280 (desktop) / 360 (Pixel 7) | render; focus danh sách, End | không `data-enhanced`; prev, next, tiến trình ẩn; `overflow-x: auto`; card cuối tràn; End cuộn danh sách (card cuối dịch trái); 5 card là link `/collections/all`; 3 level card là link, badge có sẵn trong HTML | E2E/nojs | P1 |
+| TC-17 | AC-H8, AC-H9 (nojs) | JS tắt, `/?view=te15`, 1280 (desktop) / 360 (Pixel 7) | render; focus danh sách, mũi tên phải (Home/End của Chromium cuộn dọc) | không `data-enhanced`; prev, next, tiến trình ẩn; `overflow-x: auto`; card cuối tràn; mũi tên phải cuộn danh sách (card cuối dịch trái); 5 card là link `/collections/all`; 3 level card là link, badge có sẵn trong HTML | E2E/nojs | P1 |
 | TC-18 | AC-H8 (nojs) | JS tắt, `/?view=figma` 1280 | render | 5 link card đúng `/collections/figma-cat-*`; thiếu dữ liệu thì skip | E2E/nojs | P2 |
-| TC-19 | AC-H9 (thiếu JS) | `scroll-buttons.js` bị chặn (`route.abort`), 1024 | render; focus danh sách, End | không `data-enhanced`; nút, tiến trình ẩn; danh sách vẫn cuộn; axe 0 serious; 0 console error của theme (trừ log mạng của file bị chặn) | E2E/a11y | P1 |
+| TC-19 | AC-H9 (thiếu JS) | `scroll-buttons.js` bị chặn (`route.abort`), 1024 | render; focus danh sách, mũi tên phải | không `data-enhanced`; nút, tiến trình ẩn; danh sách vẫn cuộn; axe 0 serious; 0 console error của theme (trừ log mạng của file bị chặn) | E2E/a11y | P1 |
 | TC-20 | AC-H9 (AC1 360), ticket "Đo 360" | Pixel 7, 360, `te15-five`, `te15-level-three` | render, đợi `data-enhanced` | card danh mục 252, ảnh 252 × 165, tên 22px; không nút; tiến trình hiện; vùng bấm card ≥ 44; level 320 × 240, 1 cột; hàng số ≥ 44 luôn hiện; trang không tràn ngang; axe 0 serious | UI/a11y | P1 |
 | TC-21 | AC-H9 (AC1 768), ticket "Đo 768" | Pixel 7, 768 | render | card 307, ảnh 307 × 201; prev, next 52 × 52, đáy nút = đáy h2 ± 2; tiến trình hiện; level 232 × 232, 3 cột; không tràn | UI | P1 |
 | TC-22 | AC-H9 (AC1 1280) | desktop 1280 × 800 | render | card 271, ảnh 271 × 177; card 4 thấy trọn, card 5 thấy ≥ 25%; nút 52 bên phải tiêu đề; level 397; không tràn | UI | P2 |
@@ -87,6 +87,7 @@ Spec: `tests/e2e/ES1-T187.spec.ts`. Gộp phần nghiệm thu của spec dev ES1
 | TC-10 | `/collections/all` không có `collection-count` | không đối chiếu được số thật |
 | TC-11 | không có collection đúng 1 sản phẩm | không kiểm được số ít trên store này |
 | TC-14 | project mobile | Pixel 7 không hover: hàng số luôn hiện (TC-20) |
+| TC-10 … TC-14 | project mobile | số sản phẩm render ở server, giống mọi viewport: chạy 1 lần ở desktop để bớt nửa lượt tải trang collection (store dev chặn 429, CI 24/11) |
 
 ## Ngoài phạm vi spec (DoD, ghi nhận)
 - `npx playwright test tests/e2e/TE-1.spec.ts tests/e2e/TE-3.spec.ts tests/e2e/ES1-T176.spec.ts` và `npx lhci autorun` trên `/`, `/?view=figma`: chạy ở CI của PR (store-tests, lighthouse); phiên này không có store, không báo đạt.
