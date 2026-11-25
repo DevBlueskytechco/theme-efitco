@@ -11,6 +11,7 @@ import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
+import { expectRoundDisabled } from './support/round-disabled';
 
 const TE15 = '/?view=te15';
 const JS_FILE = 'assets/scroll-buttons.js';
@@ -129,12 +130,12 @@ test.describe('ES1-T335 data-static', () => {
 });
 
 test.describe('ES1-T335 nút đầu/cuối', () => {
-  test('nút tắt vẫn hiện, mờ 0.35, vẫn có tên; đầu/cuối không đổi kích thước nút', async ({ page }) => {
+  test('nút tắt vẫn hiện, cặp màu disabled không mờ (ES1-T543), vẫn có tên; đầu/cuối không đổi kích thước nút', async ({ page }) => {
     await open(page);
     const prev = prevOf(page, 'te15-five');
     await off(prev);
     await expect(prev).toBeVisible();
-    await expect(prev).toHaveCSS('opacity', '0.35');
+    await expectRoundDisabled(prev);
     await expect(prev).toHaveAccessibleName(/.+/);
     await expect(prev).not.toHaveAttribute('hidden', '');
     await on(nextOf(page, 'te15-five'));

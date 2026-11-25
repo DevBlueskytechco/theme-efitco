@@ -146,18 +146,24 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
     await expect(root.getByTestId('bundle-builder-link')).toHaveCount(0);
   });
 
-  test('AC1-markup chưa chọn gì thì nút không hiện, chọn 1 thì hiện, bỏ chọn thì ẩn lại', async ({ page }) => {
+  // SRS 0.5 TE-12 AC8 (ES1-T339) thay kỳ vọng cũ "0 món thì nút ẩn": nút luôn hiện, 0 món thì mờ, không nhận chuột (CSS FE).
+  // `disabled` thật khi 0 món là việc BE (ES1-T340, bundle-form.js), không kiểm ở đây.
+  test('AC1-markup, AC8 chưa chọn gì thì nút hiện nhưng không nhận bấm, chọn 1 thì nhận bấm, bỏ chọn thì về như cũ', async ({ page }) => {
     await page.goto(TE12);
     const submit = bundle(page).getByTestId('bundle-builder-submit');
-    await expect(submit).toBeHidden();
+    const pointer = () => submit.evaluate((el) => getComputedStyle(el).pointerEvents);
+    await expect(submit).toBeVisible();
     await expect(submit).toHaveAttribute('type', 'submit');
-    expect(await submit.getAttribute('disabled')).toBeNull();
+    expect(await pointer()).toBe('none');
 
     const first = available(page).first();
     await first.check();
     await expect(submit).toBeVisible();
+    await expect(submit).toBeEnabled();
+    await expect.poll(pointer).not.toBe('none');
     await first.uncheck();
-    await expect(submit).toBeHidden();
+    await expect(submit).toBeVisible();
+    await expect.poll(pointer).toBe('none');
   });
 
   test('AC1-markup tên card vẫn dẫn tới trang sản phẩm, không bị vùng chọn che', async ({ page }) => {
@@ -216,7 +222,10 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
     await item.locator('.bundle-builder__select').click({ force: true });
     await expect(input).not.toBeChecked();
     await expect(page).toHaveURL(/view=te12/);
-    await expect(bundle(page).getByTestId('bundle-builder-submit')).toBeHidden();
+    // AC8: món hết hàng không tính là đã chọn → nút vẫn ở trạng thái 0 món (hiện, không nhận chuột)
+    const submit = bundle(page).getByTestId('bundle-builder-submit');
+    await expect(submit).toBeVisible();
+    expect(await submit.evaluate((el) => getComputedStyle(el).pointerEvents)).toBe('none');
 
     const ring = await item.locator('.bundle-builder__select').evaluate((el) => getComputedStyle(el, '::before').display);
     expect(ring).toBe('none');
@@ -237,18 +246,26 @@ test.describe('ES1-T147 TE-12 bundle builder', () => {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 
-  test('nojs AC1 panel còn tiêu đề, ghi chú; số liệu ẩn; nút hiện khi chọn món', async ({ browser }) => {
+  // SRS 0.5 TE-12 AC8 (ES1-T339) thay kỳ vọng cũ "không JS thì số liệu ẩn, nút ẩn khi 0 món":
+  // không JS thì số món, tạm tính, tổng in sẵn từ Liquid theo món chọn sẵn (te12 không chọn sẵn → 0); nút hiện, 0 món không nhận chuột.
+  test('nojs AC1, AC8 panel còn tiêu đề; số liệu in từ Liquid; nút hiện, nhận bấm khi chọn món', async ({ browser }) => {
     const { context, page } = await noJsPage(browser);
     await page.goto(TE12);
     const root = bundle(page);
     await expect(root.getByTestId('bundle-builder-panel')).toContainText('Your Bundle');
-    for (const id of ['count', 'subtotal', 'discount', 'total', 'progress', 'empty']) {
-      await expect(root.getByTestId(`bundle-builder-${id}`), id).toBeHidden();
+    await expect(root.getByTestId('bundle-builder-count')).toHaveText('0 Items');
+    for (const id of ['subtotal', 'total', 'empty']) {
+      await expect(root.getByTestId(`bundle-builder-${id}`), id).toBeVisible();
     }
+    await expect(root.getByTestId('bundle-builder-total')).toHaveText(/\d/);
+    await expect(root.getByTestId('bundle-builder-discount-row')).toBeHidden();
     const submit = root.getByTestId('bundle-builder-submit');
-    await expect(submit).toBeHidden();
+    const pointer = () => submit.evaluate((el) => getComputedStyle(el).pointerEvents);
+    await expect(submit).toBeVisible();
+    expect(await pointer()).toBe('none');
     await available(page).first().check();
     await expect(submit).toBeVisible();
+    await expect.poll(pointer).not.toBe('none');
     await context.close();
   });
 
