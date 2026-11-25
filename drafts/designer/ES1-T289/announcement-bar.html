@@ -13,7 +13,7 @@
   /* Bar 44 mọi mốc, nền tối + noise liền header, gạch đáy 1px trắng 12% (spec §3) */
   .announcement-bar {
     display: grid;
-    min-height: calc(var(--space-1) * 11);
+    min-height: calc(var(--space-2xs) * 11);
     border-block-end: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent);
     background: var(--color-background-dark) var(--dark-texture);
     color: var(--color-background-dark-foreground);
@@ -22,12 +22,12 @@
     line-height: var(--line-height-sm);
     text-align: center;
   }
-  .announcement-bar__text { display: flex; align-items: center; justify-content: center; width: var(--content-width); margin-inline: auto; padding-block: var(--space-3); }
+  .announcement-bar__text { display: flex; align-items: center; justify-content: center; width: var(--content-width); margin-inline: auto; padding-block: var(--space-sm); }
   /* inline-block + padding 12: vùng chạm 44; mũi tên inline nên khi xuống dòng đi theo chữ cuối (A8) */
-  .announcement-bar__link { display: inline-block; min-height: var(--touch-target); margin-block: calc(var(--space-3) * -1); padding-block: var(--space-3); color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; transition: text-decoration-thickness var(--motion-fast) var(--ease-out); }
-  .announcement-bar__link svg { display: inline-block; width: 16px; height: 13px; margin-inline-start: var(--space-2); vertical-align: -2px; transition: translate var(--motion-fast) var(--ease-out); }
+  .announcement-bar__link { display: inline-block; min-height: var(--touch-target); margin-block: calc(var(--space-sm) * -1); padding-block: var(--space-sm); color: inherit; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; transition: text-decoration-thickness var(--motion-fast) var(--ease-out); }
+  .announcement-bar__link svg { display: inline-block; width: 16px; height: 13px; margin-inline-start: var(--space-xs); vertical-align: -2px; transition: translate var(--motion-fast) var(--ease-out); }
   .announcement-bar__link:hover, .announcement-bar__link.is-hover { text-decoration-thickness: 2px; }
-  .announcement-bar__link:hover svg, .announcement-bar__link.is-hover svg { translate: var(--space-1) 0; }
+  .announcement-bar__link:hover svg, .announcement-bar__link.is-hover svg { translate: var(--space-2xs) 0; }
   .announcement-bar__link:active svg, .announcement-bar__link.is-active svg { translate: 0 0; }
   .announcement-bar :focus-visible, .announcement-bar .is-focus { outline: 2px solid var(--color-background-dark-foreground); outline-offset: -2px; }
   .announcement-bar--placeholder { background: var(--color-background-alt); color: var(--color-muted-light); outline: 1px dashed var(--color-border); outline-offset: -1px; border: 0; }
@@ -37,15 +37,15 @@
   .sale-grid { padding-block-end: var(--section-gap); }
 
   /* States */
-  .demo-states { padding-block: var(--space-7); }
-  .state-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); }
+  .demo-states { padding-block: var(--space-4xl); }
+  .state-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-2xl); }
   @media (min-width: 80rem) { .state-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
   .stage { overflow: hidden; border: 1px dashed var(--color-muted-light); border-radius: var(--radius-card); background: var(--color-background); }
-  .stage__body { padding: var(--space-4) var(--space-5); color: var(--color-muted); font-size: var(--font-size-sm); }
+  .stage__body { padding: var(--space-md) var(--space-xl); color: var(--color-muted); font-size: var(--font-size-sm); }
   .stage--phone { width: 360px; max-width: 100%; }
-  .stage .site-header__inner { width: calc(100% - var(--space-6)); }
-  .state-row { display: grid; gap: var(--space-3); }
-  .scroll-note { display: flex; justify-content: space-between; padding: var(--space-2) var(--space-5); color: var(--color-muted); font-size: var(--font-size-xs); }
+  .stage .site-header__inner { width: calc(100% - var(--space-2xl)); }
+  .state-row { display: grid; gap: var(--space-sm); }
+  .scroll-note { display: flex; justify-content: space-between; padding: var(--space-xs) var(--space-xl); color: var(--color-muted); font-size: var(--font-size-xs); }
 </style>
 </head>
 <body>
@@ -149,17 +149,17 @@
       <p class="demo-note">A1 mặc định: text rỗng thì không render, header ở y 0 (AC4). A2 chỉ trong theme editor. A3 có chữ, không link: không gạch chân, không mũi tên.</p>
       <div class="state-grid">
         <div class="stage">
-          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A1 · Rỗng, storefront</p>
+          <p class="demo-label" style="padding:var(--space-sm) var(--space-xl) 0">A1 · Rỗng, storefront</p>
           <div class="site-header"><div class="site-header__inner"><a class="site-header__logo" href="#" aria-label="Efitco home, sample A1"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a><div class="site-header__icons"><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div></div></div>
           <p class="stage__body">Không có bar, header bắt đầu ở y 0.</p>
         </div>
         <div class="stage">
-          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A2 · Rỗng, theme editor (placeholder)</p>
+          <p class="demo-label" style="padding:var(--space-sm) var(--space-xl) 0">A2 · Rỗng, theme editor (placeholder)</p>
           <div class="announcement-bar announcement-bar--placeholder" data-testid="announcement-bar-placeholder"><p class="announcement-bar__text">Announcement bar is hidden. Add text in this block's settings to show it above the header.</p></div>
           <div class="site-header"><div class="site-header__inner"><a class="site-header__logo" href="#" aria-label="Efitco home, sample A2"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a></div></div>
         </div>
         <div class="stage">
-          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A3 · Chữ, không link</p>
+          <p class="demo-label" style="padding:var(--space-sm) var(--space-xl) 0">A3 · Chữ, không link</p>
           <div class="announcement-bar"><p class="announcement-bar__text">90 day money back on every order</p></div>
           <div class="site-header"><div class="site-header__inner"><a class="site-header__logo" href="#" aria-label="Efitco home, sample A3"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a></div></div>
         </div>
@@ -170,10 +170,10 @@
       <h2>A4–A7 · Link: mặc định, hover, focus, nhấn</h2>
       <p class="demo-note">Hover: gạch chân 2px + mũi tên dịch 4 về inline-end, 150 ms. Focus bàn phím: outline trắng 2px offset −2, nằm trong bar (cam trên tối chỉ 3.48:1). Vùng chạm link cao 44.</p>
       <div class="state-row">
-        <div class="stage"><p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A4 · Mặc định</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link" href="#">Up to 24% off selected gear, sample default<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
-        <div class="stage"><p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A5 · Hover</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link is-hover" href="#">Up to 24% off selected gear, sample hover<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
-        <div class="stage"><p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A6 · Focus</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link is-focus" href="#">Up to 24% off selected gear, sample focus<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
-        <div class="stage"><p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A7 · Nhấn</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link is-active" href="#">Up to 24% off selected gear, sample active<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
+        <div class="stage"><p class="demo-label" style="padding:var(--space-sm) var(--space-xl) 0">A4 · Mặc định</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link" href="#">Up to 24% off selected gear, sample default<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
+        <div class="stage"><p class="demo-label" style="padding:var(--space-sm) var(--space-xl) 0">A5 · Hover</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link is-hover" href="#">Up to 24% off selected gear, sample hover<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
+        <div class="stage"><p class="demo-label" style="padding:var(--space-sm) var(--space-xl) 0">A6 · Focus</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link is-focus" href="#">Up to 24% off selected gear, sample focus<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
+        <div class="stage"><p class="demo-label" style="padding:var(--space-sm) var(--space-xl) 0">A7 · Nhấn</p><div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link is-active" href="#">Up to 24% off selected gear, sample active<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div></div>
       </div>
     </div>
 
@@ -182,12 +182,12 @@
       <p class="demo-note">A8: không cắt chữ, xuống 2 dòng, bar cao 64; info setting khuyên dưới 40 ký tự. A9: bar khuất, header dính top 0, có bóng (sentinel đặt ngay trước header, spec §4).</p>
       <div class="state-grid">
         <div class="stage stage--phone">
-          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A8 · 360, 2 dòng</p>
+          <p class="demo-label" style="padding:var(--space-sm) var(--space-xl) 0">A8 · 360, 2 dòng</p>
           <div class="announcement-bar"><p class="announcement-bar__text"><a class="announcement-bar__link" href="#">Up to 24% off selected gear for your home gym this week<svg aria-hidden="true"><use href="#i-arrow"/></svg></a></p></div>
           <div class="site-header"><div class="site-header__inner"><span class="site-header__icon site-header__menu-toggle"><svg aria-hidden="true"><use href="#i-menu"/></svg></span><a class="site-header__logo" href="#" aria-label="Efitco home, sample A8"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a><div class="site-header__icons"><span class="site-header__icon site-header__icon--search"><svg aria-hidden="true"><use href="#i-search"/></svg></span><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div></div></div>
         </div>
         <div class="stage">
-          <p class="demo-label" style="padding:var(--space-3) var(--space-5) 0">A9 · Cuộn ≥ 44: header dính có bóng</p>
+          <p class="demo-label" style="padding:var(--space-sm) var(--space-xl) 0">A9 · Cuộn ≥ 44: header dính có bóng</p>
           <div class="site-header site-header--scrolled"><div class="site-header__inner"><a class="site-header__logo" href="#" aria-label="Efitco home, sample A9"><svg viewBox="0 0 100 30" aria-hidden="true"><use href="#i-logo"/></svg></a><div class="site-header__icons"><span class="site-header__icon"><svg aria-hidden="true"><use href="#i-bag"/></svg></span></div></div></div>
           <div class="scroll-note"><span>top 0 viewport</span><span>bar đã cuộn đi</span></div>
           <p class="stage__body">Header 80 dính; bar không dính (sticky ≤ 80, 04 §3.8).</p>
