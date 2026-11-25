@@ -13,7 +13,15 @@ Thứ tự nguồn (CTO 21/11, ES1-T567): `kit.css` → mockup `drafts/designer/
 
 Quy ước cho Dev FE: kit.css là nguồn chuẩn về giá trị token và hình component, nhưng là CSS mockup: không chép nguyên file vào `assets/`. Code theme viết theo AGENTS.md (logical properties, 0 màu literal, `var(--*)`, breakpoint `48rem / 64rem / 80rem`) và phản chiếu `:root` của kit. Cột "Code hiện có" chỉ class đã có trong `assets/`.
 
-Bản design system: 2.0.0 (CTO chốt số bản 21/11 lượt 2). Quy tắc đánh số và lịch sử: `docs/design/CHANGELOG.md`; số bản ghi ở `docs/tokens.json` `_version` và đầu màn foundation.html (§40).
+Bản design system: 2.0.0 (CTO chốt số bản 21/11 lượt 2); 2.1.0 ĐỀ XUẤT (ES1-T573, chờ CTO duyệt). Quy tắc đánh số và lịch sử: `docs/design/CHANGELOG.md`; số bản ghi ở `docs/tokens.json` `_version` và đầu màn foundation.html (§40).
+
+## Thay đổi ES1-T573 (bản 2.1.0, minor, ĐỀ XUẤT tới khi CTO duyệt)
+
+Chi tiết, đo đạc, bản vá cho file ngoài phạm vi Designer: `drafts/designer/ES1-T573/notes.md`.
+- Token mới (20, `:root` 150 → 170): thang kích thước `--size-1000…2400` (40 / 44 / 48 / 52 / 56 / 64 / 72 / 80 / 96; §1.2), tỉ lệ `--ratio-1-1 / 2-1 / 3-2 / 4-3 / 3-4 / 16-9 / 9-16` (§36), `--display-fluid`, `--logo-width` 100 / `--logo-height` 30, `--quantity-compact-width` 130.
+- Component lên kit: 7 component riêng trang chủ (§41, màn `h-level-card`, `h-stl`, `h-vcard`, `h-tcard`, `h-specs`, `h-faq-stats`, `h-quiz-opt`) và 4 mảnh nhỏ (`.icon-button` 44, `.link-button` 44, `.sheet-handle`, `.filter-toggle__count` 20 đọc `--count-badge-size`, trước 24). `.code__value` (mã giảm giá) đọc `--letter-spacing-caps` 0.04em (trước 0.06em).
+- Deprecated, xoá ở 3.0.0: `--space-1…8` (mockup đọc 0 lần, 13 trang đổi sang tên chính), `--radius-hero` (chỗ đọc duy nhất đổi sang `--radius-md`).
+- `aspect-ratio` trong kit và 3 trang chủ chỉ đọc `var(--ratio-*)` (trừ `auto`).
 
 ## Thay đổi ES1-T567 (CTO 21/11: mockup là nguồn chuẩn, chuẩn Polaris trước, nhãn nút sentence case)
 
@@ -227,7 +235,7 @@ Line-height (sổ 21/11, ES1-T567; THAY ngoại lệ foundations-18): không cò
 
 Khoảng cách, lưới 4px: `--space-050` 2, `2xs` 4, `150` 6, `xs` 8, `sm` 12, `md` 16, `lg` 20, `xl` 24, `2xl` 32, `3xl` 40, `4xl` 48, `5xl` 64, `6xl` 80, `7xl` 128. Chuẩn: Polaris web spacing 2 / 4 / 6 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48 (`small-500` … `large-500`); 64, 80 và 128 có trong Polaris React space; 128 là padding section desktop (CTO 21/11 lượt 2, trước là 120).
 
-Một hệ tên (sổ 20/11 V06, sổ 21/11 foundations-08; màn `h-spacing-radius`): tên chính là `--space-050…7xl`. Kit và mọi thành phần mới CHỈ đọc tên này cho padding, gap, margin. `--space-1…8` và `calc(var(--space-1) * N)` là tên cũ, chỉ còn trong code theme (setting `space_base` × hệ số) và trang mockup cũ; trong kit chúng là alias trỏ về tên chính.
+Một hệ tên (sổ 20/11 V06, sổ 21/11 foundations-08; màn `h-spacing-radius`): tên chính là `--space-050…7xl`. Kit và mọi thành phần mới CHỈ đọc tên này cho padding, gap, margin. `--space-1…8` và `calc(var(--space-1) * N)` là tên cũ, chỉ còn trong code theme (setting `space_base` × hệ số); trong kit chúng là alias trỏ về tên chính, DEPRECATED từ 2.1.0 (ES1-T573), xoá ở 3.0.0. Mockup đọc 0 lần (grep `var(--space-[1-8])` trong `drafts/designer/**/*.html` = 0; trước ES1-T573: 383 lần ở 13 trang).
 
 | Tên chính | px | Tên cũ trong code theme | Nguồn / ghi chú |
 | --- | --- | --- | --- |
@@ -275,6 +283,24 @@ Thang khoảng cách chỉ cho padding, gap, margin. Kích thước (rộng, cao
 | `--count-badge-size` | 20 | Số đếm giỏ trên icon header | Thiết kế: trên lưới 4px (trước 18) |
 | `--progress-height` · `--meter-height` | 4 · 8 | Thanh tiến trình carousel · meter freeship | Sổ 09/11 (thanh mảnh); trên lưới 4px |
 | `--icon-size-sm / md / lg` | 16 / 20 / 24 | Icon (§33) | Polaris icon khung 20, vùng an toàn 16 |
+| `--logo-width` · `--logo-height` | 100 · 30 | Logo header, trang password, gift card (2.1.0) | Thiết kế: logo thương hiệu, tỉ lệ 10:3. Code theme: setting `logo_width` đặt `--logo-width` inline |
+| `--quantity-compact-width` | 130 | Bề ngang `.quantity--compact`, cột Quantity trang giỏ (2.1.0) | Thiết kế: 44 + 40 + 44 + viền 2 |
+
+Thang kích thước primitive (2.1.0, ES1-T573, ĐỀ XUẤT): cho width / height không có vai trò riêng (ô ảnh, thumb, đĩa icon, hàng cố định). Tên theo bậc cùng quy ước `--space-050 / 150` (bậc 100 = 4px), không đặt theo giá trị (§32.1). Token vai trò ở bảng trên giữ tên riêng, cùng giá trị bậc tương ứng.
+
+| Token | px | Dùng (hiện có) |
+| --- | --- | --- |
+| `--size-1000` | 40 | Tay nắm sheet (rộng), ô ảnh nhỏ |
+| `--size-1100` | 44 | Thumb tròn `.quiz-opt`, hàng `.specs` từ 80rem |
+| `--size-1200` | 48 | Thumb thanh dính đáy |
+| `--size-1300` | 52 | Đĩa icon `.stl__fits-icon` |
+| `--size-1400` | 56 | Thumb dòng sản phẩm |
+| `--size-1600` | 64 | Thumb gợi ý tìm kiếm; trần chân `.level-card` khi mở |
+| `--size-1800` | 72 | `.quiz-opt` dưới 48rem |
+| `--size-2000` | 80 | `.quiz-opt` từ 48rem; thumb dòng giỏ |
+| `--size-2400` | 96 | Ảnh chồng footer; placeholder media tối đa |
+
+Nguồn: Thiết kế (gom kích thước đang viết số trong mockup, notes ES1-T567 §8.3); Polaris không dùng token khoảng cách cho width / height. Component cũ còn viết px (`.thumb`, `.product-row__media`, footer): chuyển dần, không bắt buộc trong 2.1.0.
 
 Ngoại lệ có tên của quy tắc "không px trong component": toạ độ nét vẽ glyph (chevron 9 × 5, 12 × 7, mũi tên 16 × 14, sao 14 × 13, dấu ✓; Thiết kế: quang học glyph) và nút, icon do Shopify / Apple render (§27).
 
@@ -960,26 +986,29 @@ Quy ước:
 - Token tầng component khai báo ở cuối `:root` (dùng chung nhiều chỗ của component, vd `--tab-padding-inline`, `--row-height`) hoặc là custom property cục bộ trong rule của component (`--alert-color`, `--toast-color`, `--thumb-size`, `--ratio`). Khoảng cách của component trỏ về thang; kích thước khai báo px trực tiếp.
 - Mỗi giá trị ghi nguồn theo một trong 5 dạng (đầu kit.css): "Chuẩn: Polaris <tên bậc>" · "Chuẩn: <Carbon | M3 | Fluent 2 | Spectrum | Ant> …" · "CTO dd/mm" · "AA: n:1" · "Thiết kế: …". Điều Polaris không nêu (thang chữ, lưới, container, breakpoint có tên, chiều cao control cho storefront) không ghi "Chuẩn: Polaris".
 - Thêm token mới thì thêm ở đúng tầng và ở đủ bốn nơi (§32.3).
+- Ngoại lệ có tên của quy tắc tên: `--ratio-*` mang chính tên tỉ lệ (4-3, 16-9) vì tỉ lệ có tên là khái niệm của Carbon / M3 / Spectrum, không phải giá trị px; thang kích thước đặt theo bậc (`--size-1000` = 40).
 
 ### 32.2 Nhóm token và số đếm
 
-`:root` của kit có 150 custom property (đếm 21/11 sau ES1-T567; trước là 134). Cột "Code theme hôm nay" là hiện trạng trên `origin/develop`, phần thiếu là việc FE.
+`:root` của kit có 170 custom property (2.1.0, ES1-T573: +20; 150 sau ES1-T567; trước là 134). Cách đếm: dòng khai báo `--*:` trong khối `:root` đầu kit.css, không tính 3 khối `:root` trong media query (ghi đè giá trị, không thêm biến). Cột "Code theme hôm nay" là hiện trạng trên `origin/develop`, phần thiếu là việc FE.
 
 | Nhóm | Kit | Tầng | Code theme hôm nay | tokens.json |
 | --- | --- | --- | --- | --- |
 | Color | 32 | 22 primitive có setting · 6 alias trạng thái + 4 dẫn xuất (accent-on-sand, panel-muted, panel-saving, overlay-scrim) semantic | 23 biến `--color-*` ở `css-variables.liquid`; 3 dẫn xuất `--panel-muted`, `--panel-saving`, `--overlay-scrim` đang ở base.css; 6 alias trạng thái chưa có | `color`, `color_status`, `color_derived`, `elevation.scrim` |
-| Typography | 34 | Primitive (họ chữ 5, cỡ 11, body weight 1, letter-spacing 5) · semantic (12 line-height theo bậc) | Có 15 / 34 ở `css-variables.liquid`; thiếu `--font-size-eyebrow`, `--font-size-h4`, `--font-body-weight`, 5 `--letter-spacing-*`, line-height từng bậc (h1…h4, eyebrow, title, reading, sm, label, price-lg, display); body đang 1.625, cần 1.5 | `font`, `type_scale`, `line_height`, `letter_spacing` |
-| Space | 14 + 8 | 14 bậc primitive · 8 tên cũ là alias | Chỉ có `--space-1…8`; thiếu bậc 2, 6, 20, 40, 64, 80; `--space-7` (48) cần thêm tên `--space-4xl` | `space.named`, `space.1…8` |
-| Radius | 6 + 7 | 6 bậc primitive · 7 vai trò semantic | 4 vai trò (input, button, card, hero) + pill ở `css-variables.liquid`; thiếu xs…xl, `--radius-panel`, `--radius-swatch`; `--radius-dialog` đang ở base.css và là card × 2 = 24 (kit 20, sổ 20/11 V04) | `radius`, `radius.roles` |
+| Typography | 35 | Primitive (họ chữ 5, cỡ 11, body weight 1, letter-spacing 5) · semantic (12 line-height theo bậc) · `--display-fluid` (2.1.0) | Có 15 / 34 ở `css-variables.liquid`; thiếu `--font-size-eyebrow`, `--font-size-h4`, `--font-body-weight`, 5 `--letter-spacing-*`, line-height từng bậc (h1…h4, eyebrow, title, reading, sm, label, price-lg, display); body đang 1.625, cần 1.5 | `font`, `type_scale`, `line_height`, `letter_spacing` |
+| Space | 14 + 8 | 14 bậc primitive · 8 tên cũ là alias (Deprecated 2.1.0) | Chỉ có `--space-1…8`; thiếu bậc 2, 6, 20, 40, 64, 80; `--space-7` (48) cần thêm tên `--space-4xl` | `space.named`, `space.1…8` |
+| Radius | 6 + 7 | 6 bậc primitive · 7 vai trò semantic (`--radius-hero` Deprecated 2.1.0) | 4 vai trò (input, button, card, hero) + pill ở `css-variables.liquid`; thiếu xs…xl, `--radius-panel`, `--radius-swatch`; `--radius-dialog` đang ở base.css và là card × 2 = 24 (kit 20, sổ 20/11 V04) | `radius`, `radius.roles` |
 | Motion | 8 + 3 | 8 duration primitive · 3 easing semantic | `css-variables.liquid` (đủ) | `motion`, `easing` |
 | Shadow | 4 | Semantic | base.css (2 trong 4: raised, overlay); thiếu none, bar | `elevation` |
 | Layer | 8 | Semantic | base.css (đủ 8), cần gom về `css-variables.liquid` | `layer` |
 | Icon | 4 | Primitive | Chỉ `--icon-stroke-width`, khai báo cục bộ 2 chỗ trong base.css; thiếu `--icon-size-sm` / `-md` / `-lg` | `icon` |
 | Size và layout | 15 | Semantic (page width, lề, header, grid, control, touch target, texture) | Có 4 / 15 ở `css-variables.liquid`: `--page-width`, `--page-margin`, `--header-height`, `--touch-target-min`; thiếu 11: `--touch-target`, `--section-gap`, `--heading-gap`, `--grid-gap`, `--grid-columns`, `--control-height`, `--control-height-compact`, `--content-width`, `--band-side`, `--band-inset`, `--dark-texture` | `container`, `layout` |
-| Component | 7 | Component (`--tab-padding-inline` 24, `--tab-height-desktop` 40, `--row-height` 52, `--round-button-size` 52, `--count-badge-size` 20, `--progress-height` 4, `--meter-height` 8) | Viết số trong base.css (tab đang 28) | `component` |
-| Breakpoint | 3 | 48rem, 64rem, 80rem: hằng số trong media query (CSS không cho dùng biến), không tính vào 150 | AGENTS.md | `breakpoint` |
+| Component | 10 | Component (`--tab-padding-inline` 24, `--tab-height-desktop` 40, `--row-height` 52, `--round-button-size` 52, `--count-badge-size` 20, `--progress-height` 4, `--meter-height` 8; 2.1.0: `--logo-width` 100, `--logo-height` 30, `--quantity-compact-width` 130) | Viết số trong base.css (tab đang 28); `--logo-width` đặt inline theo setting | `component` |
+| Size scale | 9 | Primitive 2.1.0: `--size-1000…2400` (§1.2) | Chưa có | `size` |
+| Aspect ratio | 7 | Primitive 2.1.0: `--ratio-*` (§36) | Chưa có (tỉ lệ viết số trong block) | `aspect_ratio.tokens` |
+| Breakpoint | 3 | 48rem, 64rem, 80rem: hằng số trong media query (CSS không cho dùng biến), không tính vào 170 | AGENTS.md | `breakpoint` |
 
-Đối chiếu 21/11 với `origin/develop`: trong 150 token của kit, 66 có ở `css-variables.liquid`, 15 khai báo ở base.css (cần gom), 69 chưa có trong code (17 token thêm ở ES1-T567).
+Đối chiếu 21/11 với `origin/develop`: trong 150 token của kit 2.0.0, 66 có ở `css-variables.liquid`, 15 khai báo ở base.css (cần gom), 69 chưa có trong code (17 token thêm ở ES1-T567). 2.1.0 thêm 20 token chưa có trong code: 89 / 170.
 
 Số token màu có setting là 22 (khớp `config/settings_schema.json`, DESIGN.md và màn `h-color`; con số "23" ở bản trước là sai).
 
@@ -1004,6 +1033,7 @@ Bốn nơi giữ token, nơi đứng trước là gốc của nơi đứng sau:
   - Shadow (2): `--shadow-none`, `--shadow-bar`. Icon (3): `--icon-size-sm` / `-md` / `-lg`.
   - Size và layout (11): `--touch-target`, `--section-gap`, `--heading-gap`, `--grid-gap`, `--grid-columns`, `--control-height`, `--control-height-compact`, `--content-width`, `--band-side`, `--band-inset`, `--dark-texture`.
   - Component (7): `--tab-padding-inline`, `--tab-height-desktop`, `--row-height`, `--round-button-size`, `--count-badge-size`, `--progress-height`, `--meter-height`.
+  - 2.1.0 (20, ES1-T573, Đề xuất): 9 `--size-*`, 7 `--ratio-*`, `--display-fluid`, `--logo-width`, `--logo-height`, `--quantity-compact-width`.
 - Có trong code nhưng sai chỗ (15 token ở base.css, cần gom về `css-variables.liquid`): 8 `--layer-*`, `--shadow-raised`, `--shadow-overlay`, `--overlay-scrim`, `--panel-muted`, `--panel-saving`, `--icon-stroke-width` (cục bộ), `--radius-dialog` (đang 24, đổi 20).
 - Phép kiểm CI so 4 nơi (lấy kit làm chuẩn): việc DevOps (notes ES1-T527 V01, V03; notes ES1-T535 lượt 2; notes ES1-T567).
 
@@ -1142,7 +1172,7 @@ Chọn Banner, Inline hay Toast (dựng từ V45, §17, §18):
 Chỉ gom quy tắc đã có (DESIGN.md mục Images, §9, §30.14), không đổi token.
 
 - Mọi ảnh nằm trong khung giữ tỉ lệ (0 CLS), render qua `snippets/image.liquid` (srcset 360 / 720 / 1080 / 1440, `sizes`, focal point).
-- `.media`: khung `aspect-ratio: var(--ratio, 1)`, bo `--radius-card` 12, nền cream. Mặc định ảnh `cover`; `.media--contain` cho ảnh sản phẩm (contain + `mix-blend-mode: darken` trên cream); `.media--panel` bo `--radius-panel` 16; `.media--dark` nền `--color-background-dark` cho hero, banner, card tối.
+- `.media`: khung `aspect-ratio: var(--ratio, var(--ratio-1-1))` (custom property cục bộ `--ratio` nhận token `--ratio-*`, vd `style="--ratio: var(--ratio-3-2)"`), bo `--radius-card` 12, nền cream. Mặc định ảnh `cover`; `.media--contain` cho ảnh sản phẩm (contain + `mix-blend-mode: darken` trên cream); `.media--panel` bo `--radius-panel` 16; `.media--dark` nền `--color-background-dark` cho hero, banner, card tối.
 - Hai kiểu fit: contain trên nền cream cho ảnh sản phẩm (không cắt mất hàng); cover cho ảnh đời sống (collection, bài viết, hero).
 - Placeholder `.media__placeholder`: chưa chọn ảnh (editor) hoặc sản phẩm không ảnh = icon image `--color-muted-light` trên cream (icon rộng 40% khung, tối đa 96).
 - Thiếu ảnh hoặc ảnh lỗi trên storefront ở hero, banner, card tối: chỉ nền tối, chữ vẫn đọc được. Luôn giữ khung và nền; không bao giờ hiện icon ảnh vỡ, khung không co lại.
@@ -1162,16 +1192,18 @@ Không ảnh: thumb giữ khung, hiện icon image muted-light. Không thumbnail
 
 Tỉ lệ khung theo vị trí. Chỉ dùng bộ tỉ lệ có tên, không lấy tỉ lệ theo px của một khung cụ thể (sổ 21/11, ES1-T567). Chuẩn: Carbon aspect ratio 1:1, 2:1, 2:3, 3:2, 4:3, 16:9; M3 carousel item 9:16 đến 16:9; Spectrum preview cao tối đa 3:4.
 
+Token tỉ lệ (2.1.0, ES1-T573): `--ratio-1-1` · `--ratio-2-1` · `--ratio-3-2` · `--ratio-4-3` · `--ratio-3-4` · `--ratio-16-9` · `--ratio-9-16` (giá trị `a / b`). `aspect-ratio` trong kit và mockup chỉ đọc `var(--ratio-*)`, ngoại lệ duy nhất `auto` (khung trạng thái rỗng co theo nội dung) và thẻ quà tặng 1.586 / 1 (chưa có token, chỉ ở gift card). Tên là chính tỉ lệ có tên của Carbon / M3 / Spectrum, không phải giá trị px.
+
 | Vị trí | Tỉ lệ | Fit | Bo | Nguồn |
 | --- | --- | --- | --- | --- |
 | Product card, quick view, PDP gallery, featured product | 1 / 1 | Contain, nền cream | `--radius-card` 12 | Chuẩn: Polaris Image mặc định 1/1 |
-| Hero / slideshow, hero mini, ảnh bìa bài viết | 2 / 1 từ 1280 · 4 / 3 ở 768 · 3 / 4 dưới 768 | Cover + focal point | `--radius-panel` 16 (hero trang chủ, hero mini, bìa bài viết; mockup là nguồn chuẩn) · `--radius-hero` 12 chỉ còn cho khung popup · Cần FE: `hero_corner_radius` mặc định 12 → 16 hoặc hero đọc `--radius-panel` | Chuẩn: Carbon 2:1, 4:3 · Spectrum 3:4 ở 360 (khung 360 × 480, sổ 07/11) |
+| Hero / slideshow, hero mini, ảnh bìa bài viết | 2 / 1 từ 1280 · 4 / 3 ở 768 · 3 / 4 dưới 768 | Cover + focal point | `--radius-panel` 16 (hero trang chủ, hero mini, bìa bài viết; mockup là nguồn chuẩn) · khung popup đọc `--radius-md` 12 (`--radius-hero` Deprecated 2.1.0) · Cần FE: `hero_corner_radius` mặc định 12 → 16 hoặc hero đọc `--radius-panel` | Chuẩn: Carbon 2:1, 4:3 · Spectrum 3:4 ở 360 (khung 360 × 480, sổ 07/11) |
 | Collection card | 3 / 2 | Cover | `--radius-panel` 16 | Chuẩn: Carbon 3:2 |
 | Collection card trong mega menu, ảnh promo mega, cột ảnh FAQ | 4 / 3 | Cover | `--radius-card` 12 | Chuẩn: Carbon 4:3 |
-| Training level card, shop the look, why choose us | 1 / 1 | Cover | `--radius-panel` 16 | Chuẩn: Carbon 1:1 |
+| Training level card, shop the look, why choose us | 1 / 1 (level card 4 / 3 dưới 768) | Cover | `--radius-panel` 16 | Chuẩn: Carbon 1:1, 4:3 |
 | Blog card | 3 / 4 | Cover + gradient tối nửa dưới | `--radius-panel` 16 | Chuẩn: Spectrum preview cao tối đa 3:4 |
-| Testimonial card, ảnh trong tiêu đề | 16 / 9 | Cover | `--radius-card` 12 · ảnh trong tiêu đề `--radius-sm` 8, cao theo em | Chuẩn: Carbon 16:9 |
-| Video card dọc | 9 / 16 | Cover | `--radius-panel` 16 | Chuẩn: M3 carousel item 9:16 đến 16:9 |
+| Testimonial card, ảnh trong tiêu đề | 16 / 9 | Cover | card `--radius-panel` 16 (ảnh theo bo card) · ảnh trong tiêu đề `--radius-sm` 8, cao theo em | Chuẩn: Carbon 16:9 |
+| Video card dọc | 9 / 16 | Cover | card `--radius-card` 12 | Chuẩn: M3 carousel item 9:16 đến 16:9 |
 | Thẻ quà tặng | 1.586 / 1 | Cover | `--radius-card` 12 | Thiết kế: tỉ lệ thẻ ID-1 |
 | Khối chưa dựng | Tạm tính | — | — | Chờ Product và Design chốt (ES1-T39) |
 
@@ -1261,7 +1293,7 @@ Còn thiếu (ticket sau): các spec riêng ở §23 (variant-picker, pagination
 - Trên màn DS: mỗi section có thuộc tính `data-status` và nhãn cạnh tiêu đề; chú giải ở đầu trang. `h-banner` (page banner) không có tiêu đề `h2` riêng nên không hiện nhãn: nó thuộc dòng `h-header`, cùng trạng thái Đã dựng (43 section, 42 nhãn).
 - "Đã dựng" gán theo việc class đã có trong `assets/` hoặc `snippets/` của nhánh làm việc (Designer đối chiếu bằng tìm tên class, chưa soát từng trạng thái): FE / QA xác nhận lại khi làm ticket.
 
-Trạng thái hiện tại (21/11, bản 2.0.0): 25 Đã dựng, 11 Đã chốt, 6 Đề xuất, 0 Ngừng dùng.
+Trạng thái hiện tại (21/11, bản 2.0.0): 25 Đã dựng, 11 Đã chốt, 6 Đề xuất, 0 Ngừng dùng. Bản 2.1.0 (ES1-T573) thêm 7 section Đề xuất (35–41, cuối bảng): 25 Đã dựng, 11 Đã chốt, 13 Đề xuất (50 section, 49 nhãn). Token Ngừng dùng (không phải section): `--space-1…8`, `--radius-hero`, xoá ở 3.0.0. Component trang chủ có code theme (`blocks/level-card`, `video-card`, `shop-the-look*`, `featured-product`, `quiz`…) nhưng class kit 2.1.0 chưa khớp tên với `assets/`: giữ Đề xuất tới khi FE đối chiếu (ES1-T548, T576, T580).
 
 | Màn DS (`id`) | Component / nền tảng | Trạng thái | Mục spec |
 | --- | --- | --- | --- |
@@ -1307,6 +1339,13 @@ Trạng thái hiện tại (21/11, bản 2.0.0): 25 Đã dựng, 11 Đã chốt,
 | `h-countdown` | Sale countdown | Đã dựng | countdown.md |
 | `h-panel` | Dark panel | Đã dựng | §2, §30.16 |
 | `h-content` | Content and voice | Đề xuất | `docs/design/content.md` |
+| `h-level-card` | Level card | Đề xuất (2.1.0) | §41.1 |
+| `h-stl` | Shop the look, hotspot | Đề xuất (2.1.0) | §41.2 |
+| `h-vcard` | Video card, `--error` | Đề xuất (2.1.0) | §41.3 |
+| `h-tcard` | Testimonial card | Đề xuất (2.1.0) | §41.4 |
+| `h-specs` | Specs table | Đề xuất (2.1.0) | §41.5 |
+| `h-faq-stats` | FAQ stats | Đề xuất (2.1.0) | §41.6 |
+| `h-quiz-opt` | Quiz answer option | Đề xuất (2.1.0) | §41.7 |
 
 Phần Đề xuất nằm trong màn Đã dựng / Đã chốt của lượt này: focus tóm tắt lỗi form (`h-form`), `.button--wrap`, `.badge--wrap`, quy tắc tertiary small + icon cạnh chip (`h-button`, `h-tabs`), bảng ánh xạ ở `h-spacing-radius`, `h-elevation-layers`. Chuyển sang Đã chốt khi CTO duyệt bản 1.3.0.
 
@@ -1316,3 +1355,59 @@ Phần Đề xuất nằm trong màn Đã dựng / Đã chốt của lượt nà
 - major: đổi tên hoặc xoá token, setting id, class component, hoặc đổi nguồn chuẩn (phá theme đã cài hoặc trang đang dùng). minor: thêm token, component, biến thể, màn DS, quy tắc không phá cái cũ. patch: sửa giá trị, sửa lỗi, sửa tài liệu.
 - Mỗi bản CTO / BGĐ duyệt gắn một số; bản đã duyệt không sửa lại, thay đổi tiếp theo ra số mới.
 - Lịch sử và quy tắc đầy đủ: `docs/design/CHANGELOG.md`. Mỗi thay đổi DS thêm một dòng vào đó trong cùng PR.
+- 2.1.0 (ES1-T573, ĐỀ XUẤT tới khi CTO duyệt): minor. Thêm 20 token, 7 component trang chủ + 4 mảnh nhỏ lên kit, 7 section màn DS; Deprecated `--space-1…8`, `--radius-hero` (chưa xoá: xoá là major 3.0.0). Dòng CHANGELOG: bản vá ở `drafts/designer/ES1-T573/notes.md` (file ngoài phạm vi ghi của Designer agent).
+
+## 41. Component riêng trang chủ (2.1.0, ES1-T573, ĐỀ XUẤT; màn `h-level-card` … `h-quiz-opt`)
+
+Trước 2.1.0 mỗi component định nghĩa 2 lần: `ES1-T293/index.html` (≥ 80rem) và `ES1-T278` / `ES1-T279` (360, 768). Nay một định nghĩa ở kit (mục 13c), mobile-first: gốc = 360, `@48rem` = 768, `@80rem` = 1280 / 1920; số đo giữ đúng từng mốc như trang cũ (ảnh 6 khổ cao bằng nhau từng px). Bố cục section (`.hero`, `.mf`, `.quiz`, `.fp`, `.why`, `.bpanel`, `.intro`, lưới hàng, `.faq__aside`, `.faq__image`) vẫn ở trang. Trang không định nghĩa lại các selector dưới đây.
+
+### 41.1 Level card `.level-card`
+
+- Anatomy: `<a class="level-card">` > `img` (cover, focal 50% 15%) + `::before` gradient + `.level-card__body` (`__label`, `__title`, `__foot`).
+- Số đo: khung `--ratio-4-3` (< 48rem) / `--ratio-1-1`; bo `--radius-panel`; đệm 24 / 24 / 16 (360), 16 (768), `clamp(32, 2.0833vw, 40)` (≥ 80rem); nhãn Sofia 800 14/20 HOA +4%; tiêu đề Sofia 700 h3 28/36, h2 từ 80rem; chân 14/20 500, cao 44, vạch trắng 24%.
+- Trạng thái: < 80rem chân luôn hiện (cảm ứng, V31). ≥ 80rem chân ẩn (`max-height 0`, opacity 0), hiện khi hover / `:focus-visible` (trần `--size-1600`, 250 ms `--ease-out`); hover ảnh phóng 1.04 (500 ms), tắt khi giảm chuyển động. Focus vòng accent 2. Thiếu ảnh: nền `--color-background-dark`, chữ vẫn đọc.
+- A11y: cả thẻ một link, ảnh `alt=""`; AA chữ trắng trên gradient tối 85% (bắt đầu 35%) / 100% (bắt đầu 50%).
+
+### 41.2 Shop the look `.stl`
+
+- Markup thống nhất (ES1-T573 đổi markup 2 trang): `.stl` > `.stl__media` (img + `.hotspot` × n) + `.stl__body` > `.stl__list` (`.stl__fits`, `ul.stl__rows` > `li.option-card.stl-row`) + `.dpanel.stl__summary`. Đầu khối < 80rem: `.stl__head` (section-header + section-link); ≥ 80rem trang dùng `.shead`.
+- 360: một cột, ảnh → body cách 24; rows cách 12. 768: body 2 cột `1fr | 280`, cách 16, summary dính `header + 16`. ≥ 80rem: `.stl` lưới `--grid-columns` (12), ảnh 8 cột, body 4 cột flex dọc cách `clamp(16, 1.25vw, 24)`, `.stl__list` `display: contents`, fits cao `clamp(84, 5.2vw, 100)`, rows cách 8, summary `margin-top: auto` (đáy cột), không dính.
+- `.stl__fits`: sand, bo 8, đĩa icon `--size-1300` trắng, glyph 28; dòng 18/28 700 + 14/20 muted.
+- `.hotspot`: vùng chạm 44 (`--touch-target`); chấm trắng 20 + quầng trắng 40% 4; `aria-pressed="true"`: chấm 28 viền foreground 2 + quầng 60% 6. Bắt buộc `aria-label` "Show {tên} in the list".
+- `.stl-row`: `.option-card` đang xem = `is-checked` / `aria-current="true"` (viền accent, KHÔNG vòng check: tổng tính cả bộ); cả dòng là link (`a::after` phủ); hết hàng `is-disabled` + badge Sold out, tổng bỏ món đó.
+
+### 41.3 Video card `.vcard`
+
+- Khung `--ratio-9-16` nền tối; nút play phủ khung, đĩa 52 trắng 92%, glyph 16 × 18; hover accent + 1.06; focus thụt 4 vào trong (khung `overflow: hidden`).
+- Dòng sản phẩm `.product-row.vcard__product`: cao 76, đệm 12 (< 80rem); 84, đệm 12 / 16 (≥ 80rem); tên một dòng cắt "…" (ngoại lệ cắt: tên đầy đủ ở link và nhãn nút play).
+- `--error`: giữ khung, icon 24 + "Video unavailable." + link tới sản phẩm, chữ trắng.
+- Card rộng 252 (360), 264 (768, ≥ 1280) do hàng của trang đặt.
+
+### 41.4 Testimonial card `.tcard`
+
+- Ảnh `--ratio-16-9`; thân đệm 24, cách 12; meta (tên, Verified 14/20 muted-light + icon 16 `--color-badge-new`, sao); tiêu đề `.text-title` Inter 700 18/28; trích dẫn muted giãn; `.tcard__product` dưới vạch border, đệm trên 24.
+- < 80rem: meta xuống dòng, sao chiếm hàng riêng, tên 16 500. ≥ 80rem: một hàng, sao dạt phải, tên 14/20 600.
+- Partial: Verified mặc định tắt (E9); không gắn sản phẩm thì bỏ `.tcard__product`.
+
+### 41.5 Specs `.specs`
+
+- `dl` > `div` (`dt` muted 14/20, `dd` 16/24 500); hàng lẻ sand; viền border, bo 8.
+- 360: dt trên dd, đệm 12 / 16, cách 4. 768: 2 cột, dd căn cuối, đệm ngang 24, cách 16. ≥ 80rem: flex, cao tối thiểu `--size-1100` 44, đệm 8 / 24, cách trên 8.
+- Empty: không metafield thì không in bảng.
+
+### 41.6 FAQ stats `.faq__stats`
+
+- `ul` 2 ô (`.faq__stat`: `__label` eyebrow, `__value` Sofia 800 h1 dòng 1, `__text` 14/20 500). Ô 1 accent, ô 2 tối; chữ trắng (4.97:1, 17.4:1). Bo 8, cách 12.
+- 360: chồng đáy ảnh −48, lề 12, đệm 16. 768: tuyệt đối góc dưới trái khung ảnh, cách đáy 7.5%, rộng 80%, đệm 24. ≥ 80rem: cách đáy 40, rộng 79.6%.
+- Khung chứa (`.faq__aside`, position relative) do trang đặt.
+
+### 41.7 Quiz answer option `.option-card.quiz-opt`
+
+- Component riêng, KHÔNG gộp `.option-card--tile` hay đổi tên thành class chung: cột thumb tròn `--size-1100` 44 nền sand + chữ (`.quiz-opt__text`: `.option-card__title`, `.option-card__meta`); check 24 của `.option-card`.
+- Cao tối thiểu `--size-1800` 72 (< 48rem) / `--size-2000` 80; cách cột 12.
+- Trạng thái theo §30.2 (`.option-card`): hover viền foreground, chọn viền accent 2 + check accent, focus vòng accent, disabled nền alt.
+
+Quyết định CTO cần chốt (2.1.0):
+1. Tên thang kích thước: `--size-1000…2400` (bậc 100 = 4px, theo quy ước `--space-050` và §32.1 "không đặt tên theo giá trị") hay tên px (`--size-40…96`) như body ticket ES1-T573 gợi ý. ĐỀ XUẤT: giữ `--size-1000…2400` (nguồn: §32.1; kit `--space-050 / 150`).
+2. Duyệt 2.1.0 và các trạng thái Đề xuất 35–41. ĐỀ XUẤT: duyệt, giữ Đề xuất tới khi FE dựng (ES1-T548, T576, T580).
+3. `.filter-toggle__count` 24 → 20 (`--count-badge-size`): số có 2 chữ số rộng 28 (min-width 20 + đệm 4 × 2). ĐỀ XUẤT: chấp nhận (nguồn: notes ES1-T567 §8.3; một token số đếm cho giỏ và bộ lọc).
