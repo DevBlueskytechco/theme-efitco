@@ -594,6 +594,105 @@ modal-dialog {
   margin-block-start: var(--space-2);
 }
 
+/* Thông báo form (kit .form-message, foundation §12, §18; ES1-T545): thanh đầu 4px + icon theo trạng thái, chữ 14/20.
+   Tóm tắt lỗi form từ 2 trường: .form-message--error tabindex="-1" + .form-message__list (link tới từng trường).
+   Đặt trước footer: .site-footer__message đè khung trên nền tối */
+.form-message {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-inline-start-width: var(--space-1);
+  border-radius: var(--radius-input);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
+  overflow-wrap: anywhere;
+}
+
+.form-message[hidden],
+.product-form__error:empty {
+  display: none;
+}
+
+.form-message--success {
+  border-inline-start-color: var(--color-success);
+}
+
+.form-message--error {
+  border-inline-start-color: var(--color-critical);
+}
+
+.form-message .status-icon {
+  flex: none;
+  inline-size: var(--icon-size-sm);
+  block-size: var(--icon-size-sm);
+  margin-block-start: calc(var(--space-1) / 2);
+}
+
+.form-message--success .status-icon {
+  color: var(--color-success);
+}
+
+.form-message--error .status-icon {
+  color: var(--color-critical);
+}
+
+.form-message__body {
+  min-inline-size: 0;
+}
+
+.form-message__body > p {
+  margin: 0;
+}
+
+.form-message__title {
+  display: block;
+  color: var(--color-foreground);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-body);
+}
+
+.form-message__list {
+  display: grid;
+  gap: var(--space-1);
+  margin: var(--space-2) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Mục của trường hợp lệ ẩn sẵn (BE mở lại khi kiểm trên trình duyệt); hết mục thì bỏ khoảng trống */
+.form-message__list:not(:has(> li:not([hidden]))) {
+  display: none;
+}
+
+/* Link tóm tắt lỗi: vùng chạm 44 dưới 80rem (màn chạm), 24 từ 80rem (CTO 21/11 lượt 2) */
+.form-message__list a {
+  display: inline-flex;
+  align-items: center;
+  min-block-size: var(--touch-target);
+  color: var(--color-foreground);
+  font-weight: 500;
+  text-decoration: underline 1px;
+  text-underline-offset: 0.2em;
+}
+
+.form-message__list a:hover {
+  text-decoration-thickness: 2px;
+}
+
+.form-message[tabindex]:focus-visible,
+.form-message__list a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (min-width: 80rem) {
+  .form-message__list a {
+    min-block-size: var(--touch-target-min);
+  }
+}
+
 /* Empty state. Markup: snippets/empty-state.liquid */
 .empty-state {
   display: grid;
@@ -2006,10 +2105,12 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   border-inline-start: var(--space-1) solid var(--color-sale);
   border-radius: var(--radius-input);
   color: var(--color-background-dark-foreground);
+  font-size: inherit;
+  line-height: inherit;
 }
 
-.form-message--success {
-  border-inline-start-color: var(--color-badge-new);
+.site-footer__message.form-message--success {
+  border-inline-start-color: var(--color-success);
 }
 
 .site-footer__message-body {
@@ -3756,9 +3857,14 @@ product-variant-picker {
   resize: vertical;
 }
 
-.product-form__hint {
+.product-form__hint,
+.product-form__optional {
   color: var(--color-muted);
   font-size: var(--font-size-sm);
+}
+
+.product-form__optional {
+  font-weight: 500;
 }
 
 /* Variant picker: không JS thì select trong noscript chọn variant, ẩn radio để không có 2 bộ chọn */
@@ -4144,6 +4250,34 @@ product-variant-picker:not(:defined) {
   display: grid;
 }
 
+/* Lỗi trường gift card (product-shopify-features §6): viền 2px + câu có icon, BE ES1-T554 bật aria-invalid, bỏ hidden */
+.product-form__input[aria-invalid='true'] {
+  border-color: var(--color-critical);
+  box-shadow: inset 0 0 0 1px var(--color-critical);
+}
+
+.product-form__field-error {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  color: var(--color-critical);
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  line-height: var(--line-height-sm);
+}
+
+.product-form__field-error[hidden] {
+  display: none;
+}
+
+.product-form__field-error .status-icon {
+  flex: none;
+  inline-size: var(--icon-size-sm);
+  block-size: var(--icon-size-sm);
+  margin-block-start: calc(var(--space-1) / 2);
+}
+
 /* Buy buttons */
 .product-form__buy-buttons {
   display: grid;
@@ -4279,14 +4413,6 @@ product-variant-picker:not(:defined) {
   font-weight: 600;
 }
 
-/* Live region lỗi: rỗng thì không chiếm chỗ, BE ES1-T67 điền text API */
-.product-form__error:not(:empty) {
-  padding: var(--space-3) var(--space-4);
-  border-inline-start: 2px solid var(--color-sale);
-  background-color: var(--color-background-alt);
-  color: var(--color-background-alt-foreground);
-  font-size: var(--font-size-sm);
-}
 
 /** Sale countdown (ADR 0009, countdown.md §1–§5; snippets/sale-countdown): featured product, PDP, big offer.
    Compact khi khung chứa < 23rem, Regular từ 23rem (data-size regular); data-size compact luôn Compact (CD1).

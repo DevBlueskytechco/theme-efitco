@@ -8,7 +8,9 @@
 
   States, all rendered by Liquid:
   - field error: input aria-invalid + aria-describedby, sentence with icon under
-    the field; the summary box (role="alert") lists a link per wrong field;
+    the field; the summary box .form-message--error (role="alert", tabindex -1,
+    foundation §12) says "Check {n} field(s)" and lists a link per wrong field
+    ("Name: enter your name", .form-message__list, 44 tall under 80rem);
   - general error (form.errors contains 'form', for example a spam check): an
     .alert box above the fields, typed values stay in the fields;
   - success (form.posted_successfully?): a role="status" box with a secondary
@@ -24,6 +26,8 @@
   - summary data-contact-summary (hidden when no field error), title
     data-contact-summary-title, data-label-1..3 hold "Check {n} field(s)",
     list items data-contact-summary-for="<input id>" (hidden when that field is fine);
+    the same box also carries the shared hooks data-form-summary, data-form-summary-title,
+    data-form-summary-for (ES1-T545, for assets/form-errors.js in ES1-T554);
   - error sentences #ContactNameError, #ContactEmailError, #ContactBodyError
     (hidden when the field is fine); the hint #ContactBodyHint is always described.
   Loading: the script sets aria-busy="true" on the submit button (spinner from
@@ -141,10 +145,11 @@
       {%- endif -%}
 
       <div
-        class="alert contact-form__summary"
+        class="form-message form-message--error contact-form__summary"
         role="alert"
         tabindex="-1"
         data-contact-summary
+        data-form-summary
         data-label-1="{{ summary_label_1 | escape }}"
         data-label-2="{{ summary_label_2 | escape }}"
         data-label-3="{{ summary_label_3 | escape }}"
@@ -153,37 +158,40 @@
           hidden
         {% endif %}
       >
-        <span class="alert__icon">{% render 'status-icon', name: 'error' %}</span>
-        <div class="alert__body">
-          <p class="alert__title" data-contact-summary-title>
+        {%- render 'status-icon', name: 'error' -%}
+        <div class="form-message__body">
+          <strong class="form-message__title" data-contact-summary-title data-form-summary-title>
             {%- if field_error_count > 0 -%}
               {{- 'contact.check_fields' | t: count: field_error_count -}}
             {%- endif -%}
-          </p>
-          <ul class="contact-form__summary-list" role="list">
+          </strong>
+          <ul class="form-message__list" role="list">
             <li
               data-contact-summary-for="ContactName"
+              data-form-summary-for="ContactName"
               {% unless name_error %}
                 hidden
               {% endunless %}
             >
-              <a class="contact-form__link" href="#ContactName" data-testid="contact-error-summary-link">{{ 'contact.error_name' | t }}</a>
+              <a href="#ContactName" data-testid="contact-error-summary-link">{{ 'contact.summary_name' | t }}</a>
             </li>
             <li
               data-contact-summary-for="ContactEmail"
+              data-form-summary-for="ContactEmail"
               {% unless email_error %}
                 hidden
               {% endunless %}
             >
-              <a class="contact-form__link" href="#ContactEmail" data-testid="contact-error-summary-link">{{ 'contact.error_email' | t }}</a>
+              <a href="#ContactEmail" data-testid="contact-error-summary-link">{{ 'contact.summary_email' | t }}</a>
             </li>
             <li
               data-contact-summary-for="ContactBody"
+              data-form-summary-for="ContactBody"
               {% unless body_error %}
                 hidden
               {% endunless %}
             >
-              <a class="contact-form__link" href="#ContactBody" data-testid="contact-error-summary-link">{{ 'contact.error_body' | t }}</a>
+              <a href="#ContactBody" data-testid="contact-error-summary-link">{{ 'contact.summary_body' | t }}</a>
             </li>
           </ul>
         </div>
