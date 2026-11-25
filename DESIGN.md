@@ -73,7 +73,8 @@ lives in `docs/tokens.json` `_version`; rules and history are in
   kit is not changed to match a setting. A CTO decision in
   `docs/design/decisions.md` is applied to the kit first. Known mismatches
   waiting for FE: `badge_new_color` #467A48 → #4B824D (V01),
-  `background_alt_color` #F4F4F4 → #F4F4F5 (V18), spacing steps 2, 6, 20, 40,
+  `background_alt_color` #F4F4F4 → #F4F4F5 (V18), `type_primary_font`
+  inter_n4 → inter_n5 (V05), spacing steps 2, 6, 20, 40,
   64, 80 and the name `--space-4xl` for 48, per-step line heights, body line
   height 1.625 → 1.5, `--band-inset` 60 → 64, `--tab-padding-inline` 28 → 24.
   Every `:root` variable is declared in `snippets/css-variables.liquid`, not
