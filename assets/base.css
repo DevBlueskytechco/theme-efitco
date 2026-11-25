@@ -872,7 +872,6 @@ modal-dialog {
   fill: currentcolor;
 }
 
-/* Cách mép 8 dưới 64rem, 16 từ 64rem: card 152 phải chứa đủ 2 badge */
 .product-card__badge {
   position: absolute;
   inset-block-start: var(--space-2);
@@ -891,7 +890,6 @@ modal-dialog {
   pointer-events: none;
 }
 
-/* Badge dài hơn bề ngang ảnh (foundation.md §37): chọn thêm, tối đa 2 dòng, bo 12 thay pill. Giá trị theo kit.css */
 .badge--wrap {
   max-inline-size: 100%;
   padding-block: var(--space-1);
@@ -918,13 +916,10 @@ modal-dialog {
   color: var(--color-badge-new-foreground);
 }
 
-/* Sold out > -N% > New: JS chỉ đổi [data-card-badge], nên New tự theo swatch đang chọn */
 [data-card-badge]:not([hidden]) ~ .product-card__badge--new {
   display: none;
 }
 
-/* Figma 1:502 Review: pill trắng 62 × 28, viền trong 1px, sao 14 × 13 + số.
-   Dưới 64rem padding 8: "Sold out" + rating vẫn vừa card 152 */
 .product-card__rating {
   position: absolute;
   inset-block-start: var(--space-2);
@@ -2791,8 +2786,7 @@ localization-picker[data-tabs] .localization__tabs {
   white-space: nowrap;
 }
 
-/* Nhãn dịch dài hơn khung (foundation.md §37): chọn thêm, chữ xuống dòng trong nút, nút cao lên.
-   Không cắt "…", không thu chữ, không khoá bề rộng. Giá trị theo kit.css */
+/* Nhãn dài (foundation §37, kit): .button--wrap, .badge--wrap */
 .button--wrap {
   max-inline-size: 100%;
   padding-block: var(--space-2);
@@ -6799,7 +6793,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-header__icon svg { display: block; }
 
   .button { font-family: var(--font-primary--family); font-size: 16px; line-height: 26px; font-weight: 600; letter-spacing: -0.16px; padding: 13px 32px; border-width: 0; border-radius: var(--figma-radius-8); gap: 8px; min-height: 52px; }
-  /* .button ngay trên ghi đè padding-block của .button--wrap: đặt lại theo kit */
   .button--wrap { padding-block: var(--space-2); }
 
   /* Dải tối: hero + danh mục cùng nền var(--figma-1a1a1a) tới y=1515 */
