@@ -771,7 +771,6 @@ test.describe('ES1-T122 AC6 testimonials đo và a11y', () => {
   });
 
   test('TC-30 AC6 1280: nút tắt dùng cặp màu disabled, không opacity', async ({ page }) => {
-    test.fail(true, BUG.disabled);
     await open(page, TE7, 1280);
     const scope = band(page, 'te7-testimonials');
     await enhanced(scope);
