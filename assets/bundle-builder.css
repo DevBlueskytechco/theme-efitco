@@ -1,11 +1,9 @@
 /* CSS tầng 4 (ADR 0014): nạp bằng stylesheet_tag trong blocks/bundle-builder.liquid, sau base.css. Trần 8 192 B gzip. */
 
-/* Góc này là vòng chọn của bundle */
 .bundle-builder__item .product-card__rating {
   display: none;
 }
 
-/** Bundle builder: padding 120, lưới 807 + panel 576, panel không kéo dài theo lưới */
 bundle-form {
   display: block;
 }
@@ -70,7 +68,6 @@ bundle-form {
   text-underline-offset: 0.2em;
 }
 
-/* Dưới 64rem panel nằm dưới lưới, cách 32 (index-mobile-b §1) */
 .bundle-builder__form {
   display: grid;
   gap: var(--space-6);
@@ -93,7 +90,6 @@ bundle-form {
   list-style: none;
 }
 
-/* Bo góc Figma 16: ôm ảnh bo --radius-card. Padding 8 ở 360 (ảnh 136), 12 từ 48rem (ảnh 208) */
 .bundle-builder__item {
   --bundle-ring: calc(var(--space-1) * 6);
   --bundle-ring-inset: var(--space-2);
@@ -106,7 +102,6 @@ bundle-form {
   color: var(--color-foreground);
 }
 
-/* Cả card là vùng chọn (AC8); tên nổi lên trên để vẫn bấm được link */
 .bundle-builder__item .product-card__title {
   position: relative;
   z-index: var(--layer-content);
@@ -119,7 +114,6 @@ bundle-form {
   cursor: pointer;
 }
 
-/* Vòng chọn 24 cách góc 8 (360) / 12 (768); Figma 1920: 20 cách 8 */
 .bundle-builder__input,
 .bundle-builder__select::before,
 .bundle-builder__select::after {
@@ -130,7 +124,6 @@ bundle-form {
   block-size: var(--bundle-ring);
 }
 
-/* Input trong suốt nằm trên vòng: label bên dưới mở rộng vùng bấm */
 .bundle-builder__input {
   z-index: var(--layer-content);
   margin: 0;
@@ -150,7 +143,6 @@ bundle-form {
   background-color: var(--color-accent);
 }
 
-/* Dấu tick vẽ bằng clip-path: không phải icon hướng, không lật khi RTL */
 .bundle-builder__input:checked + .bundle-builder__select::after {
   background-color: var(--color-accent-foreground);
   clip-path: polygon(24% 52%, 33% 43%, 44% 54%, 67% 31%, 76% 40%, 44% 72%);
@@ -176,7 +168,6 @@ bundle-form {
   opacity: 0.6;
 }
 
-/* Nền panel (CR-9). Chữ phụ --panel-muted (FD1, 6.56:1), dòng giảm --panel-saving + icon + dấu − */
 .bundle-builder__panel {
   display: grid;
   gap: var(--space-5);
@@ -187,7 +178,6 @@ bundle-form {
   color: var(--color-background-dark-foreground);
 }
 
-/* 2 cột chỉ ở 48–64rem; mốc khác panel xếp con trực tiếp như trước */
 .bundle-builder__panel-main,
 .bundle-builder__panel-side {
   display: contents;
@@ -223,8 +213,6 @@ bundle-form {
   white-space: nowrap;
 }
 
-/* 0 món (AC8, HB1): nút panel và nút thanh mờ, không nhận chuột; bundle-form.js gắn disabled thật.
-   Số liệu panel do Liquid in sẵn theo món chọn sẵn nên không cần ẩn trước khi module chạy */
 .bundle-builder:not(:has([data-bundle-item]:checked)) :is([data-bundle-submit], [data-bundle-bar-submit]),
 .bundle-builder :is([data-bundle-submit], [data-bundle-bar-submit]):disabled:not([aria-busy='true']) {
   border-color: var(--color-border);
@@ -335,7 +323,6 @@ bundle-form {
   content: '';
 }
 
-/* Icon khoá khi còn bậc kế, tick khi đã đạt bậc cao nhất (data-done) */
 .bundle-builder__progress-text {
   display: flex;
   align-items: center;
@@ -359,7 +346,6 @@ bundle-form {
   mask-image: var(--icon-tick);
 }
 
-/* Cao nút 48 dưới 80rem; từ 80rem do .button (52) ở base.css, như trước khi tách (ADR 0014) */
 .bundle-builder__submit {
   inline-size: 100%;
 }
@@ -401,8 +387,6 @@ bundle-form {
   }
 }
 
-/* Thanh dính bundle < 48rem (TE-12 AC6, HB1; index-mobile-b §1.1). Hiện khi bundle-form.js bỏ hidden và
-   gắn html[data-bottom-bar="bundle"]; cao 72 + safe area (nút 48 + 12 × 2), cao thêm khi có ô lỗi */
 .bundle-bar {
   position: fixed;
   inset-inline: 0;
@@ -419,13 +403,11 @@ bundle-form {
   translate: 0 100%;
 }
 
-/* Lớp mở hoặc consent: luật ẩn chung ở đầu file (layers §2.3) thắng nhờ :not() */
 html[data-bottom-bar='bundle']:not([data-layer-open], [data-consent]) .bundle-bar {
   visibility: visible;
   translate: none;
 }
 
-/* Ô lỗi trên hàng nút: nền trắng, viền --color-sale (đỏ trên panel chỉ 1.79:1). role="alert" luôn trong cây */
 .bundle-bar__alert {
   display: flex;
   align-items: flex-start;
@@ -523,7 +505,6 @@ html[data-bottom-bar='bundle']:not([data-layer-open], [data-consent]) .bundle-ba
     display: none;
   }
 
-  /* 768: panel dưới lưới chia 2 cột 316 + 316, gap 32, padding 32 (index-mobile-b §1, ĐỀ XUẤT đã chốt) */
   .bundle-builder__panel {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-6);
@@ -539,8 +520,6 @@ html[data-bottom-bar='bundle']:not([data-layer-open], [data-consent]) .bundle-ba
   }
 }
 
-/* Từ 64rem: lưới 7 cột trang + panel 5 cột, gutter 24 (index-1280 R1, khối 9): 1280 panel 503, 1920 panel 576.
-   Padding panel clamp(32, 2.5vw, 40): 1280 = 32, 1920 = 40 */
 @media (min-width: 64rem) {
   .bundle-builder {
     gap: calc(var(--space-1) * 10);
@@ -569,18 +548,15 @@ html[data-bottom-bar='bundle']:not([data-layer-open], [data-consent]) .bundle-ba
   }
 }
 
-/* ==== Trang chủ theo Figma 1:359, khung 1920 (CTO 07/11). Số đo lấy từ snapshot, không làm tròn. ==== */
 @media (min-width: 80rem) {
   .bundle-builder__link { line-height: 28px; align-self: flex-end; min-height: 0; padding: 0; position: relative; inset-block-start: 1px; inset-inline-start: -1px; }
 
-  /* Bundle: 7 + 5 cột trang, gutter 24 (index-1280 R1, khối 9; lưới form ở khối 64rem); vòng chọn Figma 20 cách 8 */
   .bundle-builder__item { --bundle-ring: 20px; --bundle-ring-inset: 8px; }
   .bundle-builder__list { gap: 24px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .bundle-builder__panel { min-height: 658px; padding: clamp(32px, 2.5vw, 40px); border-radius: var(--figma-radius-16); background: var(--figma-393942); display: flex; flex-direction: column; gap: 0; }
   .bundle-builder__panel-header { padding-block-end: 24px; margin: 0 0 -1px; border-block-end: 1px solid var(--figma-4d4d4d); }
   .bundle-builder__panel-title { margin: 0; font-size: 18px; line-height: 28px; font-weight: 700; letter-spacing: -0.18px; }
   .bundle-builder__count { height: 28px; padding: 3px 12px; border-radius: var(--figma-radius-18); background: var(--color-accent); color: var(--figma-ffffff); font-size: 13px; line-height: 20px; font-weight: 600; letter-spacing: -0.26px; }
-  /* Giữ khung cố định: chọn hàng không làm panel nhảy */
   .bundle-builder__selection { padding-block: 24px; margin-block: -1px; border-block-end: 1px solid var(--figma-4d4d4d); position: relative; min-block-size: 194px; }
   .bundle-builder__lines { display: grid; align-content: start; gap: 4px; block-size: 146px; margin: 0; padding: 0; overflow-y: auto; scrollbar-width: none; list-style: none; }
   .bundle-builder__lines:empty { display: none; }
@@ -600,13 +576,11 @@ html[data-bottom-bar='bundle']:not([data-layer-open], [data-consent]) .bundle-ba
   .bundle-builder__actions { margin-block-start: 24px; }
   .bundle-builder__submit { width: 100%; background: var(--color-accent); color: var(--figma-ffffff); }
 
-  /* Tinh chỉnh ±px theo so pixel với frame Figma */
   .bundle-builder__eyebrow { position: relative; inset-block-start: 1px; }
   .bundle-builder__panel-title { position: relative; inset-block-start: 1px; }
   .bundle-builder__select { translate: 1px 0; }
 }
 
-/* ==== Trải nghiệm mượt. Không đổi bố cục tĩnh. ==== */
 .bundle-builder__submit:disabled:not([aria-busy='true']) { opacity: 0.55; cursor: not-allowed; }
 
 @media (prefers-reduced-motion: no-preference) {
