@@ -9,8 +9,13 @@
   storefront renders nothing and the editor shows how to turn comments on.
 
   The form works without JavaScript: Shopify posts it and reloads the article.
-  - form.errors: summary role="alert" "Check {n} fields" (tabindex -1), an error
-    with an icon under each field (aria-invalid, aria-describedby), typed text kept.
+  - form.errors: summary .form-message--error #CommentFormErrors (role="alert",
+    tabindex -1, foundation §12) "Check {n} field(s)" plus a link per wrong field
+    (.form-message__list, href #CommentAuthor / #CommentEmail / #CommentBody), an
+    error with an icon under each field (aria-invalid, aria-describedby), typed text
+    kept. Summary, list items and sentences are always rendered, hidden when fine,
+    so a client check can open them: data-form-summary (data-label-1..3),
+    data-form-summary-title, li[data-form-summary-for="<input id>"], #<input id>Error.
   - form.posted_successfully?: role="status" box (tabindex -1) at the top of the
     form, "in review" text when blog.moderated?, fields empty.
   - blog.moderated?: note "Comments are reviewed before they appear." above the fields.
@@ -26,7 +31,7 @@
   Test hooks: data-testid="article-comments", "article-comments-heading",
   "article-comments-list", "article-comment", "article-comments-empty",
   "comment-form", "comment-moderated-note", "comment-status", "comment-errors",
-  "comment-submit", "article-comments-placeholder"; pagination hooks in
+  "comment-error-summary-link", "comment-submit", "article-comments-placeholder"; pagination hooks in
   snippets/pagination.liquid.
 
   @example
@@ -89,23 +94,25 @@
         assign form_error = false
         assign field_errors = 0
         if form.errors
-          for field in form.errors
-            if field == 'form'
-              assign form_error = true
-            else
-              assign field_errors = field_errors | plus: 1
-            endif
-          endfor
+          if form.errors contains 'form'
+            assign form_error = true
+          endif
           if form.errors contains 'author'
             assign author_error = true
+            assign field_errors = field_errors | plus: 1
           endif
           if form.errors contains 'email'
             assign email_error = true
+            assign field_errors = field_errors | plus: 1
           endif
           if form.errors contains 'body'
             assign body_error = true
+            assign field_errors = field_errors | plus: 1
           endif
         endif
+        assign summary_label_1 = 'blog.comment_errors_summary' | t: count: 1
+        assign summary_label_2 = 'blog.comment_errors_summary' | t: count: 2
+        assign summary_label_3 = 'blog.comment_errors_summary' | t: count: 3
 
         assign value_author = form.author
         assign value_email = form.email
@@ -131,28 +138,60 @@
         </div>
       {%- endif -%}
 
-      {%- if form.errors -%}
-        <div
-          class="form-status form-status--error"
-          role="alert"
-          tabindex="-1"
-          id="CommentFormErrors"
-          data-testid="comment-errors"
-        >
-          <span class="form-status__icon">{% render 'status-icon', name: 'error' %}</span>
-          <div class="form-status__body">
+      <div
+        class="form-message form-message--error"
+        role="alert"
+        tabindex="-1"
+        id="CommentFormErrors"
+        data-form-summary
+        data-label-1="{{ summary_label_1 | escape }}"
+        data-label-2="{{ summary_label_2 | escape }}"
+        data-label-3="{{ summary_label_3 | escape }}"
+        data-testid="comment-errors"
+        {% unless form.errors %}
+          hidden
+        {% endunless %}
+      >
+        {%- render 'status-icon', name: 'error' -%}
+        <div class="form-message__body">
+          <strong class="form-message__title" data-form-summary-title>
             {%- if field_errors > 0 -%}
-              <p class="form-status__title">{{ 'blog.comment_errors_summary' | t: count: field_errors }}</p>
-              <p>{{ 'blog.comment_errors_hint' | t }}</p>
-            {%- else -%}
-              <p class="form-status__title">{{ 'blog.comment_errors_title' | t }}</p>
+              {{- 'blog.comment_errors_summary' | t: count: field_errors -}}
+            {%- elsif form.errors -%}
+              {{- 'blog.comment_errors_title' | t -}}
             {%- endif -%}
-            {%- if form_error -%}
-              <p>{{ form.errors.messages['form'] }}</p>
-            {%- endif -%}
-          </div>
+          </strong>
+          {%- if form_error -%}
+            <p>{{ form.errors.messages['form'] }}</p>
+          {%- endif -%}
+          <ul class="form-message__list" role="list">
+            <li
+              data-form-summary-for="CommentAuthor"
+              {% unless author_error %}
+                hidden
+              {% endunless %}
+            >
+              <a href="#CommentAuthor" data-testid="comment-error-summary-link">{{ 'blog.comment_summary_author' | t }}</a>
+            </li>
+            <li
+              data-form-summary-for="CommentEmail"
+              {% unless email_error %}
+                hidden
+              {% endunless %}
+            >
+              <a href="#CommentEmail" data-testid="comment-error-summary-link">{{ 'blog.comment_summary_email' | t }}</a>
+            </li>
+            <li
+              data-form-summary-for="CommentBody"
+              {% unless body_error %}
+                hidden
+              {% endunless %}
+            >
+              <a href="#CommentBody" data-testid="comment-error-summary-link">{{ 'blog.comment_summary_body' | t }}</a>
+            </li>
+          </ul>
         </div>
-      {%- endif -%}
+      </div>
 
       {%- if blog.moderated? -%}
         <p class="comment-form__note" data-testid="comment-moderated-note">
@@ -180,12 +219,16 @@
               aria-describedby="CommentAuthorError"
             {% endif %}
           >
-          {%- if author_error -%}
-            <p id="CommentAuthorError" class="form-field__error">
-              {%- render 'status-icon', name: 'error' -%}
-              <span>{{ 'blog.comment_error_author' | t }}</span>
-            </p>
-          {%- endif -%}
+          <p
+            id="CommentAuthorError"
+            class="form-field__error"
+            {% unless author_error %}
+              hidden
+            {% endunless %}
+          >
+            {%- render 'status-icon', name: 'error' -%}
+            <span>{{ 'blog.comment_error_author' | t }}</span>
+          </p>
         </div>
 
         <div class="form-field">
@@ -209,12 +252,16 @@
               aria-describedby="CommentEmailHint"
             {% endif %}
           >
-          {%- if email_error -%}
-            <p id="CommentEmailError" class="form-field__error">
-              {%- render 'status-icon', name: 'error' -%}
-              <span>{{ 'blog.comment_error_email' | t }}</span>
-            </p>
-          {%- endif -%}
+          <p
+            id="CommentEmailError"
+            class="form-field__error"
+            {% unless email_error %}
+              hidden
+            {% endunless %}
+          >
+            {%- render 'status-icon', name: 'error' -%}
+            <span>{{ 'blog.comment_error_email' | t }}</span>
+          </p>
           <p id="CommentEmailHint" class="form-field__hint">{{ 'blog.email_hint' | t }}</p>
         </div>
 
@@ -234,12 +281,16 @@
               aria-describedby="CommentBodyError"
             {% endif %}
           >{{ value_body }}</textarea>
-          {%- if body_error -%}
-            <p id="CommentBodyError" class="form-field__error">
-              {%- render 'status-icon', name: 'error' -%}
-              <span>{{ 'blog.comment_error_body' | t }}</span>
-            </p>
-          {%- endif -%}
+          <p
+            id="CommentBodyError"
+            class="form-field__error"
+            {% unless body_error %}
+              hidden
+            {% endunless %}
+          >
+            {%- render 'status-icon', name: 'error' -%}
+            <span>{{ 'blog.comment_error_body' | t }}</span>
+          </p>
         </div>
       </div>
 
