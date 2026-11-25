@@ -190,9 +190,7 @@ modal-dialog {
   }
 }
 
-/* Nút tròn 52 prev/next, phân trang: trắng, viền border; rê chuột nền accent.
-   Icon: snippets/slideshow-icon previous/next. Đầu/cuối hàng: aria-disabled không làm mờ — nền trắng,
-   viền border, icon muted-light (kit .round-button[aria-disabled], foundation §6); dải tối ở cuối file. */
+/* Nút tròn 52 prev/next, phân trang; tắt: cặp màu kit, không mờ (ES1-T543) */
 .round-button {
   display: inline-flex;
   flex: none;
@@ -7054,16 +7052,11 @@ scroll-buttons.video-carousel__scroller { display: grid; grid-template-columns: 
 .video-carousel__row > .carousel-nav { margin-inline-start: auto; }
 .video-carousel__link + .carousel-nav { margin-inline-start: 0; }
 @media (min-width: 48rem) { .carousel-nav { display: flex; } }
-/* visibility giữ chỗ (CLS 0) và bỏ nút khỏi thứ tự Tab, cây a11y */
 scroll-buttons:not([data-enhanced]) .carousel-nav,
 scroll-buttons[data-static] .carousel-nav { visibility: hidden; }
-/* Đầu/cuối hàng: aria-disabled theo .round-button (không làm mờ). hidden của scroll-buttons.js hiện tại
-   vẫn ẩn nút nhưng giữ chỗ để nút kia không nhảy */
 .carousel-nav .round-button[hidden] { display: inline-flex; visibility: hidden; }
-/* Dải tối (danh mục): nút trắng viền trắng, focus trắng; tiến trình trắng 12% / thumb trắng */
 .block-container--dark .round-button { border-color: var(--color-background); }
 .block-container--dark .round-button:focus-visible { outline-color: var(--color-background-dark-foreground); }
-/* Disabled trên nền tối: đĩa trắng không phân biệt được với nút bật → nền trong suốt, viền + icon muted-on-dark (kit) */
 .block-container--dark .round-button:is(:disabled, [aria-disabled='true']) { border-color: var(--color-muted-on-dark); background: transparent; color: var(--color-muted-on-dark); }
 
 .collection-list__track, .testimonials__list, .blog-posts__list, .video-carousel__list {
