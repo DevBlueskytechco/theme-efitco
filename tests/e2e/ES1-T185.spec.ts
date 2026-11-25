@@ -1,7 +1,7 @@
 // KHÔNG CHẮC: spec chưa chạy, chưa type-check (phiên viết không có trình duyệt và preview; CTO 06/11: e2e tắt tới khi trang chủ xong).
 // Ticket ES1-T185 TE-15-BE1: assets/scroll-buttons.js qua lazy-module (docs/srs.md AC-H8, AC-H9 phần JS; plan ES1-T169 D6).
 // ES1-T335 (TE-7 AC1, AC6; sổ 10/11 câu 5): trần 768 → 1 536 B (ADR 0010, trả lời ES1-T209); nút đầu/cuối không còn
-// hidden mà aria-disabled="true" (mờ 0.35, giữ chỗ); hàng vừa khung: data-static, CSS ẩn cả 2 nút.
+// hidden mà aria-disabled="true" (cặp màu disabled theo ES1-T543, không mờ; giữ chỗ); hàng vừa khung: data-static, CSS ẩn cả 2 nút.
 // Chạy: PREVIEW_URL=... STORE_PASSWORD=... npx playwright test tests/e2e/ES1-T185.spec.ts tests/e2e/ES1-T184.spec.ts
 // Dùng /?view=te15 (collection all, không cần dữ liệu nhập). Nút chỉ hiện từ 48rem nên test bấm đặt viewport 1024 ở cả desktop và Pixel 7:
 // 1024 còn đủ chỗ cuộn nhiều card; 1920 chỉ cuộn được dưới 1 card vì khung cuộn chặn ở cuối.
@@ -10,6 +10,7 @@ import { test, expect, type Page } from './support/test';
 import AxeBuilder from '@axe-core/playwright';
 import { expectNotChallenged } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
+import { expectRoundDisabled } from './support/round-disabled';
 
 const TE15 = '/?view=te15';
 const JS_FILE = 'assets/scroll-buttons.js';
@@ -179,7 +180,7 @@ test.describe('ES1-T185 nút đầu/cuối (ES1-T335)', () => {
     await off(prev(page));
     await on(next(page));
     await expect(prev(page)).toBeVisible();
-    await expect(prev(page)).toHaveCSS('opacity', '0.35');
+    await expectRoundDisabled(prev(page));
     await expect(root(page)).not.toHaveAttribute('data-static', '');
     const box = await next(page).boundingBox();
 

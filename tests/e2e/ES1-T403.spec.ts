@@ -38,7 +38,7 @@ test.describe('ES1-T403 tĩnh', () => {
     for (const file of ['assets/base.css', 'assets/product.css']) expect(read(file)).not.toContain('product-info__description');
   });
 
-  test('D5 line-clamp / ellipsis chỉ còn ở tên shop (critical) và badge article-card__tag', () => {
+  test('D5 line-clamp / ellipsis chỉ còn ở tên shop (critical) và select sort', () => {
     const hits: string[] = [];
     // ES1-T478: quét cả file CSS theo template (ADR 0013); ES1-T565: thêm 5 file block, ES1-T566: thêm multicolumn, hello-world (ADR 0014; CTO 21/11 ES1-T575)
     const blockFiles = [
@@ -53,8 +53,9 @@ test.describe('ES1-T403 tĩnh', () => {
     }
     expect(hits.some((h) => /title/.test(h))).toBe(false);
     // AC thay: ui-spec collection.md §Sort (ES1-T365) — giá trị sort dài cắt "…"; D5 chỉ cấm cắt TÊN, assert /title/ giữ nguyên.
-    // ES1-T478 (ADR 0013): rule sort ở collection.css; ngoài critical chỉ 2 chỗ này được cắt.
-    expect(hits.filter((h) => !h.startsWith('assets/critical.css'))).toEqual(['assets/base.css: .article-card__tag', 'assets/collection.css: .collection-toolbar__select']);
+    // ES1-T478 (ADR 0013): rule sort ở collection.css; ngoài critical chỉ chỗ này được cắt.
+    // ES1-T579 (§37, ES1-T567): tag bài viết .article-card__tag không còn cắt "…".
+    expect(hits.filter((h) => !h.startsWith('assets/critical.css'))).toEqual(['assets/collection.css: .collection-toolbar__select']);
   });
 
   test('C8 viền radio quiz không dùng #999 (2.85:1)', () => {
