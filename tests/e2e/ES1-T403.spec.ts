@@ -67,7 +67,7 @@ test.describe('ES1-T403 tĩnh', () => {
     for (const body of marks) expect(body).not.toContain('--figma-999999');
   });
 
-  test('§28 h2–h5 giảm dần, h5 ≠ h6 trong .rte; bảng cuộn ngang, trang không tràn', async ({ page }) => {
+  test('§28 h2–h5 giảm dần, h5 ≠ h6 trong .rte; bảng vừa cột, trang không tràn', async ({ page }) => {
     await rteFixture(page);
     const h5 = await style(page, '.rte h5');
     const h6 = await style(page, '.rte h6');
@@ -77,9 +77,10 @@ test.describe('ES1-T403 tĩnh', () => {
     const sizes = await Promise.all(['h2', 'h3', 'h4', 'h5'].map(async (h) => parseFloat((await style(page, `.rte ${h}`)).fontSize)));
     expect(sizes).toEqual([...sizes].sort((a, b) => b - a));
     expect(new Set(sizes).size).toBe(4);
+    // ES1-T547: bảng giữ display table, ô 400 ký tự liền xuống dòng trong ô, bảng vừa cột .rte
     const table = await style(page, '.rte table');
-    expect(table.display).toBe('block');
-    expect(table.overflowX).toBe('auto');
+    expect(table.display).toBe('table');
+    expect(await page.locator('.rte table').evaluate((el) => el.scrollWidth <= el.closest('.rte')!.clientWidth)).toBe(true);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   });
 });
