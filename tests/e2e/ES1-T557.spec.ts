@@ -139,7 +139,10 @@ test.describe('ES1-T557 AC2 slideshow RTL', () => {
     return count;
   }
 
-  test('next → slide 2 inert=false, chấm 2 aria-current, track cuộn âm; prev từ slide 1 → slide cuối', async ({ page }) => {
+  // Mũi tên chỉ hiện từ 48rem, chấm chỉ dưới 48rem (ES1-T333 AC7): next/prev đo ở 1280, chấm đo ở 360.
+  test('1280: next → slide 2 inert=false, chấm 2 aria-current, track cuộn âm; prev từ slide 1 → slide cuối', async ({ page }) => {
+    desktopOnly({}, test.info());
+    await page.setViewportSize({ width: 1280, height: 800 });
     const errors = watchConsole(page);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await forceRtl(page);
@@ -155,13 +158,37 @@ test.describe('ES1-T557 AC2 slideshow RTL', () => {
     expect(await inFrame(page, 1)).toBe(true);
     expect(await page.getByTestId('slideshow-track').evaluate((el) => el.scrollLeft)).toBeLessThan(0);
 
-    // Về slide 1 bằng chấm, rồi prev vòng về slide cuối
-    await dots.nth(0).click();
+    // Về slide 1 bằng prev, rồi prev vòng về slide cuối
+    await page.getByTestId('slideshow-prev').click();
     await expect.poll(() => activeIndex(page)).toBe(0);
+    await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true');
     await page.getByTestId('slideshow-prev').click();
     await expect.poll(() => activeIndex(page)).toBe(count - 1);
     await expect(dots.nth(count - 1)).toHaveAttribute('aria-current', 'true');
     expect(await inFrame(page, count - 1)).toBe(true);
+    expect(errors).toEqual([]);
+  });
+
+  test('360: bấm chấm 2 → slide 2 inert=false, aria-current, track cuộn âm; chấm 1 về đầu', async ({ page }) => {
+    desktopOnly({}, test.info());
+    await page.setViewportSize({ width: 360, height: 800 });
+    const errors = watchConsole(page);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await forceRtl(page);
+    await open(page);
+    const dots = page.getByTestId('slideshow-dot');
+    await expect.poll(() => activeIndex(page)).toBe(0);
+
+    await dots.nth(1).click();
+    await expect.poll(() => activeIndex(page)).toBe(1);
+    await expect(dots.nth(1)).toHaveAttribute('aria-current', 'true');
+    expect(await inFrame(page, 1)).toBe(true);
+    expect(await page.getByTestId('slideshow-track').evaluate((el) => el.scrollLeft)).toBeLessThan(0);
+
+    await dots.nth(0).click();
+    await expect.poll(() => activeIndex(page)).toBe(0);
+    await expect(dots.nth(0)).toHaveAttribute('aria-current', 'true');
+    expect(await inFrame(page, 0)).toBe(true);
     expect(errors).toEqual([]);
   });
 
@@ -188,7 +215,8 @@ test.describe('ES1-T557 AC2 slideshow RTL', () => {
     await page.mouse.move(640, 2);
     await expect(page.getByTestId('slideshow')).toHaveAttribute('data-playing', 'true');
     await expect.poll(() => activeIndex(page), { timeout: (SPEED_SECONDS + 2) * 1000 }).toBe(1);
-    expect(await inFrame(page, 1)).toBe(true);
+    // Autoplay cuộn mượt (không reduced motion): inert đổi khi IntersectionObserver thấy slide 2, khung tới đích sau đó
+    await expect.poll(() => inFrame(page, 1)).toBe(true);
     await expect(page.getByTestId('slideshow-dot').nth(1)).toHaveAttribute('aria-current', 'true');
   });
 });
