@@ -14,7 +14,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync, readdirSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { test, expect, type Locator, type Page, type ConsoleMessage } from './support/test';
-import { gotoStore } from './support/store-guard';
+import { expectNotChallenged, gotoStore } from './support/store-guard';
 import { watchShopPay403 } from './support/console-guard';
 import { footerSettingsApplied, loadHomeFixture, skipUnlessFixture, FOOTER_PENDING, type FixtureBlock } from './support/home-fixture';
 
@@ -445,6 +445,7 @@ test.describe('ES1-T345 trang chủ 1280', () => {
       await list.focus();
       await page.keyboard.press('End');
       await expect.poll(() => list.evaluate((el) => el.scrollLeft), 'End cuộn tới cuối hàng').toBeGreaterThan(0);
+      await expectNotChallenged(page);
       const axe = await new AxeBuilder({ page })
         .include('[data-testid="container-home-hero"]')
         .include('[data-testid="container-home-collection-list"]')
