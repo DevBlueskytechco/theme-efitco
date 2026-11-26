@@ -68,8 +68,7 @@ html[data-inbox] :is(#ShopifyChat, #dummy-chat-button-iframe) {
   translate: 0 calc(-1 * var(--bottom-bar-height));
 }
 
-/* Focus, link neo không nằm dưới header dính / thanh đáy (WCAG 2.2 SC 2.4.11). scroll-margin thay
-   scroll-padding trên html: focus() bằng script sau click không cuộn thêm. :where giữ specificity 0. */
+/* Focus không nằm dưới header dính / thanh đáy (WCAG 2.4.11); :where giữ specificity 0 */
 :where(:focus-visible, :target) {
   scroll-margin-block: calc(var(--sticky-top) + var(--space-4))
     calc(var(--bottom-bar-height) + var(--consent-height, 0px) + var(--space-4));
@@ -250,9 +249,7 @@ modal-dialog {
   }
 }
 
-/* Dialog: mobile-first là bottom sheet (< 48rem: rộng 100%, cao ≤ 88dvh, thanh kéo 40 × 4, bo 2 góc trên);
-   từ 48rem giữa màn, cỡ .dialog--s|m|l. Cấu trúc: .dialog__header > .dialog__title, .dialog__close,
-   .dialog__body (cuộn riêng), .dialog__footer (hàng nút, chân dính trong khung). */
+/* Dialog: < 48rem bottom sheet, từ 48rem giữa màn cỡ .dialog--s|m|l; __body cuộn riêng, __footer dính */
 .dialog {
   --dialog-size: var(--dialog-s);
   --dialog-pad: var(--space-5);
@@ -387,8 +384,7 @@ modal-dialog {
   }
 }
 
-/* Drawer: .drawer--end mở từ mép inline-end (cart, search), mặc định inline-start (menu, filter).
-   Chân dính là flex item nên phần tử đang focus trong thân không nằm dưới chân. */
+/* Drawer: --end từ inline-end (cart, search), mặc định inline-start; chân dính là flex item */
 .drawer {
   --drawer-from: -100%;
 
@@ -716,9 +712,7 @@ modal-dialog {
   outline-offset: 2px;
 }
 
-/* Đang tải: skeleton đúng kích thước nội dung, nền alt; vùng cha có
-   aria-busy="true" + dòng role="status" (.visually-hidden được). Không làm mờ chữ để báo tải.
-   Card: .skeleton-card > .skeleton.skeleton--media + .skeleton.skeleton--line + .skeleton.skeleton--line.skeleton--short */
+/* Đang tải: skeleton đúng cỡ nội dung, nền alt; cha aria-busy + role="status", không làm mờ chữ */
 .skeleton {
   position: relative;
   display: block;
@@ -1084,8 +1078,7 @@ modal-dialog {
   opacity: 0.6;
 }
 
-/* Swatch là chỉ báo (aria-hidden, không focus). > 4 hiện 3 + "+N" để vừa card 152 ở 360.
-   ::before vẽ pill, ::after là vùng chạm trong suốt, không đổi layout. */
+/* Swatch chỉ báo (aria-hidden): > 4 hiện 3 + "+N"; ::after là vùng chạm */
 .product-card__swatches {
   display: flex;
   flex-wrap: wrap;
@@ -1145,6 +1138,89 @@ modal-dialog {
   color: var(--color-muted);
   font-size: var(--font-size-sm);
   line-height: 1;
+}
+
+/* Nút Quick View (TE-3 AC9, AC12): không JS thì ẩn, card là link. < 64rem / cảm ứng: tròn 44 góc ảnh; ≥ 64rem hover: thanh đáy ảnh, hiện khi rê / focus */
+quick-view-button:not(:defined) {
+  display: none;
+}
+
+.product-card__quick-view-button {
+  --icon-stroke-width: 1.5;
+
+  position: absolute;
+  inset-block-end: var(--space-2);
+  inset-inline-end: var(--space-2);
+  z-index: var(--layer-content);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  inline-size: calc(var(--space-1) * 11);
+  block-size: calc(var(--space-1) * 11);
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-primary--family);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.product-card__quick-view-button svg {
+  flex: none;
+  inline-size: var(--space-5);
+  block-size: var(--space-5);
+}
+
+.product-card__quick-view-label {
+  display: none;
+}
+
+.product-card__quick-view-button:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+@media (hover: hover) {
+  .product-card__quick-view-button:hover {
+    border-color: var(--color-foreground);
+    background-color: var(--color-foreground);
+    color: var(--color-background);
+  }
+}
+
+@media (min-width: 64rem) and (hover: hover) {
+  .product-card__quick-view-button {
+    inset-inline: var(--space-4);
+    inset-block-end: var(--space-4);
+    inline-size: auto;
+    border-radius: var(--radius-button);
+    opacity: 0;
+    translate: 0 var(--space-2);
+  }
+
+  .product-card__quick-view-label {
+    display: inline;
+  }
+
+  .product-card:is(:hover, :focus-within) .product-card__quick-view-button {
+    opacity: 1;
+    translate: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .product-card__quick-view-button {
+    transition:
+      opacity var(--motion-base) var(--ease-out),
+      translate var(--motion-base) var(--ease-out),
+      background-color var(--motion-base) var(--ease-out),
+      color var(--motion-base) var(--ease-out),
+      border-color var(--motion-base) var(--ease-out);
+  }
 }
 
 /** Featured collection: padding 120, heading → lưới 40, lưới 2 / 3 / --columns */
@@ -1628,8 +1704,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 @media (prefers-reduced-motion: no-preference) { .site-header[data-drawer-enhanced] details[open] > .site-header__drawer-level { animation: drawer-level-in var(--motion-base) var(--ease-out); } }
 @keyframes drawer-level-in { from { translate: var(--drawer-level-from) 0; } }
 
-/** Mega menu từ 80rem. Panel, scrim neo vào container header:
-   mục mega, nav, inner không định vị. Header giữ tối, cao 80 khi mở; panel absolute nên CLS 0. */
+/** Mega menu từ 80rem: panel absolute neo container header (CLS 0) */
 @media (min-width: 80rem) {
   .site-header__item--mega {
     position: static;
@@ -2247,8 +2322,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   rotate: 180deg;
 }
 
-/* Panel localization footer là <dialog class="dialog">. Không :modal (không JS, ≥ 48rem): popover trắng neo trên nút,
-   < 48rem rộng hết nhóm (100vw − 40, §4.3; ES1-T45 R-05), ≥ 48rem 1 danh sách 320, 2 danh sách 600 (§4.2). :modal (BE showModal < 48rem): bottom sheet của .dialog (§4.3). */
+/* Panel localization footer (localization.md §4.2, §4.3): popover ≥ 48rem, :modal là bottom sheet */
 .site-footer__disclosure[open] .site-footer__panel:not(:modal) {
   position: absolute;
   inset-block: auto 100%;
@@ -3685,8 +3759,7 @@ product-variant-picker:not(:defined) {
   border: 0;
 }
 
-/* Legend "Weight: 45 lb": tên 600, giá trị đang chọn 400 muted (8.45), cách giá trị 12.
-   float để legend vào luồng thường (margin chạy được trên mọi trình duyệt) */
+/* Legend: tên 600, giá trị 400 muted; float để margin chạy trên mọi trình duyệt */
 .product-option__legend {
   float: inline-start;
   inline-size: 100%;
@@ -4072,9 +4145,7 @@ product-variant-picker:not(:defined) {
   font-size: var(--font-size-sm);
 }
 
-/** Sale countdown (ADR 0009, countdown.md §1–§5; snippets/sale-countdown): featured product, PDP, big offer.
-   Compact khi khung chứa < 23rem, Regular từ 23rem (data-size regular); data-size compact luôn Compact (CD1).
-   Số in sẵn bằng Liquid, hiện ngay (ES1-T276); không JS thì ẩn. Không chuyển động. */
+/** Sale countdown (ADR 0009, countdown.md): Compact < 23rem, Regular từ 23rem; không JS thì ẩn */
 sale-countdown {
   display: block;
   container-type: inline-size;
@@ -5390,8 +5461,7 @@ cart-drawer {
   text-wrap: balance;
 }
 
-/* Figma bo 16, tỉ lệ 3/4. overflow: clip (không phải scroll container) nên tên dài làm card cao thêm thay vì bị cắt. Nền tối giữ chữ trắng đọc được khi chưa có ảnh.
-   isolation + ảnh z-index -1: ảnh nằm dưới chữ mà .article-card__content không cần position, để ::after của link phủ cả khung */
+/* Bo 16, 3/4; overflow: clip để tên dài làm card cao thêm; ảnh z-index -1 dưới chữ */
 .article-card__frame {
   --article-card-radius: var(--radius-panel);
   position: relative;
@@ -6238,6 +6308,119 @@ cart-drawer {
   }
 }
 
+/** Quick view (TE-3 AC10, AC14–AC16): vỏ + skeleton (layout/theme.liquid) và lưới chung. Nội dung: quick-view.css nạp lười (ADR 0014) */
+quick-view {
+  display: contents;
+}
+
+@media (min-width: 80rem) {
+  .quick-view__dialog {
+    --dialog-size: 60rem;
+  }
+}
+
+/* Hàng mua dính (48 + 2 × 16) không che focus trong sheet (layers §3) */
+.quick-view__body {
+  padding-block-end: 0;
+  scroll-padding-block-end: calc(var(--space-1) * 20);
+}
+
+.quick-view__layout,
+.quick-view__info {
+  display: grid;
+  gap: var(--space-4);
+  min-inline-size: 0;
+  align-content: start;
+}
+
+.quick-view__header {
+  display: grid;
+  gap: var(--space-3);
+  padding-inline-end: calc(var(--close-button-size) + var(--space-2));
+}
+
+/* Media: dải vuốt 78% (< 48rem), 1:1 nền cream bo 16; 1 media 4:3 hết bề ngang */
+.quick-view__gallery {
+  display: grid;
+  gap: var(--space-3);
+  min-inline-size: 0;
+  timeline-scope: --qv-media;
+}
+
+/* Đang tải (5a): skeleton tên, ảnh vuông, giá, 3 giá trị, nút */
+.quick-view__skeleton-title {
+  inline-size: 70%;
+  block-size: var(--font-size-h2);
+}
+
+.quick-view__skeleton-price {
+  inline-size: 40%;
+  block-size: calc(var(--space-1) * 7);
+}
+
+.quick-view__skeleton-values {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.quick-view__skeleton-values > .skeleton {
+  inline-size: calc(var(--space-1) * 11);
+  block-size: calc(var(--space-1) * 11);
+  border-radius: var(--radius-pill);
+}
+
+.quick-view__skeleton-button {
+  block-size: calc(var(--space-1) * 12);
+  border-radius: var(--radius-button);
+}
+
+.quick-view__loading,
+.quick-view__error {
+  padding-block-end: var(--dialog-pad);
+}
+
+@media (min-width: 48rem) {
+  .quick-view__body {
+    padding-block-end: var(--dialog-pad);
+  }
+
+  .quick-view__loading,
+  .quick-view__error {
+    padding-block-end: 0;
+  }
+
+  .quick-view__layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 'media header' 'media info';
+    column-gap: var(--space-5);
+  }
+
+  .quick-view__header {
+    grid-area: header;
+  }
+
+  .quick-view__gallery {
+    grid-area: media;
+    align-self: start;
+  }
+
+  .quick-view__info {
+    grid-area: info;
+  }
+}
+
+@media (min-width: 80rem) {
+  .quick-view__layout {
+    column-gap: var(--space-7);
+    row-gap: var(--space-5);
+  }
+
+  .quick-view__info {
+    gap: var(--space-5);
+  }
+}
+
 /** Video carousel (TE-13, Figma 1:817). Khung hàng, nút, tiến trình, bề card: "Hàng ngang" */
 
 .video-carousel--placeholder {
@@ -6534,8 +6717,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
 @media (min-width: 80rem) {
   /* Header */
-  /* Nav đặt bằng lưới thay absolute (cùng x = 50% − 303, y = 26 = (80 − 28) / 2): không tổ tiên nào của
-     panel mega và scrim được định vị, để chúng neo vào container header full bề ngang */
+  /* Nav đặt bằng lưới: panel mega, scrim neo vào container header */
   .site-header__inner { display: grid; grid-template-columns: calc(50% - 303px) auto 1fr; column-gap: 0; min-height: 80px; }
   .site-header svg { width: auto; }
   .site-header__nav { align-self: start; margin: calc((var(--header-height) - 1.75rem) / 2) 0 0; }
@@ -6812,9 +6994,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   outline-offset: 3px;
 }
 
-/* 3. Hàng ngang: gốc .full-width, card đầu thẳng mép nội dung, hàng tràn mép phải. 100cqi = bề gốc, không
-   tính thanh cuộn như 100vw. 1280: (100cqi − lề − n × gap) / (n + 0.3) để lộ ≥ 25% card kế.
-   data-static (BE) khi hàng vừa khung: ẩn nút, tiến trình. Không JS: vẫn vuốt, cuộn bàn phím. */
+/* 3. Hàng ngang: card đầu thẳng mép nội dung, tràn mép phải; data-static (BE) ẩn nút, tiến trình */
 .collection-list, .testimonials, .blog-posts, .video-carousel {
   --row-inset: max(var(--page-margin), (100cqi - var(--page-width)) / 2 + var(--page-margin));
   --row-gap: var(--space-4);
