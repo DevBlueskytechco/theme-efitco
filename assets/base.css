@@ -6752,7 +6752,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .site-header svg { width: auto; }
   .site-header__nav { align-self: start; margin: calc((var(--header-height) - 1.75rem) / 2) 0 0; }
   .site-header__logo { justify-self: start; position: relative; inset-block-start: -1px; }
-  /* Ô icon 44 (--touch-target), svg 24: gap 4 + 2 × 10 = nhịp 24 như Figma; margin âm 10 giữ mép icon giỏ (ES1-T544) */
+  /* Ô icon 44, svg 24: gap 4 + 2 × 10 = nhịp 24 Figma, margin âm giữ mép giỏ (ES1-T544) */
   .site-header__icons { grid-column: 3; position: relative; inset-block-start: 1px; gap: var(--space-1); margin-inline-end: calc((var(--space-5) - var(--touch-target)) / 2); }
   .site-header__menu { gap: 40px; }
   /* Menu trên thanh tối mọi trang: trắng 60% (6.93:1); hover, mở, trang hiện tại trắng 100% */
@@ -6774,14 +6774,13 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
      Không dùng ::after định vị: summary không được thành khối chứa của scrim mega */
   .site-header__item > .site-header__link, .site-header__item > details > .site-header__link { padding-block: 10px; margin-block: -10px; }
   .site-header__item:nth-child(n + 5) > .site-header__link, .site-header__item:nth-child(n + 5) > details > .site-header__link { padding-block: 9px; margin-block: -9px; }
-  /* Ngang ≥ 44 cho mục cấp 1 hẹp (ES1-T544). Link: ::after căn giữa, inset âm đối xứng nên đúng cả RTL.
-     Summary không định vị (scrim mega): padding-inline bù margin âm, chữ giữ toạ độ */
+  /* Mục cấp 1 hẹp ngang ≥ 44: link ::after căn giữa; summary (không định vị: scrim mega) padding bù margin âm */
   .site-header__item > a.site-header__link { position: relative; }
   .site-header__item > a.site-header__link::after { content: ''; position: absolute; inset-block: 0; inset-inline: min(0px, calc((100% - var(--touch-target)) / 2)); }
   .site-header__item > details > .site-header__link { padding-inline: var(--space-2); margin-inline: calc(-1 * var(--space-2)); }
-  /* Kính lúp vẽ 20 trong ô 44 (lề 12, icon khác 10): kéo ô 2px để mép icon giữ vị trí Figma */
+  /* Kính lúp 20 (lề 12): kéo 2px giữ mép Figma */
   .site-header__icons > [data-testid='header-search-link'] { margin-inline-end: -2px; }
-  /* Badge neo vào ô 44 thay ô 24: bù lề 10 để giữ chỗ cũ (−8, −9 so với icon) */
+  /* Badge neo ô 44: bù lề 10 giữ chỗ cũ */
   .site-header__icons .site-header__cart-count { inset-block-start: 2px; inset-inline-end: 1px; }
   .site-header__svg-chevron { width: 9px; height: 5px; }
   .site-header__icon svg { display: block; }
