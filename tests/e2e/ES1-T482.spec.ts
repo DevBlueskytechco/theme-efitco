@@ -1,4 +1,4 @@
-// Ticket ES1-T482 (bug ES1-T330-B01, TE-22 AC7): từ 80rem ô bấm mục menu cấp 1 ≥ 44px, link dropdown C ≥ 40px,
+// Ticket ES1-T482 (bug ES1-T330-B01, TE-22 AC7): từ 80rem ô bấm mục menu cấp 1 ≥ 44px, link dropdown C ≥ 44px (ES1-T544, CTO 21/11: 40 → var(--touch-target); cập nhật theo ES1-T614),
 // thanh header giữ cao 80 và chữ giữ toạ độ Figma (navigation.md §5.1, §8).
 // Chạy: npx playwright test tests/e2e/ES1-T482.spec.ts --project=desktop
 import { readFileSync } from 'node:fs';
@@ -10,9 +10,9 @@ const desktopOnly = (name: string) => test.skip(name !== 'desktop', 'chỉ đo �
 test.describe('ES1-T482 CSS (tĩnh)', () => {
   test.beforeEach(({}, ti) => desktopOnly(ti.project.name));
 
-  test('TC-01 base.css 80rem: link dropdown C min-height 40, mục cấp 1 padding-block bù margin âm', () => {
+  test('TC-01 base.css 80rem: link dropdown C min-height var(--touch-target) (44, ES1-T544), mục cấp 1 padding-block bù margin âm', () => {
     const css = readFileSync('assets/base.css', 'utf8');
-    expect(css).toContain('.site-header__submenu .site-header__link { min-height: 40px;');
+    expect(css).toContain('.site-header__submenu .site-header__link { min-height: var(--touch-target);');
     expect(css).not.toMatch(/\.site-header__submenu \.site-header__link \{ min-height: 36px/);
     expect(css).toContain('.site-header__item > .site-header__link, .site-header__item > details > .site-header__link { padding-block: 10px; margin-block: -10px; }');
     expect(css).toContain('.site-header__item:nth-child(n + 5) > .site-header__link, .site-header__item:nth-child(n + 5) > details > .site-header__link { padding-block: 9px; margin-block: -9px; }');
@@ -22,7 +22,7 @@ test.describe('ES1-T482 CSS (tĩnh)', () => {
 test.describe('ES1-T482 store thật', () => {
   test.describe.configure({ retries: 0 });
 
-  test('TC-02 trang chủ 1280: mục cấp 1 cao ≥ 44, header 80, link dropdown C cao ≥ 40', async ({ page }, ti) => {
+  test('TC-02 trang chủ 1280: mục cấp 1 cao ≥ 44, header 80, link dropdown C cao ≥ 44 (ES1-T544)', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
     const watch = watchStore(page);
     await gotoStore(page, '/');
@@ -55,7 +55,7 @@ test.describe('ES1-T482 store thật', () => {
     const linkCount = await links.count();
     for (let i = 0; i < linkCount; i++) {
       const box = await links.nth(i).boundingBox();
-      expect(box?.height ?? 0, `link dropdown C #${i + 1} cao < 40`).toBeGreaterThanOrEqual(40);
+      expect(box?.height ?? 0, `link dropdown C #${i + 1} cao < 44`).toBeGreaterThanOrEqual(44);
     }
     await watch.finish();
   });
