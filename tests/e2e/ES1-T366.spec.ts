@@ -6,6 +6,7 @@ import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
+import { SPACE_TOKENS } from './support/space-tokens';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
 // ES1-T478 (ADR 0013): CSS lọc collection ở assets/collection.css, nạp sau base.css trên collection/search
@@ -94,7 +95,7 @@ const FIXTURE = (enhanced: boolean, clear: boolean) => `
 
 const mount = async (page: Page, width: number, { enhanced = false, clear = true } = {}) => {
   await page.setViewportSize({ width, height: 900 });
-  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}${COLLECTION}</style></head><body>${FIXTURE(enhanced, clear)}</body></html>`);
+  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${SPACE_TOKENS}${CRITICAL}${BASE}${COLLECTION}</style></head><body>${FIXTURE(enhanced, clear)}</body></html>`);
 };
 const box = async (page: Page, id: string) => (await page.getByTestId(id).first().boundingBox())!;
 // Mở popover rồi chờ transition trượt vào xong: boundingBox đo cả translate (bài học ES1-T313 TC-05).

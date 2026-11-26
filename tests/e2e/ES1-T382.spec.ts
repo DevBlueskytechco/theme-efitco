@@ -10,6 +10,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { readFileSync } from 'node:fs';
 import { env } from './support/store-data';
 import { expectNotChallenged } from './support/store-guard';
+import { SPACE_TOKENS } from './support/space-tokens';
 
 const read = (p: string) => readFileSync(p, 'utf8');
 const noComments = (css: string) => css.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -131,7 +132,7 @@ const TOKENS = `:root{--page-width:1440px;--page-margin:20px;--content-width:min
 
 async function fixture(page: Page) {
   const longTitle = 'Supercalifragilisticexpialidociousandmoretext'.repeat(2);
-  await page.setContent(`<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>fixture</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head>
+  await page.setContent(`<!doctype html><html lang="en"><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>fixture</title><style>${TOKENS}${SPACE_TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head>
 <body><main>
 <article class="block-container"><div class="article-main">
   <div class="image article-main__cover" data-testid="article-cover"><img src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" width="1800" height="828" alt="Cover"></div>
