@@ -188,7 +188,7 @@ test.describe('ES1-T184 cỡ card theo màn hình', () => {
 });
 
 test.describe('ES1-T184 /?view=figma', () => {
-  test('1920: 5 card 336 x 270 đúng tên, đúng link, nền tối', async ({ page }) => {
+  test('1920: 5 card 336 x 274 (ảnh 3 / 2) đúng tên, đúng link, nền tối', async ({ page }) => {
     await page.setViewportSize({ width: 1920, height: 1080 });
     await page.goto(FIGMA);
     const row = band(page, 'figma-collection-list');
@@ -202,7 +202,8 @@ test.describe('ES1-T184 /?view=figma', () => {
       await expect(card.getByTestId('collection-card-link')).toHaveAttribute('href', new RegExp(`/collections/${handle}$`));
       const box = await card.boundingBox();
       expect(box!.width).toBeCloseTo(336, 0);
-      expect(box!.height).toBeCloseTo(270, 0);
+      // Ảnh 3 / 2 (foundation §36, ES1-T580): 336 × 2 / 3 = 224, phần chữ 50.
+      expect(box!.height).toBeCloseTo(274, 0);
     }
     await expect(row).toHaveClass(/block-container--dark/);
   });

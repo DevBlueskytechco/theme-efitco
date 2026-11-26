@@ -116,7 +116,7 @@ test.describe('ES1-T382 tĩnh', () => {
     // ES1-T478 (ADR 0013): CSS trang bài viết ở assets/aux.css
     const css = noComments(read('assets/aux.css'));
     const start = css.indexOf('.image.article-main__cover {');
-    const end = css.indexOf('aspect-ratio: 1798 / 827; } }');
+    const end = css.indexOf('aspect-ratio: 2 / 1; } }');
     expect(start).toBeGreaterThan(0);
     expect(end).toBeGreaterThan(start);
     const part = css.slice(start, end);
@@ -159,7 +159,7 @@ const box = (page: Page, sel: string) => page.locator(sel).first().evaluate((el)
 });
 
 test.describe('ES1-T382 fixture', () => {
-  for (const [vw, ratio] of [[360, 4 / 3], [768, 16 / 9], [1280, 1798 / 827]] as const) {
+  for (const [vw, ratio] of [[360, 4 / 3], [768, 16 / 9], [1280, 2]] as const) {
     test(`${vw}: tỉ lệ ảnh bìa, cột đọc ≤ 736, vùng chạm, form, không cuộn ngang`, async ({ page }) => {
       await page.setViewportSize({ width: vw, height: 900 });
       await fixture(page);

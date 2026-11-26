@@ -182,13 +182,13 @@ test.describe('ES1-T157 TE-13 video carousel', () => {
     await expect(noProduct.getByTestId('video-card-badge')).toHaveCount(0);
   });
 
-  test('AC4-markup khung giữ tỉ lệ 264 / 470 và nền tối khi không có poster', async ({ page }) => {
+  test('AC4-markup khung giữ tỉ lệ 9 / 16 và nền tối khi không có poster', async ({ page }) => {
     await page.goto(TE13);
     const frame = card(page, 'te13-video-4').getByTestId('video-card-frame');
     await expect(frame.locator('img')).toHaveCount(0);
     const box = await frame.boundingBox();
     expect(box).not.toBeNull();
-    expect(Math.abs(box!.width / box!.height - 264 / 470)).toBeLessThan(0.01);
+    expect(Math.abs(box!.width / box!.height - 9 / 16)).toBeLessThan(0.01);
     const colors = await frame.evaluate((el) => {
       const probe = document.createElement('div');
       probe.style.backgroundColor = 'var(--color-background-dark)';
@@ -241,7 +241,7 @@ test.describe('ES1-T157 AC-H21 phần markup trên /?view=figma', () => {
   test.use({ viewport: { width: 1920, height: 1080 } });
   test.skip(({ isMobile }) => isMobile, 'Figma chỉ có 1920');
 
-  test('AC3-markup 6 thẻ 264 x 554, copy 1:817, không có số liệu, link, nhãn', async ({ page }) => {
+  test('AC3-markup 6 thẻ 264 x 553 (khung 9 / 16), copy 1:817, không có số liệu, link, nhãn', async ({ page }) => {
     await page.goto(FIGMA);
     const scope = band(page, 'figma-video-carousel');
     const cards = scope.getByTestId('video-card');
@@ -253,10 +253,10 @@ test.describe('ES1-T157 AC-H21 phần markup trên /?view=figma', () => {
     }
     const first = await cards.first().boundingBox();
     expect(Math.round(first!.width)).toBe(264);
-    // Tên dài hơn 1 dòng không đổi cao vì tên cắt 1 dòng; thiếu product thì thẻ chỉ cao 470.
-    expect(Math.round(first!.height)).toBe(554);
+    // Khung 9 / 16 (foundation §36): 264 × 16 / 9 = 469.3, thẻ = khung + 84 phần chữ. Tên dài hơn 1 dòng không đổi cao vì tên cắt 1 dòng; thiếu product thì thẻ chỉ cao bằng khung.
+    expect(Math.round(first!.height)).toBe(553);
     const frame = await cards.first().getByTestId('video-card-frame').boundingBox();
-    expect(Math.round(frame!.height)).toBe(470);
+    expect(Math.round(frame!.height)).toBe(469);
   });
 });
 
