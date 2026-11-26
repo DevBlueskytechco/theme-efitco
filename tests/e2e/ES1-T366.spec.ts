@@ -30,6 +30,7 @@ const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;
 --color-background:#fff;--color-foreground:#1a1a1a;--color-muted:#4d4d4d;--color-muted-light:#6b6b6b;--color-border:#e5e5e5;--color-background-cream:#f5f5f1;
 --color-background-alt:#f4f4f5;--color-background-alt-foreground:#1a1a1a;--color-background-dark:#1a1a1a;--color-background-dark-foreground:#fff;
 --color-background-panel:#393942;--color-accent:#c8400e;--color-accent-foreground:#fff;--color-sale:#c8102e;--color-badge-new:#467a48;
+--color-critical:var(--color-sale);--color-success:var(--color-badge-new);--color-warning:var(--color-accent);
 --font-size-xs:.8125rem;--font-size-sm:.875rem;--font-size-base:1rem;--font-size-h3:1.5rem;--font-size-h2:2rem;--line-height-body:1.5;--line-height-heading:1.1;
 --font-heading--family:serif;--font-heading--weight-display:800;--font-primary--family:sans-serif;
 --motion-fast:150ms;--motion-base:250ms;--motion-slow:500ms;--motion-hero:1400ms;--ease-out:ease-out}`;
