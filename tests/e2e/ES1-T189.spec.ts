@@ -97,9 +97,10 @@ async function expectNoSeriousAxe(page: Page) {
 }
 
 test.describe('ES1-T189 tĩnh', () => {
-  test('trần 1536 B, không fetch, không innerHTML, hook khớp giữa Liquid và JS', ({}, ti) => {
+  test('trần 1792 B, không fetch, không innerHTML, hook khớp giữa Liquid và JS', ({}, ti) => {
     test.skip(ti.project.name !== 'desktop', 'static, chạy 1 lần ở desktop');
-    expect(statSync(JS_FILE).size).toBeLessThanOrEqual(1536);
+    // ES1-T557 AC6: 1536 → 1792 cho phím mũi tên theo hướng văn bản (RTL)
+    expect(statSync(JS_FILE).size).toBeLessThanOrEqual(1792);
     const js = readFileSync(JS_FILE, 'utf8');
     // ES1-T217: kiểm code, không kiểm comment: dòng 1 của file ghi "no fetch". Chỉ bỏ dòng comment nguyên dòng, không đụng chuỗi.
     const code = js.replace(/^\s*\/\/.*$/gm, '');

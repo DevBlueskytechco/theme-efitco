@@ -38,8 +38,9 @@ customElements.define("collection-tabs", class extends HTMLElement {
 		// Modifier: native link, browser keys.
 		if (!t || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
 		if (e.type == "click") return e.preventDefault(), this.select(t);
-		const a = this.tabs, i = a.indexOf(t);
-		const to = { ArrowRight: i + 1, ArrowLeft: i - 1, Home: 0, End: -1, " ": i }[e.key];
+		// Arrows follow text direction: RTL ArrowLeft = next tab (ES1-T557)
+		const a = this.tabs, i = a.indexOf(t), d = this.matches(":dir(rtl)") ? -1 : 1;
+		const to = { ArrowRight: i + d, ArrowLeft: i - d, Home: 0, End: -1, " ": i }[e.key];
 		if (to == null) return;
 		e.preventDefault();
 		const next = a.at(to % a.length);
