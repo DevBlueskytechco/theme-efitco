@@ -759,7 +759,7 @@ test.describe('ES1-T112 AC5 list-collections', () => {
         const r = el.getBoundingClientRect();
         return r.width / r.height;
       });
-      expect(ratio, 'tỉ lệ ảnh 336:220').toBeCloseTo(336 / 220, 1);
+      expect(ratio, 'tỉ lệ ảnh 3 / 2 (foundation §36)').toBeCloseTo(3 / 2, 1);
     }
     await expectAxeClean(page, 'main');
     void guard;

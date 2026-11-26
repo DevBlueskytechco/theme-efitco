@@ -138,7 +138,8 @@ test.describe('ES1-T341 shop the look (TE-12 AC5, AC9, index-1280 §2.4)', () =>
     };
   };
 
-  for (const [width, w, h] of [[WIDTHS.mobile, 320, 279], [WIDTHS.tablet, 728, 635], [WIDTHS.desktop, 819, 714], [WIDTHS.wide, 936, 816]] as const) {
+  // Khung 1 / 1 (foundation §36, ES1-T580) là chiều cao tối thiểu; cột phải thấp hơn nên ảnh vuông.
+  for (const [width, w, h] of [[WIDTHS.mobile, 320, 320], [WIDTHS.tablet, 728, 728], [WIDTHS.desktop, 819, 819], [WIDTHS.wide, 936, 936]] as const) {
     test(`${width}: ảnh ${w} × ${h}`, async ({ page }) => {
       await openHome(page, width);
       const { root, image } = parts(page);
