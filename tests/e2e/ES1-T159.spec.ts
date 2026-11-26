@@ -998,7 +998,11 @@ test.describe('ES1-T159 module lỗi', () => {
     const errors = watchConsole(page);
     const aborted = await blockModules(page);
     await page.route(EMBED, (r) => r.abort());
-    await page.route(/youtube\.com\/watch/, (r) => r.fulfill({ contentType: 'text/html', body: '<!doctype html><title>watch</title>' }));
+    const stub = { contentType: 'text/html', body: '<!doctype html><title>watch</title>' };
+    await page.route(/youtube\.com\/watch/, (r) => r.fulfill(stub));
+    // ES1-T617: storefront Shopify có lúc đổi link ra ngoài thành /url?q=<href>&trigger=click (307 về chính nó rồi store dev trả 429 cf-mitigated),
+    // nên request youtube không bao giờ tới (CI 45530422209 mobile). Trả trang giả tại chỗ: không chạm store, không gặp thử thách.
+    await page.route((u) => u.pathname === '/url' && u.searchParams.has('q'), (r) => r.fulfill(stub));
     await gotoStore(page, TE13);
     const scope = featured(page, 'te13-a');
     await scope.scrollIntoViewIfNeeded();
@@ -1006,11 +1010,20 @@ test.describe('ES1-T159 module lỗi', () => {
     await expect(buyForm(scope)).toHaveAttribute('method', /post/i);
     await carousel(page).scrollIntoViewIfNeeded();
     await expect.poll(() => aborted.has('video-carousel'), 'video-carousel.js đã bị gọi và chặn').toBe(true);
-    await page.waitForTimeout(500);
-    await expect(card(page, 2).getByTestId('video-card-poster')).toHaveAttribute('href', /youtube\.com\/watch/);
-    // Không module: bấm poster đi theo link (không chặn mặc định).
-    const [req] = await Promise.all([page.waitForRequest((r) => /youtube\.com\/watch/.test(r.url())).catch(() => null), card(page, 2).getByTestId('video-card-poster').click()]);
-    expect(req, 'poster đi theo href khi video-carousel.js lỗi').not.toBeNull();
+    const poster = card(page, 2).getByTestId('video-card-poster');
+    await expect(poster).toHaveAttribute('href', /youtube\.com\/watch/);
+    const href = (await poster.getAttribute('href'))!;
+    const store = new URL(page.url()).origin;
+    // Không module: bấm poster đi theo link (không chặn mặc định) = khung chính điều hướng tới đúng href,
+    // trực tiếp hoặc qua bộ chuyển hướng link ra ngoài của Shopify (/url?q=href, cùng origin store).
+    const followsHref = (r: Request) => {
+      if (!r.isNavigationRequest() || r.frame() !== page.mainFrame()) return false;
+      if (r.url() === href) return true;
+      const u = new URL(r.url());
+      return u.origin === store && u.pathname === '/url' && u.searchParams.get('q') === href;
+    };
+    const [req] = await Promise.all([page.waitForRequest(followsHref, { timeout: 15_000 }).catch(() => null), poster.click()]);
+    expect(req, `poster đi theo href khi video-carousel.js lỗi (${href})`).not.toBeNull();
     noteAborted(aborted);
     expect(errors.filter((e) => e.startsWith('pageerror'))).toEqual([]);
   });

@@ -56,7 +56,7 @@ Không viết trùng spec dev: ES1-T156 (markup featured), ES1-T157 (markup vide
 | TC-46 | AC2 | JS tắt, ≥ 2 media | bấm thumbnail 2 | URL có hash `#FeaturedMedia-…`, phần tử đích có | nojs | P2 |
 | TC-47 | AC2 | JS tắt | bấm Add to cart (`clickAndLoad`: Cloudflare thử thách thì skip có lý do, ES1-T300) | form chứa nút mua method POST, action /cart/add; 0 `select[name=id]`; tới /cart; giỏ có variant hiện tại | nojs | P1 |
 | TC-48 | AC3, AC4 | JS tắt | render, bấm link sản phẩm thẻ 6 | poster YouTube → youtube.com/watch, Vimeo → vimeo.com/{id}, Shopify → product url; 0 video/iframe; link sản phẩm điều hướng | nojs | P1 |
-| TC-49 | AC2, AC3 | JS bật, chặn cùng lúc featured-product / video-carousel / product-form / product-variant-picker / sale-countdown .js (5 module không import nhau, fallback độc lập) | 2 test, mỗi test mở 1 trang: STATES, TE13 | STATES: form chứa nút mua method POST, featured-product + sale-countdown đã bị gọi và chặn, ghi trạng thái khung countdown band A (ES1-T608); TE13: form POST, video-carousel đã bị chặn, poster vẫn href, bấm poster đi theo link; 0 pageerror cả 2 | E2E | P2 |
+| TC-49 | AC2, AC3 | JS bật, chặn cùng lúc featured-product / video-carousel / product-form / product-variant-picker / sale-countdown .js (5 module không import nhau, fallback độc lập) | 2 test, mỗi test mở 1 trang: STATES, TE13 | STATES: form chứa nút mua method POST, featured-product + sale-countdown đã bị gọi và chặn, ghi trạng thái khung countdown band A (ES1-T608); TE13: form POST, video-carousel đã bị chặn, poster vẫn href, bấm poster thì khung chính điều hướng tới đúng href (trực tiếp hoặc qua `/url?q=<href>` của Shopify, cả hai trả trang giả tại chỗ; ES1-T617); 0 pageerror cả 2 | E2E | P2 |
 | TC-50 | AC2 | chặn product-form.js | bấm Add to cart (`clickAndLoad`) | form POST tới /cart, giỏ có variant; Cloudflare thử thách POST thì skip có lý do (ES1-T300) | E2E | P1 |
 | TC-51 | AC2, AC3 | /?view=te13, embed bị chặn | tải; cuộn tới carousel | axe 0 serious/critical cả 2 lúc; 0 console error (bỏ qua script nền tảng Shopify) | a11y | P1 |
 
@@ -108,6 +108,12 @@ Không có bug theme thật, không vượt ngân sách JS thật trong lượt 
 | TC-32 | không phải Cloudflare: chữ lỗi in `card_title` = alt video ("Media đủ loại"), spec lấy tên sản phẩm ("Sale giá nhỏ") | lỗi code spec | title lấy từ `data-label-error` (Liquid), đối chiếu tên nút play cùng thẻ; chữ ẩn sau lỗi = locale `error_product` với title đó |
 | TC-08 | lượt 2 đạt; bản chất cần 2 lần tải | môi trường | giữ 2 lần `gotoStore`; trước lần 2 gọi `waitStoreCooldown` (chỉ chờ khi shard đã bị 429/thử thách) |
 Số lần mở trang mỗi project (đường chính, không tính retry, nhánh thẻ giả TC-39, tải lại trong themeAdd): 65 → 57 (TC-49 10 → 2; TC-08 2, TC-32 1 giữ nguyên).
+
+## Phân loại lỗi TC-49 TE13 đỏ chập chờn sau #335 (ES1-T617, 26/11)
+| TC | Nguyên nhân | Loại | Sửa |
+| --- | --- | --- | --- |
+| TC-49 (TE13) | trace CI 45530422209 mobile: click poster xong, điều hướng thật ra là `https://<store>/url?q=https%3A%2F%2Fwww.youtube.com%2Fwatch…&trigger=click` (Shopify đổi link ra ngoài khi bấm, có lúc có lúc không) → 307 về chính nó → 429 cf-mitigated; request `youtube.com/watch` không bao giờ có, `waitForRequest` treo tới hết 30 s. Poster vẫn là `<a href>` đúng, không bị chặn mặc định | môi trường + spec | route `/url?q=` trả trang giả (không chạm store); chờ request điều hướng khung chính có URL = href hoặc `/url` cùng origin store với `q` = href, timeout 15 s; bỏ `waitForTimeout(500)` (toHaveAttribute tự chờ). Mục đích kiểm giữ nguyên |
+Không lỗi theme: `video-carousel.js` lỗi thì poster vẫn đi theo href.
 
 ## KHÔNG CHẮC
 - Xem dòng đầu file. Câu hỏi mở: ES1-T608 (AC-H22 trên `/`, countdown khi module lỗi), ES1-T600 (countdown 1 band khi đổi biến thể, TC-13 fixme).
