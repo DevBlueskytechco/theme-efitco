@@ -88,15 +88,14 @@ watch() {
 const bar = (this.bar = this.$("bar"));
 if (!bar) return;
 const grid = this.querySelector("fieldset");
+const panel = this.querySelector("[role=group]");
 this.io = new IntersectionObserver((entries) => {
-for (const { target, isIntersecting, boundingClientRect: r } of entries) {
-if (target == grid) this.gridIn = isIntersecting;
-else this.below = !isIntersecting && r.top > 0;
-}
+for (const e of entries) if (e.target == grid) this.gridIn = e.isIntersecting;
+this.below = panel.getBoundingClientRect().top > innerHeight - 72;
 this.show();
 }, { rootMargin: "0px 0px -72px" });
 this.io.observe(grid);
-this.io.observe(this.querySelector("[role=group]"));
+this.io.observe(panel);
 }
 show() {
 const bar = this.bar;

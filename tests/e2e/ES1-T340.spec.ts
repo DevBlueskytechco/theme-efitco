@@ -133,10 +133,18 @@ test.describe('ES1-T340 thanh dính', () => {
     });
 
     test('AC6 lúc tải và ở khối trên: thanh ẩn; lưới trong màn: hiện, html[data-bottom-bar=bundle], body chừa chỗ', async ({ page }) => {
+      // te12 đặt bundle ngay dưới header: ở 412 × 839 lưới đã trong màn lúc tải nên thanh hiện đúng AC6 (CI PR #338).
+      // Màn thấp 300 thì lưới còn dưới vạch đỉnh thanh: đúng trạng thái "lưới chưa vào màn".
+      const size = page.viewportSize()!;
+      await page.setViewportSize({ width: size.width, height: 300 });
       await gotoStore(page, TE12);
       const root = bundle(page);
+      await expect(root).toHaveAttribute('data-enhanced', '');
+      const gridBelow = await root.evaluate((el, offset) => el.querySelector('fieldset')!.getBoundingClientRect().top > innerHeight - offset, BAR_OFFSET);
+      test.skip(!gridBelow, 'Lưới đã trong màn 300 lúc tải');
       expect(await bottomBar(page)).toBeNull();
       await expect(bar(root)).toBeHidden();
+      await page.setViewportSize(size);
       await ready(root);
       test.skip(!(await toGrid(page, root)), 'Lưới thấp hơn màn: panel đã vào vùng trên thanh');
       await expect.poll(() => barShown(root)).toBe(true);
@@ -157,7 +165,10 @@ test.describe('ES1-T340 thanh dính', () => {
       await toPanel(root);
       await expect.poll(() => barShown(root)).toBe(false);
       await expect(bar(root)).toHaveJSProperty('inert', true);
-      expect(await bottomBar(page)).toBeNull();
+      // Bundle thứ hai của te12 nằm ngay dưới: lưới của nó vào màn thì thanh của nó hiện (tối đa 1 thanh), html giữ "bundle" (CI PR #338).
+      const others = await page.evaluate(() => [...document.querySelectorAll<HTMLElement>('[data-bundle-bar]')].filter((b) => !b.hidden && !b.inert).length);
+      expect(others, 'tối đa 1 thanh, không phải thanh của khối này').toBeLessThanOrEqual(1);
+      expect(await bottomBar(page)).toBe(others ? 'bundle' : null);
       // Thanh không che panel: đỉnh panel nằm trên vùng thanh
       const top = await root.getByTestId('bundle-builder-panel').evaluate((el) => el.getBoundingClientRect().top);
       expect(top).toBeLessThan(await page.evaluate(() => innerHeight) - BAR_OFFSET);
