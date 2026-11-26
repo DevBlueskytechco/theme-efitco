@@ -20,10 +20,13 @@ const SPEED_SECONDS = 3; // min của setting autoplay_speed (như ES1-T333)
 const desktopOnly = ({}, ti: { project: { name: string } }) =>
   test.skip(ti.project.name !== 'desktop', 'đặt viewport, chuột trong test: chạy ở desktop');
 
-/** Ép dir="rtl" trên <html> của mọi document trả về. */
+/** Ép dir="rtl" trên <html> của document khung chính.
+ * Chỉ khung chính: iframe Shop Pay (login_with_shop/authorize, 302 sang shop.app) tải muộn, route.fetch còn treo khi test xong
+ * → "route.fetch: Test ended" thành lỗi ngoài test, job đỏ dù test qua (CI PR #326). */
 async function forceRtl(page: Page) {
   await page.route('**/*', async (route) => {
-    if (route.request().resourceType() !== 'document') return route.fallback();
+    const request = route.request();
+    if (request.resourceType() !== 'document' || request.frame() !== page.mainFrame()) return route.fallback();
     const response = await route.fetch();
     const body = (await response.text()).replace(/<html\b/, '<html dir="rtl"');
     await route.fulfill({ response, body });
