@@ -55,6 +55,32 @@
     --font-size-wordmark: clamp(4rem, 10.4vw, 12.5rem);
     --line-height-body: 1.5;
     --line-height-heading: 1.1;
+    /* Token kit (ES1-T540, kit.css :root): khai báo, chưa áp vào component. --line-height-heading giữ tới ES1-T577 */
+    --font-size-eyebrow: clamp(0.875rem, 0.826rem + 0.217vw, 1rem);
+    --font-size-h4: 1.25rem;
+    --font-body-weight: 500;
+    --letter-spacing-body: -0.01em;
+    --letter-spacing-label: -0.02em;
+    --letter-spacing-heading: -0.02em;
+    --letter-spacing-display: -0.03em;
+    --letter-spacing-caps: 0.04em;
+    --line-height-sm: 1.4286;
+    --line-height-label: 1.5385;
+    --line-height-title: 1.5556;
+    --line-height-reading: 1.75;
+    --line-height-price-lg: 1.4;
+    --line-height-eyebrow: 1.25rem;
+    --line-height-h4: 1.2;
+    --line-height-h3: 1.2857;
+    --line-height-h2: 1.25;
+    --line-height-h1: 1.2;
+    --line-height-display: 1.1538;
+
+    /* Icon: khung 16 / 20 / 24, nét 1.5 */
+    --icon-size-sm: 16px;
+    --icon-size-md: 20px;
+    --icon-size-lg: 24px;
+    --icon-stroke-width: 1.5;
 
     /* Layout */
     /* 91rem = 1456px = nội dung 1416px (Figma) + 2 x page margin 20px */
@@ -62,6 +88,13 @@
     --page-margin: {{ settings.min_page_margin }}px;
     /* Hero chui dưới header đúng bằng chiều cao này khi header trong suốt */
     --header-height: {{ space | times: 20 }}px;
+    /* Cột giữa của lưới trang; 100% tính tại phần tử dùng (.block-container) */
+    --content-width: min(
+      calc(var(--page-width) - var(--page-margin) * 2),
+      calc(100% - var(--page-margin) * 2)
+    );
+    --grid-columns: 4;
+    --dark-texture: url('{{ 'noise-dark.png' | asset_url }}');
 
     /* Space scale: 4 / 8 / 12 / 16 / 24 / 32 / 48 / 120 px at base 4 */
     --space-1: {{ space }}px;
@@ -74,6 +107,15 @@
     --space-8: {{ space | times: 30 }}px;
     /* Sàn vùng bấm (WCAG 2.5.8, TE-3 AC6): hằng số, không theo space_base */
     --touch-target-min: 24px;
+    /* Kích thước component (kit): px hằng số, không theo space_base */
+    --touch-target: 44px;
+    --control-height: 48px;
+    --control-height-compact: 44px;
+    --tab-height-desktop: 40px;
+    --row-height: 52px;
+    --count-badge-size: 20px;
+    --progress-height: 4px;
+    --meter-height: 8px;
 
     /* Corner radius */
     --radius-input: {{ settings.input_corner_radius }}px;
@@ -106,6 +148,13 @@
     --color-badge-new: {{ settings.badge_new_color }};
     --color-badge-new-foreground: {{ settings.badge_new_foreground_color }};
     --color-rating: {{ settings.rating_color }};
+    /* Vai trò trạng thái: chỉ alias, không thêm giá trị màu */
+    --color-success: var(--color-badge-new);
+    --color-success-foreground: var(--color-badge-new-foreground);
+    --color-critical: var(--color-sale);
+    --color-critical-foreground: var(--color-sale-foreground);
+    --color-warning: var(--color-accent);
+    --color-warning-foreground: var(--color-accent-foreground);
     --figma-radius-2: 2px;
     --figma-radius-4: 4px;
     --figma-radius-8: 8px;
@@ -170,5 +219,21 @@
     --panel-muted: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel));
     --panel-saving: color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground));
     --round-button-size: calc(var(--space-1) * 13);
+  }
+
+  @media (min-width: 48rem) {
+    :root {
+      --grid-columns: 8;
+      --letter-spacing-display: -0.04em;
+      --line-height-display: 1;
+    }
+  }
+
+  @media (min-width: 80rem) {
+    :root {
+      --grid-columns: 12;
+      --line-height-h2: 1.2222;
+      --line-height-h1: 1.1667;
+    }
   }
 {% endstyle %}

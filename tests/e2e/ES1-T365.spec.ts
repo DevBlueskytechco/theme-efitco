@@ -33,9 +33,9 @@ const section = () => {
 const body = (src: string) => src.slice(src.indexOf('{% enddoc %}'));
 const schema = (src: string) => JSON.parse(src.match(/{% schema %}([\s\S]*?){% endschema %}/)![1]);
 
-// Token mặc định (settings_schema.json); css-variables.liquid là nguồn thật trên store.
+// Token mặc định (settings_schema.json); css-variables.liquid là nguồn thật trên store (--content-width ở :root từ ES1-T540).
 const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:120px;
---touch-target-min:24px;--page-margin:20px;--page-width:91rem;--header-height:80px;--radius-input:8px;--radius-button:8px;--radius-card:12px;--radius-pill:999px;
+--touch-target-min:24px;--page-margin:20px;--page-width:91rem;--content-width:min(calc(var(--page-width) - var(--page-margin) * 2),calc(100% - var(--page-margin) * 2));--header-height:80px;--radius-input:8px;--radius-button:8px;--radius-card:12px;--radius-pill:999px;
 --color-background:#fff;--color-foreground:#1a1a1a;--color-muted:#6b6b6b;--color-muted-light:#808080;--color-border:#e5e5e5;--color-background-cream:#f5f5f1;
 --color-background-alt:#f4f4f5;--color-background-alt-foreground:#1a1a1a;--color-background-dark:#1a1a1a;--color-background-dark-foreground:#fff;
 --color-accent:#c8400e;--color-accent-foreground:#fff;--color-sale:#c8102e;
