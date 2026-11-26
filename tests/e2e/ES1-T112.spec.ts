@@ -12,6 +12,7 @@ import { join } from 'node:path';
 import { env } from './support/store-data';
 import { expectNotChallenged, gotoStore, watchStore, type StoreWatch } from './support/store-guard';
 import { productData } from './support/product-data';
+import { expectRoundDisabled } from './support/round-disabled';
 import { newStoreContext } from './support/store-noise';
 
 const ALL = '/collections/all';
@@ -839,7 +840,8 @@ test.describe('ES1-T112 AC6 phân trang chung', () => {
     await expect(prev).toHaveAccessibleName('Previous page');
     await expect(prev).not.toHaveAttribute('href');
     expect(await prev.evaluate((el) => (el as HTMLElement).tabIndex), 'không vào thứ tự Tab').toBe(-1);
-    expect(Number(await prev.evaluate((el) => getComputedStyle(el).opacity))).toBeCloseTo(0.35, 2);
+    // ES1-T543: tắt không làm mờ, dùng cặp màu disabled (TE-7 AC6, kit .round-button[aria-disabled])
+    await expectRoundDisabled(prev);
     await expect(prevLink(page)).toHaveCount(0);
 
     const next = nextLink(page);

@@ -68,9 +68,9 @@ test.describe('ES1-T578 tĩnh', () => {
       'cart.checkout': 'Checkout',
       'search.clear_all': 'Clear all',
       'cart.added': 'Added to cart',
-      // Ngoài phạm vi (ES1-T579): chưa đổi dấu trừ
-      'products.card.sale_percent': '-{{ percent }}%',
-      'cart.discount_value': '-{{ amount }}',
+      // ES1-T579 (đã merge develop): dấu trừ U+2212
+      'products.card.sale_percent': '\u2212{{ percent }}%',
+      'cart.discount_value': '\u2212{{ amount }}',
     };
     for (const [k, v] of Object.entries(expected)) expect(locale[k], k).toBe(v);
     // Toast success ≤ 3 từ, ≤ 24 ký tự
