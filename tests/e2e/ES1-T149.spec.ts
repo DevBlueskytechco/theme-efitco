@@ -107,8 +107,9 @@ test.describe('ES1-T149 tĩnh', () => {
   const shop = readFileSync('blocks/shop-the-look.liquid', 'utf8');
   const row = readFileSync('blocks/shop-the-look-row.liquid', 'utf8');
 
-  test('AC3 AC5 trần 5504 B, 1 file, không static import, không gọi actions, chỉ resolve', () => {
-    expect(Buffer.byteLength(js)).toBeLessThanOrEqual(5504);
+  test('AC3 AC5 trần 7168 B, 1 file, không static import, không gọi actions, chỉ resolve', () => {
+    // ES1-T340 (TE-12-R2-BE1): trần 5504 → 7168 B theo ADR 0010 (bundle-form gồm thanh bundle 360).
+    expect(Buffer.byteLength(js)).toBeLessThanOrEqual(7168);
     expect(js).not.toMatch(/^import /m);
     expect(js).not.toMatch(/Shopify\.actions|\.reject\(|innerHTML|\.submit\(\)|prototype\.submit/);
     expect(js).toContain('import("https://cdn.shopify.com/storefront/standard-events.js")');
