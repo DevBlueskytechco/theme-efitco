@@ -1,0 +1,19 @@
+{% doc %}
+  Outputs the text direction of the current storefront locale: `rtl` when the
+  first two letters of request.locale.iso_code are ar, he, fa or ur, otherwise
+  `ltr`. Used on the `<html dir>` attribute of layout/theme.liquid,
+  layout/password.liquid and templates/gift_card.liquid (foundation.md §34,
+  condition 1). The RTL language list lives only here.
+
+  @example
+  <html lang="{{ request.locale.iso_code }}" dir="{% render 'text-direction' %}">
+{% enddoc %}
+{%- liquid
+  assign rtl_languages = 'ar,he,fa,ur' | split: ','
+  assign language = request.locale.iso_code | slice: 0, 2 | downcase
+  if rtl_languages contains language
+    echo 'rtl'
+  else
+    echo 'ltr'
+  endif
+-%}

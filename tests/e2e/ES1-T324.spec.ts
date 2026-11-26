@@ -26,7 +26,7 @@ const IGNORE_CONSOLE = [/shopifycloud|monorail|web-pixels|trekkie|shop\.app|shop
 
 const ORIGIN = 'https://theme.test';
 const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:120px;
---page-margin:20px;--page-width:91rem;--header-height:80px;--radius-input:8px;--radius-button:8px;--radius-card:12px;--radius-pill:999px;
+--page-margin:20px;--page-width:91rem;--header-height:80px;--radius-input:8px;--radius-button:8px;--radius-card:12px;--radius-pill:999px;--radius-xs:4px;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-swatch:var(--radius-sm);--radius-panel:var(--radius-lg);--radius-dialog:var(--radius-xl);
 --color-background:#fff;--color-foreground:#1a1a1a;--color-muted:#5c5c5c;--color-muted-light:#6e6e6e;--color-border:#e5e5e5;
 --color-background-alt:#f4f4f5;--color-background-dark:#1a1a1a;--color-background-dark-foreground:#fff;--color-accent:#b5380b;--color-sale:#b42318;
 --font-size-sm:.875rem;--font-size-base:1rem;--font-size-lg:1.125rem;--font-size-h3:1.5rem;--font-size-h2:2rem;--line-height-heading:1.1;
