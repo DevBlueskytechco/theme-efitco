@@ -830,6 +830,8 @@
 [data-quiz-title]:focus { outline: 0; }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* ES1-T550: back giữ 3px khi RTL */
+  html[data-motion] button.quiz__shortlist-back:dir(rtl):hover > .slideshow-icon--arrow { translate: 3px 0; }
   .quiz-option { transition: box-shadow var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), background-color var(--motion-base) var(--ease-out), translate var(--motion-base) var(--ease-out); }
   .quiz-step[data-active] { animation: motion-fade var(--motion-base) var(--ease-out); }
   .quiz-step__bar, .quiz-step__bar::before { transition: width var(--motion-slow) var(--ease-out), inline-size var(--motion-slow) var(--ease-out), scale var(--motion-slow) var(--ease-out); }
