@@ -139,7 +139,6 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .cart-sticky
   --overlay-scrim: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
   --shadow-raised: 0 var(--space-2) var(--space-5) color-mix(in srgb, var(--color-foreground) 12%, transparent);
   --shadow-overlay: 0 var(--space-6) calc(var(--space-1) * 20) color-mix(in srgb, var(--color-foreground) 28%, transparent);
-  --radius-dialog: calc(var(--radius-card) * 2);
   /* Panel tối: chữ phụ 70% (6.56:1), dòng giảm giá (5.64:1, luôn kèm icon + dấu −) */
   --panel-muted: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel));
   --panel-saving: color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground));
@@ -1193,7 +1192,7 @@ collection-tabs {
   justify-content: center;
   min-block-size: calc(var(--space-1) * 11);
   padding-inline: calc(var(--space-1) * 7);
-  border-radius: calc(var(--radius-button) * 2);
+  border-radius: var(--radius-sm);
   background-color: var(--color-background-alt);
   color: var(--color-background-alt-foreground);
   font-size: var(--font-size-base);
@@ -1401,7 +1400,7 @@ collection-tabs {
   min-block-size: 17.5rem;
   margin-block-start: var(--space-4);
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-dark);
   color: var(--color-background-dark-foreground);
 }
@@ -1812,7 +1811,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   position: absolute;
   inset-block: calc(var(--space-1) * 2.75);
   width: 61.4%;
-  border-radius: calc(var(--radius-card) - var(--space-1));
+  border-radius: var(--radius-sm);
   background-color: color-mix(in srgb, var(--color-background-dark-foreground) 4%, transparent);
 }
 
@@ -1828,7 +1827,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   z-index: var(--layer-content);
   width: 6.125rem;
   margin-inline: auto;
-  border-radius: calc(var(--radius-card) - var(--space-1));
+  border-radius: var(--radius-sm);
 }
 
 .site-footer__newsletter {
@@ -1945,7 +1944,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   margin-inline: var(--site-footer-inset);
   padding-block: var(--space-7) var(--space-5);
   padding-inline: calc(var(--site-footer-side) - var(--site-footer-inset));
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: color-mix(in srgb, var(--color-background-dark-foreground) 2%, transparent);
 }
 
@@ -4342,7 +4341,7 @@ cart-items[aria-busy='true'] {
 .cart-drawer__bestseller-media {
   display: block;
   overflow: hidden;
-  border-radius: calc(var(--radius-card) - var(--space-1));
+  border-radius: var(--radius-swatch);
   background-color: var(--color-background-cream);
 }
 
@@ -4922,7 +4921,7 @@ cart-drawer {
   margin: 0 var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
   padding: var(--space-5);
   border: 0;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-panel);
   color: var(--color-background-dark-foreground);
 }
@@ -5010,7 +5009,7 @@ cart-drawer {
 .collection-card > .collection-card__image {
   aspect-ratio: 336 / 220;
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-panel);
 }
 
@@ -5049,7 +5048,7 @@ cart-drawer {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
 }
 
 .collection-card:hover .collection-card__link {
@@ -5148,7 +5147,7 @@ cart-drawer {
   justify-content: flex-end;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-dark);
   color: var(--color-background-dark-foreground);
   text-align: start;
@@ -5341,7 +5340,7 @@ cart-drawer {
 /* Figma bo 16, tỉ lệ 3/4. overflow: clip (không phải scroll container) nên tên dài làm card cao thêm thay vì bị cắt. Nền tối giữ chữ trắng đọc được khi chưa có ảnh.
    isolation + ảnh z-index -1: ảnh nằm dưới chữ mà .article-card__content không cần position, để ::after của link phủ cả khung */
 .article-card__frame {
-  --article-card-radius: calc(var(--radius-card) + var(--space-1));
+  --article-card-radius: var(--radius-panel);
   position: relative;
   isolation: isolate;
   display: flex;
