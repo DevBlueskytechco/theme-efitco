@@ -6,7 +6,12 @@ import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
+// critical.css nạp trước base.css như layout/theme.liquid (.visually-hidden của chữ ẩn trong .alert__close ở đây)
+const CRITICAL = readFileSync('assets/critical.css', 'utf8');
 const AUX = readFileSync('assets/aux.css', 'utf8');
+
+// Hộp đo làm tròn 0.01 px (Pixel 7 DPR 2.625 cho 44.00006)
+const size = (box: { width: number; height: number } | null) => ({ width: Math.round(box!.width * 100) / 100, height: Math.round(box!.height * 100) / 100 });
 
 // Mọi rule có selector bắt đầu bằng .alert (bỏ comment)
 const alertRules = (css: string) =>
@@ -46,7 +51,7 @@ ${alert('alert--page alert--error', 'alert', 'page-error', false)}
 
 const mount = async (page: Page, width: number) => {
   await page.setViewportSize({ width, height: 1200 });
-  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${BASE}</style></head><body>${FIXTURE}</body></html>`);
+  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}</style></head><body>${FIXTURE}</body></html>`);
 };
 
 test.describe('ES1-T546 tĩnh', () => {
@@ -85,7 +90,7 @@ test.describe('ES1-T546 fixture', () => {
     await expect(el).toHaveCSS('border-top-color', RGB.error);
     await expect(el).toHaveCSS('border-radius', '12px');
     const svg = (await el.locator('.alert__icon svg').boundingBox())!;
-    expect(svg).toMatchObject({ width: 24, height: 24 });
+    expect(size(svg)).toEqual({ width: 24, height: 24 });
     await expect(el.locator('.alert__icon')).toHaveCSS('color', RGB.error);
   });
 
@@ -115,8 +120,8 @@ test.describe('ES1-T546 fixture', () => {
     for (const width of [360, 1280]) {
       await mount(page, width);
       const btn = page.getByTestId('info-close');
-      expect(await btn.boundingBox()).toMatchObject({ width: 44, height: 44 });
-      expect((await btn.locator('svg').boundingBox())!).toMatchObject({ width: 16, height: 16 });
+      expect(size(await btn.boundingBox())).toEqual({ width: 44, height: 44 });
+      expect(size(await btn.locator('svg').boundingBox())).toEqual({ width: 16, height: 16 });
       await expect(btn).toHaveCSS('color', 'rgb(77, 77, 77)');
       const withClose = (await page.getByTestId('info').boundingBox())!.height;
       const without = (await page.getByTestId('no-close').boundingBox())!.height;
