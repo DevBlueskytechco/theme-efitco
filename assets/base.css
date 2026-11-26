@@ -37,9 +37,19 @@ html:is([data-bottom-bar="product"], [data-bottom-bar="cart"], [data-bottom-bar=
   --bottom-bar-height: calc(var(--space-1) * 18 + env(safe-area-inset-bottom, 0px));
 }
 
+/* Thanh bundle cao lên khi có ô lỗi: bundle-form.js đo và ghi --bundle-bar-height lên :root (TE-12 AC7, HB2) */
+html[data-bottom-bar="bundle"] {
+  --bottom-bar-height: var(--bundle-bar-height, calc(var(--space-1) * 18 + env(safe-area-inset-bottom, 0px)));
+}
+
 @media (min-width: 48rem) {
   html[data-bottom-bar="product"] {
     --bottom-bar-height: calc(var(--space-1) * 20 + env(safe-area-inset-bottom, 0px));
+  }
+
+  /* Thanh bundle chỉ có dưới 48rem */
+  html[data-bottom-bar="bundle"] {
+    --bottom-bar-height: 0px;
   }
 
   /* Thanh cũ chỉ hiện dưới 48rem */
@@ -71,7 +81,7 @@ body {
 
 /* Lớp mở hoặc banner consent đang hiện: thanh đáy, teaser Big Offer ẩn.
    visibility: hidden bỏ control khỏi thứ tự Tab; body giữ padding nên không xô bố cục. */
-html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .cart-sticky-checkout, .offer-popup__teaser) {
+html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .cart-sticky-checkout, .bundle-bar, .offer-popup__teaser) {
   visibility: hidden;
   opacity: 0;
   translate: 0 var(--space-4);
@@ -155,8 +165,6 @@ modal-dialog {
 
 /* Nút đóng tròn 48, icon 20. Tên riêng qua aria-label hoặc chữ ẩn. */
 .close-button {
-  --icon-stroke-width: 1.5;
-
   display: inline-flex;
   flex: none;
   align-items: center;
@@ -189,8 +197,7 @@ modal-dialog {
   }
 }
 
-/* Nút tròn 52 prev/next, phân trang: trắng, viền border; rê chuột nền accent.
-   Icon: snippets/slideshow-icon previous/next. Đầu/cuối hàng: aria-disabled mờ 0.35 (pagination.md). */
+/* Nút tròn 52 prev/next, phân trang; tắt: cặp màu kit, không mờ (ES1-T543) */
 .round-button {
   display: inline-flex;
   flex: none;
@@ -224,7 +231,10 @@ modal-dialog {
 }
 
 .round-button:is(:disabled, [aria-disabled='true']) {
-  opacity: 0.35;
+  border-color: var(--color-border);
+  background: var(--color-background);
+  color: var(--color-muted-light);
+  scale: none;
   cursor: not-allowed;
 }
 
@@ -727,7 +737,7 @@ modal-dialog {
     scale: 1.06;
   }
 
-  :is(.round-button, .close-button):active {
+  :is(.round-button, .close-button):not(:disabled, [aria-disabled='true']):active {
     scale: 0.94;
   }
 
@@ -2689,8 +2699,6 @@ localization-picker[data-tabs] .localization__tabs {
 }
 
 .localization__clear svg {
-  --icon-stroke-width: 1.5;
-
   inline-size: var(--space-4);
   block-size: var(--space-4);
 }
@@ -4913,9 +4921,10 @@ cart-items[aria-busy='true'] {
 
 .cart-summary__badge {
   padding: var(--space-1) var(--space-3);
+  border: 1px solid currentColor;
   border-radius: var(--radius-pill);
-  background-color: var(--color-accent);
-  color: var(--color-accent-foreground);
+  background-color: transparent;
+  color: var(--color-background-dark-foreground);
   font-size: var(--font-size-xs);
   font-weight: 600;
   line-height: var(--line-height-body);
@@ -5655,7 +5664,7 @@ cart-drawer {
   background-image: linear-gradient(to bottom, transparent 63.72%, var(--color-background-dark));
 }
 
-/* Figma 1:1035: pill cao 28, cách mép 12, chữ 13 / 20. Nhãn dài thì cắt, không tràn khỏi card */
+/* Figma 1:1035: pill cao 28, cách mép 12, chữ 13 / 20. Tag trung tính (ES1-T567, kit .badge--tag); không cắt "…" (§37) */
 .article-card__tag {
   position: absolute;
   inset-block-start: var(--space-3);
@@ -5665,15 +5674,14 @@ cart-drawer {
   margin: 0;
   padding-block: calc(var(--space-1) * 0.75);
   padding-inline: var(--space-3);
-  overflow: hidden;
+  border: 1px solid var(--color-border);
   border-radius: var(--radius-pill);
-  background-color: var(--color-accent);
-  color: var(--color-accent-foreground);
+  background-color: var(--color-background);
+  color: var(--color-foreground);
   font-size: var(--font-size-xs);
   font-weight: 600;
   letter-spacing: -0.02em;
   line-height: calc(20 / 13);
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -6878,12 +6886,11 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .rich-text__content .button { gap: 14px; }
   .level-card__link:is(:hover, :focus-visible) .level-card__label { position: relative; inset-block-start: -1px; }
   .level-card__link:not(:hover, :focus-visible) .level-card__title { position: relative; inset-block-start: 1px; }
-  .product-card__badge, .article-card__tag { padding-block: 4px 2px; }
+  .product-card__badge { padding-block: 4px 2px; }
   .product-card__rating-star { position: relative; inset-inline-start: -1px; inset-block-start: -1px; }
   .product-card__rating > span[aria-hidden] { position: relative; inset-inline-start: -1px; inset-block-start: 1px; }
   .price { gap: 9px; }
   .testimonial-item__title { position: relative; inset-block-start: 1px; }
-  .article-card__tag { translate: -1px 0; }
   .faq-item__question { position: relative; inset-block-start: 2px; }
   .faq-item:first-child .faq-item__summary { position: relative; inset-block-start: -1px; }
   .faq-item:first-child .faq-item__question { inset-block-start: 3px; }
@@ -7049,15 +7056,12 @@ scroll-buttons.video-carousel__scroller { display: grid; grid-template-columns: 
 .video-carousel__row > .carousel-nav { margin-inline-start: auto; }
 .video-carousel__link + .carousel-nav { margin-inline-start: 0; }
 @media (min-width: 48rem) { .carousel-nav { display: flex; } }
-/* visibility giữ chỗ (CLS 0) và bỏ nút khỏi thứ tự Tab, cây a11y */
 scroll-buttons:not([data-enhanced]) .carousel-nav,
 scroll-buttons[data-static] .carousel-nav { visibility: hidden; }
-/* Đầu/cuối hàng: aria-disabled mờ 0.35 qua .round-button. hidden của scroll-buttons.js hiện tại
-   vẫn ẩn nút nhưng giữ chỗ để nút kia không nhảy */
 .carousel-nav .round-button[hidden] { display: inline-flex; visibility: hidden; }
-/* Dải tối (danh mục): nút trắng viền trắng, focus trắng; tiến trình trắng 12% / thumb trắng */
 .block-container--dark .round-button { border-color: var(--color-background); }
 .block-container--dark .round-button:focus-visible { outline-color: var(--color-background-dark-foreground); }
+.block-container--dark .round-button:is(:disabled, [aria-disabled='true']) { border-color: var(--color-muted-on-dark); background: transparent; color: var(--color-muted-on-dark); }
 
 .collection-list__track, .testimonials__list, .blog-posts__list, .video-carousel__list {
   display: flex;

@@ -3,6 +3,7 @@
 // Chạy: npx playwright test tests/e2e/ES1-T313.spec.ts --project=desktop
 import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
+import { expectRoundDisabled } from './support/round-disabled';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
 const CRITICAL = readFileSync('assets/critical.css', 'utf8');
@@ -16,7 +17,7 @@ const section = () => {
 // Token mặc định (settings_schema.json); css-variables.liquid là nguồn thật trên store.
 const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:120px;
 --page-margin:20px;--page-width:91rem;--header-height:80px;--radius-input:8px;--radius-button:8px;--radius-card:12px;--radius-pill:999px;--radius-xs:4px;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-swatch:var(--radius-sm);--radius-panel:var(--radius-lg);--radius-dialog:var(--radius-xl);
---color-background:#fff;--color-foreground:#1a1a1a;--color-muted:#6b6b6b;--color-muted-light:#808080;--color-border:#e5e5e5;
+--color-background:#fff;--color-foreground:#1a1a1a;--color-muted:#4d4d4d;--color-muted-light:#6b6b6b;--color-border:#e5e5e5;
 --color-background-alt:#f4f4f5;--color-background-alt-foreground:#1a1a1a;--color-background-dark:#1a1a1a;--color-background-dark-foreground:#fff;
 --color-background-panel:#393942;--color-accent:#c8400e;--color-accent-foreground:#fff;--color-sale:#c8102e;--color-badge-new:#467a48;
 --font-size-xs:.8125rem;--font-size-sm:.875rem;--font-size-base:1rem;--font-size-h3:1.5rem;--font-size-h2:2rem;--line-height-body:1.5;--line-height-heading:1.1;
@@ -127,9 +128,9 @@ test.describe('ES1-T313 tĩnh', () => {
     expect(Math.round(dialog.x)).toBe(24);
   });
 
-  test('TC-08 nút tròn ở đầu/cuối hàng (aria-disabled, TE-7 AC6) mờ 0.35, ngoài hàng cuộn [hidden] vẫn ẩn', async ({ page }) => {
+  test('TC-08 nút tròn ở đầu/cuối hàng (aria-disabled, TE-7 AC6) cặp màu disabled không mờ (ES1-T543), ngoài hàng cuộn [hidden] vẫn ẩn', async ({ page }) => {
     await mount(page, 1280);
-    await expect(page.getByTestId('round-hidden')).toHaveCSS('opacity', '0.35');
+    await expectRoundDisabled(page.getByTestId('round-hidden'));
     await expect(page.getByTestId('round-plain-hidden')).toBeHidden();
   });
 
