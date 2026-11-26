@@ -7,6 +7,7 @@
 import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
+import { SPACE_TOKENS } from './support/space-tokens';
 
 const read = (path: string) => readFileSync(path, 'utf8');
 const BASE = read('assets/base.css');
@@ -30,7 +31,7 @@ const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;
 --color-accent-foreground:#fff;--color-sale:#c8102e;--color-badge-new:#4b824d;
 --font-size-xs:.8125rem;--font-size-sm:.875rem;--font-size-base:1rem;--font-size-lg:1.125rem;--font-size-h3:1.5rem;--font-size-h2:2rem;--font-size-h1:3rem;
 --line-height-body:1.5;--line-height-heading:1.1;--font-heading--family:serif;--font-heading--weight:700;--font-heading--weight-display:800;
---font-primary--family:sans-serif;--motion-fast:150ms;--motion-base:250ms;--motion-slow:500ms;--ease-out:ease-out}`;
+--font-primary--family:sans-serif;--motion-fast:150ms;--motion-base:250ms;--motion-slow:500ms;--ease-out:ease-out}${SPACE_TOKENS}`;
 
 const icon = '<svg viewBox="0 0 24 24" aria-hidden="true"></svg>';
 const line = (n: number, rule = false) => `

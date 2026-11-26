@@ -8,6 +8,7 @@ import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { expectNotChallenged } from './support/store-guard';
+import { SPACE_TOKENS } from './support/space-tokens';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
 const CRITICAL = readFileSync('assets/critical.css', 'utf8');
@@ -30,7 +31,7 @@ const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;
 --color-background-alt:#f4f4f5;--color-background-dark:#1a1a1a;--color-background-dark-foreground:#fff;--color-accent:#c8400e;
 --font-size-xs:.8125rem;--font-size-sm:.875rem;--font-size-base:1rem;--font-size-h1:2rem;--line-height-body:1.5;--line-height-heading:1.1;
 --font-heading--family:serif;--font-heading--weight:700;--font-heading--weight-display:800;--font-primary--family:sans-serif;
---motion-fast:150ms;--motion-base:250ms;--motion-slow:500ms;--ease-out:ease-out}`;
+--motion-fast:150ms;--motion-base:250ms;--motion-slow:500ms;--ease-out:ease-out}${SPACE_TOKENS}`;
 
 // 60 ký tự không khoảng trắng: phải xuống dòng, không "…" (AC10)
 const LONG = 'Adjustable-Dumbbell-Pair-With-Quick-Dial-And-Storage-Tray-XL';

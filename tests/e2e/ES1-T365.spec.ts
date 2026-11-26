@@ -10,6 +10,7 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { expectNotChallenged } from './support/store-guard';
 import { env } from './support/store-data';
+import { SPACE_TOKENS } from './support/space-tokens';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
 // ES1-T478 (ADR 0013): CSS trang collection ở assets/collection.css, nạp sau base.css trên collection/search/list-collections
@@ -84,7 +85,7 @@ const FIXTURE = ({ filters = true, chips = true } = {}) => `
 
 const mount = async (page: Page, width: number, opts?: { filters?: boolean; chips?: boolean }) => {
   await page.setViewportSize({ width, height: 900 });
-  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}${COLLECTION}</style></head><body>${FIXTURE(opts)}</body></html>`);
+  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${SPACE_TOKENS}${CRITICAL}${BASE}${COLLECTION}</style></head><body>${FIXTURE(opts)}</body></html>`);
 };
 const box = async (page: Page, id: string) => (await page.getByTestId(id).first().boundingBox())!;
 const css = (page: Page, id: string, prop: string, pseudo: string | null = null) =>

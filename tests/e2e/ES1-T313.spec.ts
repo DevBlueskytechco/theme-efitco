@@ -4,6 +4,7 @@
 import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { expectRoundDisabled } from './support/round-disabled';
+import { SPACE_TOKENS } from './support/space-tokens';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
 const CRITICAL = readFileSync('assets/critical.css', 'utf8');
@@ -42,7 +43,7 @@ const FIXTURE = `
 
 const mount = async (page: Page, width: number) => {
   await page.setViewportSize({ width, height: 900 });
-  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${CRITICAL}${BASE}</style></head><body>${FIXTURE}</body></html>`);
+  await page.setContent(`<!doctype html><html><head><style>${TOKENS}${SPACE_TOKENS}${CRITICAL}${BASE}</style></head><body>${FIXTURE}</body></html>`);
 };
 const box = async (page: Page, id: string) => (await page.getByTestId(id).boundingBox())!;
 // Mở mọi dialog rồi chờ transition mở (opacity/translate/scale qua @starting-style) chạy xong:

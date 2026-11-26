@@ -8,6 +8,7 @@ import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { watchShopPay403 } from './support/console-guard';
+import { SPACE_TOKENS } from './support/space-tokens';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
 const CRITICAL = readFileSync('assets/critical.css', 'utf8');
@@ -21,7 +22,7 @@ const VIEWPORTS = {
 // Token mặc định (config/settings_schema.json); css-variables.liquid là nguồn thật trên store.
 const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;
 --page-margin:20px;--page-width:91rem;--color-background:#fff;--color-foreground:#1a1a1a;--color-border:#e5e5e5;
---color-background-dark-foreground:#fff;--radius-hero:12px}`;
+--color-background-dark-foreground:#fff;--radius-hero:12px}${SPACE_TOKENS}`;
 
 type Root = { enhanced?: boolean; multiple?: boolean; autoplay?: boolean; video?: boolean; disabled: boolean };
 

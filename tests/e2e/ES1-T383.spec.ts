@@ -10,6 +10,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { env } from './support/store-data';
 import { expectNotChallenged } from './support/store-guard';
+import { SPACE_TOKENS } from './support/space-tokens';
 
 const read = (p: string) => readFileSync(join(process.cwd(), p), 'utf8');
 const schema = (p: string) => JSON.parse(read(p).split('{% schema %}')[1].split('{% endschema %}')[0]);
@@ -41,7 +42,7 @@ const CONTACT_FIXTURE = `
 </div></section>`;
 
 async function fixture(page: Page, body: string) {
-  await page.setContent(`<!doctype html><html lang="en"><head><title>contact</title><style>${TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head><body><main>${body}</main></body></html>`);
+  await page.setContent(`<!doctype html><html lang="en"><head><title>contact</title><style>${TOKENS}${SPACE_TOKENS}</style><style>${read('assets/critical.css')}</style><style>${noComments(read('assets/base.css'))}</style><style>${noComments(read('assets/aux.css'))}</style></head><body><main>${body}</main></body></html>`);
 }
 
 const box = async (page: Page, selector: string) => (await page.locator(selector).first().boundingBox())!;
