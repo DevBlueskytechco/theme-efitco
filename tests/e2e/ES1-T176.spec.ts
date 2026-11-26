@@ -281,11 +281,13 @@ test.describe('ES1-T176 so Figma', () => {
   test.describe('So ảnh, kích thước, style (AC-H3, AC-H4)', () => {
     for (const row of rows as Row[]) {
       const title = `Hàng ${row.id} ${row.name} (${row.node})`;
-      if (row.image !== 'active') {
+      // image=style: hình khối đã đổi theo nguồn chuẩn mới (mockup, foundation §36) nên không so ảnh / số đo với Figma, vẫn so computed style.
+      if (row.image === 'style') {
+        test.fixme(`${title}: so ảnh — ${row.imageWhy}`, () => {});
+      } else if (row.image !== 'active') {
         test.fixme(`${title}: chưa hiệu chuẩn, ${row.closedBy} đóng hàng này`, () => {});
         continue;
-      }
-      test(`${title}: so ảnh`, async ({ page }) => {
+      } else test(`${title}: so ảnh`, async ({ page }) => {
         const requests = countStoreRequests(page);
         await openGate(page);
         await showSlide(page, row);

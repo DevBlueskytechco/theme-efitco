@@ -744,10 +744,10 @@ test.describe('ES1-T385 blog', () => {
 
 // ============================================================ Trang bài viết
 test.describe('ES1-T385 bài viết', () => {
-  test('TC-30 AC9: ảnh bìa 320×240 / 728×410 / 1240×570 / 1416×651, bo 16, dưới header 16/24, không chữ, eager + high, ×4', async ({ page }, ti) => {
+  test('TC-30 AC9: ảnh bìa 320×240 / 728×410 / 1240×620 / 1416×708 (2 / 1 từ 1280), bo 16, dưới header 16/24, không chữ, eager + high, ×4', async ({ page }, ti) => {
     desktopOnly(ti.project.name);
     const path = await coverArticle(page);
-    const SIZE: Record<number, [number, number]> = { 360: [320, 240], 768: [728, 410], 1280: [1240, 570], 1920: [1416, 651] };
+    const SIZE: Record<number, [number, number]> = { 360: [320, 240], 768: [728, 410], 1280: [1240, 620], 1920: [1416, 708] };
     for (const w of WIDTHS) {
       await openArticle(page, w, path);
       const cover = page.getByTestId('article-cover');

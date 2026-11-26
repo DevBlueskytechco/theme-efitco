@@ -717,7 +717,7 @@ test.describe('ES1-T159 AC6 AC8 đo theo mốc', () => {
     if (await row.count()) near((await box(row.locator('th'))).y, (await box(row.locator('td'))).y);
   });
 
-  test('TC-36 AC6 1280: 2 cột 580 | 80 | 580, ảnh 580 × 566', async ({ page }) => {
+  test('TC-36 AC6 1280: 2 cột 580 | 80 | 580, ảnh 580 × 580 (1 / 1, foundation §36)', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await gotoStore(page, STATES);
     const scope = featured(page, 'te13-a');
@@ -726,7 +726,7 @@ test.describe('ES1-T159 AC6 AC8 đo theo mốc', () => {
     near(gallery.w, 580); near(details.w, 580);
     near(details.x - (gallery.x + gallery.w), 80);
     const media = await box(scope.getByTestId('featured-product-media-item').first());
-    near(media.w, 580); near(media.h, 566);
+    near(media.w, 580); near(media.h, 580);
   });
 
   for (const w of [360, 768, 1280]) {
