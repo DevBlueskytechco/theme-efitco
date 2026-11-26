@@ -44,8 +44,9 @@ async function noOverflow(page: Page) {
 
 test.describe('ES1-T341 @static', () => {
   test.beforeEach(({}, info) => { test.skip(info.project.name !== 'desktop', 'tĩnh, chạy 1 lần'); });
-  // ADR 0014 (ES1-T565): CSS shop the look, quiz, image with text ở file block; token --panel-* giữ base.css
+  // ADR 0014 (ES1-T565): CSS shop the look, quiz, image with text ở file block; token --panel-* ở css-variables.liquid (ES1-T539)
   const base = read('assets/base.css');
+  const vars = read('snippets/css-variables.liquid');
   const lookCss = read('assets/shop-the-look.css');
   const quizCss = read('assets/quiz.css');
   const iwtCss = read('assets/image-with-text.css');
@@ -53,7 +54,7 @@ test.describe('ES1-T341 @static', () => {
   const locale = JSON.parse(read('locales/en.default.json'));
 
   test('--panel-muted chung: không còn --look-panel-muted, chữ phụ panel shop the look và ghi chú quiz dùng token chung', () => {
-    expect(base).toMatch(/--panel-muted:/);
+    expect(vars).toMatch(/--panel-muted:/);
     for (const css of [base, lookCss]) expect(css).not.toMatch(/--look-panel-muted|shop-the-look__discount-note/);
     expect(lookCss).toMatch(/\.shop-the-look__line \{[^}]*color: var\(--panel-muted\)/);
     expect(lookCss).toMatch(/\.shop-the-look__line--discount \{[^}]*color: var\(--panel-saving\)/);

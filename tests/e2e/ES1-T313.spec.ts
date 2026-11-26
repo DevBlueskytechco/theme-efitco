@@ -14,7 +14,7 @@ const section = () => {
   return BASE.slice(from, BASE.indexOf(END, from));
 };
 
-// Token mặc định (settings_schema.json); css-variables.liquid là nguồn thật trên store.
+// Token mặc định (settings_schema.json); css-variables.liquid là nguồn thật trên store (lớp, bóng, panel, --round-button-size từ ES1-T539).
 const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:120px;
 --page-margin:20px;--page-width:91rem;--header-height:80px;--radius-input:8px;--radius-button:8px;--radius-card:12px;--radius-pill:999px;--radius-xs:4px;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-swatch:var(--radius-sm);--radius-panel:var(--radius-lg);--radius-dialog:var(--radius-xl);
 --color-background:#fff;--color-foreground:#1a1a1a;--color-muted:#4d4d4d;--color-muted-light:#6b6b6b;--color-border:#e5e5e5;
@@ -22,7 +22,14 @@ const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;
 --color-background-panel:#393942;--color-accent:#c8400e;--color-accent-foreground:#fff;--color-sale:#c8102e;--color-badge-new:#467a48;--color-critical:var(--color-sale);
 --font-size-xs:.8125rem;--font-size-sm:.875rem;--font-size-base:1rem;--font-size-h3:1.5rem;--font-size-h2:2rem;--line-height-body:1.5;--line-height-heading:1.1;
 --font-heading--family:serif;--font-heading--weight-display:800;--font-primary--family:sans-serif;
---motion-fast:150ms;--motion-base:250ms;--motion-slow:500ms;--motion-hero:1400ms;--ease-out:ease-out}`;
+--motion-fast:150ms;--motion-base:250ms;--motion-slow:500ms;--motion-hero:1400ms;--ease-out:ease-out;
+--layer-content:1;--layer-sticky:4;--layer-bottom-bar:5;--layer-header:10;--layer-floating:15;--layer-scrim:20;--layer-overlay:21;--layer-toast:30;
+--overlay-scrim:color-mix(in srgb,var(--color-background-dark) 50%,transparent);--shadow-none:none;
+--shadow-raised:0 var(--space-2) var(--space-5) color-mix(in srgb,var(--color-foreground) 12%,transparent);
+--shadow-overlay:0 var(--space-6) calc(var(--space-1) * 20) color-mix(in srgb,var(--color-foreground) 28%,transparent);
+--shadow-bar:0 calc(-1 * var(--space-1)) var(--space-5) color-mix(in srgb,var(--color-foreground) 10%,transparent);
+--panel-muted:color-mix(in srgb,var(--color-background-dark-foreground) 70%,var(--color-background-panel));
+--panel-saving:color-mix(in srgb,var(--color-badge-new) 50%,var(--color-background-dark-foreground));--round-button-size:calc(var(--space-1) * 13)}`;
 
 const FIXTURE = `
 <div class="toast-region" data-testid="toast-region">

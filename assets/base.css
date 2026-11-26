@@ -1,16 +1,8 @@
 /** Lớp và dải đáy màn hình (ADR 0007, docs/ui-spec/layers.md §1–§3, TE-10 AC6, AC8).
-   Thang z và chiều cao thanh là giá trị dẫn xuất như --header-height, không phải token merchant.
+   Thang z --layer-* khai báo ở snippets/css-variables.liquid (foundation §31, ES1-T539).
    Mọi z-index trong assets/*.css dùng var(--layer-*); không z-index ≥ 1000, không `popover`
    cho phần tử không modal (không vượt banner consent, Shopify Inbox). */
 :root {
-  --layer-content: 1;
-  --layer-sticky: 4;
-  --layer-bottom-bar: 5;
-  --layer-header: 10;
-  --layer-floating: 15;
-  --layer-scrim: 20;
-  --layer-overlay: 21;
-  --layer-toast: 30;
   --edge: var(--space-4);
   --sticky-top: 0px;
   --bottom-bar-height: 0px;
@@ -134,14 +126,9 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .cart-sticky
 /** Khung lớp và trạng thái chung (TE-10-R2-FE2; foundation §2, §6, §15–§18; SRS TE-10 AC11–AC13).
    Màn nào cũng dùng lại (dialog, drawer, toast, alert, skeleton, empty state).
    Markup: <modal-dialog data-layer="<tên>" data-sheet-below="48rem"><dialog class="dialog dialog--m">.
-   Kích thước là giá trị dẫn xuất như --header-height, không phải token merchant. */
+   Kích thước là giá trị dẫn xuất như --header-height, không phải token merchant.
+   Scrim, bóng, màu panel, --round-button-size ở snippets/css-variables.liquid (ES1-T539). */
 :root {
-  --overlay-scrim: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
-  --shadow-raised: 0 var(--space-2) var(--space-5) color-mix(in srgb, var(--color-foreground) 12%, transparent);
-  --shadow-overlay: 0 var(--space-6) calc(var(--space-1) * 20) color-mix(in srgb, var(--color-foreground) 28%, transparent);
-  /* Panel tối: chữ phụ 70% (6.56:1), dòng giảm giá (5.64:1, luôn kèm icon + dấu −) */
-  --panel-muted: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel));
-  --panel-saving: color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground));
   /* Dialog S 480 / M 720 / L 1120, cao ≤ 860; drawer 420 / 480; empty state ≤ 512 */
   --dialog-s: 30rem;
   --dialog-m: 45rem;
@@ -151,7 +138,6 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .cart-sticky
   --drawer-l: 30rem;
   --empty-state-max: 32rem;
   --close-button-size: calc(var(--space-1) * 12);
-  --round-button-size: calc(var(--space-1) * 13);
   /* Hàng ngang: card tối đa 336, review 456, video 264, tiến trình cao 2 */
   --row-card-max: 21rem;
   --row-card-review-max: 28.5rem;
@@ -6718,7 +6704,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
   /* Nút */
   .button, .slideshow__arrow, .featured-collection__tab { transition: background-color var(--motion-base) var(--ease-out), color var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out), scale var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
-  html[data-motion] .button:hover:not(:disabled) { translate: 0 -1px; box-shadow: 0 6px 16px color-mix(in srgb, var(--color-foreground) 18%, transparent); }
+  html[data-motion] .button:hover:not(:disabled) { translate: 0 -1px; box-shadow: var(--shadow-raised); }
   html[data-motion] .button:active:not(:disabled) { translate: 0 0; scale: 0.98; }
   html[data-motion] .slideshow__arrow:hover { scale: 1.06; }
   html[data-motion] .slideshow__arrow:active { scale: 0.94; }
@@ -6759,7 +6745,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   .video-card__play { transition: opacity var(--motion-base) var(--ease-out), scale var(--motion-base) var(--ease-out); }
   html[data-motion] .video-card:hover .video-card__play { scale: 1.08; }
   .testimonial-item { transition: box-shadow var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), background-color var(--motion-base) var(--ease-out), translate var(--motion-base) var(--ease-out); }
-  html[data-motion] .testimonial-item:hover { box-shadow: 0 8px 24px color-mix(in srgb, var(--color-foreground) 10%, transparent); translate: 0 -2px; }
+  html[data-motion] .testimonial-item:hover { box-shadow: var(--shadow-raised); translate: 0 -2px; }
 
   /* Tab (quiz, bundle, shop the look: file block, ADR 0014) */
   .featured-collection__grid { animation: motion-fade var(--motion-slow) var(--ease-out); }
@@ -6956,7 +6942,7 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
   /* Hàng cuộn: card nổi nhẹ khi rê chuột, nút bấm có độ nảy */
   .carousel-progress__thumb { transition: width var(--motion-base) var(--ease-out); }
   .article-card, .video-card { transition: translate var(--motion-slow) var(--ease-expo), box-shadow var(--motion-slow) var(--ease-expo); }
-  html[data-motion] .article-card:hover { translate: 0 -6px; box-shadow: 0 18px 40px color-mix(in srgb, var(--figma-000000) 18%, transparent); }
+  html[data-motion] .article-card:hover { translate: 0 -6px; box-shadow: var(--shadow-raised); }
   html[data-motion] .product-card { transition: translate var(--motion-slow) var(--ease-expo); }
   html[data-motion] .product-card:hover { translate: 0 -4px; }
 
