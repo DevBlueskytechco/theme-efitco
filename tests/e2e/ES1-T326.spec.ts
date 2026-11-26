@@ -8,6 +8,7 @@ import { test, expect, type Page } from './support/test';
 import { readFileSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
 import { expectNotChallenged } from './support/store-guard';
+import { SPACE_TOKENS } from './support/space-tokens';
 
 const BASE = readFileSync('assets/base.css', 'utf8');
 const CRITICAL = readFileSync('assets/critical.css', 'utf8');
@@ -25,12 +26,12 @@ const BASE_URL = process.env.STORE_ORIGIN || (process.env.PREVIEW_URL ? new URL(
 
 // Token mặc định (settings_schema.json); css-variables.liquid là nguồn thật trên store.
 const TOKENS = `:root{--space-1:4px;--space-2:8px;--space-3:12px;--space-4:16px;--space-5:24px;--space-6:32px;--space-7:48px;--space-8:120px;
---page-margin:20px;--page-width:91rem;--header-height:80px;--radius-input:8px;--radius-button:8px;--radius-card:12px;--radius-pill:999px;
+--page-margin:20px;--page-width:91rem;--header-height:80px;--radius-input:8px;--radius-button:8px;--radius-card:12px;--radius-pill:999px;--radius-xs:4px;--radius-sm:8px;--radius-md:12px;--radius-lg:16px;--radius-xl:20px;--radius-swatch:var(--radius-sm);--radius-panel:var(--radius-lg);--radius-dialog:var(--radius-xl);
 --color-background:#fff;--color-foreground:#1a1a1a;--color-muted:#6b6b6b;--color-muted-light:#808080;--color-border:#e5e5e5;
 --color-background-alt:#f4f4f5;--color-background-dark:#1a1a1a;--color-background-dark-foreground:#fff;--color-accent:#c8400e;
 --font-size-xs:.8125rem;--font-size-sm:.875rem;--font-size-base:1rem;--font-size-h1:2rem;--line-height-body:1.5;--line-height-heading:1.1;
 --font-heading--family:serif;--font-heading--weight:700;--font-heading--weight-display:800;--font-primary--family:sans-serif;
---motion-fast:150ms;--motion-base:250ms;--motion-slow:500ms;--ease-out:ease-out}`;
+--motion-fast:150ms;--motion-base:250ms;--motion-slow:500ms;--ease-out:ease-out}${SPACE_TOKENS}`;
 
 // 60 ký tự không khoảng trắng: phải xuống dòng, không "…" (AC10)
 const LONG = 'Adjustable-Dumbbell-Pair-With-Quick-Dial-And-Storage-Tray-XL';
