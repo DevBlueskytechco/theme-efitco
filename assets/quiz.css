@@ -91,7 +91,7 @@
   gap: var(--space-6);
   min-inline-size: 0;
   padding: var(--space-5) var(--space-4);
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background);
   color: var(--color-foreground);
 }
@@ -639,7 +639,7 @@
   display: none;
 }
 
-/* 768: panel trong container, bo 24, padding 40 / 32 */
+/* 768: panel lớn trong trang, bo 20 (--radius-xl, foundation §1.2), padding 40 / 32 */
 @media (min-width: 48rem) {
   .block-container > .quiz {
     grid-column: 2;
@@ -647,7 +647,7 @@
 
   .quiz {
     padding: calc(var(--space-1) * 10) var(--space-6);
-    border-radius: calc(var(--radius-card) * 2);
+    border-radius: var(--radius-xl);
   }
 
   :is(.quiz__dialog, .quiz-page) .quiz__results-grid {
@@ -831,6 +831,8 @@
 [data-quiz-title]:focus { outline: 0; }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* ES1-T550: back giữ 3px khi RTL */
+  html[data-motion] button.quiz__shortlist-back:dir(rtl):hover > .slideshow-icon--arrow { translate: 3px 0; }
   .quiz-option { transition: box-shadow var(--motion-base) var(--ease-out), border-color var(--motion-base) var(--ease-out), background-color var(--motion-base) var(--ease-out), translate var(--motion-base) var(--ease-out); }
   .quiz-step[data-active] { animation: motion-fade var(--motion-base) var(--ease-out); }
   .quiz-step__bar, .quiz-step__bar::before { transition: width var(--motion-slow) var(--ease-out), inline-size var(--motion-slow) var(--ease-out), scale var(--motion-slow) var(--ease-out); }
