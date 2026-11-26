@@ -103,8 +103,9 @@ test.describe('ES1-T341 quiz (TE-11 AC4, index-mobile-a §6, index-1280 khối 6
     await noOverflow(page);
   });
 
-  for (const [width, panel, radius] of [[WIDTHS.tablet, 728, '24px'], [WIDTHS.desktop, 1240, '24px'], [WIDTHS.wide, 1416, '24px']] as const) {
-    test(`${width}: panel ${panel} bo 24${width >= 1280 ? ', thẻ 608, giới thiệu cùng hàng' : ', thẻ dưới giới thiệu'}`, async ({ page }) => {
+  // ES1-T537: 768 panel lớn trong trang --radius-xl 20 (bo 24 → 20); từ 1280 .quiz--split bo --figma-radius-24 (ES1-T538)
+  for (const [width, panel, radius] of [[WIDTHS.tablet, 728, '20px'], [WIDTHS.desktop, 1240, '24px'], [WIDTHS.wide, 1416, '24px']] as const) {
+    test(`${width}: panel ${panel} bo ${parseInt(radius)}${width >= 1280 ? ', thẻ 608, giới thiệu cùng hàng' : ', thẻ dưới giới thiệu'}`, async ({ page }) => {
       await openHome(page, width);
       const quiz = page.getByTestId('quiz').first();
       test.skip(!(await quiz.count()), 'Trang chủ không có quiz (bước rỗng)');

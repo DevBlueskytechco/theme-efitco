@@ -10,6 +10,9 @@
   the range keeps the hidden Sale price label and is followed by the
   variant's compare-at price struck through (CTO 3/11, ES1-T56).
 
+  Every money string sits in a <bdi> so its digits and signs keep their order
+  inside an RTL page (foundation.md §34); textContent does not change.
+
   @param {product} product - The product to price
   @param {variant} [variant] - Variant to price. When set, the range is never shown
   @param {boolean} [show_range] - Show price_min – price_max when the price varies. Default: true
@@ -41,26 +44,26 @@
     -%}
     {%- if on_sale -%}
       <span class="visually-hidden">{{ 'products.price.sale_price' | t }}</span>
-      <span class="price__current price__current--sale" data-testid="price-range">
+      <span class="price__current price__current--sale" data-testid="price-range"><bdi>
         {{- 'products.price.range' | t: min: price_min, max: price_max -}}
-      </span>
+      </bdi></span>
       <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
-      <s class="price__compare" data-testid="price-compare">{{ target.compare_at_price | money }}</s>
+      <s class="price__compare" data-testid="price-compare"><bdi>{{ target.compare_at_price | money }}</bdi></s>
     {%- else -%}
-      <span class="price__current" data-testid="price-range">
+      <span class="price__current" data-testid="price-range"><bdi>
         {{- 'products.price.range' | t: min: price_min, max: price_max -}}
-      </span>
+      </bdi></span>
     {%- endif -%}
   {%- elsif on_sale -%}
     <span class="visually-hidden">{{ 'products.price.sale_price' | t }}</span>
-    <span class="price__current price__current--sale" data-testid="price-regular">
+    <span class="price__current price__current--sale" data-testid="price-regular"><bdi>
       {{- target.price | money -}}
-    </span>
+    </bdi></span>
     <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
-    <s class="price__compare" data-testid="price-compare">{{ target.compare_at_price | money }}</s>
+    <s class="price__compare" data-testid="price-compare"><bdi>{{ target.compare_at_price | money }}</bdi></s>
   {%- else -%}
     <span class="visually-hidden">{{ 'products.price.regular_price' | t }}</span>
-    <span class="price__current" data-testid="price-regular">{{ target.price | money }}</span>
+    <span class="price__current" data-testid="price-regular"><bdi>{{ target.price | money }}</bdi></span>
   {%- endif -%}
 
   {%- if target.unit_price_measurement -%}
@@ -73,8 +76,8 @@
       assign unit_price = target.unit_price | money
     -%}
     <span class="visually-hidden">{{ 'products.price.unit_price' | t }}</span>
-    <span class="price__unit" data-testid="price-unit">
+    <span class="price__unit" data-testid="price-unit"><bdi>
       {{- 'products.price.unit_price_value' | t: price: unit_price, unit: reference -}}
-    </span>
+    </bdi></span>
   {%- endif -%}
 </div>
