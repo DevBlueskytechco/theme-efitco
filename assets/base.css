@@ -139,7 +139,6 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .cart-sticky
   --overlay-scrim: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
   --shadow-raised: 0 var(--space-2) var(--space-5) color-mix(in srgb, var(--color-foreground) 12%, transparent);
   --shadow-overlay: 0 var(--space-6) calc(var(--space-1) * 20) color-mix(in srgb, var(--color-foreground) 28%, transparent);
-  --radius-dialog: calc(var(--radius-card) * 2);
   /* Panel tối: chữ phụ 70% (6.56:1), dòng giảm giá (5.64:1, luôn kèm icon + dấu −) */
   --panel-muted: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel));
   --panel-saving: color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground));
@@ -494,15 +493,15 @@ modal-dialog {
 }
 
 .toast--success {
-  --toast-accent: var(--color-badge-new);
+  --toast-accent: var(--color-success);
 }
 
 .toast--warning {
-  --toast-accent: var(--color-accent);
+  --toast-accent: var(--color-warning);
 }
 
 .toast--error {
-  --toast-accent: var(--color-sale);
+  --toast-accent: var(--color-critical);
 }
 
 .toast__icon {
@@ -1193,7 +1192,7 @@ collection-tabs {
   justify-content: center;
   min-block-size: calc(var(--space-1) * 11);
   padding-inline: calc(var(--space-1) * 7);
-  border-radius: calc(var(--radius-button) * 2);
+  border-radius: var(--radius-sm);
   background-color: var(--color-background-alt);
   color: var(--color-background-alt-foreground);
   font-size: var(--font-size-base);
@@ -1401,7 +1400,7 @@ collection-tabs {
   min-block-size: 17.5rem;
   margin-block-start: var(--space-4);
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-dark);
   color: var(--color-background-dark-foreground);
 }
@@ -1812,7 +1811,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   position: absolute;
   inset-block: calc(var(--space-1) * 2.75);
   width: 61.4%;
-  border-radius: calc(var(--radius-card) - var(--space-1));
+  border-radius: var(--radius-sm);
   background-color: color-mix(in srgb, var(--color-background-dark-foreground) 4%, transparent);
 }
 
@@ -1828,7 +1827,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   z-index: var(--layer-content);
   width: 6.125rem;
   margin-inline: auto;
-  border-radius: calc(var(--radius-card) - var(--space-1));
+  border-radius: var(--radius-sm);
 }
 
 .site-footer__newsletter {
@@ -1900,8 +1899,8 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 }
 
 .site-footer__input[aria-invalid='true'] {
-  border-color: var(--color-sale);
-  box-shadow: inset 0 0 0 1px var(--color-sale);
+  border-color: var(--color-critical);
+  box-shadow: inset 0 0 0 1px var(--color-critical);
 }
 
 .site-footer__submit {
@@ -1945,7 +1944,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   margin-inline: var(--site-footer-inset);
   padding-block: var(--space-7) var(--space-5);
   padding-inline: calc(var(--site-footer-side) - var(--site-footer-inset));
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: color-mix(in srgb, var(--color-background-dark-foreground) 2%, transparent);
 }
 
@@ -2003,13 +2002,13 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   margin-block-start: var(--space-3);
   padding: var(--space-3) var(--space-4);
   border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent);
-  border-inline-start: var(--space-1) solid var(--color-sale);
+  border-inline-start: var(--space-1) solid var(--color-critical);
   border-radius: var(--radius-input);
   color: var(--color-background-dark-foreground);
 }
 
 .form-message--success {
-  border-inline-start-color: var(--color-badge-new);
+  border-inline-start-color: var(--color-success);
 }
 
 .site-footer__message-body {
@@ -2039,11 +2038,11 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 }
 
 .site-footer :is(.site-footer__invalid, .site-footer__message--error) .status-icon {
-  color: var(--color-sale);
+  color: var(--color-critical);
 }
 
 .site-footer .form-message--success .status-icon {
-  color: var(--color-badge-new);
+  color: var(--color-success);
 }
 
 .site-footer__form .status-icon {
@@ -3401,61 +3400,14 @@ slideshow-carousel[data-playing]:not([data-playing='false']) .slideshow__pause .
     padding-block: var(--space-6) var(--space-8);
   }
 
-  /* Cộng chiều cao header vì header sticky mặc định bật */
-  .product__details {
-    position: sticky;
-    inset-block-start: calc(var(--header-height) + var(--space-6));
   }
-}
 
 /** Product media gallery: cuộn ngang scroll-snap dưới 64rem, xếp dọc từ 64rem */
 product-media-gallery {
   display: block;
 }
 
-.product-media__list,
-.product-media__thumbnails {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.product-media__list {
-  display: flex;
-  gap: var(--space-2);
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-
-.product-media__list::-webkit-scrollbar {
-  display: none;
-}
-
 /* Không JS: thanh cuộn là dấu hiệu còn media khác (giống slideshow) */
-@media (scripting: none) {
-  .product-media__list {
-    scrollbar-width: thin;
-  }
-
-  .product-media__list::-webkit-scrollbar {
-    display: block;
-  }
-}
-
-.product-media__item {
-  position: relative;
-  display: grid;
-  flex: 0 0 100%;
-  align-content: center;
-  overflow: hidden;
-  scroll-snap-align: start;
-  /* Bấm thumbnail (anchor) không để media nằm dưới header sticky */
-  scroll-margin-block-start: calc(var(--sticky-top) + var(--space-4));
-  border-radius: var(--radius-card);
-  background-color: var(--color-background-cream);
-}
 
 /* darken: nền trắng của ảnh sản phẩm hoà vào nền cream như product card */
 .product-media__image > img {
@@ -3517,6 +3469,11 @@ product-media-gallery {
   translate: -50% -50%;
 }
 
+/* RTL: inset-inline-start là cạnh phải, translate không có từ khoá logical */
+.product-media__play:dir(rtl) {
+  translate: 50% -50%;
+}
+
 .product-media__play .slideshow-icon {
   inline-size: var(--space-5);
   block-size: var(--space-5);
@@ -3544,29 +3501,6 @@ product-media-gallery {
   block-size: 100%;
 }
 
-.product-media__placeholder {
-  aspect-ratio: 1;
-  color: var(--color-muted-light);
-}
-
-.product-media__placeholder-svg {
-  inline-size: 100%;
-  block-size: 100%;
-  fill: currentcolor;
-}
-
-.product-media__thumbnails {
-  display: flex;
-  gap: var(--space-2);
-  margin-block-start: var(--space-3);
-  overflow-x: auto;
-  scrollbar-width: thin;
-}
-
-.product-media__thumbnail-item {
-  flex: none;
-}
-
 /* 64 × 64, vùng bấm vượt 24px (WCAG 2.5.8) */
 .product-media__thumbnail {
   position: relative;
@@ -3582,13 +3516,6 @@ product-media-gallery {
 .product-media__thumbnail:hover,
 .product-media__thumbnail[aria-current='true'] {
   border-color: var(--color-foreground);
-}
-
-.product-media__thumbnail-image {
-  inline-size: 100%;
-  block-size: 100%;
-  object-fit: cover;
-  mix-blend-mode: darken;
 }
 
 .product-media__thumbnail-badge {
@@ -3617,82 +3544,6 @@ product-media-gallery {
   line-height: var(--line-height-body);
 }
 
-/* Dialog zoom: assets/product-media.js mở bằng showModal() và gắn ảnh */
-.product-media__dialog {
-  inline-size: 100%;
-  max-inline-size: 100%;
-  block-size: 100%;
-  max-block-size: 100%;
-  padding: 0;
-  border: 0;
-}
-
-.product-media__dialog::backdrop {
-  background-color: color-mix(in srgb, var(--color-background-dark) 60%, transparent);
-}
-
-.product-media__dialog-image {
-  inline-size: 100%;
-  block-size: 100%;
-  object-fit: contain;
-}
-
-.product-media__dialog-form {
-  position: absolute;
-  inset-block-start: var(--space-4);
-  inset-inline-end: var(--space-4);
-  z-index: var(--layer-content);
-}
-
-.product-media__dialog-close {
-  position: relative;
-  display: grid;
-  place-items: center;
-  inline-size: 44px;
-  block-size: 44px;
-  padding: 0;
-  border: 1px solid var(--color-border);
-  border-radius: 50%;
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  cursor: pointer;
-}
-
-.product-media__dialog-close:hover {
-  border-color: var(--color-foreground);
-  background-color: var(--color-foreground);
-  color: var(--color-background);
-}
-
-.product-media__close-icon::before,
-.product-media__close-icon::after {
-  position: absolute;
-  inset-block-start: calc(50% - 1px);
-  inset-inline-start: calc(50% - var(--space-2));
-  inline-size: var(--space-4);
-  block-size: 2px;
-  background-color: currentcolor;
-  content: '';
-  rotate: 45deg;
-}
-
-.product-media__close-icon::after {
-  rotate: -45deg;
-}
-
-@media (min-width: 64rem) {
-  .product-media__list {
-    flex-direction: column;
-    gap: var(--space-3);
-    overflow: visible;
-    scroll-snap-type: none;
-  }
-
-  .product-media__item {
-    flex: none;
-  }
-}
-
 /** Product form: picker pill radio, quantity, selling plan,
    gift card, buy buttons, pickup. Mặc định kỹ thuật;
    payment_button của Shopify không bị đè màu */
@@ -3709,14 +3560,6 @@ product-variant-picker {
 
 .product-form {
   margin-block: var(--space-5);
-}
-
-.product-form--placeholder {
-  padding: var(--space-4);
-  outline: 1px dashed var(--color-border);
-  outline-offset: -1px;
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
 }
 
 .product-form[aria-busy='true'] .product-form__add {
@@ -3750,10 +3593,6 @@ product-variant-picker {
 
 .product-form__quantity {
   inline-size: calc(var(--space-1) * 28);
-}
-
-.product-form__textarea {
-  resize: vertical;
 }
 
 .product-form__hint {
@@ -3999,7 +3838,7 @@ product-variant-picker:not(:defined) {
   grid-template-columns: auto 1fr;
   align-items: start;
   gap: var(--space-2);
-  color: var(--color-sale);
+  color: var(--color-critical);
   font-size: var(--font-size-sm);
   font-weight: 500;
 }
@@ -4122,32 +3961,8 @@ product-variant-picker:not(:defined) {
   gap: var(--space-4);
 }
 
-.product-gift-card__toggle {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  min-block-size: 44px;
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-}
-
-.product-gift-card__fields {
-  display: none;
-  gap: var(--space-4);
-  min-inline-size: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
 .product-gift-card:has(.product-gift-card__checkbox:checked) .product-gift-card__fields {
   display: grid;
-}
-
-/* Buy buttons */
-.product-form__buy-buttons {
-  display: grid;
-  gap: var(--space-3);
 }
 
 .product-form__inventory {
@@ -4186,52 +4001,6 @@ product-variant-picker:not(:defined) {
   cursor: not-allowed;
 }
 
-.product-form__payment-button:empty,
-.product-form__installments:empty {
-  display: none;
-}
-
-/* Dynamic checkout: chỉ nút unbranded + link "More payment options"
-   lấy token foreground/background (tương phản như chữ thân, AA); nút ví có thương hiệu (Shop Pay,
-   PayPal…) giữ màu của Shopify. 2 class để thắng CSS Shopify kể cả :hover:not([disabled]). */
-.product-form__payment-button .shopify-payment-button__button--unbranded {
-  min-block-size: 52px;
-  padding: var(--space-3) var(--space-6);
-  border: 1px solid var(--color-foreground);
-  border-radius: var(--radius-button);
-  background-color: var(--color-foreground);
-  color: var(--color-background);
-  font-family: inherit;
-  font-size: var(--font-size-base);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.2;
-}
-
-.product-form__payment-button .shopify-payment-button__button--unbranded:hover:not([disabled]) {
-  border-color: var(--color-foreground);
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-}
-
-.product-form__payment-button .shopify-payment-button__button--unbranded:focus-visible {
-  outline: 2px solid var(--color-foreground);
-  outline-offset: 2px;
-}
-
-.product-form__payment-button .shopify-payment-button__button--unbranded[disabled] {
-  border-color: var(--color-border);
-  background-color: var(--color-background-alt);
-  color: var(--color-muted);
-  opacity: 1;
-}
-
-.product-form__payment-button .shopify-payment-button__more-options {
-  color: var(--color-foreground);
-  font-size: var(--font-size-sm);
-  text-decoration: underline;
-}
-
 /* Pickup */
 .product-pickup {
   display: grid;
@@ -4241,48 +4010,10 @@ product-variant-picker:not(:defined) {
   font-size: var(--font-size-sm);
 }
 
-.product-pickup__status {
-  font-weight: 600;
-}
-
-.product-pickup__time,
-.product-pickup__address {
-  color: var(--color-muted);
-}
-
-.product-pickup__address p {
-  margin: 0;
-}
-
-.product-pickup__details {
-  margin-block-start: var(--space-2);
-}
-
-.product-pickup__summary {
-  display: inline-flex;
-  align-items: center;
-  min-block-size: max(var(--space-5), var(--touch-target-min));
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-  cursor: pointer;
-}
-
-.product-pickup__list {
-  display: grid;
-  gap: var(--space-4);
-  margin: var(--space-3) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.product-pickup__name {
-  font-weight: 600;
-}
-
 /* Live region lỗi: rỗng thì không chiếm chỗ, BE ES1-T67 điền text API */
 .product-form__error:not(:empty) {
   padding: var(--space-3) var(--space-4);
-  border-inline-start: 2px solid var(--color-sale);
+  border-inline-start: 2px solid var(--color-critical);
   background-color: var(--color-background-alt);
   color: var(--color-background-alt-foreground);
   font-size: var(--font-size-sm);
@@ -4521,7 +4252,7 @@ cart-items[aria-busy='true'] {
 .cart-items__error:not(:empty) {
   margin-block-end: var(--space-5);
   padding: var(--space-3) var(--space-4);
-  border-inline-start: 2px solid var(--color-sale);
+  border-inline-start: 2px solid var(--color-critical);
   background-color: var(--color-background-alt);
   color: var(--color-background-alt-foreground);
   font-size: var(--font-size-sm);
@@ -4538,7 +4269,7 @@ cart-items[aria-busy='true'] {
 }
 
 .cart-free-shipping--reached {
-  --free-shipping-fill: var(--color-badge-new);
+  --free-shipping-fill: var(--color-success);
 }
 
 .cart-free-shipping__icon svg,
@@ -4610,7 +4341,7 @@ cart-items[aria-busy='true'] {
 .cart-drawer__bestseller-media {
   display: block;
   overflow: hidden;
-  border-radius: calc(var(--radius-card) - var(--space-1));
+  border-radius: var(--radius-swatch);
   background-color: var(--color-background-cream);
 }
 
@@ -4736,6 +4467,11 @@ cart-items[aria-busy='true'] {
   background-color: var(--color-background);
 }
 
+/* RTL: stepper giữ thứ tự − số + (foundation §34, kit .quantity) */
+.cart-line__stepper:dir(rtl) {
+  direction: ltr;
+}
+
 .cart-line__stepper:focus-within {
   border-color: var(--color-accent);
 }
@@ -4820,7 +4556,7 @@ cart-items[aria-busy='true'] {
   align-items: flex-start;
   gap: var(--space-2);
   margin: 0;
-  color: var(--color-sale);
+  color: var(--color-critical);
   font-size: var(--font-size-sm);
   font-weight: 500;
 }
@@ -5053,7 +4789,7 @@ cart-drawer {
   margin: 0 0 var(--space-4);
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-border);
-  border-inline-start: var(--space-1) solid var(--color-badge-new);
+  border-inline-start: var(--space-1) solid var(--color-success);
   border-radius: var(--radius-input);
   font-size: var(--font-size-sm);
   overflow-wrap: anywhere;
@@ -5071,7 +4807,7 @@ cart-drawer {
 }
 
 .cart-drawer__added-icon {
-  color: var(--color-badge-new);
+  color: var(--color-success);
 }
 
 .cart-drawer__added-text {
@@ -5185,7 +4921,7 @@ cart-drawer {
   margin: 0 var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
   padding: var(--space-5);
   border: 0;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-panel);
   color: var(--color-background-dark-foreground);
 }
@@ -5273,7 +5009,7 @@ cart-drawer {
 .collection-card > .collection-card__image {
   aspect-ratio: 336 / 220;
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-panel);
 }
 
@@ -5312,7 +5048,7 @@ cart-drawer {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
 }
 
 .collection-card:hover .collection-card__link {
@@ -5411,7 +5147,7 @@ cart-drawer {
   justify-content: flex-end;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-dark);
   color: var(--color-background-dark-foreground);
   text-align: start;
@@ -5604,7 +5340,7 @@ cart-drawer {
 /* Figma bo 16, tỉ lệ 3/4. overflow: clip (không phải scroll container) nên tên dài làm card cao thêm thay vì bị cắt. Nền tối giữ chữ trắng đọc được khi chưa có ảnh.
    isolation + ảnh z-index -1: ảnh nằm dưới chữ mà .article-card__content không cần position, để ::after của link phủ cả khung */
 .article-card__frame {
-  --article-card-radius: calc(var(--radius-card) + var(--space-1));
+  --article-card-radius: var(--radius-panel);
   position: relative;
   isolation: isolate;
   display: flex;
@@ -6707,13 +6443,13 @@ video-card {
   display: grid;
   gap: var(--space-2);
   padding: var(--space-4);
-  border-inline-start: var(--space-1) solid var(--color-badge-new);
+  border-inline-start: var(--space-1) solid var(--color-success);
   border-radius: var(--radius-input);
   background-color: var(--color-background-alt);
 }
 
 .form-status--error {
-  border-inline-start-color: var(--color-sale);
+  border-inline-start-color: var(--color-critical);
 }
 
 .form-status:focus-visible {
@@ -6730,8 +6466,8 @@ video-card {
 }
 
 .form-status:has(> .form-status__icon) { grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); }
-.form-status__icon { display: flex; color: var(--color-badge-new); }
-.form-status--error .form-status__icon { color: var(--color-sale); }
+.form-status__icon { display: flex; color: var(--color-success); }
+.form-status--error .form-status__icon { color: var(--color-critical); }
 .form-status__icon .status-icon { inline-size: calc(var(--space-1) * 5); block-size: calc(var(--space-1) * 5); }
 .form-status__body { display: grid; gap: var(--space-1); }
 .form-status__body > p { margin: 0; }
@@ -6742,7 +6478,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .site-header .site-header__svg-search { width: 20px; height: 20px; }
 .site-header__icons svg:not(.site-header__svg-search) { width: 24px; height: 24px; }
 .slideshow__arrow .slideshow-icon { flex: none; width: 52px; height: 52px; }
-
 
 @media (min-width: 80rem) {
   /* Header */
@@ -6903,11 +6638,10 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 }
 
 /* ==== Trải nghiệm mượt. Không đổi bố cục tĩnh. ==== */
-/* Model 3D nạp xong không được nở khỏi cột gallery (TC-108) */
-.product-media__item { grid-template-columns: minmax(0, 1fr); }
 .site-header__cart-count { inset-block-start: -8px; inset-inline-end: -9px; min-width: 16px; padding-inline: 3px; border-radius: var(--figma-radius-8); background-color: var(--color-accent); color: var(--color-accent-foreground); font-size: 10px; line-height: 16px; }
 .video-card__media { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
 .video-card__toggle { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; translate: -50% -50%; display: flex; align-items: center; justify-content: center; inline-size: 52px; block-size: 52px; padding: 0; border: 0; border-radius: 50%; background-color: var(--color-background); color: var(--color-foreground); cursor: pointer; }
+.video-card__toggle:dir(rtl) { translate: 50% -50%; }
 .video-card__toggle[hidden] { display: none; }
 /* Giống lúc đầu: icon chỉ hiện khi rê chuột, video nào cũng vậy. Màn cảm ứng: chạm video để dừng, đang dừng thì hiện icon. */
 @media (hover: hover) { .video-card__toggle { opacity: 0; } .video-card:hover .video-card__toggle, .video-card__toggle:focus-visible { opacity: 1; } }
@@ -6938,6 +6672,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   html[data-motion] .button--link:hover:not(:disabled), html[data-motion] .button--link:active:not(:disabled) { translate: none; scale: none; box-shadow: none; }
   .slideshow-icon--arrow { transition: translate var(--motion-base) var(--ease-out); }
   html[data-motion] a:hover > .slideshow-icon--arrow, html[data-motion] button:hover > .slideshow-icon--arrow { translate: 3px 0; }
+  /* RTL: mũi tên đã lật, trượt theo hướng đọc; nút back (aux.css, quiz.css) và announcement bar giữ rule riêng */
+  html[data-motion] :is(a, button):not(.article-main__back, .announcement-bar__link):dir(rtl):hover > .slideshow-icon--arrow { translate: calc(var(--space-1) * -0.75) 0; }
   .button[aria-busy='true']::after { animation: motion-spin var(--motion-hero) linear infinite; }
 
   /* Menu */
@@ -6957,6 +6693,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   html[data-motion] .site-header__mega-link:dir(rtl):hover { translate: calc(-1 * var(--space-1)) 0; }
   .site-header__submenu .site-header__link { transition: color var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
   html[data-motion] .site-header__submenu .site-header__link:hover { color: var(--color-accent); translate: 4px 0; text-decoration: none; }
+  html[data-motion] .site-header__submenu .site-header__link:dir(rtl):hover { translate: calc(-1 * var(--space-1)) 0; }
   [data-testid='header-cart-link'][data-bump] { animation: motion-bump var(--motion-slow) var(--ease-out); }
   .site-header__cart-count { animation: motion-pop var(--motion-base) var(--ease-out); }
 
@@ -6994,7 +6731,6 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   /* Form */
   .site-footer__input { transition: border-color var(--motion-base) var(--ease-out), box-shadow var(--motion-base) var(--ease-out); }
   .site-footer__menu-summary .site-footer__chevron, .site-footer__link, .site-footer__social-link { transition: rotate var(--motion-base) var(--ease-out), color var(--motion-fast) var(--ease-out); }
-
 
   @keyframes motion-spin { to { rotate: 360deg; } }
   @keyframes motion-drop { from { opacity: 0; translate: 0 -8px; } }
@@ -7134,6 +6870,10 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
   background: var(--color-foreground);
   translate: calc(var(--scroll-pos, 0) * (1 / var(--scroll-size, 1) - 1) * 100%) 0;
 }
+/* RTL: thumb đứng ở inline-start (cạnh phải), chạy về trái nên đảo dấu translate (foundation §34) */
+.carousel-progress__thumb:dir(rtl) {
+  translate: calc(var(--scroll-pos, 0) * (1 - 1 / var(--scroll-size, 1)) * 100%) 0;
+}
 .block-container--dark .carousel-progress { background: color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent); }
 .block-container--dark .carousel-progress__thumb { background: var(--color-background-dark-foreground); }
 @media (pointer: fine) {
@@ -7145,7 +6885,6 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
 /* 4. Eyebrow cam như Figma (CTO 09/11, thay E3). Nền sand dùng cam đậm hơn 10% để chữ nhỏ đạt AA. */
 .shop-by-level__eyebrow { color: var(--color-accent); }
 .block-container--sand .shop-by-level__eyebrow { color: var(--color-accent-on-sand); }
-
 
 /* ==== Chuyển động v2: mở trang, hiện dần theo cuộn, cuộn gắn tiến trình. Chỉ transform, opacity, clip-path. ==== */
 @media (prefers-reduced-motion: no-preference) {
