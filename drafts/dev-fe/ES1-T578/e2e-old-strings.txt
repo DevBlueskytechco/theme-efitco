@@ -1,0 +1,171 @@
+tests/e2e/ES1-T112.spec.ts:246:  test('TC-07 AC1 + AC14 rỗng: "No Products Here Yet", Shop All Products, Browse collections, toolbar ẩn, axe sạch', async ({ page, guard }) => {
+tests/e2e/ES1-T112.spec.ts:250:    await expect(page.getByTestId('collection-empty-heading')).toHaveText('No Products Here Yet');
+tests/e2e/ES1-T112.spec.ts:251:    await expect(page.getByTestId('collection-empty-button')).toHaveText('Shop All Products');
+tests/e2e/ES1-T112.spec.ts:967:  test('TC-49 AC7 có JS: /collections/all?page=9999 → "No Products on This Page" + "Go to page 1", không lưới, axe sạch', async ({ page, guard }) => {
+tests/e2e/ES1-T112.spec.ts:973:    await expect(page.getByTestId('collection-page-empty-heading')).toHaveText('No Products on This Page');
+tests/e2e/ES1-T112.spec.ts:1032:  test('TC-21 AC2 + AC14 nojs lọc ra 0: "No Matching Products", Clear filters về URL không filter', async ({ page, guard, browser }) => {
+tests/e2e/ES1-T112.spec.ts:1036:    await expect(page.getByTestId('collection-empty-heading')).toHaveText('No Matching Products');
+tests/e2e/ES1-T118.spec.ts:231:    await expect(tid(home, 'testimonials-heading')).toHaveText('What Our Customers Say?');
+tests/e2e/ES1-T120.spec.ts:111:    await expect(button).toHaveText('View About Us');
+tests/e2e/ES1-T121.spec.ts:96:    await expect(tid(withIcon, 'multicolumn-link')).toHaveText('Shop All Products');
+tests/e2e/ES1-T131.spec.ts:511:    test('TC-19 AC11 mọi nhóm 0: không tab, hộp No results, khám phá dưới, nút chân Shop All Products', async ({ page }) => {
+tests/e2e/ES1-T131.spec.ts:522:      await expect(all).toContainText('Shop All Products');
+tests/e2e/ES1-T131.spec.ts:576:      test(`TC-23 AC12 lỗi ${mode}: alert + Try Again gọi lại, lành thì hiện kết quả; 0 console error`, async ({ page }) => {
+tests/e2e/ES1-T131.spec.ts:589:        await error.getByRole('button', { name: 'Try Again' }).click();
+tests/e2e/ES1-T131.spec.ts:704:  test('TC-30 AC2 0 kết quả: status No results, panel Nothing Matches + Shop All Products', async ({ page }) => {
+tests/e2e/ES1-T131.spec.ts:710:    await expect(empty.getByRole('heading', { level: 2 })).toContainText('Nothing Matches');
+tests/e2e/ES1-T131.spec.ts:711:    const shopAll = empty.getByRole('link', { name: 'Shop All Products' });
+tests/e2e/ES1-T131.spec.ts:812:  test('TC-43 AC8 S6a filter ra 0 sản phẩm: chip giữ, h3 No Products Match These Filters, Clear All Filters', async ({ page }) => {
+tests/e2e/ES1-T131.spec.ts:819:    await expect(tid(page, S.products).getByRole('heading', { level: 3, name: 'No Products Match These Filters' })).toBeVisible();
+tests/e2e/ES1-T131.spec.ts:820:    await expect(tid(page, S.products).getByRole('link', { name: 'Clear All Filters' }).or(tid(page, S.products).getByRole('button', { name: 'Clear All Filters' })).first()).toBeVisible();
+tests/e2e/ES1-T131.spec.ts:942:  test('TC-39 AC8 S6b refresh lỗi: alert + Try Again, lưới cũ và filter đã chọn giữ', async ({ page }) => {
+tests/e2e/ES1-T131.spec.ts:962:    await Promise.all([waitRefresh(page), error.getByRole('button', { name: 'Try Again' }).click()]);
+tests/e2e/ES1-T131.spec.ts:1020:  test('TC-48 AC3 0 kết quả không JS: panel rỗng + Shop All Products', async ({ page }) => {
+tests/e2e/ES1-T131.spec.ts:1023:    await expect(tid(page, S.empty).getByRole('link', { name: 'Shop All Products' })).toBeVisible();
+tests/e2e/ES1-T137.spec.ts:63:    await expect(tid(page, 'quiz-heading')).toHaveText('Find Your Perfect Gear');
+tests/e2e/ES1-T147.spec.ts:63:    await expect(root.getByTestId('bundle-builder-heading')).toHaveText('Pick Your Kit, Save As You Go');
+tests/e2e/ES1-T147.spec.ts:64:    await expect(root.getByTestId('bundle-builder-link')).toHaveText('View Preset Bundles');
+tests/e2e/ES1-T147.spec.ts:255:    await expect(root.getByTestId('bundle-builder-panel')).toContainText('Your Bundle');
+tests/e2e/ES1-T148.spec.ts:64:    await expect(root.getByTestId('shop-the-look-heading')).toHaveText('A Complete Corner Gym, Itemised');
+tests/e2e/ES1-T148.spec.ts:65:    await expect(root.getByTestId('shop-the-look-link')).toHaveText('Browse All Setups');
+tests/e2e/ES1-T148.spec.ts:66:    await expect(root.getByTestId('shop-the-look-submit')).toContainText('Add Setup To Cart');
+tests/e2e/ES1-T148.spec.ts:168:    await expect(root).toHaveAttribute('data-label-discount', 'Setup Discount (%p%)');
+tests/e2e/ES1-T156.spec.ts:119:  test('AC2 hết hàng: nút disabled nhãn Sold out, View Detail vẫn tới sản phẩm', async ({ page }) => {
+tests/e2e/ES1-T157.spec.ts:108:    await expect(carousel.getByTestId('video-carousel-heading')).toHaveText('See Real Equipment In Action, Before You Buy');
+tests/e2e/ES1-T157.spec.ts:110:    await expect(carousel.getByTestId('video-carousel-link')).toHaveText('View Preset Bundles');
+tests/e2e/ES1-T157.spec.ts:250:    await expect(scope.getByTestId('video-carousel-heading')).toHaveText('See Real Equipment In Action, Before You Buy');
+tests/e2e/ES1-T158.spec.ts:562:    await expect(add.locator('.product-form__add-label')).toHaveText('Add To Cart');
+tests/e2e/ES1-T179.spec.ts:37:  await expect(scope.locator('.faq__eyebrow')).toHaveText('Questions and Answers');
+tests/e2e/ES1-T179.spec.ts:54:  await expect(tid(scope, 'testimonials-heading')).toHaveText('What Our Customers Say?');
+tests/e2e/ES1-T180.spec.ts:18:  heading: 'Level Up Your Fitness',
+tests/e2e/ES1-T180.spec.ts:20:  button: 'Explore Equipment',
+tests/e2e/ES1-T180.spec.ts:25:  button: 'Get Started Now',
+tests/e2e/ES1-T180.spec.ts:30:  heading: 'Why Choose efitco?',
+tests/e2e/ES1-T180.spec.ts:32:  button: 'View About Us',
+tests/e2e/ES1-T180.spec.ts:89:    expect(await content(tid(scope, 'rich-text-heading'))).toBe('Everything You Need to Train.');
+tests/e2e/ES1-T180.spec.ts:91:    expect(await content(tid(scope, 'rich-text-button'))).toBe('Become A Member');
+tests/e2e/ES1-T182.spec.ts:50:    await expect(tid(page, 'quiz-heading')).toHaveText('Find Your Perfect Gear');
+tests/e2e/ES1-T182.spec.ts:88:    await expect(root.getByTestId('bundle-builder-heading')).toHaveText('Pick Your Kit, Save As You Go');
+tests/e2e/ES1-T182.spec.ts:89:    await expect(root.getByTestId('bundle-builder-link')).toHaveText('View Preset Bundles');
+tests/e2e/ES1-T184.spec.ts:88:    await expect(five.getByTestId('collection-list-heading')).toHaveText('Browse Categories');
+tests/e2e/ES1-T186.spec.ts:125:    await expect(three.getByTestId('shop-by-level-heading')).toHaveText('Choose Your Training Level');
+tests/e2e/ES1-T313.spec.ts:88:    expect(locale.general).toMatchObject({ dismiss: 'Dismiss:', try_again: 'Try Again' });
+tests/e2e/ES1-T315.spec.ts:37:    <div class="dialog__body" data-testid="qv-body"><button type="button" data-testid="qv-add">Add To Cart</button><p data-testid="qv-long" style="block-size:2000px">Body</p></div>
+tests/e2e/ES1-T323.spec.ts:85:      <a class="site-header__drawer-account" href="#account" data-testid="header-drawer-account">Sign In</a>
+tests/e2e/ES1-T330.spec.ts:23:const QUIZ_TRAIL = 'Your Gear Shortlist'; // SRS TE-22 AC9, quiz-result.md §6
+tests/e2e/ES1-T330.spec.ts:993:  test('TC-39 TC-40 TC-44 AC9 AC12 ?view=quiz: Home / Your Gear Shortlist', async ({ page }) => {
+tests/e2e/ES1-T347.spec.ts:166:    expect(adds, 'bấm Add To Cart lúc đang tải không gửi request thêm giỏ').toHaveLength(0);
+tests/e2e/ES1-T347.spec.ts:210:  test('lỗi tải: giữ biến thể cuối đã tải, role=alert + Try Again; thử lại thành công', async ({ page }) => {
+tests/e2e/ES1-T347.spec.ts:250:  test('quickview: URL trang nền không đổi, chỉ View Detail đổi ?variant=', async () => {
+tests/e2e/ES1-T365.spec.ts:179:      empty_heading: 'No Products Here Yet',
+tests/e2e/ES1-T365.spec.ts:180:      empty_cta: 'Shop All Products',
+tests/e2e/ES1-T365.spec.ts:182:      empty_filtered_heading: 'No Matching Products',
+tests/e2e/ES1-T369.spec.ts:73:        <div class="cart-summary__head"><h2 class="cart-summary__title">Order Summary</h2><span class="cart-summary__badge" data-testid="cart-summary-count">3 Items</span></div>
+tests/e2e/ES1-T370.spec.ts:28:  error: 'Something went wrong.',
+tests/e2e/ES1-T381.spec.ts:106:    expect(t.empty_heading).toBe('No Articles Yet');
+tests/e2e/ES1-T381.spec.ts:107:    expect(t.empty_button).toBe('Explore Equipment');
+tests/e2e/ES1-T381.spec.ts:108:    expect(t.empty_tag_heading).toBe('No Articles On This Topic');
+tests/e2e/ES1-T381.spec.ts:109:    expect(t.empty_tag_button).toBe('View All Articles');
+tests/e2e/ES1-T381.spec.ts:174:  test('AC4: tag không còn bài → giữ nav, h2 No Articles On This Topic, View All Articles', async ({ page }) => {
+tests/e2e/ES1-T381.spec.ts:177:    await expect(page.getByTestId('blog-articles-empty-heading')).toHaveText('No Articles On This Topic');
+tests/e2e/ES1-T381.spec.ts:178:    await expect(page.getByTestId('blog-articles-empty-button')).toHaveText('View All Articles');
+tests/e2e/ES1-T382.spec.ts:103:    expect(t.comment_form_submit).toBe('Post Comment');
+tests/e2e/ES1-T382.spec.ts:151:  </div><div class="comment-form__actions"><button class="button" type="submit">Post Comment</button></div></form>
+tests/e2e/ES1-T383.spec.ts:22:<section class="block-container"><nav class="breadcrumb"><ol class="breadcrumb__list"><li class="breadcrumb__item"><a class="breadcrumb__link" href="#">Home</a></li><li class="breadcrumb__item"><span class="breadcrumb__current" aria-current="page">Contact Us</span></li></ol></nav>
+tests/e2e/ES1-T383.spec.ts:23:<div class="page-title"><h1 class="page-title__heading">Contact Us</h1></div>
+tests/e2e/ES1-T383.spec.ts:28:      <div class="contact-form__head"><h2 class="contact-form__heading">Send Us A Message</h2><p class="contact-form__required">* Required fields</p></div>
+tests/e2e/ES1-T383.spec.ts:35:      <button class="button contact-form__submit" type="submit" data-testid="contact-submit"><span class="button__label">Send Message</span></button>
+tests/e2e/ES1-T383.spec.ts:38:  <aside class="contact-aside" aria-labelledby="h" data-testid="contact-aside"><div class="contact-aside__header"><p class="contact-aside__eyebrow">Questions and Answers</p><h2 id="h" class="contact-aside__heading">Quick Answers</h2></div>
+tests/e2e/ES1-T383.spec.ts:99:  test('AC4, AC5 contact-form: tóm tắt lỗi role=alert, lỗi chung .alert, thành công role=status + Continue Shopping', () => {
+tests/e2e/ES1-T383.spec.ts:128:    expect(t.contact.submit).toBe('Send Message');
+tests/e2e/ES1-T383.spec.ts:134:    expect(t.contact.continue_shopping).toBe('Continue Shopping');
+tests/e2e/ES1-T383.spec.ts:136:    expect(t.blocks.contact_form.heading).toBe('Send Us A Message');
+tests/e2e/ES1-T383.spec.ts:137:    expect(t.blocks.contact_aside.eyebrow).toBe('Questions and Answers');
+tests/e2e/ES1-T383.spec.ts:216:  test('AC3: thứ tự DOM breadcrumb → h1 → intro → form → aside; 1 h1; 3 trường; nút Send Message', async ({ page }) => {
+tests/e2e/ES1-T383.spec.ts:228:    await expect(page.getByTestId('contact-submit')).toHaveText('Send Message');
+tests/e2e/ES1-T384.spec.ts:80:    expect(t['404'].heading).toBe('Page Not Found');
+tests/e2e/ES1-T384.spec.ts:106:    await expect(page.getByTestId('not-found-home')).toHaveText('Back To Homepage');
+tests/e2e/ES1-T384.spec.ts:196:  test('gift card: noindex, logo link, QR ≥ 120, Start Shopping, không header theme (AC13)', async ({ page }) => {
+tests/e2e/ES1-T384.spec.ts:207:    await expect(page.getByTestId('gift-card-start')).toHaveText('Start Shopping');
+tests/e2e/ES1-T385.spec.ts:536:  test('TC-15 AC4: tag không còn bài → giữ nav, "No Articles On This Topic", primary "View All Articles", ×4', async ({ page }, ti) => {
+tests/e2e/ES1-T385.spec.ts:550:      await expect(heading).toHaveText('No Articles On This Topic');
+tests/e2e/ES1-T385.spec.ts:554:      await expect(button).toHaveText('View All Articles');
+tests/e2e/ES1-T385.spec.ts:562:  test('TC-16 AC4: blog 0 bài → không nav, không số bài, "No Articles Yet", "Explore Equipment", "Back to homepage", ×4', async ({ page }, ti) => {
+tests/e2e/ES1-T385.spec.ts:569:      await expect(page.getByTestId('blog-articles-empty-heading')).toHaveText('No Articles Yet');
+tests/e2e/ES1-T385.spec.ts:570:      await expect(page.getByTestId('blog-articles-empty-button')).toHaveText('Explore Equipment');
+tests/e2e/ES1-T385.spec.ts:920:  test('TC-37 AC12: form Name*, Email* "Not published.", Comment*, "Post Comment"; label, autocomplete; bố cục 360 / 1280', async ({ page, browser }, ti) => {
+tests/e2e/ES1-T385.spec.ts:934:      await expect(submit).toHaveText('Post Comment');
+tests/e2e/ES1-T385.spec.ts:1192:    await expect(block.getByTestId('related-articles-heading')).toHaveText('More Articles');
+tests/e2e/ES1-T386.spec.ts:186:  test('TC-43 AC14 nguồn gift card: QR, Wallet, Copy chỉ khi còn hiệu lực; Contact Us chỉ khi hết hạn/bị tắt', () => {
+tests/e2e/ES1-T386.spec.ts:221:    expect(t['404'].heading).toBe('Page Not Found');
+tests/e2e/ES1-T386.spec.ts:223:    expect(t.blocks.contact_form.heading).toBe('Send Us A Message');
+tests/e2e/ES1-T386.spec.ts:253:      <div class="gift-card__code-group"><p class="gift-card__code-label">Gift card code</p><p class="gift-card__code" data-testid="gift-card-code">7H3K 9QXF 2M8P 4LDW</p>${inactive ? '' : '<button type="button" class="button button--secondary gift-card__copy" data-testid="gift-card-copy">Copy Code</button>'}</div>
+tests/e2e/ES1-T386.spec.ts:255:      <div class="gift-card__actions">${inactive ? '<a class="button button--secondary" href="/pages/contact" data-testid="gift-card-contact">Contact Us</a>' : '<a class="button gift-card__start" href="/" data-testid="gift-card-start">Start Shopping</a><button type="button" class="button button--secondary gift-card__print" data-testid="gift-card-print">Print Gift Card</button>'}</div>
+tests/e2e/ES1-T386.spec.ts:404:      await expect(page.getByTestId('contact-submit')).toHaveText('Send Message');
+tests/e2e/ES1-T386.spec.ts:542:  test('TC-12 AC5 gửi hợp lệ: hộp role=status thay form, Continue Shopping secondary', async ({ page }) => {
+tests/e2e/ES1-T386.spec.ts:554:    await expect(cont).toHaveText('Continue Shopping');
+tests/e2e/ES1-T386.spec.ts:608:  test('B-04 bàn phím contact 1280: Name → Email → Message → (privacy) → Send Message, không nhảy sang aside', async ({ page }) => {
+tests/e2e/ES1-T386.spec.ts:676:      await expect(home).toHaveText('Back To Homepage');
+tests/e2e/ES1-T386.spec.ts:737:    test(`TC-21 AC7 bàn phím @${width}: Tab ô tìm → nút Search → Back To Homepage, outline khi focus, Enter sang /search`, async ({ page }) => {
+tests/e2e/ES1-T386.spec.ts:833:          await expect(page.getByTestId('password-newsletter-submit')).toHaveText('Notify Me');
+tests/e2e/ES1-T386.spec.ts:848:        await expect(page.getByTestId('password-submit')).toHaveText('Enter Store');
+tests/e2e/ES1-T386.spec.ts:849:        await expect(page.getByText('Enter Using Password')).toBeVisible();
+tests/e2e/ES1-T386.spec.ts:1040:  await expect(contact).toHaveText('Contact Us');
+tests/e2e/ES1-T386.spec.ts:1050:    test(`TC-48 AC16, TC-38 AC13, TC-47 AC16 gift card còn hiệu lực @${width}: LCP chữ, head, thanh, logo link, thẻ CSS, Wallet, Start Shopping, bố cục, axe 0`, async ({ page }) => {
+tests/e2e/ES1-T386.spec.ts:1077:      await expect(start).toHaveText('Start Shopping');
+tests/e2e/ES1-T386.spec.ts:1111:    test(`TC-41 AC14 hết hạn @${width}: xám, gạch số dư, pill Expired, alert + ngày, không QR/Wallet/Copy, Contact Us, mã vẫn hiện`, async ({ page }) => {
+tests/e2e/ES1-T386.spec.ts:1129:  test('TC-44 AC15 Copy Code: clipboard, nhãn Copied 2 s, status "Gift card code copied"', async ({ page }) => {
+tests/e2e/ES1-T386.spec.ts:1142:    await expect(copy).toHaveText('Copy Code');
+tests/e2e/ES1-T386.spec.ts:1232:    await expect(page.getByTestId('contact-form-heading')).toHaveText('Send Us A Message');
+tests/e2e/ES1-T386.spec.ts:1235:    await expect(page.getByTestId('not-found-heading')).toHaveText('Page Not Found');
+tests/e2e/ES1-T386.spec.ts:1249:  test('TC-52 AC17 store dev đã cấu hình (TE386_STORE_STATE=configured): contact 5 FAQ, 404 5 figma-cat + 4 sản phẩm, password Opening Soon + Level Up Your Fitness + ảnh', async ({ page, browser }) => {
+tests/e2e/ES1-T386.spec.ts:1252:    await expect(page.getByTestId('contact-form-heading')).toHaveText('Send Us A Message');
+tests/e2e/ES1-T386.spec.ts:1264:      await expect(pw.getByText('Opening Soon', { exact: true })).toBeVisible();
+tests/e2e/ES1-T386.spec.ts:1265:      await expect(pw.getByTestId('password-heading')).toHaveText(/Level Up\s*Your Fitness/i);
+tests/e2e/ES1-T387.spec.ts:73:    expect(quiz.results_heading).toBe('Your Gear Shortlist');
+tests/e2e/ES1-T387.spec.ts:74:    expect(quiz.empty_heading).toBe('No Exact Match');
+tests/e2e/ES1-T387.spec.ts:120:<div class="quiz__card-action"><form class="quiz__card-form"><button class="button button--secondary quiz__card-button" data-testid="quiz-card-add">Add To Cart</button>
+tests/e2e/ES1-T387.spec.ts:128:      <h2 class="quiz__results-heading dialog__title" id="t" tabindex="-1">Your Gear Shortlist</h2>
+tests/e2e/ES1-T387.spec.ts:139:      <button class="button button--secondary" data-testid="quiz-restart">Retake Quiz</button>
+tests/e2e/ES1-T387.spec.ts:140:      <div class="quiz__results-actions">${busy ? '' : '<a class="button" href="#" data-testid="quiz-view-all">View All 5 Matches</a>'}</div>
+tests/e2e/ES1-T387.spec.ts:198:  test('AC8 ?view=quiz không tag: 1 h1 "Your Gear Shortlist", breadcrumb, empty "No Exact Match" + 2 đích', async ({ page }) => {
+tests/e2e/ES1-T387.spec.ts:202:    await expect(page.locator('h1')).toHaveText('Your Gear Shortlist');
+tests/e2e/ES1-T387.spec.ts:205:    await expect(crumb.locator('[aria-current="page"]')).toHaveText('Your Gear Shortlist');
+tests/e2e/ES1-T387.spec.ts:207:    await expect(tid(page, 'quiz-empty-heading')).toHaveText('No Exact Match');
+tests/e2e/ES1-T387.spec.ts:219:    await expect(page.locator('h1')).toHaveText('Your Gear Shortlist');
+tests/e2e/ES1-T387.spec.ts:247:  test('AC3 ≤ 4 kết quả: "Shop All Equipment" thay "View All"', async ({ page }) => {
+tests/e2e/ES1-T407.spec.ts:76:    expect(t.blog.comment_form_submit).toBe('Post Comment');
+tests/e2e/ES1-T408.spec.ts:51:    expect(t['404'].home).toBe('Back To Homepage');
+tests/e2e/ES1-T410.spec.ts:308:  test('Copy Code: hiện nút, chép mã, nhãn Copied 2 s, status đọc câu đã chép', async ({ page }) => {
+tests/e2e/ES1-T442.spec.ts:22:    <button type="submit">Enter Store</button>
+tests/e2e/ES1-T442.spec.ts:31:    <button type="submit">Notify Me</button>
+tests/e2e/ES1-T442.spec.ts:38:    <details data-testid="password-details"><summary>Enter Using Password</summary>${passwordForm()}</details>`,
+tests/e2e/ES1-T442.spec.ts:40:    <details data-testid="password-details" open><summary>Enter Using Password</summary>${passwordForm()}</details>`,
+tests/e2e/ES1-T442.spec.ts:42:    <details class="password-disclosure"><summary>Enter Using Password</summary>${passwordForm()}</details>`,
+tests/e2e/ES1-T442.spec.ts:44:    <details data-testid="password-details"><summary>Enter Using Password</summary>
+tests/e2e/ES1-T442.spec.ts:174:    await expect(summary).toHaveText('Enter Using Password');
+tests/e2e/ES1-T443.spec.ts:95:<button class="button password-hero__submit" type="submit" data-testid="password-newsletter-submit"><span>Notify Me</span></button>
+tests/e2e/ES1-T443.spec.ts:98:<details data-testid="password-details" open><summary>Enter Using Password</summary>
+tests/e2e/ES1-T443.spec.ts:102:<button class="button password-hero__enter" type="submit" data-testid="password-submit">Enter Store</button>
+tests/e2e/ES1-T45.spec.ts:14:const HEADING = 'Everything You Need to Train.';
+tests/e2e/ES1-T45.spec.ts:83:  test('TC-02 heading textContent chuẩn hoá = "Everything You Need to Train.", thẻ h1/h2', async ({ page }) => {
+tests/e2e/ES1-T473.spec.ts:74:    <button type="submit" class="button" data-testid="comment-submit">Post Comment</button>
+tests/e2e/ES1-T474.spec.ts:82:      ? `<div class="alert alert--success contact-form__status" role="status" tabindex="-1" data-testid="contact-status"><p>Thanks for contacting us</p><a class="button button--secondary" href="/collections/all" data-testid="contact-continue">Continue Shopping</a></div>${eager}`
+tests/e2e/ES1-T474.spec.ts:83:      : `<h2>Send Us A Message</h2>
+tests/e2e/ES1-T474.spec.ts:94:<button type="submit" class="button contact-form__submit" data-testid="contact-submit" style="padding:12px 24px"><span class="button__label">Send Message</span></button>
+tests/e2e/ES1-T474.spec.ts:99:<a href="/" data-testid="skip">Home</a><h1>Contact Us</h1>
+tests/e2e/ES1-T496.spec.ts:98:<main><h1>Page Not Found</h1>
+tests/e2e/TE-16.spec.ts:252:    await expect(root.getByTestId('blog-posts-heading')).toHaveText('Training Tips & Inspiration');
+tests/e2e/TE-4.spec.ts:1139:    await expect(tid(page, T.stickyAdd)).toHaveText(target!.available ? 'Add To Cart' : 'Sold out');
+tests/e2e/TE-4.spec.ts:1502:  test('AC8 TC-806 keyboard: Enter trên nút Add To Cart gửi cart/add.js đúng 1 lần', async ({ page }) => {
+tests/e2e/TE-5.spec.ts:78:  empty: 'Your Cart Is Empty',
+tests/e2e/TE-5.spec.ts:79:  continueShopping: 'Continue Shopping',
+tests/e2e/TE-5.spec.ts:81:  bestsellers: 'Shop Bestsellers',
+tests/e2e/TE-5.spec.ts:84:  summary: 'Order Summary',
+tests/e2e/TE-5.spec.ts:779:  test('AC4 TC-16 /cart rỗng: h1, khối rỗng + Continue Shopping + Browse collections, không summary/thuế/freeship (AC3 TC-15)/thanh checkout (AC17 TC-46), axe', async ({ page }) => {
+tests/e2e/TE-5.spec.ts:799:  test('AC4 TC-17 drawer rỗng: khối rỗng + Shop Bestsellers, không chân panel/pill/freeship (AC3 TC-15), gợi ý ≤ 2, axe', async ({ page }) => {
+tests/e2e/ES1-T147.spec.ts:256:    await expect(root.getByTestId('bundle-builder-count')).toHaveText('0 Items');
+tests/e2e/ES1-T149.spec.ts:169:    await expect(part(root, 'count')).toHaveText('0 Items');
+tests/e2e/ES1-T149.spec.ts:185:    await expect(part(root, 'count')).toHaveText('2 Items');
+tests/e2e/ES1-T149.spec.ts:191:    await expect(part(root, 'count')).toHaveText('3 Items');
+tests/e2e/ES1-T149.spec.ts:240:    await expect(part(root, 'count')).toHaveText('2 Items');
