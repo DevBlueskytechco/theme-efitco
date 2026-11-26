@@ -7,8 +7,9 @@
   with a specific destination, optional text link. Rendered for shoppers when a page result
   is empty (AGENTS.md: an empty page result is content, not missing setup).
 
-  kind 'error': alert block (1px sale border, icon 24, title, how-to-fix sentence, secondary
-  "Try Again"), role="alert". Without button_url the button is a <button data-retry> for the
+  kind 'error': .alert tone error (foundation.md §35: 1px --color-critical border, padding
+  16 / 24, icon 24, title, how-to-fix sentence, secondary "Try Again"), role="alert", no close
+  button (an error stays until it is fixed). Without button_url the button is a <button data-retry> for the
   feature script to re-run its request (hook for Dev BE); with button_url it is a link, so the
   fallback works without JavaScript (for example the `?view=quiz` page).
 
@@ -57,7 +58,7 @@
 
 {%- if heading != blank -%}
   {%- if state_kind == 'error' -%}
-    <div class="alert" role="alert" data-testid="{{ state_testid }}">
+    <div class="alert alert--error" role="alert" data-testid="{{ state_testid }}">
       <span class="alert__icon">{% render 'status-icon', name: state_icon %}</span>
       <div class="alert__body">
         <{{ state_tag }} class="alert__title" data-testid="{{ state_testid }}-heading">{{ heading }}</{{ state_tag }}>

@@ -395,3 +395,33 @@
     padding-inline: var(--space-6);
   }
 }
+
+/* Đang tải biến thể (VP1): như product.css, giới hạn trong <quick-view> để không trùng selector tầng 3 (ADR 0014) */
+quick-view .product-form__stock {
+  display: grid;
+  gap: var(--space-2);
+}
+
+quick-view .product-form__checking,
+quick-view .product-form__stock[aria-busy='true'] > :not(.product-form__checking) {
+  display: none;
+}
+
+quick-view .product-form__stock[aria-busy='true'] > .product-form__checking {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-muted);
+  font-size: var(--font-size-sm);
+}
+
+quick-view .product-form__checking-spinner {
+  inline-size: var(--space-3);
+  block-size: var(--space-3);
+  border-color: var(--color-border);
+  border-block-start-color: var(--color-foreground);
+}
+
+quick-view .product-form__add[aria-disabled='true'] {
+  cursor: progress;
+}

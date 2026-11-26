@@ -68,8 +68,7 @@ html[data-inbox] :is(#ShopifyChat, #dummy-chat-button-iframe) {
   translate: 0 calc(-1 * var(--bottom-bar-height));
 }
 
-/* Focus, link neo không nằm dưới header dính / thanh đáy (WCAG 2.2 SC 2.4.11). scroll-margin thay
-   scroll-padding trên html: focus() bằng script sau click không cuộn thêm. :where giữ specificity 0. */
+/* Focus không nằm dưới header dính / thanh đáy (WCAG 2.4.11); :where giữ specificity 0 */
 :where(:focus-visible, :target) {
   scroll-margin-block: calc(var(--sticky-top) + var(--space-4))
     calc(var(--bottom-bar-height) + var(--consent-height, 0px) + var(--space-4));
@@ -139,7 +138,6 @@ html:is([data-layer-open], [data-consent]) :is(.product-sticky-bar, .cart-sticky
   --overlay-scrim: color-mix(in srgb, var(--color-background-dark) 50%, transparent);
   --shadow-raised: 0 var(--space-2) var(--space-5) color-mix(in srgb, var(--color-foreground) 12%, transparent);
   --shadow-overlay: 0 var(--space-6) calc(var(--space-1) * 20) color-mix(in srgb, var(--color-foreground) 28%, transparent);
-  --radius-dialog: calc(var(--radius-card) * 2);
   /* Panel tối: chữ phụ 70% (6.56:1), dòng giảm giá (5.64:1, luôn kèm icon + dấu −) */
   --panel-muted: color-mix(in srgb, var(--color-background-dark-foreground) 70%, var(--color-background-panel));
   --panel-saving: color-mix(in srgb, var(--color-badge-new) 50%, var(--color-background-dark-foreground));
@@ -251,9 +249,7 @@ modal-dialog {
   }
 }
 
-/* Dialog: mobile-first là bottom sheet (< 48rem: rộng 100%, cao ≤ 88dvh, thanh kéo 40 × 4, bo 2 góc trên);
-   từ 48rem giữa màn, cỡ .dialog--s|m|l. Cấu trúc: .dialog__header > .dialog__title, .dialog__close,
-   .dialog__body (cuộn riêng), .dialog__footer (hàng nút, chân dính trong khung). */
+/* Dialog: < 48rem bottom sheet, từ 48rem giữa màn cỡ .dialog--s|m|l; __body cuộn riêng, __footer dính */
 .dialog {
   --dialog-size: var(--dialog-s);
   --dialog-pad: var(--space-5);
@@ -388,8 +384,7 @@ modal-dialog {
   }
 }
 
-/* Drawer: .drawer--end mở từ mép inline-end (cart, search), mặc định inline-start (menu, filter).
-   Chân dính là flex item nên phần tử đang focus trong thân không nằm dưới chân. */
+/* Drawer: --end từ inline-end (cart, search), mặc định inline-start; chân dính là flex item */
 .drawer {
   --drawer-from: -100%;
 
@@ -494,15 +489,15 @@ modal-dialog {
 }
 
 .toast--success {
-  --toast-accent: var(--color-badge-new);
+  --toast-accent: var(--color-success);
 }
 
 .toast--warning {
-  --toast-accent: var(--color-accent);
+  --toast-accent: var(--color-warning);
 }
 
 .toast--error {
-  --toast-accent: var(--color-sale);
+  --toast-accent: var(--color-critical);
 }
 
 .toast__icon {
@@ -544,32 +539,56 @@ modal-dialog {
   background: transparent;
 }
 
-/* Alert khối. Markup: empty-state kind 'error' */
+/* Alert (foundation §35): tone qua --alert-color, mặc định error; --page banner cấp trang; __close chỉ info / success / warning */
 .alert {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: var(--space-4);
-  padding: var(--space-5);
-  border: 1px solid var(--color-sale);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--alert-color, var(--color-critical));
   border-radius: var(--radius-card);
   background: var(--color-background);
   color: var(--color-foreground);
 }
 
+.alert--info {
+  --alert-color: var(--color-muted);
+}
+
+.alert--success {
+  --alert-color: var(--color-success);
+}
+
+.alert--warning {
+  --alert-color: var(--color-warning);
+}
+
+.alert--error {
+  --alert-color: var(--color-critical);
+}
+
+.alert--page {
+  border-inline-start-width: 4px;
+  background: color-mix(in srgb, var(--alert-color, var(--color-critical)) 6%, var(--color-background));
+}
+
 .alert__icon {
   display: flex;
-  color: var(--color-sale);
+  flex: none;
+  color: var(--alert-color, var(--color-critical));
 }
 
 .alert__icon svg {
-  inline-size: var(--space-5);
-  block-size: var(--space-5);
+  inline-size: var(--icon-size-lg);
+  block-size: var(--icon-size-lg);
 }
 
 .alert__body {
   display: grid;
+  flex: 1;
   gap: var(--space-2);
   justify-items: start;
+  min-inline-size: 0;
 }
 
 .alert__title {
@@ -584,14 +603,43 @@ modal-dialog {
   margin: 0;
   color: var(--color-muted);
   font-size: var(--font-size-sm);
+  line-height: var(--line-height-sm);
 }
 
 .alert__actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--space-4);
-  margin-block-start: var(--space-2);
+  gap: var(--space-3) var(--space-4);
+  margin-block-start: var(--space-1);
+}
+
+/* Nút đóng 44, margin âm không đẩy cao alert; tên "Dismiss: {tiêu đề}" */
+.alert__close {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: var(--touch-target);
+  block-size: var(--touch-target);
+  margin-block: calc(var(--space-2) * -1);
+  margin-inline-end: calc(var(--space-3) * -1);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: none;
+  color: var(--color-muted);
+  cursor: pointer;
+  transition: color var(--motion-fast) var(--ease-out);
+}
+
+.alert__close:hover {
+  color: var(--color-foreground);
+}
+
+.alert__close svg {
+  inline-size: var(--icon-size-sm);
+  block-size: var(--icon-size-sm);
 }
 
 /* Empty state. Markup: snippets/empty-state.liquid */
@@ -664,9 +712,7 @@ modal-dialog {
   outline-offset: 2px;
 }
 
-/* Đang tải: skeleton đúng kích thước nội dung, nền alt; vùng cha có
-   aria-busy="true" + dòng role="status" (.visually-hidden được). Không làm mờ chữ để báo tải.
-   Card: .skeleton-card > .skeleton.skeleton--media + .skeleton.skeleton--line + .skeleton.skeleton--line.skeleton--short */
+/* Đang tải: skeleton đúng cỡ nội dung, nền alt; cha aria-busy + role="status", không làm mờ chữ */
 .skeleton {
   position: relative;
   display: block;
@@ -1032,8 +1078,7 @@ modal-dialog {
   opacity: 0.6;
 }
 
-/* Swatch là chỉ báo (aria-hidden, không focus). > 4 hiện 3 + "+N" để vừa card 152 ở 360.
-   ::before vẽ pill, ::after là vùng chạm trong suốt, không đổi layout. */
+/* Swatch chỉ báo (aria-hidden): > 4 hiện 3 + "+N"; ::after là vùng chạm */
 .product-card__swatches {
   display: flex;
   flex-wrap: wrap;
@@ -1276,7 +1321,7 @@ collection-tabs {
   justify-content: center;
   min-block-size: calc(var(--space-1) * 11);
   padding-inline: calc(var(--space-1) * 7);
-  border-radius: calc(var(--radius-button) * 2);
+  border-radius: var(--radius-sm);
   background-color: var(--color-background-alt);
   color: var(--color-background-alt-foreground);
   font-size: var(--font-size-base);
@@ -1484,7 +1529,7 @@ collection-tabs {
   min-block-size: 17.5rem;
   margin-block-start: var(--space-4);
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-dark);
   color: var(--color-background-dark-foreground);
 }
@@ -1659,8 +1704,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 @media (prefers-reduced-motion: no-preference) { .site-header[data-drawer-enhanced] details[open] > .site-header__drawer-level { animation: drawer-level-in var(--motion-base) var(--ease-out); } }
 @keyframes drawer-level-in { from { translate: var(--drawer-level-from) 0; } }
 
-/** Mega menu từ 80rem. Panel, scrim neo vào container header:
-   mục mega, nav, inner không định vị. Header giữ tối, cao 80 khi mở; panel absolute nên CLS 0. */
+/** Mega menu từ 80rem: panel absolute neo container header (CLS 0) */
 @media (min-width: 80rem) {
   .site-header__item--mega {
     position: static;
@@ -1895,7 +1939,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   position: absolute;
   inset-block: calc(var(--space-1) * 2.75);
   width: 61.4%;
-  border-radius: calc(var(--radius-card) - var(--space-1));
+  border-radius: var(--radius-sm);
   background-color: color-mix(in srgb, var(--color-background-dark-foreground) 4%, transparent);
 }
 
@@ -1911,7 +1955,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   z-index: var(--layer-content);
   width: 6.125rem;
   margin-inline: auto;
-  border-radius: calc(var(--radius-card) - var(--space-1));
+  border-radius: var(--radius-sm);
 }
 
 .site-footer__newsletter {
@@ -1983,8 +2027,8 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 }
 
 .site-footer__input[aria-invalid='true'] {
-  border-color: var(--color-sale);
-  box-shadow: inset 0 0 0 1px var(--color-sale);
+  border-color: var(--color-critical);
+  box-shadow: inset 0 0 0 1px var(--color-critical);
 }
 
 .site-footer__submit {
@@ -2028,7 +2072,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   margin-inline: var(--site-footer-inset);
   padding-block: var(--space-7) var(--space-5);
   padding-inline: calc(var(--site-footer-side) - var(--site-footer-inset));
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: color-mix(in srgb, var(--color-background-dark-foreground) 2%, transparent);
 }
 
@@ -2086,13 +2130,13 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   margin-block-start: var(--space-3);
   padding: var(--space-3) var(--space-4);
   border: 1px solid color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent);
-  border-inline-start: var(--space-1) solid var(--color-sale);
+  border-inline-start: var(--space-1) solid var(--color-critical);
   border-radius: var(--radius-input);
   color: var(--color-background-dark-foreground);
 }
 
 .form-message--success {
-  border-inline-start-color: var(--color-badge-new);
+  border-inline-start-color: var(--color-success);
 }
 
 .site-footer__message-body {
@@ -2122,11 +2166,11 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
 }
 
 .site-footer :is(.site-footer__invalid, .site-footer__message--error) .status-icon {
-  color: var(--color-sale);
+  color: var(--color-critical);
 }
 
 .site-footer .form-message--success .status-icon {
-  color: var(--color-badge-new);
+  color: var(--color-success);
 }
 
 .site-footer__form .status-icon {
@@ -2278,8 +2322,7 @@ details[open] > .site-header__drawer-row svg { rotate: 180deg; }
   rotate: 180deg;
 }
 
-/* Panel localization footer là <dialog class="dialog">. Không :modal (không JS, ≥ 48rem): popover trắng neo trên nút,
-   < 48rem rộng hết nhóm (100vw − 40, §4.3; ES1-T45 R-05), ≥ 48rem 1 danh sách 320, 2 danh sách 600 (§4.2). :modal (BE showModal < 48rem): bottom sheet của .dialog (§4.3). */
+/* Panel localization footer (localization.md §4.2, §4.3): popover ≥ 48rem, :modal là bottom sheet */
 .site-footer__disclosure[open] .site-footer__panel:not(:modal) {
   position: absolute;
   inset-block: auto 100%;
@@ -3553,6 +3596,11 @@ product-media-gallery {
   translate: -50% -50%;
 }
 
+/* RTL: inset-inline-start là cạnh phải, translate không có từ khoá logical */
+.product-media__play:dir(rtl) {
+  translate: 50% -50%;
+}
+
 .product-media__play .slideshow-icon {
   inline-size: var(--space-5);
   block-size: var(--space-5);
@@ -3711,8 +3759,7 @@ product-variant-picker:not(:defined) {
   border: 0;
 }
 
-/* Legend "Weight: 45 lb": tên 600, giá trị đang chọn 400 muted (8.45), cách giá trị 12.
-   float để legend vào luồng thường (margin chạy được trên mọi trình duyệt) */
+/* Legend: tên 600, giá trị 400 muted; float để margin chạy trên mọi trình duyệt */
 .product-option__legend {
   float: inline-start;
   inline-size: 100%;
@@ -3917,7 +3964,7 @@ product-variant-picker:not(:defined) {
   grid-template-columns: auto 1fr;
   align-items: start;
   gap: var(--space-2);
-  color: var(--color-sale);
+  color: var(--color-critical);
   font-size: var(--font-size-sm);
   font-weight: 500;
 }
@@ -4080,36 +4127,6 @@ product-variant-picker:not(:defined) {
   cursor: not-allowed;
 }
 
-/* Đang tải biến thể (VP1, PDP + quick view): aria-busy trên dòng tồn, aria-disabled trên nút */
-.product-form__stock {
-  display: grid;
-  gap: var(--space-2);
-}
-
-.product-form__checking,
-.product-form__stock[aria-busy='true'] > :not(.product-form__checking) {
-  display: none;
-}
-
-.product-form__stock[aria-busy='true'] > .product-form__checking {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  color: var(--color-muted);
-  font-size: var(--font-size-sm);
-}
-
-.product-form__checking-spinner {
-  inline-size: var(--space-3);
-  block-size: var(--space-3);
-  border-color: var(--color-border);
-  border-block-start-color: var(--color-foreground);
-}
-
-.product-form__add[aria-disabled='true'] {
-  cursor: progress;
-}
-
 /* Pickup */
 .product-pickup {
   display: grid;
@@ -4122,15 +4139,13 @@ product-variant-picker:not(:defined) {
 /* Live region lỗi: rỗng thì không chiếm chỗ, BE ES1-T67 điền text API */
 .product-form__error:not(:empty) {
   padding: var(--space-3) var(--space-4);
-  border-inline-start: 2px solid var(--color-sale);
+  border-inline-start: 2px solid var(--color-critical);
   background-color: var(--color-background-alt);
   color: var(--color-background-alt-foreground);
   font-size: var(--font-size-sm);
 }
 
-/** Sale countdown (ADR 0009, countdown.md §1–§5; snippets/sale-countdown): featured product, PDP, big offer.
-   Compact khi khung chứa < 23rem, Regular từ 23rem (data-size regular); data-size compact luôn Compact (CD1).
-   Số in sẵn bằng Liquid, hiện ngay (ES1-T276); không JS thì ẩn. Không chuyển động. */
+/** Sale countdown (ADR 0009, countdown.md): Compact < 23rem, Regular từ 23rem; không JS thì ẩn */
 sale-countdown {
   display: block;
   container-type: inline-size;
@@ -4361,7 +4376,7 @@ cart-items[aria-busy='true'] {
 .cart-items__error:not(:empty) {
   margin-block-end: var(--space-5);
   padding: var(--space-3) var(--space-4);
-  border-inline-start: 2px solid var(--color-sale);
+  border-inline-start: 2px solid var(--color-critical);
   background-color: var(--color-background-alt);
   color: var(--color-background-alt-foreground);
   font-size: var(--font-size-sm);
@@ -4378,7 +4393,7 @@ cart-items[aria-busy='true'] {
 }
 
 .cart-free-shipping--reached {
-  --free-shipping-fill: var(--color-badge-new);
+  --free-shipping-fill: var(--color-success);
 }
 
 .cart-free-shipping__icon svg,
@@ -4450,7 +4465,7 @@ cart-items[aria-busy='true'] {
 .cart-drawer__bestseller-media {
   display: block;
   overflow: hidden;
-  border-radius: calc(var(--radius-card) - var(--space-1));
+  border-radius: var(--radius-swatch);
   background-color: var(--color-background-cream);
 }
 
@@ -4576,6 +4591,11 @@ cart-items[aria-busy='true'] {
   background-color: var(--color-background);
 }
 
+/* RTL: stepper giữ thứ tự − số + (foundation §34, kit .quantity) */
+.cart-line__stepper:dir(rtl) {
+  direction: ltr;
+}
+
 .cart-line__stepper:focus-within {
   border-color: var(--color-accent);
 }
@@ -4660,7 +4680,7 @@ cart-items[aria-busy='true'] {
   align-items: flex-start;
   gap: var(--space-2);
   margin: 0;
-  color: var(--color-sale);
+  color: var(--color-critical);
   font-size: var(--font-size-sm);
   font-weight: 500;
 }
@@ -4893,7 +4913,7 @@ cart-drawer {
   margin: 0 0 var(--space-4);
   padding: var(--space-3) var(--space-4);
   border: 1px solid var(--color-border);
-  border-inline-start: var(--space-1) solid var(--color-badge-new);
+  border-inline-start: var(--space-1) solid var(--color-success);
   border-radius: var(--radius-input);
   font-size: var(--font-size-sm);
   overflow-wrap: anywhere;
@@ -4911,7 +4931,7 @@ cart-drawer {
 }
 
 .cart-drawer__added-icon {
-  color: var(--color-badge-new);
+  color: var(--color-success);
 }
 
 .cart-drawer__added-text {
@@ -5025,7 +5045,7 @@ cart-drawer {
   margin: 0 var(--space-3) calc(var(--space-3) + env(safe-area-inset-bottom, 0px));
   padding: var(--space-5);
   border: 0;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-panel);
   color: var(--color-background-dark-foreground);
 }
@@ -5113,7 +5133,7 @@ cart-drawer {
 .collection-card > .collection-card__image {
   aspect-ratio: 336 / 220;
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-panel);
 }
 
@@ -5152,7 +5172,7 @@ cart-drawer {
   content: '';
   position: absolute;
   inset: 0;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
 }
 
 .collection-card:hover .collection-card__link {
@@ -5251,7 +5271,7 @@ cart-drawer {
   justify-content: flex-end;
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  border-radius: calc(var(--radius-card) + var(--space-1));
+  border-radius: var(--radius-panel);
   background-color: var(--color-background-dark);
   color: var(--color-background-dark-foreground);
   text-align: start;
@@ -5441,10 +5461,9 @@ cart-drawer {
   text-wrap: balance;
 }
 
-/* Figma bo 16, tỉ lệ 3/4. overflow: clip (không phải scroll container) nên tên dài làm card cao thêm thay vì bị cắt. Nền tối giữ chữ trắng đọc được khi chưa có ảnh.
-   isolation + ảnh z-index -1: ảnh nằm dưới chữ mà .article-card__content không cần position, để ::after của link phủ cả khung */
+/* Bo 16, 3/4; overflow: clip để tên dài làm card cao thêm; ảnh z-index -1 dưới chữ */
 .article-card__frame {
-  --article-card-radius: calc(var(--radius-card) + var(--space-1));
+  --article-card-radius: var(--radius-panel);
   position: relative;
   isolation: isolate;
   display: flex;
@@ -6660,13 +6679,13 @@ video-card {
   display: grid;
   gap: var(--space-2);
   padding: var(--space-4);
-  border-inline-start: var(--space-1) solid var(--color-badge-new);
+  border-inline-start: var(--space-1) solid var(--color-success);
   border-radius: var(--radius-input);
   background-color: var(--color-background-alt);
 }
 
 .form-status--error {
-  border-inline-start-color: var(--color-sale);
+  border-inline-start-color: var(--color-critical);
 }
 
 .form-status:focus-visible {
@@ -6683,8 +6702,8 @@ video-card {
 }
 
 .form-status:has(> .form-status__icon) { grid-template-columns: auto minmax(0, 1fr); gap: var(--space-3); }
-.form-status__icon { display: flex; color: var(--color-badge-new); }
-.form-status--error .form-status__icon { color: var(--color-sale); }
+.form-status__icon { display: flex; color: var(--color-success); }
+.form-status--error .form-status__icon { color: var(--color-critical); }
 .form-status__icon .status-icon { inline-size: calc(var(--space-1) * 5); block-size: calc(var(--space-1) * 5); }
 .form-status__body { display: grid; gap: var(--space-1); }
 .form-status__body > p { margin: 0; }
@@ -6698,8 +6717,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 
 @media (min-width: 80rem) {
   /* Header */
-  /* Nav đặt bằng lưới thay absolute (cùng x = 50% − 303, y = 26 = (80 − 28) / 2): không tổ tiên nào của
-     panel mega và scrim được định vị, để chúng neo vào container header full bề ngang */
+  /* Nav đặt bằng lưới: panel mega, scrim neo vào container header */
   .site-header__inner { display: grid; grid-template-columns: calc(50% - 303px) auto 1fr; column-gap: 0; min-height: 80px; }
   .site-header svg { width: auto; }
   .site-header__nav { align-self: start; margin: calc((var(--header-height) - 1.75rem) / 2) 0 0; }
@@ -6858,6 +6876,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
 .site-header__cart-count { inset-block-start: -8px; inset-inline-end: -9px; min-width: 16px; padding-inline: 3px; border-radius: var(--figma-radius-8); background-color: var(--color-accent); color: var(--color-accent-foreground); font-size: 10px; line-height: 16px; }
 .video-card__media { width: 100%; height: 100%; object-fit: cover; cursor: pointer; }
 .video-card__toggle { position: absolute; inset-block-start: 50%; inset-inline-start: 50%; translate: -50% -50%; display: flex; align-items: center; justify-content: center; inline-size: 52px; block-size: 52px; padding: 0; border: 0; border-radius: 50%; background-color: var(--color-background); color: var(--color-foreground); cursor: pointer; }
+.video-card__toggle:dir(rtl) { translate: 50% -50%; }
 .video-card__toggle[hidden] { display: none; }
 /* Giống lúc đầu: icon chỉ hiện khi rê chuột, video nào cũng vậy. Màn cảm ứng: chạm video để dừng, đang dừng thì hiện icon. */
 @media (hover: hover) { .video-card__toggle { opacity: 0; } .video-card:hover .video-card__toggle, .video-card__toggle:focus-visible { opacity: 1; } }
@@ -6888,6 +6907,8 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   html[data-motion] .button--link:hover:not(:disabled), html[data-motion] .button--link:active:not(:disabled) { translate: none; scale: none; box-shadow: none; }
   .slideshow-icon--arrow { transition: translate var(--motion-base) var(--ease-out); }
   html[data-motion] a:hover > .slideshow-icon--arrow, html[data-motion] button:hover > .slideshow-icon--arrow { translate: 3px 0; }
+  /* RTL: mũi tên đã lật, trượt theo hướng đọc; nút back (aux.css, quiz.css) và announcement bar giữ rule riêng */
+  html[data-motion] :is(a, button):not(.article-main__back, .announcement-bar__link):dir(rtl):hover > .slideshow-icon--arrow { translate: calc(var(--space-1) * -0.75) 0; }
   .button[aria-busy='true']::after { animation: motion-spin var(--motion-hero) linear infinite; }
 
   /* Menu */
@@ -6907,6 +6928,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   html[data-motion] .site-header__mega-link:dir(rtl):hover { translate: calc(-1 * var(--space-1)) 0; }
   .site-header__submenu .site-header__link { transition: color var(--motion-fast) var(--ease-out), translate var(--motion-fast) var(--ease-out); }
   html[data-motion] .site-header__submenu .site-header__link:hover { color: var(--color-accent); translate: 4px 0; text-decoration: none; }
+  html[data-motion] .site-header__submenu .site-header__link:dir(rtl):hover { translate: calc(-1 * var(--space-1)) 0; }
   [data-testid='header-cart-link'][data-bump] { animation: motion-bump var(--motion-slow) var(--ease-out); }
   .site-header__cart-count { animation: motion-pop var(--motion-base) var(--ease-out); }
 
@@ -6972,9 +6994,7 @@ body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; 
   outline-offset: 3px;
 }
 
-/* 3. Hàng ngang: gốc .full-width, card đầu thẳng mép nội dung, hàng tràn mép phải. 100cqi = bề gốc, không
-   tính thanh cuộn như 100vw. 1280: (100cqi − lề − n × gap) / (n + 0.3) để lộ ≥ 25% card kế.
-   data-static (BE) khi hàng vừa khung: ẩn nút, tiến trình. Không JS: vẫn vuốt, cuộn bàn phím. */
+/* 3. Hàng ngang: card đầu thẳng mép nội dung, tràn mép phải; data-static (BE) ẩn nút, tiến trình */
 .collection-list, .testimonials, .blog-posts, .video-carousel {
   --row-inset: max(var(--page-margin), (100cqi - var(--page-width)) / 2 + var(--page-margin));
   --row-gap: var(--space-4);
@@ -7082,6 +7102,10 @@ scroll-buttons[data-enhanced]:not([data-static]) .carousel-progress { visibility
   border-radius: inherit;
   background: var(--color-foreground);
   translate: calc(var(--scroll-pos, 0) * (1 / var(--scroll-size, 1) - 1) * 100%) 0;
+}
+/* RTL: thumb đứng ở inline-start (cạnh phải), chạy về trái nên đảo dấu translate (foundation §34) */
+.carousel-progress__thumb:dir(rtl) {
+  translate: calc(var(--scroll-pos, 0) * (1 - 1 / var(--scroll-size, 1)) * 100%) 0;
 }
 .block-container--dark .carousel-progress { background: color-mix(in srgb, var(--color-background-dark-foreground) 12%, transparent); }
 .block-container--dark .carousel-progress__thumb { background: var(--color-background-dark-foreground); }
