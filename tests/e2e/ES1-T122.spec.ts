@@ -680,7 +680,8 @@ test.describe('ES1-T122 AC6 testimonials đo và a11y', () => {
   test.beforeEach(({}, info) => desktopOnly(info.project.name));
   guardConsole();
 
-  const SIZE: Record<Width, [number, number]> = { 360: [272, 161], 768: [307, 182], 1280: [360, 213], 1920: [456, 270] };
+  // Ảnh 16 / 9 (foundation §36, ES1-T580): cao = rộng × 9 / 16.
+  const SIZE: Record<Width, [number, number]> = { 360: [272, 153], 768: [307, 172.7], 1280: [360, 202.5], 1920: [456, 256.5] };
 
   for (const width of WIDTHS) {
     test(`TC-24 AC6 ${width}: card ${SIZE[width][0]}, ảnh ${SIZE[width][0]} × ${SIZE[width][1]}`, async ({ page }) => {

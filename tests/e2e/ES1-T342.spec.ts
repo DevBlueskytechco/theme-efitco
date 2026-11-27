@@ -116,12 +116,12 @@ test.describe('ES1-T342 featured product (TE-13 AC6)', () => {
     await noOverflow(page);
   });
 
-  test('1280: 2 cột 580 | 80 | 580, ảnh 580 × 566', async ({ page }) => {
+  test('1280: 2 cột 580 | 80 | 580, ảnh 580 × 580 (1 / 1, foundation §36)', async ({ page }) => {
     const scope = await featured(page, 1280);
     const item = await box(tid(scope, 'featured-product-media-item').first());
     near(item.x, 20, 'mép trái nội dung');
     near(item.width, 580, 'ảnh rộng');
-    near(item.height, 566, 'ảnh cao');
+    near(item.height, 580, 'ảnh cao (1 / 1)');
     const title = await box(tid(scope, 'featured-product-title'));
     near(title.x, 680, 'cột chi tiết bắt đầu sau khoảng 80');
   });
@@ -231,7 +231,7 @@ test.describe('ES1-T342 FAQ (TE-7 AC2, AC7)', () => {
     const s2 = await box(tid(scope, 'faq-stat-2'));
     expect(image.y).toBeGreaterThanOrEqual(list.y + list.height);
     near(image.width, 320, 'ảnh rộng');
-    near(image.height, 341, 'ảnh cao (509 / 542)');
+    near(image.height, 240, 'ảnh cao (4 / 3, foundation §36)');
     near(image.y + image.height - s1.y, 48, 'ô đè đáy ảnh');
     near(s1.x, image.x + 12, 'ô 1 lùi 12');
     near(s1.width, 142, 'ô 1');
@@ -254,14 +254,14 @@ test.describe('ES1-T342 FAQ (TE-7 AC2, AC7)', () => {
     await noOverflow(page);
   });
 
-  test('1280: 580 | 80 | 580, ảnh 442 × 471, ô 225 cách đáy 40', async ({ page }) => {
+  test('1280: 580 | 80 | 580, ảnh 442 × 331.5 (4 / 3), ô 225 cách đáy 40', async ({ page }) => {
     const scope = await faq(page, 1280);
     const list = await box(tid(scope, 'faq-list'));
     const image = await box(tid(scope, 'faq-image'));
     const s1 = await box(tid(scope, 'faq-stat-1'));
     near(list.width, 580, 'cột câu hỏi');
     near(image.width, 442, 'ảnh rộng');
-    near(image.height, 471, 'ảnh cao');
+    near(image.height, 442 * 3 / 4, 'ảnh cao (4 / 3, foundation §36)');
     near(image.x + image.width, 1260, 'ảnh sát mép cuối');
     near(s1.x, 680, 'ô 1 mép đầu cột');
     near(s1.width, 225, 'ô 1');
